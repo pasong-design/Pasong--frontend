@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PASONG — Secure Checkout</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07090b;color:#fff;font-family:Arial,sans-serif}header{height:76px;border-bottom:1px solid #272b30;display:flex;align-items:center;padding:0 6%}.logo{font-size:27px;font-weight:900}.logo span{color:#ffb414}.logo small{display:block;font-size:7px;letter-spacing:4px;color:#888}.wrap{max-width:1050px;width:90%;margin:42px auto}.back{color:#ffb414;text-decoration:none}.layout{display:grid;grid-template-columns:1.3fr .8fr;gap:24px;margin-top:20px}.box{background:#111519;border:1px solid #2b3036;border-radius:14px;padding:25px}.box h1,.box h2{margin-top:0}.field{margin:15px 0}.field label{display:block;color:#bbb;font-size:13px;margin-bottom:7px}.field input{width:100%;padding:13px;border-radius:9px;border:1px solid #353b42;background:#080b0e;color:#fff;outline:none}.methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pay{padding:16px 8px;border-radius:10px;border:1px solid #3b4148;background:#171b20;color:#fff;cursor:pointer;font-weight:800}.pay.active{border-color:#ffb414;background:#2a210f;color:#ffb414}.phone{display:none}.phone.show{display:block}.submit{width:100%;margin-top:22px;padding:15px;border:0;border-radius:10px;background:#ffb414;color:#111;font-weight:900;cursor:pointer}.note{color:#888;font-size:12px;margin-top:12px}.item{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #292e34}.total{display:flex;justify-content:space-between;font-size:20px;margin-top:20px}.total b{color:#ffb414}.status{margin-top:15px;color:#ffb414;font-size:13px}.success{display:none;margin-top:18px;padding:16px;border:1px solid #5c4313;border-radius:10px;background:#1b1409}.download{display:block;margin-top:12px;padding:12px;background:#ffb414;color:#111;text-align:center;text-decoration:none;border-radius:9px;font-weight:900}.secure{color:#8d949b;font-size:12px;margin-top:18px}
+@media(max-width:750px){.layout{grid-template-columns:1fr}.methods{grid-template-columns:1fr}.wrap{margin:25px auto}}
+</style>
+</head>
+<body>
+<header><a class="logo" href="music-store.html">◉ PA<span>SONG</span><small>MUSIC MARKETPLACE</small></a></header>
+<main class="wrap">
+<a class="back" href="music-store.html">← Back to Music Store</a>
+<div class="layout">
+<section class="box">
+<h1>Secure Checkout</h1>
+<p style="color:#999">Choose how you want to pay for your music.</p>
+<div class="field"><label>Full Name</label><input id="name" placeholder="Your name"></div>
+<div class="field"><label>Email Address</label><input id="email" type="email" placeholder="you@example.com"></div>
+<div class="field"><label>Mobile Money / Payment Phone</label><input id="phone" placeholder="07XXXXXXXX"></div>
+<h2>Payment Method</h2>
+<div class="methods">
+<button class="pay active" data-method="MTN MoMo" onclick="selectMethod(this)">🟡<br>MTN MoMo</button>
+<button class="pay" data-method="Airtel Money" onclick="selectMethod(this)">🔴<br>Airtel Money</button>
+<button class="pay" data-method="Card" onclick="selectMethod(this)">💳<br>Card</button>
+</div>
+<div id="phoneHelp" class="phone show">
+<p class="note">For Mobile Money, the payment request will be sent to this number.</p>
+</div>
+<button class="submit" onclick="startPayment()">Continue to Payment</button>
+<div id="status" class="status"></div>
+<div id="success" class="success">
+<b>Payment confirmation</b>
+<p style="color:#aaa">Your purchase will be released only after the payment is confirmed by the PASONG server.</p>
+<a class="download" href="#" onclick="alert('Download will become available after successful payment.')">Download Purchased Music</a>
+</div>
+<p class="secure">🔒 Your payment credentials are never stored in this HTML. API secret keys must stay on the server.</p>
+</section>
+<aside class="box">
+<h2>Your Order</h2>
+<div class="item"><span>Kube<br><small style="color:#888">Triple Jokerman</small></span><b>UGX 2,000</b></div>
+<div class="item"><span>Digital delivery</span><b>Free</b></div>
+<div class="total"><span>Total</span><b>UGX 2,000</b></div>
+</aside>
+</div>
+</main>
+<script>
+let method="MTN MoMo";
+function selectMethod(btn){
+ document.querySelectorAll(".pay").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active"); method=btn.dataset.method;
+ document.getElementById("phoneHelp").classList.toggle("show",method!=="Card");
+}
+function startPayment(){
+ const n=document.getElementById("name").value.trim(),e=document.getElementById("email").value.trim(),p=document.getElementById("phone").value.trim(),s=document.getElementById("status");
+ if(!n||!e){s.textContent="Please enter your name and email.";return}
+ if(method!=="Card"&&!p){s.textContent="Please enter your payment phone number.";return}
+ s.textContent="Selected "+method+". API connection is ready for the backend integration.";
+}
+</script>
+</body>
+</html>

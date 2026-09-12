@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PASONG — Upload Song</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#07090b;color:#fff}
+a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}
+header{height:76px;border-bottom:1px solid #272b30;display:flex;align-items:center;padding:0 5%;gap:24px;background:#07090b;position:sticky;top:0;z-index:10}
+.logo{font-size:27px;font-weight:900}.logo span{color:#ffb414}.logo small{display:block;font-size:7px;letter-spacing:4px;color:#888}
+.container{width:92%;max-width:850px;margin:35px auto}
+.box{background:#111519;border:1px solid #292f35;border-radius:16px;padding:25px}
+h1{margin-top:0}.sub{color:#999}
+.field{margin:18px 0}label{display:block;font-weight:800;margin-bottom:8px}
+input,textarea{width:100%;background:#15191e;border:1px solid #343941;border-radius:10px;padding:13px;color:#fff;outline:none}
+textarea{min-height:110px;resize:vertical}
+input[type=file]{padding:10px}
+.contract{background:#0c1014;border:1px solid #343941;border-radius:10px;padding:15px;line-height:1.6;color:#bbb}
+.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px}.check input{width:auto;margin-top:4px}
+button{width:100%;border:0;border-radius:10px;padding:14px;background:#ffb414;color:#111;font-weight:900;cursor:pointer;margin-top:20px}
+.status{margin-top:15px;color:#ffb414;white-space:pre-wrap}
+.back{display:inline-block;margin-bottom:18px;color:#ffb414;font-weight:800}
+.note{font-size:12px;color:#888;margin-top:8px}
+@media(max-width:600px){header{padding:0 4%}.container{width:94%}.box{padding:18px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">◉ PA<span>SONG</span><small>MUSIC MARKETPLACE</small></a>
+</header>
+
+<main class="container">
+<a class="back" href="index.html">← Back to PASONG</a>
+<section class="box">
+<h1>Upload Your Song</h1>
+<p class="sub">Share your music on PASONG and reach new listeners.</p>
+
+<div class="field">
+<label>Artist Name</label>
+<input id="artistName" placeholder="Enter artist name" maxlength="100">
+</div>
+
+<div class="field">
+<label>Song Title</label>
+<input id="songTitle" placeholder="Enter song title" maxlength="150">
+</div>
+
+<div class="field">
+<label>Description</label>
+<textarea id="description" placeholder="Tell listeners about your song"></textarea>
+</div>
+
+<div class="field">
+<label>Song File</label>
+<input id="songFile" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav">
+<div class="note">MP3 or WAV only. Maximum 10 MB.</div>
+</div>
+
+<div class="field">
+<label>Cover Image</label>
+<input id="coverFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+<div class="note">JPG, PNG or WEBP. Maximum 5 MB.</div>
+</div>
+
+<div class="field">
+<label>PASONG Upload Contract</label>
+<div class="contract">
+By uploading this song, you confirm that you have the right to upload and distribute the music and artwork, that the information you provide is accurate, and that your upload does not knowingly violate another person's rights. PASONG may review, reject or remove content that violates its rules or applicable law.
+</div>
+<label class="check">
+<input id="contractAccepted" type="checkbox">
+<span>I have read and agree to the PASONG upload contract.</span>
+</label>
+</div>
+
+<button id="uploadBtn" onclick="uploadSong()">Upload Song</button>
+<div id="status" class="status"></div>
+</section>
+</main>
+
+<script>
+const API_BASE = "https://pasong-api.vercel.app";
+
+function setStatus(msg){ document.getElementById("status").textContent = msg; }
+
+async function uploadToCloudinary(file, info){
+  const form = new FormData();
+  form.append("file", file);
+  form.append("api_key", info.apiKey);
+  form.append("timestamp", info.timestamp);
+  form.append("signature", info.signature);
+  form.append("folder", info.folder);
+  form.append("public_id", info.publicId);
+  form.append("tags", info.tags);
+  form.append("context", info.context);
+
+  const r = await fetch(info.uploadUrl, {method:"POST", body:form});
+  const data = await r.json();
+  if(!r.ok || data.error) throw new Error(data.error?.message || "Cloudinary upload failed.");
+  return data;
+}
+
+async function uploadSong(){
+  const artistName = document.getElementById("artistName").value.trim();
+  const songTitle = document.getElementById("songTitle").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const songFile = document.getElementById("songFile").files[0];
+  const coverFile = document.getElementById("coverFile").files[0];
+  const contractAccepted = document.getElementById("contractAccepted").checked;
+  const btn = document.getElementById("uploadBtn");
+
+  if(!artistName || !songTitle) return setStatus("Please enter the artist name and song title.");
+  if(!songFile) return setStatus("Please choose an MP3 or WAV song.");
+  if(songFile.size > 10 * 1024 * 1024) return setStatus("Song file is larger than 10 MB.");
+  if(!/\.(mp3|wav)$/i.test(songFile.name)) return setStatus("Only MP3 and WAV files are allowed.");
+  if(coverFile && coverFile.size > 5 * 1024 * 1024) return setStatus("Cover image is larger than 5 MB.");
+  if(coverFile && !/\.(jpg|jpeg|png|webp)$/i.test(coverFile.name)) return setStatus("Cover must be JPG, PNG or WEBP.");
+  if(!contractAccepted) return setStatus("You must read and agree to the PASONG upload contract.");
+
+  btn.disabled = true;
+  btn.textContent = "Preparing upload...";
+  setStatus("Preparing secure upload...");
+
+  try {
+    const sign = await fetch(API_BASE + "/api/songs/sign-upload", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        artistName,
+        songTitle,
+        description,
+        contractAccepted:true,
+        fileName:songFile.name,
+        fileSize:songFile.size,
+        coverFileName:coverFile ? coverFile.name : "",
+        coverFileSize:coverFile ? coverFile.size : 0
+      })
+    });
+
+    const info = await sign.json();
+    if(!sign.ok) throw new Error(info.error || "Could not prepare upload.");
+
+    btn.textContent = "Uploading song...";
+    setStatus("Uploading song to PASONG storage...");
+
+    await uploadToCloudinary(songFile, info.song);
+
+    if(coverFile){
+      btn.textContent = "Uploading cover...";
+      setStatus("Song uploaded. Uploading cover image...");
+      await uploadToCloudinary(coverFile, info.cover);
+    }
+
+    btn.textContent = "Upload complete";
+    setStatus("✅ Your song has been uploaded successfully and will appear in the PASONG Music Store.");
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = "Upload Song";
+    setStatus("❌ " + e.message);
+  }
+}
+</script>
+</body>
+</html>
