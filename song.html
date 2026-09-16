@@ -1,1 +1,319 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Song Details</title><link rel="stylesheet" href="assets/style.css"></head><body><header><b>PASONG</b><a href="store.html">Music Store</a></header><main id="songPage"><h1>Song Details</h1><p>Listen to the preview, then buy for UGX 500.</p></main><script src="config.js"></script><script src="assets/app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PASONG — Song Details</title>
+
+  <link rel="stylesheet" href="assets/style.css">
+
+  <style>
+    .song-card {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 25px;
+      border-radius: 18px;
+      background: #171323;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .song-cover {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 25px;
+      border-radius: 16px;
+      background: #211b32;
+    }
+
+    .song-title {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .song-meta {
+      opacity: .8;
+      margin-bottom: 20px;
+    }
+
+    .preview-box {
+      margin: 25px 0;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    .buy-button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg,#8b5cf6,#ec4899);
+      color: white;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .buy-button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.06);
+    }
+
+    .error {
+      color: #ff8fa3;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <b>PASONG</b>
+  <a href="store.html">Music Store</a>
+</header>
+
+<main id="songPage">
+
+  <div class="song-card">
+
+    <p id="loading">Loading song...</p>
+
+    <div id="songContent" style="display:none;">
+
+      <img
+        id="songCover"
+        class="song-cover"
+        src=""
+        alt="Song cover"
+      >
+
+      <h1 id="songTitle" class="song-title"></h1>
+
+      <p id="songMeta" class="song-meta"></p>
+
+      <p id="songDescription"></p>
+
+      <div class="preview-box">
+        <h3>20-Second Preview</h3>
+
+        <audio
+          id="previewPlayer"
+          controls
+          preload="metadata">
+        </audio>
+      </div>
+
+      <button
+        id="buyButton"
+        class="buy-button"
+        type="button">
+        Buy Song — UGX 500
+      </button>
+
+      <div id="status" class="status" style="display:none;"></div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<script src="config.js"></script>
+
+<script>
+  const API_BASE =
+    (window.PASONG_CONFIG && window.PASONG_CONFIG.API_BASE) ||
+    "https://pasong-api.vercel.app";
+
+  const params = new URLSearchParams(window.location.search);
+  const songId = params.get("id");
+
+  const loading = document.getElementById("loading");
+  const songContent = document.getElementById("songContent");
+  const songCover = document.getElementById("songCover");
+  const songTitle = document.getElementById("songTitle");
+  const songMeta = document.getElementById("songMeta");
+  const songDescription = document.getElementById("songDescription");
+  const previewPlayer = document.getElementById("previewPlayer");
+  const buyButton = document.getElementById("buyButton");
+  const statusBox = document.getElementById("status");
+
+  function showError(message) {
+    loading.textContent = message;
+    loading.className = "error";
+  }
+
+  function getSongFromResponse(data) {
+    if (!data) return null;
+
+    if (data.song) return data.song;
+
+    if (data.data && data.data.song) {
+      return data.data.song;
+    }
+
+    if (Array.isArray(data.songs)) {
+      return data.songs.find(song => song.id === songId);
+    }
+
+    if (Array.isArray(data.data)) {
+      return data.data.find(song => song.id === songId);
+    }
+
+    return null;
+  }
+
+  async function loadSong() {
+
+    if (!songId) {
+      showError("No song ID was provided.");
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+        API_BASE + "/api/songs/" + encodeURIComponent(songId)
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Song could not be loaded. Server returned " +
+          response.status
+        );
+      }
+
+      const data = await response.json();
+
+      const song = getSongFromResponse(data);
+
+      if (!song) {
+        throw new Error("Song was not found.");
+      }
+
+      const title =
+        song.title ||
+        song.songTitle ||
+        "Untitled Song";
+
+      const genre =
+        song.genre ||
+        "Music";
+
+      const price =
+        song.price ||
+        500;
+
+      const currency =
+        song.currency ||
+        "UGX";
+
+      const coverUrl =
+        song.cover_url ||
+        song.coverUrl ||
+        "";
+
+      const audioUrl =
+        song.preview_url ||
+        song.previewUrl ||
+        song.audio_url ||
+        song.audioUrl ||
+        "";
+
+      songTitle.textContent = title;
+
+      songMeta.textContent =
+        genre + " • " +
+        price + " " +
+        currency;
+
+      songDescription.textContent =
+        song.description ||
+        "Listen to the preview, then purchase this song.";
+
+      if (coverUrl) {
+        songCover.src = coverUrl;
+        songCover.style.display = "block";
+      } else {
+        songCover.style.display = "none";
+      }
+
+      if (audioUrl) {
+        previewPlayer.src = audioUrl;
+      } else {
+        previewPlayer.style.display = "none";
+      }
+
+      buyButton.textContent =
+        "Buy Song — " + price + " " + currency;
+
+      loading.style.display = "none";
+      songContent.style.display = "block";
+
+      setupPreviewLimit();
+
+    } catch (error) {
+
+      console.error("SONG PAGE ERROR:", error);
+
+      showError(
+        error.message ||
+        "Unable to load this song."
+      );
+    }
+  }
+
+  function setupPreviewLimit() {
+
+    let previewStarted = false;
+
+    previewPlayer.addEventListener("timeupdate", function() {
+
+      if (previewPlayer.currentTime >= 20) {
+
+        previewPlayer.pause();
+
+        previewPlayer.currentTime = 20;
+
+        if (!previewStarted) {
+          previewStarted = true;
+          showStatus(
+            "Preview finished. Purchase the song to continue listening."
+          );
+        }
+      }
+
+    });
+
+  }
+
+  function showStatus(message) {
+
+    statusBox.textContent = message;
+    statusBox.style.display = "block";
+  }
+
+  buyButton.addEventListener("click", function() {
+
+    showStatus(
+      "Purchase system is ready to be connected to MTN MoMo / Airtel Money."
+    );
+
+  });
+
+  loadSong();
+</script>
+
+</body>
+</html>
