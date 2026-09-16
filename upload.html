@@ -114,6 +114,8 @@
       padding: 12px;
       border-radius: 9px;
       display: none;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     .status.success {
@@ -170,9 +172,7 @@
 
       <div class="price-box">
         <strong>Song price: UGX 500</strong>
-
         <br>
-
         <small>
           PASONG will use the marketplace revenue-sharing
           system for qualifying sales.
@@ -180,9 +180,7 @@
       </div>
 
       <div class="field">
-        <label for="artistName">
-          Artist Name
-        </label>
+        <label for="artistName">Artist Name</label>
 
         <input
           id="artistName"
@@ -194,9 +192,7 @@
       </div>
 
       <div class="field">
-        <label for="songTitle">
-          Song Title
-        </label>
+        <label for="songTitle">Song Title</label>
 
         <input
           id="songTitle"
@@ -208,15 +204,10 @@
       </div>
 
       <div class="field">
-        <label for="genre">
-          Genre
-        </label>
+        <label for="genre">Genre</label>
 
         <select id="genre">
-          <option value="">
-            Select genre
-          </option>
-
+          <option value="">Select genre</option>
           <option value="Afrobeats">Afrobeats</option>
           <option value="Amapiano">Amapiano</option>
           <option value="Bongo">Bongo</option>
@@ -230,9 +221,7 @@
       </div>
 
       <div class="field">
-        <label for="description">
-          Description
-        </label>
+        <label for="description">Description</label>
 
         <textarea
           id="description"
@@ -242,9 +231,7 @@
       </div>
 
       <div class="field">
-        <label for="songFile">
-          Song File
-        </label>
+        <label for="songFile">Song File</label>
 
         <input
           id="songFile"
@@ -259,9 +246,7 @@
       </div>
 
       <div class="field">
-        <label for="coverFile">
-          Cover Image
-        </label>
+        <label for="coverFile">Cover Image</label>
 
         <input
           id="coverFile"
@@ -314,10 +299,7 @@
 
       </div>
 
-      <div
-        id="status"
-        class="status"
-      ></div>
+      <div id="status" class="status"></div>
 
     </div>
   </div>
@@ -329,17 +311,8 @@
 
 <script>
 
-/* =====================================================
-   PASONG API
-   ===================================================== */
-
 const API_URL =
   "https://pasong-api.vercel.app";
-
-
-/* =====================================================
-   FORM ELEMENTS
-   ===================================================== */
 
 const artistName =
   document.getElementById("artistName");
@@ -378,23 +351,14 @@ const statusBox =
   document.getElementById("status");
 
 
-/* =====================================================
-   STATUS
-   ===================================================== */
-
 function showStatus(message, type) {
 
   statusBox.textContent = message;
 
   statusBox.className =
     "status " + type;
-
 }
 
-
-/* =====================================================
-   PROGRESS
-   ===================================================== */
 
 function setProgress(percent, text) {
 
@@ -405,13 +369,8 @@ function setProgress(percent, text) {
 
   progressText.textContent =
     text;
-
 }
 
-
-/* =====================================================
-   FILE VALIDATION
-   ===================================================== */
 
 function validateFiles() {
 
@@ -421,13 +380,11 @@ function validateFiles() {
   const cover =
     coverFile.files[0];
 
-
   if (!song) {
     throw new Error(
       "Please choose a song file."
     );
   }
-
 
   if (!cover) {
     throw new Error(
@@ -435,30 +392,20 @@ function validateFiles() {
     );
   }
 
-
-  if (
-    song.size >
-    10 * 1024 * 1024
-  ) {
+  if (song.size > 10 * 1024 * 1024) {
     throw new Error(
       "Song file must not be larger than 10 MB."
     );
   }
 
-
-  if (
-    cover.size >
-    5 * 1024 * 1024
-  ) {
+  if (cover.size > 5 * 1024 * 1024) {
     throw new Error(
       "Cover image must not be larger than 5 MB."
     );
   }
 
-
   const songName =
     song.name.toLowerCase();
-
 
   if (
     !songName.endsWith(".mp3") &&
@@ -469,10 +416,8 @@ function validateFiles() {
     );
   }
 
-
   const coverName =
     cover.name.toLowerCase();
-
 
   const validCover =
     coverName.endsWith(".jpg") ||
@@ -480,56 +425,36 @@ function validateFiles() {
     coverName.endsWith(".png") ||
     coverName.endsWith(".webp");
 
-
   if (!validCover) {
     throw new Error(
       "Cover must be JPG, JPEG, PNG or WEBP."
     );
   }
 
-
   return {
     song,
     cover
   };
-
 }
 
-
-/* =====================================================
-   READ JSON
-   ===================================================== */
 
 async function readJsonResponse(response) {
 
   const text =
     await response.text();
 
-  let data;
-
-
   try {
 
-    data =
-      JSON.parse(text);
+    return JSON.parse(text);
 
-  } catch (error) {
+  } catch {
 
     throw new Error(
       "PASONG API returned an invalid response."
     );
-
   }
-
-
-  return data;
-
 }
 
-
-/* =====================================================
-   CLOUDINARY UPLOAD
-   ===================================================== */
 
 function uploadToCloudinary(
   file,
@@ -540,91 +465,127 @@ function uploadToCloudinary(
   return new Promise(
     (resolve, reject) => {
 
+      if (!uploadInfo) {
+
+        reject(
+          new Error(
+            "Cloudinary upload information is missing."
+          )
+        );
+
+        return;
+      }
+
+      if (!uploadInfo.uploadUrl) {
+
+        console.error(
+          "Missing Cloudinary uploadUrl:",
+          uploadInfo
+        );
+
+        reject(
+          new Error(
+            "Cloudinary upload URL is missing."
+          )
+        );
+
+        return;
+      }
+
       const formData =
         new FormData();
-
 
       formData.append(
         "file",
         file
       );
 
-
       formData.append(
         "api_key",
         uploadInfo.apiKey
       );
-
 
       formData.append(
         "timestamp",
         uploadInfo.timestamp
       );
 
-
       formData.append(
         "signature",
         uploadInfo.signature
       );
 
+      if (uploadInfo.folder) {
 
-      formData.append(
-        "folder",
-        uploadInfo.folder
-      );
+        formData.append(
+          "folder",
+          uploadInfo.folder
+        );
+      }
 
+      if (uploadInfo.publicId) {
 
-      formData.append(
-        "public_id",
-        uploadInfo.publicId
-      );
+        formData.append(
+          "public_id",
+          uploadInfo.publicId
+        );
+      }
 
+      if (uploadInfo.tags) {
 
-      formData.append(
-        "tags",
-        uploadInfo.tags
-      );
+        formData.append(
+          "tags",
+          uploadInfo.tags
+        );
+      }
 
+      if (uploadInfo.context) {
 
-      formData.append(
-        "context",
-        uploadInfo.context
-      );
-
+        formData.append(
+          "context",
+          uploadInfo.context
+        );
+      }
 
       const xhr =
         new XMLHttpRequest();
 
-
       xhr.open(
         "POST",
-        uploadInfo.uploadUrl
+        uploadInfo.uploadUrl,
+        true
       );
 
+      xhr.timeout = 120000;
 
       xhr.upload.onprogress =
         function(event) {
 
-          if (
-            event.lengthComputable
-          ) {
+          if (event.lengthComputable) {
 
             const percent =
               Math.round(
-                event.loaded /
-                event.total *
-                100
+                (event.loaded /
+                event.total) * 100
               );
 
             onProgress(percent);
-
           }
-
         };
 
 
       xhr.onload =
         function() {
+
+          console.log(
+            "Cloudinary HTTP status:",
+            xhr.status
+          );
+
+          console.log(
+            "Cloudinary response:",
+            xhr.responseText
+          );
 
           if (
             xhr.status >= 200 &&
@@ -639,39 +600,88 @@ function uploadToCloudinary(
                 )
               );
 
-            } catch (error) {
+            } catch {
 
               reject(
                 new Error(
-                  "Invalid Cloudinary response."
+                  "Cloudinary returned an invalid response."
                 )
               );
-
             }
 
           } else {
 
+            let message =
+              "Cloudinary upload failed. HTTP " +
+              xhr.status;
+
+            try {
+
+              const data =
+                JSON.parse(
+                  xhr.responseText
+                );
+
+              if (data.error?.message) {
+
+                message +=
+                  ": " +
+                  data.error.message;
+              }
+
+            } catch {}
+
             reject(
-              new Error(
-                "Cloudinary upload failed. HTTP " +
-                xhr.status
-              )
+              new Error(message)
             );
-
           }
-
         };
 
 
       xhr.onerror =
         function() {
 
-          reject(
-            new Error(
-              "Network error during Cloudinary upload."
-            )
+          console.error(
+            "Cloudinary network error",
+            {
+              url:
+                uploadInfo.uploadUrl,
+
+              status:
+                xhr.status,
+
+              response:
+                xhr.responseText
+            }
           );
 
+          reject(
+            new Error(
+              "Network error during Cloudinary upload. Check the Cloudinary upload URL and browser connection."
+            )
+          );
+        };
+
+
+      xhr.ontimeout =
+        function() {
+
+          reject(
+            new Error(
+              "Cloudinary upload timed out."
+            )
+          );
+        };
+
+
+      xhr.onabort =
+        function() {
+
+          reject(
+            new Error(
+              "Cloudinary upload was aborted."
+            )
+          );
         };
 
 
@@ -679,71 +689,48 @@ function uploadToCloudinary(
 
     }
   );
-
 }
 
-
-/* =====================================================
-   UPLOAD
-   ===================================================== */
 
 uploadButton.addEventListener(
   "click",
   async function() {
 
-    if (
-      uploadButton.disabled
-    ) {
+    if (uploadButton.disabled) {
       return;
     }
-
 
     try {
 
       statusBox.className =
         "status";
 
-
-      if (
-        !artistName.value.trim()
-      ) {
+      if (!artistName.value.trim()) {
 
         throw new Error(
           "Enter the artist name."
         );
-
       }
 
-
-      if (
-        !songTitle.value.trim()
-      ) {
+      if (!songTitle.value.trim()) {
 
         throw new Error(
           "Enter the song title."
         );
-
       }
 
-
-      if (
-        !contractAccepted.checked
-      ) {
+      if (!contractAccepted.checked) {
 
         throw new Error(
           "Please accept the upload contract."
         );
-
       }
-
 
       const files =
         validateFiles();
 
-
       uploadButton.disabled =
         true;
-
 
       setProgress(
         5,
@@ -751,12 +738,9 @@ uploadButton.addEventListener(
       );
 
 
-      /* ===============================================
-         STEP 1 — REQUEST CLOUDINARY SIGNATURE
-         =============================================== */
+      /* STEP 1 */
 
       let signResponse;
-
 
       try {
 
@@ -805,12 +789,11 @@ uploadButton.addEventListener(
             }
           );
 
-      } catch (error) {
+      } catch {
 
         throw new Error(
-          "Could not connect to the PASONG upload API. Please check the API deployment."
+          "Could not connect to the PASONG upload API."
         );
-
       }
 
 
@@ -820,15 +803,28 @@ uploadButton.addEventListener(
         );
 
 
-      if (
-        !signResponse.ok
-      ) {
+      console.log(
+        "PASONG SIGN RESPONSE:",
+        signData
+      );
+
+      console.log(
+        "SONG CLOUDINARY URL:",
+        signData.song?.uploadUrl
+      );
+
+      console.log(
+        "COVER CLOUDINARY URL:",
+        signData.cover?.uploadUrl
+      );
+
+
+      if (!signResponse.ok) {
 
         throw new Error(
           signData.error ||
           "Could not prepare upload."
         );
-
       }
 
 
@@ -840,13 +836,10 @@ uploadButton.addEventListener(
         throw new Error(
           "PASONG API did not return upload information."
         );
-
       }
 
 
-      /* ===============================================
-         STEP 2 — UPLOAD SONG
-         =============================================== */
+      /* STEP 2 — SONG */
 
       setProgress(
         15,
@@ -862,21 +855,16 @@ uploadButton.addEventListener(
 
             setProgress(
               15 +
-              Math.round(
-                percent * 0.45
-              ),
+              Math.round(percent * 0.45),
               "Uploading song " +
               percent +
               "%..."
             );
-
           }
         );
 
 
-      /* ===============================================
-         STEP 3 — UPLOAD COVER
-         =============================================== */
+      /* STEP 3 — COVER */
 
       setProgress(
         65,
@@ -892,21 +880,16 @@ uploadButton.addEventListener(
 
             setProgress(
               65 +
-              Math.round(
-                percent * 0.20
-              ),
+              Math.round(percent * 0.20),
               "Uploading cover " +
               percent +
               "%..."
             );
-
           }
         );
 
 
-      /* ===============================================
-         STEP 4 — SAVE SONG TO SUPABASE
-         =============================================== */
+      /* STEP 4 — SAVE */
 
       setProgress(
         90,
@@ -915,7 +898,6 @@ uploadButton.addEventListener(
 
 
       let createResponse;
-
 
       try {
 
@@ -965,12 +947,11 @@ uploadButton.addEventListener(
             }
           );
 
-      } catch (error) {
+      } catch {
 
         throw new Error(
-          "Song uploaded, but PASONG could not connect to save the song."
+          "Song uploaded, but PASONG could not save the song."
         );
-
       }
 
 
@@ -980,22 +961,15 @@ uploadButton.addEventListener(
         );
 
 
-      if (
-        !createResponse.ok
-      ) {
+      if (!createResponse.ok) {
 
         throw new Error(
           createData.details ||
           createData.error ||
           "Could not save song."
         );
-
       }
 
-
-      /* ===============================================
-         COMPLETE
-         =============================================== */
 
       setProgress(
         100,
@@ -1014,17 +988,11 @@ uploadButton.addEventListener(
 
 
       artistName.value = "";
-
       songTitle.value = "";
-
       genre.value = "";
-
       description.value = "";
-
       songFile.value = "";
-
       coverFile.value = "";
-
       contractAccepted.checked = false;
 
 
@@ -1035,17 +1003,14 @@ uploadButton.addEventListener(
         error
       );
 
-
       showStatus(
         error.message ||
         "Upload failed. Please try again.",
         "error"
       );
 
-
       uploadButton.disabled =
         false;
-
     }
 
   }
