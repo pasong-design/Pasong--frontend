@@ -1,1022 +1,850 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PASONG — Upload Song</title><style>
+*{
+  box-sizing:border-box;
+}
 
-  <title>PASONG — Upload Song</title>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#07070b;
+  color:#fff;
+}
 
-  <link rel="stylesheet" href="assets/style.css">
+a{
+  color:inherit;
+  text-decoration:none;
+}
 
-  <style>
-    .upload-wrap {
-      max-width: 650px;
-      margin: 30px auto;
-      padding: 0 16px;
-    }
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
 
-    .upload-card {
-      background: #11151a;
-      border: 1px solid #242a32;
-      border-radius: 16px;
-      padding: 20px;
-    }
+header{
+  min-height:76px;
+  border-bottom:1px solid #292334;
+  display:flex;
+  align-items:center;
+  padding:0 5%;
+  background:#08070d;
+}
 
-    .upload-card h1 {
-      margin-top: 0;
-    }
+.logo{
+  font-size:27px;
+  font-weight:900;
+  color:#fff;
+}
 
-    .field {
-      margin-bottom: 18px;
-    }
+.logo span{
+  color:#d946ef;
+}
 
-    .field label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: 600;
-    }
+.logo small{
+  display:block;
+  font-size:7px;
+  letter-spacing:4px;
+  color:#888;
+  margin-top:3px;
+}
 
-    .field input,
-    .field textarea,
-    .field select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 9px;
-      border: 1px solid #303640;
-      background: #090b0f;
-      color: white;
-      box-sizing: border-box;
-    }
+.container{
+  width:92%;
+  max-width:850px;
+  margin:35px auto 60px;
+}
 
-    .field textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
+.back{
+  display:inline-block;
+  margin-bottom:18px;
+  color:#c026d3;
+  font-weight:800;
+}
 
-    .contract {
-      background: #090b0f;
-      border: 1px solid #303640;
-      border-radius: 10px;
-      padding: 14px;
-      margin: 20px 0;
-      line-height: 1.5;
-      font-size: 14px;
-    }
+.box{
+  background:#111019;
+  border:1px solid #30283d;
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 10px 35px rgba(0,0,0,.25);
+}
 
-    .contract label {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
+h1{
+  margin-top:0;
+  margin-bottom:10px;
+  font-size:32px;
+}
 
-    .contract input {
-      margin-top: 4px;
-    }
+.sub{
+  color:#999;
+  margin-bottom:25px;
+}
 
-    .upload-button {
-      width: 100%;
-      padding: 14px;
-      border: 0;
-      border-radius: 10px;
-      background: #8b5cf6;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.price-box{
+  background:linear-gradient(135deg,#171124,#21112a);
+  border:1px solid #4b2a5d;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:25px;
+}
 
-    .upload-button:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
+.price-box strong{
+  color:#e879f9;
+  font-size:18px;
+}
 
-    .progress {
-      display: none;
-      margin-top: 18px;
-    }
+.price-box small{
+  display:block;
+  color:#aaa;
+  margin-top:5px;
+}
 
-    .progress-bar {
-      height: 8px;
-      background: #292f38;
-      border-radius: 10px;
-      overflow: hidden;
-    }
+.field{
+  margin:18px 0;
+}
 
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: #8b5cf6;
-      transition: width .3s;
-    }
+label{
+  display:block;
+  font-weight:800;
+  margin-bottom:8px;
+}
 
-    .status {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 9px;
-      display: none;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+input,
+textarea,
+select{
+  width:100%;
+  background:#15141c;
+  border:1px solid #383243;
+  border-radius:10px;
+  padding:13px;
+  color:#fff;
+  outline:none;
+}
 
-    .status.success {
-      display: block;
-      background: #12351f;
-      color: #b9f6c9;
-    }
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#c026d3;
+  box-shadow:0 0 0 2px rgba(192,38,211,.12);
+}
 
-    .status.error {
-      display: block;
-      background: #3a1515;
-      color: #ffbaba;
-    }
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
 
-    .price-box {
-      background: #171b22;
-      padding: 12px;
-      border-radius: 9px;
-      margin-bottom: 18px;
-    }
-  </style>
-</head>
+select{
+  cursor:pointer;
+}
 
-<body>
+input[type=file]{
+  padding:10px;
+}
 
-<header>
+.note{
+  font-size:12px;
+  color:#888;
+  margin-top:8px;
+}
+
+.contract{
+  background:#0c0b11;
+  border:1px solid #383243;
+  border-radius:10px;
+  padding:15px;
+  line-height:1.6;
+  color:#bbb;
+}
+
+.check{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  margin-top:14px;
+}
+
+.check input{
+  width:auto;
+  margin-top:4px;
+}
+
+.check span{
+  color:#ddd;
+  font-size:14px;
+  line-height:1.5;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:10px;
+  padding:14px;
+  background:linear-gradient(90deg,#9333ea,#d946ef);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  margin-top:20px;
+}
+
+button:hover{
+  opacity:.92;
+}
+
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.status{
+  margin-top:15px;
+  color:#e879f9;
+  white-space:pre-wrap;
+  line-height:1.5;
+}
+
+.footer{
+  text-align:center;
+  color:#666;
+  font-size:13px;
+  margin-top:30px;
+}
+
+@media(max-width:600px){
+  header{
+    padding:0 4%;
+  }
+
+  .container{
+    width:94%;
+    margin-top:25px;
+  }
+
+  .box{
+    padding:18px;
+  }
+
+  h1{
+    font-size:27px;
+  }
+}
+</style></head><body><header>
   <a class="logo" href="index.html">
-    ◈ PASONG
+    ◈ PAS<span>ONG</span>
+    <small>MUSIC MARKETPLACE</small>
   </a>
+</header><main class="container"><a class="back" href="index.html">← Back to PASONG</a>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="store.html">Music Store</a>
-    <a href="charts.html">Charts</a>
-    <a href="artists.html">Artists</a>
-    <a href="playlists.html">Playlists</a>
-    <a href="promotion.html">Promotion</a>
-    <a href="upload.html">Upload Music</a>
-    <a href="account.html">Account</a>
-  </nav>
-</header>
+  <section class="box"><h1>Upload Your Song</h1>
 
-<main>
-  <div class="upload-wrap">
+<p class="sub">
+  Upload your music to PASONG and make it available in the Music Store.
+</p>
 
-    <div class="upload-card">
+<div class="price-box">
+  <strong>Song price: UGX 500</strong>
+  <small>
+    PASONG will use the marketplace revenue-sharing system for qualifying sales.
+  </small>
+</div>
 
-      <h1>Upload Your Song</h1>
+<div class="field">
+  <label for="artistName">Artist Name</label>
+  <input
+    id="artistName"
+    type="text"
+    placeholder="Enter artist name"
+    maxlength="100"
+  >
+</div>
 
-      <p>
-        Upload your music to PASONG and make it available
-        in the Music Store.
-      </p>
+<div class="field">
+  <label for="songTitle">Song Title</label>
+  <input
+    id="songTitle"
+    type="text"
+    placeholder="Enter song title"
+    maxlength="150"
+  >
+</div>
 
-      <div class="price-box">
-        <strong>Song price: UGX 500</strong>
-        <br>
-        <small>
-          PASONG will use the marketplace revenue-sharing
-          system for qualifying sales.
-        </small>
-      </div>
+<div class="field">
+  <label for="genre">Genre</label>
+  <select id="genre">
+    <option value="">Select genre</option>
+    <option value="Afrobeats">Afrobeats</option>
+    <option value="Amapiano">Amapiano</option>
+    <option value="Bongo">Bongo</option>
+    <option value="Gengetone">Gengetone</option>
+    <option value="Hip Hop">Hip Hop</option>
+    <option value="Gospel">Gospel</option>
+    <option value="Dancehall">Dancehall</option>
+    <option value="R&B">R&B</option>
+    <option value="Other">Other</option>
+  </select>
+</div>
 
-      <div class="field">
-        <label for="artistName">Artist Name</label>
+<div class="field">
+  <label for="description">Description</label>
+  <textarea
+    id="description"
+    placeholder="Tell listeners about your song..."
+  ></textarea>
+</div>
 
-        <input
-          id="artistName"
-          type="text"
-          maxlength="100"
-          placeholder="Enter artist name"
-          required
-        >
-      </div>
+<div class="field">
+  <label for="songFile">Song File</label>
 
-      <div class="field">
-        <label for="songTitle">Song Title</label>
+  <input
+    id="songFile"
+    type="file"
+    accept=".mp3,.wav,audio/mpeg,audio/wav"
+  >
 
-        <input
-          id="songTitle"
-          type="text"
-          maxlength="150"
-          placeholder="Enter song title"
-          required
-        >
-      </div>
-
-      <div class="field">
-        <label for="genre">Genre</label>
-
-        <select id="genre">
-          <option value="">Select genre</option>
-          <option value="Afrobeats">Afrobeats</option>
-          <option value="Amapiano">Amapiano</option>
-          <option value="Bongo">Bongo</option>
-          <option value="Gengetone">Gengetone</option>
-          <option value="Hip Hop">Hip Hop</option>
-          <option value="Gospel">Gospel</option>
-          <option value="Dancehall">Dancehall</option>
-          <option value="R&B">R&B</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="description">Description</label>
-
-        <textarea
-          id="description"
-          maxlength="500"
-          placeholder="Tell listeners about the song..."
-        ></textarea>
-      </div>
-
-      <div class="field">
-        <label for="songFile">Song File</label>
-
-        <input
-          id="songFile"
-          type="file"
-          accept=".mp3,.wav,audio/mpeg,audio/wav"
-          required
-        >
-
-        <small>
-          MP3 or WAV — maximum 10 MB.
-        </small>
-      </div>
-
-      <div class="field">
-        <label for="coverFile">Cover Image</label>
-
-        <input
-          id="coverFile"
-          type="file"
-          accept=".jpg,.jpeg,.png,.webp,image/*"
-          required
-        >
-
-        <small>
-          JPG, PNG or WEBP — maximum 5 MB.
-        </small>
-      </div>
-
-      <div class="contract">
-        <label>
-          <input
-            id="contractAccepted"
-            type="checkbox"
-          >
-
-          <span>
-            I confirm that I have the right to upload
-            this music and artwork. I understand that
-            PASONG may make the song available for sale
-            after verification.
-          </span>
-        </label>
-      </div>
-
-      <button
-        id="uploadButton"
-        class="upload-button"
-        type="button"
-      >
-        Upload Song
-      </button>
-
-      <div id="progress" class="progress">
-
-        <p id="progressText">
-          Preparing upload...
-        </p>
-
-        <div class="progress-bar">
-          <div
-            id="progressFill"
-            class="progress-fill"
-          ></div>
-        </div>
-
-      </div>
-
-      <div id="status" class="status"></div>
-
-    </div>
+  <div class="note">
+    MP3 or WAV — maximum 10 MB.
   </div>
-</main>
+</div>
 
-<footer>
-  PASONG © 2026
-</footer>
+<div class="field">
+  <label for="coverFile">Cover Image</label>
 
-<script>
+  <input
+    id="coverFile"
+    type="file"
+    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+  >
 
-const API_URL =
-  "https://pasong-api.vercel.app";
+  <div class="note">
+    JPG, PNG or WEBP — maximum 5 MB.
+  </div>
+</div>
 
-const artistName =
-  document.getElementById("artistName");
+<div class="field">
 
-const songTitle =
-  document.getElementById("songTitle");
+  <label>PASONG Upload Contract</label>
 
-const genre =
-  document.getElementById("genre");
+  <div class="contract">
+    By uploading this song, you confirm that you have the right
+    to upload and distribute the music and artwork, that the
+    information you provide is accurate, and that your upload
+    does not knowingly violate another person's rights.
+    PASONG may review, reject or remove content that violates
+    its rules or applicable law.
+  </div>
 
-const description =
-  document.getElementById("description");
+  <label class="check">
+    <input id="contractAccepted" type="checkbox">
 
-const songFile =
-  document.getElementById("songFile");
+    <span>
+      I confirm that I have the right to upload this music and artwork.
+      I understand that PASONG may make the song available for sale
+      after verification.
+    </span>
+  </label>
 
-const coverFile =
-  document.getElementById("coverFile");
+</div>
 
-const contractAccepted =
-  document.getElementById("contractAccepted");
+<button id="uploadBtn" onclick="uploadSong()">
+  Upload Song
+</button>
 
-const uploadButton =
-  document.getElementById("uploadButton");
+<div id="status" class="status"></div>
 
-const progress =
-  document.getElementById("progress");
+  </section>  <div class="footer">
+    PASONG © 2026
+  </div></main><script>
 
-const progressText =
-  document.getElementById("progressText");
+const API_BASE = "https://pasong-api.vercel.app";
 
-const progressFill =
-  document.getElementById("progressFill");
-
-const statusBox =
-  document.getElementById("status");
-
-
-function showStatus(message, type) {
-
-  statusBox.textContent = message;
-
-  statusBox.className =
-    "status " + type;
+function setStatus(message){
+  document.getElementById("status").textContent = message;
 }
 
 
-function setProgress(percent, text) {
+/*
+========================================================
+CLOUDINARY UPLOAD
+IMPORTANT:
+context is sent ONLY when the API provides it.
+This fixes the Cloudinary signature mismatch.
+========================================================
+*/
 
-  progress.style.display = "block";
+async function uploadToCloudinary(file, info){
 
-  progressFill.style.width =
-    percent + "%";
+  const form = new FormData();
 
-  progressText.textContent =
-    text;
-}
+  form.append("file", file);
+  form.append("api_key", info.apiKey);
+  form.append("timestamp", info.timestamp);
+  form.append("signature", info.signature);
+  form.append("folder", info.folder);
+  form.append("public_id", info.publicId);
+  form.append("tags", info.tags);
 
-
-function validateFiles() {
-
-  const song =
-    songFile.files[0];
-
-  const cover =
-    coverFile.files[0];
-
-  if (!song) {
-    throw new Error(
-      "Please choose a song file."
-    );
+  // Only send context when it was included in the signed request.
+  if(info.context){
+    form.append("context", info.context);
   }
 
-  if (!cover) {
-    throw new Error(
-      "Please choose a cover image."
-    );
-  }
-
-  if (song.size > 10 * 1024 * 1024) {
-    throw new Error(
-      "Song file must not be larger than 10 MB."
-    );
-  }
-
-  if (cover.size > 5 * 1024 * 1024) {
-    throw new Error(
-      "Cover image must not be larger than 5 MB."
-    );
-  }
-
-  const songName =
-    song.name.toLowerCase();
-
-  if (
-    !songName.endsWith(".mp3") &&
-    !songName.endsWith(".wav")
-  ) {
-    throw new Error(
-      "Only MP3 and WAV songs are allowed."
-    );
-  }
-
-  const coverName =
-    cover.name.toLowerCase();
-
-  const validCover =
-    coverName.endsWith(".jpg") ||
-    coverName.endsWith(".jpeg") ||
-    coverName.endsWith(".png") ||
-    coverName.endsWith(".webp");
-
-  if (!validCover) {
-    throw new Error(
-      "Cover must be JPG, JPEG, PNG or WEBP."
-    );
-  }
-
-  return {
-    song,
-    cover
-  };
-}
-
-
-async function readJsonResponse(response) {
-
-  const text =
-    await response.text();
-
-  try {
-
-    return JSON.parse(text);
-
-  } catch {
-
-    throw new Error(
-      "PASONG API returned an invalid response."
-    );
-  }
-}
-
-
-function uploadToCloudinary(
-  file,
-  uploadInfo,
-  onProgress
-) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      if (!uploadInfo) {
-
-        reject(
-          new Error(
-            "Cloudinary upload information is missing."
-          )
-        );
-
-        return;
-      }
-
-      if (!uploadInfo.uploadUrl) {
-
-        console.error(
-          "Missing Cloudinary uploadUrl:",
-          uploadInfo
-        );
-
-        reject(
-          new Error(
-            "Cloudinary upload URL is missing."
-          )
-        );
-
-        return;
-      }
-
-      const formData =
-        new FormData();
-
-      formData.append(
-        "file",
-        file
-      );
-
-      formData.append(
-        "api_key",
-        uploadInfo.apiKey
-      );
-
-      formData.append(
-        "timestamp",
-        uploadInfo.timestamp
-      );
-
-      formData.append(
-        "signature",
-        uploadInfo.signature
-      );
-
-      if (uploadInfo.folder) {
-
-        formData.append(
-          "folder",
-          uploadInfo.folder
-        );
-      }
-
-      if (uploadInfo.publicId) {
-
-        formData.append(
-          "public_id",
-          uploadInfo.publicId
-        );
-      }
-
-      if (uploadInfo.tags) {
-
-        formData.append(
-          "tags",
-          uploadInfo.tags
-        );
-      }
-
-      if (uploadInfo.context) {
-
-        formData.append(
-          "context",
-          uploadInfo.context
-        );
-      }
-
-      const xhr =
-        new XMLHttpRequest();
-
-      xhr.open(
-        "POST",
-        uploadInfo.uploadUrl,
-        true
-      );
-
-      xhr.timeout = 120000;
-
-      xhr.upload.onprogress =
-        function(event) {
-
-          if (event.lengthComputable) {
-
-            const percent =
-              Math.round(
-                (event.loaded /
-                event.total) * 100
-              );
-
-            onProgress(percent);
-          }
-        };
-
-
-      xhr.onload =
-        function() {
-
-          console.log(
-            "Cloudinary HTTP status:",
-            xhr.status
-          );
-
-          console.log(
-            "Cloudinary response:",
-            xhr.responseText
-          );
-
-          if (
-            xhr.status >= 200 &&
-            xhr.status < 300
-          ) {
-
-            try {
-
-              resolve(
-                JSON.parse(
-                  xhr.responseText
-                )
-              );
-
-            } catch {
-
-              reject(
-                new Error(
-                  "Cloudinary returned an invalid response."
-                )
-              );
-            }
-
-          } else {
-
-            let message =
-              "Cloudinary upload failed. HTTP " +
-              xhr.status;
-
-            try {
-
-              const data =
-                JSON.parse(
-                  xhr.responseText
-                );
-
-              if (data.error?.message) {
-
-                message +=
-                  ": " +
-                  data.error.message;
-              }
-
-            } catch {}
-
-            reject(
-              new Error(message)
-            );
-          }
-        };
-
-
-      xhr.onerror =
-        function() {
-
-          console.error(
-            "Cloudinary network error",
-            {
-              url:
-                uploadInfo.uploadUrl,
-
-              status:
-                xhr.status,
-
-              response:
-                xhr.responseText
-            }
-          );
-
-          reject(
-            new Error(
-              "Network error during Cloudinary upload. Check the Cloudinary upload URL and browser connection."
-            )
-          );
-        };
-
-
-      xhr.ontimeout =
-        function() {
-
-          reject(
-            new Error(
-              "Cloudinary upload timed out."
-            )
-          );
-        };
-
-
-      xhr.onabort =
-        function() {
-
-          reject(
-            new Error(
-              "Cloudinary upload was aborted."
-            )
-          );
-        };
-
-
-      xhr.send(formData);
-
+  const response = await fetch(
+    info.uploadUrl,
+    {
+      method:"POST",
+      body:form
     }
   );
+
+  let data;
+
+  try{
+    data = await response.json();
+  }
+  catch(error){
+    throw new Error(
+      "Cloudinary returned an invalid response. Please try again."
+    );
+  }
+
+  if(!response.ok || data.error){
+
+    throw new Error(
+      data.error?.message ||
+      "Cloudinary upload failed."
+    );
+
+  }
+
+  return data;
 }
 
 
-uploadButton.addEventListener(
-  "click",
-  async function() {
+/*
+========================================================
+MAIN UPLOAD
+========================================================
+*/
 
-    if (uploadButton.disabled) {
+async function uploadSong(){
+
+  const artistName =
+    document.getElementById("artistName").value.trim();
+
+  const songTitle =
+    document.getElementById("songTitle").value.trim();
+
+  const genre =
+    document.getElementById("genre").value;
+
+  const description =
+    document.getElementById("description").value.trim();
+
+  const songFile =
+    document.getElementById("songFile").files[0];
+
+  const coverFile =
+    document.getElementById("coverFile").files[0];
+
+  const contractAccepted =
+    document.getElementById("contractAccepted").checked;
+
+  const btn =
+    document.getElementById("uploadBtn");
+
+
+  /*
+  -----------------------------
+  VALIDATION
+  -----------------------------
+  */
+
+  if(!artistName){
+
+    setStatus("Please enter the artist name.");
+
+    return;
+  }
+
+
+  if(!songTitle){
+
+    setStatus("Please enter the song title.");
+
+    return;
+  }
+
+
+  if(!songFile){
+
+    setStatus("Please choose an MP3 or WAV song.");
+
+    return;
+  }
+
+
+  if(songFile.size > 10 * 1024 * 1024){
+
+    setStatus(
+      "Song file is larger than 10 MB."
+    );
+
+    return;
+  }
+
+
+  if(!/\.(mp3|wav)$/i.test(songFile.name)){
+
+    setStatus(
+      "Only MP3 and WAV files are allowed."
+    );
+
+    return;
+  }
+
+
+  if(coverFile){
+
+    if(coverFile.size > 5 * 1024 * 1024){
+
+      setStatus(
+        "Cover image is larger than 5 MB."
+      );
+
       return;
     }
 
-    try {
 
-      statusBox.className =
-        "status";
+    if(!/\.(jpg|jpeg|png|webp)$/i.test(coverFile.name)){
 
-      if (!artistName.value.trim()) {
-
-        throw new Error(
-          "Enter the artist name."
-        );
-      }
-
-      if (!songTitle.value.trim()) {
-
-        throw new Error(
-          "Enter the song title."
-        );
-      }
-
-      if (!contractAccepted.checked) {
-
-        throw new Error(
-          "Please accept the upload contract."
-        );
-      }
-
-      const files =
-        validateFiles();
-
-      uploadButton.disabled =
-        true;
-
-      setProgress(
-        5,
-        "Preparing upload..."
+      setStatus(
+        "Cover must be JPG, PNG or WEBP."
       );
 
-
-      /* STEP 1 */
-
-      let signResponse;
-
-      try {
-
-        signResponse =
-          await fetch(
-            API_URL +
-            "/api/songs/sign-upload",
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body: JSON.stringify({
-
-                artistName:
-                  artistName.value.trim(),
-
-                songTitle:
-                  songTitle.value.trim(),
-
-                description:
-                  description.value.trim(),
-
-                genre:
-                  genre.value,
-
-                contractAccepted:
-                  true,
-
-                fileName:
-                  files.song.name,
-
-                fileSize:
-                  files.song.size,
-
-                coverFileName:
-                  files.cover.name,
-
-                coverFileSize:
-                  files.cover.size
-
-              })
-            }
-          );
-
-      } catch {
-
-        throw new Error(
-          "Could not connect to the PASONG upload API."
-        );
-      }
-
-
-      const signData =
-        await readJsonResponse(
-          signResponse
-        );
-
-
-      console.log(
-        "PASONG SIGN RESPONSE:",
-        signData
-      );
-
-      console.log(
-        "SONG CLOUDINARY URL:",
-        signData.song?.uploadUrl
-      );
-
-      console.log(
-        "COVER CLOUDINARY URL:",
-        signData.cover?.uploadUrl
-      );
-
-
-      if (!signResponse.ok) {
-
-        throw new Error(
-          signData.error ||
-          "Could not prepare upload."
-        );
-      }
-
-
-      if (
-        !signData.song ||
-        !signData.cover
-      ) {
-
-        throw new Error(
-          "PASONG API did not return upload information."
-        );
-      }
-
-
-      /* STEP 2 — SONG */
-
-      setProgress(
-        15,
-        "Uploading song..."
-      );
-
-
-      const songUpload =
-        await uploadToCloudinary(
-          files.song,
-          signData.song,
-          function(percent) {
-
-            setProgress(
-              15 +
-              Math.round(percent * 0.45),
-              "Uploading song " +
-              percent +
-              "%..."
-            );
-          }
-        );
-
-
-      /* STEP 3 — COVER */
-
-      setProgress(
-        65,
-        "Uploading cover..."
-      );
-
-
-      const coverUpload =
-        await uploadToCloudinary(
-          files.cover,
-          signData.cover,
-          function(percent) {
-
-            setProgress(
-              65 +
-              Math.round(percent * 0.20),
-              "Uploading cover " +
-              percent +
-              "%..."
-            );
-          }
-        );
-
-
-      /* STEP 4 — SAVE */
-
-      setProgress(
-        90,
-        "Saving song to PASONG..."
-      );
-
-
-      let createResponse;
-
-      try {
-
-        createResponse =
-          await fetch(
-            API_URL +
-            "/api/songs/create",
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body: JSON.stringify({
-
-                songId:
-                  signData.song.songId,
-
-                title:
-                  songTitle.value.trim(),
-
-                description:
-                  description.value.trim(),
-
-                genre:
-                  genre.value,
-
-                cover_url:
-                  coverUpload.secure_url ||
-                  coverUpload.url ||
-                  "",
-
-                audio_url:
-                  songUpload.secure_url ||
-                  songUpload.url ||
-                  "",
-
-                file_size:
-                  files.song.size,
-
-                duration_seconds:
-                  0
-
-              })
-            }
-          );
-
-      } catch {
-
-        throw new Error(
-          "Song uploaded, but PASONG could not save the song."
-        );
-      }
-
-
-      const createData =
-        await readJsonResponse(
-          createResponse
-        );
-
-
-      if (!createResponse.ok) {
-
-        throw new Error(
-          createData.details ||
-          createData.error ||
-          "Could not save song."
-        );
-      }
-
-
-      setProgress(
-        100,
-        "Upload complete!"
-      );
-
-
-      showStatus(
-        "Song uploaded successfully! It is now in the PASONG Music Store.",
-        "success"
-      );
-
-
-      uploadButton.textContent =
-        "Upload Complete";
-
-
-      artistName.value = "";
-      songTitle.value = "";
-      genre.value = "";
-      description.value = "";
-      songFile.value = "";
-      coverFile.value = "";
-      contractAccepted.checked = false;
-
-
-    } catch (error) {
-
-      console.error(
-        "PASONG upload error:",
-        error
-      );
-
-      showStatus(
-        error.message ||
-        "Upload failed. Please try again.",
-        "error"
-      );
-
-      uploadButton.disabled =
-        false;
+      return;
     }
 
   }
-);
 
-</script>
 
-</body>
+  if(!contractAccepted){
+
+    setStatus(
+      "You must read and agree to the PASONG upload contract."
+    );
+
+    return;
+  }
+
+
+  /*
+  -----------------------------
+  START UPLOAD
+  -----------------------------
+  */
+
+  btn.disabled = true;
+
+  btn.textContent = "Preparing upload...";
+
+  setStatus(
+    "Preparing secure upload..."
+  );
+
+
+  try{
+
+    /*
+    -----------------------------
+    STEP 1
+    GET SECURE CLOUDINARY
+    SIGNATURE FROM PASONG API
+    -----------------------------
+    */
+
+    const signResponse = await fetch(
+      API_BASE + "/api/songs/sign-upload",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+          artistName:artistName,
+
+          songTitle:songTitle,
+
+          genre:genre,
+
+          description:description,
+
+          contractAccepted:true,
+
+          fileName:songFile.name,
+
+          fileSize:songFile.size,
+
+          coverFileName:
+            coverFile ? coverFile.name : "",
+
+          coverFileSize:
+            coverFile ? coverFile.size : 0
+
+        })
+      }
+    );
+
+
+    let info;
+
+    try{
+
+      info = await signResponse.json();
+
+    }
+    catch(error){
+
+      throw new Error(
+        "PASONG API returned an invalid response."
+      );
+
+    }
+
+
+    if(!signResponse.ok){
+
+      throw new Error(
+        info.error ||
+        "Could not prepare upload."
+      );
+
+    }
+
+
+    /*
+    -----------------------------
+    STEP 2
+    UPLOAD SONG
+    -----------------------------
+    */
+
+    btn.textContent =
+      "Uploading song...";
+
+    setStatus(
+      "Uploading song to PASONG storage..."
+    );
+
+
+    const songResult =
+      await uploadToCloudinary(
+        songFile,
+        info.song
+      );
+
+
+    /*
+    -----------------------------
+    STEP 3
+    UPLOAD COVER
+    -----------------------------
+    */
+
+    let coverResult = null;
+
+
+    if(coverFile){
+
+      btn.textContent =
+        "Uploading cover...";
+
+      setStatus(
+        "Song uploaded. Uploading cover image..."
+      );
+
+
+      coverResult =
+        await uploadToCloudinary(
+          coverFile,
+          info.cover
+        );
+
+    }
+
+
+    /*
+    -----------------------------
+    STEP 4
+    SAVE SONG TO PASONG API
+    -----------------------------
+    */
+
+    btn.textContent =
+      "Saving song...";
+
+    setStatus(
+      "Upload complete. Saving song to PASONG..."
+    );
+
+
+    const createResponse =
+      await fetch(
+        API_BASE + "/api/songs/create",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+          body:JSON.stringify({
+
+            songId:
+              info.song.songId,
+
+            artistId:
+              info.song.artistId || null,
+
+            albumId:
+              info.song.albumId || null,
+
+            categoryId:
+              info.song.categoryId || null,
+
+            title:
+              artistName
+                ? songTitle
+                : songTitle,
+
+            description:
+              description,
+
+            genre:
+              genre,
+
+            coverUrl:
+              coverResult
+                ? coverResult.secure_url
+                : null,
+
+            audioUrl:
+              songResult.secure_url,
+
+            previewUrl:
+              songResult.secure_url,
+
+            fileSize:
+              songFile.size,
+
+            durationSeconds:
+              null,
+
+            status:
+              "pending",
+
+            featured:
+              false
+
+          })
+        }
+      );
+
+
+    let createData;
+
+    try{
+
+      createData =
+        await createResponse.json();
+
+    }
+    catch(error){
+
+      throw new Error(
+        "PASONG could not read the song creation response."
+      );
+
+    }
+
+
+    if(!createResponse.ok){
+
+      throw new Error(
+        createData.error ||
+        "Song uploaded but could not be saved to PASONG."
+      );
+
+    }
+
+
+    /*
+    -----------------------------
+    SUCCESS
+    -----------------------------
+    */
+
+    btn.textContent =
+      "Upload Complete";
+
+    setStatus(
+      "✅ Your song has been uploaded successfully and saved to PASONG. It will appear in the Music Store after verification."
+    );
+
+
+    /*
+    Clear the form after successful upload.
+    */
+
+    document.getElementById("artistName").value = "";
+
+    document.getElementById("songTitle").value = "";
+
+    document.getElementById("genre").value = "";
+
+    document.getElementById("description").value = "";
+
+    document.getElementById("songFile").value = "";
+
+    document.getElementById("coverFile").value = "";
+
+    document.getElementById("contractAccepted").checked = false;
+
+
+    btn.disabled = false;
+
+  }
+
+
+  catch(error){
+
+    console.error(
+      "PASONG UPLOAD ERROR:",
+      error
+    );
+
+
+    btn.disabled = false;
+
+    btn.textContent =
+      "Upload Song";
+
+
+    setStatus(
+      "❌ " +
+      (error.message ||
+      "Upload failed. Please try again.")
+    );
+
+  }
+
+}
+
+</script></body>
 </html>
