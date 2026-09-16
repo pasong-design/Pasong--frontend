@@ -1,11 +1,13 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PASONG — Music Store</title>
-  <link rel="stylesheet" href="assets/style.css">  <style>
+
+  <link rel="stylesheet" href="assets/style.css">
+
+  <style>
     .store-status {
       text-align: center;
       padding: 20px;
@@ -54,69 +56,147 @@
       text-decoration: none;
       font-weight: bold;
     }
-  </style></head><body><header>
-  <b>PASONG</b>  <nav>
+
+    .buy-btn:hover {
+      opacity: .9;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <b>PASONG</b>
+
+  <nav>
     <a href="index.html">Home</a>
     <a href="account.html">Account</a>
   </nav>
-</header><main>  <h1>Music Store</h1>  <p>20-second preview, then purchase for UGX 500.</p>  <div id="store" class="grid">
+</header>
+
+<main>
+
+  <h1>Music Store</h1>
+
+  <p>
+    20-second preview, then purchase for UGX 500.
+  </p>
+
+  <div id="store" class="grid">
+
     <div class="store-status">
       Loading songs...
     </div>
-  </div></main><script>
+
+  </div>
+
+</main>
+
+<script>
+
 const API_URL = "https://pasong-api-git-main-pasong.vercel.app";
 
 const store = document.getElementById("store");
 
+
 async function loadSongs() {
+
   try {
-    const response = await fetch(API_URL + "/api/songs");
+
+    /*
+      CACHE FIX
+      The timestamp forces a fresh request.
+    */
+
+    const response = await fetch(
+      API_URL + "/api/songs?limit=50&t=" + Date.now(),
+      {
+        method: "GET",
+        cache: "no-store"
+      }
+    );
+
 
     if (!response.ok) {
-      throw new Error("Could not load songs");
+
+      throw new Error(
+        "API returned HTTP " + response.status
+      );
+
     }
 
+
     const result = await response.json();
-    const songs = result.songs || [];
+
+    const songs = Array.isArray(result.songs)
+      ? result.songs
+      : [];
+
+
+    /*
+      NO SONGS
+    */
 
     if (songs.length === 0) {
+
       store.innerHTML = `
         <div class="store-status">
+
           <h3>No songs yet</h3>
-          <p>New music will appear here when songs are uploaded.</p>
+
+          <p>
+            New music will appear here when songs are uploaded.
+          </p>
+
         </div>
       `;
+
       return;
     }
 
+
+    /*
+      DISPLAY SONGS
+    */
+
     store.innerHTML = "";
 
+
     songs.forEach(song => {
+
       const card = document.createElement("div");
+
       card.className = "song-card";
 
+
       const cover =
-        song.coverUrl ||
         song.cover_url ||
+        song.coverUrl ||
         "assets/default-cover.jpg";
 
+
       const title =
-        song.songTitle ||
         song.title ||
+        song.songTitle ||
         "Untitled Song";
+
 
       const genre =
         song.genre ||
         "Music";
 
+
       const price =
         song.price ?? 500;
+
 
       const currency =
         song.currency ||
         "UGX";
 
+
       card.innerHTML = `
+
         <img
           src="${cover}"
           alt="${title}"
@@ -124,6 +204,7 @@ async function loadSongs() {
         >
 
         <div class="song-info">
+
           <h3>${title}</h3>
 
           <p>${genre}</p>
@@ -138,24 +219,49 @@ async function loadSongs() {
           >
             View Song
           </a>
+
         </div>
+
       `;
 
+
       store.appendChild(card);
+
     });
 
-  } catch (error) {
-    console.error("PASONG Store Error:", error);
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "PASONG Store Error:",
+      error
+    );
+
 
     store.innerHTML = `
+
       <div class="store-status">
+
         <h3>Unable to load songs</h3>
-        <p>Please try again shortly.</p>
+
+        <p>
+          ${error.message || "Please try again shortly."}
+        </p>
+
       </div>
+
     `;
+
   }
+
 }
 
+
 loadSongs();
-</script></body>
+
+</script>
+
+</body>
 </html>
