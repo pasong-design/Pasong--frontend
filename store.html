@@ -1,1 +1,191 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Music Store</title><link rel="stylesheet" href="assets/style.css"></head><body><header><b>PASONG</b><nav><a href="index.html">Home</a><a href="account.html">Account</a></nav></header><main><h1>Music Store</h1><p>20-second preview, then purchase for UGX 500.</p><div id="store" class="grid"></div></main><script src="config.js"></script><script src="assets/app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PASONG — Music Store</title>
+  <link rel="stylesheet" href="assets/style.css">
+
+  <style>
+    .store-status {
+      text-align: center;
+      padding: 20px;
+      opacity: .8;
+    }
+
+    .song-card {
+      background: #11151a;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid #222831;
+    }
+
+    .song-card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+    }
+
+    .song-info {
+      padding: 14px;
+    }
+
+    .song-info h3 {
+      margin: 0 0 6px;
+    }
+
+    .song-info p {
+      margin: 5px 0;
+      opacity: .75;
+    }
+
+    .song-price {
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .buy-btn {
+      display: block;
+      text-align: center;
+      padding: 11px;
+      border-radius: 8px;
+      background: #8b5cf6;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <b>PASONG</b>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="account.html">Account</a>
+  </nav>
+</header>
+
+<main>
+
+  <h1>Music Store</h1>
+
+  <p>20-second preview, then purchase for UGX 500.</p>
+
+  <div id="store" class="grid">
+    <div class="store-status">
+      Loading songs...
+    </div>
+  </div>
+
+</main>
+
+<script>
+const API_URL = "https://pasong-api.onrender.com";
+
+const store = document.getElementById("store");
+
+async function loadSongs() {
+
+  try {
+
+    const response = await fetch(
+      API_URL + "/api/songs"
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not load songs");
+    }
+
+    const result = await response.json();
+
+    const songs = result.songs || [];
+
+    if (songs.length === 0) {
+
+      store.innerHTML = `
+        <div class="store-status">
+          <h3>No songs yet</h3>
+          <p>New music will appear here when songs are uploaded.</p>
+        </div>
+      `;
+
+      return;
+    }
+
+    store.innerHTML = "";
+
+    songs.forEach(song => {
+
+      const card = document.createElement("div");
+
+      card.className = "song-card";
+
+      const cover =
+        song.coverUrl ||
+        "assets/default-cover.jpg";
+
+      const title =
+        song.songTitle ||
+        "Untitled Song";
+
+      const genre =
+        song.genre ||
+        "Music";
+
+      const price =
+        song.price ?? 500;
+
+      card.innerHTML = `
+        <img
+          src="${cover}"
+          alt="${title}"
+          onerror="this.src='assets/default-cover.jpg'"
+        >
+
+        <div class="song-info">
+
+          <h3>${title}</h3>
+
+          <p>${genre}</p>
+
+          <div class="song-price">
+            ${price} ${song.currency || "UGX"}
+          </div>
+
+          <a
+            class="buy-btn"
+            href="song.html?id=${encodeURIComponent(song.id)}"
+          >
+            View Song
+          </a>
+
+        </div>
+      `;
+
+      store.appendChild(card);
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    store.innerHTML = `
+      <div class="store-status">
+        <h3>Unable to load songs</h3>
+        <p>Please try again shortly.</p>
+      </div>
+    `;
+
+  }
+}
+
+loadSongs();
+</script>
+
+</body>
+</html>
