@@ -94,19 +94,13 @@
 
 <script>
 
-const API_URL = "https://pasong-api-git-main-pasong.vercel.app";
+const API_URL = "https://pasong-api.vercel.app";
 
 const store = document.getElementById("store");
-
 
 async function loadSongs() {
 
   try {
-
-    /*
-      CACHE FIX
-      The timestamp forces a fresh request.
-    */
 
     const response = await fetch(
       API_URL + "/api/songs?limit=50&t=" + Date.now(),
@@ -116,15 +110,11 @@ async function loadSongs() {
       }
     );
 
-
     if (!response.ok) {
-
       throw new Error(
         "API returned HTTP " + response.status
       );
-
     }
-
 
     const result = await response.json();
 
@@ -132,35 +122,21 @@ async function loadSongs() {
       ? result.songs
       : [];
 
-
-    /*
-      NO SONGS
-    */
-
     if (songs.length === 0) {
 
       store.innerHTML = `
         <div class="store-status">
-
           <h3>No songs yet</h3>
-
           <p>
             New music will appear here when songs are uploaded.
           </p>
-
         </div>
       `;
 
       return;
     }
 
-
-    /*
-      DISPLAY SONGS
-    */
-
     store.innerHTML = "";
-
 
     songs.forEach(song => {
 
@@ -168,32 +144,26 @@ async function loadSongs() {
 
       card.className = "song-card";
 
-
       const cover =
         song.cover_url ||
         song.coverUrl ||
         "assets/default-cover.jpg";
-
 
       const title =
         song.title ||
         song.songTitle ||
         "Untitled Song";
 
-
       const genre =
         song.genre ||
         "Music";
 
-
       const price =
         song.price ?? 500;
-
 
       const currency =
         song.currency ||
         "UGX";
-
 
       card.innerHTML = `
 
@@ -224,21 +194,16 @@ async function loadSongs() {
 
       `;
 
-
       store.appendChild(card);
 
     });
 
-  }
-
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "PASONG Store Error:",
       error
     );
-
 
     store.innerHTML = `
 
@@ -257,7 +222,6 @@ async function loadSongs() {
   }
 
 }
-
 
 loadSongs();
 
