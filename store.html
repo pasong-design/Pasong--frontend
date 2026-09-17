@@ -1,227 +1,982 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>PASONG — Music Store</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="assets/style.css">
+<title>PASONG Music Store</title>
 
-  <style>
-    .store-status {
-      text-align: center;
-      padding: 20px;
-      opacity: .8;
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#080810;
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
+    min-height:100vh;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+/* ================= NAV ================= */
+
+nav{
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    height:70px;
+    padding:0 6%;
+
+    display:flex;
+    align-items:center;
+    gap:25px;
+
+    background:rgba(8,8,16,.96);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:23px;
+    font-weight:900;
+    margin-right:15px;
+
+    background:linear-gradient(90deg,#9b5cff,#ff3ea5);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+nav a{
+    color:#aaa;
+    font-size:14px;
+    font-weight:600;
+}
+
+nav a:hover,
+nav a.active{
+    color:#fff;
+}
+
+.search{
+    margin-left:auto;
+
+    width:190px;
+    padding:10px 15px;
+
+    border-radius:25px;
+    border:1px solid rgba(255,255,255,.1);
+
+    background:#11111d;
+    color:white;
+    outline:none;
+}
+
+.account{
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg,#9b5cff,#ff3ea5);
+    font-weight:bold;
+}
+
+/* ================= MAIN ================= */
+
+.container{
+    width:min(1150px,92%);
+    margin:auto;
+    padding:55px 0 80px;
+}
+
+.hero{
+    margin-bottom:35px;
+}
+
+.hero small{
+    color:#a45cff;
+    font-weight:bold;
+    text-transform:uppercase;
+    letter-spacing:2px;
+}
+
+.hero h1{
+    font-size:48px;
+    margin:10px 0;
+
+    background:linear-gradient(90deg,#fff,#bca7ff,#ff6ab7);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+    color:#999;
+    font-size:16px;
+}
+
+/* ================= FEATURED ================= */
+
+.featured{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-bottom:45px;
+}
+
+.feature{
+    padding:25px;
+    min-height:145px;
+
+    border-radius:18px;
+
+    background:linear-gradient(
+        135deg,
+        rgba(155,92,255,.18),
+        rgba(255,62,165,.08)
+    );
+
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.feature h3{
+    margin-bottom:10px;
+}
+
+.feature p{
+    color:#999;
+    font-size:14px;
+    line-height:1.5;
+}
+
+/* ================= SONG SECTION ================= */
+
+.section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.section-head h2{
+    font-size:25px;
+}
+
+.count{
+    color:#888;
+    font-size:14px;
+}
+
+/* ================= SONG CARD ================= */
+
+.song-list{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.song{
+    display:flex;
+    align-items:center;
+    gap:18px;
+
+    padding:15px;
+
+    background:#10101b;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    border-radius:16px;
+
+    transition:.2s;
+}
+
+.song:hover{
+    transform:translateY(-2px);
+    border-color:rgba(170,90,255,.4);
+}
+
+.cover{
+    width:75px;
+    height:75px;
+
+    border-radius:12px;
+
+    object-fit:cover;
+
+    background:#181824;
+
+    flex-shrink:0;
+}
+
+.song-info{
+    flex:1;
+    min-width:0;
+}
+
+.song-title{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.artist{
+    color:#999;
+    font-size:14px;
+    margin-bottom:7px;
+}
+
+.genre{
+    display:inline-block;
+
+    padding:4px 9px;
+
+    border-radius:20px;
+
+    background:#191425;
+    color:#bd8aff;
+
+    font-size:11px;
+}
+
+.price{
+    font-weight:bold;
+    color:#fff;
+    margin-right:15px;
+    white-space:nowrap;
+}
+
+.actions{
+    display:flex;
+    gap:9px;
+    align-items:center;
+}
+
+.btn{
+    border:none;
+    cursor:pointer;
+
+    padding:10px 15px;
+
+    border-radius:9px;
+
+    font-weight:bold;
+
+    font-size:13px;
+}
+
+.preview{
+    background:#1b1b29;
+    color:white;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.buy{
+    background:linear-gradient(90deg,#9b5cff,#ff3ea5);
+    color:white;
+}
+
+.btn:hover{
+    opacity:.88;
+}
+
+/* ================= EMPTY / ERROR ================= */
+
+.message{
+    padding:30px;
+
+    border-radius:16px;
+
+    background:#10101b;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    color:#999;
+
+    text-align:center;
+}
+
+.error{
+    color:#ff7777;
+}
+
+/* ================= INFO ================= */
+
+.info{
+    margin-top:35px;
+
+    padding:22px;
+
+    border-radius:15px;
+
+    background:#10101a;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    color:#aaa;
+
+    line-height:1.6;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+    padding:30px 6%;
+    text-align:center;
+
+    border-top:1px solid rgba(255,255,255,.07);
+
+    color:#666;
+
+    font-size:13px;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:800px){
+
+    nav{
+        padding:0 4%;
+        gap:15px;
     }
 
-    .song-card {
-      background: #11151a;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid #222831;
+    nav a{
+        display:none;
     }
 
-    .song-card img {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      display: block;
+    .logo{
+        margin-right:0;
     }
 
-    .song-info {
-      padding: 14px;
+    .search{
+        width:120px;
     }
 
-    .song-info h3 {
-      margin: 0 0 6px;
+    .hero h1{
+        font-size:36px;
     }
 
-    .song-info p {
-      margin: 5px 0;
-      opacity: .75;
+    .featured{
+        grid-template-columns:1fr;
     }
 
-    .song-price {
-      font-weight: bold;
-      margin: 10px 0;
+    .song{
+        flex-wrap:wrap;
     }
 
-    .buy-btn {
-      display: block;
-      text-align: center;
-      padding: 11px;
-      border-radius: 8px;
-      background: #8b5cf6;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
+    .song-info{
+        width:calc(100% - 95px);
     }
 
-    .buy-btn:hover {
-      opacity: .9;
+    .price{
+        margin-left:93px;
     }
-  </style>
+
+    .actions{
+        width:100%;
+        margin-top:5px;
+        margin-left:93px;
+    }
+
+    .actions .btn{
+        flex:1;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<header>
-  <b>PASONG</b>
+<!-- ================= NAV ================= -->
 
-  <nav>
+<nav>
+
+    <a href="index.html" class="logo">◈ PASONG</a>
+
     <a href="index.html">Home</a>
-    <a href="account.html">Account</a>
-  </nav>
-</header>
 
-<main>
+    <a href="store.html" class="active">Music Store</a>
 
-  <h1>Music Store</h1>
+    <a href="charts.html">Charts</a>
 
-  <p>
-    20-second preview, then purchase for UGX 500.
-  </p>
+    <a href="artists.html">Artists</a>
 
-  <div id="store" class="grid">
+    <a href="playlists.html">Playlists</a>
 
-    <div class="store-status">
-      Loading songs...
+    <a href="promotion.html">Promotion</a>
+
+    <input
+        class="search"
+        id="searchBox"
+        type="search"
+        placeholder="Search music..."
+    >
+
+    <a href="account.html" class="account">◉</a>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="container">
+
+    <section class="hero">
+
+        <small>PASONG MUSIC MARKETPLACE</small>
+
+        <h1>Music Store</h1>
+
+        <p>
+            Listen to a 20-second preview, then support the artist.
+            Songs are currently available for UGX 500.
+        </p>
+
+    </section>
+
+
+    <!-- FEATURED -->
+
+    <section class="featured">
+
+        <div class="feature">
+            <h3>🎵 Buy Music</h3>
+            <p>
+                Discover and support music from artists on PASONG.
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>💜 Support Artists</h3>
+            <p>
+                Every purchase helps creators earn from their music.
+            </p>
+        </div>
+
+        <div class="feature">
+            <h3>🔥 Trending Music</h3>
+            <p>
+                Discover new sounds and upcoming artists.
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- SONGS -->
+
+    <section>
+
+        <div class="section-head">
+
+            <h2>Latest Songs</h2>
+
+            <span class="count" id="songCount">
+                Loading...
+            </span>
+
+        </div>
+
+        <div id="songList" class="song-list">
+
+            <div class="message">
+                Loading songs...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="info">
+
+        🎧 <strong>Listen before you buy.</strong>
+
+        <br>
+
+        You can preview each song for 20 seconds before continuing
+        to the purchase page.
+
     </div>
 
-  </div>
-
 </main>
+
+
+<footer>
+
+    © 2026 PASONG — Music marketplace for African creators.
+
+</footer>
+
 
 <script>
 
 const API_URL = "https://pasong-api.vercel.app";
 
-const store = document.getElementById("store");
+const songList = document.getElementById("songList");
+const songCount = document.getElementById("songCount");
+const searchBox = document.getElementById("searchBox");
 
-async function loadSongs() {
+let allSongs = [];
+let currentAudio = null;
+let currentButton = null;
+let timer = null;
 
-  try {
 
-    const response = await fetch(
-      API_URL + "/api/songs?limit=50&t=" + Date.now(),
-      {
-        method: "GET",
-        cache: "no-store"
-      }
-    );
+/* ==========================================
+   LOAD SONGS
+========================================== */
 
-    if (!response.ok) {
-      throw new Error(
-        "API returned HTTP " + response.status
-      );
+async function loadSongs(){
+
+    try{
+
+        songList.innerHTML = `
+            <div class="message">
+                Loading songs...
+            </div>
+        `;
+
+        const response = await fetch(
+            API_URL + "/api/songs",
+            {
+                method:"GET",
+                cache:"no-store"
+            }
+        );
+
+        if(!response.ok){
+
+            throw new Error(
+                "API returned HTTP " + response.status
+            );
+
+        }
+
+        const data = await response.json();
+
+        console.log("PASONG API RESPONSE:",data);
+
+        if(Array.isArray(data)){
+            allSongs = data;
+        }
+        else if(Array.isArray(data.songs)){
+            allSongs = data.songs;
+        }
+        else if(Array.isArray(data.data)){
+            allSongs = data.data;
+        }
+        else if(Array.isArray(data.results)){
+            allSongs = data.results;
+        }
+        else{
+            allSongs = [];
+        }
+
+        renderSongs(allSongs);
+
+    }
+    catch(error){
+
+        console.error("PASONG STORE ERROR:",error);
+
+        songCount.textContent = "Error";
+
+        songList.innerHTML = `
+            <div class="message error">
+
+                <strong>Unable to load songs</strong>
+
+                <br><br>
+
+                ${escapeHTML(error.message)}
+
+            </div>
+        `;
+
     }
 
-    const result = await response.json();
+}
 
-    const songs = Array.isArray(result.songs)
-      ? result.songs
-      : [];
 
-    if (songs.length === 0) {
+/* ==========================================
+   RENDER SONGS
+========================================== */
 
-      store.innerHTML = `
-        <div class="store-status">
-          <h3>No songs yet</h3>
-          <p>
-            New music will appear here when songs are uploaded.
-          </p>
-        </div>
-      `;
+function renderSongs(songs){
 
-      return;
+    songList.innerHTML = "";
+
+    songCount.textContent =
+        songs.length +
+        (songs.length === 1 ? " song" : " songs");
+
+
+    if(!songs.length){
+
+        songList.innerHTML = `
+            <div class="message">
+                No songs available yet.
+            </div>
+        `;
+
+        return;
     }
 
-    store.innerHTML = "";
 
     songs.forEach(song => {
 
-      const card = document.createElement("div");
+        songList.appendChild(
+            createSongCard(song)
+        );
 
-      card.className = "song-card";
+    });
 
-      const cover =
+}
+
+
+/* ==========================================
+   CREATE SONG CARD
+========================================== */
+
+function createSongCard(song){
+
+    const card = document.createElement("article");
+
+    card.className = "song";
+
+
+    const title =
+        song.title ||
+        "Untitled Song";
+
+
+    const artist =
+        song.artist_name ||
+        song.artist ||
+        song.artistName ||
+        "PASONG Artist";
+
+
+    const genre =
+        song.genre ||
+        song.category_name ||
+        song.category ||
+        "Music";
+
+
+    const cover =
         song.cover_url ||
         song.coverUrl ||
         "assets/default-cover.jpg";
 
-      const title =
-        song.title ||
-        song.songTitle ||
-        "Untitled Song";
 
-      const genre =
-        song.genre ||
-        "Music";
+    const price =
+        Number(song.price) ||
+        500;
 
-      const price =
-        song.price ?? 500;
 
-      const currency =
+    const currency =
         song.currency ||
         "UGX";
 
-      card.innerHTML = `
+
+    const id =
+        song.id;
+
+
+    card.innerHTML = `
 
         <img
-          src="${cover}"
-          alt="${title}"
-          onerror="this.src='assets/default-cover.jpg'"
+            class="cover"
+            src="${escapeAttribute(cover)}"
+            alt="${escapeAttribute(title)}"
+            onerror="this.style.display='none'"
         >
+
 
         <div class="song-info">
 
-          <h3>${title}</h3>
+            <div class="song-title">
+                ${escapeHTML(title)}
+            </div>
 
-          <p>${genre}</p>
+            <div class="artist">
+                ${escapeHTML(artist)}
+            </div>
 
-          <div class="song-price">
-            ${price} ${currency}
-          </div>
-
-          <a
-            class="buy-btn"
-            href="song.html?id=${encodeURIComponent(song.id)}"
-          >
-            View Song
-          </a>
+            <span class="genre">
+                ${escapeHTML(genre)}
+            </span>
 
         </div>
 
-      `;
 
-      store.appendChild(card);
+        <div class="price">
+            ${price.toLocaleString()} ${escapeHTML(currency)}
+        </div>
 
-    });
 
-  } catch (error) {
+        <div class="actions">
 
-    console.error(
-      "PASONG Store Error:",
-      error
-    );
+            <button
+                class="btn preview"
+                type="button"
+                onclick='previewSong(${JSON.stringify(song)}, this)'
+            >
+                ▶ Preview
+            </button>
 
-    store.innerHTML = `
 
-      <div class="store-status">
+            <button
+                class="btn buy"
+                type="button"
+                onclick='openSong(${JSON.stringify(id)})'
+            >
+                BUY NOW
+            </button>
 
-        <h3>Unable to load songs</h3>
-
-        <p>
-          ${error.message || "Please try again shortly."}
-        </p>
-
-      </div>
+        </div>
 
     `;
 
-  }
+
+    return card;
 
 }
+
+
+/* ==========================================
+   20 SECOND PREVIEW
+========================================== */
+
+function previewSong(song,button){
+
+    if(currentAudio){
+
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        currentAudio = null;
+
+    }
+
+    if(timer){
+
+        clearTimeout(timer);
+        timer = null;
+
+    }
+
+    if(currentButton){
+
+        currentButton.textContent = "▶ Preview";
+
+    }
+
+
+    const audioUrl =
+        song.preview_url ||
+        song.audio_url ||
+        song.previewUrl ||
+        song.audioUrl;
+
+
+    if(!audioUrl){
+
+        alert("Preview is not available for this song.");
+
+        return;
+
+    }
+
+
+    currentAudio = new Audio(audioUrl);
+
+    currentButton = button;
+
+    button.textContent = "⏸ Playing...";
+
+
+    currentAudio.play()
+        .catch(error => {
+
+            console.error(error);
+
+            alert(
+                "The song preview could not be played."
+            );
+
+            button.textContent = "▶ Preview";
+
+        });
+
+
+    timer = setTimeout(() => {
+
+        stopPreview();
+
+    },20000);
+
+
+    currentAudio.onended = () => {
+
+        stopPreview();
+
+    };
+
+}
+
+
+/* ==========================================
+   STOP PREVIEW
+========================================== */
+
+function stopPreview(){
+
+    if(currentAudio){
+
+        currentAudio.pause();
+
+        currentAudio.currentTime = 0;
+
+        currentAudio = null;
+
+    }
+
+    if(timer){
+
+        clearTimeout(timer);
+
+        timer = null;
+
+    }
+
+    if(currentButton){
+
+        currentButton.textContent = "▶ Preview";
+
+        currentButton = null;
+
+    }
+
+}
+
+
+/* ==========================================
+   OPEN SONG PAGE
+========================================== */
+
+function openSong(id){
+
+    if(!id){
+
+        alert("This song does not have a valid ID.");
+
+        return;
+
+    }
+
+    stopPreview();
+
+    window.location.href =
+        "song.html?id=" +
+        encodeURIComponent(id);
+
+}
+
+
+/* ==========================================
+   SEARCH
+========================================== */
+
+searchBox.addEventListener("input",function(){
+
+    const query =
+        this.value
+        .trim()
+        .toLowerCase();
+
+
+    if(!query){
+
+        renderSongs(allSongs);
+
+        return;
+
+    }
+
+
+    const filtered =
+        allSongs.filter(song => {
+
+            const title =
+                String(song.title || "")
+                .toLowerCase();
+
+            const genre =
+                String(song.genre || "")
+                .toLowerCase();
+
+            const artist =
+                String(
+                    song.artist_name ||
+                    song.artist ||
+                    ""
+                )
+                .toLowerCase();
+
+
+            return (
+                title.includes(query) ||
+                genre.includes(query) ||
+                artist.includes(query)
+            );
+
+        });
+
+
+    renderSongs(filtered);
+
+});
+
+
+/* ==========================================
+   SECURITY / HTML HELPERS
+========================================== */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function escapeAttribute(value){
+
+    return escapeHTML(value);
+
+}
+
+
+/* ==========================================
+   START
+========================================== */
 
 loadSongs();
 
