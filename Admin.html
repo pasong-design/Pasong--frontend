@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASONG — Admin Dashboard</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+button,input,select{
+  font:inherit;
+}
+
+/* TOP BAR */
+.topbar{
+  height:70px;
+  background:#0d0d18;
+  border-bottom:1px solid #29293e;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  position:sticky;
+  top:0;
+  z-index:30;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.logo span{
+  color:#d946ef;
+}
+
+.menu-btn{
+  display:none;
+  background:none;
+  border:0;
+  color:#fff;
+  font-size:25px;
+  cursor:pointer;
+}
+
+.admin-label{
+  font-size:13px;
+  color:#aaa;
+}
+
+/* LAYOUT */
+.layout{
+  display:flex;
+  min-height:calc(100vh - 70px);
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:245px;
+  background:#0b0b15;
+  border-right:1px solid #29293e;
+  padding:22px 14px;
+}
+
+.sidebar h3{
+  color:#777;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin:12px 10px;
+}
+
+.nav{
+  display:block;
+  padding:13px 14px;
+  border-radius:10px;
+  color:#bbb;
+  margin-bottom:5px;
+  transition:.2s;
+}
+
+.nav:hover,
+.nav.active{
+  background:linear-gradient(90deg,#281238,#171126);
+  color:#fff;
+}
+
+.nav.active{
+  border-left:3px solid #d946ef;
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  padding:28px;
+  max-width:1550px;
+  margin:auto;
+  width:100%;
+}
+
+.header{
+  margin-bottom:25px;
+}
+
+.header h1{
+  font-size:30px;
+  margin-bottom:7px;
+}
+
+.header p{
+  color:#999;
+}
+
+/* STAT CARDS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:25px;
+}
+
+.card{
+  background:#10101c;
+  border:1px solid #27273d;
+  border-radius:16px;
+  padding:20px;
+}
+
+.card small{
+  color:#888;
+}
+
+.card h2{
+  margin-top:10px;
+  font-size:27px;
+}
+
+.pink{
+  color:#e879f9;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+
+/* SECTIONS */
+.section{
+  background:#10101c;
+  border:1px solid #27273d;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:20px;
+}
+
+.section h2{
+  font-size:19px;
+  margin-bottom:18px;
+}
+
+/* NOTICE */
+.notice{
+  background:#151124;
+  border:1px solid #382158;
+  border-radius:12px;
+  padding:15px;
+  color:#d2c8dc;
+  line-height:1.5;
+}
+
+/* QUICK ACTIONS */
+.quick{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.quick a{
+  padding:18px;
+  border-radius:12px;
+  background:#151522;
+  border:1px solid #292940;
+  transition:.2s;
+}
+
+.quick a:hover{
+  border-color:#9333ea;
+  transform:translateY(-2px);
+}
+
+.quick strong{
+  display:block;
+  margin-bottom:6px;
+}
+
+.quick span{
+  color:#888;
+  font-size:13px;
+}
+
+/* TABLE */
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,
+td{
+  text-align:left;
+  padding:13px;
+  border-bottom:1px solid #25253a;
+  font-size:14px;
+}
+
+th{
+  color:#888;
+  font-size:12px;
+  text-transform:uppercase;
+}
+
+td{
+  color:#ddd;
+}
+
+/* BADGES */
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+}
+
+.green{
+  background:#102d20;
+  color:#86efac;
+}
+
+.yellow{
+  background:#30220e;
+  color:#fbbf24;
+}
+
+.red{
+  background:#35121d;
+  color:#fca5a5;
+}
+
+.blue{
+  background:#13243a;
+  color:#93c5fd;
+}
+
+/* BUTTONS */
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:9px 13px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.primary{
+  color:#fff;
+  background:linear-gradient(135deg,#9333ea,#ec4899);
+}
+
+.secondary{
+  background:#1b1b2a;
+  color:#fff;
+  border:1px solid #36364b;
+}
+
+.danger{
+  background:#35121d;
+  color:#fff;
+  border:1px solid #7f1d35;
+}
+
+/* SEARCH */
+.search{
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.search input{
+  flex:1;
+  background:#090912;
+  border:1px solid #303047;
+  color:#fff;
+  padding:12px;
+  border-radius:9px;
+  outline:none;
+}
+
+.search input:focus{
+  border-color:#c026d3;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  color:#666;
+  padding:30px;
+  font-size:13px;
+}
+
+/* TABLET */
+@media(max-width:950px){
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .quick{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+/* MOBILE */
+@media(max-width:700px){
+
+  .menu-btn{
+    display:block;
+  }
+
+  .admin-label{
+    display:none;
+  }
+
+  .sidebar{
+    position:fixed;
+    left:-265px;
+    top:70px;
+    bottom:0;
+    z-index:25;
+    transition:.25s;
+    overflow-y:auto;
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .main{
+    padding:20px 14px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .quick{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="logo">
+    ◈ PASONG
+  </div>
+
+  <button class="menu-btn" onclick="toggleMenu()">
+    ☰
+  </button>
+
+  <div class="admin-label">
+    ADMIN CONTROL CENTER
+  </div>
+
+</header>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+  <h3>Administration</h3>
+
+  <a class="nav active" href="#dashboard">
+    📊 Dashboard
+  </a>
+
+  <a class="nav" href="#users">
+    👥 Users
+  </a>
+
+  <a class="nav" href="#artists">
+    🎤 Artists
+  </a>
+
+  <a class="nav" href="#songs">
+    🎵 Songs
+  </a>
+
+  <a class="nav" href="#orders">
+    🧾 Orders
+  </a>
+
+  <a class="nav" href="#payments">
+    💳 Payments
+  </a>
+
+  <a class="nav" href="#promotions">
+    📢 Promotions
+  </a>
+
+  <a class="nav" href="#categories">
+    📁 Categories
+  </a>
+
+  <a class="nav" href="#notifications">
+    🔔 Notifications
+  </a>
+
+  <h3>Platform</h3>
+
+  <a class="nav" href="index.html">
+    PASONG Home
+  </a>
+
+  <a class="nav" href="account.html">
+    My Account
+  </a>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- DASHBOARD -->
+<section id="dashboard">
+
+  <div class="header">
+
+    <h1>
+      Admin Dashboard
+    </h1>
+
+    <p>
+      Manage the PASONG music marketplace and platform operations.
+    </p>
+
+  </div>
+
+
+  <div class="stats">
+
+    <div class="card">
+      <small>Total Users</small>
+      <h2>0</h2>
+    </div>
+
+    <div class="card">
+      <small>Artists</small>
+      <h2>0</h2>
+    </div>
+
+    <div class="card">
+      <small>Songs</small>
+      <h2>0</h2>
+    </div>
+
+    <div class="card">
+      <small>Platform Revenue</small>
+      <h2 class="pink">
+        UGX 0
+      </h2>
+    </div>
+
+  </div>
+
+
+  <div class="grid">
+
+    <div class="section">
+
+      <h2>
+        Quick Management
+      </h2>
+
+      <div class="quick">
+
+        <a href="#users">
+          <strong>👥 Users</strong>
+          <span>
+            Manage PASONG accounts
+          </span>
+        </a>
+
+        <a href="#songs">
+          <strong>🎵 Songs</strong>
+          <span>
+            Review uploaded music
+          </span>
+        </a>
+
+        <a href="#payments">
+          <strong>💳 Payments</strong>
+          <span>
+            Monitor transactions
+          </span>
+        </a>
+
+        <a href="#promotions">
+          <strong>📢 Promotions</strong>
+          <span>
+            Manage advertisements
+          </span>
+        </a>
+
+        <a href="#artists">
+          <strong>🎤 Artists</strong>
+          <span>
+            Manage artist profiles
+          </span>
+        </a>
+
+        <a href="#categories">
+          <strong>📁 Categories</strong>
+          <span>
+            Manage music categories
+          </span>
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="section">
+
+      <h2>
+        System Status
+      </h2>
+
+      <div class="notice">
+
+        PASONG Admin Control Center is ready.
+        Backend/Supabase data will be connected
+        to these controls.
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- USERS -->
+<section id="users" class="section">
+
+  <h2>
+    Manage Users
+  </h2>
+
+  <div class="search">
+
+    <input
+      type="search"
+      placeholder="Search users..."
+    >
+
+    <button
+      class="btn primary"
+      onclick="searchMessage()"
+    >
+      Search
+    </button>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            No users loaded
+          </td>
+
+          <td>—</td>
+
+          <td>—</td>
+
+          <td>
+            <span class="badge blue">
+              Waiting
+            </span>
+          </td>
+
+          <td>—</td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- ARTISTS -->
+<section id="artists" class="section">
+
+  <h2>
+    Manage Artists
+  </h2>
+
+  <div class="notice">
+
+    Artist profiles will appear here after
+    the Supabase artist profile connection
+    is enabled.
+
+  </div>
+
+  <br>
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Artist</th>
+          <th>Genre</th>
+          <th>Songs</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            No artists loaded
+          </td>
+
+          <td>—</td>
+
+          <td>0</td>
+
+          <td>
+            <span class="badge blue">
+              Waiting
+            </span>
+          </td>
+
+          <td>—</td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- SONGS -->
+<section id="songs" class="section">
+
+  <h2>
+    Manage Songs
+  </h2>
+
+  <div class="search">
+
+    <input
+      type="search"
+      placeholder="Search songs or artists..."
+    >
+
+    <button
+      class="btn primary"
+      onclick="searchMessage()"
+    >
+      Search
+    </button>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Song</th>
+          <th>Artist</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            No songs loaded
+          </td>
+
+          <td>—</td>
+
+          <td>
+            UGX 500
+          </td>
+
+          <td>
+            <span class="badge blue">
+              Waiting
+            </span>
+          </td>
+
+          <td>—</td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
+<!-- ORDERS -->
+<section id="orders" class="section">
+
+  <h2>
+    Orders
+  </h2>
+
+  <div class="stats">
+
+    <div class="card">
+      <small>Total Orders</small>
+      <h2>0</h2>
+    </div>
+
+    <div class="card">
+      <small>Completed</small>
+      <h2>0</h2>
+    </div>
+
+    <div class="card">
+      <small>Pending</small>
+      <h2>0</h2>
+    </div>
+
+    <div class="card">
+      <small>Cancelled</small>
+      <h2>0</h2>
+    </div>
+
+  </div>
+
+  <div class="notice">
+
+    Order information will be loaded
+    from the PASONG backend.
+
+  </div>
+
+</section>
+
+
+<!-- PAYMENTS -->
+<section id="payments" class="section">
+
+  <h2>
+    Payments
+  </h2>
+
+  <div class="stats">
+
+    <div class="card">
+
+      <small>
+        Total Payments
+      </small>
+
+      <h2>
+        UGX 0
+      </h2>
+
+    </div>
+
+
+    <div class="card">
+
+      <small>
+        PASONG Revenue
+      </small>
+
+      <h2 class="pink">
+        UGX 0
+      </h2>
+
+    </div>
+
+
+    <div class="card">
+
+      <small>
+        Artist Share
+      </small>
+
+      <h2>
+        UGX 0
+      </h2>
+
+    </div>
+
+
+    <div class="card">
+
+      <small>
+        Other Royalties
+      </small>
+
+      <h2>
+        UGX 0
+      </h2>
+
+    </div>
+
+  </div>
+
+
+  <div class="notice">
+
+    Payment records will be connected
+    to the PASONG payment and order tables.
+
+  </div>
+
+</section>
+
+
+<!-- PROMOTIONS -->
+<section id="promotions" class="section">
+
+  <h2>
+    Promotions
+  </h2>
+
+  <div class="actions">
+
+    <button
+      class="btn primary"
+      onclick="promotionMessage()"
+    >
+      Create Promotion
+    </button>
+
+    <button
+      class="btn secondary"
+      onclick="promotionMessage()"
+    >
+      Manage Packages
+    </button>
+
+  </div>
+
+  <br>
+
+  <div class="notice">
+
+    Promotional campaigns, advertiser payments,
+    impressions and clicks will be managed here.
+
+  </div>
+
+</section>
+
+
+<!-- CATEGORIES -->
+<section id="categories" class="section">
+
+  <h2>
+    Music Categories
+  </h2>
+
+  <div class="actions">
+
+    <button
+      class="btn primary"
+      onclick="categoryMessage()"
+    >
+      Add Category
+    </button>
+
+  </div>
+
+  <br>
+
+  <div class="notice">
+
+    Categories such as Afrobeats, Amapiano,
+    Bongo and Gengetone can be managed
+    from this section.
+
+  </div>
+
+</section>
+
+
+<!-- NOTIFICATIONS -->
+<section id="notifications" class="section">
+
+  <h2>
+    Admin Notifications
+  </h2>
+
+  <div class="notice">
+    🔔 No new admin notifications.
+  </div>
+
+</section>
+
+</main>
+</div>
+
+
+<footer>
+  PASONG © 2026 • Admin Control Center
+</footer>
+
+
+<script>
+
+function toggleMenu(){
+
+  document
+    .getElementById("sidebar")
+    .classList
+    .toggle("open");
+
+}
+
+
+function searchMessage(){
+
+  alert(
+    "Search interface is ready. Database search will be connected to Supabase."
+  );
+
+}
+
+
+function promotionMessage(){
+
+  alert(
+    "Promotion management interface is ready."
+  );
+
+}
+
+
+function categoryMessage(){
+
+  alert(
+    "Category management interface is ready."
+  );
+
+}
+
+</script>
+
+</body>
+</html>
