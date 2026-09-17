@@ -1,620 +1,566 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PASONG — Song Details</title>
+<title>PASONG — Song</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    body {
-      background: #080810;
-      color: #fff;
-      font-family: Inter, Arial, sans-serif;
-      min-height: 100vh;
-    }
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+}
 
-    nav {
-      height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 6%;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      background: rgba(8,8,16,.96);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+nav{
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 7%;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background:#0b0b14;
+}
 
-    .logo {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: .5px;
-    }
+.logo{
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:.5px;
+}
 
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
+.nav-icons{
+  display:flex;
+  gap:20px;
+  font-size:24px;
+}
 
-    .search {
-      font-size: 23px;
-      opacity: .9;
-    }
+.container{
+  width:min(900px,92%);
+  margin:35px auto 60px;
+}
 
-    .account {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #181522;
-      border: 1px solid rgba(255,255,255,.1);
-    }
+.back{
+  display:inline-block;
+  color:#bbb;
+  text-decoration:none;
+  margin-bottom:25px;
+  font-size:15px;
+}
 
-    main {
-      width: min(900px, 92%);
-      margin: 35px auto 70px;
-    }
+.back:hover{
+  color:#fff;
+}
 
-    .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #d8d8df;
-      text-decoration: none;
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
+.song-card{
+  background:linear-gradient(
+    145deg,
+    rgba(35,20,55,.75),
+    rgba(13,13,25,.95)
+  );
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
 
-    .back:hover {
-      color: #fff;
-    }
+.cover{
+  width:100%;
+  max-width:420px;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+  margin:0 auto 30px;
+  border-radius:20px;
+  background:#151522;
+}
 
-    .song-card {
-      background: linear-gradient(
-        145deg,
-        rgba(36,24,55,.95),
-        rgba(16,13,25,.98)
-      );
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow: 0 20px 70px rgba(0,0,0,.35);
-    }
+.no-cover{
+  width:100%;
+  max-width:420px;
+  aspect-ratio:1/1;
+  margin:0 auto 30px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#20132f,#11111c);
+  color:#bda9d8;
+  font-weight:700;
+  font-size:20px;
+}
 
-    .song-top {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 30px;
-      align-items: center;
-    }
+.badge{
+  display:inline-block;
+  padding:7px 12px;
+  border-radius:30px;
+  background:rgba(168,85,247,.14);
+  color:#c084fc;
+  font-size:13px;
+  margin-bottom:14px;
+}
 
-    .cover {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 18px;
-      background: #12121b;
-      border: 1px solid rgba(255,255,255,.08);
-    }
+h1{
+  font-size:38px;
+  line-height:1.1;
+  margin-bottom:8px;
+}
 
-    .cover.placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-      font-size: 60px;
-    }
+.artist{
+  color:#d8a8ff;
+  font-size:18px;
+  font-weight:600;
+  margin-bottom:8px;
+}
 
-    .label {
-      display: inline-block;
-      color: #d7a7ff;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1.4px;
-      margin-bottom: 10px;
-    }
+.genre{
+  color:#999;
+  font-size:14px;
+  margin-bottom:24px;
+}
 
-    h1 {
-      font-size: clamp(32px, 6vw, 52px);
-      line-height: 1.05;
-      margin-bottom: 10px;
-    }
+.description{
+  color:#c8c8d0;
+  line-height:1.7;
+  margin-bottom:28px;
+}
 
-    .artist {
-      font-size: 19px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
+.price-box{
+  background:#11111c;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:20px;
+}
 
-    .genre {
-      display: inline-block;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(168,85,247,.13);
-      color: #d8b4fe;
-      font-size: 13px;
-      margin-bottom: 20px;
-    }
+.price-label{
+  color:#888;
+  font-size:13px;
+  margin-bottom:7px;
+}
 
-    .description {
-      color: #c7c7cf;
-      line-height: 1.7;
-      font-size: 15px;
-    }
+.price{
+  font-size:28px;
+  font-weight:800;
+}
 
-    .price-box {
-      margin-top: 28px;
-      padding: 18px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.045);
-      border: 1px solid rgba(255,255,255,.07);
-    }
+.preview-title{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:7px;
+}
 
-    .price-title {
-      color: #9999a5;
-      font-size: 13px;
-      margin-bottom: 5px;
-    }
+.preview-text{
+  color:#999;
+  font-size:14px;
+  margin-bottom:15px;
+}
 
-    .price {
-      font-size: 25px;
-      font-weight: 900;
-    }
+audio{
+  width:100%;
+  margin-bottom:8px;
+}
 
-    .preview-section {
-      margin-top: 28px;
-      padding-top: 28px;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }
+.preview-status{
+  color:#bdbdc8;
+  font-size:13px;
+  min-height:20px;
+}
 
-    .preview-title {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 7px;
-    }
+.purchase-box{
+  margin-top:25px;
+  padding:20px;
+  border-radius:18px;
+  background:rgba(168,85,247,.08);
+  border:1px solid rgba(168,85,247,.18);
+}
 
-    .preview-info {
-      color: #9999a5;
-      font-size: 13px;
-      margin-bottom: 15px;
-    }
+.purchase-title{
+  font-weight:800;
+  margin-bottom:8px;
+}
 
-    audio {
-      width: 100%;
-      display: block;
-    }
+.purchase-text{
+  color:#aaa;
+  line-height:1.6;
+  font-size:14px;
+}
 
-    .purchase-box {
-      margin-top: 24px;
-      padding: 17px;
-      border-radius: 15px;
-      background: rgba(168,85,247,.08);
-      border: 1px solid rgba(168,85,247,.18);
-      color: #cfc7d8;
-      line-height: 1.6;
-      font-size: 14px;
-    }
+.loading,
+.error{
+  text-align:center;
+  padding:60px 20px;
+  color:#aaa;
+}
 
-    .purchase-box strong {
-      color: #fff;
-    }
+.error{
+  color:#ff8f8f;
+}
 
-    .status {
-      text-align: center;
-      padding: 50px 20px;
-      color: #aaa;
-    }
+footer{
+  text-align:center;
+  color:#666;
+  font-size:13px;
+  padding:25px 15px 40px;
+}
 
-    footer {
-      text-align: center;
-      color: #777783;
-      font-size: 12px;
-      padding: 25px;
-      border-top: 1px solid rgba(255,255,255,.06);
-    }
+@media(max-width:600px){
+  nav{
+    padding:0 5%;
+  }
 
-    @media (max-width: 700px) {
-      nav {
-        padding: 0 5%;
-      }
+  .container{
+    width:94%;
+    margin-top:25px;
+  }
 
-      main {
-        width: 94%;
-        margin-top: 25px;
-      }
+  .song-card{
+    padding:20px;
+    border-radius:20px;
+  }
 
-      .song-card {
-        padding: 18px;
-        border-radius: 20px;
-      }
+  h1{
+    font-size:30px;
+  }
 
-      .song-top {
-        grid-template-columns: 1fr;
-        gap: 22px;
-      }
-
-      .cover {
-        max-width: 360px;
-        margin: auto;
-      }
-
-      h1 {
-        font-size: 36px;
-      }
-    }
-  </style>
+  .artist{
+    font-size:17px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <nav>
-    <div class="logo">◈ PASONG</div>
+<nav>
+  <div class="logo">◈ PASONG</div>
 
-    <div class="nav-right">
-      <div class="search">⌕</div>
-      <div class="account">◉</div>
+  <div class="nav-icons">
+    <span>⌕</span>
+    <span>◉</span>
+  </div>
+</nav>
+
+<main class="container">
+
+  <a href="store.html" class="back">← Back to Music Store</a>
+
+  <div id="loading" class="loading">
+    Loading song...
+  </div>
+
+  <div id="error" class="error" style="display:none;"></div>
+
+  <section id="songCard" class="song-card" style="display:none;">
+
+    <div id="coverContainer"></div>
+
+    <div class="badge" id="genreBadge">
+      Music
     </div>
-  </nav>
 
-  <main>
+    <h1 id="songTitle">Song</h1>
 
-    <a href="store.html" class="back">
-      ← Back to Music Store
-    </a>
-
-    <div id="loading" class="status">
-      Loading song...
+    <div class="artist" id="artistName">
+      Unknown Artist
     </div>
 
-    <div id="error" class="status" style="display:none;">
-      Unable to load this song.
+    <div class="genre" id="songGenre">
+      Music
     </div>
 
-    <section id="songCard" class="song-card" style="display:none;">
+    <div class="description" id="songDescription">
+      No description available.
+    </div>
 
-      <div class="song-top">
-
-        <img
-          id="cover"
-          class="cover"
-          src=""
-          alt="Song cover"
-        >
-
-        <div>
-
-          <div class="label">PASONG MUSIC</div>
-
-          <h1 id="title">Song</h1>
-
-          <div id="artist" class="artist">
-            Unknown Artist
-          </div>
-
-          <div id="genre" class="genre">
-            Music
-          </div>
-
-          <p id="description" class="description"></p>
-
-          <div class="price-box">
-            <div class="price-title">
-              Music price
-            </div>
-
-            <div id="price" class="price">
-              500 UGX
-            </div>
-          </div>
-
-        </div>
-
+    <div class="price-box">
+      <div class="price-label">
+        Music price
       </div>
 
-      <div class="preview-section">
+      <div class="price" id="songPrice">
+        500 UGX
+      </div>
+    </div>
 
-        <div class="preview-title">
-          🎧 20-Second Preview
-        </div>
+    <div class="preview-title">
+      🎧 20-Second Preview
+    </div>
 
-        <div class="preview-info">
-          Listen to up to 20 seconds before purchasing.
-        </div>
+    <div class="preview-text">
+      Listen to up to 20 seconds before purchasing.
+    </div>
 
-        <audio
-          id="audio"
-          controls
-          preload="metadata"
-        ></audio>
+    <audio
+      id="previewAudio"
+      controls
+      preload="metadata">
+    </audio>
 
-        <div class="purchase-box">
-          <strong>🛒 Purchase coming soon.</strong><br>
-          Payment is not connected yet. For now, enjoy the
-          20-second preview. PASONG payment options will be
-          connected when the payment destination is ready.
-        </div>
+    <div
+      class="preview-status"
+      id="previewStatus">
+    </div>
 
+    <div class="purchase-box">
+
+      <div class="purchase-title">
+        🛒 Purchase coming soon.
       </div>
 
-    </section>
+      <div class="purchase-text">
+        Payment is not connected yet. For now, enjoy the
+        20-second preview. PASONG payment options will be
+        connected when the payment destination is ready.
+      </div>
 
-  </main>
+    </div>
 
-  <footer>
-    PASONG © 2026 • Music • Artists • Opportunity
-  </footer>
+  </section>
+
+</main>
+
+<footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer>
+
+<script>
+
+const API_URL = "https://pasong-api.vercel.app";
+
+const loading = document.getElementById("loading");
+const errorBox = document.getElementById("error");
+const songCard = document.getElementById("songCard");
+
+const titleEl = document.getElementById("songTitle");
+const artistEl = document.getElementById("artistName");
+const genreEl = document.getElementById("songGenre");
+const genreBadge = document.getElementById("genreBadge");
+const descriptionEl = document.getElementById("songDescription");
+const priceEl = document.getElementById("songPrice");
+const audioEl = document.getElementById("previewAudio");
+const previewStatus = document.getElementById("previewStatus");
+const coverContainer = document.getElementById("coverContainer");
 
 
-  <script>
+function showError(message){
 
-    const API_BASE = "https://pasong-api.vercel.app";
+  loading.style.display = "none";
 
-    const loading = document.getElementById("loading");
-    const errorBox = document.getElementById("error");
-    const songCard = document.getElementById("songCard");
+  errorBox.textContent = message;
 
-    const titleEl = document.getElementById("title");
-    const artistEl = document.getElementById("artist");
-    const genreEl = document.getElementById("genre");
-    const descriptionEl = document.getElementById("description");
-    const priceEl = document.getElementById("price");
-    const coverEl = document.getElementById("cover");
-    const audioEl = document.getElementById("audio");
+  errorBox.style.display = "block";
+
+  songCard.style.display = "none";
+}
 
 
-    function getSongId() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("id");
+function getSongId(){
+
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  return params.get("id");
+}
+
+
+async function loadSong(){
+
+  const songId = getSongId();
+
+  if(!songId){
+
+    showError("No song was selected.");
+
+    return;
+  }
+
+  try{
+
+    const response = await fetch(
+      API_URL + "/api/songs"
+    );
+
+    if(!response.ok){
+
+      throw new Error(
+        "Unable to connect to PASONG API."
+      );
+
+    }
+
+    const result = await response.json();
+
+    const songs = result.songs || [];
+
+    const song = songs.find(
+      item => String(item.id) === String(songId)
+    );
+
+    if(!song){
+
+      showError("Song not found.");
+
+      return;
     }
 
 
-    function showError(message) {
-      loading.style.display = "none";
-      songCard.style.display = "none";
-
-      errorBox.textContent = message || "Unable to load this song.";
-      errorBox.style.display = "block";
-    }
-
-
-    async function getArtistName(artistId) {
-
-      if (!artistId) {
-        return "Unknown Artist";
-      }
-
-      try {
-
-        const response = await fetch(
-          `${API_BASE}/api/artist_profiles/${artistId}`
-        );
-
-        if (response.ok) {
-
-          const data = await response.json();
-
-          const artist =
-            data.artist ||
-            data.data?.artist ||
-            data.profile ||
-            data.data?.profile ||
-            data;
-
-          if (artist) {
-
-            return (
-              artist.stage_name ||
-              artist.artist_name ||
-              "Unknown Artist"
-            );
-
-          }
-
-        }
-
-      } catch (err) {
-        console.log("Artist endpoint unavailable:", err);
-      }
-
-
-      /*
-        Fallback: load artist_profiles directly from
-        Supabase public API.
-
-        This requires the Supabase anon key to be available
-        below. Replace the placeholder with your PUBLIC
-        Supabase anon key if needed.
-      */
-
-      try {
-
-        const SUPABASE_URL =
-          "https://mtufczmjlkvycarxylgh.supabase.co";
-
-        const SUPABASE_ANON_KEY =
-          "YOUR_SUPABASE_ANON_KEY";
-
-        if (
-          !SUPABASE_ANON_KEY ||
-          SUPABASE_ANON_KEY === "YOUR_SUPABASE_ANON_KEY"
-        ) {
-          return "Unknown Artist";
-        }
-
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/artist_profiles?id=eq.${encodeURIComponent(artistId)}&select=artist_name,stage_name`,
-          {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: `Bearer ${SUPABASE_ANON_KEY}`
-            }
-          }
-        );
-
-        if (!response.ok) {
-          return "Unknown Artist";
-        }
-
-        const artists = await response.json();
-
-        if (artists.length > 0) {
-
-          return (
-            artists[0].stage_name ||
-            artists[0].artist_name ||
-            "Unknown Artist"
-          );
-
-        }
-
-      } catch (err) {
-        console.log("Supabase artist lookup failed:", err);
-      }
-
-      return "Unknown Artist";
-    }
-
-
-    async function loadSong() {
-
-      const songId = getSongId();
-
-      if (!songId) {
-        showError("No song was selected.");
-        return;
-      }
-
-      try {
-
-        const response = await fetch(
-          `${API_BASE}/api/songs`
-        );
-
-        if (!response.ok) {
-          throw new Error("Songs API failed");
-        }
-
-        const data = await response.json();
-
-        const songs =
-          data.songs ||
-          data.data?.songs ||
-          data.data ||
-          [];
-
-        const song = songs.find(
-          item => String(item.id) === String(songId)
-        );
-
-        if (!song) {
-          showError("Song was not found.");
-          return;
-        }
-
-
-        titleEl.textContent =
-          song.title || "Untitled Song";
-
-
-        genreEl.textContent =
-          song.genre || "Music";
-
-
-        descriptionEl.textContent =
-          song.description ||
-          "No description available.";
-
-
-        const price =
-          song.price !== null &&
-          song.price !== undefined
-            ? song.price
-            : 500;
-
-        const currency =
-          song.currency || "UGX";
-
-
-        priceEl.textContent =
-          `${Number(price).toLocaleString()} ${currency}`;
-
-
-        if (song.cover_url) {
-
-          coverEl.src = song.cover_url;
-
-        } else {
-
-          coverEl.style.display = "none";
-
-        }
-
-
-        const audioUrl =
-          song.preview_url ||
-          song.audio_url;
-
-        if (audioUrl) {
-
-          audioEl.src = audioUrl;
-
-        } else {
-
-          audioEl.style.display = "none";
-
-        }
-
-
-        /*
-          IMPORTANT:
-          Artist name is loaded from artist_profiles
-          using the song's artist_id.
-        */
-
-        artistEl.textContent =
-          await getArtistName(song.artist_id);
-
-
-        loading.style.display = "none";
-        errorBox.style.display = "none";
-        songCard.style.display = "block";
-
-      } catch (err) {
-
-        console.error(err);
-
-        showError(
-          "Unable to load this song. Please try again."
-        );
-
-      }
-
-    }
+    /* ==============================
+       SONG INFORMATION
+       ============================== */
+
+    titleEl.textContent =
+      song.title || "Untitled Song";
 
 
     /*
-      Stop the preview automatically at 20 seconds.
+      IMPORTANT:
+      The PASONG API now returns artist_name
+      directly.
+
+      Example:
+      artist_name: "Bobley Nsubuga"
     */
+
+    artistEl.textContent =
+      song.artist_name ||
+      song.artist?.stage_name ||
+      song.artist?.artist_name ||
+      "Unknown Artist";
+
+
+    const genre =
+      song.genre ||
+      song.category ||
+      "Music";
+
+    genreEl.textContent = genre;
+
+    genreBadge.textContent = genre;
+
+
+    descriptionEl.textContent =
+      song.description ||
+      "No description available.";
+
+
+    const price =
+      Number(song.price) || 500;
+
+    const currency =
+      song.currency || "UGX";
+
+    priceEl.textContent =
+      price.toLocaleString() +
+      " " +
+      currency;
+
+
+    /* ==============================
+       COVER
+       ============================== */
+
+    if(song.cover_url){
+
+      const img =
+        document.createElement("img");
+
+      img.className = "cover";
+
+      img.src = song.cover_url;
+
+      img.alt =
+        song.title || "Song cover";
+
+      img.onerror = function(){
+
+        coverContainer.innerHTML = `
+          <div class="no-cover">
+            PASONG MUSIC
+          </div>
+        `;
+
+      };
+
+      coverContainer.appendChild(img);
+
+    }else{
+
+      coverContainer.innerHTML = `
+        <div class="no-cover">
+          PASONG MUSIC
+        </div>
+      `;
+
+    }
+
+
+    /* ==============================
+       AUDIO PREVIEW
+       ============================== */
+
+    const audioUrl =
+      song.preview_url ||
+      song.audio_url;
+
+    if(audioUrl){
+
+      audioEl.src = audioUrl;
+
+      audioEl.load();
+
+    }else{
+
+      audioEl.style.display = "none";
+
+      previewStatus.textContent =
+        "Preview is not available for this song.";
+
+    }
+
+
+    /* ==============================
+       DISPLAY PAGE
+       ============================== */
+
+    loading.style.display = "none";
+
+    errorBox.style.display = "none";
+
+    songCard.style.display = "block";
+
+
+    /* ==============================
+       20 SECOND PREVIEW LIMIT
+       ============================== */
 
     audioEl.addEventListener(
       "timeupdate",
-      function () {
+      function(){
 
-        if (audioEl.currentTime >= 20) {
+        if(audioEl.currentTime >= 20){
 
           audioEl.pause();
+
           audioEl.currentTime = 20;
+
+          previewStatus.textContent =
+            "20-second preview finished.";
+
+        }else{
+
+          previewStatus.textContent =
+            "Preview: " +
+            Math.floor(audioEl.currentTime) +
+            " / 20 seconds";
 
         }
 
@@ -622,9 +568,33 @@
     );
 
 
-    loadSong();
+    audioEl.addEventListener(
+      "play",
+      function(){
 
-  </script>
+        previewStatus.textContent =
+          "Preview playing...";
+
+      }
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showError(
+      "Failed to load song. Please try again."
+    );
+
+  }
+
+}
+
+
+loadSong();
+
+</script>
 
 </body>
 </html>
