@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Admin Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<title>PASONG Admin Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 *{
   margin:0;
   padding:0;
@@ -28,6 +23,9 @@ nav{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  position:sticky;
+  top:0;
+  z-index:100;
 }
 
 .logo{
@@ -42,7 +40,7 @@ nav{
 }
 
 main{
-  max-width:1200px;
+  max-width:1250px;
   margin:auto;
   padding:25px 18px 50px;
 }
@@ -119,11 +117,13 @@ h1{
   text-align:left;
   font-size:15px;
   font-weight:700;
+  transition:.2s;
 }
 
 .menu button:hover{
   border-color:#d946ef;
   background:#1b1724;
+  transform:translateY(-1px);
 }
 
 .section{
@@ -159,7 +159,7 @@ h1{
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:600px;
+  min-width:850px;
 }
 
 th,td{
@@ -167,14 +167,49 @@ th,td{
   border-bottom:1px solid #29293b;
   text-align:left;
   font-size:14px;
+  vertical-align:top;
 }
 
 th{
   color:#d8d8e5;
+  background:#13131f;
 }
 
 td{
   color:#aaaabb;
+}
+
+.song-title{
+  color:#fff;
+  font-weight:700;
+}
+
+.artist-name{
+  color:#d946ef;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.id-text{
+  font-size:11px;
+  color:#686879;
+  word-break:break-all;
+  max-width:180px;
+}
+
+.status{
+  color:#4ade80;
+  font-weight:700;
+}
+
+.status-pending{
+  color:#facc15;
+  font-weight:700;
+}
+
+.status-failed{
+  color:#fb7185;
+  font-weight:700;
 }
 
 button.action{
@@ -196,11 +231,6 @@ button.action:hover{
   border-color:#57263f !important;
 }
 
-.status{
-  color:#4ade80;
-  font-weight:700;
-}
-
 .notice{
   background:#151522;
   border:1px solid #29293d;
@@ -210,12 +240,33 @@ button.action:hover{
   line-height:1.6;
 }
 
-.artist-name{
+.empty{
+  text-align:center;
+  padding:25px;
+  color:#777789;
+}
+
+.refresh-row{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:12px;
+}
+
+.small-btn{
+  background:#181827;
   color:#fff;
-  font-weight:700;
+  border:1px solid #34344b;
+  padding:9px 14px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.small-btn:hover{
+  border-color:#d946ef;
 }
 
 @media(max-width:600px){
+
   h1{
     font-size:25px;
   }
@@ -223,379 +274,287 @@ button.action:hover{
   .menu{
     grid-template-columns:1fr;
   }
+
+  .section{
+    padding:15px;
+  }
+
+  nav{
+    padding:15px;
+  }
+
+  .logo{
+    font-size:21px;
+  }
 }
-</style>
-</head>
-
-<body>
-
-<nav>
+</style></head><body><nav>
   <div class="logo">◈ PASONG</div>
   <div class="admin-label">ADMIN PANEL</div>
-</nav>
-
-<main>
-
-<div id="loading">
+</nav><main><div id="loading">
   Checking administrator access...
-</div>
-
-<div id="error"></div>
-
-<div id="dashboard">
-
-<h1>PASONG Admin Dashboard</h1>
-
-<p class="subtitle">
-Manage PASONG music, users, orders and platform activity.
+</div><div id="error"></div><div id="dashboard"><h1>PASONG Admin Dashboard</h1><p class="subtitle">
+Manage PASONG music, artists, orders and platform activity.
+</p><!-- SUMMARY --><div class="cards">  <div class="card">
+    <h3>Administrator</h3>
+    <div class="number">✓</div>
+  </div>  <div class="card">
+    <h3>Music</h3>
+    <div class="number" id="musicCount">0</div>
+  </div>  <div class="card">
+    <h3>Artist Profiles</h3>
+    <div class="number" id="userCount">0</div>
+  </div>  <div class="card">
+    <h3>Orders</h3>
+    <div class="number" id="orderCount">0</div>
+  </div></div><!-- ADMIN MENU --><div class="menu">  <button onclick="showSection('sales')">
+    🛒 Sales & Orders
+  </button>  <button onclick="showSection('royalties')">
+    💰 Royalty Ledger
+  </button>  <button onclick="showSection('advertisements')">
+    📢 Advertisement Campaigns
+  </button>  <button onclick="showSection('referrals')">
+    🎁 Referral Points
+  </button>  <button onclick="showSection('payments')">
+    💳 Payments & Verification
+  </button>  <button onclick="showSection('reports')">
+    📊 Reports
+  </button></div><!-- SALES & ORDERS --><div class="section">  <h2>🛒 Sales & Orders</h2>  <div id="sales" class="section-content"><p>
+  View customer purchases, songs, prices and order status.
 </p>
 
+<div class="refresh-row">
+  <button class="small-btn" onclick="loadOrders()">
+    ↻ Refresh Orders
+  </button>
+</div>
 
-<!-- SUMMARY CARDS -->
+<div class="table-wrap">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Song</th>
+        <th>Buyer</th>
+        <th>Price</th>
+        <th>Currency</th>
+        <th>Status</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+
+    <tbody id="ordersTable">
+
+      <tr>
+        <td colspan="7">
+          Loading orders...
+        </td>
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
+  </div></div><!-- ROYALTIES --><div class="section">  <h2>💰 Royalty Ledger</h2>  <div id="royalties" class="section-content"><p>
+  Track PASONG music revenue distribution.
+</p>
+
+<div class="notice">
+
+  <strong>UGX 500 Song Sale Distribution</strong>
+
+  <br><br>
+
+  Artist — UGX 200 (40%)<br>
+  Producer — UGX 100 (20%)<br>
+  Writer — UGX 75 (15%)<br>
+  PASONG — UGX 125 (25%)
+
+  <br><br>
+
+  Royalty transactions will appear here as the payment system
+  records completed sales.
+
+</div>
+
+  </div></div><!-- ADVERTISEMENTS --><div class="section">  <h2>📢 Advertisement Campaigns</h2>  <div id="advertisements" class="section-content"><p>
+  Monitor PASONG advertising campaigns.
+</p>
+
+<div class="notice">
+
+  Advertiser campaigns will be managed from the PASONG advertising system.
+
+  <br><br>
+
+  Weekly promotion idea: UGX 10,000<br>
+  Monthly promotion idea: UGX 50,000
+
+</div>
+
+  </div></div><!-- REFERRALS --><div class="section">  <h2>🎁 Referral Points</h2>  <div id="referrals" class="section-content"><p>
+  Monitor PASONG referral activity.
+</p>
+
+<div class="notice">
+
+  1,000 PASONG Points = UGX 1,000
+
+  <br><br>
+
+  Successful referral = 50 PASONG Points
+
+  <br>
+
+  Referral qualifies when the referred user completes
+  their first UGX 500 song purchase.
+
+</div>
+
+  </div></div><!-- PAYMENTS --><div class="section">  <h2>💳 Payments & Verification</h2>  <div id="payments" class="section-content"><p>
+  Monitor payment processing and verification.
+</p>
+
+<div class="notice">
+
+  <strong>Payment Channels</strong>
+
+  <br><br>
+
+  MTN Mobile Money<br>
+  Airtel Money<br>
+  Card / Online Payments
+
+  <br><br>
+
+  <span class="status">
+    ● System ready for payment integration
+  </span>
+
+</div>
+
+  </div></div><!-- REPORTS --><div class="section">  <h2>📊 Reports</h2>  <div id="reports" class="section-content"><p>
+  View PASONG platform statistics.
+</p>
 
 <div class="cards">
 
   <div class="card">
-    <h3>Administrator</h3>
-    <div class="number">✓</div>
+
+    <h3>Total Music</h3>
+
+    <div
+      class="number"
+      id="reportSongs">
+      0
+    </div>
+
   </div>
 
   <div class="card">
-    <h3>Music</h3>
-    <div class="number" id="musicCount">0</div>
+
+    <h3>Total Artists</h3>
+
+    <div
+      class="number"
+      id="reportArtists">
+      0
+    </div>
+
   </div>
 
   <div class="card">
-    <h3>Artist Profiles</h3>
-    <div class="number" id="userCount">0</div>
-  </div>
 
-  <div class="card">
-    <h3>Orders</h3>
-    <div class="number" id="orderCount">0</div>
-  </div>
+    <h3>Total Orders</h3>
 
-</div>
-
-
-<!-- ADMIN MENU -->
-
-<div class="menu">
-
-  <button onclick="showSection('sales')">
-    🛒 Sales & Orders
-  </button>
-
-  <button onclick="showSection('royalties')">
-    💰 Royalty Ledger
-  </button>
-
-  <button onclick="showSection('advertisements')">
-    📢 Advertisement Campaigns
-  </button>
-
-  <button onclick="showSection('referrals')">
-    🎁 Referral Points
-  </button>
-
-  <button onclick="showSection('payments')">
-    💳 Payments & Verification
-  </button>
-
-  <button onclick="showSection('reports')">
-    📊 Reports
-  </button>
-
-</div>
-
-
-<!-- SALES & ORDERS -->
-
-<div class="section">
-
-  <h2>🛒 Sales & Orders</h2>
-
-  <div id="sales" class="section-content">
-
-    <p>Manage PASONG customer orders.</p>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>User</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-
-        <tbody id="ordersTable">
-
-          <tr>
-            <td colspan="5">
-              Loading orders...
-            </td>
-          </tr>
-
-        </tbody>
-
-      </table>
-
+    <div
+      class="number"
+      id="reportOrders">
+      0
     </div>
 
   </div>
 
 </div>
 
-
-<!-- ROYALTY LEDGER -->
-
-<div class="section">
-
-  <h2>💰 Royalty Ledger</h2>
-
-  <div id="royalties" class="section-content">
-
-    <p>Track PASONG music revenue distribution.</p>
-
-    <div class="notice">
-
-      <strong>UGX 500 Song Sale Distribution</strong>
-
-      <br><br>
-
-      Artist — UGX 200 (40%)<br>
-      Producer — UGX 100 (20%)<br>
-      Writer — UGX 75 (15%)<br>
-      PASONG — UGX 125 (25%)
-
-      <br><br>
-
-      Royalty transactions will appear here as completed purchases are recorded.
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ADVERTISEMENTS -->
-
-<div class="section">
-
-  <h2>📢 Advertisement Campaigns</h2>
-
-  <div id="advertisements" class="section-content">
-
-    <p>Monitor PASONG advertising campaigns.</p>
-
-    <div class="notice">
-
-      Advertiser campaigns will be managed from the PASONG advertising system.
-
-      <br><br>
-
-      Weekly promotion idea: UGX 10,000<br>
-      Monthly promotion idea: UGX 50,000
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- REFERRALS -->
-
-<div class="section">
-
-  <h2>🎁 Referral Points</h2>
-
-  <div id="referrals" class="section-content">
-
-    <p>Monitor PASONG referral activity.</p>
-
-    <div class="notice">
-
-      1,000 PASONG Points = UGX 1,000
-
-      <br><br>
-
-      Successful referral = 50 PASONG Points
-
-      <br><br>
-
-      A referral qualifies when the referred user completes their first UGX 500 song purchase.
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- PAYMENTS -->
-
-<div class="section">
-
-  <h2>💳 Payments & Verification</h2>
-
-  <div id="payments" class="section-content">
-
-    <p>Monitor payment processing and verification.</p>
-
-    <div class="notice">
-
-      <strong>Payment Channels</strong>
-
-      <br><br>
-
-      MTN Mobile Money<br>
-      Airtel Money<br>
-      Card / Online Payments
-
-      <br><br>
-
-      <span class="status">
-        ● Payment system ready for integration
-      </span>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- REPORTS -->
-
-<div class="section">
-
-  <h2>📊 Reports</h2>
-
-  <div id="reports" class="section-content">
-
-    <p>View PASONG platform statistics.</p>
-
-    <div class="cards">
-
-      <div class="card">
-        <h3>Total Music</h3>
-        <div class="number" id="reportSongs">0</div>
-      </div>
-
-      <div class="card">
-        <h3>Total Artists</h3>
-        <div class="number" id="reportArtists">0</div>
-      </div>
-
-      <div class="card">
-        <h3>Total Orders</h3>
-        <div class="number" id="reportOrders">0</div>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- MUSIC CONTROL -->
-
-<div class="section">
-
-  <h2>🎵 Music Control</h2>
-
-  <div class="section-content active">
-
-    <p>
-      Music currently stored in PASONG.
-    </p>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Artist</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="songsTable">
-
-          <tr>
-            <td colspan="4">
-              Loading music...
-            </td>
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- PLATFORM STATUS -->
-
-<div class="section">
-
-  <h2>⚙️ Platform Status</h2>
-
-  <div class="notice">
-
-    Authentication:
-    <span class="status">
-      ● Connected
-    </span>
-
-    <br>
-
-    Supabase:
-    <span class="status">
-      ● Connected
-    </span>
-
-    <br>
-
-    Admin Role:
-    <span class="status">
-      ● Verified
-    </span>
-
-  </div>
-
-  <br>
-
-  <button class="action logout" onclick="logout()">
-    Logout
+  </div></div><!-- MUSIC CONTROL --><div class="section">  <h2>🎵 Music Control</h2>  <div class="section-content active"><p>
+  Music currently stored in PASONG.
+</p>
+
+<div class="refresh-row">
+
+  <button
+    class="small-btn"
+    onclick="loadSongs()">
+    ↻ Refresh Music
   </button>
 
 </div>
 
+<div class="table-wrap">
+
+  <table>
+
+    <thead>
+
+      <tr>
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Price</th>
+        <th>Currency</th>
+        <th>Status</th>
+        <th>Song ID</th>
+      </tr>
+
+    </thead>
+
+    <tbody id="songsTable">
+
+      <tr>
+        <td colspan="6">
+          Loading music...
+        </td>
+      </tr>
+
+    </tbody>
+
+  </table>
 
 </div>
 
-</main>
+  </div></div><!-- PLATFORM STATUS --><div class="section">  <h2>⚙️ Platform Status</h2>  <div class="notice">Authentication:
+<span class="status">
+  ● Connected
+</span>
 
+<br>
 
-<script>
+Supabase:
+<span class="status">
+  ● Connected
+</span>
+
+<br>
+
+Admin Role:
+<span class="status">
+  ● Verified
+</span>
+
+  </div>  <br><button
+class="action logout"
+onclick="logout()">
+Logout
+</button>
+
+</div></div></main><script>
+
+/* ======================================================
+   SUPABASE
+====================================================== */
 
 const SUPABASE_URL =
 "https://mtufczmjlkvycarxylgh.supabase.co";
@@ -610,26 +569,37 @@ window.supabase.createClient(
 );
 
 
-let usersData = [];
+/* ======================================================
+   DATA
+====================================================== */
+
 let ordersData = [];
 let songsData = [];
 let artistsData = [];
+let orderItemsData = [];
 
+
+/* ======================================================
+   ERROR
+====================================================== */
 
 function showError(message){
 
   document.getElementById("loading")
-    .style.display = "none";
+    .style.display="none";
 
   const error =
     document.getElementById("error");
 
-  error.textContent = message;
+  error.textContent=message;
 
-  error.style.display = "block";
-
+  error.style.display="block";
 }
 
+
+/* ======================================================
+   ADMIN CHECK
+====================================================== */
 
 async function checkAdmin(){
 
@@ -637,25 +607,20 @@ async function checkAdmin(){
 
     const {
       data:{session},
-      error:sessionError
+      error
     } =
     await supabaseClient.auth.getSession();
 
-    if(sessionError){
-
-      throw sessionError;
-
-    }
+    if(error) throw error;
 
     if(!session){
 
-      window.location.href = "account.html";
+      window.location.href="account.html";
 
       return;
-
     }
 
-    const user = session.user;
+    const user=session.user;
 
     const role =
       user.app_metadata &&
@@ -668,14 +633,13 @@ async function checkAdmin(){
       );
 
       return;
-
     }
 
     document.getElementById("loading")
-      .style.display = "none";
+      .style.display="none";
 
     document.getElementById("dashboard")
-      .style.display = "block";
+      .style.display="block";
 
     await loadAllData();
 
@@ -684,8 +648,8 @@ async function checkAdmin(){
     console.error(error);
 
     showError(
-      "Unable to verify administrator access: " +
-      error.message
+      "Unable to verify administrator access: "
+      + error.message
     );
 
   }
@@ -693,16 +657,24 @@ async function checkAdmin(){
 }
 
 
+/* ======================================================
+   LOAD EVERYTHING
+====================================================== */
+
 async function loadAllData(){
 
   await Promise.all([
     loadUsers(),
-    loadOrders(),
-    loadSongs()
+    loadSongs(),
+    loadOrders()
   ]);
 
 }
 
+
+/* ======================================================
+   LOAD ARTIST PROFILES
+====================================================== */
 
 async function loadUsers(){
 
@@ -716,23 +688,18 @@ async function loadUsers(){
       .from("artist_profiles")
       .select("*");
 
-    if(error){
+    if(error) throw error;
 
-      throw error;
-
-    }
-
-    usersData = data || [];
-    artistsData = data || [];
+    artistsData=data || [];
 
     const count =
       artistsData.length;
 
     document.getElementById("userCount")
-      .textContent = count;
+      .textContent=count;
 
     document.getElementById("reportArtists")
-      .textContent = count;
+      .textContent=count;
 
   }catch(error){
 
@@ -741,138 +708,45 @@ async function loadUsers(){
       error
     );
 
-    document.getElementById("userCount")
-      .textContent = "0";
-
-    document.getElementById("reportArtists")
-      .textContent = "0";
-
   }
 
 }
 
 
-async function loadOrders(){
+/* ======================================================
+   FIND ARTIST NAME
+====================================================== */
 
-  try{
+function findArtistName(artistId){
 
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("orders")
-      .select("*")
-      .order(
-        "created_at",
-        {ascending:false}
-      );
+  if(!artistId){
 
-    if(error){
+    return "Unknown Artist";
+  }
 
-      throw error;
-
-    }
-
-    ordersData = data || [];
-
-    document.getElementById("orderCount")
-      .textContent = ordersData.length;
-
-    document.getElementById("reportOrders")
-      .textContent = ordersData.length;
-
-    const table =
-      document.getElementById("ordersTable");
-
-    if(!ordersData.length){
-
-      table.innerHTML =
-      `<tr>
-        <td colspan="5">
-          No orders yet.
-        </td>
-      </tr>`;
-
-      return;
-
-    }
-
-    table.innerHTML =
-      ordersData.map(order => {
-
-        const id =
-          order.id || "-";
-
-        const user =
-          order.user_id ||
-          order.buyer_id ||
-          "-";
-
-        const amount =
-          order.total_amount ||
-          order.amount ||
-          order.total ||
-          "0";
-
-        const status =
-          order.status ||
-          "pending";
-
-        const created =
-          order.created_at
-          ? new Date(
-              order.created_at
-            ).toLocaleString()
-          : "-";
-
-        return `
-        <tr>
-
-          <td>
-            ${escapeHtml(String(id))}
-          </td>
-
-          <td>
-            ${escapeHtml(String(user))}
-          </td>
-
-          <td>
-            UGX ${escapeHtml(String(amount))}
-          </td>
-
-          <td>
-            ${escapeHtml(String(status))}
-          </td>
-
-          <td>
-            ${escapeHtml(String(created))}
-          </td>
-
-        </tr>
-        `;
-
-      }).join("");
-
-  }catch(error){
-
-    console.error(
-      "Orders error:",
-      error
+  const artist =
+    artistsData.find(
+      profile =>
+        String(profile.id) === String(artistId)
     );
 
-    document.getElementById("ordersTable")
-      .innerHTML =
-      `<tr>
-        <td colspan="5">
-          Unable to load orders.
-        </td>
-      </tr>`;
+  if(!artist){
 
+    return "Unknown Artist";
   }
+
+  return (
+    artist.stage_name ||
+    artist.artist_name ||
+    "Unnamed Artist"
+  );
 
 }
 
+
+/* ======================================================
+   LOAD SONGS
+====================================================== */
 
 async function loadSongs(){
 
@@ -885,41 +759,31 @@ async function loadSongs(){
     await supabaseClient
       .from("songs")
       .select("*")
-      .order(
-        "id",
-        {ascending:false}
-      );
+      .order("created_at",{ascending:false});
 
-    if(error){
+    if(error) throw error;
 
-      throw error;
-
-    }
-
-    songsData = data || [];
+    songsData=data || [];
 
     document.getElementById("musicCount")
-      .textContent =
-      songsData.length;
+      .textContent=songsData.length;
 
     document.getElementById("reportSongs")
-      .textContent =
-      songsData.length;
+      .textContent=songsData.length;
 
     const table =
       document.getElementById("songsTable");
 
     if(!songsData.length){
 
-      table.innerHTML =
+      table.innerHTML=
       `<tr>
-        <td colspan="4">
+        <td colspan="6" class="empty">
           No songs uploaded yet.
         </td>
       </tr>`;
 
       return;
-
     }
 
     table.innerHTML =
@@ -929,38 +793,57 @@ async function loadSongs(){
           song.title || "-";
 
         const price =
-          song.price || 500;
+          song.price !== null &&
+          song.price !== undefined
+          ? song.price
+          : 500;
+
+        const currency =
+          song.currency || "UGX";
 
         const status =
           song.status || "active";
 
-        const artistId =
-          song.artist_id || null;
+        const artistName =
+          findArtistName(song.artist_id);
 
-        const artist =
-          findArtistName(artistId);
+        const songId =
+          song.id || "-";
 
         return `
         <tr>
 
           <td>
-            ${escapeHtml(String(title))}
+            <div class="song-title">
+              ${escapeHtml(String(title))}
+            </div>
           </td>
 
           <td>
-            UGX ${escapeHtml(String(price))}
+            <div class="artist-name">
+              ${escapeHtml(String(artistName))}
+            </div>
           </td>
 
           <td>
-            ${escapeHtml(String(status))}
+            ${escapeHtml(String(price))}
           </td>
 
-          <td class="artist-name">
-            ${escapeHtml(artist)}
+          <td>
+            ${escapeHtml(String(currency))}
           </td>
 
-        </tr>
-        `;
+          <td>
+            ${formatStatus(status)}
+          </td>
+
+          <td>
+            <div class="id-text">
+              ${escapeHtml(String(songId))}
+            </div>
+          </td>
+
+        </tr>`;
 
       }).join("");
 
@@ -972,9 +855,9 @@ async function loadSongs(){
     );
 
     document.getElementById("songsTable")
-      .innerHTML =
+      .innerHTML=
       `<tr>
-        <td colspan="4">
+        <td colspan="6">
           Unable to load music.
         </td>
       </tr>`;
@@ -984,45 +867,366 @@ async function loadSongs(){
 }
 
 
-function findArtistName(artistId){
+/* ======================================================
+   LOAD ORDERS
+====================================================== */
 
-  if(!artistId){
+async function loadOrders(){
 
-    return "Unknown Artist";
+  try{
 
-  }
+    const {
+      data:orders,
+      error:ordersError
+    } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {ascending:false}
+      );
 
-  const artist =
-    artistsData.find(
-      profile =>
-        String(profile.id) ===
-        String(artistId)
+    if(ordersError) throw ordersError;
+
+    ordersData=orders || [];
+
+
+    /* -----------------------------------------------
+       LOAD ORDER ITEMS
+    ----------------------------------------------- */
+
+    const {
+      data:items,
+      error:itemsError
+    } =
+    await supabaseClient
+      .from("order_items")
+      .select("*");
+
+    if(itemsError) throw itemsError;
+
+    orderItemsData=items || [];
+
+
+    /* -----------------------------------------------
+       SUMMARY
+    ----------------------------------------------- */
+
+    document.getElementById("orderCount")
+      .textContent=ordersData.length;
+
+    document.getElementById("reportOrders")
+      .textContent=ordersData.length;
+
+
+    /* -----------------------------------------------
+       TABLE
+    ----------------------------------------------- */
+
+    const table =
+      document.getElementById("ordersTable");
+
+    if(!ordersData.length){
+
+      table.innerHTML=
+      `<tr>
+        <td colspan="7" class="empty">
+          No orders yet.
+        </td>
+      </tr>`;
+
+      return;
+    }
+
+
+    table.innerHTML =
+      ordersData.map(order => {
+
+        const id =
+          order.id || "-";
+
+        const buyer =
+          order.buyer_id || "-";
+
+        const status =
+          order.status || "pending";
+
+        const created =
+          order.created_at
+          ? new Date(
+              order.created_at
+            ).toLocaleString()
+          : "-";
+
+
+        /* -----------------------------------------
+           FIND ITEMS FOR THIS ORDER
+        ----------------------------------------- */
+
+        const itemsForOrder =
+          orderItemsData.filter(
+            item =>
+              String(item.order_id)
+              ===
+              String(order.id)
+          );
+
+
+        /* -----------------------------------------
+           BUILD SONG DISPLAY
+        ----------------------------------------- */
+
+        let songHtml="";
+
+        if(!itemsForOrder.length){
+
+          songHtml =
+          `<span class="id-text">
+            No song item found
+          </span>`;
+
+        }else{
+
+          songHtml =
+            itemsForOrder.map(item => {
+
+              const song =
+                songsData.find(
+                  s =>
+                    String(s.id)
+                    ===
+                    String(item.song_id)
+                );
+
+              if(!song){
+
+                return `
+                <div>
+                  <div class="song-title">
+                    Unknown Song
+                  </div>
+
+                  <div class="id-text">
+                    Song ID:
+                    ${escapeHtml(
+                      String(item.song_id || "-")
+                    )}
+                  </div>
+                </div>`;
+
+              }
+
+              const artistName =
+                findArtistName(
+                  song.artist_id
+                );
+
+              return `
+              <div style="margin-bottom:8px;">
+
+                <div class="song-title">
+                  ${escapeHtml(
+                    String(song.title || "-")
+                  )}
+                </div>
+
+                <div class="artist-name">
+                  ${escapeHtml(
+                    String(artistName)
+                  )}
+                </div>
+
+              </div>`;
+
+            }).join("");
+
+        }
+
+
+        /* -----------------------------------------
+           PRICE
+        ----------------------------------------- */
+
+        let priceHtml="";
+
+        if(itemsForOrder.length){
+
+          priceHtml =
+            itemsForOrder.map(item => {
+
+              const price =
+                item.price !== null &&
+                item.price !== undefined
+                ? item.price
+                : 0;
+
+              return `
+              <div>
+                ${escapeHtml(
+                  String(price)
+                )}
+              </div>`;
+
+            }).join("");
+
+        }else{
+
+          const amount =
+            order.total_amount ||
+            order.amount ||
+            order.total ||
+            0;
+
+          priceHtml =
+            escapeHtml(
+              String(amount)
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           CURRENCY
+        ----------------------------------------- */
+
+        let currency="UGX";
+
+        if(itemsForOrder.length){
+
+          currency =
+            itemsForOrder[0].currency ||
+            order.currency ||
+            "UGX";
+
+        }else{
+
+          currency =
+            order.currency ||
+            "UGX";
+
+        }
+
+
+        return `
+        <tr>
+
+          <td>
+            <div class="id-text">
+              ${escapeHtml(String(id))}
+            </div>
+          </td>
+
+          <td>
+            ${songHtml}
+          </td>
+
+          <td>
+            <div class="id-text">
+              ${escapeHtml(String(buyer))}
+            </div>
+          </td>
+
+          <td>
+            ${priceHtml}
+          </td>
+
+          <td>
+            ${escapeHtml(String(currency))}
+          </td>
+
+          <td>
+            ${formatStatus(status)}
+          </td>
+
+          <td>
+            ${escapeHtml(String(created))}
+          </td>
+
+        </tr>`;
+
+      }).join("");
+
+  }catch(error){
+
+    console.error(
+      "Orders error:",
+      error
     );
 
-  if(!artist){
-
-    return "Unknown Artist";
+    document.getElementById("ordersTable")
+      .innerHTML=
+      `<tr>
+        <td colspan="7">
+          Unable to load orders.
+        </td>
+      </tr>`;
 
   }
-
-  return (
-    artist.stage_name ||
-    artist.artist_name ||
-    "Unnamed Artist"
-  );
 
 }
 
 
+/* ======================================================
+   STATUS FORMAT
+====================================================== */
+
+function formatStatus(status){
+
+  const value =
+    String(status || "pending")
+      .toLowerCase();
+
+  if(
+    value === "completed" ||
+    value === "paid" ||
+    value === "success" ||
+    value === "approved" ||
+    value === "active"
+  ){
+
+    return `
+    <span class="status">
+      ● ${escapeHtml(value)}
+    </span>`;
+
+  }
+
+  if(
+    value === "failed" ||
+    value === "cancelled" ||
+    value === "rejected"
+  ){
+
+    return `
+    <span class="status-failed">
+      ● ${escapeHtml(value)}
+    </span>`;
+
+  }
+
+  return `
+  <span class="status-pending">
+    ● ${escapeHtml(value)}
+  </span>`;
+
+}
+
+
+/* ======================================================
+   SECTION NAVIGATION
+====================================================== */
+
 function showSection(id){
 
-  document
-    .querySelectorAll(".section-content")
-    .forEach(section => {
+  document.querySelectorAll(
+    ".section-content"
+  ).forEach(section => {
 
-      section.classList.remove("active");
+    section.classList.remove("active");
 
-    });
+  });
+
 
   const selected =
     document.getElementById(id);
@@ -1041,6 +1245,10 @@ function showSection(id){
 }
 
 
+/* ======================================================
+   HTML SECURITY
+====================================================== */
+
 function escapeHtml(value){
 
   return String(value)
@@ -1053,19 +1261,24 @@ function escapeHtml(value){
 }
 
 
+/* ======================================================
+   LOGOUT
+====================================================== */
+
 async function logout(){
 
   await supabaseClient.auth.signOut();
 
-  window.location.href =
-    "account.html";
+  window.location.href="account.html";
 
 }
 
 
+/* ======================================================
+   START
+====================================================== */
+
 checkAdmin();
 
-</script>
-
-</body>
+</script></body>
 </html>
