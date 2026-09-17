@@ -20,9 +20,7 @@ body{
   min-height:100vh;
 }
 
-/* =========================
-   NAVIGATION
-========================= */
+/* ================= NAV ================= */
 
 nav{
   display:flex;
@@ -77,9 +75,7 @@ nav a.active{
   font-size:18px;
 }
 
-/* =========================
-   MAIN
-========================= */
+/* ================= MAIN ================= */
 
 .wrap{
   max-width:900px;
@@ -110,9 +106,7 @@ h1 span{
   margin-bottom:22px;
 }
 
-/* =========================
-   FLYERS
-========================= */
+/* ================= FLYERS ================= */
 
 .flyers-section{
   margin-bottom:28px;
@@ -193,9 +187,7 @@ h1 span{
   margin-top:2px;
 }
 
-/* =========================
-   SONG LIST
-========================= */
+/* ================= SONG LIST ================= */
 
 .list{
   display:flex;
@@ -230,9 +222,7 @@ h1 span{
   border:1px solid rgba(255,255,255,0.06);
 }
 
-/* =========================
-   PLAY BUTTON
-========================= */
+/* ================= PLAY ================= */
 
 .play-wrap{
   position:relative;
@@ -270,9 +260,7 @@ h1 span{
   margin-left:2px;
 }
 
-/* =========================
-   SONG INFO
-========================= */
+/* ================= INFO ================= */
 
 .info{
   flex:1;
@@ -301,9 +289,7 @@ h1 span{
   font-size:12px;
 }
 
-/* =========================
-   RIGHT SIDE
-========================= */
+/* ================= RIGHT ================= */
 
 .right{
   text-align:right;
@@ -320,15 +306,13 @@ h1 span{
   font-size:14px;
 }
 
-/* =========================
-   BUY BUTTON
-========================= */
+/* ================= BUY BUTTON ================= */
 
 .buy{
   position:relative;
   z-index:1;
   border:none;
-  background:transparent;
+  background:#151525;
   color:#c4b5fd;
   border-radius:20px;
   padding:7px 14px;
@@ -339,24 +323,28 @@ h1 span{
   gap:6px;
   cursor:pointer;
   overflow:hidden;
+  isolation:isolate;
 }
 
 .buy::before{
   content:'';
   position:absolute;
-  inset:-2px;
-  border-radius:20px;
+  z-index:-2;
+  width:200%;
+  height:200%;
+  left:-50%;
+  top:-50%;
   background:
     conic-gradient(
       from 0deg,
-      #a855f7,
-      #ec4899,
-      #60a5fa,
-      #c084fc,
-      #a855f7
+      transparent 0%,
+      transparent 60%,
+      #a855f7 75%,
+      #ec4899 85%,
+      #60a5fa 95%,
+      transparent 100%
     );
-  animation:spin 2s linear infinite;
-  z-index:-2;
+  animation:spin 1.5s linear infinite;
 }
 
 .buy::after{
@@ -378,14 +366,16 @@ h1 span{
 }
 
 @keyframes spin{
-  to{
+  0%{
+    transform:rotate(0deg);
+  }
+
+  100%{
     transform:rotate(360deg);
   }
 }
 
-/* =========================
-   EMPTY / ERROR
-========================= */
+/* ================= MESSAGE ================= */
 
 .message{
   color:#666;
@@ -408,9 +398,7 @@ h1 span{
   cursor:pointer;
 }
 
-/* =========================
-   MOBILE
-========================= */
+/* ================= MOBILE ================= */
 
 @media(max-width:650px){
 
@@ -511,15 +499,11 @@ h1 span{
 
 <body>
 
-<!-- =========================
-     NAVIGATION
-========================= -->
+<!-- ================= NAVIGATION ================= -->
 
 <nav>
 
-  <b>
-    PA<span>SONG</span>
-  </b>
+  <b>PA<span>SONG</span></b>
 
   <a href="index.html">Home</a>
 
@@ -547,9 +531,7 @@ h1 span{
 </nav>
 
 
-<!-- =========================
-     MAIN CONTENT
-========================= -->
+<!-- ================= MAIN ================= -->
 
 <div class="wrap">
 
@@ -564,9 +546,7 @@ h1 span{
   <div class="line"></div>
 
 
-  <!-- =========================
-       FLYERS
-  ========================= -->
+  <!-- ================= FLYERS ================= -->
 
   <section class="flyers-section">
 
@@ -582,12 +562,8 @@ h1 span{
 
     </div>
 
-    <div id="flyers" class="flyers">
 
-      <!--
-        FLYER 1
-        Replace the image URL with your actual flyer.
-      -->
+    <div class="flyers">
 
       <div class="flyer">
 
@@ -612,8 +588,6 @@ h1 span{
       </div>
 
 
-      <!-- FLYER 2 -->
-
       <div class="flyer">
 
         <img
@@ -636,8 +610,6 @@ h1 span{
 
       </div>
 
-
-      <!-- FLYER 3 -->
 
       <div class="flyer">
 
@@ -666,9 +638,7 @@ h1 span{
   </section>
 
 
-  <!-- =========================
-       SONG LIST
-  ========================= -->
+  <!-- ================= SONGS ================= -->
 
   <div id="songList" class="list">
 
@@ -687,11 +657,12 @@ h1 span{
    PASONG API
 ===================================================== */
 
-const API_URL = "https://pasong-api.vercel.app";
+const API_URL =
+  "https://pasong-api.vercel.app";
 
 
 /* =====================================================
-   AUDIO STATE
+   AUDIO
 ===================================================== */
 
 let currentAudio = null;
@@ -700,7 +671,7 @@ let previewTimer = null;
 
 
 /* =====================================================
-   SVG ICONS
+   ICONS
 ===================================================== */
 
 const PLAY_ICON = `
@@ -717,7 +688,7 @@ const PAUSE_ICON = `
 
 
 /* =====================================================
-   ESCAPE HTML
+   ESCAPE
 ===================================================== */
 
 function esc(value){
@@ -738,7 +709,8 @@ function esc(value){
 
 async function loadSongs(){
 
-  const list = document.getElementById("songList");
+  const list =
+    document.getElementById("songList");
 
   list.innerHTML = `
     <p class="message">
@@ -746,36 +718,41 @@ async function loadSongs(){
     </p>
   `;
 
+
   try{
 
-    const response = await fetch(
-      `${API_URL}/api/songs`,
-      {
-        method:"GET",
-        headers:{
-          "Accept":"application/json"
+    const response =
+      await fetch(
+        `${API_URL}/api/songs`,
+        {
+          method:"GET",
+          headers:{
+            "Accept":"application/json"
+          }
         }
-      }
-    );
+      );
+
 
     if(!response.ok){
 
       throw new Error(
-        `API error: ${response.status}`
+        `API returned ${response.status}`
       );
 
     }
 
-    const data = await response.json();
 
-    const songs = Array.isArray(data)
-      ? data
-      : (data.songs || []);
+    const data =
+      await response.json();
 
 
-    /* =========================
-       NO SONGS
-    ========================= */
+    const songs =
+      Array.isArray(data)
+        ? data
+        : (data.songs || []);
+
+
+    /* NO SONGS */
 
     if(!songs.length){
 
@@ -790,17 +767,18 @@ async function loadSongs(){
     }
 
 
-    /* =========================
-       CREATE SONGS
-    ========================= */
-
     list.innerHTML = "";
+
+
+    /* CREATE SONG CARDS */
 
     songs.forEach(song => {
 
-      const div = document.createElement("div");
+      const div =
+        document.createElement("div");
 
-      div.className = "item";
+      div.className =
+        "item";
 
 
       const title =
@@ -823,12 +801,6 @@ async function loadSongs(){
         song.cover_url ||
         song.image ||
         "assets/default-cover.jpg";
-
-
-      const audio =
-        song.preview_url ||
-        song.audio_url ||
-        "";
 
 
       div.innerHTML = `
@@ -903,13 +875,9 @@ async function loadSongs(){
         div.querySelector(".buy");
 
 
-      /* =========================
-         PREVIEW
-      ========================= */
-
       playButton.addEventListener(
         "click",
-        () => {
+        function(){
 
           playPreview(
             song,
@@ -920,13 +888,9 @@ async function loadSongs(){
       );
 
 
-      /* =========================
-         BUY
-      ========================= */
-
       buyButton.addEventListener(
         "click",
-        () => {
+        function(){
 
           buySong(song);
 
@@ -942,7 +906,7 @@ async function loadSongs(){
   catch(error){
 
     console.error(
-      "PASONG song loading error:",
+      "PASONG API error:",
       error
     );
 
@@ -963,6 +927,7 @@ async function loadSongs(){
 
         <button
           class="retry"
+          type="button"
           onclick="loadSongs()"
         >
           Try Again
@@ -978,10 +943,10 @@ async function loadSongs(){
 
 
 /* =====================================================
-   PLAY 20 SECOND PREVIEW
+   PLAY PREVIEW
 ===================================================== */
 
-function playPreview(song, button){
+function playPreview(song,button){
 
   const url =
     song.preview_url ||
@@ -999,9 +964,7 @@ function playPreview(song, button){
   }
 
 
-  /* =========================
-     CLICK SAME SONG
-  ========================= */
+  /* SAME BUTTON */
 
   if(
     currentButton === button &&
@@ -1015,16 +978,12 @@ function playPreview(song, button){
   }
 
 
-  /* =========================
-     STOP PREVIOUS
-  ========================= */
+  /* STOP OLD AUDIO */
 
   stopPreview();
 
 
-  /* =========================
-     CREATE AUDIO
-  ========================= */
+  /* CREATE AUDIO */
 
   const audio =
     new Audio(url);
@@ -1041,15 +1000,13 @@ function playPreview(song, button){
     PAUSE_ICON;
 
 
-  /* =========================
-     PLAY
-  ========================= */
+  /* PLAY */
 
   audio.play()
     .catch(error => {
 
       console.error(
-        "Preview playback error:",
+        "Audio playback error:",
         error
       );
 
@@ -1058,39 +1015,36 @@ function playPreview(song, button){
     });
 
 
-  /* =========================
-     20 SECOND LIMIT
-  ========================= */
+  /* 20 SECOND LIMIT */
 
   previewTimer =
-    setTimeout(() => {
+    setTimeout(
+      function(){
 
-      stopPreview();
+        stopPreview();
 
-    },20000);
+      },
+      20000
+    );
 
 
-  /* =========================
-     AUDIO ENDED
-  ========================= */
+  /* ENDED */
 
   audio.onended =
-    () => {
+    function(){
 
       stopPreview();
 
     };
 
 
-  /* =========================
-     AUDIO ERROR
-  ========================= */
+  /* ERROR */
 
   audio.onerror =
-    () => {
+    function(){
 
       console.error(
-        "Unable to play preview."
+        "Unable to play audio."
       );
 
       stopPreview();
@@ -1151,52 +1105,19 @@ function stopPreview(){
 
 function buySong(song){
 
-  /*
-    PAYMENT FLOW WILL CONNECT HERE.
-
-    The song object contains the database
-    information returned by /api/songs.
-
-    Example:
-
-      song.id
-      song.title
-      song.artist_id
-      song.price
-      song.audio_url
-      song.cover_url
-
-    The final flow will be:
-
-      BUY NOW
-          ↓
-      Payment method
-          ↓
-      MTN MoMo / Airtel Money
-          ↓
-      Payment confirmation
-          ↓
-      Create order
-          ↓
-      Save download
-          ↓
-      My Downloads
-
-  */
-
-
   const songId =
     song.id || "";
 
 
   const title =
-    song.title || "this song";
+    song.title ||
+    "this song";
 
 
   if(!songId){
 
     alert(
-      "This song does not have a valid ID yet."
+      "This song does not have a valid ID."
     );
 
     return;
@@ -1205,11 +1126,25 @@ function buySong(song){
 
 
   /*
-    Temporary purchase message.
+    PAYMENT FLOW WILL BE CONNECTED HERE.
 
-    Once the payment endpoint is connected,
-    this function will call the PASONG API.
+    Final flow:
+
+    BUY NOW
+       ↓
+    Payment Method
+       ↓
+    MTN MoMo / Airtel Money
+       ↓
+    Payment Confirmation
+       ↓
+    Create Order
+       ↓
+    Save Download
+       ↓
+    My Downloads
   */
+
 
   const confirmed =
     confirm(
@@ -1224,15 +1159,8 @@ function buySong(song){
   }
 
 
-  /*
-    NEXT PAYMENT STEP:
-
-    We will replace this alert with
-    the real PASONG payment modal.
-  */
-
   alert(
-    "Payment system is being connected. Your song ID is: " +
+    "Payment connection is the next step.\n\nSong ID: " +
     songId
   );
 
