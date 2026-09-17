@@ -206,6 +206,12 @@ nav{
   border-radius:18px;
 }
 
+.country-price{
+  color:#aaa;
+  font-size:11px;
+  margin-top:5px;
+}
+
 footer{
   text-align:center;
   color:#666;
@@ -286,7 +292,6 @@ footer{
 
 </nav>
 
-
 <main class="container">
 
   <section class="hero">
@@ -301,19 +306,17 @@ footer{
 
   </section>
 
-
   <div class="section-title">
 
     <h2>
       🔥 Trending Music
     </h2>
 
-    <span>
+    <span id="priceInfo">
       Listen before you buy
     </span>
 
   </div>
-
 
   <div
     id="loading"
@@ -322,13 +325,11 @@ footer{
     Loading songs...
   </div>
 
-
   <div
     id="error"
     class="error"
     style="display:none;"
   ></div>
-
 
   <div
     id="songs"
@@ -336,20 +337,16 @@ footer{
     style="display:none;"
   ></div>
 
-
 </main>
-
 
 <footer>
   PASONG © 2026 • Music • Artists • Opportunity
 </footer>
 
-
 <script>
 
 const API_URL =
   "https://pasong-api.vercel.app";
-
 
 const loading =
   document.getElementById("loading");
@@ -360,6 +357,9 @@ const errorBox =
 const songsContainer =
   document.getElementById("songs");
 
+const priceInfo =
+  document.getElementById("priceInfo");
+
 
 /* ==============================
    OPEN SONG PAGE
@@ -368,15 +368,74 @@ const songsContainer =
 function openSong(songId){
 
   if(!songId){
-
     return;
-
   }
 
   window.location.href =
     "song.html?id=" +
     encodeURIComponent(songId);
+}
 
+
+/* ==============================
+   FORMAT PRICE
+   ============================== */
+
+function getDisplayPrice(song){
+
+  /*
+    The backend is authoritative.
+
+    New PASONG pricing:
+
+    UG = UGX 700
+    KE = UGX 1,000 / 35 KES
+    RW = UGX 1,000
+    TZ = UGX 1,000
+    GH/NG/ZM/ZA/CM = $0.50
+    Other countries = $1.00
+  */
+
+  if(song.marketplace_label){
+
+    return song.marketplace_label;
+
+  }
+
+  /*
+    Fallback only if old API response
+    is temporarily returned.
+  */
+
+  if(
+    song.marketplace_price !== undefined &&
+    song.marketplace_currency
+  ){
+
+    return (
+      Number(song.marketplace_price)
+        .toLocaleString() +
+      " " +
+      song.marketplace_currency
+    );
+
+  }
+
+  if(
+    song.price !== undefined &&
+    song.currency
+  ){
+
+    return (
+      Number(song.price)
+        .toLocaleString() +
+      " " +
+      song.currency
+    );
+
+  }
+
+  return "UGX 700";
 }
 
 
@@ -393,7 +452,9 @@ function createSongCard(song){
     "song-card";
 
 
-  /* COVER */
+  /* ============================
+     COVER
+     ============================ */
 
   const coverWrap =
     document.createElement("div");
@@ -414,7 +475,10 @@ function createSongCard(song){
       song.cover_url;
 
     img.alt =
-      song.title || "Song";
+      song.title || "PASONG Song Cover";
+
+    img.loading =
+      "lazy";
 
 
     img.onerror =
@@ -442,10 +506,9 @@ function createSongCard(song){
   }
 
 
-  /* OPEN SONG WHEN COVER IS CLICKED */
-
   coverWrap.style.cursor =
     "pointer";
+
 
   coverWrap.addEventListener(
     "click",
@@ -457,7 +520,9 @@ function createSongCard(song){
   );
 
 
-  /* INFO */
+  /* ============================
+     SONG INFORMATION
+     ============================ */
 
   const info =
     document.createElement("div");
@@ -501,7 +566,9 @@ function createSongCard(song){
     "Music";
 
 
-  /* BOTTOM */
+  /* ============================
+     BOTTOM
+     ============================ */
 
   const bottom =
     document.createElement("div");
@@ -516,16 +583,8 @@ function createSongCard(song){
   price.className =
     "price";
 
-  const amount =
-    Number(song.price) || 500;
-
-  const currency =
-    song.currency || "UGX";
-
   price.textContent =
-    amount.toLocaleString() +
-    " " +
-    currency;
+    getDisplayPrice(song);
 
 
   const buy =
@@ -534,13 +593,18 @@ function createSongCard(song){
   buy.className =
     "buy";
 
+  buy.type =
+    "button";
+
   buy.textContent =
     "🛒 BUY NOW";
 
 
   buy.addEventListener(
     "click",
-    function(){
+    function(event){
+
+      event.stopPropagation();
 
       openSong(song.id);
 
@@ -552,6 +616,10 @@ function createSongCard(song){
 
   bottom.appendChild(buy);
 
+
+  /* ============================
+     BUILD CARD
+     ============================ */
 
   info.appendChild(title);
 
@@ -568,7 +636,6 @@ function createSongCard(song){
 
 
   return card;
-
 }
 
 
@@ -580,17 +647,49 @@ async function loadSongs(){
 
   try{
 
+    loading.style.display =
+      "block";
+
+    errorBox.style.display =
+      "none";
+
+    songsContainer.style.display =
+      "none";
+
+
     const response =
       await fetch(
-        API_URL + "/api/songs"
+        API_URL + "/api/songs",
+        {
+          method:"GET",
+          headers:{
+            "Accept":"application/json"
+          },
+          cache:"no-store"
+        }
       );
 
 
     if(!response.ok){
 
-      throw new Error(
-        "PASONG API connection failed."
-      );
+      let message =
+        "PASONG API connection failed.";
+
+      try{
+
+        const errorData =
+          await response.json();
+
+        if(errorData.error){
+
+          message =
+            errorData.error;
+
+        }
+
+      }catch(e){}
+
+      throw new Error(message);
 
     }
 
@@ -599,13 +698,41 @@ async function loadSongs(){
       await response.json();
 
 
+    console.log(
+      "PASONG API response:",
+      result
+    );
+
+
     const songs =
-      result.songs || [];
+      Array.isArray(result.songs)
+        ? result.songs
+        : [];
+
+
+    /* ==========================
+       COUNTRY / PRICE DISPLAY
+       ========================== */
+
+    if(result.pricing){
+
+      priceInfo.textContent =
+        "Songs from " +
+        (
+          result.pricing.label ||
+          "UGX 700"
+        );
+
+    }
 
 
     loading.style.display =
       "none";
 
+
+    /* ==========================
+       EMPTY STORE
+       ========================== */
 
     if(!songs.length){
 
@@ -614,7 +741,14 @@ async function loadSongs(){
 
       songsContainer.innerHTML = `
         <div class="empty">
-          No songs are available yet.
+          <h3 style="margin-bottom:8px;">
+            No songs are available yet.
+          </h3>
+
+          <p>
+            New PASONG music will appear here
+            once it is approved.
+          </p>
         </div>
       `;
 
@@ -623,12 +757,20 @@ async function loadSongs(){
     }
 
 
+    /* ==========================
+       DISPLAY SONGS
+       ========================== */
+
     songsContainer.innerHTML =
       "";
 
 
     songs.forEach(
       function(song){
+
+        if(!song.id){
+          return;
+        }
 
         songsContainer.appendChild(
           createSongCard(song)
@@ -645,7 +787,7 @@ async function loadSongs(){
   }catch(error){
 
     console.error(
-      "PASONG:",
+      "PASONG STORE ERROR:",
       error
     );
 
@@ -655,7 +797,12 @@ async function loadSongs(){
 
 
     errorBox.textContent =
-      "Unable to load songs. Please try again.";
+      "Unable to load songs. " +
+      (
+        error.message ||
+        "Please try again."
+      );
+
 
     errorBox.style.display =
       "block";
@@ -664,6 +811,10 @@ async function loadSongs(){
 
 }
 
+
+/* ==============================
+   START
+   ============================== */
 
 loadSongs();
 
