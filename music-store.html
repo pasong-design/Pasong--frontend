@@ -1,1 +1,44 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG Store</title><style>body{margin:0;font-family:Arial;background:#07090b;color:#fff}header{height:72px;border-bottom:1px solid #222;display:flex;align-items:center;padding:0 5%;gap:20px;background:#07090b;position:sticky;top:0;z-index:10}.logo{font-size:27px;font-weight:900}.logo span{color:#c850ff}.nav{display:flex;gap:18px;font-weight:700}.nav .active{color:#c850ff}.search{margin-left:auto;width:240px;background:#15191e;border:1px solid #333;border-radius:20px;padding:10px 14px;color:#fff}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.card{background:#111519;border:1px solid #2a2f37;border-radius:12px;overflow:hidden}.cover{height:210px;position:relative;background:#1a1a1a}.cover img{width:100%;height:100%;object-fit:cover}.play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);cursor:pointer}.play div{width:66px;height:66px;background:#ffffff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-size:28px;font-weight:900;animation:purpleMove 1.8s infinite}@keyframes purpleMove{0%{box-shadow:0 0 0 0 rgba(200,80,255,0.9)}70%{box-shadow:0 0 0 22px rgba(200,80,255,0)}100%{box-shadow:0 0 0 0 rgba(200,80,255,0)}}.body{padding:14px}.price{color:#d07bff;font-weight:900}.btns{display:flex;gap:8px;margin-top:10px}.btns button{flex:1;border:0;border-radius:10px;padding:11px;font-weight:800;cursor:pointer}.btns .v{background:#252a30;color:#fff}.btns .b{background:linear-gradient(90deg,#c850ff,#8a5cff);color:#fff;box-shadow:0 0 15px rgba(200,80,255,.4)}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:550px){.grid{grid-template-columns:1fr}}</style></head><body><header><div class="logo">● PA<span>SONG</span></div><div class="nav"><a href="/">Home</a><a class="active">Music Store</a></div><input id="s" class="search" placeholder="Search..." oninput="render()"></header><div style="width:92%;max-width:1250px;margin:auto;padding:25px 0"><h1>Music Store</h1><div id="grid" class="grid"></div></div><script>const API="https://pasong-api.vercel.app";let all=[];async function load(){let r=await fetch(API+"/api/songs");let d=await r.json();all=d.songs||[];render()}function render(){let q=document.getElementById('s').value.toLowerCase();let f=all.filter(x=>x.title.toLowerCase().includes(q));document.getElementById('grid').innerHTML=f.map(p=>`<div class="card"><div class="cover">${p.cover_url?`<img src="${p.cover_url}">`:''}<div class="play" onclick="playIt('${p.id}')"><div id="b-${p.id}">▶</div></div><audio id="a-${p.id}" src="${p.audio_url||p.preview_url}"></audio></div><div class="body"><b>${p.title}</b><div style="color:#888;font-size:13px">${p.genre||'Afrobeats'}</div><div class="price">UGX ${p.price||500}</div><div class="btns"><button class="v" onclick="location.href='pasong_checkout.html?songId=${p.id}'">View</button><button class="b" onclick="location.href='pasong_checkout.html?songId=${p.id}'">Buy</button></div></div></div>`).join('')}let cur=null,bb=null,t=null;function playIt(id){let a=document.getElementById('a-'+id),b=document.getElementById('b-'+id);if(cur&&cur!=a){cur.pause();cur.currentTime=0;if(bb)bb.textContent='▶'}if(a.paused){a.currentTime=0;a.play();b.textContent='⏸';cur=a;bb=b;clearTimeout(t);t=setTimeout(()=>{a.pause();b.textContent='▶'},20000)}else{a.pause();b.textContent='▶'}}load();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pasong Music Store</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080808;color:white;font-family:Inter,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+h1{font-size:48px;font-weight:800;letter-spacing:-2px;margin-bottom:10px}
+.subtitle{color:#777;margin-bottom:50px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;width:100%;max-width:1100px}
+.card{
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:20px;
+  padding:16px;
+  border:1px solid rgba(255,255,255,0.08);
+  transition:0.3s
+}
+.card:hover{background:rgba(255,255,255,0.06);border-color:rgba(168,85,247,0.3);transform:translateY(-4px)}
+.cover{width:100%;aspect-ratio:1;background:rgba(0,0,0,0.3);border-radius:14px;position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:14px;border:1px solid rgba(255,255,255,0.05)}
+/* WHITE + PURPLE GLOW - NO YELLOW */
+.play-btn{width:56px;height:56px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;z-index:1}
+.play-btn::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,#a855f7,#ec4899,#8b5cf6,#a855f7);animation:spin 2s linear infinite;z-index:-1}
+.play-btn::after{content:'';position:absolute;inset:0;border-radius:50%;background:white;z-index:-1}
+.play-btn svg{width:22px;height:22px;fill:black;margin-left:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.play-btn{box-shadow:0 0 20px rgba(168,85,247,0.6),0 0 40px rgba(168,85,247,0.25)}
+.info h3{font-size:16px;margin-bottom:4px}
+.info p{font-size:13px;color:#888}
+</style>
+</head>
+<body>
+<h1>Pasong</h1>
+<p class="subtitle">Music Store • Transparent Glass</p>
+<div class="grid">
+<div class="card"><div class="cover"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg></div></div><div class="info"><h3>Midnight Vibes</h3><p>Kivumbi • 3:42</p></div></div>
+<div class="card"><div class="cover"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg></div></div><div class="info"><h3>Urban Dreams</h3><p>Pasong • 2:58</p></div></div>
+<div class="card"><div class="cover"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg></div></div><div class="info"><h3>Neon Lights</h3><p>DJ Lenz • 4:11</p></div></div>
+</div>
+</body>
+</html>
