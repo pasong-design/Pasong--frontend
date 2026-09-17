@@ -3,29 +3,430 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pasong Music Store</title>
+
+<title>PASONG Music Store</title>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#080808;color:white;font-family:Inter,sans-serif;min-height:100vh;padding:40px 20px;display:flex;flex-direction:column;align-items:center}
-h1{font-size:42px;font-weight:800;margin-bottom:40px;letter-spacing:-1px}
-.list{width:100%;max-width:600px;display:flex;flex-direction:column;gap:16px}
-.item{background:rgba(255,255,255,0.04);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:16px}
-.play-btn{width:52px;height:52px;min-width:52px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;cursor:pointer}
-.play-btn::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from 0deg,#a855f7,#ec4899,#8b5cf6,#a855f7);animation:spin 2s linear infinite;z-index:-1}
-.play-btn::after{content:'';position:absolute;inset:0;border-radius:50%;background:white;z-index:-1}
-.play-btn svg{width:20px;height:20px;fill:black;margin-left:2px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.play-btn{box-shadow:0 0 18px rgba(168,85,247,0.6)}
-.info h3{font-size:15px;margin-bottom:2px}
-.info p{font-size:12px;color:#888}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#080808;
+  color:white;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+  padding:40px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+h1{
+  font-size:42px;
+  font-weight:800;
+  margin-bottom:40px;
+  letter-spacing:-1px;
+}
+
+.list{
+  width:100%;
+  max-width:600px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.item{
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.play-btn{
+  width:52px;
+  height:52px;
+  min-width:52px;
+  border-radius:50%;
+  background:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  z-index:1;
+  cursor:pointer;
+  border:none;
+  box-shadow:0 0 18px rgba(168,85,247,0.6);
+}
+
+.play-btn::before{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:50%;
+  background:conic-gradient(
+    from 0deg,
+    #a855f7,
+    #ec4899,
+    #8b5cf6,
+    #a855f7
+  );
+  animation:spin 2s linear infinite;
+  z-index:-1;
+}
+
+.play-btn::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:white;
+  z-index:-1;
+}
+
+.play-btn svg{
+  width:20px;
+  height:20px;
+  fill:black;
+  margin-left:2px;
+}
+
+.play-btn.pause svg{
+  margin-left:0;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.info{
+  min-width:0;
+}
+
+.info h3{
+  font-size:15px;
+  margin-bottom:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.info p{
+  font-size:12px;
+  color:#888;
+}
+
+.price{
+  margin-left:auto;
+  font-size:13px;
+  font-weight:700;
+  color:#d8b4fe;
+  white-space:nowrap;
+}
+
+.status{
+  color:#888;
+  text-align:center;
+  padding:30px 10px;
+  font-size:14px;
+}
+
+.error{
+  color:#ff6b9d;
+  text-align:center;
+  padding:30px 10px;
+  font-size:14px;
+}
 </style>
 </head>
+
 <body>
-<h1>Pasong</h1>
-<div class="list">
-<div class="item"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg></div><div class="info"><h3>Midnight Vibes</h3><p>Kivumbi • 3:42</p></div></div>
-<div class="item"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg></div><div class="info"><h3>Urban Dreams</h3><p>Pasong • 2:58</p></div></div>
-<div class="item"><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg></div><div class="info"><h3>Neon Lights</h3><p>DJ Lenz • 4:11</p></div></div>
+
+<h1>PASONG</h1>
+
+<div id="songList" class="list">
+  <div class="status">Loading songs...</div>
 </div>
+
+<script>
+
+/* ======================================================
+   PASONG API
+   ====================================================== */
+
+const API_URL = "https://pasong-api.vercel.app";
+
+
+/* ======================================================
+   AUDIO PLAYER
+   ====================================================== */
+
+let currentAudio = null;
+let currentButton = null;
+let previewTimer = null;
+
+
+/* ======================================================
+   LOAD SONGS
+   ====================================================== */
+
+async function loadSongs(){
+
+  const list = document.getElementById("songList");
+
+  try{
+
+    const response = await fetch(`${API_URL}/api/songs`);
+
+    if(!response.ok){
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const songs = data.songs || [];
+
+    list.innerHTML = "";
+
+    if(songs.length === 0){
+
+      list.innerHTML = `
+        <div class="status">
+          No songs available yet.
+        </div>
+      `;
+
+      return;
+    }
+
+    songs.forEach(song => {
+
+      const item = document.createElement("div");
+
+      item.className = "item";
+
+      const artist =
+        song.artist_name ||
+        song.artist ||
+        "Unknown Artist";
+
+      const price =
+        song.price ||
+        500;
+
+      item.innerHTML = `
+
+        <button class="play-btn"
+                aria-label="Preview ${escapeHTML(song.title || "song")}">
+
+          <svg viewBox="0 0 24 24">
+            <path d="M8 5.14v14l11-7-11-7z"/>
+          </svg>
+
+        </button>
+
+        <div class="info">
+
+          <h3>
+            ${escapeHTML(song.title || "Untitled")}
+          </h3>
+
+          <p>
+            ${escapeHTML(artist)}
+          </p>
+
+        </div>
+
+        <div class="price">
+          UGX ${Number(price).toLocaleString()}
+        </div>
+      `;
+
+      const button = item.querySelector(".play-btn");
+
+      button.addEventListener("click", () => {
+
+        playPreview(song, button);
+
+      });
+
+      list.appendChild(item);
+
+    });
+
+  }catch(error){
+
+    console.error("PASONG API ERROR:", error);
+
+    list.innerHTML = `
+      <div class="error">
+        Unable to load songs<br>
+        <small>${escapeHTML(error.message)}</small>
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* ======================================================
+   20-SECOND PREVIEW
+   ====================================================== */
+
+function playPreview(song, button){
+
+  const audioUrl =
+    song.preview_url ||
+    song.audio_url;
+
+  if(!audioUrl){
+
+    alert("Preview is not available for this song.");
+
+    return;
+  }
+
+
+  /* Stop current song */
+
+  if(currentAudio){
+
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+
+    if(currentButton){
+
+      resetButton(currentButton);
+
+    }
+
+  }
+
+  clearTimeout(previewTimer);
+
+
+  /* If clicking same button while playing */
+
+  if(currentButton === button &&
+     currentAudio){
+
+    currentAudio = null;
+    currentButton = null;
+
+    return;
+  }
+
+
+  /* Create audio */
+
+  const audio = new Audio(audioUrl);
+
+  currentAudio = audio;
+  currentButton = button;
+
+
+  button.classList.add("pause");
+
+  button.innerHTML = `
+    <svg viewBox="0 0 24 24">
+      <path d="M7 5h4v14H7zM13 5h4v14h-4z"/>
+    </svg>
+  `;
+
+
+  audio.currentTime = 0;
+
+
+  audio.play().catch(error => {
+
+    console.error("Audio playback error:", error);
+
+    resetButton(button);
+
+  });
+
+
+  /* Automatically stop after 20 seconds */
+
+  previewTimer = setTimeout(() => {
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    resetButton(button);
+
+    currentAudio = null;
+    currentButton = null;
+
+  },20000);
+
+
+  /* Stop if audio ends before 20 seconds */
+
+  audio.addEventListener("ended", () => {
+
+    clearTimeout(previewTimer);
+
+    resetButton(button);
+
+    currentAudio = null;
+    currentButton = null;
+
+  });
+
+}
+
+
+/* ======================================================
+   RESET PLAY BUTTON
+   ====================================================== */
+
+function resetButton(button){
+
+  button.classList.remove("pause");
+
+  button.innerHTML = `
+    <svg viewBox="0 0 24 24">
+      <path d="M8 5.14v14l11-7-11-7z"/>
+    </svg>
+  `;
+
+}
+
+
+/* ======================================================
+   HTML ESCAPE
+   ====================================================== */
+
+function escapeHTML(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* ======================================================
+   START
+   ====================================================== */
+
+loadSongs();
+
+</script>
+
 </body>
 </html>
