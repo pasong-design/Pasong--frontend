@@ -1,12 +1,17 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Admin Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+<title>PASONG Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
 *{
-  box-sizing:border-box;
   margin:0;
   padding:0;
+  box-sizing:border-box;
 }
 
 body{
@@ -17,479 +22,528 @@ body{
 }
 
 nav{
+  background:#10101b;
+  border-bottom:1px solid #25253a;
   padding:18px 22px;
-  background:#10101a;
-  border-bottom:1px solid #252538;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  position:sticky;
-  top:0;
-  z-index:20;
 }
 
 .logo{
-  font-size:22px;
+  font-size:24px;
   font-weight:800;
-  color:#d946ef;
 }
 
 .admin-label{
-  color:#aaa;
+  color:#d946ef;
   font-size:13px;
+  font-weight:700;
 }
 
 main{
   max-width:1200px;
   margin:auto;
-  padding:28px 18px 60px;
+  padding:25px 18px 50px;
+}
+
+h1{
+  font-size:30px;
+  margin-bottom:6px;
+}
+
+.subtitle{
+  color:#9999aa;
+  margin-bottom:25px;
 }
 
 #loading{
   text-align:center;
-  padding:60px 20px;
+  padding:50px 10px;
   color:#bbb;
 }
 
 #error{
   display:none;
-  background:#32131d;
-  border:1px solid #8b2940;
-  padding:18px;
-  border-radius:12px;
+  background:#351522;
+  border:1px solid #8b2948;
+  padding:15px;
+  border-radius:10px;
   margin-bottom:20px;
-  color:#ffb8c6;
 }
 
 #dashboard{
   display:none;
 }
 
-h1{
-  font-size:30px;
-  margin-bottom:7px;
-}
-
-.subtitle{
-  color:#999;
-  margin-bottom:25px;
-}
-
 .cards{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:15px;
+  margin-bottom:25px;
 }
 
 .card{
-  background:#11111c;
-  border:1px solid #252538;
-  border-radius:16px;
+  background:#11111d;
+  border:1px solid #28283d;
+  border-radius:14px;
   padding:20px;
 }
 
 .card h3{
-  color:#999;
-  font-size:13px;
+  color:#aaaabb;
+  font-size:14px;
   margin-bottom:10px;
 }
 
 .number{
-  font-size:30px;
+  font-size:28px;
   font-weight:800;
-  color:#d946ef;
+  color:#e879f9;
+}
+
+.menu{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:12px;
+  margin-bottom:28px;
+}
+
+.menu button{
+  background:#151522;
+  color:#fff;
+  border:1px solid #303047;
+  padding:17px;
+  border-radius:12px;
+  cursor:pointer;
+  text-align:left;
+  font-size:15px;
+  font-weight:700;
+}
+
+.menu button:hover{
+  border-color:#d946ef;
+  background:#1b1724;
 }
 
 .section{
-  margin-top:24px;
-  background:#11111c;
-  border:1px solid #252538;
-  border-radius:16px;
+  background:#10101b;
+  border:1px solid #28283d;
+  border-radius:14px;
   padding:20px;
-  overflow:hidden;
+  margin-bottom:20px;
 }
 
 .section h2{
+  font-size:20px;
   margin-bottom:8px;
 }
 
-.section-description{
-  color:#999;
-  font-size:14px;
-  margin-bottom:18px;
-}
-
-.toolbar{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+.section p{
+  color:#9999aa;
   margin-bottom:15px;
 }
 
-input,
-select{
-  background:#080810;
-  border:1px solid #303047;
-  color:#fff;
-  border-radius:9px;
-  padding:11px 12px;
-  outline:none;
+.section-content{
+  display:none;
 }
 
-input{
-  flex:1;
-  min-width:190px;
-}
-
-select{
-  min-width:140px;
-}
-
-button{
-  border:0;
-  border-radius:9px;
-  padding:11px 15px;
-  background:#d946ef;
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:.9;
-}
-
-.secondary{
-  background:#8b5cf6;
-}
-
-.danger{
-  background:#b4234d;
-}
-
-.success{
-  background:#16a34a;
+.section-content.active{
+  display:block;
 }
 
 .table-wrap{
-  width:100%;
   overflow-x:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:720px;
+  min-width:600px;
 }
 
-th,
-td{
-  padding:13px 10px;
-  border-bottom:1px solid #252538;
+th,td{
+  padding:12px 10px;
+  border-bottom:1px solid #29293b;
   text-align:left;
-  font-size:13px;
+  font-size:14px;
 }
 
 th{
-  color:#aaa;
-  font-size:12px;
-  text-transform:uppercase;
+  color:#d8d8e5;
 }
 
 td{
-  color:#eee;
+  color:#aaaabb;
 }
 
-.small{
-  color:#888;
-  font-size:12px;
+button.action{
+  background:#d946ef;
+  color:#fff;
+  border:0;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
 }
 
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  background:#252538;
-  color:#ddd;
-  font-size:11px;
-}
-
-.badge-paid{
-  background:#123c25;
-  color:#86efac;
-}
-
-.badge-pending{
-  background:#403315;
-  color:#fcd34d;
-}
-
-.badge-cancelled{
-  background:#421925;
-  color:#fda4af;
-}
-
-.actions{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-}
-
-.actions button{
-  padding:7px 9px;
-  font-size:11px;
-}
-
-.empty{
-  padding:25px;
-  text-align:center;
-  color:#777;
-}
-
-.status{
-  margin-top:12px;
-  color:#999;
-  font-size:13px;
+button.action:hover{
+  opacity:.85;
 }
 
 .logout{
-  margin-top:20px;
+  background:#21121e !important;
+  border-color:#57263f !important;
 }
-</style></head><body><nav>
+
+.status{
+  color:#4ade80;
+  font-weight:700;
+}
+
+.notice{
+  background:#151522;
+  border:1px solid #29293d;
+  padding:15px;
+  border-radius:10px;
+  color:#aaaabb;
+  line-height:1.6;
+}
+
+@media(max-width:600px){
+  h1{
+    font-size:25px;
+  }
+
+  .menu{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
   <div class="logo">◈ PASONG</div>
   <div class="admin-label">ADMIN PANEL</div>
-</nav><main><div id="loading">
+</nav>
+
+<main>
+
+<div id="loading">
   Checking administrator access...
-</div><div id="error"></div><div id="dashboard">  <h1>Admin Dashboard</h1>  <p class="subtitle">
-    Manage PASONG music, users, orders and platform activity.
-  </p>  <!-- STATISTICS -->  <div class="cards"><div class="card">
-  <h3>Administrator</h3>
-  <div class="number">✓</div>
 </div>
 
-<div class="card">
-  <h3>Music</h3>
-  <div class="number" id="musicCount">0</div>
-</div>
+<div id="error"></div>
 
-<div class="card">
-  <h3>Artist Profiles</h3>
-  <div class="number" id="userCount">0</div>
-</div>
+<div id="dashboard">
 
-<div class="card">
-  <h3>Orders</h3>
-  <div class="number" id="orderCount">0</div>
-</div>
-
-  </div>  <!-- USERS -->  <div class="section"><h2>👤 Users / Artists</h2>
-
-<p class="section-description">
-  View registered artist profiles available in the PASONG database.
+<h1>PASONG Admin Dashboard</h1>
+<p class="subtitle">
+Manage PASONG music, users, orders and platform activity.
 </p>
 
-<div class="toolbar">
+<div class="cards">
 
-  <input
-    type="text"
-    id="userSearch"
-    placeholder="Search artist..."
-    oninput="filterUsers()"
-  >
+  <div class="card">
+    <h3>Administrator</h3>
+    <div class="number">✓</div>
+  </div>
 
-  <button
-    class="secondary"
-    onclick="loadUsers()"
-  >
-    Refresh Users
+  <div class="card">
+    <h3>Music</h3>
+    <div class="number" id="musicCount">0</div>
+  </div>
+
+  <div class="card">
+    <h3>Artist Profiles</h3>
+    <div class="number" id="userCount">0</div>
+  </div>
+
+  <div class="card">
+    <h3>Orders</h3>
+    <div class="number" id="orderCount">0</div>
+  </div>
+
+</div>
+
+
+<!-- ADMIN MENU -->
+
+<div class="menu">
+
+  <button onclick="showSection('sales')">
+    🛒 Sales & Orders
+  </button>
+
+  <button onclick="showSection('royalties')">
+    💰 Royalty Ledger
+  </button>
+
+  <button onclick="showSection('advertisements')">
+    📢 Advertisement Campaigns
+  </button>
+
+  <button onclick="showSection('referrals')">
+    🎁 Referral Points
+  </button>
+
+  <button onclick="showSection('payments')">
+    💳 Payments & Verification
+  </button>
+
+  <button onclick="showSection('reports')">
+    📊 Reports
   </button>
 
 </div>
 
-<div class="table-wrap">
 
-  <table>
+<!-- SALES -->
 
-    <thead>
-      <tr>
-        <th>Artist</th>
-        <th>Email</th>
-        <th>Profile ID</th>
-        <th>Action</th>
-      </tr>
-    </thead>
+<div class="section">
+  <h2>🛒 Sales & Orders</h2>
 
-    <tbody id="usersTable">
-    </tbody>
+  <div id="sales" class="section-content">
 
-  </table>
+    <p>Manage PASONG customer orders.</p>
 
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+
+        <tbody id="ordersTable">
+          <tr>
+            <td colspan="5">Loading orders...</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
 </div>
 
-<div
-  id="usersEmpty"
-  class="empty"
-  style="display:none"
->
-  No artist profiles found.
+
+<!-- ROYALTIES -->
+
+<div class="section">
+  <h2>💰 Royalty Ledger</h2>
+
+  <div id="royalties" class="section-content">
+
+    <p>Track PASONG music revenue distribution.</p>
+
+    <div class="notice">
+
+      <strong>UGX 500 Song Sale Distribution</strong><br><br>
+
+      Artist — UGX 200 (40%)<br>
+      Producer — UGX 100 (20%)<br>
+      Writer — UGX 75 (15%)<br>
+      PASONG — UGX 125 (25%)
+
+      <br><br>
+
+      Royalty transactions will appear here as the payment system records completed sales.
+
+    </div>
+
+  </div>
 </div>
 
-  </div>  <!-- ORDERS -->  <div class="section"><h2>🛒 Orders Control</h2>
 
-<p class="section-description">
-  View PASONG orders and update their status.
-</p>
+<!-- ADVERTISEMENTS -->
 
-<div class="toolbar">
+<div class="section">
+  <h2>📢 Advertisement Campaigns</h2>
 
-  <input
-    type="text"
-    id="orderSearch"
-    placeholder="Search order..."
-    oninput="filterOrders()"
-  >
+  <div id="advertisements" class="section-content">
 
-  <select
-    id="orderStatusFilter"
-    onchange="filterOrders()"
-  >
-    <option value="all">All Orders</option>
-    <option value="pending">Pending</option>
-    <option value="paid">Paid</option>
-    <option value="completed">Completed</option>
-    <option value="cancelled">Cancelled</option>
-  </select>
+    <p>Monitor PASONG advertising campaigns.</p>
 
-  <button
-    class="secondary"
-    onclick="loadOrders()"
-  >
-    Refresh Orders
+    <div class="notice">
+
+      Advertiser campaigns will be managed from the PASONG advertising system.
+
+      <br><br>
+
+      Weekly promotion idea: UGX 10,000<br>
+      Monthly promotion idea: UGX 50,000
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- REFERRALS -->
+
+<div class="section">
+  <h2>🎁 Referral Points</h2>
+
+  <div id="referrals" class="section-content">
+
+    <p>Monitor PASONG referral activity.</p>
+
+    <div class="notice">
+
+      1,000 PASONG Points = UGX 1,000<br><br>
+
+      Successful referral = 50 PASONG Points<br>
+      Referral qualifies when the referred user completes their first UGX 500 song purchase.
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- PAYMENTS -->
+
+<div class="section">
+  <h2>💳 Payments & Verification</h2>
+
+  <div id="payments" class="section-content">
+
+    <p>Monitor payment processing and verification.</p>
+
+    <div class="notice">
+
+      <strong>Payment Channels</strong><br><br>
+
+      MTN Mobile Money<br>
+      Airtel Money<br>
+      Card / Online Payments
+
+      <br><br>
+
+      <span class="status">● System ready for payment integration</span>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- REPORTS -->
+
+<div class="section">
+  <h2>📊 Reports</h2>
+
+  <div id="reports" class="section-content">
+
+    <p>View PASONG platform statistics.</p>
+
+    <div class="cards">
+
+      <div class="card">
+        <h3>Total Music</h3>
+        <div class="number" id="reportSongs">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Total Artists</h3>
+        <div class="number" id="reportArtists">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Total Orders</h3>
+        <div class="number" id="reportOrders">0</div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- MUSIC -->
+
+<div class="section">
+  <h2>🎵 Music Control</h2>
+
+  <div class="section-content active">
+
+    <p>Music currently stored in PASONG.</p>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Artist ID</th>
+          </tr>
+        </thead>
+
+        <tbody id="songsTable">
+          <tr>
+            <td colspan="4">Loading music...</td>
+          </tr>
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- PLATFORM -->
+
+<div class="section">
+
+  <h2>⚙️ Platform Status</h2>
+
+  <div class="notice">
+
+    Authentication:
+    <span class="status">● Connected</span>
+    <br>
+
+    Supabase:
+    <span class="status">● Connected</span>
+    <br>
+
+    Admin Role:
+    <span class="status">● Verified</span>
+
+  </div>
+
+  <br>
+
+  <button class="action logout" onclick="logout()">
+    Logout
   </button>
 
 </div>
 
-<div class="table-wrap">
-
-  <table>
-
-    <thead>
-      <tr>
-        <th>Order</th>
-        <th>Customer</th>
-        <th>Amount</th>
-        <th>Status</th>
-        <th>Date</th>
-        <th>Control</th>
-      </tr>
-    </thead>
-
-    <tbody id="ordersTable">
-    </tbody>
-
-  </table>
-
 </div>
 
-<div
-  id="ordersEmpty"
-  class="empty"
-  style="display:none"
->
-  No orders found.
-</div>
+</main>
 
-  </div>  <!-- MUSIC -->  <div class="section"><h2>🎵 Music Control</h2>
 
-<p class="section-description">
-  View songs currently stored in the PASONG songs table.
-</p>
-
-<div class="toolbar">
-
-  <input
-    type="text"
-    id="songSearch"
-    placeholder="Search song..."
-    oninput="filterSongs()"
-  >
-
-  <button
-    class="secondary"
-    onclick="loadSongs()"
-  >
-    Refresh Music
-  </button>
-
-</div>
-
-<div class="table-wrap">
-
-  <table>
-
-    <thead>
-      <tr>
-        <th>Song</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Status</th>
-        <th>Song ID</th>
-      </tr>
-    </thead>
-
-    <tbody id="songsTable">
-    </tbody>
-
-  </table>
-
-</div>
-
-<div
-  id="songsEmpty"
-  class="empty"
-  style="display:none"
->
-  No songs found.
-</div>
-
-  </div>  <!-- PLATFORM -->  <div class="section"><h2>⚙️ Platform Status</h2>
-
-<p>
-  PASONG administrator access is active.
-</p>
-
-<div
-  id="status"
-  class="status"
->
-  Connecting to database...
-</div>
-
-<button
-  class="logout danger"
-  onclick="logout()"
->
-  Logout
-</button>
-
-  </div></div></main><script>
+<script>
 
 const SUPABASE_URL =
 "https://mtufczmjlkvycarxylgh.supabase.co";
 
-/*
- IMPORTANT:
- Put your existing SUPABASE PUBLISHABLE KEY below.
-
- Use the SAME publishable key that is already
- working in your account.html.
-
- NEVER put the Supabase service-role/secret key here.
-*/
-
 const SUPABASE_KEY =
 "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-
 
 const supabaseClient =
 window.supabase.createClient(
@@ -498,47 +552,38 @@ window.supabase.createClient(
 );
 
 
-let usersData = [];
-let ordersData = [];
-let songsData = [];
+function showError(message){
 
-
-/* =========================
-   ADMIN AUTHENTICATION
-========================= */
-
-async function checkAdmin(){
-
-  const loading =
-  document.getElementById("loading");
+  document.getElementById("loading").style.display="none";
 
   const error =
   document.getElementById("error");
 
-  const dashboard =
-  document.getElementById("dashboard");
+  error.textContent=message;
+  error.style.display="block";
+}
+
+
+async function checkAdmin(){
 
   try{
 
     const {
       data:{session},
-      error:sessionError
+      error
     } =
     await supabaseClient.auth.getSession();
 
-    if(sessionError)
-      throw sessionError;
+    if(error) throw error;
 
     if(!session){
 
-      window.location.href =
-      "account.html";
-
+      window.location.href="account.html";
       return;
+
     }
 
-    const user =
-    session.user;
+    const user=session.user;
 
     const role =
     user.app_metadata &&
@@ -546,54 +591,36 @@ async function checkAdmin(){
 
     if(role !== "admin"){
 
-      loading.style.display =
-      "none";
-
-      error.style.display =
-      "block";
-
-      error.innerHTML =
-      "Access denied.<br><br>" +
-      "This account does not have administrator permission.";
+      showError(
+        "Access denied. This account is not an administrator."
+      );
 
       return;
     }
 
-    loading.style.display =
-    "none";
+    document.getElementById("loading")
+      .style.display="none";
 
-    dashboard.style.display =
-    "block";
+    document.getElementById("dashboard")
+      .style.display="block";
 
     await loadAllData();
 
+  }catch(error){
+
+    console.error(error);
+
+    showError(
+      "Unable to verify administrator access: "
+      + error.message
+    );
+
   }
-  catch(err){
 
-    console.error(err);
-
-    loading.style.display =
-    "none";
-
-    error.style.display =
-    "block";
-
-    error.textContent =
-    "Unable to verify administrator access: " +
-    err.message;
-  }
 }
 
 
-/* =========================
-   LOAD EVERYTHING
-========================= */
-
 async function loadAllData(){
-
-  document.getElementById("status")
-  .textContent =
-  "Loading PASONG database...";
 
   await Promise.all([
     loadUsers(),
@@ -601,593 +628,258 @@ async function loadAllData(){
     loadSongs()
   ]);
 
-  document.getElementById("status")
-  .textContent =
-  "PASONG database connected successfully.";
 }
 
-
-/* =========================
-   USERS
-========================= */
 
 async function loadUsers(){
 
-  const table =
-  document.getElementById("usersTable");
+  try{
 
-  const empty =
-  document.getElementById("usersEmpty");
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("artist_profiles")
+      .select("*");
 
-  table.innerHTML =
-  "<tr><td colspan='4'>Loading users...</td></tr>";
+    if(error) throw error;
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
-  .from("artist_profiles")
-  .select("*")
-  .order("id",{ascending:false});
+    const count =
+    data ? data.length : 0;
 
-  if(error){
+    document.getElementById("userCount")
+      .textContent=count;
 
-    console.error(error);
+    document.getElementById("reportArtists")
+      .textContent=count;
 
-    table.innerHTML =
-    "<tr><td colspan='4'>Unable to load users.</td></tr>";
+  }catch(error){
 
-    return;
+    console.error("Users error:",error);
+
   }
 
-  usersData =
-  data || [];
-
-  document.getElementById("userCount")
-  .textContent =
-  usersData.length;
-
-  renderUsers(usersData);
-
-  empty.style.display =
-  usersData.length
-  ? "none"
-  : "block";
 }
 
-
-function renderUsers(list){
-
-  const table =
-  document.getElementById("usersTable");
-
-  if(!list.length){
-
-    table.innerHTML =
-    "<tr><td colspan='4' class='empty'>No users found.</td></tr>";
-
-    return;
-  }
-
-  table.innerHTML =
-  list.map(user => {
-
-    const name =
-    user.artist_name ||
-    user.name ||
-    user.stage_name ||
-    "Unnamed Artist";
-
-    const email =
-    user.email ||
-    "—";
-
-    return `
-      <tr>
-
-        <td>
-          <strong>${escapeHtml(name)}</strong>
-        </td>
-
-        <td>
-          ${escapeHtml(email)}
-        </td>
-
-        <td class="small">
-          ${escapeHtml(String(user.id || "—"))}
-        </td>
-
-        <td>
-
-          <div class="actions">
-
-            <button
-              onclick="viewUser('${escapeAttr(user.id)}')"
-            >
-              View
-            </button>
-
-          </div>
-
-        </td>
-
-      </tr>
-    `;
-
-  }).join("");
-}
-
-
-function filterUsers(){
-
-  const search =
-  document.getElementById("userSearch")
-  .value
-  .toLowerCase()
-  .trim();
-
-  const filtered =
-  usersData.filter(user => {
-
-    const text =
-    JSON.stringify(user)
-    .toLowerCase();
-
-    return text.includes(search);
-  });
-
-  renderUsers(filtered);
-}
-
-
-function viewUser(id){
-
-  const user =
-  usersData.find(
-    item => String(item.id) === String(id)
-  );
-
-  if(!user){
-    alert("User not found.");
-    return;
-  }
-
-  const name =
-  user.artist_name ||
-  user.name ||
-  user.stage_name ||
-  "Unnamed Artist";
-
-  alert(
-    "PASONG USER\n\n" +
-    "Artist: " + name + "\n" +
-    "ID: " + (user.id || "—") + "\n" +
-    "Email: " + (user.email || "—")
-  );
-}
-
-
-/* =========================
-   ORDERS
-========================= */
 
 async function loadOrders(){
 
-  const table =
-  document.getElementById("ordersTable");
+  try{
 
-  const empty =
-  document.getElementById("ordersEmpty");
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .order("created_at",{ascending:false});
 
-  table.innerHTML =
-  "<tr><td colspan='6'>Loading orders...</td></tr>";
+    if(error) throw error;
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
-  .from("orders")
-  .select("*")
-  .order("created_at",{ascending:false});
+    const orders=data || [];
 
-  if(error){
+    document.getElementById("orderCount")
+      .textContent=orders.length;
 
-    console.error(error);
+    document.getElementById("reportOrders")
+      .textContent=orders.length;
 
-    table.innerHTML =
-    "<tr><td colspan='6'>Unable to load orders: " +
-    escapeHtml(error.message) +
-    "</td></tr>";
+    const table=
+    document.getElementById("ordersTable");
 
-    return;
-  }
+    if(!orders.length){
 
-  ordersData =
-  data || [];
+      table.innerHTML=
+      `<tr>
+        <td colspan="5">No orders yet.</td>
+      </tr>`;
 
-  document.getElementById("orderCount")
-  .textContent =
-  ordersData.length;
+      return;
+    }
 
-  renderOrders(ordersData);
+    table.innerHTML=
+    orders.map(order=>{
 
-  empty.style.display =
-  ordersData.length
-  ? "none"
-  : "block";
-}
+      const id=
+      order.id || "-";
 
+      const user=
+      order.user_id ||
+      order.buyer_id ||
+      "-";
 
-function renderOrders(list){
+      const amount=
+      order.total_amount ||
+      order.amount ||
+      order.total ||
+      "0";
 
-  const table =
-  document.getElementById("ordersTable");
+      const status=
+      order.status ||
+      "pending";
 
-  if(!list.length){
+      const created=
+      order.created_at ?
+      new Date(order.created_at)
+      .toLocaleString() :
+      "-";
 
-    table.innerHTML =
-    "<tr><td colspan='6' class='empty'>No orders found.</td></tr>";
-
-    return;
-  }
-
-  table.innerHTML =
-  list.map(order => {
-
-    const status =
-    String(order.status || "pending")
-    .toLowerCase();
-
-    const badgeClass =
-    status === "paid"
-    ? "badge-paid"
-    : status === "completed"
-    ? "badge-paid"
-    : status === "cancelled"
-    ? "badge-cancelled"
-    : "badge-pending";
-
-    const date =
-    order.created_at
-    ? new Date(order.created_at)
-      .toLocaleString()
-    : "—";
-
-    const amount =
-    order.total_amount ??
-    order.amount ??
-    order.price ??
-    0;
-
-    const currency =
-    order.currency ||
-    "UGX";
-
-    const customer =
-    order.user_id ||
-    order.customer_id ||
-    order.email ||
-    "—";
-
-    return `
+      return `
       <tr>
+        <td>${escapeHtml(String(id))}</td>
+        <td>${escapeHtml(String(user))}</td>
+        <td>UGX ${escapeHtml(String(amount))}</td>
+        <td>${escapeHtml(String(status))}</td>
+        <td>${escapeHtml(String(created))}</td>
+      </tr>`;
 
-        <td>
-          <strong>
-            ${escapeHtml(String(order.id || "—"))}
-          </strong>
+    }).join("");
+
+  }catch(error){
+
+    console.error("Orders error:",error);
+
+    document.getElementById("ordersTable")
+      .innerHTML=
+      `<tr>
+        <td colspan="5">
+          Unable to load orders.
         </td>
+      </tr>`;
 
-        <td class="small">
-          ${escapeHtml(String(customer))}
-        </td>
-
-        <td>
-          ${escapeHtml(String(amount))}
-          ${escapeHtml(String(currency))}
-        </td>
-
-        <td>
-          <span class="badge ${badgeClass}">
-            ${escapeHtml(status)}
-          </span>
-        </td>
-
-        <td class="small">
-          ${escapeHtml(date)}
-        </td>
-
-        <td>
-
-          <div class="actions">
-
-            <button
-              class="success"
-              onclick="updateOrderStatus('${escapeAttr(order.id)}','paid')"
-            >
-              Paid
-            </button>
-
-            <button
-              onclick="updateOrderStatus('${escapeAttr(order.id)}','completed')"
-            >
-              Complete
-            </button>
-
-            <button
-              class="danger"
-              onclick="updateOrderStatus('${escapeAttr(order.id)}','cancelled')"
-            >
-              Cancel
-            </button>
-
-          </div>
-
-        </td>
-
-      </tr>
-    `;
-
-  }).join("");
-}
-
-
-function filterOrders(){
-
-  const search =
-  document.getElementById("orderSearch")
-  .value
-  .toLowerCase()
-  .trim();
-
-  const status =
-  document.getElementById("orderStatusFilter")
-  .value;
-
-  const filtered =
-  ordersData.filter(order => {
-
-    const text =
-    JSON.stringify(order)
-    .toLowerCase();
-
-    const currentStatus =
-    String(order.status || "pending")
-    .toLowerCase();
-
-    const matchesSearch =
-    !search ||
-    text.includes(search);
-
-    const matchesStatus =
-    status === "all" ||
-    currentStatus === status;
-
-    return matchesSearch &&
-           matchesStatus;
-  });
-
-  renderOrders(filtered);
-}
-
-
-async function updateOrderStatus(
-  orderId,
-  newStatus
-){
-
-  if(!orderId){
-    alert("Order ID is missing.");
-    return;
   }
 
-  const confirmed =
-  confirm(
-    "Change this order status to " +
-    newStatus +
-    "?"
-  );
-
-  if(!confirmed)
-    return;
-
-  const {
-    error
-  } =
-  await supabaseClient
-  .from("orders")
-  .update({
-    status:newStatus
-  })
-  .eq("id",orderId);
-
-  if(error){
-
-    console.error(error);
-
-    alert(
-      "Could not update order.\n\n" +
-      error.message
-    );
-
-    return;
-  }
-
-  alert(
-    "Order updated successfully."
-  );
-
-  await loadOrders();
 }
 
-
-/* =========================
-   MUSIC
-========================= */
 
 async function loadSongs(){
 
-  const table =
-  document.getElementById("songsTable");
+  try{
 
-  table.innerHTML =
-  "<tr><td colspan='5'>Loading music...</td></tr>";
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("songs")
+      .select("*")
+      .order("id",{ascending:false});
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
-  .from("songs")
-  .select("*")
-  .order("id",{ascending:false});
+    if(error) throw error;
 
-  if(error){
+    const songs=data || [];
 
-    console.error(error);
+    document.getElementById("musicCount")
+      .textContent=songs.length;
 
-    table.innerHTML =
-    "<tr><td colspan='5'>Unable to load songs: " +
-    escapeHtml(error.message) +
-    "</td></tr>";
+    document.getElementById("reportSongs")
+      .textContent=songs.length;
 
-    return;
-  }
+    const table=
+    document.getElementById("songsTable");
 
-  songsData =
-  data || [];
+    if(!songs.length){
 
-  document.getElementById("musicCount")
-  .textContent =
-  songsData.length;
+      table.innerHTML=
+      `<tr>
+        <td colspan="4">No songs uploaded yet.</td>
+      </tr>`;
 
-  renderSongs(songsData);
+      return;
+    }
 
-  document.getElementById("songsEmpty")
-  .style.display =
-  songsData.length
-  ? "none"
-  : "block";
-}
+    table.innerHTML=
+    songs.map(song=>{
 
+      const title=
+      song.title || "-";
 
-function renderSongs(list){
+      const price=
+      song.price || 500;
 
-  const table =
-  document.getElementById("songsTable");
+      const status=
+      song.status || "active";
 
-  if(!list.length){
+      const artist=
+      song.artist_id || "-";
 
-    table.innerHTML =
-    "<tr><td colspan='5' class='empty'>No songs found.</td></tr>";
-
-    return;
-  }
-
-  table.innerHTML =
-  list.map(song => {
-
-    const status =
-    song.status ||
-    "pending";
-
-    return `
+      return `
       <tr>
+        <td>${escapeHtml(String(title))}</td>
+        <td>UGX ${escapeHtml(String(price))}</td>
+        <td>${escapeHtml(String(status))}</td>
+        <td>${escapeHtml(String(artist))}</td>
+      </tr>`;
 
-        <td>
-          <strong>
-            ${escapeHtml(song.title || "Untitled")}
-          </strong>
+    }).join("");
+
+  }catch(error){
+
+    console.error("Songs error:",error);
+
+    document.getElementById("songsTable")
+      .innerHTML=
+      `<tr>
+        <td colspan="4">
+          Unable to load music.
         </td>
+      </tr>`;
 
-        <td>
-          ${escapeHtml(String(song.price ?? 500))}
-        </td>
+  }
 
-        <td>
-          ${escapeHtml(song.currency || "UGX")}
-        </td>
-
-        <td>
-          <span class="badge">
-            ${escapeHtml(status)}
-          </span>
-        </td>
-
-        <td class="small">
-          ${escapeHtml(String(song.id || "—"))}
-        </td>
-
-      </tr>
-    `;
-
-  }).join("");
 }
 
 
-function filterSongs(){
+function showSection(id){
 
-  const search =
-  document.getElementById("songSearch")
-  .value
-  .toLowerCase()
-  .trim();
+  document.querySelectorAll(".section-content")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
 
-  const filtered =
-  songsData.filter(song => {
+  const selected=
+  document.getElementById(id);
 
-    const text =
-    JSON.stringify(song)
-    .toLowerCase();
+  if(selected){
 
-    return text.includes(search);
-  });
+    selected.classList.add("active");
 
-  renderSongs(filtered);
+    selected.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+  }
+
 }
 
-
-/* =========================
-   SECURITY HELPERS
-========================= */
 
 function escapeHtml(value){
 
-  return String(value ?? "")
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&#039;");
+  return value
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
 }
 
-
-function escapeAttr(value){
-
-  return String(value ?? "")
-  .replace(/\\/g,"\\\\")
-  .replace(/'/g,"\\'");
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
 
 async function logout(){
 
   await supabaseClient.auth.signOut();
 
-  window.location.href =
-  "account.html";
+  window.location.href="account.html";
+
 }
 
 
-/* START */
-
 checkAdmin();
 
-</script></body>
+</script>
+
+</body>
 </html>
