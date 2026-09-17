@@ -75,7 +75,7 @@ h1{
 }
 
 .auth-box{
-  max-width:480px;
+  max-width:500px;
   margin:30px auto;
 }
 
@@ -112,7 +112,8 @@ h1{
   margin-bottom:7px;
 }
 
-.field input{
+.field input,
+.field select{
   width:100%;
   padding:13px;
   border-radius:10px;
@@ -122,8 +123,65 @@ h1{
   outline:none;
 }
 
-.field input:focus{
+.field input:focus,
+.field select:focus{
   border-color:#8b5cf6;
+}
+
+.account-types{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.account-type{
+  position:relative;
+}
+
+.account-type input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.account-type label{
+  display:block;
+  padding:18px 14px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  background:#080810;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.account-type label:hover{
+  border-color:#8b5cf6;
+}
+
+.account-type input:checked + label{
+  border-color:#8b5cf6;
+  background:#181125;
+  box-shadow:0 0 0 1px #8b5cf6;
+}
+
+.type-icon{
+  display:block;
+  font-size:28px;
+  margin-bottom:8px;
+}
+
+.type-title{
+  display:block;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.type-description{
+  display:block;
+  color:#888;
+  font-size:12px;
+  line-height:1.4;
 }
 
 .primary{
@@ -159,7 +217,18 @@ h1{
 
 .user-info{
   color:#c9a8e8;
-  margin-bottom:20px;
+  margin-bottom:8px;
+}
+
+.account-badge{
+  display:inline-block;
+  margin-top:8px;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#181125;
+  color:#d8b4ff;
+  font-size:12px;
+  font-weight:700;
 }
 
 .grid{
@@ -231,6 +300,21 @@ h1{
   font-weight:800;
 }
 
+.musician-card{
+  border-color:rgba(168,85,247,.25);
+}
+
+.musician-button{
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 18px;
+  border-radius:10px;
+  background:#8b5cf6;
+  color:#fff;
+  text-decoration:none;
+  font-weight:800;
+}
+
 footer{
   text-align:center;
   color:#666;
@@ -253,6 +337,10 @@ footer{
     grid-template-columns:1fr;
   }
 
+  .account-types{
+    grid-template-columns:1fr;
+  }
+
   header{
     padding:0 5%;
   }
@@ -261,268 +349,315 @@ footer{
     ◈ PASONG
   </div>  <a href="index.html">
     Home
-  </a></header><main>  <!-- =========================
-       LOGIN / SIGN UP
-       ========================= -->  <section id="authSection" class="card auth-box"><h1>Welcome to PASONG</h1>
+  </a></header><main><!-- =========================
+     LOGIN / SIGN UP
+     ========================= --><section id="authSection" class="card auth-box">  <h1>Welcome to PASONG</h1>  <p class="subtitle">
+    Login to your account or create a free PASONG account.
+  </p>  <div class="auth-tabs"><button
+  id="loginTab"
+  class="active"
+  onclick="showLogin()">
+  Login
+</button>
 
-<p class="subtitle">
-  Login to your account or create a free PASONG account.
+<button
+  id="signupTab"
+  onclick="showSignup()">
+  Sign Up
+</button>
+
+  </div>  <!-- LOGIN -->  <div id="loginForm"><div class="field">
+
+  <label>Email</label>
+
+  <input
+    id="loginEmail"
+    type="email"
+    placeholder="Enter your email"
+    autocomplete="email">
+
+</div>
+
+
+<div class="field">
+
+  <label>Password</label>
+
+  <input
+    id="loginPassword"
+    type="password"
+    placeholder="Enter your password"
+    autocomplete="current-password">
+
+</div>
+
+
+<button
+  class="primary"
+  onclick="loginUser()">
+
+  Login
+
+</button>
+
+  </div>  <!-- SIGN UP -->  <div id="signupForm" class="hidden"><div class="field">
+
+  <label>Email</label>
+
+  <input
+    id="signupEmail"
+    type="email"
+    placeholder="Enter your email"
+    autocomplete="email">
+
+</div>
+
+
+<div class="field">
+
+  <label>Password</label>
+
+  <input
+    id="signupPassword"
+    type="password"
+    placeholder="Create a password"
+    autocomplete="new-password">
+
+</div>
+
+
+<div class="field">
+
+  <label>Choose your PASONG account</label>
+
+</div>
+
+
+<div class="account-types">
+
+  <div class="account-type">
+
+    <input
+      type="radio"
+      id="buyerType"
+      name="accountType"
+      value="buyer"
+      checked>
+
+    <label for="buyerType">
+
+      <span class="type-icon">
+        🎧
+      </span>
+
+      <span class="type-title">
+        Buyer / Listener
+      </span>
+
+      <span class="type-description">
+        Buy music, save downloads,
+        create playlists and follow artists.
+      </span>
+
+    </label>
+
+  </div>
+
+
+  <div class="account-type">
+
+    <input
+      type="radio"
+      id="musicianType"
+      name="accountType"
+      value="musician">
+
+    <label for="musicianType">
+
+      <span class="type-icon">
+        🎤
+      </span>
+
+      <span class="type-title">
+        Musician / Artist
+      </span>
+
+      <span class="type-description">
+        Upload music, manage your artist
+        profile and track your earnings.
+      </span>
+
+    </label>
+
+  </div>
+
+</div>
+
+
+<button
+  class="primary"
+  onclick="signupUser()">
+
+  Create Account
+
+</button>
+
+  </div>  <div
+    id="authMessage"
+    class="message">
+  </div></section><!-- =========================
+     ACCOUNT
+     ========================= --><section
+  id="accountSection"
+  class="hidden">  <h1>My Account</h1>  <p class="subtitle">
+    Manage your PASONG account and purchases.
+  </p>  <div class="card"><div class="user-info">
+
+  Logged in as:
+  <strong id="userEmail"></strong>
+
+  <br>
+
+  <span
+    id="accountTypeBadge"
+    class="account-badge">
+  </span>
+
+</div>
+
+
+<button
+  class="logout"
+  onclick="logoutUser()">
+
+  Logout
+
+</button>
+
+  </div>  <!-- ADMIN -->  <div
+    id="adminCard"
+    class="card admin-card hidden"><h2>👑 Admin Access</h2>
+
+<p>
+  Your PASONG account has administrator privileges.
 </p>
 
-<div class="auth-tabs">
+<a
+  href="admin.html"
+  class="admin-button">
 
-  <button
-    id="loginTab"
-    class="active"
-    onclick="showLogin()"
-  >
-    Login
-  </button>
+  Open Admin Dashboard
 
-  <button
-    id="signupTab"
-    onclick="showSignup()"
-  >
-    Sign Up
-  </button>
+</a>
 
-</div>
+  </div>  <!-- MUSICIAN -->  <div
+    id="musicianCard"
+    class="card musician-card hidden"><h2>🎤 Musician Dashboard</h2>
 
-
-<div id="loginForm">
-
-  <div class="field">
-
-    <label>Email</label>
-
-    <input
-      id="loginEmail"
-      type="email"
-      placeholder="Enter your email"
-      autocomplete="email"
-    >
-
-  </div>
-
-
-  <div class="field">
-
-    <label>Password</label>
-
-    <input
-      id="loginPassword"
-      type="password"
-      placeholder="Enter your password"
-      autocomplete="current-password"
-    >
-
-  </div>
-
-
-  <button
-    class="primary"
-    onclick="loginUser()"
-  >
-    Login
-  </button>
-
-</div>
-
-
-<div id="signupForm" class="hidden">
-
-  <div class="field">
-
-    <label>Email</label>
-
-    <input
-      id="signupEmail"
-      type="email"
-      placeholder="Enter your email"
-      autocomplete="email"
-    >
-
-  </div>
-
-
-  <div class="field">
-
-    <label>Password</label>
-
-    <input
-      id="signupPassword"
-      type="password"
-      placeholder="Create a password"
-      autocomplete="new-password"
-    >
-
-  </div>
-
-
-  <button
-    class="primary"
-    onclick="signupUser()"
-  >
-    Create Account
-  </button>
-
-</div>
-
-
-<div
-  id="authMessage"
-  class="message"
-></div>
-
-  </section>  <!-- =========================
-       USER ACCOUNT
-       ========================= -->  <section
-    id="accountSection"
-    class="hidden"
-  ><h1>My Account</h1>
-
-<p class="subtitle">
-  Manage your PASONG account and purchases.
+<p>
+  Manage your artist profile, upload songs,
+  view your music activity and manage earnings.
 </p>
 
+<a
+  href="upload.html"
+  class="musician-button">
+
+  Go to Musician Area
+
+</a>
+
+  </div>  <div class="grid"><!-- DOWNLOADS -->
 
 <div class="card">
 
-  <div class="user-info">
-
-    Logged in as:
-    <strong id="userEmail"></strong>
-
-  </div>
-
-  <button
-    class="logout"
-    onclick="logoutUser()"
-  >
-    Logout
-  </button>
-
-</div>
-
-
-<div
-  id="adminCard"
-  class="card admin-card hidden"
->
-
-  <h2>👑 Admin Access</h2>
+  <h2>📥 My Downloads</h2>
 
   <p>
-    Your PASONG account has administrator privileges.
+    Purchased songs can remain available here
+    after verified payment.
   </p>
 
-  <a
-    href="admin.html"
-    class="admin-button"
-  >
-    Open Admin Dashboard
-  </a>
+  <div
+    id="downloads"
+    class="downloads">
 
-</div>
+    <div class="download-item">
 
+      <strong>
+        No purchases loaded yet
+      </strong>
 
-<div class="grid">
-
-
-  <!-- DOWNLOADS -->
-
-  <div class="card">
-
-    <h2>📥 My Downloads</h2>
-
-    <p>
-      Purchased songs can remain available here
-      after verified payment.
-    </p>
-
-    <div
-      id="downloads"
-      class="downloads"
-    >
-
-      <div class="download-item">
-
-        <strong>
-          No purchases loaded yet
-        </strong>
-
-        <span>
-          Your verified purchases will appear here.
-        </span>
-
-      </div>
+      <span>
+        Your verified purchases will appear here.
+      </span>
 
     </div>
 
   </div>
 
-
-  <!-- EARNINGS -->
-
-  <div class="card">
-
-    <h2>💰 Earnings</h2>
-
-    <p>
-      Artist, Producer/DJ and Writer balances
-      are controlled by the PASONG backend.
-    </p>
-
-  </div>
+</div>
 
 
-  <!-- REFERRALS -->
+<!-- EARNINGS -->
 
-  <div class="card">
+<div class="card">
 
-    <h2>🎁 Refer a Friend</h2>
+  <h2>💰 Earnings</h2>
 
-    <p>
-      Earn PASONG Points when your referral
-      completes the qualifying action.
-    </p>
-
-    <input
-      id="refCode"
-      class="ref-input"
-      value=""
-      readonly
-    >
-
-    <button
-      class="secondary"
-      onclick="copyReferral()"
-    >
-      Copy Referral Link
-    </button>
-
-    <p id="refMsg"></p>
-
-  </div>
-
-
-  <!-- PROFILE -->
-
-  <div class="card">
-
-    <h2>👤 Profile</h2>
-
-    <p>
-      Your PASONG account is connected to your
-      authenticated email address.
-    </p>
-
-  </div>
+  <p>
+    Artist, Producer/DJ and Writer balances
+    are controlled by the PASONG backend.
+  </p>
 
 </div>
 
-  </section></main><footer>
-  PASONG © 2026 • Music • Artists • Opportunity
+
+<!-- REFERRALS -->
+
+<div class="card">
+
+  <h2>🎁 Refer a Friend</h2>
+
+  <p>
+    Earn PASONG Points when your referral
+    completes the qualifying action.
+  </p>
+
+  <input
+    id="refCode"
+    class="ref-input"
+    value=""
+    readonly>
+
+  <button
+    class="secondary"
+    onclick="copyReferral()">
+
+    Copy Referral Link
+
+  </button>
+
+  <p id="refMsg"></p>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div class="card">
+
+  <h2>👤 Profile</h2>
+
+  <p>
+    Your PASONG account is connected to your
+    authenticated email address.
+  </p>
+
+</div>
+
+  </div></section></main><footer>
+PASONG © 2026 • Music • Artists • Opportunity
 </footer><script>
 
 /* =====================================
@@ -558,8 +693,14 @@ const authMessage =
 const userEmail =
   document.getElementById("userEmail");
 
+const accountTypeBadge =
+  document.getElementById("accountTypeBadge");
+
 const adminCard =
   document.getElementById("adminCard");
+
+const musicianCard =
+  document.getElementById("musicianCard");
 
 const refCode =
   document.getElementById("refCode");
@@ -637,10 +778,26 @@ async function signupUser(){
       .value;
 
 
+  const selectedType =
+    document.querySelector(
+      'input[name="accountType"]:checked'
+    );
+
+
   if(!email || !password){
 
     authMessage.textContent =
       "Please enter your email and password.";
+
+    return;
+
+  }
+
+
+  if(!selectedType){
+
+    authMessage.textContent =
+      "Please choose Buyer / Listener or Musician / Artist.";
 
     return;
 
@@ -657,17 +814,37 @@ async function signupUser(){
   }
 
 
+  const accountType =
+    selectedType.value;
+
+
   authMessage.textContent =
     "Creating your PASONG account...";
 
+
+  /*
+    account_type is stored in user_metadata.
+
+    This is useful for the frontend account experience.
+    Admin privileges are NOT stored here.
+  */
 
   const {
     data,
     error
   } =
     await supabaseClient.auth.signUp({
+
       email:email,
-      password:password
+
+      password:password,
+
+      options:{
+        data:{
+          account_type:accountType
+        }
+      }
+
     });
 
 
@@ -686,7 +863,9 @@ async function signupUser(){
     authMessage.textContent =
       "Account created successfully.";
 
-    showAccount(data.session.user);
+    showAccount(
+      data.session.user
+    );
 
   }else{
 
@@ -735,8 +914,11 @@ async function loginUser(){
     error
   } =
     await supabaseClient.auth.signInWithPassword({
+
       email:email,
+
       password:password
+
     });
 
 
@@ -750,7 +932,9 @@ async function loginUser(){
   }
 
 
-  showAccount(data.user);
+  showAccount(
+    data.user
+  );
 
 }
 
@@ -777,15 +961,35 @@ function showAccount(user){
     user.email || "";
 
 
-  /*
-    ADMIN CHECK
+  /* ===============================
+     ACCOUNT TYPE
+     =============================== */
 
-    We intentionally check app_metadata,
-    not a password stored in this page.
+  const accountType =
+    user.user_metadata?.account_type ||
+    "buyer";
 
-    app_metadata cannot be changed by the
-    normal user from the frontend.
-  */
+
+  if(accountType === "musician"){
+
+    accountTypeBadge.textContent =
+      "🎤 Musician / Artist";
+
+    musicianCard.classList.remove("hidden");
+
+  }else{
+
+    accountTypeBadge.textContent =
+      "🎧 Buyer / Listener";
+
+    musicianCard.classList.add("hidden");
+
+  }
+
+
+  /* ===============================
+     ADMIN ROLE
+     =============================== */
 
   const role =
     user.app_metadata?.role;
@@ -801,6 +1005,10 @@ function showAccount(user){
 
   }
 
+
+  /* ===============================
+     REFERRAL
+     =============================== */
 
   createReferralCode(user);
 
@@ -858,7 +1066,7 @@ async function checkSession(){
    ===================================== */
 
 supabaseClient.auth.onAuthStateChange(
-  function(event, session){
+  function(event,session){
 
     if(session){
 
