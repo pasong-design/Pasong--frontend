@@ -1,1 +1,952 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My Account</title><link rel="stylesheet" href="assets/style.css"></head><body><header><b>PASONG</b><a href="index.html">Home</a></header><main><h1>My Account</h1><div class="grid"><div class="card"><h2>📥 My Downloads</h2><p>Purchased songs remain available after verified payment.</p></div><div class="card"><h2>💰 Earnings</h2><p>Artist, Producer/DJ and Writer balances are backend controlled.</p></div><div id="referrals" class="card"><h2>🎁 Refer a Friend</h2><p>Earn <b>PASONG Points</b>, not cash, for qualifying referrals.</p><input id="refCode" value="YOUR-REFERRAL-CODE" readonly><button onclick="copyReferral()">Copy Referral Link</button><p id="refMsg"></p></div></div></main><script src="config.js"></script><script src="assets/app.js"></script></body></html>
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — My Account</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+}
+
+header{
+  height:70px;
+  padding:0 7%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#0b0b14;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+}
+
+header a{
+  color:#aaa;
+  text-decoration:none;
+  font-size:14px;
+}
+
+header a:hover{
+  color:#fff;
+}
+
+main{
+  width:min(1050px,92%);
+  margin:40px auto 70px;
+}
+
+h1{
+  font-size:36px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  color:#999;
+  margin-bottom:30px;
+}
+
+.card{
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.card h2{
+  margin-bottom:10px;
+}
+
+.card p{
+  color:#999;
+  line-height:1.6;
+}
+
+.auth-box{
+  max-width:480px;
+  margin:30px auto;
+}
+
+.auth-tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:20px;
+}
+
+.auth-tabs button{
+  flex:1;
+  border:0;
+  padding:12px;
+  border-radius:10px;
+  background:#171722;
+  color:#aaa;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.auth-tabs button.active{
+  background:#8b5cf6;
+  color:#fff;
+}
+
+.field{
+  margin-bottom:15px;
+}
+
+.field label{
+  display:block;
+  color:#aaa;
+  font-size:13px;
+  margin-bottom:7px;
+}
+
+.field input{
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#080810;
+  color:#fff;
+  outline:none;
+}
+
+.field input:focus{
+  border-color:#8b5cf6;
+}
+
+.primary{
+  width:100%;
+  border:0;
+  padding:13px;
+  border-radius:10px;
+  background:#8b5cf6;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.primary:hover{
+  background:#a855f7;
+}
+
+.secondary{
+  border:1px solid rgba(255,255,255,.12);
+  padding:10px 15px;
+  border-radius:10px;
+  background:#171722;
+  color:#fff;
+  cursor:pointer;
+}
+
+.message{
+  margin-top:15px;
+  color:#c9a8e8;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.user-info{
+  color:#c9a8e8;
+  margin-bottom:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
+
+.downloads{
+  margin-top:15px;
+}
+
+.download-item{
+  padding:14px;
+  background:#080810;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.download-item strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.download-item span{
+  color:#888;
+  font-size:13px;
+}
+
+.ref-input{
+  width:100%;
+  margin-top:15px;
+  margin-bottom:10px;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#080810;
+  color:#fff;
+}
+
+.logout{
+  margin-top:20px;
+  border:0;
+  padding:12px 18px;
+  border-radius:10px;
+  background:#2a172f;
+  color:#fff;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.admin-card{
+  border-color:rgba(168,85,247,.4);
+  background:linear-gradient(135deg,#171022,#11111b);
+}
+
+.admin-button{
+  display:inline-block;
+  margin-top:15px;
+  padding:12px 18px;
+  border-radius:10px;
+  background:#8b5cf6;
+  color:#fff;
+  text-decoration:none;
+  font-weight:800;
+}
+
+footer{
+  text-align:center;
+  color:#666;
+  font-size:12px;
+  padding:25px;
+}
+
+@media(max-width:650px){
+
+  main{
+    width:94%;
+    margin-top:25px;
+  }
+
+  h1{
+    font-size:30px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  header{
+    padding:0 5%;
+  }
+}
+</style></head><body><header>  <div class="logo">
+    ◈ PASONG
+  </div>  <a href="index.html">
+    Home
+  </a></header><main>  <!-- =========================
+       LOGIN / SIGN UP
+       ========================= -->  <section id="authSection" class="card auth-box"><h1>Welcome to PASONG</h1>
+
+<p class="subtitle">
+  Login to your account or create a free PASONG account.
+</p>
+
+<div class="auth-tabs">
+
+  <button
+    id="loginTab"
+    class="active"
+    onclick="showLogin()"
+  >
+    Login
+  </button>
+
+  <button
+    id="signupTab"
+    onclick="showSignup()"
+  >
+    Sign Up
+  </button>
+
+</div>
+
+
+<div id="loginForm">
+
+  <div class="field">
+
+    <label>Email</label>
+
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="Enter your email"
+      autocomplete="email"
+    >
+
+  </div>
+
+
+  <div class="field">
+
+    <label>Password</label>
+
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Enter your password"
+      autocomplete="current-password"
+    >
+
+  </div>
+
+
+  <button
+    class="primary"
+    onclick="loginUser()"
+  >
+    Login
+  </button>
+
+</div>
+
+
+<div id="signupForm" class="hidden">
+
+  <div class="field">
+
+    <label>Email</label>
+
+    <input
+      id="signupEmail"
+      type="email"
+      placeholder="Enter your email"
+      autocomplete="email"
+    >
+
+  </div>
+
+
+  <div class="field">
+
+    <label>Password</label>
+
+    <input
+      id="signupPassword"
+      type="password"
+      placeholder="Create a password"
+      autocomplete="new-password"
+    >
+
+  </div>
+
+
+  <button
+    class="primary"
+    onclick="signupUser()"
+  >
+    Create Account
+  </button>
+
+</div>
+
+
+<div
+  id="authMessage"
+  class="message"
+></div>
+
+  </section>  <!-- =========================
+       USER ACCOUNT
+       ========================= -->  <section
+    id="accountSection"
+    class="hidden"
+  ><h1>My Account</h1>
+
+<p class="subtitle">
+  Manage your PASONG account and purchases.
+</p>
+
+
+<div class="card">
+
+  <div class="user-info">
+
+    Logged in as:
+    <strong id="userEmail"></strong>
+
+  </div>
+
+  <button
+    class="logout"
+    onclick="logoutUser()"
+  >
+    Logout
+  </button>
+
+</div>
+
+
+<div
+  id="adminCard"
+  class="card admin-card hidden"
+>
+
+  <h2>👑 Admin Access</h2>
+
+  <p>
+    Your PASONG account has administrator privileges.
+  </p>
+
+  <a
+    href="admin.html"
+    class="admin-button"
+  >
+    Open Admin Dashboard
+  </a>
+
+</div>
+
+
+<div class="grid">
+
+
+  <!-- DOWNLOADS -->
+
+  <div class="card">
+
+    <h2>📥 My Downloads</h2>
+
+    <p>
+      Purchased songs can remain available here
+      after verified payment.
+    </p>
+
+    <div
+      id="downloads"
+      class="downloads"
+    >
+
+      <div class="download-item">
+
+        <strong>
+          No purchases loaded yet
+        </strong>
+
+        <span>
+          Your verified purchases will appear here.
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- EARNINGS -->
+
+  <div class="card">
+
+    <h2>💰 Earnings</h2>
+
+    <p>
+      Artist, Producer/DJ and Writer balances
+      are controlled by the PASONG backend.
+    </p>
+
+  </div>
+
+
+  <!-- REFERRALS -->
+
+  <div class="card">
+
+    <h2>🎁 Refer a Friend</h2>
+
+    <p>
+      Earn PASONG Points when your referral
+      completes the qualifying action.
+    </p>
+
+    <input
+      id="refCode"
+      class="ref-input"
+      value=""
+      readonly
+    >
+
+    <button
+      class="secondary"
+      onclick="copyReferral()"
+    >
+      Copy Referral Link
+    </button>
+
+    <p id="refMsg"></p>
+
+  </div>
+
+
+  <!-- PROFILE -->
+
+  <div class="card">
+
+    <h2>👤 Profile</h2>
+
+    <p>
+      Your PASONG account is connected to your
+      authenticated email address.
+    </p>
+
+  </div>
+
+</div>
+
+  </section></main><footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer><script>
+
+/* =====================================
+   SUPABASE
+   ===================================== */
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =====================================
+   ELEMENTS
+   ===================================== */
+
+const authSection =
+  document.getElementById("authSection");
+
+const accountSection =
+  document.getElementById("accountSection");
+
+const authMessage =
+  document.getElementById("authMessage");
+
+const userEmail =
+  document.getElementById("userEmail");
+
+const adminCard =
+  document.getElementById("adminCard");
+
+const refCode =
+  document.getElementById("refCode");
+
+
+/* =====================================
+   LOGIN TAB
+   ===================================== */
+
+function showLogin(){
+
+  document
+    .getElementById("loginForm")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("signupForm")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginTab")
+    .classList.add("active");
+
+  document
+    .getElementById("signupTab")
+    .classList.remove("active");
+
+  authMessage.textContent = "";
+
+}
+
+
+/* =====================================
+   SIGN UP TAB
+   ===================================== */
+
+function showSignup(){
+
+  document
+    .getElementById("loginForm")
+    .classList.add("hidden");
+
+  document
+    .getElementById("signupForm")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("loginTab")
+    .classList.remove("active");
+
+  document
+    .getElementById("signupTab")
+    .classList.add("active");
+
+  authMessage.textContent = "";
+
+}
+
+
+/* =====================================
+   SIGN UP
+   ===================================== */
+
+async function signupUser(){
+
+  const email =
+    document
+      .getElementById("signupEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("signupPassword")
+      .value;
+
+
+  if(!email || !password){
+
+    authMessage.textContent =
+      "Please enter your email and password.";
+
+    return;
+
+  }
+
+
+  if(password.length < 6){
+
+    authMessage.textContent =
+      "Password must be at least 6 characters.";
+
+    return;
+
+  }
+
+
+  authMessage.textContent =
+    "Creating your PASONG account...";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.signUp({
+      email:email,
+      password:password
+    });
+
+
+  if(error){
+
+    authMessage.textContent =
+      error.message;
+
+    return;
+
+  }
+
+
+  if(data.session){
+
+    authMessage.textContent =
+      "Account created successfully.";
+
+    showAccount(data.session.user);
+
+  }else{
+
+    authMessage.textContent =
+      "Account created. Please check your email to confirm your account, then login.";
+
+  }
+
+}
+
+
+/* =====================================
+   LOGIN
+   ===================================== */
+
+async function loginUser(){
+
+  const email =
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("loginPassword")
+      .value;
+
+
+  if(!email || !password){
+
+    authMessage.textContent =
+      "Please enter your email and password.";
+
+    return;
+
+  }
+
+
+  authMessage.textContent =
+    "Logging in...";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.signInWithPassword({
+      email:email,
+      password:password
+    });
+
+
+  if(error){
+
+    authMessage.textContent =
+      error.message;
+
+    return;
+
+  }
+
+
+  showAccount(data.user);
+
+}
+
+
+/* =====================================
+   SHOW ACCOUNT
+   ===================================== */
+
+function showAccount(user){
+
+  if(!user){
+
+    return;
+
+  }
+
+
+  authSection.classList.add("hidden");
+
+  accountSection.classList.remove("hidden");
+
+
+  userEmail.textContent =
+    user.email || "";
+
+
+  /*
+    ADMIN CHECK
+
+    We intentionally check app_metadata,
+    not a password stored in this page.
+
+    app_metadata cannot be changed by the
+    normal user from the frontend.
+  */
+
+  const role =
+    user.app_metadata?.role;
+
+
+  if(role === "admin"){
+
+    adminCard.classList.remove("hidden");
+
+  }else{
+
+    adminCard.classList.add("hidden");
+
+  }
+
+
+  createReferralCode(user);
+
+}
+
+
+/* =====================================
+   LOGOUT
+   ===================================== */
+
+async function logoutUser(){
+
+  await supabaseClient.auth.signOut();
+
+  accountSection.classList.add("hidden");
+
+  authSection.classList.remove("hidden");
+
+  showLogin();
+
+}
+
+
+/* =====================================
+   SESSION CHECK
+   ===================================== */
+
+async function checkSession(){
+
+  const {
+    data
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  if(data.session){
+
+    showAccount(
+      data.session.user
+    );
+
+  }else{
+
+    authSection.classList.remove("hidden");
+
+    accountSection.classList.add("hidden");
+
+  }
+
+}
+
+
+/* =====================================
+   AUTH STATE
+   ===================================== */
+
+supabaseClient.auth.onAuthStateChange(
+  function(event, session){
+
+    if(session){
+
+      showAccount(
+        session.user
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================
+   REFERRAL CODE
+   ===================================== */
+
+function createReferralCode(user){
+
+  if(!user){
+
+    return;
+
+  }
+
+
+  const code =
+    "PASONG-" +
+    user.id
+      .replace(/-/g,"")
+      .substring(0,8)
+      .toUpperCase();
+
+
+  const referralLink =
+    window.location.origin +
+    "/?ref=" +
+    encodeURIComponent(code);
+
+
+  refCode.value =
+    referralLink;
+
+}
+
+
+/* =====================================
+   COPY REFERRAL
+   ===================================== */
+
+async function copyReferral(){
+
+  const value =
+    refCode.value;
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      value
+    );
+
+    document.getElementById(
+      "refMsg"
+    ).textContent =
+      "Referral link copied.";
+
+  }catch(error){
+
+    refCode.select();
+
+    document.execCommand("copy");
+
+    document.getElementById(
+      "refMsg"
+    ).textContent =
+      "Referral link copied.";
+
+  }
+
+}
+
+
+/* =====================================
+   START
+   ===================================== */
+
+checkSession();
+
+</script></body>
+</html>
