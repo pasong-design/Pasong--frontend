@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASONG — Artist Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+}
+a{text-decoration:none;color:inherit}
+button,input,select{font:inherit}
+
+.topbar{
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 22px;
+  background:#0d0d18;
+  border-bottom:1px solid #222238;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.logo{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.logo span{color:#d946ef}
+
+.menu-btn{
+  display:none;
+  background:none;
+  border:0;
+  color:#fff;
+  font-size:25px;
+  cursor:pointer;
+}
+.user{
+  color:#aaa;
+  font-size:14px;
+}
+
+.layout{display:flex;min-height:calc(100vh - 70px)}
+
+.sidebar{
+  width:240px;
+  background:#0b0b15;
+  border-right:1px solid #222238;
+  padding:22px 14px;
+}
+.sidebar h3{
+  color:#888;
+  font-size:12px;
+  text-transform:uppercase;
+  margin:12px 10px;
+  letter-spacing:1px;
+}
+.nav{
+  display:block;
+  padding:13px 14px;
+  border-radius:10px;
+  color:#bbb;
+  margin-bottom:5px;
+  cursor:pointer;
+}
+.nav:hover,.nav.active{
+  background:linear-gradient(90deg,#261238,#171126);
+  color:#fff;
+}
+.nav.active{border-left:3px solid #d946ef}
+
+.main{
+  flex:1;
+  padding:28px;
+  max-width:1500px;
+  margin:auto;
+  width:100%;
+}
+.header{
+  margin-bottom:25px;
+}
+.header h1{font-size:30px;margin-bottom:7px}
+.header p{color:#999}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:25px;
+}
+.card{
+  background:#10101c;
+  border:1px solid #24243a;
+  border-radius:16px;
+  padding:20px;
+}
+.card small{color:#888}
+.card h2{margin-top:10px;font-size:27px}
+.pink{color:#e879f9}
+
+.grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+.section{
+  background:#10101c;
+  border:1px solid #24243a;
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:20px;
+}
+.section h2{
+  font-size:19px;
+  margin-bottom:18px;
+}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:11px 17px;
+  cursor:pointer;
+  font-weight:700;
+}
+.btn-primary{
+  color:#fff;
+  background:linear-gradient(135deg,#9333ea,#ec4899);
+}
+.btn-secondary{
+  color:#fff;
+  background:#1c1c2b;
+  border:1px solid #34344c;
+}
+.btn-danger{
+  color:#fff;
+  background:#35121d;
+  border:1px solid #7f1d35;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.upload-box{
+  border:1px dashed #44445f;
+  border-radius:14px;
+  padding:25px;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+.field label{
+  display:block;
+  color:#aaa;
+  font-size:13px;
+  margin-bottom:7px;
+}
+.field input,.field select{
+  width:100%;
+  padding:12px;
+  background:#090912;
+  color:#fff;
+  border:1px solid #303047;
+  border-radius:9px;
+  outline:none;
+}
+.field input:focus,.field select:focus{
+  border-color:#c026d3;
+}
+.full{grid-column:1/-1}
+
+.song{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:13px 0;
+  border-bottom:1px solid #222238;
+}
+.song:last-child{border-bottom:0}
+.cover{
+  width:52px;
+  height:52px;
+  border-radius:9px;
+  background:linear-gradient(135deg,#32104d,#10101c);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#d946ef;
+  font-weight:900;
+}
+.song-info{flex:1}
+.song-info strong{display:block}
+.song-info small{color:#888}
+.song-actions{display:flex;gap:7px}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  background:#172033;
+  color:#93c5fd;
+}
+.badge.pending{background:#30220e;color:#fbbf24}
+.badge.approved{background:#102d20;color:#86efac}
+
+.notice{
+  padding:15px;
+  background:#151124;
+  border:1px solid #35205b;
+  border-radius:12px;
+  color:#cfc4df;
+  line-height:1.5;
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+.avatar{
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7e22ce,#db2777);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  font-weight:900;
+}
+.muted{color:#888}
+footer{
+  padding:30px;
+  text-align:center;
+  color:#666;
+  font-size:13px;
+}
+
+@media(max-width:900px){
+  .stats{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .menu-btn{display:block}
+  .user{display:none}
+  .sidebar{
+    position:fixed;
+    left:-260px;
+    top:70px;
+    bottom:0;
+    z-index:15;
+    transition:.25s;
+  }
+  .sidebar.open{left:0}
+  .main{padding:20px 14px}
+  .stats{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  .song{align-items:flex-start}
+  .song-actions{flex-direction:column}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="logo">◈ PASONG</div>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <div class="user">Artist Dashboard</div>
+</header>
+
+<div class="layout">
+
+<aside class="sidebar" id="sidebar">
+  <h3>Artist</h3>
+
+  <a class="nav active" href="#dashboard">📊 Dashboard</a>
+  <a class="nav" href="#upload">⬆️ Upload Song</a>
+  <a class="nav" href="#songs">🎵 My Songs</a>
+  <a class="nav" href="#earnings">💰 Earnings</a>
+  <a class="nav" href="#analytics">📈 Analytics</a>
+  <a class="nav" href="#profile">👤 Artist Profile</a>
+  <a class="nav" href="#notifications">🔔 Notifications</a>
+
+  <h3>Account</h3>
+  <a class="nav" href="account.html">My Account</a>
+  <a class="nav" href="index.html">← PASONG Home</a>
+</aside>
+
+<main class="main">
+
+<section id="dashboard">
+  <div class="header">
+    <h1>Artist Dashboard</h1>
+    <p>Manage your music, profile, earnings and performance.</p>
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <small>Total Songs</small>
+      <h2>0</h2>
+    </div>
+    <div class="card">
+      <small>Total Plays</small>
+      <h2>0</h2>
+    </div>
+    <div class="card">
+      <small>Downloads</small>
+      <h2>0</h2>
+    </div>
+    <div class="card">
+      <small>Earnings</small>
+      <h2 class="pink">UGX 0</h2>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="section">
+      <h2>Quick Actions</h2>
+      <div class="actions">
+        <a class="btn btn-primary" href="#upload">⬆️ Upload New Song</a>
+        <a class="btn btn-secondary" href="#songs">🎵 Manage Songs</a>
+        <a class="btn btn-secondary" href="#profile">👤 Edit Profile</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Artist Status</h2>
+      <div class="notice">
+        Your artist dashboard is ready. Music uploaded through the approved PASONG upload flow will appear here.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="upload" class="section">
+  <h2>Upload New Song</h2>
+
+  <div class="upload-box">
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Song Title</label>
+        <input id="songTitle" type="text" placeholder="Enter song title">
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+        <select id="category">
+          <option value="">Select category</option>
+          <option>Afrobeats</option>
+          <option>Amapiano</option>
+          <option>Bongo</option>
+          <option>Gengetone</option>
+          <option>Gospel</option>
+          <option>Hip Hop</option>
+          <option>Dancehall</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Producer / DJ</label>
+        <input type="text" placeholder="Producer name">
+      </div>
+
+      <div class="field">
+        <label>Writer</label>
+        <input type="text" placeholder="Writer name">
+      </div>
+
+      <div class="field">
+        <label>Cover Image</label>
+        <input type="file" accept="image/png,image/jpeg,image/webp">
+      </div>
+
+      <div class="field">
+        <label>Audio File</label>
+        <input type="file" accept="audio/mpeg,audio/wav,audio/*">
+      </div>
+
+      <div class="field full">
+        <label>Song Description</label>
+        <input type="text" placeholder="Short description">
+      </div>
+
+      <div class="full">
+        <button class="btn btn-primary" onclick="prepareUpload()">Upload Song</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="songs" class="section">
+  <h2>My Songs</h2>
+
+  <div id="songList">
+    <div class="notice">
+      No songs loaded yet. Your uploaded songs will appear here.
+    </div>
+  </div>
+</section>
+
+<section id="earnings" class="section">
+  <h2>Earnings</h2>
+
+  <div class="stats">
+    <div class="card">
+      <small>Available Balance</small>
+      <h2 class="pink">UGX 0</h2>
+    </div>
+    <div class="card">
+      <small>Total Earned</small>
+      <h2>UGX 0</h2>
+    </div>
+    <div class="card">
+      <small>Withdrawn</small>
+      <h2>UGX 0</h2>
+    </div>
+  </div>
+
+  <div class="notice">
+    Earnings and royalty calculations are controlled by the PASONG backend.
+  </div>
+</section>
+
+<section id="analytics" class="section">
+  <h2>Analytics</h2>
+
+  <div class="stats">
+    <div class="card">
+      <small>Song Plays</small>
+      <h2>0</h2>
+    </div>
+    <div class="card">
+      <small>Purchases</small>
+      <h2>0</h2>
+    </div>
+    <div class="card">
+      <small>Followers</small>
+      <h2>0</h2>
+    </div>
+    <div class="card">
+      <small>Likes</small>
+      <h2>0</h2>
+    </div>
+  </div>
+</section>
+
+<section id="profile" class="section">
+  <h2>Artist Profile</h2>
+
+  <div class="profile">
+    <div class="avatar">KV</div>
+    <div>
+      <h3>Artist Profile</h3>
+      <p class="muted">Your public PASONG artist profile will appear here.</p>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="form-grid">
+    <div class="field">
+      <label>Artist Name</label>
+      <input type="text" placeholder="Artist name">
+    </div>
+
+    <div class="field">
+      <label>Genre</label>
+      <input type="text" placeholder="Main genre">
+    </div>
+
+    <div class="field full">
+      <label>Biography</label>
+      <input type="text" placeholder="Tell listeners about the artist">
+    </div>
+
+    <div class="full">
+      <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+    </div>
+  </div>
+</section>
+
+<section id="notifications" class="section">
+  <h2>Notifications</h2>
+
+  <div class="notice">
+    🔔 No new notifications.
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("open");
+}
+
+function prepareUpload(){
+  const title=document.getElementById("songTitle").value.trim();
+  const category=document.getElementById("category").value;
+
+  if(!title || !category){
+    alert("Please enter the song title and select a category.");
+    return;
+  }
+
+  alert("Upload form is ready. API upload connection will be connected to the PASONG backend.");
+}
+
+function saveProfile(){
+  alert("Artist profile interface is ready. Supabase profile saving will be connected in the next backend integration.");
+}
+</script>
+
+</body>
+</html>
