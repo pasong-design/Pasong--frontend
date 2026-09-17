@@ -1,663 +1,276 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>PASONG Admin Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASONG Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-    background:#080810;
-    color:#fff;
-    font-family:Inter,Arial,sans-serif;
-    min-height:100vh;
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
 }
 
 nav{
-    background:#10101a;
-    border-bottom:1px solid #242436;
-    padding:16px 22px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    position:sticky;
-    top:0;
-    z-index:10;
+  padding:18px 22px;
+  background:#10101a;
+  border-bottom:1px solid #252538;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .logo{
-    font-size:24px;
-    font-weight:900;
-    letter-spacing:1px;
-    background:linear-gradient(90deg,#a855f7,#ec4899);
-    -webkit-background-clip:text;
-    color:transparent;
-}
-
-.nav-right{
-    display:flex;
-    align-items:center;
-    gap:12px;
+  font-size:22px;
+  font-weight:800;
+  color:#d946ef;
 }
 
 .admin-label{
-    font-size:13px;
-    color:#aaa;
+  color:#aaa;
+  font-size:14px;
 }
 
-button{
-    border:0;
-    border-radius:9px;
-    padding:10px 15px;
-    cursor:pointer;
-    color:white;
-    background:#242436;
-    font-weight:700;
-}
-
-button:hover{
-    background:#33334b;
-}
-
-.logout{
-    background:#7f1d1d;
-}
-
-.logout:hover{
-    background:#991b1b;
-}
-
-.container{
-    width:min(1200px,94%);
-    margin:30px auto 60px;
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:30px 20px;
 }
 
 h1{
-    font-size:30px;
-    margin-bottom:8px;
+  font-size:30px;
+  margin-bottom:8px;
 }
 
 .subtitle{
-    color:#999;
-    margin-bottom:25px;
+  color:#999;
+  margin-bottom:28px;
 }
 
-.status{
-    background:#11111c;
-    border:1px solid #27273a;
-    padding:13px 15px;
-    border-radius:10px;
-    margin-bottom:20px;
-    color:#bbb;
+#loading{
+  text-align:center;
+  padding:50px 20px;
+  color:#bbb;
 }
 
-.status.success{
-    border-color:#16a34a;
-    color:#86efac;
+#error{
+  display:none;
+  background:#32131d;
+  border:1px solid #8b2940;
+  padding:18px;
+  border-radius:12px;
+  margin-bottom:20px;
+  color:#ffb8c6;
 }
 
-.status.error{
-    border-color:#dc2626;
-    color:#fca5a5;
+#dashboard{
+  display:none;
 }
 
-.stats{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:15px;
-    margin-bottom:30px;
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:16px;
 }
 
 .card{
-    background:#11111c;
-    border:1px solid #27273a;
-    border-radius:14px;
-    padding:20px;
+  background:#11111c;
+  border:1px solid #252538;
+  border-radius:16px;
+  padding:22px;
 }
 
-.card-title{
-    color:#999;
-    font-size:13px;
-    margin-bottom:10px;
+.card h3{
+  color:#999;
+  font-size:14px;
+  margin-bottom:10px;
 }
 
 .number{
-    font-size:28px;
-    font-weight:900;
+  font-size:30px;
+  font-weight:800;
+  color:#d946ef;
 }
 
 .section{
-    background:#11111c;
-    border:1px solid #27273a;
-    border-radius:14px;
-    margin-bottom:25px;
-    overflow:hidden;
+  margin-top:25px;
+  background:#11111c;
+  border:1px solid #252538;
+  border-radius:16px;
+  padding:22px;
 }
 
-.section-head{
-    padding:18px 20px;
-    border-bottom:1px solid #27273a;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.section h2{
+  margin-bottom:10px;
 }
 
-.section-head h2{
-    font-size:18px;
+.section p{
+  color:#aaa;
+  line-height:1.6;
 }
 
-.table-wrap{
-    overflow-x:auto;
+button{
+  margin-top:20px;
+  border:0;
+  border-radius:10px;
+  padding:12px 18px;
+  background:#d946ef;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
 }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:650px;
+button:hover{
+  opacity:.9;
 }
+</style>
+</head>
 
-th,td{
-    text-align:left;
-    padding:14px 16px;
-    border-bottom:1px solid #20202d;
-    font-size:14px;
-}
+<body>
 
-th{
-    color:#aaa;
-    font-size:12px;
-    text-transform:uppercase;
-}
+<nav>
+  <div class="logo">◈ PASONG</div>
+  <div class="admin-label">ADMIN PANEL</div>
+</nav>
 
-td{
-    color:#ddd;
-}
+<main>
 
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    background:#242436;
-    font-size:11px;
-}
+  <div id="loading">
+    Checking administrator access...
+  </div>
 
-.empty{
-    padding:25px;
-    color:#888;
-    text-align:center;
-}
+  <div id="error"></div>
 
-.loading{
-    color:#999;
-}
+  <div id="dashboard">
 
-@media(max-width:900px){
-    .stats{
-        grid-template-columns:repeat(2,1fr);
-    }
-}
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">
+      Manage PASONG music, users, sales and platform activity.
+    </p>
 
-@media(max-width:500px){
-    .stats{
-        grid-template-columns:1fr 1fr;
-    }
+    <div class="cards">
 
-    h1{
-        font-size:24px;
-    }
+      <div class="card">
+        <h3>Admin</h3>
+        <div class="number">✓</div>
+      </div>
 
-    .admin-label{
-        display:none;
-    }
-}
-</style></head><body><nav>
-    <div class="logo">PASONG</div><div class="nav-right">
-    <span class="admin-label" id="adminEmail">Checking admin...</span>
-    <button class="logout" onclick="logout()">Logout</button>
-</div>
+      <div class="card">
+        <h3>Music</h3>
+        <div class="number">—</div>
+      </div>
 
-</nav><div class="container"><h1>Admin Dashboard</h1>
-<p class="subtitle">
-    Manage and monitor your PASONG music platform.
-</p>
+      <div class="card">
+        <h3>Users</h3>
+        <div class="number">—</div>
+      </div>
 
-<div id="status" class="status">
-    Connecting to PASONG...
-</div>
+      <div class="card">
+        <h3>Sales</h3>
+        <div class="number">—</div>
+      </div>
 
-<div class="stats">
-
-    <div class="card">
-        <div class="card-title">Songs</div>
-        <div class="number" id="songsCount">—</div>
     </div>
 
-    <div class="card">
-        <div class="card-title">Users</div>
-        <div class="number" id="usersCount">—</div>
+    <div class="section">
+      <h2>Welcome, PASONG Admin</h2>
+      <p>
+        Your account has administrator access. More management controls
+        will be connected here next.
+      </p>
+
+      <button onclick="logout()">Logout</button>
     </div>
 
-    <div class="card">
-        <div class="card-title">Orders</div>
-        <div class="number" id="ordersCount">—</div>
-    </div>
+  </div>
 
-    <div class="card">
-        <div class="card-title">Downloads</div>
-        <div class="number" id="downloadsCount">—</div>
-    </div>
+</main>
 
-    <div class="card">
-        <div class="card-title">Payments</div>
-        <div class="number" id="paymentsCount">—</div>
-    </div>
-
-</div>
-
-<div class="section">
-
-    <div class="section-head">
-        <h2>Recent Songs</h2>
-        <button onclick="loadSongs()">Refresh</button>
-    </div>
-
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Currency</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-
-            <tbody id="songsTable">
-                <tr>
-                    <td colspan="4" class="loading">
-                        Loading songs...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-<div class="section">
-
-    <div class="section-head">
-        <h2>Recent Orders</h2>
-        <button onclick="loadOrders()">Refresh</button>
-    </div>
-
-    <div class="table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Amount</th>
-                    <th>Currency</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-
-            <tbody id="ordersTable">
-                <tr>
-                    <td colspan="4" class="loading">
-                        Loading orders...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-</div><script>
-
-/* =========================================================
-   PASONG SUPABASE
-   ========================================================= */
-
-const SUPABASE_URL =
-    "https://mtufczmjlkvycarxylgh.supabase.co";
+<script>
+const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
 
 /*
-   IMPORTANT:
-   Put your SUPABASE ANON/PUBLIC KEY below.
-
-   DO NOT put the service_role key here.
+ IMPORTANT:
+ Use your Supabase PUBLISHABLE/ANON key here.
+ NEVER put the service-role secret key in this file.
 */
-const SUPABASE_ANON_KEY =
-    "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const SUPABASE_KEY = "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
-function setStatus(message, type=""){
-    const box = document.getElementById("status");
-
-    box.textContent = message;
-    box.className = "status " + type;
-}
-
-
-/* =========================================================
-   ADMIN CHECK
-   ========================================================= */
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 async function checkAdmin(){
 
+  const loading = document.getElementById("loading");
+  const error = document.getElementById("error");
+  const dashboard = document.getElementById("dashboard");
+
+  try{
+
     const {
-        data: { user },
-        error
-    } = await supabaseClient.auth.getUser();
+      data: { session },
+      error: sessionError
+    } = await supabaseClient.auth.getSession();
 
-    if(error){
-        setStatus(
-            "Authentication error: " + error.message,
-            "error"
-        );
-        return false;
+    if(sessionError) throw sessionError;
+
+    if(!session){
+      window.location.href = "index.html";
+      return;
     }
 
-    if(!user){
-
-        setStatus(
-            "You are not logged in. Please log in first.",
-            "error"
-        );
-
-        setTimeout(()=>{
-            window.location.href = "login.html";
-        },1500);
-
-        return false;
-    }
-
-    document.getElementById("adminEmail").textContent =
-        user.email || "Admin";
-
-    /*
-       Admin role is checked from Supabase user metadata.
-       This does not create an admin account.
-    */
-
-    const metadata = user.user_metadata || {};
-    const appMetadata = user.app_metadata || {};
+    const user = session.user;
 
     const role =
-        metadata.role ||
-        appMetadata.role ||
-        "";
+      user.app_metadata &&
+      user.app_metadata.role;
 
     if(role !== "admin"){
 
-        setStatus(
-            "Access denied. This account is not an admin account.",
-            "error"
-        );
+      loading.style.display = "none";
+      error.style.display = "block";
 
-        return false;
+      error.innerHTML =
+        "Access denied.<br><br>" +
+        "This account does not have administrator permission.";
+
+      return;
     }
 
-    setStatus(
-        "PASONG Admin connected successfully.",
-        "success"
-    );
+    loading.style.display = "none";
+    dashboard.style.display = "block";
 
-    return true;
+  }catch(err){
+
+    console.error(err);
+
+    loading.style.display = "none";
+    error.style.display = "block";
+
+    error.textContent =
+      "Unable to verify administrator access: " +
+      err.message;
+  }
 }
-
-
-/* =========================================================
-   COUNT HELPER
-   ========================================================= */
-
-async function getCount(table){
-
-    const {
-        count,
-        error
-    } = await supabaseClient
-        .from(table)
-        .select("*", {
-            count:"exact",
-            head:true
-        });
-
-    if(error){
-        console.log(table, error);
-        return "—";
-    }
-
-    return count ?? 0;
-}
-
-
-/* =========================================================
-   LOAD DASHBOARD COUNTS
-   ========================================================= */
-
-async function loadCounts(){
-
-    document.getElementById("songsCount").textContent =
-        await getCount("songs");
-
-    document.getElementById("ordersCount").textContent =
-        await getCount("orders");
-
-    document.getElementById("downloadsCount").textContent =
-        await getCount("downloads");
-
-    document.getElementById("paymentsCount").textContent =
-        await getCount("payments");
-
-    /*
-       Supabase Auth users cannot normally be counted directly
-       from the browser using the anon key.
-
-       Therefore this currently displays "—".
-       We will connect the real user count through the secure
-       admin backend later.
-    */
-
-    document.getElementById("usersCount").textContent = "—";
-}
-
-
-/* =========================================================
-   LOAD SONGS
-   ========================================================= */
-
-async function loadSongs(){
-
-    const tbody =
-        document.getElementById("songsTable");
-
-    tbody.innerHTML =
-        '<tr><td colspan="4" class="loading">Loading songs...</td></tr>';
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("songs")
-        .select("id,title,price,currency,status")
-        .order("created_at", {
-            ascending:false
-        })
-        .limit(10);
-
-    if(error){
-
-        console.error(error);
-
-        tbody.innerHTML =
-            '<tr><td colspan="4" class="empty">Unable to load songs.</td></tr>';
-
-        return;
-    }
-
-    if(!data || data.length === 0){
-
-        tbody.innerHTML =
-            '<tr><td colspan="4" class="empty">No songs found.</td></tr>';
-
-        return;
-    }
-
-    tbody.innerHTML = data.map(song => `
-
-        <tr>
-
-            <td>
-                ${escapeHtml(song.title || "Untitled")}
-            </td>
-
-            <td>
-                ${song.price ?? 500}
-            </td>
-
-            <td>
-                ${escapeHtml(song.currency || "UGX")}
-            </td>
-
-            <td>
-                <span class="badge">
-                    ${escapeHtml(song.status || "active")}
-                </span>
-            </td>
-
-        </tr>
-
-    `).join("");
-}
-
-
-/* =========================================================
-   LOAD ORDERS
-   ========================================================= */
-
-async function loadOrders(){
-
-    const tbody =
-        document.getElementById("ordersTable");
-
-    tbody.innerHTML =
-        '<tr><td colspan="4" class="loading">Loading orders...</td></tr>';
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("orders")
-        .select("id,total_amount,currency,status")
-        .order("created_at", {
-            ascending:false
-        })
-        .limit(10);
-
-    if(error){
-
-        console.error(error);
-
-        tbody.innerHTML =
-            '<tr><td colspan="4" class="empty">Unable to load orders.</td></tr>';
-
-        return;
-    }
-
-    if(!data || data.length === 0){
-
-        tbody.innerHTML =
-            '<tr><td colspan="4" class="empty">No orders found.</td></tr>';
-
-        return;
-    }
-
-    tbody.innerHTML = data.map(order => `
-
-        <tr>
-
-            <td>
-                ${escapeHtml(String(order.id || "").slice(0,12))}
-            </td>
-
-            <td>
-                ${order.total_amount ?? "—"}
-            </td>
-
-            <td>
-                ${escapeHtml(order.currency || "UGX")}
-            </td>
-
-            <td>
-                <span class="badge">
-                    ${escapeHtml(order.status || "pending")}
-                </span>
-            </td>
-
-        </tr>
-
-    `).join("");
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-   ========================================================= */
-
-function escapeHtml(value){
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
 
 async function logout(){
 
-    await supabaseClient.auth.signOut();
+  await supabaseClient.auth.signOut();
 
-    window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
+checkAdmin();
+</script>
 
-/* =========================================================
-   START
-   ========================================================= */
-
-async function start(){
-
-    const isAdmin = await checkAdmin();
-
-    if(!isAdmin) return;
-
-    await loadCounts();
-    await loadSongs();
-    await loadOrders();
-}
-
-start();
-
-</script></body>
+</body>
 </html>
