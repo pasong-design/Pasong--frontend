@@ -137,7 +137,7 @@ h1{
   border:1px solid rgba(255,255,255,.07);
   border-radius:18px;
   padding:20px;
-  margin-bottom:20px;
+  margin-bottom:25px;
 }
 
 .price-label{
@@ -212,6 +212,7 @@ footer{
 }
 
 @media(max-width:600px){
+
   nav{
     padding:0 5%;
   }
@@ -233,6 +234,7 @@ footer{
   .artist{
     font-size:17px;
   }
+
 }
 </style>
 </head>
@@ -240,56 +242,104 @@ footer{
 <body>
 
 <nav>
-  <div class="logo">◈ PASONG</div>
+
+  <div class="logo">
+    ◈ PASONG
+  </div>
 
   <div class="nav-icons">
     <span>⌕</span>
     <span>◉</span>
   </div>
+
 </nav>
+
 
 <main class="container">
 
-  <a href="store.html" class="back">← Back to Music Store</a>
+  <a href="store.html" class="back">
+    ← Back to Music Store
+  </a>
+
 
   <div id="loading" class="loading">
     Loading song...
   </div>
 
+
   <div id="error" class="error" style="display:none;"></div>
 
-  <section id="songCard" class="song-card" style="display:none;">
 
+  <section
+    id="songCard"
+    class="song-card"
+    style="display:none;"
+  >
+
+    <!-- SONG COVER -->
     <div id="coverContainer"></div>
 
-    <div class="badge" id="genreBadge">
+
+    <!-- GENRE -->
+    <div
+      class="badge"
+      id="genreBadge"
+    >
       Music
     </div>
 
-    <h1 id="songTitle">Song</h1>
 
-    <div class="artist" id="artistName">
+    <!-- SONG TITLE -->
+    <h1 id="songTitle">
+      Song
+    </h1>
+
+
+    <!-- ARTIST -->
+    <div
+      class="artist"
+      id="artistName"
+    >
       Unknown Artist
     </div>
 
-    <div class="genre" id="songGenre">
+
+    <!-- GENRE -->
+    <div
+      class="genre"
+      id="songGenre"
+    >
       Music
     </div>
 
-    <div class="description" id="songDescription">
+
+    <!-- DESCRIPTION -->
+    <div
+      class="description"
+      id="songDescription"
+    >
       No description available.
     </div>
 
+
+    <!-- PRICE -->
     <div class="price-box">
+
       <div class="price-label">
         Music price
       </div>
 
-      <div class="price" id="songPrice">
+      <div
+        class="price"
+        id="songPrice"
+      >
         500 UGX
       </div>
+
     </div>
 
+
+    <!-- PREVIEW -->
     <div class="preview-title">
       🎧 20-Second Preview
     </div>
@@ -298,17 +348,21 @@ footer{
       Listen to up to 20 seconds before purchasing.
     </div>
 
+
     <audio
       id="previewAudio"
       controls
-      preload="metadata">
-    </audio>
+      preload="metadata"
+    ></audio>
+
 
     <div
       class="preview-status"
-      id="previewStatus">
-    </div>
+      id="previewStatus"
+    ></div>
 
+
+    <!-- PURCHASE -->
     <div class="purchase-box">
 
       <div class="purchase-title">
@@ -316,9 +370,10 @@ footer{
       </div>
 
       <div class="purchase-text">
-        Payment is not connected yet. For now, enjoy the
-        20-second preview. PASONG payment options will be
-        connected when the payment destination is ready.
+        Payment is not connected yet. For now, enjoy
+        the 20-second preview. PASONG payment options
+        will be connected when the payment destination
+        is ready.
       </div>
 
     </div>
@@ -327,28 +382,58 @@ footer{
 
 </main>
 
+
 <footer>
   PASONG © 2026 • Music • Artists • Opportunity
 </footer>
 
+
 <script>
 
-const API_URL = "https://pasong-api.vercel.app";
+const API_URL =
+  "https://pasong-api.vercel.app";
 
-const loading = document.getElementById("loading");
-const errorBox = document.getElementById("error");
-const songCard = document.getElementById("songCard");
 
-const titleEl = document.getElementById("songTitle");
-const artistEl = document.getElementById("artistName");
-const genreEl = document.getElementById("songGenre");
-const genreBadge = document.getElementById("genreBadge");
-const descriptionEl = document.getElementById("songDescription");
-const priceEl = document.getElementById("songPrice");
-const audioEl = document.getElementById("previewAudio");
-const previewStatus = document.getElementById("previewStatus");
-const coverContainer = document.getElementById("coverContainer");
+const loading =
+  document.getElementById("loading");
 
+const errorBox =
+  document.getElementById("error");
+
+const songCard =
+  document.getElementById("songCard");
+
+const titleEl =
+  document.getElementById("songTitle");
+
+const artistEl =
+  document.getElementById("artistName");
+
+const genreEl =
+  document.getElementById("songGenre");
+
+const genreBadge =
+  document.getElementById("genreBadge");
+
+const descriptionEl =
+  document.getElementById("songDescription");
+
+const priceEl =
+  document.getElementById("songPrice");
+
+const audioEl =
+  document.getElementById("previewAudio");
+
+const previewStatus =
+  document.getElementById("previewStatus");
+
+const coverContainer =
+  document.getElementById("coverContainer");
+
+
+/* ==============================
+   ERROR
+   ============================== */
 
 function showError(message){
 
@@ -359,35 +444,54 @@ function showError(message){
   errorBox.style.display = "block";
 
   songCard.style.display = "none";
+
 }
 
+
+/* ==============================
+   GET SONG ID
+   ============================== */
 
 function getSongId(){
 
-  const params = new URLSearchParams(
-    window.location.search
-  );
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
 
   return params.get("id");
+
 }
 
 
+/* ==============================
+   LOAD SONG
+   ============================== */
+
 async function loadSong(){
 
-  const songId = getSongId();
+  const songId =
+    getSongId();
+
 
   if(!songId){
 
-    showError("No song was selected.");
+    showError(
+      "No song was selected."
+    );
 
     return;
+
   }
+
 
   try{
 
-    const response = await fetch(
-      API_URL + "/api/songs"
-    );
+    const response =
+      await fetch(
+        API_URL + "/api/songs"
+      );
+
 
     if(!response.ok){
 
@@ -397,37 +501,53 @@ async function loadSong(){
 
     }
 
-    const result = await response.json();
 
-    const songs = result.songs || [];
+    const result =
+      await response.json();
 
-    const song = songs.find(
-      item => String(item.id) === String(songId)
-    );
+
+    const songs =
+      result.songs || [];
+
+
+    const song =
+      songs.find(
+        item =>
+          String(item.id) ===
+          String(songId)
+      );
+
 
     if(!song){
 
-      showError("Song not found.");
+      showError(
+        "Song not found."
+      );
 
       return;
+
     }
 
 
     /* ==============================
-       SONG INFORMATION
+       TITLE
        ============================== */
 
     titleEl.textContent =
-      song.title || "Untitled Song";
+      song.title ||
+      "Untitled Song";
 
+
+    /* ==============================
+       ARTIST
+       ============================== */
 
     /*
-      IMPORTANT:
-      The PASONG API now returns artist_name
-      directly.
+      The API now returns:
 
-      Example:
       artist_name: "Bobley Nsubuga"
+
+      We use this first.
     */
 
     artistEl.textContent =
@@ -437,26 +557,41 @@ async function loadSong(){
       "Unknown Artist";
 
 
+    /* ==============================
+       GENRE
+       ============================== */
+
     const genre =
       song.genre ||
       song.category ||
       "Music";
 
-    genreEl.textContent = genre;
+    genreEl.textContent =
+      genre;
 
-    genreBadge.textContent = genre;
+    genreBadge.textContent =
+      genre;
 
+
+    /* ==============================
+       DESCRIPTION
+       ============================== */
 
     descriptionEl.textContent =
       song.description ||
       "No description available.";
 
 
+    /* ==============================
+       PRICE
+       ============================== */
+
     const price =
       Number(song.price) || 500;
 
     const currency =
       song.currency || "UGX";
+
 
     priceEl.textContent =
       price.toLocaleString() +
@@ -473,22 +608,28 @@ async function loadSong(){
       const img =
         document.createElement("img");
 
-      img.className = "cover";
+      img.className =
+        "cover";
 
-      img.src = song.cover_url;
+      img.src =
+        song.cover_url;
 
       img.alt =
-        song.title || "Song cover";
+        song.title ||
+        "Song cover";
 
-      img.onerror = function(){
 
-        coverContainer.innerHTML = `
-          <div class="no-cover">
-            PASONG MUSIC
-          </div>
-        `;
+      img.onerror =
+        function(){
 
-      };
+          coverContainer.innerHTML = `
+            <div class="no-cover">
+              PASONG MUSIC
+            </div>
+          `;
+
+        };
+
 
       coverContainer.appendChild(img);
 
@@ -504,22 +645,25 @@ async function loadSong(){
 
 
     /* ==============================
-       AUDIO PREVIEW
+       AUDIO
        ============================== */
 
     const audioUrl =
       song.preview_url ||
       song.audio_url;
 
+
     if(audioUrl){
 
-      audioEl.src = audioUrl;
+      audioEl.src =
+        audioUrl;
 
       audioEl.load();
 
     }else{
 
-      audioEl.style.display = "none";
+      audioEl.style.display =
+        "none";
 
       previewStatus.textContent =
         "Preview is not available for this song.";
@@ -528,55 +672,17 @@ async function loadSong(){
 
 
     /* ==============================
-       DISPLAY PAGE
+       SHOW PAGE
        ============================== */
 
-    loading.style.display = "none";
+    loading.style.display =
+      "none";
 
-    errorBox.style.display = "none";
+    errorBox.style.display =
+      "none";
 
-    songCard.style.display = "block";
-
-
-    /* ==============================
-       20 SECOND PREVIEW LIMIT
-       ============================== */
-
-    audioEl.addEventListener(
-      "timeupdate",
-      function(){
-
-        if(audioEl.currentTime >= 20){
-
-          audioEl.pause();
-
-          audioEl.currentTime = 20;
-
-          previewStatus.textContent =
-            "20-second preview finished.";
-
-        }else{
-
-          previewStatus.textContent =
-            "Preview: " +
-            Math.floor(audioEl.currentTime) +
-            " / 20 seconds";
-
-        }
-
-      }
-    );
-
-
-    audioEl.addEventListener(
-      "play",
-      function(){
-
-        previewStatus.textContent =
-          "Preview playing...";
-
-      }
-    );
+    songCard.style.display =
+      "block";
 
 
   }catch(error){
@@ -591,6 +697,63 @@ async function loadSong(){
 
 }
 
+
+/* ==============================
+   20-SECOND PREVIEW
+   ============================== */
+
+audioEl.addEventListener(
+  "timeupdate",
+  function(){
+
+    if(audioEl.currentTime >= 20){
+
+      audioEl.pause();
+
+      audioEl.currentTime = 20;
+
+      previewStatus.textContent =
+        "20-second preview finished.";
+
+    }else{
+
+      previewStatus.textContent =
+        "Preview: " +
+        Math.floor(
+          audioEl.currentTime
+        ) +
+        " / 20 seconds";
+
+    }
+
+  }
+);
+
+
+/* ==============================
+   PREVIEW START
+   ============================== */
+
+audioEl.addEventListener(
+  "play",
+  function(){
+
+    if(audioEl.currentTime >= 20){
+
+      audioEl.currentTime = 0;
+
+    }
+
+    previewStatus.textContent =
+      "Preview playing...";
+
+  }
+);
+
+
+/* ==============================
+   START
+   ============================== */
 
 loadSong();
 
