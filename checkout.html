@@ -1,1 +1,646 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Checkout</title><link rel="stylesheet" href="assets/style.css"></head><body><header><b>PASONG</b></header><main><h1>Checkout</h1><div class="card"><h2 id="checkoutTitle">Selected Song</h2><p><b>UGX 500</b></p><button onclick="startPayment('MTN MoMo')">MTN MoMo</button><button onclick="startPayment('Airtel Money')">Airtel Money</button><button onclick="startPayment('Card')">Card</button><p id="paymentStatus"></p></div><div class="google">Google AdSense placement</div></main><script src="config.js"></script><script src="assets/app.js"></script></body></html>
+<!doctype html>
+
+<html lang="en"><head><meta charset="utf-8"><meta
+name="viewport"
+content="width=device-width,initial-scale=1"
+
+«»
+
+<title>PASONG — Checkout</title><style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+}
+
+header{
+  height:70px;
+  display:flex;
+  align-items:center;
+  padding:0 7%;
+  background:#0b0b14;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+  background:linear-gradient(
+    90deg,
+    #c084fc,
+    #ec4899
+  );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+main{
+  width:min(700px,92%);
+  margin:35px auto 70px;
+}
+
+.back{
+  display:inline-block;
+  color:#aaa;
+  text-decoration:none;
+  font-size:14px;
+  margin-bottom:22px;
+}
+
+.back:hover{
+  color:#fff;
+}
+
+h1{
+  font-size:34px;
+  margin-bottom:20px;
+}
+
+.card{
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(168,85,247,.10),
+      transparent 40%
+    ),
+    #10101a;
+
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:22px;
+  padding:25px;
+  box-shadow:0 25px 70px rgba(0,0,0,.40);
+}
+
+.song-preview{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:24px;
+}
+
+.cover{
+  width:85px;
+  height:85px;
+  border-radius:14px;
+  object-fit:cover;
+  background:#181822;
+}
+
+.no-cover{
+  width:85px;
+  height:85px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(
+    135deg,
+    #251536,
+    #11111c
+  );
+  color:#c084fc;
+  font-size:11px;
+  font-weight:800;
+}
+
+.song-title{
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.artist{
+  color:#c084fc;
+  font-size:14px;
+}
+
+.genre{
+  color:#777;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.price-box{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:17px;
+  margin:20px 0;
+  border-radius:15px;
+  background:#0b0b14;
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.price-label{
+  color:#888;
+  font-size:13px;
+}
+
+.price{
+  font-size:24px;
+  font-weight:800;
+  background:linear-gradient(
+    90deg,
+    #c084fc,
+    #ec4899
+  );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.payment-title{
+  font-size:17px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+
+.payment-text{
+  color:#888;
+  font-size:13px;
+  line-height:1.6;
+  margin-bottom:18px;
+}
+
+.payment-buttons{
+  display:grid;
+  gap:12px;
+}
+
+.payment-button{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:14px;
+  color:#fff;
+  background:#181824;
+  border:1px solid rgba(255,255,255,.08);
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.payment-button:hover{
+  transform:translateY(-1px);
+  border-color:rgba(192,132,252,.5);
+  background:#21172d;
+}
+
+.payment-button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.status{
+  display:none;
+  margin-top:18px;
+  padding:14px;
+  border-radius:13px;
+  background:#0b0b14;
+  border:1px solid rgba(255,255,255,.07);
+  color:#aaa;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.loading{
+  text-align:center;
+  color:#999;
+  padding:50px 10px;
+}
+
+.error{
+  text-align:center;
+  color:#ff8e8e;
+  padding:40px 10px;
+}
+
+footer{
+  text-align:center;
+  color:#666;
+  font-size:12px;
+  padding:20px;
+}
+
+@media(max-width:600px){
+
+  main{
+    width:94%;
+    margin-top:25px;
+  }
+
+  h1{
+    font-size:29px;
+  }
+
+  .card{
+    padding:20px;
+  }
+
+}
+
+</style></head><body><header>  <div class="logo">
+    ◈ PASONG
+  </div></header><main><a
+href="store.html"
+class="back"
+
+«»
+
+← Back to Music Store
+</a>
+
+<h1>
+  Checkout
+</h1><div
+  id="loading"
+  class="loading"
+>
+  Loading selected song...
+</div><div
+  id="error"
+  class="error"
+  style="display:none;"
+></div><div
+  id="checkoutCard"
+  class="card"
+  style="display:none;"
+>  <div class="song-preview"><div id="coverContainer"></div>
+
+<div>
+
+  <div
+    id="checkoutTitle"
+    class="song-title"
+  >
+    Selected Song
+  </div>
+
+  <div
+    id="artistName"
+    class="artist"
+  >
+    Unknown Artist
+  </div>
+
+  <div
+    id="genre"
+    class="genre"
+  >
+    Music
+  </div>
+
+</div>
+
+  </div>  <div class="price-box"><div class="price-label">
+  Music price
+</div>
+
+<div
+  id="checkoutPrice"
+  class="price"
+>
+  UGX 700
+</div>
+
+  </div>  <div class="payment-title">
+    Choose payment method
+  </div>  <div class="payment-text">
+    Select your preferred payment method to continue
+    with your PASONG purchase.
+  </div>  <div class="payment-buttons"><button
+  class="payment-button"
+  onclick="startPayment('MTN MoMo')"
+>
+  📱 MTN MoMo
+</button>
+
+<button
+  class="payment-button"
+  onclick="startPayment('Airtel Money')"
+>
+  📱 Airtel Money
+</button>
+
+<button
+  class="payment-button"
+  onclick="startPayment('Card')"
+>
+  💳 Card
+</button>
+
+  </div>  <div
+    id="paymentStatus"
+    class="status"
+  ></div></div></main><footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer><script>
+
+const API_URL =
+  "https://pasong-api.vercel.app";
+
+
+let selectedSong = null;
+
+
+/* =========================
+   GET SONG ID
+   ========================= */
+
+function getSongId(){
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return params.get("id");
+
+}
+
+
+/* =========================
+   SHOW ERROR
+   ========================= */
+
+function showError(message){
+
+  document.getElementById(
+    "loading"
+  ).style.display = "none";
+
+  document.getElementById(
+    "checkoutCard"
+  ).style.display = "none";
+
+  const error =
+    document.getElementById("error");
+
+  error.textContent =
+    message;
+
+  error.style.display =
+    "block";
+
+}
+
+
+/* =========================
+   LOAD SONG
+   ========================= */
+
+async function loadCheckout(){
+
+  const songId =
+    getSongId();
+
+
+  if(!songId){
+
+    showError(
+      "No song was selected for checkout."
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        API_URL +
+        "/api/songs/" +
+        encodeURIComponent(songId)
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Song could not be loaded."
+      );
+
+    }
+
+
+    const result =
+      await response.json();
+
+
+    selectedSong =
+      result.song ||
+      result;
+
+
+    if(
+      !selectedSong ||
+      !selectedSong.id
+    ){
+
+      throw new Error(
+        "Invalid song information."
+      );
+
+    }
+
+
+    /* =====================
+       TITLE
+       ===================== */
+
+    document.getElementById(
+      "checkoutTitle"
+    ).textContent =
+      selectedSong.title ||
+      "Untitled Song";
+
+
+    /* =====================
+       ARTIST
+       ===================== */
+
+    document.getElementById(
+      "artistName"
+    ).textContent =
+      selectedSong.artist_name ||
+      selectedSong.artist?.stage_name ||
+      selectedSong.artist?.artist_name ||
+      selectedSong.artist_profiles?.stage_name ||
+      selectedSong.artist_profiles?.artist_name ||
+      "Unknown Artist";
+
+
+    /* =====================
+       GENRE
+       ===================== */
+
+    document.getElementById(
+      "genre"
+    ).textContent =
+      selectedSong.genre ||
+      "Music";
+
+
+    /* =====================
+       PRICE
+       ===================== */
+
+    const marketplacePrice =
+      Number(
+        selectedSong.marketplace_price
+      );
+
+    const databasePrice =
+      Number(
+        selectedSong.price
+      );
+
+
+    const finalPrice =
+      Number.isFinite(
+        marketplacePrice
+      )
+      ? marketplacePrice
+      : (
+          Number.isFinite(
+            databasePrice
+          )
+          ? databasePrice
+          : 700
+        );
+
+
+    const currency =
+      selectedSong.marketplace_currency ||
+      selectedSong.currency ||
+      "UGX";
+
+
+    const label =
+      selectedSong.marketplace_label ||
+      (
+        finalPrice.toLocaleString() +
+        " " +
+        currency
+      );
+
+
+    document.getElementById(
+      "checkoutPrice"
+    ).textContent =
+      label;
+
+
+    /* =====================
+       COVER
+       ===================== */
+
+    const coverContainer =
+      document.getElementById(
+        "coverContainer"
+      );
+
+
+    if(selectedSong.cover_url){
+
+      coverContainer.innerHTML = `
+        <img
+          src="${selectedSong.cover_url}"
+          class="cover"
+          alt="Song cover"
+        >
+      `;
+
+    }else{
+
+      coverContainer.innerHTML = `
+        <div class="no-cover">
+          PASONG
+        </div>
+      `;
+
+    }
+
+
+    /* =====================
+       SHOW
+       ===================== */
+
+    document.getElementById(
+      "loading"
+    ).style.display = "none";
+
+
+    document.getElementById(
+      "checkoutCard"
+    ).style.display = "block";
+
+
+  }catch(error){
+
+    console.error(
+      "PASONG CHECKOUT:",
+      error
+    );
+
+
+    showError(
+      error.message ||
+      "Failed to load checkout."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   PAYMENT BUTTON
+   ========================= */
+
+function startPayment(method){
+
+  const status =
+    document.getElementById(
+      "paymentStatus"
+    );
+
+
+  status.style.display =
+    "block";
+
+
+  /*
+    Payment processing is NOT connected yet.
+
+    This is intentionally not pretending
+    that a payment has been made.
+  */
+
+  status.textContent =
+    method +
+    " checkout is being connected. " +
+    "No payment has been taken yet.";
+
+}
+
+
+/* =========================
+   START
+   ========================= */
+
+loadCheckout();
+
+</script></body>
+</html>
