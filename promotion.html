@@ -1,1 +1,620 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — promotion</title><link rel="stylesheet" href="assets/style.css"></head><body><header><a class="logo" href="index.html">◈ PASONG</a><nav><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="account.html">Account</a></nav></header><main><h1>promotion</h1><div class="card"><h2>PASONG promotion</h2><p>This page is part of the updated PASONG structure. Connect it to the PASONG API/Supabase backend for live data.</p><a class="btn" href="store.html">Open Music Store</a></div></main><footer>PASONG © 2026</footer></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>PASONG — Promotion</title>
+
+  <link
+    rel="stylesheet"
+    href="assets/style.css"
+  >
+
+  <style>
+
+    .promotion-hero{
+      padding:35px 0 25px;
+    }
+
+    .promotion-hero h1{
+      font-size:34px;
+      margin-bottom:10px;
+    }
+
+    .promotion-hero p{
+      color:#999;
+      max-width:700px;
+      line-height:1.6;
+    }
+
+    .packages{
+      display:grid;
+      grid-template-columns:
+        repeat(auto-fit,minmax(240px,1fr));
+      gap:18px;
+      margin-top:25px;
+    }
+
+    .package{
+      background:#11111c;
+      border:1px solid #252538;
+      border-radius:18px;
+      padding:22px;
+      transition:.2s;
+    }
+
+    .package:hover{
+      transform:translateY(-3px);
+      border-color:#d946ef;
+    }
+
+    .package h2{
+      margin-bottom:8px;
+    }
+
+    .package-description{
+      color:#999;
+      line-height:1.5;
+      min-height:60px;
+    }
+
+    .package-price{
+      font-size:27px;
+      font-weight:800;
+      color:#d946ef;
+      margin:18px 0;
+    }
+
+    .package-duration{
+      color:#aaa;
+      font-size:13px;
+      margin-bottom:18px;
+    }
+
+    .promotion-btn{
+      display:inline-block;
+      text-decoration:none;
+      background:#d946ef;
+      color:white;
+      padding:11px 16px;
+      border-radius:9px;
+      font-weight:700;
+    }
+
+    .promotion-btn:hover{
+      opacity:.9;
+    }
+
+    .loading,
+    .empty,
+    .error{
+      margin-top:22px;
+      padding:20px;
+      border-radius:14px;
+      background:#11111c;
+      border:1px solid #252538;
+      color:#999;
+    }
+
+    .error{
+      color:#ffb8c6;
+      border-color:#8b2940;
+      background:#32131d;
+    }
+
+    .how{
+      margin-top:35px;
+      display:grid;
+      grid-template-columns:
+        repeat(auto-fit,minmax(200px,1fr));
+      gap:15px;
+    }
+
+    .how-card{
+      background:#11111c;
+      border:1px solid #252538;
+      border-radius:15px;
+      padding:20px;
+    }
+
+    .how-card strong{
+      display:block;
+      margin-bottom:8px;
+      font-size:17px;
+    }
+
+    .how-card p{
+      color:#999;
+      line-height:1.5;
+      font-size:14px;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+  <a
+    class="logo"
+    href="index.html"
+  >
+    ◈ PASONG
+  </a>
+
+  <nav>
+
+    <a href="index.html">
+      Home
+    </a>
+
+    <a href="store.html">
+      Music Store
+    </a>
+
+    <a href="charts.html">
+      Charts
+    </a>
+
+    <a href="artists.html">
+      Artists
+    </a>
+
+    <a href="playlists.html">
+      Playlists
+    </a>
+
+    <a href="promotion.html">
+      Promotion
+    </a>
+
+    <a href="account.html">
+      Account
+    </a>
+
+  </nav>
+
+</header>
+
+
+<main>
+
+
+  <!-- HERO -->
+
+  <section class="promotion-hero">
+
+    <h1>
+      Promote Your Music 🚀
+    </h1>
+
+    <p>
+      Get your music in front of more listeners
+      on PASONG. Choose a promotion package and
+      grow your song, artist profile or release.
+    </p>
+
+  </section>
+
+
+  <!-- PACKAGES -->
+
+  <section>
+
+    <h2>
+      Promotion Packages
+    </h2>
+
+    <div
+      id="packages"
+      class="packages"
+    ></div>
+
+    <div
+      id="loading"
+      class="loading"
+    >
+      Loading promotion packages...
+    </div>
+
+    <div
+      id="empty"
+      class="empty"
+      style="display:none"
+    >
+      No promotion packages are available yet.
+    </div>
+
+    <div
+      id="error"
+      class="error"
+      style="display:none"
+    ></div>
+
+  </section>
+
+
+  <!-- HOW IT WORKS -->
+
+  <section>
+
+    <h2 style="margin-top:35px;">
+      How PASONG Promotion Works
+    </h2>
+
+    <div class="how">
+
+      <div class="how-card">
+
+        <strong>
+          1. Choose a package
+        </strong>
+
+        <p>
+          Select the promotion package that
+          matches your campaign.
+        </p>
+
+      </div>
+
+
+      <div class="how-card">
+
+        <strong>
+          2. Select your music
+        </strong>
+
+        <p>
+          Choose the song, release or artist
+          profile you want to promote.
+        </p>
+
+      </div>
+
+
+      <div class="how-card">
+
+        <strong>
+          3. Submit promotion
+        </strong>
+
+        <p>
+          Send your promotion request to PASONG
+          for processing.
+        </p>
+
+      </div>
+
+
+      <div class="how-card">
+
+        <strong>
+          4. Track your campaign
+        </strong>
+
+        <p>
+          View the status of your promotion from
+          your PASONG account.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <div style="margin-top:30px;">
+
+    <a
+      class="btn"
+      href="store.html"
+    >
+      Browse Music Store
+    </a>
+
+  </div>
+
+
+</main>
+
+
+<footer>
+  PASONG © 2026
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+
+/* =========================
+   PASONG SUPABASE
+========================= */
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+
+/*
+ IMPORTANT:
+
+ Use the SAME Supabase publishable
+ key you already use in account.html.
+
+ Do NOT use the service-role key.
+*/
+
+const SUPABASE_KEY =
+  "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const packagesElement =
+  document.getElementById("packages");
+
+const loadingElement =
+  document.getElementById("loading");
+
+const emptyElement =
+  document.getElementById("empty");
+
+const errorElement =
+  document.getElementById("error");
+
+
+/* =========================
+   LOAD PACKAGES
+========================= */
+
+async function loadPromotionPackages(){
+
+  loadingElement.style.display =
+    "block";
+
+  emptyElement.style.display =
+    "none";
+
+  errorElement.style.display =
+    "none";
+
+  packagesElement.innerHTML =
+    "";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("promotion_packages")
+      .select("*");
+
+
+    if(error){
+      throw error;
+    }
+
+
+    const packages =
+      data || [];
+
+
+    loadingElement.style.display =
+      "none";
+
+
+    if(!packages.length){
+
+      emptyElement.style.display =
+        "block";
+
+      return;
+    }
+
+
+    renderPackages(packages);
+
+
+  }catch(err){
+
+    console.error(
+      "Promotion packages error:",
+      err
+    );
+
+
+    loadingElement.style.display =
+      "none";
+
+    errorElement.style.display =
+      "block";
+
+    errorElement.textContent =
+      "Unable to load promotion packages: " +
+      err.message;
+
+  }
+
+}
+
+
+/* =========================
+   RENDER PACKAGES
+========================= */
+
+function renderPackages(packages){
+
+  packagesElement.innerHTML =
+    packages.map(pkg => {
+
+      const name =
+        pkg.name ||
+        pkg.title ||
+        "PASONG Promotion";
+
+
+      const description =
+        pkg.description ||
+        "Promote your music on PASONG.";
+
+
+      const price =
+        pkg.price ??
+        pkg.amount ??
+        0;
+
+
+      const currency =
+        pkg.currency ||
+        "UGX";
+
+
+      const duration =
+        pkg.duration ||
+        pkg.duration_days ||
+        "";
+
+
+      let durationText =
+        "";
+
+
+      if(duration){
+
+        if(
+          String(duration)
+            .toLowerCase()
+            .includes("day")
+        ){
+
+          durationText =
+            duration;
+
+        }else{
+
+          durationText =
+            duration + " days";
+
+        }
+
+      }else{
+
+        durationText =
+          "Promotion package";
+
+      }
+
+
+      return `
+
+        <article class="package">
+
+          <h2>
+            ${escapeHtml(name)}
+          </h2>
+
+          <p class="package-description">
+            ${escapeHtml(description)}
+          </p>
+
+          <div class="package-price">
+            ${escapeHtml(currency)}
+            ${escapeHtml(
+              formatNumber(price)
+            )}
+          </div>
+
+          <div class="package-duration">
+            ${escapeHtml(durationText)}
+          </div>
+
+          <a
+            class="promotion-btn"
+            href="account.html"
+          >
+            Promote Now
+          </a>
+
+        </article>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function formatNumber(value){
+
+  const number =
+    Number(value);
+
+  if(
+    Number.isFinite(number)
+  ){
+
+    return number.toLocaleString();
+
+  }
+
+  return String(
+    value ?? "0"
+  );
+
+}
+
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;")
+  .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadPromotionPackages();
+
+</script>
+
+
+</body>
+</html>
