@@ -397,26 +397,23 @@ footer{
   }
 
 }
-</style></head><body><!-- =========================
-     NAV
-     ========================= --><nav>  <div class="logo">
+</style></head><body><nav>  <div class="logo">
     ◈ PASONG
-  </div>  <div class="nav-icons">
-    <span
-      title="Search"
-      onclick="window.location.href='store.html'"
-    >
-      ⌕
-    </span><span
+  </div>  <div class="nav-icons"><span
+  title="Search"
+  onclick="window.location.href='store.html'"
+>
+  ⌕
+</span>
+
+<span
   title="Account"
   onclick="window.location.href='account.html'"
 >
   ◉
 </span>
 
-  </div></nav><!-- =========================
-     MAIN
-     ========================= --><main class="container"><a
+  </div></nav><main class="container"><a
 href="store.html"
 class="back"
 
@@ -437,14 +434,10 @@ class="back"
     id="songCard"
     class="song-card"
     style="display:none;"
-  ><!-- COVER -->
-
-<div class="cover-wrap">
+  ><div class="cover-wrap">
   <div id="coverContainer"></div>
 </div>
 
-
-<!-- SONG INFORMATION -->
 
 <div class="song-info">
 
@@ -485,8 +478,6 @@ class="back"
   </div>
 
 
-  <!-- PRICE -->
-
   <div class="price-box">
 
     <div class="price-label">
@@ -502,8 +493,6 @@ class="back"
 
   </div>
 
-
-  <!-- PREVIEW -->
 
   <div class="preview-section">
 
@@ -528,8 +517,6 @@ class="back"
 
   </div>
 
-
-  <!-- PURCHASE -->
 
   <div class="purchase-box">
 
@@ -679,12 +666,6 @@ async function loadSong(){
 
   try{
 
-    /*
-      Use the specific song endpoint.
-      Example:
-      /api/songs/b7a6166f-...
-    */
-
     const response =
       await fetch(
         API_URL +
@@ -714,18 +695,15 @@ async function loadSong(){
       await response.json();
 
 
-    /*
-      The API normally returns the song object
-      directly. This also supports {song: {...}}
-      just in case.
-    */
-
     const song =
       result.song ||
       result;
 
 
-    if(!song || !song.id){
+    if(
+      !song ||
+      !song.id
+    ){
 
       throw new Error(
         "Song data is unavailable."
@@ -747,17 +725,13 @@ async function loadSong(){
        ARTIST
        ========================= */
 
-    const artistName =
+    artistEl.textContent =
       song.artist_name ||
       song.artist?.stage_name ||
       song.artist?.artist_name ||
       song.artist_profiles?.stage_name ||
       song.artist_profiles?.artist_name ||
       "Unknown Artist";
-
-
-    artistEl.textContent =
-      artistName;
 
 
     /* =========================
@@ -793,7 +767,6 @@ async function loadSong(){
       Number(
         song.marketplace_price
       );
-
 
     const normalPrice =
       Number(
@@ -1047,27 +1020,36 @@ audioEl.addEventListener(
 
 
 /* ==============================
-   BUY BUTTON
+   BUY NOW → CHECKOUT
    ============================== */
 
 buyButton.addEventListener(
   "click",
   function(){
 
-    /*
-      Payment endpoint is not connected yet.
+    const songId =
+      getSongId();
 
-      IMPORTANT:
-      Do not pretend a payment was completed.
-      When the PASONG payment endpoint is ready,
-      this button will open the real checkout.
+
+    if(!songId){
+
+      alert(
+        "Song ID is missing."
+      );
+
+      return;
+
+    }
+
+
+    /*
+      Send the selected song ID
+      to the PASONG checkout page.
     */
 
-    paymentMessage.style.display =
-      "block";
-
-    paymentMessage.textContent =
-      "PASONG checkout is being connected. No payment has been taken.";
+    window.location.href =
+      "pasong_checkout.html?id=" +
+      encodeURIComponent(songId);
 
   }
 );
