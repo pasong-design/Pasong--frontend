@@ -1,1 +1,2383 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — playlists</title><link rel="stylesheet" href="assets/style.css"></head><body><header><a class="logo" href="index.html">◈ PASONG</a><nav><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="account.html">Account</a></nav></header><main><h1>playlists</h1><div class="card"><h2>PASONG playlists</h2><p>This page is part of the updated PASONG structure. Connect it to the PASONG API/Supabase backend for live data.</p><a class="btn" href="store.html">Open Music Store</a></div></main><footer>PASONG © 2026</footer></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>PASONG — Playlists</title>
+
+<link rel="stylesheet" href="assets/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(8,8,16,.97);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:16px 20px;
+}
+
+.logo{
+  color:#fff;
+  text-decoration:none;
+  font-size:22px;
+  font-weight:800;
+}
+
+nav{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+nav a{
+  color:#aaa;
+  text-decoration:none;
+  font-size:14px;
+}
+
+nav a:hover,
+nav a.active{
+  color:#fff;
+}
+
+main{
+  width:min(1200px,94%);
+  margin:auto;
+  padding:28px 0 60px;
+}
+
+.hero{
+  background:
+    radial-gradient(circle at top right,rgba(168,85,247,.25),transparent 40%),
+    radial-gradient(circle at bottom left,rgba(236,72,153,.16),transparent 40%),
+    #10101b;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:22px;
+  padding:28px;
+  margin-bottom:25px;
+}
+
+.hero h1{
+  margin:0 0 8px;
+  font-size:34px;
+}
+
+.hero p{
+  margin:0;
+  color:#aaa;
+  line-height:1.6;
+}
+
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.btn{
+  border:0;
+  border-radius:11px;
+  padding:11px 17px;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(135deg,#7c3aed,#db2777);
+}
+
+.btn.secondary{
+  background:#191925;
+  border:1px solid rgba(255,255,255,.1);
+}
+
+.btn:hover{
+  opacity:.9;
+}
+
+.status{
+  display:inline-flex;
+  margin-top:18px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(168,85,247,.12);
+  border:1px solid rgba(168,85,247,.25);
+  color:#d8b4fe;
+  font-size:13px;
+}
+
+.section{
+  margin-top:34px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:16px;
+}
+
+.section-head h2{
+  margin:0;
+  font-size:22px;
+}
+
+.section-head p{
+  margin:4px 0 0;
+  color:#888;
+  font-size:13px;
+}
+
+.playlist-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:18px;
+}
+
+.playlist-card{
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
+  padding:14px;
+  transition:.25s;
+}
+
+.playlist-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(168,85,247,.35);
+}
+
+.cover{
+  position:relative;
+  aspect-ratio:1/1;
+  border-radius:14px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(168,85,247,.5),transparent 40%),
+    linear-gradient(135deg,#151522,#28132d);
+}
+
+.cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.placeholder{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:48px;
+}
+
+.playlist-card h3{
+  margin:13px 0 6px;
+  font-size:17px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.playlist-card p{
+  color:#888;
+  font-size:13px;
+  margin:0;
+}
+
+.card-actions{
+  display:flex;
+  gap:7px;
+  margin-top:13px;
+}
+
+.card-actions button,
+.card-actions a{
+  flex:1;
+  text-align:center;
+  padding:9px 7px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#191925;
+  color:#fff;
+  text-decoration:none;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.card-actions .primary{
+  background:linear-gradient(135deg,#7c3aed,#db2777);
+  border:0;
+}
+
+.song-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:18px;
+}
+
+.song-card{
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;
+  padding:12px;
+}
+
+.song-cover{
+  position:relative;
+  aspect-ratio:1/1;
+  overflow:hidden;
+  border-radius:13px;
+  background:#181824;
+}
+
+.song-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.song-info{
+  padding-top:11px;
+}
+
+.song-info h3{
+  margin:0 0 5px;
+  font-size:15px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-info p{
+  margin:0;
+  color:#888;
+  font-size:12px;
+}
+
+.song-buttons{
+  display:flex;
+  gap:7px;
+  margin-top:10px;
+}
+
+.song-buttons button{
+  flex:1;
+  border:0;
+  padding:9px 6px;
+  border-radius:9px;
+  color:#fff;
+  background:#191925;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.song-buttons button:first-child{
+  background:linear-gradient(135deg,#7c3aed,#db2777);
+}
+
+.empty{
+  padding:30px 20px;
+  text-align:center;
+  color:#888;
+  background:#11111b;
+  border:1px dashed rgba(255,255,255,.12);
+  border-radius:17px;
+}
+
+.loading{
+  padding:25px;
+  text-align:center;
+  color:#999;
+}
+
+.message{
+  margin-top:12px;
+  color:#bbb;
+  font-size:13px;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.78);
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(520px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;
+  padding:22px;
+}
+
+.modal-box h2{
+  margin:0 0 18px;
+}
+
+.form-group{
+  margin-bottom:15px;
+}
+
+.form-group label{
+  display:block;
+  margin-bottom:7px;
+  color:#ccc;
+  font-size:13px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  outline:none;
+  background:#080810;
+  color:#fff;
+}
+
+.form-group textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.modal-actions button{
+  flex:1;
+}
+
+.close-btn{
+  background:#191925 !important;
+  border:1px solid rgba(255,255,255,.1) !important;
+}
+
+footer{
+  border-top:1px solid rgba(255,255,255,.07);
+  padding:25px 20px;
+  text-align:center;
+  color:#666;
+  font-size:13px;
+}
+
+.hidden{
+  display:none !important;
+}
+
+@media(max-width:700px){
+
+  header{
+    padding:14px;
+  }
+
+  nav{
+    gap:12px;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+  }
+
+  nav a{
+    white-space:nowrap;
+  }
+
+  main{
+    width:94%;
+    padding-top:20px;
+  }
+
+  .hero{
+    padding:22px;
+    border-radius:18px;
+  }
+
+  .hero h1{
+    font-size:28px;
+  }
+
+  .playlist-grid,
+  .song-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .playlist-card{
+    padding:10px;
+  }
+
+  .playlist-card h3{
+    font-size:14px;
+  }
+
+  .section-head{
+    align-items:flex-start;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <a class="logo" href="index.html">◈ PASONG</a>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="store.html">Music Store</a>
+    <a href="charts.html">Charts</a>
+    <a href="artists.html">Artists</a>
+    <a href="playlists.html" class="active">Playlists</a>
+    <a href="promotion.html">Promotion</a>
+    <a href="account.html">Account</a>
+  </nav>
+
+</header>
+
+
+<main>
+
+  <section class="hero">
+
+    <h1>🎧 PASONG Playlists</h1>
+
+    <p>
+      Discover music, create your own playlists and organize
+      the songs you love on PASONG.
+    </p>
+
+    <div class="status" id="loginStatus">
+      ● Checking account...
+    </div>
+
+    <div class="hero-actions">
+
+      <button class="btn" onclick="openCreatePlaylist()">
+        ＋ Create Playlist
+      </button>
+
+      <button class="btn secondary" onclick="scrollToMyPlaylists()">
+        🎵 My Playlists
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- MY PLAYLISTS -->
+
+  <section class="section" id="myPlaylistsSection">
+
+    <div class="section-head">
+
+      <div>
+        <h2>💜 My Playlists</h2>
+        <p>Your personal PASONG playlists.</p>
+      </div>
+
+      <button
+        class="btn secondary"
+        onclick="loadMyPlaylists()">
+        ↻ Refresh
+      </button>
+
+    </div>
+
+    <div id="myPlaylists" class="playlist-grid">
+
+      <div class="loading">
+        Checking your playlists...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- TRENDING -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🔥 Trending Music</h2>
+        <p>Popular songs on PASONG.</p>
+      </div>
+
+    </div>
+
+    <div id="trendingSongs" class="song-grid">
+
+      <div class="loading">
+        Loading trending music...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LATEST -->
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🆕 Latest Releases</h2>
+        <p>Recently uploaded music.</p>
+      </div>
+
+    </div>
+
+    <div id="latestSongs" class="song-grid">
+
+      <div class="loading">
+        Loading latest music...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- GENRES -->
+
+  <section class="section">
+
+    <div class="section-head">
+      <div>
+        <h2>🎵 Afrobeats</h2>
+        <p>Fresh African sounds.</p>
+      </div>
+    </div>
+
+    <div id="afrobeatsSongs" class="song-grid"></div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-head">
+      <div>
+        <h2>🔥 Amapiano</h2>
+        <p>Dance-ready sounds.</p>
+      </div>
+    </div>
+
+    <div id="amapianoSongs" class="song-grid"></div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-head">
+      <div>
+        <h2>🎤 Gengetone</h2>
+        <p>East African sounds.</p>
+      </div>
+    </div>
+
+    <div id="gengetoneSongs" class="song-grid"></div>
+
+  </section>
+
+
+  <section class="section">
+
+    <div class="section-head">
+      <div>
+        <h2>🌍 Bongo</h2>
+        <p>Discover Bongo music.</p>
+      </div>
+    </div>
+
+    <div id="bongoSongs" class="song-grid"></div>
+
+  </section>
+
+</main>
+
+
+<footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer>
+
+
+<!-- CREATE PLAYLIST MODAL -->
+
+<div class="modal" id="createPlaylistModal">
+
+  <div class="modal-box">
+
+    <h2>＋ Create Playlist</h2>
+
+    <div class="form-group">
+
+      <label for="playlistName">
+        Playlist Name
+      </label>
+
+      <input
+        id="playlistName"
+        type="text"
+        placeholder="e.g. My Uganda Hits"
+        maxlength="100"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="playlistDescription">
+        Description
+      </label>
+
+      <textarea
+        id="playlistDescription"
+        placeholder="Tell people about this playlist..."
+        maxlength="500"
+      ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="playlistCover">
+        Playlist Cover Image
+      </label>
+
+      <input
+        id="playlistCover"
+        type="url"
+        placeholder="Optional cover image URL"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="playlistVisibility">
+        Visibility
+      </label>
+
+      <select id="playlistVisibility">
+
+        <option value="public">
+          Public
+        </option>
+
+        <option value="private">
+          Private
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="createMessage"
+      class="message">
+    </div>
+
+
+    <div class="modal-actions">
+
+      <button
+        class="btn close-btn"
+        onclick="closeCreatePlaylist()">
+        Cancel
+      </button>
+
+      <button
+        class="btn"
+        id="createPlaylistButton"
+        onclick="createPlaylist()">
+        Create Playlist
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ADD SONG MODAL -->
+
+<div class="modal" id="addSongModal">
+
+  <div class="modal-box">
+
+    <h2>🎵 Add Song</h2>
+
+    <p
+      id="addSongPlaylistName"
+      style="color:#999;margin-bottom:18px;">
+    </p>
+
+    <div id="songSelectionList"></div>
+
+    <div class="modal-actions">
+
+      <button
+        class="btn close-btn"
+        onclick="closeAddSongModal()">
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   PASONG CONFIG
+========================================= */
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const API_BASE =
+  "https://pasong-api.onrender.com";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+let currentUser = null;
+let allSongs = [];
+let currentPlaylist = null;
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function getSongsFromResponse(data){
+
+  if(Array.isArray(data)){
+    return data;
+  }
+
+  if(data && Array.isArray(data.songs)){
+    return data.songs;
+  }
+
+  if(data && Array.isArray(data.data)){
+    return data.data;
+  }
+
+  return [];
+
+}
+
+
+function getSongTitle(song){
+
+  return song.title ||
+         song.name ||
+         "Untitled Song";
+
+}
+
+
+function getArtist(song){
+
+  if(song.artist_name){
+    return song.artist_name;
+  }
+
+  if(song.artist){
+
+    if(typeof song.artist === "string"){
+      return song.artist;
+    }
+
+    if(song.artist.name){
+      return song.artist.name;
+    }
+
+    if(song.artist.performing_name){
+      return song.artist.performing_name;
+    }
+
+    if(song.artist.stage_name){
+      return song.artist.stage_name;
+    }
+
+  }
+
+  return song.performing_artist ||
+         song.performing_artists ||
+         "PASONG Artist";
+
+}
+
+
+function getGenre(song){
+
+  return String(
+    song.genre ||
+    song.category_name ||
+    song.category ||
+    ""
+  ).trim();
+
+}
+
+
+function getCover(song){
+
+  return song.cover_url ||
+         song.cover ||
+         song.coverUrl ||
+         "";
+
+}
+
+
+function getPlays(song){
+
+  return Number(
+    song.plays ||
+    song.play_count ||
+    song.total_plays ||
+    0
+  ) || 0;
+
+}
+
+
+function getDownloads(song){
+
+  return Number(
+    song.downloads ||
+    song.download_count ||
+    song.total_downloads ||
+    0
+  ) || 0;
+
+}
+
+
+function getSongDate(song){
+
+  return song.created_at ||
+         song.createdAt ||
+         song.updated_at ||
+         null;
+
+}
+
+
+function getSongId(song){
+
+  return song.id ||
+         song.song_id ||
+         song.songId ||
+         "";
+
+}
+
+
+/* =========================================
+   ACCOUNT
+========================================= */
+
+async function checkUser(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getUser();
+
+    if(error){
+      throw error;
+    }
+
+    currentUser = data.user || null;
+
+    const status =
+      document.getElementById("loginStatus");
+
+    if(currentUser){
+
+      status.textContent =
+        "● Logged in as " +
+        (currentUser.email || "PASONG user");
+
+    }else{
+
+      status.textContent =
+        "● Login to create your own playlists";
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    currentUser = null;
+
+    document.getElementById("loginStatus")
+      .textContent =
+      "● Login to create your own playlists";
+
+  }
+
+}
+
+
+/* =========================================
+   CREATE PLAYLIST
+========================================= */
+
+function openCreatePlaylist(){
+
+  if(!currentUser){
+
+    alert(
+      "Please log in to your PASONG account before creating a playlist."
+    );
+
+    window.location.href = "account.html";
+
+    return;
+  }
+
+  document
+    .getElementById("createPlaylistModal")
+    .classList.add("show");
+
+}
+
+
+function closeCreatePlaylist(){
+
+  document
+    .getElementById("createPlaylistModal")
+    .classList.remove("show");
+
+}
+
+
+async function createPlaylist(){
+
+  if(!currentUser){
+
+    alert("Please log in first.");
+
+    return;
+  }
+
+
+  const name =
+    document
+      .getElementById("playlistName")
+      .value
+      .trim();
+
+  const description =
+    document
+      .getElementById("playlistDescription")
+      .value
+      .trim();
+
+  const coverUrl =
+    document
+      .getElementById("playlistCover")
+      .value
+      .trim();
+
+  const visibility =
+    document
+      .getElementById("playlistVisibility")
+      .value;
+
+  const message =
+    document.getElementById("createMessage");
+
+
+  if(!name){
+
+    message.textContent =
+      "Please enter a playlist name.";
+
+    return;
+  }
+
+
+  const button =
+    document.getElementById(
+      "createPlaylistButton"
+    );
+
+  button.disabled = true;
+  button.textContent = "Creating...";
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("playlists")
+      .insert({
+
+        user_id: currentUser.id,
+
+        name:name,
+
+        description:
+          description || null,
+
+        cover_url:
+          coverUrl || null,
+
+        visibility:visibility,
+
+        is_public:
+          visibility === "public"
+
+      })
+      .select()
+      .single();
+
+
+    if(error){
+      throw error;
+    }
+
+
+    document.getElementById("playlistName")
+      .value = "";
+
+    document.getElementById("playlistDescription")
+      .value = "";
+
+    document.getElementById("playlistCover")
+      .value = "";
+
+    message.textContent =
+      "✓ Playlist created successfully.";
+
+    await loadMyPlaylists();
+
+
+    setTimeout(
+      closeCreatePlaylist,
+      700
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    message.textContent =
+      "Could not create playlist: " +
+      (error.message || "Unknown error");
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent =
+      "Create Playlist";
+
+  }
+
+}
+
+
+/* =========================================
+   MY PLAYLISTS
+========================================= */
+
+async function loadMyPlaylists(){
+
+  const container =
+    document.getElementById("myPlaylists");
+
+
+  if(!currentUser){
+
+    container.innerHTML = `
+      <div class="empty">
+        🔐 Log in to create and manage your playlists.
+        <br><br>
+        <a
+          href="account.html"
+          class="btn"
+          style="display:inline-block;text-decoration:none;">
+          Login / Sign Up
+        </a>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    `<div class="loading">
+      Loading your playlists...
+    </div>`;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("playlists")
+      .select("*")
+      .eq("user_id",currentUser.id)
+      .order("created_at",{
+        ascending:false
+      });
+
+
+    if(error){
+      throw error;
+    }
+
+
+    if(!data || !data.length){
+
+      container.innerHTML = `
+        <div class="empty">
+          You haven't created a playlist yet.
+          <br><br>
+          <button
+            class="btn"
+            onclick="openCreatePlaylist()">
+            ＋ Create Your First Playlist
+          </button>
+        </div>
+      `;
+
+      return;
+    }
+
+
+    container.innerHTML =
+      data.map(
+        playlistCard
+      ).join("");
+
+
+  }catch(error){
+
+    console.error(error);
+
+    container.innerHTML = `
+      <div class="empty">
+        Unable to load your playlists.
+        <br><br>
+        <small>${escapeHTML(error.message || "")}</small>
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================================
+   PLAYLIST CARD
+========================================= */
+
+function playlistCard(playlist){
+
+  const id =
+    playlist.id;
+
+  const name =
+    playlist.name ||
+    "Untitled Playlist";
+
+  const description =
+    playlist.description ||
+    "PASONG Playlist";
+
+  const cover =
+    playlist.cover_url ||
+    "";
+
+
+  const coverHTML =
+    cover
+      ? `<img src="${escapeHTML(cover)}"
+           alt="${escapeHTML(name)}"
+           loading="lazy">`
+      : `<div class="placeholder">
+           🎧
+         </div>`;
+
+
+  return `
+
+    <article class="playlist-card">
+
+      <div class="cover">
+
+        ${coverHTML}
+
+      </div>
+
+      <h3 title="${escapeHTML(name)}">
+        ${escapeHTML(name)}
+      </h3>
+
+      <p>
+        ${escapeHTML(description)}
+      </p>
+
+      <div class="card-actions">
+
+        <button
+          class="primary"
+          onclick="openPlaylist('${escapeHTML(id)}')">
+          Open
+        </button>
+
+        <button
+          onclick="openAddSong('${escapeHTML(id)}','${escapeHTML(name)}')">
+          ＋ Song
+        </button>
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* =========================================
+   OPEN PLAYLIST
+========================================= */
+
+async function openPlaylist(id){
+
+  try{
+
+    const {
+      data:playlist,
+      error
+    } = await supabaseClient
+      .from("playlists")
+      .select("*")
+      .eq("id",id)
+      .single();
+
+
+    if(error){
+      throw error;
+    }
+
+
+    currentPlaylist = playlist;
+
+
+    const {
+      data:playlistSongs,
+      error:songError
+    } = await supabaseClient
+      .from("playlist_songs")
+      .select("song_id, position")
+      .eq("playlist_id",id)
+      .order("position",{
+        ascending:true
+      });
+
+
+    if(songError){
+      throw songError;
+    }
+
+
+    const ids =
+      (playlistSongs || [])
+        .map(item=>item.song_id);
+
+
+    const selectedSongs =
+      allSongs.filter(
+        song =>
+          ids.includes(getSongId(song))
+      );
+
+
+    showPlaylistModal(
+      playlist,
+      selectedSongs
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Could not open playlist: " +
+      (error.message || "")
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   PLAYLIST DETAIL MODAL
+========================================= */
+
+function showPlaylistModal(
+  playlist,
+  songs
+){
+
+  const modal =
+    document.getElementById("addSongModal");
+
+  document.getElementById(
+    "addSongPlaylistName"
+  ).innerHTML = `
+
+    <strong>
+      ${escapeHTML(
+        playlist.name ||
+        "Playlist"
+      )}
+    </strong>
+
+    <br>
+
+    <span>
+      ${songs.length} song(s)
+    </span>
+
+  `;
+
+
+  const list =
+    document.getElementById(
+      "songSelectionList"
+    );
+
+
+  if(!songs.length){
+
+    list.innerHTML = `
+
+      <div class="empty">
+
+        This playlist has no songs yet.
+
+        <br><br>
+
+        <button
+          class="btn"
+          onclick="showAvailableSongs()">
+          ＋ Add Songs
+        </button>
+
+      </div>
+
+    `;
+
+  }else{
+
+    list.innerHTML = `
+
+      <div
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+        ">
+
+        ${songs.map(
+          (song,index)=>`
+
+            <div
+              style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                padding:10px;
+                border-radius:10px;
+                background:#191925;
+              ">
+
+              <strong>
+                ${index+1}.
+              </strong>
+
+              <div style="flex:1">
+
+                <div>
+                  ${escapeHTML(
+                    getSongTitle(song)
+                  )}
+                </div>
+
+                <small style="color:#888">
+                  ${escapeHTML(
+                    getArtist(song)
+                  )}
+                </small>
+
+              </div>
+
+              <button
+                class="btn"
+                onclick="
+                  removeSongFromPlaylist(
+                    '${escapeHTML(playlist.id)}',
+                    '${escapeHTML(getSongId(song))}'
+                  )
+                ">
+                Remove
+              </button>
+
+            </div>
+
+          `
+        ).join("")}
+
+      </div>
+
+      <br>
+
+      <button
+        class="btn"
+        onclick="showAvailableSongs()">
+        ＋ Add More Songs
+      </button>
+
+    `;
+
+  }
+
+
+  modal.classList.add("show");
+
+}
+
+
+function showAvailableSongs(){
+
+  if(!currentPlaylist){
+    return;
+  }
+
+
+  document.getElementById(
+    "addSongPlaylistName"
+  ).innerHTML = `
+
+    Add songs to:
+
+    <strong>
+      ${escapeHTML(
+        currentPlaylist.name
+      )}
+    </strong>
+
+  `;
+
+
+  const list =
+    document.getElementById(
+      "songSelectionList"
+    );
+
+
+  if(!allSongs.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        No PASONG songs available.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    allSongs.map(
+      song=>`
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:10px;
+            margin-bottom:8px;
+            border-radius:10px;
+            background:#191925;
+          ">
+
+          <div style="flex:1">
+
+            <strong>
+              ${escapeHTML(
+                getSongTitle(song)
+              )}
+            </strong>
+
+            <br>
+
+            <small style="color:#888">
+              ${escapeHTML(
+                getArtist(song)
+              )}
+            </small>
+
+          </div>
+
+          <button
+            class="btn"
+            onclick="
+              addSongToPlaylist(
+                '${escapeHTML(
+                  getSongId(song)
+                )}'
+              )
+            ">
+            ＋ Add
+          </button>
+
+        </div>
+
+      `
+    ).join("");
+
+}
+
+
+function closeAddSongModal(){
+
+  document
+    .getElementById("addSongModal")
+    .classList.remove("show");
+
+  currentPlaylist = null;
+
+}
+
+
+/* =========================================
+   ADD SONG
+========================================= */
+
+async function openAddSong(
+  playlistId,
+  playlistName
+){
+
+  if(!currentUser){
+
+    alert("Please log in first.");
+
+    return;
+  }
+
+
+  const {
+    data:playlist,
+    error
+  } = await supabaseClient
+    .from("playlists")
+    .select("*")
+    .eq("id",playlistId)
+    .single();
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  currentPlaylist = playlist;
+
+
+  document.getElementById(
+    "addSongPlaylistName"
+  ).innerHTML = `
+
+    Add songs to:
+
+    <strong>
+      ${escapeHTML(playlistName)}
+    </strong>
+
+  `;
+
+
+  document.getElementById(
+    "addSongModal"
+  ).classList.add("show");
+
+
+  showAvailableSongs();
+
+}
+
+
+async function addSongToPlaylist(songId){
+
+  if(!currentPlaylist){
+    return;
+  }
+
+
+  if(!songId){
+
+    alert("Song ID is missing.");
+
+    return;
+  }
+
+
+  try{
+
+    const {
+      data:existing,
+      error:checkError
+    } = await supabaseClient
+      .from("playlist_songs")
+      .select("id")
+      .eq(
+        "playlist_id",
+        currentPlaylist.id
+      )
+      .eq(
+        "song_id",
+        songId
+      )
+      .maybeSingle();
+
+
+    if(checkError){
+      throw checkError;
+    }
+
+
+    if(existing){
+
+      alert(
+        "This song is already in the playlist."
+      );
+
+      return;
+    }
+
+
+    const {
+      count,
+      error:countError
+    } = await supabaseClient
+      .from("playlist_songs")
+      .select("*",{
+        count:"exact",
+        head:true
+      })
+      .eq(
+        "playlist_id",
+        currentPlaylist.id
+      );
+
+
+    if(countError){
+      throw countError;
+    }
+
+
+    const {
+      error
+    } = await supabaseClient
+      .from("playlist_songs")
+      .insert({
+
+        playlist_id:
+          currentPlaylist.id,
+
+        song_id:
+          songId,
+
+        position:
+          (count || 0) + 1
+
+      });
+
+
+    if(error){
+      throw error;
+    }
+
+
+    alert("✓ Song added to playlist.");
+
+    showAvailableSongs();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Could not add song: " +
+      (error.message || "")
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   REMOVE SONG
+========================================= */
+
+async function removeSongFromPlaylist(
+  playlistId,
+  songId
+){
+
+  if(!confirm(
+    "Remove this song from the playlist?"
+  )){
+    return;
+  }
+
+
+  try{
+
+    const {
+      error
+    } = await supabaseClient
+      .from("playlist_songs")
+      .delete()
+      .eq(
+        "playlist_id",
+        playlistId
+      )
+      .eq(
+        "song_id",
+        songId
+      );
+
+
+    if(error){
+      throw error;
+    }
+
+
+    alert("✓ Song removed.");
+
+    openPlaylist(playlistId);
+
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Could not remove song: " +
+      (error.message || "")
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   SONG CARDS
+========================================= */
+
+function createSongCard(song){
+
+  const id =
+    getSongId(song);
+
+  const title =
+    getSongTitle(song);
+
+  const artist =
+    getArtist(song);
+
+  const cover =
+    getCover(song);
+
+  const plays =
+    getPlays(song);
+
+  const downloads =
+    getDownloads(song);
+
+
+  const coverHTML =
+    cover
+      ? `<img
+          src="${escapeHTML(cover)}"
+          alt="${escapeHTML(title)}"
+          loading="lazy">
+        `
+      : `<div
+          class="placeholder">
+          🎵
+        </div>`;
+
+
+  return `
+
+    <article class="song-card">
+
+      <div class="song-cover">
+        ${coverHTML}
+      </div>
+
+      <div class="song-info">
+
+        <h3 title="${escapeHTML(title)}">
+          ${escapeHTML(title)}
+        </h3>
+
+        <p>
+          ${escapeHTML(artist)}
+        </p>
+
+      </div>
+
+      <div class="song-buttons">
+
+        <button
+          onclick="
+            openSong(
+              '${escapeHTML(id)}'
+            )
+          ">
+          ▶ Open
+        </button>
+
+        <button
+          onclick="
+            quickAddSong(
+              '${escapeHTML(id)}'
+            )
+          ">
+          ＋ Playlist
+        </button>
+
+      </div>
+
+      <div
+        style="
+          color:#666;
+          font-size:11px;
+          margin-top:8px;
+        ">
+
+        ▶ ${plays}
+        &nbsp; • &nbsp;
+        ⬇ ${downloads}
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+/* =========================================
+   QUICK ADD
+========================================= */
+
+async function quickAddSong(songId){
+
+  if(!currentUser){
+
+    alert(
+      "Please log in to add songs to playlists."
+    );
+
+    window.location.href =
+      "account.html";
+
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("playlists")
+    .select("*")
+    .eq("user_id",currentUser.id)
+    .order("created_at",{
+      ascending:false
+    });
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+
+  if(!data || !data.length){
+
+    if(confirm(
+      "You don't have a playlist yet. Create one now?"
+    )){
+
+      openCreatePlaylist();
+
+    }
+
+    return;
+  }
+
+
+  const playlistName =
+    prompt(
+      "Enter the number of the playlist:\n\n" +
+      data.map(
+        (p,i)=>
+          `${i+1}. ${p.name}`
+      ).join("\n")
+    );
+
+
+  const number =
+    Number(playlistName);
+
+
+  if(
+    !Number.isInteger(number) ||
+    number < 1 ||
+    number > data.length
+  ){
+
+    return;
+  }
+
+
+  const playlist =
+    data[number-1];
+
+
+  currentPlaylist =
+    playlist;
+
+
+  await addSongToPlaylist(
+    songId
+  );
+
+}
+
+
+/* =========================================
+   LOAD SONGS
+========================================= */
+
+async function loadSongs(){
+
+  const containers = [
+    "trendingSongs",
+    "latestSongs",
+    "afrobeatsSongs",
+    "amapianoSongs",
+    "gengetoneSongs",
+    "bongoSongs"
+  ];
+
+
+  try{
+
+    const response =
+      await fetch(
+        `${API_BASE}/api/songs`
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        `API returned ${response.status}`
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    allSongs =
+      getSongsFromResponse(data);
+
+
+    const trending =
+      [...allSongs]
+        .sort((a,b)=>{
+
+          const scoreA =
+            getPlays(a) +
+            getDownloads(a)*5;
+
+          const scoreB =
+            getPlays(b) +
+            getDownloads(b)*5;
+
+          return scoreB-scoreA;
+
+        })
+        .slice(0,8);
+
+
+    const latest =
+      [...allSongs]
+        .sort((a,b)=>{
+
+          const dateA =
+            getSongDate(a)
+              ? new Date(
+                  getSongDate(a)
+                ).getTime()
+              : 0;
+
+          const dateB =
+            getSongDate(b)
+              ? new Date(
+                  getSongDate(b)
+                ).getTime()
+              : 0;
+
+          return dateB-dateA;
+
+        })
+        .slice(0,8);
+
+
+    renderSongList(
+      "trendingSongs",
+      trending,
+      "No trending songs yet."
+    );
+
+
+    renderSongList(
+      "latestSongs",
+      latest,
+      "No songs uploaded yet."
+    );
+
+
+    renderGenre(
+      "afrobeatsSongs",
+      "Afrobeats"
+    );
+
+
+    renderGenre(
+      "amapianoSongs",
+      "Amapiano"
+    );
+
+
+    renderGenre(
+      "gengetoneSongs",
+      "Gengetone"
+    );
+
+
+    renderGenre(
+      "bongoSongs",
+      "Bongo"
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    containers.forEach(id=>{
+
+      const el =
+        document.getElementById(id);
+
+      if(el){
+
+        el.innerHTML = `
+          <div class="empty">
+            Unable to load music right now.
+          </div>
+        `;
+
+      }
+
+    });
+
+  }
+
+}
+
+
+/* =========================================
+   RENDER SONG LIST
+========================================= */
+
+function renderSongList(
+  elementId,
+  songs,
+  emptyText
+){
+
+  const container =
+    document.getElementById(elementId);
+
+
+  if(!songs.length){
+
+    container.innerHTML = `
+      <div class="empty">
+        ${emptyText}
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    songs.map(
+      createSongCard
+    ).join("");
+
+}
+
+
+function renderGenre(
+  elementId,
+  genre
+){
+
+  const songs =
+    allSongs
+      .filter(
+        song =>
+          getGenre(song).toLowerCase()
+          === genre.toLowerCase()
+      )
+      .sort((a,b)=>{
+
+        const scoreA =
+          getPlays(a) +
+          getDownloads(a)*5;
+
+        const scoreB =
+          getPlays(b) +
+          getDownloads(b)*5;
+
+        return scoreB-scoreA;
+
+      })
+      .slice(0,8);
+
+
+  renderSongList(
+    elementId,
+    songs,
+    `No ${genre} songs available yet.`
+  );
+
+}
+
+
+/* =========================================
+   OPEN SONG PAGE
+========================================= */
+
+function openSong(id){
+
+  if(!id){
+
+    window.location.href =
+      "store.html";
+
+    return;
+  }
+
+
+  window.location.href =
+    `song.html?id=${encodeURIComponent(id)}`;
+
+}
+
+
+/* =========================================
+   SCROLL
+========================================= */
+
+function scrollToMyPlaylists(){
+
+  document
+    .getElementById(
+      "myPlaylistsSection"
+    )
+    .scrollIntoView({
+      behavior:"smooth"
+    });
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+async function init(){
+
+  await checkUser();
+
+  await loadSongs();
+
+  await loadMyPlaylists();
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  init
+);
+
+
+/* =========================================
+   AUTH CHANGES
+========================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  async (event,session)=>{
+
+    currentUser =
+      session?.user || null;
+
+    await loadMyPlaylists();
+
+    const status =
+      document.getElementById(
+        "loginStatus"
+      );
+
+    if(currentUser){
+
+      status.textContent =
+        "● Logged in as " +
+        (
+          currentUser.email ||
+          "PASONG user"
+        );
+
+    }else{
+
+      status.textContent =
+        "● Login to create your own playlists";
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
