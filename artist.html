@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASONG — Artist</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  min-height:100vh;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+nav{
+  background:#10101a;
+  border-bottom:1px solid #242434;
+  padding:15px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.logo{
+  color:#fff;
+  font-size:22px;
+  font-weight:800;
+}
+
+.logo span{
+  color:#b45cff;
+}
+
+.nav-links{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.nav-links a{
+  color:#aaaabd;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+.nav-links a:hover{
+  color:#fff;
+  background:#1d1728;
+}
+
+.container{
+  max-width:1050px;
+  margin:auto;
+  padding:25px 18px 60px;
+}
+
+.back{
+  display:inline-block;
+  color:#aaaabd;
+  margin-bottom:25px;
+  font-size:14px;
+}
+
+.artist-header{
+  background:#11111b;
+  border:1px solid #252536;
+  border-radius:18px;
+  padding:30px;
+  display:flex;
+  align-items:center;
+  gap:25px;
+  margin-bottom:25px;
+}
+
+.avatar{
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#7e22ce,#db2777);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  font-weight:900;
+  flex-shrink:0;
+  overflow:hidden;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.artist-header h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.artist-header p{
+  color:#999;
+}
+
+.section{
+  background:#11111b;
+  border:1px solid #252536;
+  border-radius:18px;
+  padding:22px;
+}
+
+.section h2{
+  margin-bottom:18px;
+}
+
+.song{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid #252536;
+}
+
+.song:last-child{
+  border-bottom:0;
+}
+
+.cover{
+  width:58px;
+  height:58px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#32104d,#171722);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#d946ef;
+  font-size:22px;
+  font-weight:900;
+  flex-shrink:0;
+}
+
+.cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.song-info{
+  flex:1;
+}
+
+.song-info strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.song-info small{
+  color:#888;
+}
+
+.view-btn{
+  background:linear-gradient(90deg,#8d45d2,#d94b9d);
+  padding:9px 15px;
+  border-radius:9px;
+  font-size:13px;
+  font-weight:700;
+}
+
+.message{
+  text-align:center;
+  padding:35px 15px;
+  color:#999;
+}
+
+footer{
+  border-top:1px solid #20202d;
+  color:#707082;
+  text-align:center;
+  padding:25px 15px;
+  font-size:13px;
+}
+
+@media(max-width:600px){
+
+  .artist-header{
+    flex-direction:column;
+    text-align:center;
+  }
+
+  .artist-header h1{
+    font-size:27px;
+  }
+
+  .song{
+    align-items:flex-start;
+  }
+
+  .view-btn{
+    padding:8px 10px;
+  }
+
+  .nav-links{
+    width:100%;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+  }
+
+  .nav-links a{
+    white-space:nowrap;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+
+<a class="logo" href="index.html">
+◈ <span>PASONG</span>
+</a>
+
+<div class="nav-links">
+
+<a href="index.html">Home</a>
+<a href="store.html">Music Store</a>
+<a href="charts.html">Charts</a>
+<a href="artists.html">Artists</a>
+<a href="playlists.html">Playlists</a>
+<a href="promotion.html">Promotion</a>
+<a href="account.html">Account</a>
+
+</div>
+
+</nav>
+
+
+<main class="container">
+
+<a class="back" href="artists.html">
+← Back to Artists
+</a>
+
+
+<div id="content">
+
+<div class="message">
+Loading artist...
+</div>
+
+</div>
+
+</main>
+
+
+<footer>
+PASONG © 2026 • Music • Artists • Opportunity
+</footer>
+
+
+<script>
+
+const API_BASE =
+"https://pasong-api.onrender.com";
+
+
+async function loadArtist(){
+
+const content =
+document.getElementById("content");
+
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+
+const artistId =
+params.get("id");
+
+
+if(!artistId){
+
+content.innerHTML = `
+
+<div class="message">
+
+<h2>No artist was selected.</h2>
+
+<br>
+
+<a
+href="artists.html"
+style="color:#d946ef;"
+>
+← Return to Artists
+</a>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+try{
+
+const response =
+await fetch(
+API_BASE + "/api/songs"
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"API request failed"
+);
+
+}
+
+
+const data =
+await response.json();
+
+
+const songs =
+Array.isArray(data)
+? data
+: (data.songs || []);
+
+
+const artistSongs =
+songs.filter(song=>{
+
+const id =
+song.artist_id ||
+song.artistId ||
+song.artist?.id;
+
+return String(id) ===
+String(artistId);
+
+});
+
+
+if(!artistSongs.length){
+
+content.innerHTML = `
+
+<div class="message">
+
+<h2>Artist not found</h2>
+
+<br>
+
+<p>
+No songs were found for this artist.
+</p>
+
+<br>
+
+<a
+href="artists.html"
+style="color:#d946ef;"
+>
+← Return to Artists
+</a>
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+const first =
+artistSongs[0];
+
+
+const artistName =
+first.artist_name ||
+first.artistName ||
+first.artist?.name ||
+first.artist ||
+"Artist";
+
+
+const artistImage =
+first.artist_avatar ||
+first.artist_image ||
+first.artist?.avatar_url ||
+first.artist?.image_url ||
+"";
+
+
+const initial =
+artistName
+.charAt(0)
+.toUpperCase();
+
+
+const avatar =
+artistImage
+
+? `
+<img
+src="${escapeHtml(artistImage)}"
+alt="${escapeHtml(artistName)}"
+>
+`
+
+: initial;
+
+
+content.innerHTML = `
+
+<div class="artist-header">
+
+<div class="avatar">
+
+${avatar}
+
+</div>
+
+
+<div>
+
+<h1>
+${escapeHtml(artistName)}
+</h1>
+
+<p>
+${artistSongs.length}
+${artistSongs.length === 1 ? "song" : "songs"}
+on PASONG
+</p>
+
+</div>
+
+</div>
+
+
+<div class="section">
+
+<h2>
+🎵 Music
+</h2>
+
+<div>
+
+${artistSongs.map(song=>{
+
+const title =
+song.title ||
+song.name ||
+"Untitled Song";
+
+
+const cover =
+song.cover_url ||
+song.coverUrl ||
+"";
+
+
+const id =
+song.id ||
+"";
+
+
+const coverHTML =
+cover
+
+? `
+<div class="cover">
+
+<img
+src="${escapeHtml(cover)}"
+alt="${escapeHtml(title)}"
+>
+
+</div>
+`
+
+: `
+<div class="cover">
+♪
+</div>
+`;
+
+
+return `
+
+<div class="song">
+
+${coverHTML}
+
+<div class="song-info">
+
+<strong>
+${escapeHtml(title)}
+</strong>
+
+<small>
+PASONG Music
+</small>
+
+</div>
+
+
+<a
+class="view-btn"
+href="song.html?id=${encodeURIComponent(id)}"
+>
+View Song
+</a>
+
+</div>
+
+`;
+
+}).join("")}
+
+</div>
+
+</div>
+
+`;
+
+
+}catch(error){
+
+console.error(error);
+
+
+content.innerHTML = `
+
+<div class="message">
+
+<h2>
+Could not load artist
+</h2>
+
+<br>
+
+<p>
+PASONG could not connect to the music service.
+</p>
+
+<br>
+
+<button
+onclick="loadArtist()"
+style="
+border:0;
+padding:10px 18px;
+border-radius:9px;
+background:linear-gradient(90deg,#8d45d2,#d94b9d);
+color:#fff;
+cursor:pointer;
+font-weight:600;
+"
+>
+Try Again
+</button>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+function escapeHtml(value){
+
+return String(value ?? "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+loadArtist();
+
+</script>
+
+</body>
+  </html>
