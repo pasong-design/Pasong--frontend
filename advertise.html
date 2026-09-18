@@ -1,1 +1,2020 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Advertise With PASONG</title><link rel="stylesheet" href="assets/style.css"></head><body><header><b>PASONG</b><a href="index.html">Home</a></header><main><h1>Advertise With PASONG</h1><div class="two"><div class="card"><h2>Weekly</h2><b>UGX 10,000</b><p>7 days</p></div><div class="card"><h2>Monthly</h2><b>UGX 50,000</b><p>30 days</p></div></div><div class="card"><h2>Send Your Ad</h2><input placeholder="Advertiser name"><input type="file" accept="image/*,video/*"><select><option>UGX 10,000 — Weekly</option><option>UGX 50,000 — Monthly</option></select><button onclick="advertiseStart()">Continue to payment</button><p id="adStatus"></p><small>Ad goes live only after verified payment and expires automatically.</small></div></main><script src="config.js"></script><script src="assets/app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advertise With PASONG</title>
+
+<link rel="stylesheet" href="assets/style.css">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(8,8,16,.96);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+}
+
+.header-inner{
+  max-width:1200px;
+  margin:auto;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:900;
+  background:linear-gradient(90deg,#b86cff,#ff4fa3);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  white-space:nowrap;
+}
+
+nav{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+}
+
+nav a{
+  color:#aaaabc;
+  text-decoration:none;
+  padding:9px 11px;
+  border-radius:10px;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+nav a:hover,
+nav a.active{
+  background:rgba(181,87,255,.14);
+  color:#fff;
+}
+
+main{
+  width:min(1180px,calc(100% - 24px));
+  margin:auto;
+  padding:28px 0 60px;
+}
+
+.hero{
+  padding:30px 24px;
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 10% 20%,rgba(181,91,255,.22),transparent 35%),
+    radial-gradient(circle at 90% 10%,rgba(255,70,160,.18),transparent 35%),
+    linear-gradient(135deg,#11111d,#0c0c15);
+  border:1px solid rgba(255,255,255,.08);
+  margin-bottom:20px;
+}
+
+.hero h1{
+  margin:0 0 10px;
+  font-size:clamp(30px,6vw,50px);
+}
+
+.hero p{
+  margin:0;
+  max-width:760px;
+  color:#aaaabd;
+  line-height:1.7;
+}
+
+.badge{
+  display:inline-block;
+  margin-bottom:14px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(184,100,255,.12);
+  border:1px solid rgba(184,100,255,.22);
+  color:#d7adff;
+  font-size:13px;
+  font-weight:800;
+}
+
+.pricing{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  margin-bottom:20px;
+}
+
+.price-card{
+  position:relative;
+  padding:23px;
+  border-radius:20px;
+  background:linear-gradient(145deg,#11111c,#0c0c14);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.price-card.featured{
+  border-color:rgba(197,105,255,.4);
+  box-shadow:0 15px 45px rgba(151,65,255,.12);
+}
+
+.price-card h2{
+  margin:0 0 8px;
+}
+
+.price{
+  font-size:30px;
+  font-weight:900;
+  color:#d49aff;
+}
+
+.price small{
+  font-size:13px;
+  color:#88889b;
+  font-weight:normal;
+}
+
+.price-card p{
+  color:#9999ab;
+  margin-bottom:0;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:20px;
+}
+
+.card{
+  background:linear-gradient(145deg,#11111c,#0c0c14);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  padding:21px;
+  margin-bottom:20px;
+}
+
+.card h2{
+  margin:0 0 8px;
+}
+
+.subtitle{
+  color:#9696aa;
+  font-size:14px;
+  line-height:1.6;
+  margin:0 0 18px;
+}
+
+.field{
+  margin-bottom:15px;
+}
+
+label{
+  display:block;
+  margin-bottom:7px;
+  color:#b5b5c5;
+  font-size:13px;
+  font-weight:700;
+}
+
+input,
+textarea,
+select{
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#080810;
+  color:#fff;
+  outline:none;
+  font-size:14px;
+}
+
+textarea{
+  min-height:105px;
+  resize:vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#b45cff;
+  box-shadow:0 0 0 3px rgba(180,92,255,.1);
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.file-box{
+  padding:17px;
+  border:1px dashed rgba(190,105,255,.3);
+  border-radius:15px;
+  background:rgba(180,90,255,.04);
+}
+
+.file-note{
+  color:#858598;
+  font-size:12px;
+  line-height:1.5;
+  margin-top:8px;
+}
+
+.checkbox{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  margin:14px 0;
+  color:#a4a4b4;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.checkbox input{
+  width:auto;
+  margin-top:3px;
+}
+
+.btn{
+  border:0;
+  cursor:pointer;
+  border-radius:12px;
+  padding:13px 18px;
+  font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,#9b55ff,#ff4d9d);
+  box-shadow:0 9px 25px rgba(170,70,255,.2);
+}
+
+.btn:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+
+.btn.secondary{
+  background:#171722;
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:none;
+}
+
+.full{
+  width:100%;
+}
+
+.status{
+  padding:15px;
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.07);
+  color:#aaaabc;
+  line-height:1.6;
+  font-size:13px;
+  margin-top:14px;
+}
+
+.status strong{
+  color:#fff;
+}
+
+.preview{
+  min-height:330px;
+  border-radius:18px;
+  overflow:hidden;
+  background:#090911;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.preview-media{
+  height:190px;
+  background:
+    radial-gradient(circle at 30% 30%,rgba(184,91,255,.35),transparent 35%),
+    radial-gradient(circle at 80% 30%,rgba(255,70,160,.25),transparent 35%),
+    #10101b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.preview-media img,
+.preview-media video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.preview-placeholder{
+  text-align:center;
+  color:#77778a;
+  padding:20px;
+}
+
+.preview-body{
+  padding:17px;
+}
+
+.preview-title{
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.preview-business{
+  color:#b5b5c6;
+  font-size:13px;
+  margin-bottom:10px;
+}
+
+.preview-description{
+  color:#9191a4;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.preview-buttons{
+  display:flex;
+  gap:8px;
+  margin-top:15px;
+}
+
+.preview-buttons span{
+  flex:1;
+  text-align:center;
+  padding:10px;
+  border-radius:10px;
+  background:#191923;
+  color:#bbb;
+  font-size:12px;
+}
+
+.status-flow{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:15px;
+}
+
+.flow{
+  text-align:center;
+  padding:12px 7px;
+  border-radius:12px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+  color:#777789;
+  font-size:11px;
+}
+
+.flow.active{
+  color:#d3a0ff;
+  border-color:rgba(189,100,255,.35);
+  background:rgba(180,90,255,.08);
+}
+
+.analytics{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.metric{
+  padding:15px;
+  border-radius:14px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.metric-label{
+  color:#888899;
+  font-size:12px;
+}
+
+.metric-value{
+  margin-top:7px;
+  font-size:23px;
+  font-weight:900;
+}
+
+.history{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,
+td{
+  text-align:left;
+  padding:12px 9px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  font-size:13px;
+}
+
+th{
+  color:#8d8d9e;
+}
+
+td{
+  color:#d3d3df;
+}
+
+.pill{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.pending{
+  background:rgba(255,255,255,.07);
+  color:#bbb;
+}
+
+.paid{
+  background:rgba(110,230,170,.1);
+  color:#7de0a9;
+}
+
+.live{
+  background:rgba(115,200,255,.1);
+  color:#83cfff;
+}
+
+.expired{
+  background:rgba(255,255,255,.06);
+  color:#888899;
+}
+
+.empty{
+  text-align:center;
+  padding:25px;
+  color:#777789;
+}
+
+.info{
+  padding:14px;
+  border-radius:14px;
+  background:rgba(180,90,255,.06);
+  border:1px solid rgba(180,90,255,.12);
+  color:#9999aa;
+  line-height:1.6;
+  font-size:13px;
+}
+
+.info strong{
+  color:#fff;
+}
+
+.hidden{
+  display:none!important;
+}
+
+footer{
+  border-top:1px solid rgba(255,255,255,.07);
+  padding:25px;
+  text-align:center;
+  color:#777789;
+  font-size:13px;
+}
+
+@media(max-width:850px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .pricing{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:600px){
+  .header-inner{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  nav{
+    width:100%;
+  }
+
+  main{
+    width:calc(100% - 16px);
+    padding-top:15px;
+  }
+
+  .pricing{
+    grid-template-columns:1fr;
+  }
+
+  .row{
+    grid-template-columns:1fr;
+  }
+
+  .analytics{
+    grid-template-columns:1fr 1fr 1fr;
+  }
+
+  .status-flow{
+    grid-template-columns:1fr;
+  }
+
+  .flow{
+    text-align:left;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+
+    <a class="logo" href="index.html">◈ PASONG</a>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a class="active" href="promotion.html">Promotion</a>
+      <a href="points.html">Points</a>
+      <a href="account.html">Account</a>
+    </nav>
+
+  </div>
+</header>
+
+
+<main>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="badge">📢 PASONG ADVERTISING</div>
+
+    <h1>Advertise With PASONG</h1>
+
+    <p>
+      Put your business, brand, event, product or service in front
+      of PASONG users. Submit your campaign, complete payment,
+      and your advertisement will go through verification before
+      it becomes live.
+    </p>
+
+  </section>
+
+
+  <!-- PRICING -->
+
+  <section class="pricing">
+
+    <div class="price-card">
+
+      <h2>Weekly</h2>
+
+      <div class="price">
+        UGX 10,000
+      </div>
+
+      <p>
+        7 days of advertising on PASONG.
+      </p>
+
+      <button
+        class="btn full"
+        onclick="selectPackage('weekly')"
+        style="margin-top:15px"
+      >
+        Choose Weekly
+      </button>
+
+    </div>
+
+
+    <div class="price-card featured">
+
+      <h2>Monthly</h2>
+
+      <div class="price">
+        UGX 50,000
+      </div>
+
+      <p>
+        30 days of advertising on PASONG.
+      </p>
+
+      <button
+        class="btn full"
+        onclick="selectPackage('monthly')"
+        style="margin-top:15px"
+      >
+        Choose Monthly
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <div class="grid">
+
+    <!-- LEFT -->
+
+    <div>
+
+      <section class="card">
+
+        <h2>📢 Create Your Campaign</h2>
+
+        <p class="subtitle">
+          Enter your advertisement information below.
+        </p>
+
+
+        <div class="row">
+
+          <div class="field">
+
+            <label>Advertiser Name *</label>
+
+            <input
+              id="advertiserName"
+              type="text"
+              placeholder="Your name"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>Business / Company Name *</label>
+
+            <input
+              id="businessName"
+              type="text"
+              placeholder="Business or company"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="row">
+
+          <div class="field">
+
+            <label>Email *</label>
+
+            <input
+              id="advertiserEmail"
+              type="email"
+              placeholder="you@example.com"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>Phone / WhatsApp *</label>
+
+            <input
+              id="advertiserPhone"
+              type="tel"
+              placeholder="07XXXXXXXX"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Campaign Name *</label>
+
+          <input
+            id="campaignName"
+            type="text"
+            placeholder="Example: September Business Promotion"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Ad Title *</label>
+
+          <input
+            id="adTitle"
+            type="text"
+            placeholder="Your advertisement headline"
+            maxlength="100"
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Ad Description *</label>
+
+          <textarea
+            id="adDescription"
+            placeholder="Tell PASONG users about your product, service, event or offer..."
+          ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Website / Landing Page</label>
+
+          <input
+            id="websiteUrl"
+            type="url"
+            placeholder="https://example.com"
+          >
+
+        </div>
+
+
+        <div class="row">
+
+          <div class="field">
+
+            <label>Ad Placement *</label>
+
+            <select id="placement">
+
+              <option value="">Choose placement</option>
+
+              <option value="home">
+                Home Page
+              </option>
+
+              <option value="store">
+                Music Store
+              </option>
+
+              <option value="search">
+                Search
+              </option>
+
+              <option value="charts">
+                Charts
+              </option>
+
+              <option value="artists">
+                Artist Pages
+              </option>
+
+              <option value="songs">
+                Song Pages
+              </option>
+
+              <option value="all">
+                PASONG Network
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label>Target Country</label>
+
+            <select id="targetCountry">
+
+              <option value="Uganda">
+                Uganda
+              </option>
+
+              <option value="Kenya">
+                Kenya
+              </option>
+
+              <option value="Tanzania">
+                Tanzania
+              </option>
+
+              <option value="Nigeria">
+                Nigeria
+              </option>
+
+              <option value="Other">
+                Other
+              </option>
+
+              <option value="All">
+                All Available Markets
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div class="row">
+
+          <div class="field">
+
+            <label>Start Date *</label>
+
+            <input
+              id="startDate"
+              type="date"
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label>End Date</label>
+
+            <input
+              id="endDate"
+              type="date"
+              readonly
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Choose Package *</label>
+
+          <select
+            id="package"
+            onchange="updatePackage()"
+          >
+
+            <option value="weekly">
+              UGX 10,000 — Weekly / 7 Days
+            </option>
+
+            <option value="monthly">
+              UGX 50,000 — Monthly / 30 Days
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="field">
+
+          <label>Advertisement Image / Video *</label>
+
+          <div class="file-box">
+
+            <input
+              id="adFile"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+              onchange="previewAdFile(event)"
+            >
+
+            <div class="file-note">
+              Recommended: clear promotional artwork.
+              Supported: JPG, PNG, WEBP, MP4 and WEBM.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="checkbox">
+
+          <input
+            id="rightsCheck"
+            type="checkbox"
+          >
+
+          <span>
+            I confirm that I have permission to use the submitted
+            advertisement, images, video, logos and other materials.
+          </span>
+
+        </div>
+
+
+        <div class="checkbox">
+
+          <input
+            id="termsCheck"
+            type="checkbox"
+          >
+
+          <span>
+            I agree that my advertisement will only become live
+            after payment verification and PASONG approval.
+          </span>
+
+        </div>
+
+
+        <button
+          class="btn full"
+          onclick="submitCampaign()"
+          id="submitButton"
+        >
+          Continue to Payment
+        </button>
+
+
+        <div
+          id="adStatus"
+          class="status"
+        >
+          Campaign status will appear here.
+        </div>
+
+      </section>
+
+
+      <!-- PAYMENT -->
+
+      <section class="card">
+
+        <h2>💳 Payment</h2>
+
+        <p class="subtitle">
+          Your selected package is shown below. Payment integration
+          can be connected to PASONG's live payment providers.
+        </p>
+
+
+        <div class="analytics">
+
+          <div class="metric">
+
+            <div class="metric-label">
+              Package
+            </div>
+
+            <div
+              class="metric-value"
+              id="paymentPackage"
+            >
+              Weekly
+            </div>
+
+          </div>
+
+
+          <div class="metric">
+
+            <div class="metric-label">
+              Price
+            </div>
+
+            <div
+              class="metric-value"
+              id="paymentAmount"
+            >
+              UGX 10,000
+            </div>
+
+          </div>
+
+
+          <div class="metric">
+
+            <div class="metric-label">
+              Duration
+            </div>
+
+            <div
+              class="metric-value"
+              id="paymentDuration"
+            >
+              7 days
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="status"
+          style="margin-top:15px"
+        >
+
+          <strong>Payment methods ready for connection:</strong><br><br>
+
+          🟡 MTN Mobile Money<br>
+          🔴 Airtel Money<br>
+          💳 Card / online payment
+
+          <br><br>
+
+          The campaign remains
+          <strong>Pending Payment</strong>
+          until PASONG receives and verifies the payment.
+
+        </div>
+
+      </section>
+
+    </div>
+
+
+    <!-- RIGHT -->
+
+    <div>
+
+      <!-- PREVIEW -->
+
+      <section class="card">
+
+        <h2>👁️ Ad Preview</h2>
+
+        <p class="subtitle">
+          This is approximately how your advertisement can appear.
+        </p>
+
+
+        <div class="preview">
+
+          <div
+            class="preview-media"
+            id="previewMedia"
+          >
+
+            <div class="preview-placeholder">
+              🖼️<br><br>
+              Your advertisement preview
+            </div>
+
+          </div>
+
+
+          <div class="preview-body">
+
+            <div
+              class="preview-title"
+              id="previewTitle"
+            >
+              Your Ad Title
+            </div>
+
+            <div
+              class="preview-business"
+              id="previewBusiness"
+            >
+              Your Business
+            </div>
+
+            <div
+              class="preview-description"
+              id="previewDescription"
+            >
+              Your advertisement description will appear here.
+            </div>
+
+
+            <div class="preview-buttons">
+
+              <span>
+                📱 WhatsApp
+              </span>
+
+              <span>
+                🔗 Visit
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- WORKFLOW -->
+
+      <section class="card">
+
+        <h2>🔄 Campaign Workflow</h2>
+
+        <div class="status-flow">
+
+          <div class="flow active">
+            1<br>
+            Submitted
+          </div>
+
+          <div class="flow">
+            2<br>
+            Payment
+          </div>
+
+          <div class="flow">
+            3<br>
+            Verified
+          </div>
+
+          <div class="flow">
+            4<br>
+            Admin Approval
+          </div>
+
+          <div class="flow">
+            5<br>
+            Live
+          </div>
+
+        </div>
+
+        <div class="info" style="margin-top:15px">
+
+          Your advertisement does <strong>not</strong> automatically
+          become live after submitting the form.
+
+          <br><br>
+
+          PASONG verifies the payment and reviews the advertisement
+          before activation.
+
+        </div>
+
+      </section>
+
+
+      <!-- ANALYTICS -->
+
+      <section class="card">
+
+        <h2>📊 Campaign Analytics</h2>
+
+        <p class="subtitle">
+          Once your advertisement is live, these statistics can
+          display its performance.
+        </p>
+
+        <div class="analytics">
+
+          <div class="metric">
+            <div class="metric-label">
+              Impressions
+            </div>
+            <div class="metric-value">
+              0
+            </div>
+          </div>
+
+          <div class="metric">
+            <div class="metric-label">
+              Clicks
+            </div>
+            <div class="metric-value">
+              0
+            </div>
+          </div>
+
+          <div class="metric">
+            <div class="metric-label">
+              CTR
+            </div>
+            <div class="metric-value">
+              0%
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+
+  <!-- CAMPAIGN HISTORY -->
+
+  <section class="card">
+
+    <h2>📋 My Campaigns</h2>
+
+    <p class="subtitle">
+      Your submitted campaigns will appear here after the
+      advertiser database is connected.
+    </p>
+
+    <div class="history">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Campaign</th>
+            <th>Package</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="campaignHistory">
+
+          <tr>
+
+            <td colspan="5">
+
+              <div class="empty">
+                No campaigns submitted yet.
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </section>
+
+
+  <!-- RULES -->
+
+  <section class="card">
+
+    <h2>📌 Advertising Information</h2>
+
+    <div class="info">
+
+      <strong>Weekly:</strong> UGX 10,000 for 7 days.<br>
+
+      <strong>Monthly:</strong> UGX 50,000 for 30 days.<br><br>
+
+      Advertisements are subject to payment verification and
+      PASONG approval.
+
+      <br><br>
+
+      PASONG may reject advertisements that contain misleading,
+      unlawful, fraudulent, copyrighted or otherwise prohibited
+      material.
+
+      <br><br>
+
+      Approved campaigns automatically expire when their paid
+      advertising period ends.
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer>
+  PASONG © 2026 • Music • Artists • Opportunity • Advertising
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="assets/app.js"></script>
+
+<script>
+
+/* =========================================
+   PASONG ADVERTISING
+========================================= */
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+let currentUser = null;
+let selectedPackage = "weekly";
+
+
+/* =========================================
+   PACKAGE
+========================================= */
+
+function selectPackage(type){
+
+  selectedPackage =
+    type === "monthly"
+      ? "monthly"
+      : "weekly";
+
+  document.getElementById("package").value =
+    selectedPackage;
+
+  updatePackage();
+
+  document
+    .getElementById("campaignName")
+    .scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+
+}
+
+
+function updatePackage(){
+
+  selectedPackage =
+    document.getElementById("package").value;
+
+  const monthly =
+    selectedPackage === "monthly";
+
+  document.getElementById(
+    "paymentPackage"
+  ).textContent =
+    monthly
+      ? "Monthly"
+      : "Weekly";
+
+  document.getElementById(
+    "paymentAmount"
+  ).textContent =
+    monthly
+      ? "UGX 50,000"
+      : "UGX 10,000";
+
+  document.getElementById(
+    "paymentDuration"
+  ).textContent =
+    monthly
+      ? "30 days"
+      : "7 days";
+
+  updateEndDate();
+
+}
+
+
+/* =========================================
+   DATE
+========================================= */
+
+function updateEndDate(){
+
+  const start =
+    document.getElementById(
+      "startDate"
+    ).value;
+
+  if(!start){
+    document.getElementById(
+      "endDate"
+    ).value = "";
+    return;
+  }
+
+  const date =
+    new Date(start + "T00:00:00");
+
+  const days =
+    selectedPackage === "monthly"
+      ? 30
+      : 7;
+
+  date.setDate(
+    date.getDate() + days
+  );
+
+  document.getElementById(
+    "endDate"
+  ).value =
+    date.toISOString()
+      .split("T")[0];
+
+}
+
+
+document
+  .getElementById("startDate")
+  .addEventListener(
+    "change",
+    updateEndDate
+  );
+
+
+/* =========================================
+   LIVE PREVIEW
+========================================= */
+
+document
+  .getElementById("adTitle")
+  .addEventListener(
+    "input",
+    function(){
+
+      document.getElementById(
+        "previewTitle"
+      ).textContent =
+        this.value ||
+        "Your Ad Title";
+
+    }
+  );
+
+
+document
+  .getElementById("businessName")
+  .addEventListener(
+    "input",
+    function(){
+
+      document.getElementById(
+        "previewBusiness"
+      ).textContent =
+        this.value ||
+        "Your Business";
+
+    }
+  );
+
+
+document
+  .getElementById("adDescription")
+  .addEventListener(
+    "input",
+    function(){
+
+      document.getElementById(
+        "previewDescription"
+      ).textContent =
+        this.value ||
+        "Your advertisement description will appear here.";
+
+    }
+  );
+
+
+/* =========================================
+   FILE PREVIEW
+========================================= */
+
+function previewAdFile(event){
+
+  const file =
+    event.target.files[0];
+
+  if(!file){
+    return;
+  }
+
+  const container =
+    document.getElementById(
+      "previewMedia"
+    );
+
+  const url =
+    URL.createObjectURL(file);
+
+  if(file.type.startsWith("video/")){
+
+    container.innerHTML = `
+      <video
+        src="${url}"
+        controls
+        muted
+        playsinline
+      ></video>
+    `;
+
+  }else{
+
+    container.innerHTML = `
+      <img
+        src="${url}"
+        alt="Advertisement preview"
+      >
+    `;
+
+  }
+
+}
+
+
+/* =========================================
+   ACCOUNT
+========================================= */
+
+async function loadUser(){
+
+  try{
+
+    const {
+      data:{
+        session
+      }
+    } =
+      await supabaseClient.auth.getSession();
+
+    if(session){
+
+      currentUser =
+        session.user;
+
+      const email =
+        document.getElementById(
+          "advertiserEmail"
+        );
+
+      if(
+        email &&
+        !email.value
+      ){
+
+        email.value =
+          currentUser.email || "";
+
+      }
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "User session not available."
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   VALIDATION
+========================================= */
+
+function validateCampaign(){
+
+  const required = [
+
+    ["advertiserName","Advertiser name"],
+
+    ["businessName","Business/company name"],
+
+    ["advertiserEmail","Email"],
+
+    ["advertiserPhone","Phone/WhatsApp"],
+
+    ["campaignName","Campaign name"],
+
+    ["adTitle","Ad title"],
+
+    ["adDescription","Ad description"],
+
+    ["placement","Ad placement"],
+
+    ["startDate","Start date"]
+
+  ];
+
+
+  for(
+    const [id,label]
+    of required
+  ){
+
+    const element =
+      document.getElementById(id);
+
+    if(!element.value.trim()){
+
+      alert(
+        "Please enter " +
+        label + "."
+      );
+
+      element.focus();
+
+      return false;
+
+    }
+
+  }
+
+
+  const file =
+    document.getElementById(
+      "adFile"
+    ).files[0];
+
+  if(!file){
+
+    alert(
+      "Please upload your advertisement image or video."
+    );
+
+    return false;
+
+  }
+
+
+  if(
+    !document.getElementById(
+      "rightsCheck"
+    ).checked
+  ){
+
+    alert(
+      "Please confirm that you have the rights to use the advertisement."
+    );
+
+    return false;
+
+  }
+
+
+  if(
+    !document.getElementById(
+      "termsCheck"
+    ).checked
+  ){
+
+    alert(
+      "Please agree to the PASONG advertising terms."
+    );
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =========================================
+   SUBMIT CAMPAIGN
+========================================= */
+
+async function submitCampaign(){
+
+  if(!validateCampaign()){
+    return;
+  }
+
+
+  const button =
+    document.getElementById(
+      "submitButton"
+    );
+
+  const status =
+    document.getElementById(
+      "adStatus"
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Preparing campaign...";
+
+
+  const campaign = {
+
+    advertiser_name:
+      document.getElementById(
+        "advertiserName"
+      ).value.trim(),
+
+    business_name:
+      document.getElementById(
+        "businessName"
+      ).value.trim(),
+
+    email:
+      document.getElementById(
+        "advertiserEmail"
+      ).value.trim(),
+
+    phone:
+      document.getElementById(
+        "advertiserPhone"
+      ).value.trim(),
+
+    campaign_name:
+      document.getElementById(
+        "campaignName"
+      ).value.trim(),
+
+    ad_title:
+      document.getElementById(
+        "adTitle"
+      ).value.trim(),
+
+    ad_description:
+      document.getElementById(
+        "adDescription"
+      ).value.trim(),
+
+    website_url:
+      document.getElementById(
+        "websiteUrl"
+      ).value.trim() || null,
+
+    placement:
+      document.getElementById(
+        "placement"
+      ).value,
+
+    target_country:
+      document.getElementById(
+        "targetCountry"
+      ).value,
+
+    package:
+      selectedPackage,
+
+    amount:
+      selectedPackage === "monthly"
+        ? 50000
+        : 10000,
+
+    currency:
+      "UGX",
+
+    start_date:
+      document.getElementById(
+        "startDate"
+      ).value,
+
+    end_date:
+      document.getElementById(
+        "endDate"
+      ).value,
+
+    payment_status:
+      "pending",
+
+    approval_status:
+      "pending",
+
+    campaign_status:
+      "pending_payment"
+
+  };
+
+
+  /*
+    IMPORTANT:
+
+    The advertising database/payment backend
+    can be connected here.
+
+    We first try the existing PASONG
+    promotions table.
+
+    If the table uses a different schema,
+    the campaign is still shown as ready
+    for backend connection rather than being
+    falsely marked as paid/live.
+  */
+
+
+  try{
+
+    if(currentUser){
+
+      const result =
+        await supabaseClient
+          .from("promotions")
+          .insert({
+
+            user_id:
+              currentUser.id,
+
+            title:
+              campaign.ad_title,
+
+            description:
+              campaign.ad_description,
+
+            amount:
+              campaign.amount,
+
+            currency:
+              campaign.currency,
+
+            start_date:
+              campaign.start_date,
+
+            end_date:
+              campaign.end_date,
+
+            status:
+              "pending"
+
+          })
+          .select()
+          .maybeSingle();
+
+
+      if(result.error){
+
+        console.log(
+          "Promotions insert:",
+          result.error.message
+        );
+
+      }else{
+
+        renderLocalCampaign(
+          campaign,
+          result.data
+        );
+
+      }
+
+    }
+
+
+    status.innerHTML =
+      "<strong>✓ Campaign submitted.</strong><br><br>" +
+
+      "Status: Pending Payment / Review.<br>" +
+
+      "Package: " +
+      escapeHtml(
+        selectedPackage === "monthly"
+          ? "Monthly"
+          : "Weekly"
+      ) +
+      "<br>" +
+
+      "Amount: UGX " +
+      Number(
+        campaign.amount
+      ).toLocaleString() +
+
+      "<br><br>" +
+
+      "The advertisement will NOT go live until payment is verified and the campaign is approved.";
+
+
+    status.scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+
+
+  }catch(error){
+
+    console.error(error);
+
+    status.innerHTML =
+      "<strong>Campaign prepared.</strong><br><br>" +
+
+      "The payment/backend connection still needs to be completed. Your advertisement has not been marked as paid or live.";
+
+  }
+
+
+  button.disabled = false;
+
+  button.textContent =
+    "Continue to Payment";
+
+}
+
+
+/* =========================================
+   LOCAL CAMPAIGN DISPLAY
+========================================= */
+
+function renderLocalCampaign(
+  campaign,
+  databaseRow
+){
+
+  const body =
+    document.getElementById(
+      "campaignHistory"
+    );
+
+
+  body.innerHTML = `
+
+    <tr>
+
+      <td>
+        ${escapeHtml(
+          campaign.campaign_name
+        )}
+      </td>
+
+      <td>
+        ${campaign.package === "monthly"
+          ? "Monthly"
+          : "Weekly"}
+      </td>
+
+      <td>
+        UGX ${Number(
+          campaign.amount
+        ).toLocaleString()}
+      </td>
+
+      <td>
+        <span class="pill pending">
+          Pending
+        </span>
+      </td>
+
+      <td>
+        ${escapeHtml(
+          campaign.start_date
+        )}
+        →
+        ${escapeHtml(
+          campaign.end_date
+        )}
+      </td>
+
+    </tr>
+
+  `;
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================
+   START
+========================================= */
+
+loadUser();
+
+updatePackage();
+
+</script>
+
+</body>
+</html>
