@@ -1,1 +1,1801 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — charts</title><link rel="stylesheet" href="assets/style.css"></head><body><header><a class="logo" href="index.html">◈ PASONG</a><nav><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="account.html">Account</a></nav></header><main><h1>charts</h1><div class="card"><h2>PASONG charts</h2><p>This page is part of the updated PASONG structure. Connect it to the PASONG API/Supabase backend for live data.</p><a class="btn" href="store.html">Open Music Store</a></div></main><footer>PASONG © 2026</footer></body></html>
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1">
+
+<title>PASONG — Charts</title>
+
+<link
+  rel="stylesheet"
+  href="assets/style.css">
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+/* HEADER */
+
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:18px 5%;
+  background:#0d0d18;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.logo{
+  color:#fff;
+  text-decoration:none;
+  font-size:22px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+nav{
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+nav a{
+  color:#aaaaba;
+  text-decoration:none;
+  font-size:14px;
+  transition:.2s;
+}
+
+nav a:hover,
+nav a.active{
+  color:#fff;
+}
+
+/* MAIN */
+
+main{
+  width:min(1150px,94%);
+  margin:auto;
+  padding:45px 0 80px;
+}
+
+/* HERO */
+
+.hero{
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.hero h1{
+  margin:0 0 10px;
+  font-size:clamp(36px,7vw,60px);
+  font-weight:900;
+  background:linear-gradient(
+    90deg,
+    #a855f7,
+    #ec4899
+  );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+  margin:0;
+  color:#9999aa;
+  font-size:15px;
+}
+
+/* CHART TYPE */
+
+.chart-types{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding-bottom:8px;
+  margin-bottom:14px;
+}
+
+.chart-type{
+  border:1px solid rgba(255,255,255,.09);
+  background:#11111d;
+  color:#aaaaba;
+  padding:11px 18px;
+  border-radius:999px;
+  white-space:nowrap;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.chart-type.active{
+  color:#fff;
+  border-color:#9b4dff;
+  background:linear-gradient(
+    135deg,
+    #6427a8,
+    #d62f83
+  );
+}
+
+/* PERIOD */
+
+.periods{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+
+.period{
+  border:1px solid rgba(255,255,255,.08);
+  background:#0f0f1a;
+  color:#9292a4;
+  padding:8px 14px;
+  border-radius:9px;
+  cursor:pointer;
+  font-size:13px;
+  font-weight:700;
+}
+
+.period.active{
+  color:#fff;
+  border-color:#8747d8;
+}
+
+/* GENRES */
+
+.genre-wrap{
+  margin-bottom:20px;
+}
+
+.genre-label{
+  display:block;
+  color:#888899;
+  font-size:12px;
+  margin-bottom:7px;
+}
+
+.genre-select{
+  width:100%;
+  max-width:330px;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#11111d;
+  color:#fff;
+  outline:none;
+}
+
+/* CARD */
+
+.chart-card{
+  background:
+    linear-gradient(
+      145deg,
+      #11111d,
+      #0d0d16
+    );
+
+  border:1px solid rgba(255,255,255,.08);
+
+  border-radius:20px;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.25);
+}
+
+/* CHART HEADER */
+
+.chart-header{
+  padding:23px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.07);
+}
+
+.chart-header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.chart-header h2{
+  margin:0 0 7px;
+  font-size:22px;
+}
+
+.chart-header p{
+  margin:0;
+  color:#9999aa;
+  font-size:13px;
+}
+
+.refresh{
+  border:1px solid rgba(255,255,255,.1);
+  background:#171724;
+  color:#fff;
+  padding:9px 13px;
+  border-radius:9px;
+  cursor:pointer;
+}
+
+.refresh:hover{
+  border-color:#a855f7;
+}
+
+/* SONG */
+
+.song-list{
+  display:flex;
+  flex-direction:column;
+}
+
+.song{
+  display:grid;
+  grid-template-columns:55px 70px 1fr auto;
+  gap:16px;
+  align-items:center;
+  padding:15px 20px;
+  border-bottom:1px solid rgba(255,255,255,.055);
+  transition:.2s;
+}
+
+.song:last-child{
+  border-bottom:0;
+}
+
+.song:hover{
+  background:rgba(255,255,255,.025);
+}
+
+/* RANK */
+
+.rank{
+  text-align:center;
+  color:#777789;
+  font-size:20px;
+  font-weight:900;
+}
+
+.song:nth-child(1) .rank{
+  color:#f5c76b;
+}
+
+.song:nth-child(2) .rank{
+  color:#c5c5cf;
+}
+
+.song:nth-child(3) .rank{
+  color:#d08b63;
+}
+
+/* COVER */
+
+.cover{
+  width:70px;
+  height:70px;
+  border-radius:13px;
+  object-fit:cover;
+  background:#191925;
+}
+
+/* INFO */
+
+.info{
+  min-width:0;
+}
+
+.title{
+  font-size:16px;
+  font-weight:900;
+  color:#fff;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+
+  margin-bottom:5px;
+}
+
+.artist{
+  color:#a5a5b4;
+  font-size:13px;
+
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.genre{
+  display:inline-block;
+  margin-top:6px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#191927;
+  color:#8f8fa1;
+  font-size:10px;
+}
+
+.song-date{
+  margin-top:5px;
+  color:#666678;
+  font-size:11px;
+}
+
+/* STATS */
+
+.stats{
+  text-align:right;
+  min-width:105px;
+}
+
+.stats-main{
+  color:#fff;
+  font-size:14px;
+  font-weight:800;
+}
+
+.stats-sub{
+  color:#777789;
+  font-size:11px;
+  margin-top:5px;
+}
+
+/* OPEN */
+
+.open-song{
+  display:inline-block;
+  margin-top:8px;
+  padding:8px 13px;
+  border-radius:999px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7b3ff2,
+      #e83e91
+    );
+
+  color:#fff;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:900;
+}
+
+/* LOADING */
+
+.loading,
+.empty,
+.error{
+  padding:55px 20px;
+  text-align:center;
+  color:#9999aa;
+}
+
+.loading-icon{
+  font-size:35px;
+  margin-bottom:10px;
+}
+
+/* TOP 1 */
+
+.number-one{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(168,85,247,.12),
+      rgba(236,72,153,.06)
+    );
+}
+
+.number-one .title{
+  font-size:18px;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+  header{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:15px 4%;
+  }
+
+  nav{
+    width:100%;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+  }
+
+  nav a{
+    white-space:nowrap;
+  }
+
+  main{
+    width:94%;
+    padding-top:32px;
+  }
+
+  .chart-header-top{
+    align-items:flex-start;
+  }
+
+  .song{
+    grid-template-columns:35px 58px 1fr;
+    gap:10px;
+    padding:14px 10px;
+  }
+
+  .cover{
+    width:58px;
+    height:58px;
+  }
+
+  .stats{
+    grid-column:3;
+    text-align:left;
+    min-width:0;
+    margin-top:-4px;
+  }
+
+  .open-song{
+    margin-top:7px;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+  <a
+    class="logo"
+    href="index.html">
+    ◈ PASONG
+  </a>
+
+  <nav>
+
+    <a href="index.html">
+      Home
+    </a>
+
+    <a href="store.html">
+      Music Store
+    </a>
+
+    <a
+      class="active"
+      href="charts.html">
+      Charts
+    </a>
+
+    <a href="artists.html">
+      Artists
+    </a>
+
+    <a href="playlists.html">
+      Playlists
+    </a>
+
+    <a href="promotion.html">
+      Promotion
+    </a>
+
+    <a href="account.html">
+      Account
+    </a>
+
+  </nav>
+
+</header>
+
+
+<main>
+
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <h1>
+      PASONG Charts
+    </h1>
+
+    <p>
+      Discover music getting attention on PASONG.
+    </p>
+
+  </section>
+
+
+  <!-- CHART TYPES -->
+
+  <div class="chart-types">
+
+    <button
+      class="chart-type active"
+      id="topSongsButton"
+      onclick="setChartType('top')">
+
+      🔥 Top Songs
+
+    </button>
+
+
+    <button
+      class="chart-type"
+      id="trendingButton"
+      onclick="setChartType('trending')">
+
+      📈 Trending
+
+    </button>
+
+
+    <button
+      class="chart-type"
+      id="latestButton"
+      onclick="setChartType('latest')">
+
+      🆕 Latest
+
+    </button>
+
+  </div>
+
+
+  <!-- PERIOD -->
+
+  <div class="periods">
+
+    <button
+      class="period active"
+      onclick="setPeriod('today',this)">
+
+      Today
+
+    </button>
+
+    <button
+      class="period"
+      onclick="setPeriod('week',this)">
+
+      This Week
+
+    </button>
+
+    <button
+      class="period"
+      onclick="setPeriod('month',this)">
+
+      This Month
+
+    </button>
+
+    <button
+      class="period"
+      onclick="setPeriod('all',this)">
+
+      All Time
+
+    </button>
+
+  </div>
+
+
+  <!-- GENRE -->
+
+  <div class="genre-wrap">
+
+    <label
+      class="genre-label"
+      for="genreSelect">
+
+      Genre
+
+    </label>
+
+    <select
+      class="genre-select"
+      id="genreSelect"
+      onchange="renderCurrentChart()">
+
+      <option value="all">
+        All Genres
+      </option>
+
+      <option value="Afrobeats">
+        Afrobeats
+      </option>
+
+      <option value="Amapiano">
+        Amapiano
+      </option>
+
+      <option value="Gengetone">
+        Gengetone
+      </option>
+
+      <option value="Bongo">
+        Bongo
+      </option>
+
+      <option value="Dancehall">
+        Dancehall
+      </option>
+
+      <option value="Hip Hop">
+        Hip Hop
+      </option>
+
+      <option value="R&B">
+        R&B
+      </option>
+
+      <option value="Gospel">
+        Gospel
+      </option>
+
+      <option value="Reggae">
+        Reggae
+      </option>
+
+      <option value="Other">
+        Other
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- CHART -->
+
+  <section class="chart-card">
+
+
+    <div class="chart-header">
+
+      <div class="chart-header-top">
+
+        <div>
+
+          <h2 id="chartTitle">
+            🔥 Top Songs
+          </h2>
+
+          <p id="chartDescription">
+            Songs currently receiving the most activity.
+          </p>
+
+        </div>
+
+
+        <button
+          class="refresh"
+          onclick="loadCharts()">
+
+          ↻ Refresh
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="songList"
+      class="song-list">
+
+      <div class="loading">
+
+        <div class="loading-icon">
+          🎵
+        </div>
+
+        Loading PASONG charts...
+
+      </div>
+
+    </div>
+
+
+  </section>
+
+
+</main>
+
+
+<footer>
+
+  PASONG © 2026
+
+</footer>
+
+
+<script>
+
+
+const API_BASE =
+  "https://pasong-api.onrender.com";
+
+
+let allSongs = [];
+
+let chartType = "top";
+
+let period = "today";
+
+
+/* =========================
+   SAFE HTML
+========================= */
+
+function escapeHTML(value){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   SONG DATA HELPERS
+========================= */
+
+function getTitle(song){
+
+  return (
+    song.title ||
+    song.song_title ||
+    "Untitled Song"
+  );
+
+}
+
+
+function getArtist(song){
+
+  if(song.artist_name){
+    return song.artist_name;
+  }
+
+  if(
+    song.artist &&
+    typeof song.artist === "string"
+  ){
+    return song.artist;
+  }
+
+  if(
+    song.artist &&
+    song.artist.name
+  ){
+    return song.artist.name;
+  }
+
+  if(
+    song.artist &&
+    song.artist.performing_name
+  ){
+    return song.artist.performing_name;
+  }
+
+  if(
+    song.artist_profile &&
+    song.artist_profile.performing_name
+  ){
+    return song.artist_profile.performing_name;
+  }
+
+  if(
+    song.artist_profile &&
+    song.artist_profile.stage_name
+  ){
+    return song.artist_profile.stage_name;
+  }
+
+  return "PASONG Artist";
+
+}
+
+
+function getGenre(song){
+
+  return (
+    song.genre ||
+    song.category_name ||
+    song.category ||
+    "Music"
+  );
+
+}
+
+
+function getCover(song){
+
+  return (
+    song.cover_url ||
+    song.cover ||
+    song.image ||
+    "assets/default-cover.png"
+  );
+
+}
+
+
+function getPlays(song){
+
+  return Number(
+    song.plays ??
+    song.play_count ??
+    song.total_plays ??
+    song.song_plays ??
+    0
+  ) || 0;
+
+}
+
+
+function getDownloads(song){
+
+  return Number(
+    song.downloads ??
+    song.download_count ??
+    song.total_downloads ??
+    0
+  ) || 0;
+
+}
+
+
+function getDate(song){
+
+  return (
+    song.created_at ||
+    song.createdAt ||
+    song.updated_at ||
+    null
+  );
+
+}
+
+
+function getId(song){
+
+  return (
+    song.id ||
+    song.song_id ||
+    song.songId ||
+    ""
+  );
+
+}
+
+
+/* =========================
+   NUMBER FORMAT
+========================= */
+
+function formatNumber(value){
+
+  const number =
+    Number(value) || 0;
+
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      notation:"compact",
+      maximumFractionDigits:1
+    }
+  ).format(number);
+
+}
+
+
+/* =========================
+   DATE
+========================= */
+
+function formatDate(value){
+
+  if(!value){
+    return "";
+  }
+
+  const date =
+    new Date(value);
+
+  if(
+    Number.isNaN(
+      date.getTime()
+    )
+  ){
+    return "";
+  }
+
+  return date.toLocaleDateString(
+    "en-GB",
+    {
+      day:"numeric",
+      month:"short",
+      year:"numeric"
+    }
+  );
+
+}
+
+
+/* =========================
+   PERIOD FILTER
+========================= */
+
+function isWithinPeriod(song){
+
+  if(period === "all"){
+    return true;
+  }
+
+  const created =
+    new Date(getDate(song));
+
+  if(
+    Number.isNaN(
+      created.getTime()
+    )
+  ){
+
+    /*
+      If the API doesn't provide a date,
+      don't incorrectly remove the song.
+    */
+
+    return true;
+
+  }
+
+
+  const now =
+    new Date();
+
+  const difference =
+    now.getTime() -
+    created.getTime();
+
+
+  if(period === "today"){
+
+    return (
+      created.getDate() === now.getDate() &&
+      created.getMonth() === now.getMonth() &&
+      created.getFullYear() === now.getFullYear()
+    );
+
+  }
+
+
+  if(period === "week"){
+
+    return (
+      difference <=
+      7 * 24 * 60 * 60 * 1000
+    );
+
+  }
+
+
+  if(period === "month"){
+
+    return (
+      difference <=
+      30 * 24 * 60 * 60 * 1000
+    );
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =========================
+   CHART SCORE
+========================= */
+
+function getScore(song){
+
+  const plays =
+    getPlays(song);
+
+  const downloads =
+    getDownloads(song);
+
+
+  /*
+    Current API data is used as supplied.
+
+    Downloads receive extra weight because
+    they represent stronger engagement than
+    a simple play.
+  */
+
+  return (
+    plays +
+    downloads * 5
+  );
+
+}
+
+
+/* =========================
+   FILTER GENRE
+========================= */
+
+function filterGenre(songs){
+
+  const selected =
+    document.getElementById(
+      "genreSelect"
+    ).value;
+
+
+  if(selected === "all"){
+    return songs;
+  }
+
+
+  return songs.filter(song=>{
+
+    return String(
+      getGenre(song)
+    ).toLowerCase() ===
+    selected.toLowerCase();
+
+  });
+
+}
+
+
+/* =========================
+   TOP CHART
+========================= */
+
+function getTopSongs(songs){
+
+  return [...songs]
+    .sort(
+      (a,b)=>
+        getScore(b) -
+        getScore(a)
+    );
+
+}
+
+
+/* =========================
+   TRENDING
+========================= */
+
+function getTrendingSongs(songs){
+
+  const now =
+    Date.now();
+
+
+  return [...songs]
+    .sort((a,b)=>{
+
+      const scoreA =
+        getScore(a);
+
+      const scoreB =
+        getScore(b);
+
+      const dateA =
+        new Date(
+          getDate(a) || 0
+        ).getTime();
+
+      const dateB =
+        new Date(
+          getDate(b) || 0
+        ).getTime();
+
+
+      const ageA =
+        dateA
+        ? Math.max(
+            1,
+            (now-dateA) /
+            (24*60*60*1000)
+          )
+        : 30;
+
+
+      const ageB =
+        dateB
+        ? Math.max(
+            1,
+            (now-dateB) /
+            (24*60*60*1000)
+          )
+        : 30;
+
+
+      const trendA =
+        scoreA /
+        Math.sqrt(ageA);
+
+      const trendB =
+        scoreB /
+        Math.sqrt(ageB);
+
+
+      return trendB-trendA;
+
+    });
+
+}
+
+
+/* =========================
+   LATEST
+========================= */
+
+function getLatestSongs(songs){
+
+  return [...songs]
+    .sort((a,b)=>{
+
+      const dateA =
+        new Date(
+          getDate(a) || 0
+        ).getTime();
+
+      const dateB =
+        new Date(
+          getDate(b) || 0
+        ).getTime();
+
+      return dateB-dateA;
+
+    });
+
+}
+
+
+/* =========================
+   CHART TITLE
+========================= */
+
+function updateChartHeader(){
+
+  const title =
+    document.getElementById(
+      "chartTitle"
+    );
+
+  const description =
+    document.getElementById(
+      "chartDescription"
+    );
+
+
+  if(chartType === "trending"){
+
+    title.textContent =
+      "📈 Trending Songs";
+
+    description.textContent =
+      "Songs showing strong recent activity.";
+
+    return;
+
+  }
+
+
+  if(chartType === "latest"){
+
+    title.textContent =
+      "🆕 Latest Songs";
+
+    description.textContent =
+      "The newest music uploaded to PASONG.";
+
+    return;
+
+  }
+
+
+  title.textContent =
+    "🔥 Top Songs";
+
+  description.textContent =
+    "Songs currently receiving the most activity.";
+
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function renderCurrentChart(){
+
+  updateChartHeader();
+
+
+  let songs =
+    filterGenre(
+      allSongs
+    );
+
+
+  if(
+    chartType === "top"
+  ){
+
+    songs =
+      getTopSongs(
+        songs
+      );
+
+  }
+
+
+  if(
+    chartType === "trending"
+  ){
+
+    songs =
+      getTrendingSongs(
+        songs
+      );
+
+  }
+
+
+  if(
+    chartType === "latest"
+  ){
+
+    songs =
+      getLatestSongs(
+        songs
+      );
+
+  }
+
+
+  /*
+    Period is mainly useful for
+    activity-based charts.
+
+    Latest remains a true latest-upload list.
+  */
+
+  if(
+    chartType !== "latest"
+  ){
+
+    const periodSongs =
+      songs.filter(
+        isWithinPeriod
+      );
+
+    /*
+      If filtering would produce no
+      results, don't hide all available
+      songs just because the API does
+      not provide historical activity.
+    */
+
+    if(periodSongs.length > 0){
+
+      songs =
+        periodSongs;
+
+    }
+
+  }
+
+
+  renderSongs(
+    songs.slice(0,50)
+  );
+
+}
+
+
+/* =========================
+   RENDER SONG LIST
+========================= */
+
+function renderSongs(songs){
+
+  const list =
+    document.getElementById(
+      "songList"
+    );
+
+
+  if(
+    !songs ||
+    songs.length === 0
+  ){
+
+    list.innerHTML = `
+
+      <div class="empty">
+
+        <div class="loading-icon">
+          🎵
+        </div>
+
+        <div>
+          No songs available for
+          this chart yet.
+        </div>
+
+        <a
+          class="open-song"
+          href="store.html">
+
+          Open Music Store
+
+        </a>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    songs.map(
+      (song,index)=>{
+
+        const title =
+          escapeHTML(
+            getTitle(song)
+          );
+
+        const artist =
+          escapeHTML(
+            getArtist(song)
+          );
+
+        const genre =
+          escapeHTML(
+            getGenre(song)
+          );
+
+        const cover =
+          escapeHTML(
+            getCover(song)
+          );
+
+        const plays =
+          getPlays(song);
+
+        const downloads =
+          getDownloads(song);
+
+        const date =
+          formatDate(
+            getDate(song)
+          );
+
+        const id =
+          getId(song);
+
+        let link =
+          "song.html";
+
+        if(id){
+
+          link +=
+            "?id=" +
+            encodeURIComponent(id);
+
+        }
+
+
+        return `
+
+          <article
+            class="song
+            ${index === 0 &&
+              chartType !== "latest"
+              ? "number-one"
+              : ""}">
+
+            <div class="rank">
+
+              ${index + 1}
+
+            </div>
+
+
+            <img
+              class="cover"
+              src="${cover}"
+              alt="${title}"
+              loading="lazy"
+              onerror="
+                this.onerror=null;
+                this.src='assets/default-cover.png';
+              ">
+
+
+            <div class="info">
+
+              <div class="title">
+                ${title}
+              </div>
+
+              <div class="artist">
+                ${artist}
+              </div>
+
+              <span class="genre">
+                ${genre}
+              </span>
+
+              ${
+                date
+                ?
+                `
+                <div class="song-date">
+                  ${date}
+                </div>
+                `
+                :
+                ""
+              }
+
+              <a
+                class="open-song"
+                href="${link}">
+
+                Open Song
+
+              </a>
+
+            </div>
+
+
+            <div class="stats">
+
+              <div class="stats-main">
+
+                ${formatNumber(
+                  plays
+                )}
+
+                plays
+
+              </div>
+
+              <div class="stats-sub">
+
+                ${formatNumber(
+                  downloads
+                )}
+
+                downloads
+
+              </div>
+
+            </div>
+
+          </article>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* =========================
+   CHART TYPE
+========================= */
+
+function setChartType(type){
+
+  chartType =
+    type;
+
+
+  document
+    .querySelectorAll(
+      ".chart-type"
+    )
+    .forEach(button=>{
+
+      button.classList.remove(
+        "active"
+      );
+
+    });
+
+
+  if(type === "top"){
+
+    document
+      .getElementById(
+        "topSongsButton"
+      )
+      .classList.add(
+        "active"
+      );
+
+  }
+
+
+  if(type === "trending"){
+
+    document
+      .getElementById(
+        "trendingButton"
+      )
+      .classList.add(
+        "active"
+      );
+
+  }
+
+
+  if(type === "latest"){
+
+    document
+      .getElementById(
+        "latestButton"
+      )
+      .classList.add(
+        "active"
+      );
+
+  }
+
+
+  renderCurrentChart();
+
+}
+
+
+/* =========================
+   PERIOD
+========================= */
+
+function setPeriod(value,button){
+
+  period =
+    value;
+
+
+  document
+    .querySelectorAll(
+      ".period"
+    )
+    .forEach(item=>{
+
+      item.classList.remove(
+        "active"
+      );
+
+    });
+
+
+  button.classList.add(
+    "active"
+  );
+
+
+  renderCurrentChart();
+
+}
+
+
+/* =========================
+   LOAD API
+========================= */
+
+async function loadCharts(){
+
+  const list =
+    document.getElementById(
+      "songList"
+    );
+
+
+  list.innerHTML = `
+
+    <div class="loading">
+
+      <div class="loading-icon">
+        🎵
+      </div>
+
+      Loading PASONG charts...
+
+    </div>
+
+  `;
+
+
+  try{
+
+    const response =
+      await fetch(
+        API_BASE +
+        "/api/songs",
+        {
+          method:"GET",
+          headers:{
+            "Accept":
+              "application/json"
+          }
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "API error: HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if(
+      Array.isArray(data)
+    ){
+
+      allSongs =
+        data;
+
+    }
+    else if(
+      Array.isArray(
+        data.songs
+      )
+    ){
+
+      allSongs =
+        data.songs;
+
+    }
+    else if(
+      data.data &&
+      Array.isArray(
+        data.data
+      )
+    ){
+
+      allSongs =
+        data.data;
+
+    }
+    else{
+
+      allSongs = [];
+
+    }
+
+
+    renderCurrentChart();
+
+
+  }
+  catch(error){
+
+    console.error(
+      "PASONG Charts:",
+      error
+    );
+
+
+    list.innerHTML = `
+
+      <div class="error">
+
+        <div class="loading-icon">
+          ⚠️
+        </div>
+
+        <div>
+          PASONG Charts could not
+          load right now.
+        </div>
+
+        <button
+          class="refresh"
+          style="margin-top:15px"
+          onclick="loadCharts()">
+
+          Try Again
+
+        </button>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    loadCharts();
+
+  }
+);
+
+</script>
+
+
+</body>
+</html>
