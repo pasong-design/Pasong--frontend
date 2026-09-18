@@ -29,17 +29,14 @@ a{
 
 button,
 input,
-select{
+select,
+textarea{
   font:inherit;
 }
 
 button{
   cursor:pointer;
 }
-
-/* =========================
-   TOP BAR
-========================= */
 
 .topbar{
   position:sticky;
@@ -72,10 +69,6 @@ button{
   padding:9px 12px;
   display:none;
 }
-
-/* =========================
-   LAYOUT
-========================= */
 
 .layout{
   display:flex;
@@ -133,10 +126,6 @@ button{
   padding:25px;
 }
 
-/* =========================
-   MOBILE
-========================= */
-
 @media(max-width:800px){
 
   .menu-btn{
@@ -162,10 +151,6 @@ button{
   }
 }
 
-/* =========================
-   HEADERS
-========================= */
-
 .page-title{
   font-size:28px;
   font-weight:900;
@@ -184,10 +169,6 @@ button{
 .section.active{
   display:block;
 }
-
-/* =========================
-   CARDS
-========================= */
 
 .card{
   background:#0f0f18;
@@ -210,10 +191,6 @@ button{
 .muted{
   color:#89849a;
 }
-
-/* =========================
-   STATS
-========================= */
 
 .stats{
   display:grid;
@@ -246,10 +223,6 @@ button{
   }
 }
 
-/* =========================
-   FORM
-========================= */
-
 .form-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -273,7 +246,8 @@ label{
 }
 
 input,
-select{
+select,
+textarea{
   width:100%;
   background:#090910;
   color:#fff;
@@ -283,12 +257,19 @@ select{
   outline:none;
 }
 
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
 input:focus,
-select:focus{
+select:focus,
+textarea:focus{
   border-color:#8b5cf6;
 }
 
-input::placeholder{
+input::placeholder,
+textarea::placeholder{
   color:#595568;
 }
 
@@ -305,10 +286,6 @@ select{
     grid-column:auto;
   }
 }
-
-/* =========================
-   ARTIST BOX
-========================= */
 
 .artist-info{
   background:#0b0b13;
@@ -329,10 +306,6 @@ select{
   font-size:12px;
   font-weight:700;
 }
-
-/* =========================
-   COVER HELP
-========================= */
 
 .cover-help{
   display:flex;
@@ -379,10 +352,6 @@ select{
 .cover-request-btn:hover{
   opacity:.9;
 }
-
-/* =========================
-   TERMS
-========================= */
 
 .terms-box{
   margin:25px 0;
@@ -441,10 +410,6 @@ select{
   font-weight:600;
 }
 
-/* =========================
-   FILE INPUT
-========================= */
-
 .file-box{
   background:#090910;
   border:1px dashed #3a334d;
@@ -457,10 +422,6 @@ select{
   padding:0;
   background:transparent;
 }
-
-/* =========================
-   BUTTONS
-========================= */
 
 .primary-btn{
   border:0;
@@ -500,10 +461,6 @@ select{
   color:#ff9bbb;
 }
 
-/* =========================
-   MESSAGE
-========================= */
-
 .message{
   display:none;
   padding:13px 15px;
@@ -534,10 +491,6 @@ select{
   border:1px solid #39336f;
   color:#c5b9ff;
 }
-
-/* =========================
-   SONG LIST
-========================= */
 
 .song-list{
   display:flex;
@@ -593,10 +546,6 @@ select{
   }
 }
 
-/* =========================
-   PROFILE
-========================= */
-
 .profile-preview{
   display:flex;
   align-items:center;
@@ -618,19 +567,11 @@ select{
   font-weight:900;
 }
 
-/* =========================
-   EMPTY
-========================= */
-
 .empty{
   text-align:center;
   padding:35px 15px;
   color:#777286;
 }
-
-/* =========================
-   MODAL
-========================= */
 
 .modal{
   position:fixed;
@@ -640,7 +581,7 @@ select{
   align-items:center;
   justify-content:center;
   padding:20px;
-  background:rgba(0,0,0,.75);
+  background:rgba(0,0,0,.78);
 }
 
 .modal.show{
@@ -648,7 +589,9 @@ select{
 }
 
 .modal-box{
-  width:min(500px,100%);
+  width:min(650px,100%);
+  max-height:92vh;
+  overflow-y:auto;
   background:#11101a;
   border:1px solid #352b4d;
   border-radius:17px;
@@ -669,11 +612,40 @@ select{
   display:flex;
   gap:10px;
   justify-content:flex-end;
+  flex-wrap:wrap;
 }
 
-/* =========================
-   LOADING
-========================= */
+.cover-info-box{
+  margin:15px 0 20px;
+  padding:15px;
+  border-radius:12px;
+  background:#0b0b13;
+  border:1px solid #302944;
+}
+
+.cover-info-box strong{
+  color:#fff;
+}
+
+.cover-photo-preview{
+  display:none;
+  margin-top:12px;
+}
+
+.cover-photo-preview img{
+  width:150px;
+  height:150px;
+  object-fit:cover;
+  border-radius:14px;
+  border:2px solid #6d3cff;
+}
+
+.small-note{
+  display:block;
+  margin-top:7px;
+  font-size:12px;
+  color:#777286;
+}
 
 .loading{
   opacity:.65;
@@ -685,910 +657,1372 @@ select{
 <body>
 
 <header class="topbar">
-  <div class="logo">◈ <span>PASONG</span></div>
 
-  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+  <div class="logo">
+    ◈ <span>PASONG</span>
+  </div>
+
+  <button
+    class="menu-btn"
+    onclick="toggleSidebar()"
+  >
+    ☰
+  </button>
+
 </header>
+
 
 <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+<aside class="sidebar" id="sidebar">
 
-    <div class="sidebar-title">Artist Area</div>
+  <div class="sidebar-title">
+    Artist Area
+  </div>
 
-    <nav class="nav">
+  <nav class="nav">
 
-      <a href="#dashboard" data-section="dashboard">
-        📊 Dashboard
-      </a>
+    <a href="#dashboard" data-section="dashboard">
+      📊 Dashboard
+    </a>
 
-      <a href="#upload" data-section="upload">
-        ⬆️ Upload Song
-      </a>
+    <a href="#upload" data-section="upload">
+      ⬆️ Upload Song
+    </a>
 
-      <a href="#songs" data-section="songs">
-        🎵 My Songs
-      </a>
+    <a href="#songs" data-section="songs">
+      🎵 My Songs
+    </a>
 
-      <a href="#earnings" data-section="earnings">
-        💰 Earnings
-      </a>
+    <a href="#earnings" data-section="earnings">
+      💰 Earnings
+    </a>
 
-      <a href="#analytics" data-section="analytics">
-        📈 Analytics
-      </a>
+    <a href="#analytics" data-section="analytics">
+      📈 Analytics
+    </a>
 
-      <a href="#profile" data-section="profile">
-        👤 Artist Profile
-      </a>
+    <a href="#profile" data-section="profile">
+      👤 Artist Profile
+    </a>
 
-      <a href="#account" data-section="account">
-        ⚙️ My Account
-      </a>
+    <a href="#account" data-section="account">
+      ⚙️ My Account
+    </a>
 
-      <a href="https://pasong-frontend.vercel.app/">
-        🏠 PASONG Home
-      </a>
+    <a href="https://pasong-frontend.vercel.app/">
+      🏠 PASONG Home
+    </a>
 
-      <button class="logout" onclick="logout()">
-        🚪 Logout
+    <button
+      class="logout"
+      onclick="logout()"
+    >
+      🚪 Logout
+    </button>
+
+  </nav>
+
+</aside>
+
+
+<main class="main">
+
+
+<!-- =========================================================
+     DASHBOARD
+========================================================= -->
+
+<section id="dashboard" class="section">
+
+  <h1 class="page-title">
+    Artist Dashboard
+  </h1>
+
+  <p class="page-subtitle">
+    Manage your music, profile and earnings.
+  </p>
+
+  <div
+    id="dashboardMessage"
+    class="message"
+  ></div>
+
+  <div class="card">
+
+    <div>
+      ✓ Artist account connected:
+      <strong id="connectedEmail">
+        Loading...
+      </strong>
+    </div>
+
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Songs
+      </div>
+
+      <div
+        class="stat-value"
+        id="totalSongs"
+      >
+        0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Plays
+      </div>
+
+      <div
+        class="stat-value"
+        id="totalPlays"
+      >
+        0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Downloads
+      </div>
+
+      <div
+        class="stat-value"
+        id="totalDownloads"
+      >
+        0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Earnings
+      </div>
+
+      <div
+        class="stat-value"
+        id="totalEarnings"
+      >
+        UGX 0
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      Welcome to PASONG
+    </h2>
+
+    <p class="muted">
+      Upload your music, manage your artist profile and track your
+      PASONG activity from one place.
+    </p>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     UPLOAD
+========================================================= -->
+
+<section id="upload" class="section">
+
+  <h1 class="page-title">
+    Upload Song
+  </h1>
+
+  <p class="page-subtitle">
+    Upload your music to PASONG.
+  </p>
+
+
+  <!-- COVER HELP -->
+
+  <div class="cover-help">
+
+    <div class="cover-icon">
+      🎨
+    </div>
+
+    <div class="cover-help-content">
+
+      <h3>
+        Need a Cover?
+      </h3>
+
+      <p>
+        A cover is required before your song can appear in the
+        PASONG Music Store. PASONG can design your cover for
+        <strong>UGX 10,000</strong> in Uganda or
+        <strong>$10</strong> outside Uganda.
+      </p>
+
+      <button
+        type="button"
+        class="cover-request-btn"
+        onclick="requestCover()"
+      >
+        🎨 I Need a Cover
       </button>
 
-    </nav>
-  </aside>
+    </div>
 
-  <!-- MAIN -->
-  <main class="main">
+  </div>
 
-    <!-- =========================
-         DASHBOARD
-    ========================= -->
 
-    <section id="dashboard" class="section">
+  <div
+    id="uploadMessage"
+    class="message"
+  ></div>
 
-      <h1 class="page-title">Artist Dashboard</h1>
 
-      <p class="page-subtitle">
-        Manage your music, profile and earnings.
-      </p>
+  <div class="card">
 
-      <div id="dashboardMessage" class="message"></div>
+    <h2>
+      Song Information
+    </h2>
 
-      <div class="card">
-        <div>
-          ✓ Artist account connected:
-          <strong id="connectedEmail">Loading...</strong>
-        </div>
-      </div>
+    <p
+      class="muted"
+      style="margin-bottom:20px;"
+    >
+      Add the song information and upload your audio and cover.
+    </p>
 
-      <div class="stats">
 
-        <div class="stat">
-          <div class="stat-label">Total Songs</div>
-          <div class="stat-value" id="totalSongs">0</div>
-        </div>
+    <form id="uploadForm">
 
-        <div class="stat">
-          <div class="stat-label">Total Plays</div>
-          <div class="stat-value" id="totalPlays">0</div>
-        </div>
 
-        <div class="stat">
-          <div class="stat-label">Total Downloads</div>
-          <div class="stat-value" id="totalDownloads">0</div>
-        </div>
+      <div class="artist-info">
 
-        <div class="stat">
-          <div class="stat-label">Earnings</div>
-          <div class="stat-value" id="totalEarnings">UGX 0</div>
-        </div>
+        <h3>
+          Performing Artists
+        </h3>
 
-      </div>
-
-      <div class="card">
-        <h2>Welcome to PASONG</h2>
-        <p class="muted">
-          Upload your music, manage your artist profile and track your
-          PASONG activity from one place.
+        <p
+          class="muted"
+          style="margin-bottom:15px;"
+        >
+          Enter the PASONG account email for each performing artist.
+          The artist's public performing name will be used automatically.
         </p>
+
+
+        <div class="form-group">
+
+          <label for="artistEmail1">
+            First artist PASONG email
+          </label>
+
+          <input
+            type="email"
+            id="artistEmail1"
+            placeholder="artist@example.com"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="artistEmail2">
+            Second artist PASONG email (Optional)
+          </label>
+
+          <input
+            type="email"
+            id="artistEmail2"
+            placeholder="artist@example.com"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="artistEmail3">
+            Third artist PASONG email (Optional)
+          </label>
+
+          <input
+            type="email"
+            id="artistEmail3"
+            placeholder="artist@example.com"
+          >
+
+        </div>
+
+
+        <span
+          class="artist-count"
+          id="artistCount"
+        >
+          1 performing artist
+        </span>
+
       </div>
 
-    </section>
+
+      <div class="form-grid">
 
 
-    <!-- =========================
-         UPLOAD
-    ========================= -->
+        <div class="form-group full">
 
-    <section id="upload" class="section">
+          <label for="songTitle">
+            Song Title
+          </label>
 
-      <h1 class="page-title">Upload Song</h1>
+          <input
+            type="text"
+            id="songTitle"
+            placeholder="Song title"
+            required
+          >
 
-      <p class="page-subtitle">
-        Upload your music to PASONG.
-      </p>
+        </div>
 
-      <!-- COVER HELP -->
 
-      <div class="cover-help">
+        <div class="form-group">
 
-        <div class="cover-icon">🎨</div>
+          <label for="genre">
+            Genre
+          </label>
 
-        <div class="cover-help-content">
+          <select
+            id="genre"
+            required
+          >
 
-          <h3>Need a Cover?</h3>
+            <option value="">
+              Select Genre
+            </option>
+
+            <option value="Afrobeats">
+              Afrobeats
+            </option>
+
+            <option value="Amapiano">
+              Amapiano
+            </option>
+
+            <option value="Bongo">
+              Bongo
+            </option>
+
+            <option value="Gengetone">
+              Gengetone
+            </option>
+
+            <option value="Hip Hop">
+              Hip Hop
+            </option>
+
+            <option value="Dancehall">
+              Dancehall
+            </option>
+
+            <option value="R&B">
+              R&B
+            </option>
+
+            <option value="Gospel">
+              Gospel
+            </option>
+
+            <option value="Reggae">
+              Reggae
+            </option>
+
+            <option value="Zouk">
+              Zouk
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="labelName">
+            Label (Optional)
+          </label>
+
+          <input
+            type="text"
+            id="labelName"
+            placeholder="Record label"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="writerEmail">
+            Writer / Songwriter PASONG Email
+          </label>
+
+          <input
+            type="email"
+            id="writerEmail"
+            placeholder="writer@example.com"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="producerEmail">
+            Producer PASONG Email
+          </label>
+
+          <input
+            type="email"
+            id="producerEmail"
+            placeholder="producer@example.com"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="audioFile">
+            Audio File
+          </label>
+
+          <div class="file-box">
+
+            <input
+              type="file"
+              id="audioFile"
+              accept=".mp3,.wav,audio/mpeg,audio/wav"
+              required
+            >
+
+          </div>
+
+          <small class="muted">
+            MP3 or WAV • Maximum 10 MB
+          </small>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="coverFile">
+            Cover Image
+          </label>
+
+          <div class="file-box">
+
+            <input
+              type="file"
+              id="coverFile"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+              required
+            >
+
+          </div>
+
+          <small class="muted">
+            JPG, JPEG, PNG or WEBP • Maximum 5 MB
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div class="terms-box">
+
+        <label class="terms-check">
+
+          <input
+            type="checkbox"
+            id="rights"
+            required
+          >
+
+          <span>
+            I confirm that I have the legal rights and/or permission
+            to upload, distribute and sell this song on PASONG.
+          </span>
+
+        </label>
+
+
+        <div class="terms-text">
+
+          <h4>
+            📜 PASONG Upload Terms & Conditions
+          </h4>
 
           <p>
-            A cover is required before your song can appear in the
-            PASONG Music Store. PASONG can design your cover for
-            <strong>UGX 10,000</strong> in Uganda or
-            <strong>$10</strong> outside Uganda.
+            By uploading this song, I confirm that:
           </p>
 
-          <button
-            type="button"
-            class="cover-request-btn"
-            onclick="requestCover()"
-          >
-            🎨 I Need a Cover
-          </button>
+          <ul>
+
+            <li>
+              I own the song or have permission from the copyright
+              owner(s) to upload and distribute it.
+            </li>
+
+            <li>
+              I have permission to use the music, beat, lyrics,
+              vocals, samples and other copyrighted material
+              contained in the song.
+            </li>
+
+            <li>
+              The information I provide about the artist, producer,
+              writer and other contributors is accurate.
+            </li>
+
+            <li>
+              I understand that PASONG may make the song available
+              for listening, purchase and download according to
+              PASONG's platform rules.
+            </li>
+
+            <li>
+              I understand that I may be responsible for resolving
+              copyright claims or disputes relating to material
+              I upload.
+            </li>
+
+            <li>
+              I agree that PASONG may remove, suspend or restrict
+              a song if there is a credible copyright complaint,
+              rights dispute, fraudulent information or violation
+              of PASONG rules.
+            </li>
+
+            <li>
+              I understand that royalties and other earnings are
+              subject to PASONG's applicable payment and royalty
+              rules.
+            </li>
+
+          </ul>
+
+          <p class="terms-note">
+            By checking the box, you acknowledge that you have read
+            and agree to these upload conditions.
+          </p>
 
         </div>
 
       </div>
 
 
-      <!-- UPLOAD MESSAGE -->
+      <button
+        type="submit"
+        class="primary-btn"
+        id="uploadButton"
+      >
+        ⬆️ Upload Song
+      </button>
 
-      <div id="uploadMessage" class="message"></div>
+    </form>
 
+  </div>
 
-      <div class="card">
+</section>
 
-        <h2>Song Information</h2>
 
-        <p class="muted" style="margin-bottom:20px;">
-          Add the song information and upload your audio and cover.
-        </p>
 
+<!-- =========================================================
+     MY SONGS
+========================================================= -->
 
-        <form id="uploadForm">
+<section id="songs" class="section">
 
-          <!-- PERFORMING ARTISTS -->
+  <h1 class="page-title">
+    My Songs
+  </h1>
 
-          <div class="artist-info">
+  <p class="page-subtitle">
+    Manage songs connected to your PASONG account.
+  </p>
 
-            <h3>Performing Artists</h3>
+  <div
+    id="songsMessage"
+    class="message"
+  ></div>
 
-            <p class="muted" style="margin-bottom:15px;">
-              Enter the PASONG account email for each performing artist.
-              The artist's public performing name will be used automatically.
-            </p>
 
-            <div class="form-group">
-              <label for="artistEmail1">
-                First artist PASONG email
-              </label>
+  <div class="card">
 
-              <input
-                type="email"
-                id="artistEmail1"
-                placeholder="artist@example.com"
-                required
-              >
-            </div>
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        margin-bottom:15px;
+      "
+    >
 
-            <div class="form-group">
-              <label for="artistEmail2">
-                Second artist PASONG email (Optional)
-              </label>
+      <h2>
+        Your Music
+      </h2>
 
-              <input
-                type="email"
-                id="artistEmail2"
-                placeholder="artist@example.com"
-              >
-            </div>
+      <button
+        class="secondary-btn"
+        onclick="loadMySongs()"
+      >
+        🔄 Refresh
+      </button>
 
-            <div class="form-group">
-              <label for="artistEmail3">
-                Third artist PASONG email (Optional)
-              </label>
+    </div>
 
-              <input
-                type="email"
-                id="artistEmail3"
-                placeholder="artist@example.com"
-              >
-            </div>
 
-            <span class="artist-count" id="artistCount">
-              1 performing artist
-            </span>
+    <div
+      id="songList"
+      class="song-list"
+    >
 
-          </div>
-
-
-          <!-- SONG INFO -->
-
-          <div class="form-grid">
-
-            <div class="form-group full">
-
-              <label for="songTitle">
-                Song Title
-              </label>
-
-              <input
-                type="text"
-                id="songTitle"
-                placeholder="Song title"
-                required
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="genre">
-                Genre
-              </label>
-
-              <select id="genre" required>
-
-                <option value="">
-                  Select Genre
-                </option>
-
-                <option value="Afrobeats">
-                  Afrobeats
-                </option>
-
-                <option value="Amapiano">
-                  Amapiano
-                </option>
-
-                <option value="Bongo">
-                  Bongo
-                </option>
-
-                <option value="Gengetone">
-                  Gengetone
-                </option>
-
-                <option value="Hip Hop">
-                  Hip Hop
-                </option>
-
-                <option value="Dancehall">
-                  Dancehall
-                </option>
-
-                <option value="R&B">
-                  R&B
-                </option>
-
-                <option value="Gospel">
-                  Gospel
-                </option>
-
-                <option value="Reggae">
-                  Reggae
-                </option>
-
-                <option value="Zouk">
-                  Zouk
-                </option>
-
-                <option value="Other">
-                  Other
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="labelName">
-                Label (Optional)
-              </label>
-
-              <input
-                type="text"
-                id="labelName"
-                placeholder="Record label"
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="writerEmail">
-                Writer / Songwriter PASONG Email
-              </label>
-
-              <input
-                type="email"
-                id="writerEmail"
-                placeholder="writer@example.com"
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="producerEmail">
-                Producer PASONG Email
-              </label>
-
-              <input
-                type="email"
-                id="producerEmail"
-                placeholder="producer@example.com"
-              >
-
-            </div>
-
-
-            <!-- AUDIO -->
-
-            <div class="form-group">
-
-              <label for="audioFile">
-                Audio File
-              </label>
-
-              <div class="file-box">
-
-                <input
-                  type="file"
-                  id="audioFile"
-                  accept=".mp3,.wav,audio/mpeg,audio/wav"
-                  required
-                >
-
-              </div>
-
-              <small class="muted">
-                MP3 or WAV • Maximum 10 MB
-              </small>
-
-            </div>
-
-
-            <!-- COVER -->
-
-            <div class="form-group">
-
-              <label for="coverFile">
-                Cover Image
-              </label>
-
-              <div class="file-box">
-
-                <input
-                  type="file"
-                  id="coverFile"
-                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                  required
-                >
-
-              </div>
-
-              <small class="muted">
-                JPG, JPEG, PNG or WEBP • Maximum 5 MB
-              </small>
-
-            </div>
-
-          </div>
-
-
-          <!-- TERMS -->
-
-          <div class="terms-box">
-
-            <label class="terms-check">
-
-              <input
-                type="checkbox"
-                id="rights"
-                required
-              >
-
-              <span>
-                I confirm that I have the legal rights and/or permission
-                to upload, distribute and sell this song on PASONG.
-              </span>
-
-            </label>
-
-
-            <div class="terms-text">
-
-              <h4>
-                📜 PASONG Upload Terms & Conditions
-              </h4>
-
-              <p>
-                By uploading this song, I confirm that:
-              </p>
-
-              <ul>
-
-                <li>
-                  I own the song or have permission from the copyright
-                  owner(s) to upload and distribute it.
-                </li>
-
-                <li>
-                  I have permission to use the music, beat, lyrics,
-                  vocals, samples and other copyrighted material
-                  contained in the song.
-                </li>
-
-                <li>
-                  The information I provide about the artist, producer,
-                  writer and other contributors is accurate.
-                </li>
-
-                <li>
-                  I understand that PASONG may make the song available
-                  for listening, purchase and download according to
-                  PASONG's platform rules.
-                </li>
-
-                <li>
-                  I understand that I may be responsible for resolving
-                  copyright claims or disputes relating to material
-                  I upload.
-                </li>
-
-                <li>
-                  I agree that PASONG may remove, suspend or restrict
-                  a song if there is a credible copyright complaint,
-                  rights dispute, fraudulent information or violation
-                  of PASONG rules.
-                </li>
-
-                <li>
-                  I understand that royalties and other earnings are
-                  subject to PASONG's applicable payment and royalty
-                  rules.
-                </li>
-
-              </ul>
-
-              <p class="terms-note">
-                By checking the box, you acknowledge that you have read
-                and agree to these upload conditions.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- UPLOAD BUTTON -->
-
-          <button
-            type="submit"
-            class="primary-btn"
-            id="uploadButton"
-          >
-            ⬆️ Upload Song
-          </button>
-
-        </form>
-
+      <div class="empty">
+        Loading your songs...
       </div>
 
-    </section>
+    </div>
+
+  </div>
+
+</section>
 
 
-    <!-- =========================
-         MY SONGS
-    ========================= -->
 
-    <section id="songs" class="section">
+<!-- =========================================================
+     EARNINGS
+========================================================= -->
 
-      <h1 class="page-title">My Songs</h1>
+<section id="earnings" class="section">
 
-      <p class="page-subtitle">
-        Manage songs connected to your PASONG account.
-      </p>
+  <h1 class="page-title">
+    Earnings
+  </h1>
 
-      <div id="songsMessage" class="message"></div>
+  <p class="page-subtitle">
+    Track your PASONG music earnings.
+  </p>
 
-      <div class="card">
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-label">
+        Available Balance
+      </div>
+      <div class="stat-value">
+        UGX 0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Total Earned
+      </div>
+      <div class="stat-value">
+        UGX 0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Withdrawn
+      </div>
+      <div class="stat-value">
+        UGX 0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Pending
+      </div>
+      <div class="stat-value">
+        UGX 0
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      Royalty Earnings
+    </h2>
+
+    <p class="muted">
+      Your song-sale royalties will appear here when purchases
+      are processed.
+    </p>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ANALYTICS
+========================================================= -->
+
+<section id="analytics" class="section">
+
+  <h1 class="page-title">
+    Analytics
+  </h1>
+
+  <p class="page-subtitle">
+    Monitor your music performance on PASONG.
+  </p>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-label">
+        Plays
+      </div>
+
+      <div
+        class="stat-value"
+        id="analyticsPlays"
+      >
+        0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Downloads
+      </div>
+
+      <div
+        class="stat-value"
+        id="analyticsDownloads"
+      >
+        0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Songs
+      </div>
+
+      <div
+        class="stat-value"
+        id="analyticsSongs"
+      >
+        0
+      </div>
+    </div>
+
+
+    <div class="stat">
+      <div class="stat-label">
+        Earnings
+      </div>
+
+      <div class="stat-value">
+        UGX 0
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      Performance
+    </h2>
+
+    <p class="muted">
+      Detailed plays, downloads and sales analytics will appear
+      here as PASONG activity grows.
+    </p>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     PROFILE
+========================================================= -->
+
+<section id="profile" class="section">
+
+  <h1 class="page-title">
+    Artist Profile
+  </h1>
+
+  <p class="page-subtitle">
+    Manage your public artist identity and private account information.
+  </p>
+
+
+  <div
+    id="profileMessage"
+    class="message"
+  ></div>
+
+
+  <div class="card">
+
+    <div class="profile-preview">
+
+      <img
+        id="profileImagePreview"
+        src=""
+        alt="Artist profile"
+        onerror="this.style.display='none'"
+      >
+
+      <div>
 
         <div
-          style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:10px;
-            margin-bottom:15px;
-          "
+          class="profile-name"
+          id="profileStagePreview"
         >
-
-          <h2>Your Music</h2>
-
-          <button
-            class="secondary-btn"
-            onclick="loadMySongs()"
-          >
-            🔄 Refresh
-          </button>
-
+          Your Performing Name
         </div>
 
-        <div id="songList" class="song-list">
-
-          <div class="empty">
-            Loading your songs...
-          </div>
-
+        <div class="muted">
+          Public artist name
         </div>
 
       </div>
 
-    </section>
+    </div>
 
 
-    <!-- =========================
-         EARNINGS
-    ========================= -->
+    <form id="profileForm">
 
-    <section id="earnings" class="section">
+      <div class="form-grid">
 
-      <h1 class="page-title">Earnings</h1>
+        <div class="form-group">
 
-      <p class="page-subtitle">
-        Track your PASONG music earnings.
-      </p>
+          <label for="realName">
+            Legal / Real Name
+          </label>
 
-      <div class="stats">
-
-        <div class="stat">
-          <div class="stat-label">Available Balance</div>
-          <div class="stat-value">UGX 0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Total Earned</div>
-          <div class="stat-value">UGX 0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Withdrawn</div>
-          <div class="stat-value">UGX 0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Pending</div>
-          <div class="stat-value">UGX 0</div>
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <h2>Royalty Earnings</h2>
-
-        <p class="muted">
-          Your song-sale royalties will appear here when purchases
-          are processed.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================
-         ANALYTICS
-    ========================= -->
-
-    <section id="analytics" class="section">
-
-      <h1 class="page-title">Analytics</h1>
-
-      <p class="page-subtitle">
-        Monitor your music performance on PASONG.
-      </p>
-
-      <div class="stats">
-
-        <div class="stat">
-          <div class="stat-label">Plays</div>
-          <div class="stat-value" id="analyticsPlays">0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Downloads</div>
-          <div class="stat-value" id="analyticsDownloads">0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Songs</div>
-          <div class="stat-value" id="analyticsSongs">0</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Earnings</div>
-          <div class="stat-value">UGX 0</div>
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <h2>Performance</h2>
-
-        <p class="muted">
-          Detailed plays, downloads and sales analytics will appear
-          here as PASONG activity grows.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================
-         PROFILE
-    ========================= -->
-
-    <section id="profile" class="section">
-
-      <h1 class="page-title">Artist Profile</h1>
-
-      <p class="page-subtitle">
-        Manage your public artist identity and private account information.
-      </p>
-
-      <div id="profileMessage" class="message"></div>
-
-      <div class="card">
-
-        <div class="profile-preview">
-
-          <img
-            id="profileImagePreview"
-            src=""
-            alt="Artist profile"
-            onerror="this.style.display='none'"
+          <input
+            type="text"
+            id="realName"
+            placeholder="Your legal name"
           >
 
-          <div>
-
-            <div
-              class="profile-name"
-              id="profileStagePreview"
-            >
-              Your Performing Name
-            </div>
-
-            <div class="muted">
-              Public artist name
-            </div>
-
-          </div>
+          <small class="muted">
+            This remains private and may be used for royalty
+            verification.
+          </small>
 
         </div>
 
 
-        <form id="profileForm">
+        <div class="form-group">
 
-          <div class="form-grid">
+          <label for="performingName">
+            Performing / Stage Name
+          </label>
 
-            <div class="form-group">
-
-              <label for="realName">
-                Legal / Real Name
-              </label>
-
-              <input
-                type="text"
-                id="realName"
-                placeholder="Your legal name"
-              >
-
-              <small class="muted">
-                This remains private and may be used for royalty
-                verification.
-              </small>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="performingName">
-                Performing / Stage Name
-              </label>
-
-              <input
-                type="text"
-                id="performingName"
-                placeholder="Your public artist name"
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="mobileMoneyProvider">
-                Mobile Money Provider
-              </label>
-
-              <select id="mobileMoneyProvider">
-
-                <option value="">
-                  Select provider
-                </option>
-
-                <option value="MTN">
-                  MTN Mobile Money
-                </option>
-
-                <option value="Airtel">
-                  Airtel Money
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label for="mobileMoneyNumber">
-                Mobile Money Number
-              </label>
-
-              <input
-                type="text"
-                id="mobileMoneyNumber"
-                placeholder="07XXXXXXXX"
-              >
-
-            </div>
-
-
-            <div class="form-group full">
-
-              <label for="profileImage">
-                Profile Picture
-              </label>
-
-              <input
-                type="file"
-                id="profileImage"
-                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-              >
-
-            </div>
-
-          </div>
-
-
-          <button
-            type="submit"
-            class="primary-btn"
+          <input
+            type="text"
+            id="performingName"
+            placeholder="Your public artist name"
           >
-            💾 Save Artist Profile
-          </button>
 
-        </form>
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="mobileMoneyProvider">
+            Mobile Money Provider
+          </label>
+
+          <select id="mobileMoneyProvider">
+
+            <option value="">
+              Select provider
+            </option>
+
+            <option value="MTN">
+              MTN Mobile Money
+            </option>
+
+            <option value="Airtel">
+              Airtel Money
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="mobileMoneyNumber">
+            Mobile Money Number
+          </label>
+
+          <input
+            type="text"
+            id="mobileMoneyNumber"
+            placeholder="07XXXXXXXX"
+          >
+
+        </div>
+
+
+        <div class="form-group full">
+
+          <label for="profileImage">
+            Profile Picture
+          </label>
+
+          <input
+            type="file"
+            id="profileImage"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+          >
+
+        </div>
 
       </div>
 
-    </section>
+
+      <button
+        type="submit"
+        class="primary-btn"
+      >
+        💾 Save Artist Profile
+      </button>
+
+    </form>
+
+  </div>
+
+</section>
 
 
-    <!-- =========================
-         ACCOUNT
-    ========================= -->
 
-    <section id="account" class="section">
+<!-- =========================================================
+     ACCOUNT
+========================================================= -->
 
-      <h1 class="page-title">My Account</h1>
+<section id="account" class="section">
 
-      <p class="page-subtitle">
-        Your PASONG account information.
-      </p>
+  <h1 class="page-title">
+    My Account
+  </h1>
 
-      <div class="card">
+  <p class="page-subtitle">
+    Your PASONG account information.
+  </p>
 
-        <h2>Account</h2>
 
-        <p style="margin-bottom:8px;">
-          Logged in as:
-          <strong id="accountEmail">Loading...</strong>
-        </p>
+  <div class="card">
 
-        <p class="muted">
-          Your account is securely connected to PASONG authentication.
-        </p>
+    <h2>
+      Account
+    </h2>
 
-      </div>
+    <p style="margin-bottom:8px;">
+      Logged in as:
+      <strong id="accountEmail">
+        Loading...
+      </strong>
+    </p>
 
-      <div class="card">
+    <p class="muted">
+      Your account is securely connected to PASONG authentication.
+    </p>
 
-        <h2>Security</h2>
+  </div>
 
-        <p class="muted" style="margin-bottom:15px;">
-          Your private account information should never be shared
-          publicly.
-        </p>
 
-        <button
-          class="danger-btn"
-          onclick="logout()"
-        >
-          🚪 Logout
-        </button>
+  <div class="card">
 
-      </div>
+    <h2>
+      Security
+    </h2>
 
-    </section>
+    <p
+      class="muted"
+      style="margin-bottom:15px;"
+    >
+      Your private account information should never be shared
+      publicly.
+    </p>
 
-  </main>
+    <button
+      class="danger-btn"
+      onclick="logout()"
+    >
+      🚪 Logout
+    </button>
+
+  </div>
+
+</section>
+
+</main>
 
 </div>
 
 
-<!-- =========================
-     COVER MODAL
-========================= -->
 
-<div class="modal" id="coverModal">
+<!-- =========================================================
+     NEW COVER REQUEST MODAL
+========================================================= -->
 
-  <div class="modal-box">
+<div
+  class="modal"
+  id="coverModal"
+>
 
-    <h2>🎨 PASONG Cover Design</h2>
+  <div
+    class="modal-box"
+  >
+
+    <h2>
+      🎨 PASONG Cover Design
+    </h2>
 
     <p>
-      Need professional artwork for your song?
-      PASONG can help design your cover.
+      You provide all the song information and the photo.
+      PASONG Admin will only design the cover and approve the
+      finished artwork.
     </p>
 
-    <p>
-      🇺🇬 Uganda:
-      <strong>UGX 10,000</strong>
-      <br><br>
-      🌍 Outside Uganda:
-      <strong>$10</strong>
-    </p>
 
-    <p class="muted">
-      Your cover-design request can be submitted to PASONG
-      for processing.
-    </p>
+    <div class="cover-info-box">
+
+      <strong>
+        Important
+      </strong>
+
+      <p style="margin-top:8px;">
+        Fill in all available song information correctly.
+        Admin will use the information you provide and will not
+        re-enter your song details.
+      </p>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="coverSongTitle">
+        Song Title *
+      </label>
+
+      <input
+        type="text"
+        id="coverSongTitle"
+        placeholder="Enter song title"
+      >
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="coverPerformingArtists">
+        Performing Artist(s) *
+      </label>
+
+      <input
+        type="text"
+        id="coverPerformingArtists"
+        placeholder="Example: KV BEATS"
+      >
+
+      <small class="small-note">
+        Enter the public performing/stage names.
+      </small>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="coverFeaturedArtists">
+        Featured Artist(s)
+      </label>
+
+      <input
+        type="text"
+        id="coverFeaturedArtists"
+        placeholder="Example: Patel, Jlak"
+      >
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label for="coverProducer">
+          Producer
+        </label>
+
+        <input
+          type="text"
+          id="coverProducer"
+          placeholder="Producer name"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="coverWriter">
+          Writer / Songwriter
+        </label>
+
+        <input
+          type="text"
+          id="coverWriter"
+          placeholder="Writer name"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="coverGenre">
+          Genre *
+        </label>
+
+        <select id="coverGenre">
+
+          <option value="">
+            Select Genre
+          </option>
+
+          <option value="Afrobeats">
+            Afrobeats
+          </option>
+
+          <option value="Amapiano">
+            Amapiano
+          </option>
+
+          <option value="Bongo">
+            Bongo
+          </option>
+
+          <option value="Gengetone">
+            Gengetone
+          </option>
+
+          <option value="Hip Hop">
+            Hip Hop
+          </option>
+
+          <option value="Dancehall">
+            Dancehall
+          </option>
+
+          <option value="R&B">
+            R&B
+          </option>
+
+          <option value="Gospel">
+            Gospel
+          </option>
+
+          <option value="Reggae">
+            Reggae
+          </option>
+
+          <option value="Zouk">
+            Zouk
+          </option>
+
+          <option value="Other">
+            Other
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="coverLabel">
+          Label
+        </label>
+
+        <input
+          type="text"
+          id="coverLabel"
+          placeholder="Record label, if any"
+        >
+
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="coverText">
+        Extra Cover Details
+      </label>
+
+      <textarea
+        id="coverText"
+        placeholder="Tell PASONG any other text or details you want included on the cover."
+      ></textarea>
+
+    </div>
+
+
+    <!-- PHOTO -->
+
+    <div class="form-group">
+
+      <label for="coverPhoto">
+        📸 Photo to Use on the Cover *
+      </label>
+
+      <div class="file-box">
+
+        <input
+          type="file"
+          id="coverPhoto"
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+        >
+
+      </div>
+
+      <small class="small-note">
+        Upload the photo you want PASONG to use.
+        JPG, PNG or WEBP • Maximum 5 MB.
+      </small>
+
+
+      <div
+        class="cover-photo-preview"
+        id="coverPhotoPreview"
+      >
+
+        <img
+          id="coverPhotoPreviewImage"
+          src=""
+          alt="Cover photo preview"
+        >
+
+        <div
+          class="small-note"
+          id="coverPhotoName"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- FEE -->
+
+    <div class="cover-info-box">
+
+      <strong>
+        💳 Cover Design Fee
+      </strong>
+
+      <p style="margin-top:8px;">
+        🇺🇬 Uganda:
+        <strong>
+          UGX 10,000
+        </strong>
+      </p>
+
+      <p>
+        🌍 Outside Uganda:
+        <strong>
+          $10
+        </strong>
+      </p>
+
+      <p style="margin-top:10px;">
+        Your request will only become available to Admin after
+        the cover-design payment has been approved.
+      </p>
+
+    </div>
+
+
+    <div
+      id="coverRequestMessage"
+      class="message"
+    ></div>
+
 
     <div class="modal-actions">
 
       <button
+        type="button"
         class="secondary-btn"
         onclick="closeCoverModal()"
       >
-        Close
+        Cancel
       </button>
 
+
       <button
+        type="button"
         class="primary-btn"
+        id="submitCoverRequestBtn"
         onclick="submitCoverRequest()"
       >
-        🎨 Request Cover
+        🎨 Submit Cover Request
       </button>
 
     </div>
@@ -1596,6 +2030,7 @@ select{
   </div>
 
 </div>
+
 
 
 <script>
@@ -1640,6 +2075,7 @@ function toggleSidebar(){
     document.getElementById("sidebar");
 
   sidebar.classList.toggle("open");
+
 }
 
 
@@ -1656,6 +2092,7 @@ function showSection(sectionName){
     section.classList.remove("active");
   });
 
+
   const target =
     document.getElementById(sectionName);
 
@@ -1663,36 +2100,45 @@ function showSection(sectionName){
     target.classList.add("active");
   }
 
-  document.querySelectorAll(".nav a[data-section]")
-    .forEach(link => {
 
-      link.classList.toggle(
-        "active",
-        link.dataset.section === sectionName
-      );
+  document.querySelectorAll(
+    ".nav a[data-section]"
+  ).forEach(link => {
 
-    });
+    link.classList.toggle(
+      "active",
+      link.dataset.section === sectionName
+    );
+
+  });
+
 
   const sidebar =
     document.getElementById("sidebar");
 
   sidebar.classList.remove("open");
 
+
   if(history.replaceState){
+
     history.replaceState(
       null,
       "",
       "#" + sectionName
     );
+
   }
+
 
   if(sectionName === "songs"){
     loadMySongs();
   }
 
+
   if(sectionName === "profile"){
     loadProfile();
   }
+
 }
 
 
@@ -1701,9 +2147,11 @@ function handleHash(){
   let hash =
     window.location.hash.replace("#","");
 
+
   if(!hash){
     hash = "dashboard";
   }
+
 
   const allowed = [
     "dashboard",
@@ -1715,11 +2163,14 @@ function handleHash(){
     "account"
   ];
 
+
   if(!allowed.includes(hash)){
     hash = "dashboard";
   }
 
+
   showSection(hash);
+
 }
 
 
@@ -1736,7 +2187,11 @@ document.querySelectorAll(
   link.addEventListener(
     "click",
     function(){
-      showSection(this.dataset.section);
+
+      showSection(
+        this.dataset.section
+      );
+
     }
   );
 
@@ -1758,7 +2213,8 @@ function showMessage(
 
   if(!element) return;
 
-  element.textContent = text;
+  element.textContent =
+    text;
 
   element.className =
     "message show " + type;
@@ -1772,8 +2228,13 @@ function hideMessage(elementId){
     document.getElementById(elementId);
 
   if(element){
-    element.className = "message";
-    element.textContent = "";
+
+    element.className =
+      "message";
+
+    element.textContent =
+      "";
+
   }
 
 }
@@ -1793,16 +2254,10 @@ async function initialize(){
     } =
     await supabaseClient.auth.getSession();
 
+
     if(error){
+
       console.error(error);
-      window.location.href = "login.html";
-      return;
-    }
-
-    const session =
-      data.session;
-
-    if(!session || !session.user){
 
       window.location.href =
         "login.html";
@@ -1810,28 +2265,54 @@ async function initialize(){
       return;
     }
 
-    currentSession = session;
-    currentUser = session.user;
+
+    const session =
+      data.session;
+
+
+    if(
+      !session ||
+      !session.user
+    ){
+
+      window.location.href =
+        "login.html";
+
+      return;
+    }
+
+
+    currentSession =
+      session;
+
+    currentUser =
+      session.user;
 
 
     document.getElementById(
       "connectedEmail"
     ).textContent =
-      currentUser.email || "PASONG User";
+      currentUser.email ||
+      "PASONG User";
 
 
     document.getElementById(
       "accountEmail"
     ).textContent =
-      currentUser.email || "PASONG User";
+      currentUser.email ||
+      "PASONG User";
 
 
     await loadRoles();
+
     await loadProfile();
+
     await loadMySongs();
+
     await loadStats();
 
     handleHash();
+
 
   }catch(error){
 
@@ -1839,6 +2320,7 @@ async function initialize(){
       "Initialization error:",
       error
     );
+
 
     showMessage(
       "dashboardMessage",
@@ -1859,6 +2341,7 @@ async function loadRoles(){
 
   if(!currentUser) return;
 
+
   try{
 
     const {
@@ -1868,7 +2351,11 @@ async function loadRoles(){
     await supabaseClient
       .from("user_roles")
       .select("*")
-      .eq("user_id",currentUser.id);
+      .eq(
+        "user_id",
+        currentUser.id
+      );
+
 
     if(error){
 
@@ -1880,10 +2367,12 @@ async function loadRoles(){
       return;
     }
 
+
     console.log(
       "PASONG roles:",
       data
     );
+
 
   }catch(error){
 
@@ -1905,8 +2394,10 @@ async function findUserByEmail(email){
 
   if(!email) return null;
 
+
   const cleanEmail =
     email.trim().toLowerCase();
+
 
   const response =
     await fetch(
@@ -1915,6 +2406,7 @@ async function findUserByEmail(email){
       encodeURIComponent(cleanEmail),
       {
         method:"GET",
+
         headers:{
           "Authorization":
             "Bearer " +
@@ -1923,12 +2415,15 @@ async function findUserByEmail(email){
       }
     );
 
+
   if(!response.ok){
 
     let errorText =
       "User lookup failed.";
 
+
     try{
+
       const json =
         await response.json();
 
@@ -1939,10 +2434,16 @@ async function findUserByEmail(email){
 
     }catch(e){}
 
-    throw new Error(errorText);
+
+    throw new Error(
+      errorText
+    );
+
   }
 
+
   return await response.json();
+
 }
 
 
@@ -1974,10 +2475,12 @@ async function getCloudinarySignature(){
       }
     );
 
+
   if(!response.ok){
 
     let message =
       "Could not prepare upload.";
+
 
     try{
 
@@ -1991,10 +2494,16 @@ async function getCloudinarySignature(){
 
     }catch(e){}
 
-    throw new Error(message);
+
+    throw new Error(
+      message
+    );
+
   }
 
+
   return await response.json();
+
 }
 
 
@@ -2010,25 +2519,30 @@ async function uploadToCloudinary(
   const formData =
     new FormData();
 
+
   formData.append(
     "file",
     file
   );
+
 
   formData.append(
     "api_key",
     signatureData.api_key
   );
 
+
   formData.append(
     "timestamp",
     signatureData.timestamp
   );
 
+
   formData.append(
     "signature",
     signatureData.signature
   );
+
 
   formData.append(
     "folder",
@@ -2053,6 +2567,7 @@ async function uploadToCloudinary(
     let message =
       "Cloudinary upload failed.";
 
+
     try{
 
       const data =
@@ -2065,11 +2580,16 @@ async function uploadToCloudinary(
 
     }catch(e){}
 
-    throw new Error(message);
+
+    throw new Error(
+      message
+    );
+
   }
 
 
   return await response.json();
+
 }
 
 
@@ -2081,6 +2601,7 @@ function updateArtistCount(){
 
   let count = 0;
 
+
   [
     "artistEmail1",
     "artistEmail2",
@@ -2088,7 +2609,10 @@ function updateArtistCount(){
   ].forEach(id => {
 
     const value =
-      document.getElementById(id).value.trim();
+      document.getElementById(id)
+        .value
+        .trim();
+
 
     if(value){
       count++;
@@ -2096,9 +2620,6 @@ function updateArtistCount(){
 
   });
 
-  if(count < 1){
-    count = 0;
-  }
 
   document.getElementById(
     "artistCount"
@@ -2126,7 +2647,8 @@ function updateArtistCount(){
 
 
 /* ============================================================
-   UPLOAD SONG
+   NORMAL SONG UPLOAD
+   DO NOT CHANGE
 ============================================================ */
 
 document.getElementById(
@@ -2137,10 +2659,15 @@ document.getElementById(
 
     event.preventDefault();
 
-    hideMessage("uploadMessage");
+    hideMessage(
+      "uploadMessage"
+    );
 
 
-    if(!currentUser || !currentSession){
+    if(
+      !currentUser ||
+      !currentSession
+    ){
 
       showMessage(
         "uploadMessage",
@@ -2152,69 +2679,71 @@ document.getElementById(
     }
 
 
-    /* -------------------------
-       GET FORM VALUES
-    ------------------------- */
-
     const artistEmail1 =
       document.getElementById(
         "artistEmail1"
       ).value.trim();
+
 
     const artistEmail2 =
       document.getElementById(
         "artistEmail2"
       ).value.trim();
 
+
     const artistEmail3 =
       document.getElementById(
         "artistEmail3"
       ).value.trim();
+
 
     const title =
       document.getElementById(
         "songTitle"
       ).value.trim();
 
+
     const genre =
       document.getElementById(
         "genre"
       ).value;
+
 
     const label =
       document.getElementById(
         "labelName"
       ).value.trim();
 
+
     const writerEmail =
       document.getElementById(
         "writerEmail"
       ).value.trim();
+
 
     const producerEmail =
       document.getElementById(
         "producerEmail"
       ).value.trim();
 
+
     const audioFile =
       document.getElementById(
         "audioFile"
       ).files[0];
+
 
     const coverFile =
       document.getElementById(
         "coverFile"
       ).files[0];
 
+
     const rights =
       document.getElementById(
         "rights"
       );
 
-
-    /* -------------------------
-       VALIDATION
-    ------------------------- */
 
     if(!artistEmail1){
 
@@ -2320,16 +2849,15 @@ document.getElementById(
     }
 
 
-    /* -------------------------
-       BUTTON STATE
-    ------------------------- */
-
     const button =
       document.getElementById(
         "uploadButton"
       );
 
-    button.disabled = true;
+
+    button.disabled =
+      true;
+
     button.textContent =
       "⏳ Uploading...";
 
@@ -2342,10 +2870,6 @@ document.getElementById(
         "info"
       );
 
-
-      /* -------------------------
-         FIND ARTISTS
-      ------------------------- */
 
       const artistEmails = [
         artistEmail1,
@@ -2362,7 +2886,9 @@ document.getElementById(
       ){
 
         const result =
-          await findUserByEmail(email);
+          await findUserByEmail(
+            email
+          );
 
 
         let user =
@@ -2387,6 +2913,7 @@ document.getElementById(
             "PASONG account not found for " +
             email
           );
+
         }
 
 
@@ -2401,11 +2928,9 @@ document.getElementById(
         );
 
 
-      /* -------------------------
-         FIND WRITER
-      ------------------------- */
+      let writerUserId =
+        null;
 
-      let writerUserId = null;
 
       if(writerEmail){
 
@@ -2415,21 +2940,25 @@ document.getElementById(
           "info"
         );
 
+
         const result =
           await findUserByEmail(
             writerEmail
           );
+
 
         let user =
           result?.user ||
           result?.data ||
           result;
 
+
         if(
           Array.isArray(user)
         ){
           user = user[0];
         }
+
 
         if(
           !user ||
@@ -2442,17 +2971,16 @@ document.getElementById(
 
         }
 
+
         writerUserId =
           user.id;
 
       }
 
 
-      /* -------------------------
-         FIND PRODUCER
-      ------------------------- */
+      let producerUserId =
+        null;
 
-      let producerUserId = null;
 
       if(producerEmail){
 
@@ -2462,21 +2990,25 @@ document.getElementById(
           "info"
         );
 
+
         const result =
           await findUserByEmail(
             producerEmail
           );
+
 
         let user =
           result?.user ||
           result?.data ||
           result;
 
+
         if(
           Array.isArray(user)
         ){
           user = user[0];
         }
+
 
         if(
           !user ||
@@ -2489,15 +3021,12 @@ document.getElementById(
 
         }
 
+
         producerUserId =
           user.id;
 
       }
 
-
-      /* -------------------------
-         CLOUDINARY SIGNATURE
-      ------------------------- */
 
       showMessage(
         "uploadMessage",
@@ -2509,10 +3038,6 @@ document.getElementById(
       const signature =
         await getCloudinarySignature();
 
-
-      /* -------------------------
-         COVER UPLOAD
-      ------------------------- */
 
       showMessage(
         "uploadMessage",
@@ -2542,10 +3067,6 @@ document.getElementById(
       }
 
 
-      /* -------------------------
-         AUDIO UPLOAD
-      ------------------------- */
-
       showMessage(
         "uploadMessage",
         "Uploading audio file...",
@@ -2573,10 +3094,6 @@ document.getElementById(
 
       }
 
-
-      /* -------------------------
-         CREATE SONG
-      ------------------------- */
 
       showMessage(
         "uploadMessage",
@@ -2647,10 +3164,12 @@ document.getElementById(
         let errorMessage =
           "Song creation failed.";
 
+
         try{
 
           const errorData =
             await createResponse.json();
+
 
           errorMessage =
             errorData.message ||
@@ -2658,6 +3177,7 @@ document.getElementById(
             errorMessage;
 
         }catch(e){}
+
 
         throw new Error(
           errorMessage
@@ -2676,10 +3196,6 @@ document.getElementById(
       );
 
 
-      /* -------------------------
-         SUCCESS
-      ------------------------- */
-
       showMessage(
         "uploadMessage",
         "✓ Song uploaded successfully with " +
@@ -2691,22 +3207,16 @@ document.getElementById(
       );
 
 
-      /* -------------------------
-         CLEAR FORM
-      ------------------------- */
-
       document.getElementById(
         "uploadForm"
       ).reset();
 
+
       updateArtistCount();
 
 
-      /* -------------------------
-         REFRESH DATA
-      ------------------------- */
-
       await loadMySongs();
+
       await loadStats();
 
 
@@ -2731,7 +3241,8 @@ document.getElementById(
 
     }finally{
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
       button.textContent =
         "⬆️ Upload Song";
@@ -2743,6 +3254,505 @@ document.getElementById(
 
 
 /* ============================================================
+   COVER PHOTO PREVIEW
+============================================================ */
+
+document.getElementById(
+  "coverPhoto"
+).addEventListener(
+  "change",
+  function(){
+
+    const file =
+      this.files[0];
+
+
+    const preview =
+      document.getElementById(
+        "coverPhotoPreview"
+      );
+
+
+    const image =
+      document.getElementById(
+        "coverPhotoPreviewImage"
+      );
+
+
+    const name =
+      document.getElementById(
+        "coverPhotoName"
+      );
+
+
+    preview.style.display =
+      "none";
+
+
+    image.src =
+      "";
+
+
+    name.textContent =
+      "";
+
+
+    if(!file){
+      return;
+    }
+
+
+    if(
+      ![
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ].includes(file.type)
+    ){
+
+      alert(
+        "Please select a JPG, PNG or WEBP image."
+      );
+
+      this.value =
+        "";
+
+      return;
+    }
+
+
+    if(
+      file.size >
+      5 * 1024 * 1024
+    ){
+
+      alert(
+        "Photo must be 5 MB or smaller."
+      );
+
+      this.value =
+        "";
+
+      return;
+    }
+
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload =
+      function(event){
+
+        image.src =
+          event.target.result;
+
+        name.textContent =
+          file.name;
+
+        preview.style.display =
+          "block";
+
+      };
+
+
+    reader.readAsDataURL(file);
+
+  }
+);
+
+
+/* ============================================================
+   COVER REQUEST
+============================================================ */
+
+function requestCover(){
+
+  if(!currentUser){
+
+    alert(
+      "Please log in first."
+    );
+
+    window.location.href =
+      "login.html";
+
+    return;
+  }
+
+
+  document.getElementById(
+    "coverRequestMessage"
+  ).className =
+    "message";
+
+
+  document.getElementById(
+    "coverRequestMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "coverModal"
+  ).classList.add(
+    "show"
+  );
+
+}
+
+
+function closeCoverModal(){
+
+  document.getElementById(
+    "coverModal"
+  ).classList.remove(
+    "show"
+  );
+
+}
+
+
+/* ============================================================
+   SUBMIT COVER REQUEST
+============================================================ */
+
+async function submitCoverRequest(){
+
+  if(
+    !currentUser ||
+    !currentSession
+  ){
+
+    alert(
+      "Your PASONG session has expired. Please log in again."
+    );
+
+    window.location.href =
+      "login.html";
+
+    return;
+  }
+
+
+  const title =
+    document.getElementById(
+      "coverSongTitle"
+    ).value.trim();
+
+
+  const performingArtists =
+    document.getElementById(
+      "coverPerformingArtists"
+    ).value.trim();
+
+
+  const featuredArtists =
+    document.getElementById(
+      "coverFeaturedArtists"
+    ).value.trim();
+
+
+  const producer =
+    document.getElementById(
+      "coverProducer"
+    ).value.trim();
+
+
+  const writer =
+    document.getElementById(
+      "coverWriter"
+    ).value.trim();
+
+
+  const genre =
+    document.getElementById(
+      "coverGenre"
+    ).value;
+
+
+  const label =
+    document.getElementById(
+      "coverLabel"
+    ).value.trim();
+
+
+  const coverText =
+    document.getElementById(
+      "coverText"
+    ).value.trim();
+
+
+  const photo =
+    document.getElementById(
+      "coverPhoto"
+    ).files[0];
+
+
+  const message =
+    document.getElementById(
+      "coverRequestMessage"
+    );
+
+
+  const button =
+    document.getElementById(
+      "submitCoverRequestBtn"
+    );
+
+
+  /* -------------------------
+     REQUIRED DETAILS
+  ------------------------- */
+
+  if(!title){
+
+    showMessage(
+      "coverRequestMessage",
+      "Please enter the song title.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!performingArtists){
+
+    showMessage(
+      "coverRequestMessage",
+      "Please enter the performing artist name(s).",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!genre){
+
+    showMessage(
+      "coverRequestMessage",
+      "Please select the genre.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!photo){
+
+    showMessage(
+      "coverRequestMessage",
+      "Please upload the photo you want PASONG to use on the cover.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(
+    photo.size >
+    5 * 1024 * 1024
+  ){
+
+    showMessage(
+      "coverRequestMessage",
+      "Photo must be 5 MB or smaller.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  try{
+
+    button.disabled =
+      true;
+
+
+    button.textContent =
+      "⏳ Uploading photo...";
+
+
+    /*
+      Use the same secure Cloudinary
+      system already used by the normal
+      dashboard upload.
+    */
+
+    const signature =
+      await getCloudinarySignature();
+
+
+    const photoResult =
+      await uploadToCloudinary(
+        photo,
+        signature
+      );
+
+
+    const photoUrl =
+      photoResult.secure_url ||
+      photoResult.url;
+
+
+    if(!photoUrl){
+
+      throw new Error(
+        "Photo upload did not return a URL."
+      );
+
+    }
+
+
+    button.textContent =
+      "⏳ Saving request...";
+
+
+    /*
+      IMPORTANT:
+      This request starts as awaiting_payment.
+
+      It is NOT approved.
+      It is NOT sent to Admin as a
+      payment-approved request.
+    */
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_design_requests")
+      .insert({
+
+        artist_id:
+          currentUser.id,
+
+        artist_email:
+          currentUser.email || null,
+
+        song_title:
+          title,
+
+        performing_artists:
+          performingArtists,
+
+        featured_artists:
+          featuredArtists || null,
+
+        producer:
+          producer || null,
+
+        writer:
+          writer || null,
+
+        genre:
+          genre,
+
+        label:
+          label || null,
+
+        cover_text:
+          coverText || null,
+
+        photo_url:
+          photoUrl,
+
+        country:
+          "Uganda",
+
+        fee_amount:
+          10000,
+
+        fee_currency:
+          "UGX",
+
+        payment_status:
+          "pending",
+
+        request_status:
+          "awaiting_payment"
+
+      })
+      .select()
+      .single();
+
+
+    if(error){
+
+      console.error(
+        "Cover request error:",
+        error
+      );
+
+      throw new Error(
+        error.message
+      );
+
+    }
+
+
+    /*
+      Save the request ID for the
+      payment step that we will connect next.
+    */
+
+    window.currentCoverRequestId =
+      data.id;
+
+
+    showMessage(
+      "coverRequestMessage",
+      "✓ Cover request saved. Your request is now waiting for the UGX 10,000 cover-design payment to be approved.",
+      "success"
+    );
+
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "💳 Continue to Payment";
+
+
+  }catch(error){
+
+    console.error(
+      "Cover request error:",
+      error
+    );
+
+
+    showMessage(
+      "coverRequestMessage",
+      "❌ " +
+      (
+        error.message ||
+        "Could not submit cover request."
+      ),
+      "error"
+    );
+
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "🎨 Submit Cover Request";
+
+  }
+
+}
+
+
+/* ============================================================
    LOAD MY SONGS
 ============================================================ */
 
@@ -2750,10 +3760,12 @@ async function loadMySongs(){
 
   if(!currentUser) return;
 
+
   const list =
     document.getElementById(
       "songList"
     );
+
 
   try{
 
@@ -2795,7 +3807,10 @@ async function loadMySongs(){
     }
 
 
-    if(!data || data.length === 0){
+    if(
+      !data ||
+      data.length === 0
+    ){
 
       list.innerHTML =
         `<div class="empty">
@@ -2806,41 +3821,57 @@ async function loadMySongs(){
     }
 
 
-    list.innerHTML = "";
+    list.innerHTML =
+      "";
 
 
     data.forEach(song => {
 
       const row =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       row.className =
         "song-row";
 
 
       const left =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
 
       const name =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       name.className =
         "song-name";
 
+
       name.textContent =
-        song.title || "Untitled";
+        song.title ||
+        "Untitled";
 
 
       const meta =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       meta.className =
         "song-meta";
 
+
       const price =
         song.price ||
         PASONG_PRICE;
+
 
       const currency =
         song.currency ||
@@ -2859,21 +3890,29 @@ async function loadMySongs(){
 
 
       left.appendChild(name);
+
       left.appendChild(meta);
 
 
       const actions =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       actions.className =
         "song-actions";
 
 
       const status =
-        document.createElement("span");
+        document.createElement(
+          "span"
+        );
+
 
       status.className =
         "status";
+
 
       status.textContent =
         song.status ||
@@ -2881,13 +3920,18 @@ async function loadMySongs(){
 
 
       const editButton =
-        document.createElement("button");
+        document.createElement(
+          "button"
+        );
+
 
       editButton.className =
         "secondary-btn";
 
+
       editButton.textContent =
         "✏️ Edit Title";
+
 
       editButton.onclick =
         () => editSongTitle(
@@ -2896,15 +3940,29 @@ async function loadMySongs(){
         );
 
 
-      actions.appendChild(status);
-      actions.appendChild(editButton);
+      actions.appendChild(
+        status
+      );
 
 
-      row.appendChild(left);
-      row.appendChild(actions);
+      actions.appendChild(
+        editButton
+      );
 
 
-      list.appendChild(row);
+      row.appendChild(
+        left
+      );
+
+
+      row.appendChild(
+        actions
+      );
+
+
+      list.appendChild(
+        row
+      );
 
     });
 
@@ -3006,10 +4064,12 @@ async function editSongTitle(
       let message =
         "Could not update title.";
 
+
       try{
 
         const data =
           await response.json();
+
 
         message =
           data.message ||
@@ -3017,6 +4077,7 @@ async function editSongTitle(
           message;
 
       }catch(e){}
+
 
       throw new Error(
         message
@@ -3036,6 +4097,7 @@ async function editSongTitle(
   }catch(error){
 
     console.error(error);
+
 
     alert(
       "❌ " +
@@ -3057,6 +4119,7 @@ async function editSongTitle(
 async function loadStats(){
 
   if(!currentUser) return;
+
 
   try{
 
@@ -3108,10 +4171,6 @@ async function loadStats(){
       count;
 
 
-    /* Current counters remain zero
-       until connected play/download
-       analytics are implemented. */
-
     document.getElementById(
       "totalPlays"
     ).textContent =
@@ -3161,6 +4220,7 @@ async function loadProfile(){
 
   if(!currentUser) return;
 
+
   try{
 
     const {
@@ -3189,7 +4249,6 @@ async function loadProfile(){
 
 
     if(!data){
-
       return;
     }
 
@@ -3197,7 +4256,8 @@ async function loadProfile(){
     document.getElementById(
       "realName"
     ).value =
-      data.real_name || "";
+      data.real_name ||
+      "";
 
 
     document.getElementById(
@@ -3231,8 +4291,10 @@ async function loadProfile(){
           "profileImagePreview"
         );
 
+
       image.src =
         data.profile_image_url;
+
 
       image.style.display =
         "block";
@@ -3273,6 +4335,7 @@ document.getElementById(
 
     event.preventDefault();
 
+
     hideMessage(
       "profileMessage"
     );
@@ -3297,20 +4360,24 @@ document.getElementById(
           "realName"
         ).value.trim();
 
+
       const performingName =
         document.getElementById(
           "performingName"
         ).value.trim();
+
 
       const provider =
         document.getElementById(
           "mobileMoneyProvider"
         ).value;
 
+
       const mobileNumber =
         document.getElementById(
           "mobileMoneyNumber"
         ).value.trim();
+
 
       const imageFile =
         document.getElementById(
@@ -3321,10 +4388,6 @@ document.getElementById(
       let profileImageUrl =
         null;
 
-
-      /* -------------------------
-         PROFILE IMAGE
-      ------------------------- */
 
       if(imageFile){
 
@@ -3364,10 +4427,6 @@ document.getElementById(
 
       }
 
-
-      /* -------------------------
-         SAVE
-      ------------------------- */
 
       const profileData = {
 
@@ -3436,8 +4495,10 @@ document.getElementById(
             "profileImagePreview"
           );
 
+
         image.src =
           profileImageUrl;
+
 
         image.style.display =
           "block";
@@ -3477,51 +4538,6 @@ document.getElementById(
 
 
 /* ============================================================
-   COVER REQUEST
-============================================================ */
-
-function requestCover(){
-
-  document.getElementById(
-    "coverModal"
-  ).classList.add("show");
-
-}
-
-
-function closeCoverModal(){
-
-  document.getElementById(
-    "coverModal"
-  ).classList.remove("show");
-
-}
-
-
-async function submitCoverRequest(){
-
-  /*
-    For now this opens the PASONG cover
-    request information.
-
-    The actual cover-request database
-    workflow can be connected to the
-    Admin Dashboard separately.
-  */
-
-  closeCoverModal();
-
-
-  showMessage(
-    "uploadMessage",
-    "🎨 Cover request selected. PASONG cover design: UGX 10,000 in Uganda or $10 outside Uganda.",
-    "info"
-  );
-
-}
-
-
-/* ============================================================
    LOGOUT
 ============================================================ */
 
@@ -3539,6 +4555,7 @@ async function logout(){
     );
 
   }
+
 
   window.location.href =
     "login.html";
