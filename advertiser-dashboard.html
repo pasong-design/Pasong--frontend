@@ -1,1 +1,617 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — advertiser-dashboard</title><link rel="stylesheet" href="assets/style.css"></head><body><header><a class="logo" href="index.html">◈ PASONG</a><nav><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="account.html">Account</a></nav></header><main><h1>advertiser-dashboard</h1><div class="card"><h2>PASONG advertiser-dashboard</h2><p>This page is part of the updated PASONG structure. Connect it to the PASONG API/Supabase backend for live data.</p><a class="btn" href="store.html">Open Music Store</a></div></main><footer>PASONG © 2026</footer></body></html>
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — Advertiser Dashboard</title><link rel="stylesheet" href="assets/style.css"><style>
+body{
+  background:#080810;
+  color:#fff;
+}
+
+.dashboard{
+  max-width:1100px;
+  margin:0 auto;
+  padding:30px 18px 60px;
+}
+
+.top{
+  margin-bottom:25px;
+}
+
+.top h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.top p{
+  color:#9696aa;
+}
+
+.user-box{
+  margin-top:18px;
+  padding:14px 16px;
+  background:#11111b;
+  border:1px solid #272738;
+  border-radius:12px;
+  color:#aaaabd;
+}
+
+.user-box strong{
+  color:#fff;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.stat{
+  background:#11111b;
+  border:1px solid #272738;
+  border-radius:14px;
+  padding:20px;
+}
+
+.stat small{
+  color:#858597;
+}
+
+.stat h2{
+  margin-top:8px;
+  font-size:25px;
+}
+
+.section{
+  background:#11111b;
+  border:1px solid #272738;
+  border-radius:15px;
+  padding:20px;
+  margin-bottom:22px;
+}
+
+.section h2{
+  margin-bottom:15px;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  text-align:left;
+  padding:13px 10px;
+  border-bottom:1px solid #252536;
+  white-space:nowrap;
+}
+
+th{
+  color:#9d9dae;
+  font-size:13px;
+}
+
+td{
+  color:#eee;
+  font-size:14px;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:7px;
+  background:#211b2c;
+  color:#c58cff;
+  font-size:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  display:inline-block;
+  border:0;
+  cursor:pointer;
+  text-decoration:none;
+  color:#fff;
+  background:linear-gradient(90deg,#8d45d2,#d94b9d);
+  padding:10px 16px;
+  border-radius:9px;
+  font-weight:600;
+}
+
+.btn.secondary{
+  background:#1b1b27;
+  border:1px solid #303041;
+}
+
+.message{
+  color:#9999aa;
+  text-align:center;
+  padding:25px 10px;
+}
+
+.error{
+  color:#ff8eae;
+}
+
+@media(max-width:800px){
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:500px){
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .top h1{
+    font-size:27px;
+  }
+}
+</style></head><body><header>
+  <a class="logo" href="index.html">◈ PASONG</a>  <nav>
+    <a href="index.html">Home</a>
+    <a href="store.html">Music Store</a>
+    <a href="charts.html">Charts</a>
+    <a href="artists.html">Artists</a>
+    <a href="playlists.html">Playlists</a>
+    <a href="promotion.html">Promotion</a>
+    <a href="account.html">Account</a>
+  </nav>
+</header><main class="dashboard">  <div class="top"><h1>Advertiser Dashboard</h1>
+
+<p>
+  Manage your PASONG advertising campaigns and view their performance.
+</p>
+
+<div class="user-box">
+  Logged in as:
+  <strong id="userEmail">Checking account...</strong>
+</div>
+
+  </div>  <!-- STATISTICS -->  <div class="stats"><div class="stat">
+  <small>Total Promotions</small>
+  <h2 id="totalPromotions">0</h2>
+</div>
+
+<div class="stat">
+  <small>Active Promotions</small>
+  <h2 id="activePromotions">0</h2>
+</div>
+
+<div class="stat">
+  <small>Total Impressions</small>
+  <h2 id="totalImpressions">0</h2>
+</div>
+
+<div class="stat">
+  <small>Total Clicks</small>
+  <h2 id="totalClicks">0</h2>
+</div>
+
+  </div>  <!-- ACTIONS -->  <section class="section"><h2>Advertising</h2>
+
+<div class="actions">
+
+  <a class="btn" href="promotion.html">
+    + Create Promotion
+  </a>
+
+  <button class="btn secondary" onclick="loadDashboard()">
+    Refresh
+  </button>
+
+</div>
+
+  </section>  <!-- PROMOTIONS -->  <section class="section"><h2>My Promotions</h2>
+
+<div id="message" class="message">
+  Loading promotions...
+</div>
+
+<div class="table-wrap">
+
+  <table id="promotionTable" style="display:none">
+
+    <thead>
+
+      <tr>
+        <th>Promotion</th>
+        <th>Status</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Impressions</th>
+        <th>Clicks</th>
+      </tr>
+
+    </thead>
+
+    <tbody id="promotionRows"></tbody>
+
+  </table>
+
+</div>
+
+  </section>  <!-- HELP -->  <section class="section"><h2>Advertiser Information</h2>
+
+<p style="color:#9999aa;line-height:1.7">
+
+  PASONG advertising allows businesses, artists and brands to promote
+  their content to PASONG listeners.
+
+  <br><br>
+
+  Promotions can be monitored through this dashboard once they are
+  connected to the PASONG advertising system.
+
+</p>
+
+  </section></main><footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer><script>
+
+/*
+====================================================
+PASONG ADVERTISER DASHBOARD
+====================================================
+*/
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE";
+
+
+/*
+====================================================
+SUPABASE REQUEST
+====================================================
+*/
+
+async function supabaseRequest(path){
+
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/" + path,
+    {
+      headers:{
+        "apikey":SUPABASE_ANON_KEY,
+        "Authorization":"Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type":"application/json"
+      }
+    }
+  );
+
+  if(!response.ok){
+
+    const errorText = await response.text();
+
+    throw new Error(errorText || "Supabase request failed");
+  }
+
+  return response.json();
+}
+
+
+/*
+====================================================
+GET LOGGED-IN USER
+====================================================
+*/
+
+function getStoredUser(){
+
+  try{
+
+    const keys = Object.keys(localStorage);
+
+    for(const key of keys){
+
+      const value = localStorage.getItem(key);
+
+      if(!value) continue;
+
+      try{
+
+        const parsed = JSON.parse(value);
+
+        if(parsed &&
+           parsed.user &&
+           parsed.user.email){
+
+          return parsed.user;
+        }
+
+        if(parsed &&
+           parsed.email){
+
+          return parsed;
+        }
+
+      }catch(e){}
+
+    }
+
+  }catch(e){}
+
+  return null;
+}
+
+
+/*
+====================================================
+LOAD DASHBOARD
+====================================================
+*/
+
+async function loadDashboard(){
+
+  const message =
+    document.getElementById("message");
+
+  const rows =
+    document.getElementById("promotionRows");
+
+  try{
+
+    message.textContent =
+      "Loading promotions...";
+
+    const user =
+      getStoredUser();
+
+    if(user && user.email){
+
+      document.getElementById("userEmail")
+        .textContent = user.email;
+
+    }else{
+
+      document.getElementById("userEmail")
+        .textContent = "Not detected";
+
+    }
+
+
+    /*
+      Get promotions.
+
+      RLS determines which rows the current
+      authenticated user is allowed to see.
+    */
+
+    const promotions =
+      await supabaseRequest(
+        "promotions?select=*&order=created_at.desc"
+      );
+
+
+    document.getElementById("totalPromotions")
+      .textContent = promotions.length;
+
+
+    let active = 0;
+
+    let impressions = 0;
+
+    let clicks = 0;
+
+
+    rows.innerHTML = "";
+
+
+    if(!promotions.length){
+
+      message.innerHTML =
+        "You do not have any promotions yet.";
+
+      document.getElementById("promotionTable")
+        .style.display = "none";
+
+      updateStats(0,0,0);
+
+      return;
+
+    }
+
+
+    promotions.forEach(promotion => {
+
+      const status =
+        String(promotion.status || "pending")
+          .toLowerCase();
+
+
+      if(
+        status === "active" ||
+        status === "approved" ||
+        status === "running"
+      ){
+
+        active++;
+
+      }
+
+
+      const promotionImpressions =
+        Number(
+          promotion.impressions ||
+          promotion.total_impressions ||
+          0
+        );
+
+
+      const promotionClicks =
+        Number(
+          promotion.clicks ||
+          promotion.total_clicks ||
+          0
+        );
+
+
+      impressions += promotionImpressions;
+
+      clicks += promotionClicks;
+
+
+      const tr =
+        document.createElement("tr");
+
+
+      tr.innerHTML = `
+
+        <td>
+          ${escapeHtml(
+            promotion.title ||
+            promotion.name ||
+            "Untitled Promotion"
+          )}
+        </td>
+
+        <td>
+          <span class="status">
+            ${escapeHtml(status)}
+          </span>
+        </td>
+
+        <td>
+          ${formatDate(promotion.start_date)}
+        </td>
+
+        <td>
+          ${formatDate(promotion.end_date)}
+        </td>
+
+        <td>
+          ${promotionImpressions}
+        </td>
+
+        <td>
+          ${promotionClicks}
+        </td>
+
+      `;
+
+
+      rows.appendChild(tr);
+
+    });
+
+
+    document.getElementById("promotionTable")
+      .style.display = "table";
+
+    message.style.display = "none";
+
+
+    updateStats(
+      active,
+      impressions,
+      clicks
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    message.innerHTML = `
+      <div class="error">
+        Could not load advertiser data.
+        <br><br>
+        ${escapeHtml(error.message)}
+      </div>
+    `;
+
+  }
+
+}
+
+
+/*
+====================================================
+UPDATE STATISTICS
+====================================================
+*/
+
+function updateStats(
+  active,
+  impressions,
+  clicks
+){
+
+  document.getElementById("activePromotions")
+    .textContent = active;
+
+  document.getElementById("totalImpressions")
+    .textContent = impressions;
+
+  document.getElementById("totalClicks")
+    .textContent = clicks;
+
+}
+
+
+/*
+====================================================
+DATE
+====================================================
+*/
+
+function formatDate(value){
+
+  if(!value) return "—";
+
+  try{
+
+    return new Date(value)
+      .toLocaleDateString();
+
+  }catch(e){
+
+    return "—";
+
+  }
+
+}
+
+
+/*
+====================================================
+SECURITY
+====================================================
+*/
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/*
+====================================================
+START
+====================================================
+*/
+
+loadDashboard();
+
+</script></body>
+</html>
