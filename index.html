@@ -507,17 +507,115 @@ header{
   font-weight:700;
 }
 
+/* =========================
+   MUSIC LOADING AREA
+========================= */
+
 .music-row{
   min-height:150px;
-  padding:30px;
+  padding:20px;
   border-radius:18px;
   background:#10101a;
   border:1px solid rgba(255,255,255,.06);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  color:#666678;
+  font-size:13px;
+}
+
+.music-empty{
+  min-height:110px;
+  grid-column:1/-1;
   display:flex;
   align-items:center;
   justify-content:center;
+  text-align:center;
   color:#666678;
-  font-size:13px;
+}
+
+.song-card{
+  min-width:0;
+  overflow:hidden;
+  border-radius:16px;
+  background:#151521;
+  border:1px solid rgba(255,255,255,.07);
+  transition:.2s ease;
+}
+
+.song-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(168,85,247,.35);
+}
+
+.song-cover{
+  width:100%;
+  aspect-ratio:1/1;
+  display:block;
+  object-fit:cover;
+  background:#1a1a28;
+}
+
+.song-cover-placeholder{
+  width:100%;
+  aspect-ratio:1/1;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at 30% 20%,rgba(168,85,247,.25),transparent 40%),
+    radial-gradient(circle at 80% 80%,rgba(236,72,153,.18),transparent 40%),
+    #171722;
+  font-size:42px;
+}
+
+.song-info{
+  padding:13px;
+}
+
+.song-title{
+  display:block;
+  color:#fff;
+  font-size:14px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-artist{
+  margin-top:4px;
+  color:#9292a4;
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:11px;
+}
+
+.song-price{
+  color:#c084fc;
+  font-size:12px;
+  font-weight:900;
+}
+
+.song-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:31px;
+  padding:0 10px;
+  border-radius:9px;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
 }
 
 .uganda-label{
@@ -731,6 +829,10 @@ footer{
   .choice-grid{
     grid-template-columns:repeat(2,1fr);
   }
+
+  .music-row{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
 }
 
 @media(max-width:800px){
@@ -852,6 +954,34 @@ footer{
     font-size:18px;
   }
 
+  .music-row{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    padding:12px;
+    gap:10px;
+  }
+
+  .song-info{
+    padding:10px;
+  }
+
+  .song-title{
+    font-size:12px;
+  }
+
+  .song-artist{
+    font-size:10px;
+  }
+
+  .song-price{
+    font-size:10px;
+  }
+
+  .song-button{
+    min-height:28px;
+    padding:0 8px;
+    font-size:9px;
+  }
+
   .mobile-bottom-nav{
     position:fixed;
     left:0;
@@ -925,7 +1055,6 @@ footer{
       <a href="promotion.html">Promotion</a>
       <a href="artist-dashboard.html">Upload Music</a>
 
-      <!-- BELL -->
       <a href="notifications.html"
          class="notification-link"
          aria-label="Notifications">
@@ -933,7 +1062,6 @@ footer{
         <span class="notification-count" id="notificationCount">0</span>
       </a>
 
-      <!-- ACCOUNT WITH OWNER PHOTO -->
       <a href="account.html" class="account-link">
         <img
           id="accountPhoto"
@@ -944,7 +1072,6 @@ footer{
         <span class="account-name" id="accountName">Account</span>
       </a>
 
-      <!-- LOGIN / SIGN UP AFTER ACCOUNT -->
       <a href="login.html" class="login-button" id="loginButton">
         Login / Sign Up
       </a>
@@ -1154,8 +1281,8 @@ footer{
     <a href="charts.html">View all →</a>
   </div>
 
-  <div class="music-row">
-    Trending songs will appear here.
+  <div class="music-row" id="trendingMusic">
+    <div class="music-empty">Loading trending music...</div>
   </div>
 
 </section>
@@ -1172,8 +1299,8 @@ footer{
     <a href="store.html">View all →</a>
   </div>
 
-  <div class="music-row">
-    Latest uploaded songs will appear here.
+  <div class="music-row" id="latestMusic">
+    <div class="music-empty">Loading latest uploads...</div>
   </div>
 
 </section>
@@ -1190,8 +1317,8 @@ footer{
     <a href="charts.html">Charts →</a>
   </div>
 
-  <div class="music-row">
-    Most downloaded music will appear here.
+  <div class="music-row" id="topDownloads">
+    <div class="music-empty">Loading top downloads...</div>
   </div>
 
 </section>
@@ -1212,8 +1339,8 @@ footer{
 
   </div>
 
-  <div class="music-row">
-    Top Ugandan songs will appear here.
+  <div class="music-row" id="ugandanMusic">
+    <div class="music-empty">Loading Ugandan music...</div>
   </div>
 
 </section>
@@ -1282,8 +1409,8 @@ footer{
 
     <h2>⏳ Weekly Countdown</h2>
 
-    <p>
-      Top music this week
+    <p id="countdownMusic">
+      Loading this week's music...
     </p>
 
   </div>
@@ -1307,8 +1434,8 @@ footer{
 
   </div>
 
-  <div class="music-row">
-    Popular PASONG artists will appear here.
+  <div class="music-row" id="popularArtists">
+    <div class="music-empty">Loading popular artists...</div>
   </div>
 
 </section>
@@ -1324,8 +1451,8 @@ footer{
     <h2>🎧 Continue Listening</h2>
   </div>
 
-  <div class="music-row">
-    Your recently played music will appear here.
+  <div class="music-row" id="continueListening">
+    <div class="music-empty">Your recently played music will appear here.</div>
   </div>
 
 </section>
@@ -1401,7 +1528,7 @@ footer{
 
     <p>
       PASONG supports convenient payment options.
-      Standard song price: <strong>UGX 500</strong>.
+      Standard song price: <strong>UGX 700</strong>.
     </p>
 
     <div class="payment-badges">
@@ -1600,18 +1727,11 @@ footer{
 
 /* =========================================================
    PASONG SUPABASE CONNECTION
-   Uses public anon/publishable key only.
    ========================================================= */
 
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
 
-/*
- IMPORTANT:
- Replace ONLY this value with your existing
- Supabase publishable/anon key if it is not already
- supplied by your project.
-*/
 const SUPABASE_ANON_KEY =
   "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
@@ -1631,6 +1751,15 @@ if(
 
 
 /* =========================================================
+   PASONG API
+   RESTORED WORKING SONG CONNECTION
+   ========================================================= */
+
+const PASONG_API =
+  "https://pasong-api.onrender.com";
+
+
+/* =========================================================
    ACCOUNT OWNER PHOTO
    ========================================================= */
 
@@ -1647,10 +1776,6 @@ async function loadPasongAccount(){
 
   if(!photo || !name) return;
 
-  /*
-   If Supabase is not configured on this page,
-   safely keep the default avatar.
-  */
   if(!pasongSupabase){
     return;
   }
@@ -1676,12 +1801,6 @@ async function loadPasongAccount(){
       return;
     }
 
-
-    /*
-     Try common profile-photo metadata names.
-     This allows the account photo to work with
-     existing Supabase auth metadata.
-    */
 
     const metadata =
       user.user_metadata || {};
@@ -1754,8 +1873,616 @@ async function loadPasongAccount(){
 
 
 /* =========================================================
+   SONG DATA HELPERS
+   ========================================================= */
+
+function extractSongs(data){
+
+  if(
+    data &&
+    Array.isArray(data.songs)
+  ){
+    return data.songs;
+  }
+
+  if(
+    Array.isArray(data)
+  ){
+    return data;
+  }
+
+  return [];
+}
+
+
+function getSongTitle(song){
+
+  return (
+    song.title ||
+    song.name ||
+    "Untitled Song"
+  );
+
+}
+
+
+function getArtistName(song){
+
+  if(song.artist_name){
+    return song.artist_name;
+  }
+
+  if(song.artistName){
+    return song.artistName;
+  }
+
+  if(song.stage_name){
+    return song.stage_name;
+  }
+
+  if(song.performing_name){
+    return song.performing_name;
+  }
+
+  if(
+    song.artist &&
+    typeof song.artist === "object"
+  ){
+
+    return (
+      song.artist.stage_name ||
+      song.artist.performing_name ||
+      song.artist.name ||
+      "PASONG Artist"
+    );
+
+  }
+
+  if(
+    song.artist_profiles &&
+    typeof song.artist_profiles === "object"
+  ){
+
+    return (
+      song.artist_profiles.stage_name ||
+      song.artist_profiles.performing_name ||
+      song.artist_profiles.name ||
+      "PASONG Artist"
+    );
+
+  }
+
+  return "PASONG Artist";
+
+}
+
+
+function getSongCover(song){
+
+  return (
+    song.cover_url ||
+    song.coverUrl ||
+    song.cover ||
+    song.image_url ||
+    song.image ||
+    ""
+  );
+
+}
+
+
+function getSongPrice(song){
+
+  /*
+   PASONG standard song price is UGX 700.
+   Use the API price when explicitly supplied.
+  */
+
+  if(
+    song.price !== undefined &&
+    song.price !== null &&
+    song.price !== ""
+  ){
+
+    const numericPrice =
+      Number(song.price);
+
+    if(
+      Number.isFinite(numericPrice) &&
+      numericPrice > 0
+    ){
+
+      return numericPrice;
+
+    }
+
+  }
+
+  return 700;
+
+}
+
+
+function getSongId(song){
+
+  return (
+    song.id ||
+    song.song_id ||
+    ""
+  );
+
+}
+
+
+/* =========================================================
+   SONG CARD
+   ========================================================= */
+
+function createSongCard(song){
+
+  const title =
+    getSongTitle(song);
+
+  const artist =
+    getArtistName(song);
+
+  const cover =
+    getSongCover(song);
+
+  const price =
+    getSongPrice(song);
+
+  const id =
+    getSongId(song);
+
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "song-card";
+
+
+  let coverHTML;
+
+  if(cover){
+
+    coverHTML =
+      `<img
+        class="song-cover"
+        src="${escapeHTML(cover)}"
+        alt="${escapeHTML(title)}"
+        loading="lazy"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='grid';"
+      >
+      <div
+        class="song-cover-placeholder"
+        style="display:none"
+      >
+        🎵
+      </div>`;
+
+  }else{
+
+    coverHTML =
+      `<div class="song-cover-placeholder">
+        🎵
+      </div>`;
+
+  }
+
+
+  const songLink =
+    id
+      ? `song.html?id=${encodeURIComponent(id)}`
+      : "store.html";
+
+
+  card.innerHTML = `
+
+    ${coverHTML}
+
+    <div class="song-info">
+
+      <a
+        href="${songLink}"
+        class="song-title"
+        title="${escapeHTML(title)}"
+      >
+        ${escapeHTML(title)}
+      </a>
+
+      <div class="song-artist">
+        ${escapeHTML(artist)}
+      </div>
+
+      <div class="song-bottom">
+
+        <span class="song-price">
+          UGX ${Number(price).toLocaleString()}
+        </span>
+
+        <a
+          href="${songLink}"
+          class="song-button"
+        >
+          View Song
+        </a>
+
+      </div>
+
+    </div>
+
+  `;
+
+  return card;
+
+}
+
+
+/* =========================================================
+   SAFE HTML
+   ========================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   RENDER SONGS
+   ========================================================= */
+
+function renderSongs(
+  containerId,
+  songs,
+  emptyMessage
+){
+
+  const container =
+    document.getElementById(containerId);
+
+  if(!container) return;
+
+  container.innerHTML = "";
+
+
+  if(
+    !Array.isArray(songs) ||
+    songs.length === 0
+  ){
+
+    const empty =
+      document.createElement("div");
+
+    empty.className =
+      "music-empty";
+
+    empty.textContent =
+      emptyMessage;
+
+    container.appendChild(empty);
+
+    return;
+
+  }
+
+
+  songs.forEach(function(song){
+
+    container.appendChild(
+      createSongCard(song)
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   LOAD PASONG SONGS
+   ========================================================= */
+
+async function loadPasongSongs(){
+
+  const trending =
+    document.getElementById("trendingMusic");
+
+  const latest =
+    document.getElementById("latestMusic");
+
+  const downloads =
+    document.getElementById("topDownloads");
+
+  const ugandan =
+    document.getElementById("ugandanMusic");
+
+  const countdown =
+    document.getElementById("countdownMusic");
+
+  const artists =
+    document.getElementById("popularArtists");
+
+
+  try{
+
+    console.log(
+      "PASONG: Loading songs from API..."
+    );
+
+
+    const response =
+      await fetch(
+        `${PASONG_API}/api/songs`,
+        {
+          method:"GET",
+          headers:{
+            "Accept":"application/json"
+          },
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        `PASONG API returned ${response.status}`
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "PASONG API response:",
+      data
+    );
+
+
+    const songs =
+      extractSongs(data);
+
+
+    console.log(
+      `PASONG: ${songs.length} songs loaded`
+    );
+
+
+    /* -----------------------------------------
+       TRENDING
+    ----------------------------------------- */
+
+    renderSongs(
+      "trendingMusic",
+      songs.slice(0,6),
+      "No trending songs available yet."
+    );
+
+
+    /* -----------------------------------------
+       LATEST
+    ----------------------------------------- */
+
+    renderSongs(
+      "latestMusic",
+      songs.slice(0,6),
+      "No uploaded songs available yet."
+    );
+
+
+    /* -----------------------------------------
+       TOP DOWNLOADS
+    ----------------------------------------- */
+
+    const downloadsSongs =
+      [...songs].sort(function(a,b){
+
+        return (
+          Number(b.downloads || b.download_count || 0) -
+          Number(a.downloads || a.download_count || 0)
+        );
+
+      });
+
+
+    renderSongs(
+      "topDownloads",
+      downloadsSongs.slice(0,6),
+      "No download data available yet."
+    );
+
+
+    /* -----------------------------------------
+       UGANDAN MUSIC
+    ----------------------------------------- */
+
+    const ugandanSongs =
+      songs.filter(function(song){
+
+        const country =
+          String(
+            song.country ||
+            song.artist_country ||
+            song.location ||
+            ""
+          ).toLowerCase();
+
+        return (
+          country.includes("uganda") ||
+          country === "ug" ||
+          song.is_ugandan === true
+        );
+
+      });
+
+
+    renderSongs(
+      "ugandanMusic",
+      ugandanSongs.length
+        ? ugandanSongs.slice(0,6)
+        : songs.slice(0,6),
+      "No Ugandan songs available yet."
+    );
+
+
+    /* -----------------------------------------
+       WEEKLY COUNTDOWN
+    ----------------------------------------- */
+
+    if(countdown){
+
+      if(songs.length){
+
+        countdown.innerHTML =
+          `🔥 ${songs.length} song${songs.length === 1 ? "" : "s"} currently available on PASONG`;
+
+      }else{
+
+        countdown.textContent =
+          "No songs available for this week's countdown yet.";
+
+      }
+
+    }
+
+
+    /* -----------------------------------------
+       POPULAR ARTISTS
+    ----------------------------------------- */
+
+    if(artists){
+
+      const artistMap =
+        new Map();
+
+
+      songs.forEach(function(song){
+
+        const artistName =
+          getArtistName(song);
+
+        if(
+          artistName &&
+          !artistMap.has(artistName)
+        ){
+
+          artistMap.set(
+            artistName,
+            song
+          );
+
+        }
+
+      });
+
+
+      const artistSongs =
+        Array.from(
+          artistMap.values()
+        ).slice(0,6);
+
+
+      artists.innerHTML = "";
+
+
+      if(!artistSongs.length){
+
+        const empty =
+          document.createElement("div");
+
+        empty.className =
+          "music-empty";
+
+        empty.textContent =
+          "No artists available yet.";
+
+        artists.appendChild(empty);
+
+      }else{
+
+        artistSongs.forEach(
+          function(song){
+
+            artists.appendChild(
+              createSongCard(song)
+            );
+
+          }
+        );
+
+      }
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "PASONG song loading error:",
+      error
+    );
+
+
+    renderSongs(
+      "trendingMusic",
+      [],
+      "Music is temporarily unavailable."
+    );
+
+    renderSongs(
+      "latestMusic",
+      [],
+      "Music is temporarily unavailable."
+    );
+
+    renderSongs(
+      "topDownloads",
+      [],
+      "Music is temporarily unavailable."
+    );
+
+    renderSongs(
+      "ugandanMusic",
+      [],
+      "Music is temporarily unavailable."
+    );
+
+
+    if(countdown){
+
+      countdown.textContent =
+        "Music is temporarily unavailable. Please try again.";
+
+    }
+
+
+    if(artists){
+
+      artists.innerHTML =
+        `<div class="music-empty">
+          Music artists are temporarily unavailable.
+        </div>`;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
    SEARCH
-   Keeps search simple and safe.
    ========================================================= */
 
 const siteSearch =
@@ -1793,6 +2520,8 @@ if(siteSearch){
    ========================================================= */
 
 loadPasongAccount();
+
+loadPasongSongs();
 
 </script>
 
