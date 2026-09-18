@@ -1,31 +1,29 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG — Music. Opportunity. Support.</title><style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>PASONG — Music. Opportunity. Support.</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
 *{
+  box-sizing:border-box;
   margin:0;
   padding:0;
-  box-sizing:border-box;
 }
 
-:root{
-  --bg:#07070d;
-  --panel:#10101a;
-  --panel2:#151522;
-  --border:#242438;
-  --text:#fff;
-  --muted:#9b9bad;
-  --purple:#8b5cf6;
-  --pink:#ec4899;
-  --green:#22c55e;
+html{
+  scroll-behavior:smooth;
 }
 
 body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,Arial,sans-serif;
-  min-height:100vh;
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  line-height:1.5;
 }
 
 a{
@@ -33,1493 +31,1720 @@ a{
   text-decoration:none;
 }
 
-button{
+button,
+input{
   font:inherit;
 }
 
-nav{
+button{
+  cursor:pointer;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
   position:sticky;
   top:0;
   z-index:1000;
-  background:rgba(7,7,13,.94);
+  background:rgba(8,8,16,.94);
   backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid rgba(255,255,255,.07);
 }
 
-.nav-inner{
+.navbar{
+  width:100%;
   max-width:1400px;
   margin:auto;
   min-height:70px;
-  padding:0 22px;
+  padding:12px 22px;
   display:flex;
   align-items:center;
-  gap:22px;
+  gap:20px;
 }
 
 .logo{
-  font-size:24px;
+  font-size:23px;
   font-weight:900;
-  letter-spacing:-1px;
   white-space:nowrap;
+  letter-spacing:.3px;
 }
 
 .logo span{
-  background:linear-gradient(90deg,var(--purple),var(--pink));
-  -webkit-background-clip:text;
-  color:transparent;
+  color:#c084fc;
 }
 
-.search{
+.search-box{
   flex:1;
-  max-width:560px;
+  max-width:430px;
   position:relative;
 }
 
-.search input{
+.search-box input{
   width:100%;
-  background:#11111b;
-  border:1px solid var(--border);
-  color:#fff;
-  padding:13px 18px 13px 44px;
-  border-radius:30px;
+  height:42px;
+  padding:0 15px 0 42px;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.08);
   outline:none;
+  color:#fff;
+  background:#12121d;
 }
 
-.search input:focus{
-  border-color:var(--purple);
+.search-box input::placeholder{
+  color:#77778a;
 }
 
 .search-icon{
   position:absolute;
-  left:17px;
-  top:11px;
-  font-size:18px;
+  left:15px;
+  top:10px;
+  color:#9696a9;
 }
 
 .nav-links{
+  margin-left:auto;
   display:flex;
   align-items:center;
-  gap:15px;
-  margin-left:auto;
+  gap:5px;
 }
 
 .nav-links a{
-  color:#bbbaca;
-  font-size:14px;
+  padding:10px 11px;
+  border-radius:10px;
+  color:#b8b8c8;
+  font-size:13px;
+  font-weight:600;
   white-space:nowrap;
 }
 
 .nav-links a:hover{
   color:#fff;
+  background:rgba(168,85,247,.1);
 }
 
-.notify{
+.notification-link{
   position:relative;
-  font-size:21px!important;
 }
 
-.badge{
+.notification-count{
   position:absolute;
-  top:-8px;
-  right:-9px;
-  min-width:17px;
-  height:17px;
+  top:2px;
+  right:1px;
+  min-width:16px;
+  height:16px;
+  display:grid;
+  place-items:center;
   padding:0 4px;
-  border-radius:20px;
-  background:var(--pink);
+  border-radius:50px;
+  background:#ec4899;
   color:#fff;
-  font-size:10px;
-  display:none;
+  font-size:9px;
+  font-weight:800;
+}
+
+/* ACCOUNT */
+
+.account-link{
+  display:flex !important;
   align-items:center;
-  justify-content:center;
+  gap:7px;
 }
 
-.account-btn{
-  padding:9px 15px;
-  border-radius:22px;
-  background:linear-gradient(90deg,var(--purple),var(--pink));
-  color:#fff!important;
-  font-weight:700;
+.account-photo{
+  width:31px;
+  height:31px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(192,132,252,.6);
+  background:#191927;
 }
 
-.mobile-menu{
-  display:none;
+.account-name{
+  font-size:13px;
 }
 
-/* HERO */
+/* LOGIN */
+
+.login-button{
+  padding:9px 14px !important;
+  border:1px solid rgba(192,132,252,.35);
+  background:rgba(168,85,247,.10);
+  color:#fff !important;
+  border-radius:10px !important;
+}
+
+.login-button:hover{
+  background:linear-gradient(135deg,#8b5cf6,#ec4899) !important;
+  border-color:transparent !important;
+}
+
+/* =========================
+   HERO
+========================= */
 
 .hero{
+  width:100%;
   max-width:1400px;
   margin:auto;
-  padding:55px 22px 25px;
+  padding:65px 22px 35px;
 }
 
 .hero-box{
-  min-height:350px;
-  border:1px solid var(--border);
-  border-radius:28px;
-  padding:55px;
   position:relative;
   overflow:hidden;
+  padding:65px 45px;
+  border-radius:28px;
   background:
-    radial-gradient(circle at 80% 20%,rgba(236,72,153,.20),transparent 32%),
-    radial-gradient(circle at 30% 90%,rgba(139,92,246,.22),transparent 38%),
-    linear-gradient(135deg,#11111c,#090911);
+    radial-gradient(
+      circle at 12% 20%,
+      rgba(168,85,247,.28),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 88% 80%,
+      rgba(236,72,153,.17),
+      transparent 34%
+    ),
+    #11111d;
+  border:1px solid rgba(168,85,247,.18);
 }
 
 .hero-box:after{
   content:"";
   position:absolute;
-  width:420px;
-  height:420px;
-  right:-170px;
-  bottom:-240px;
+  width:320px;
+  height:320px;
+  right:-120px;
+  top:-130px;
   border-radius:50%;
-  border:70px solid rgba(139,92,246,.08);
+  background:rgba(168,85,247,.08);
+  filter:blur(20px);
 }
 
-.hero small{
+.hero-kicker{
   color:#c084fc;
-  font-weight:800;
+  font-size:12px;
   letter-spacing:2px;
+  font-weight:800;
+  margin-bottom:12px;
 }
 
 .hero h1{
-  font-size:clamp(38px,6vw,70px);
-  line-height:1;
-  max-width:760px;
-  margin:18px 0;
+  position:relative;
+  z-index:1;
+  font-size:clamp(40px,7vw,78px);
+  line-height:.98;
+  max-width:800px;
+  font-weight:900;
 }
 
-.gradient{
-  background:linear-gradient(90deg,#fff,var(--purple),var(--pink));
+.hero h1 span{
+  background:linear-gradient(90deg,#a855f7,#ec4899);
   -webkit-background-clip:text;
+  background-clip:text;
   color:transparent;
 }
 
 .hero p{
-  max-width:680px;
-  color:#b0afbd;
-  line-height:1.7;
-  font-size:17px;
+  position:relative;
+  z-index:1;
+  max-width:690px;
+  margin:20px 0;
+  color:#a9a9b8;
+  font-size:16px;
 }
 
-.hero-buttons{
+.hero-actions{
+  position:relative;
+  z-index:2;
   display:flex;
-  gap:12px;
   flex-wrap:wrap;
-  margin-top:28px;
+  gap:11px;
 }
 
 .btn{
-  padding:13px 20px;
-  border-radius:25px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:43px;
+  padding:0 17px;
+  border-radius:12px;
+  font-size:13px;
   font-weight:800;
-  display:inline-block;
+  border:1px solid rgba(255,255,255,.08);
 }
 
 .btn-primary{
-  background:linear-gradient(90deg,var(--purple),var(--pink));
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+  border:none;
 }
 
-.btn-dark{
-  background:#171724;
-  border:1px solid var(--border);
+.btn-secondary{
+  background:#181825;
+  color:#ddd;
 }
 
-/* QUICK NAV */
+/* =========================
+   QUICK NAV
+========================= */
 
 .quick-nav{
   max-width:1400px;
-  margin:auto;
-  padding:18px 22px;
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:12px;
-}
-
-.quick{
-  background:var(--panel);
-  border:1px solid var(--border);
-  padding:18px 12px;
-  border-radius:16px;
-  text-align:center;
-  color:#c5c4d1;
-  transition:.2s;
-}
-
-.quick:hover{
-  transform:translateY(-2px);
-  border-color:#57418b;
-  color:#fff;
-}
-
-.quick .icon{
-  display:block;
-  font-size:23px;
-  margin-bottom:7px;
-}
-
-.quick strong{
-  display:block;
-  font-size:13px;
-}
-
-/* SECTIONS */
-
-.section{
-  max-width:1400px;
-  margin:auto;
-  padding:25px 22px;
-}
-
-.section-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:17px;
-}
-
-.section-head h2{
-  font-size:22px;
-}
-
-.section-head span{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.scroll-row{
-  display:flex;
-  gap:16px;
-  overflow-x:auto;
-  padding-bottom:8px;
-  scrollbar-width:none;
-}
-
-.scroll-row::-webkit-scrollbar{
-  display:none;
-}
-
-/* SONG CARD */
-
-.song-card{
-  flex:0 0 205px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:17px;
-  overflow:hidden;
-  transition:.2s;
-}
-
-.song-card:hover{
-  transform:translateY(-4px);
-  border-color:#4d3b79;
-}
-
-.cover{
-  width:100%;
-  aspect-ratio:1;
-  display:block;
-  background:#151520;
-  object-fit:cover;
-}
-
-.song-info{
-  padding:13px;
-}
-
-.song-title{
-  font-weight:800;
-  font-size:14px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.artist{
-  color:#9c9baa;
-  font-size:12px;
-  margin-top:6px;
-}
-
-.song-bottom{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:12px;
-}
-
-.price{
-  color:#d8b4fe;
-  font-size:13px;
-  font-weight:800;
-}
-
-.play-btn{
-  width:34px;
-  height:34px;
-  border:0;
-  border-radius:50%;
-  background:linear-gradient(135deg,var(--purple),var(--pink));
-  color:#fff;
-  cursor:pointer;
-}
-
-/* FEATURE GRID */
-
-.feature-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-}
-
-.feature{
-  background:var(--panel);
-  border:1px solid var(--border);
-  padding:23px;
-  border-radius:18px;
-}
-
-.feature-icon{
-  font-size:28px;
-  margin-bottom:12px;
-}
-
-.feature h3{
-  margin-bottom:8px;
-}
-
-.feature p{
-  color:#9897a7;
-  font-size:14px;
-  line-height:1.6;
-}
-
-/* ARTIST */
-
-.artist-card{
-  flex:0 0 170px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:15px;
-  text-align:center;
-}
-
-.artist-photo{
-  width:110px;
-  height:110px;
-  border-radius:50%;
-  margin:auto;
-  display:block;
-  object-fit:cover;
-  background:#181824;
-}
-
-.artist-card h3{
-  font-size:14px;
-  margin-top:12px;
-}
-
-.artist-card p{
-  color:#8e8d9b;
-  font-size:12px;
-  margin-top:5px;
-}
-
-/* GENRES */
-
-.genre-row{
+  margin:0 auto;
+  padding:10px 22px 30px;
   display:flex;
   gap:10px;
   overflow-x:auto;
   scrollbar-width:none;
 }
 
-.genre{
-  flex:0 0 auto;
-  padding:11px 18px;
-  border-radius:25px;
-  background:#12121d;
-  border:1px solid var(--border);
-  color:#c5c4d0;
-  font-size:13px;
-}
-
-.genre:hover{
-  border-color:var(--purple);
-  color:#fff;
-}
-
-/* PROMO */
-
-.promo{
-  background:
-    radial-gradient(circle at 90% 10%,rgba(236,72,153,.18),transparent 35%),
-    linear-gradient(120deg,#11111d,#0c0c15);
-  border:1px solid var(--border);
-  border-radius:23px;
-  padding:30px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:25px;
-}
-
-.promo h2{
-  margin-bottom:8px;
-}
-
-.promo p{
-  color:#9998a7;
-  line-height:1.6;
-  max-width:700px;
-}
-
-/* EMPTY */
-
-.loading,
-.empty{
-  width:100%;
-  padding:35px;
-  border:1px dashed var(--border);
-  border-radius:17px;
-  color:#888796;
-  text-align:center;
-}
-
-/* PLAYER */
-
-.player{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  z-index:1500;
-  background:rgba(12,12,20,.97);
-  border-top:1px solid var(--border);
-  padding:10px 18px;
+.quick-nav::-webkit-scrollbar{
   display:none;
 }
 
-.player-inner{
+.quick-nav a{
+  flex:0 0 auto;
+  padding:10px 14px;
+  border-radius:999px;
+  background:#12121d;
+  border:1px solid rgba(255,255,255,.07);
+  color:#bcbccc;
+  font-size:12px;
+  font-weight:700;
+}
+
+.quick-nav a:hover{
+  color:#fff;
+  border-color:rgba(168,85,247,.4);
+  background:rgba(168,85,247,.1);
+}
+
+/* =========================
+   YOUR MUSIC YOUR CHOICE
+========================= */
+
+.your-choice-section{
+  width:100%;
+  padding:25px 22px 40px;
+}
+
+.your-choice-box{
+  width:100%;
   max-width:1400px;
   margin:auto;
-  display:flex;
-  align-items:center;
+  padding:35px;
+  border-radius:25px;
+  background:
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(157,78,221,.18),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(236,72,153,.12),
+      transparent 35%
+    ),
+    #10101b;
+  border:1px solid rgba(168,85,247,.2);
+}
+
+.your-choice-header{
+  text-align:center;
+  max-width:720px;
+  margin:0 auto 30px;
+}
+
+.choice-kicker{
+  display:inline-block;
+  margin-bottom:8px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:2px;
+  color:#c084fc;
+}
+
+.your-choice-header h2{
+  font-size:clamp(28px,5vw,46px);
+  line-height:1.05;
+  font-weight:900;
+}
+
+.your-choice-header h2 span{
+  background:linear-gradient(90deg,#a855f7,#ec4899);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.your-choice-header p{
+  margin:13px auto 0;
+  max-width:650px;
+  color:#a9a9b8;
+  font-size:14px;
+}
+
+.choice-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
   gap:14px;
 }
 
-.player-cover{
-  width:48px;
-  height:48px;
-  border-radius:8px;
-  object-fit:cover;
+.choice-card{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-height:105px;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.08);
+  transition:.2s ease;
 }
 
-.player-info{
-  min-width:140px;
-  flex:0 0 200px;
+.choice-card:hover{
+  transform:translateY(-4px);
+  background:rgba(168,85,247,.08);
+  border-color:rgba(168,85,247,.4);
 }
 
-.player-title{
-  font-weight:800;
-  font-size:13px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+.choice-icon{
+  flex:0 0 45px;
+  width:45px;
+  height:45px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  background:rgba(168,85,247,.13);
+  font-size:21px;
 }
 
-.player-artist{
-  color:#858493;
+.choice-card h3{
+  font-size:15px;
+  margin-bottom:4px;
+}
+
+.choice-card p{
+  color:#9999aa;
   font-size:11px;
-  margin-top:4px;
 }
 
-.player audio{
-  flex:1;
-  height:35px;
+.choice-arrow{
+  margin-left:auto;
+  color:#c084fc;
+  font-size:20px;
 }
 
-/* FOOTER */
-
-footer{
-  margin-top:45px;
-  border-top:1px solid var(--border);
-  padding:40px 22px 90px;
+.choice-discover{
+  margin-top:30px;
+  padding-top:24px;
+  border-top:1px solid rgba(255,255,255,.07);
 }
 
-.footer-inner{
+.choice-discover h3{
+  margin-bottom:13px;
+  font-size:15px;
+}
+
+.choice-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.choice-pills a{
+  display:inline-flex;
+  align-items:center;
+  min-height:37px;
+  padding:0 14px;
+  border-radius:999px;
+  color:#ddd;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:12px;
+  font-weight:700;
+}
+
+.choice-pills a:hover{
+  background:rgba(168,85,247,.13);
+  border-color:rgba(168,85,247,.4);
+}
+
+/* =========================
+   CONTENT SECTIONS
+========================= */
+
+.container{
+  width:100%;
   max-width:1400px;
   margin:auto;
-  display:grid;
-  grid-template-columns:2fr repeat(3,1fr);
-  gap:30px;
+  padding:0 22px;
 }
 
-.footer-brand p{
-  color:#858493;
-  line-height:1.7;
-  max-width:380px;
-  margin-top:10px;
+.section{
+  padding:25px 0;
 }
 
-footer h4{
-  margin-bottom:12px;
+.section-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:16px;
 }
 
-footer a{
-  display:block;
-  color:#858493;
+.section-heading h2{
+  font-size:21px;
+  font-weight:850;
+}
+
+.section-heading a{
+  color:#c084fc;
+  font-size:12px;
+  font-weight:700;
+}
+
+.music-row{
+  min-height:150px;
+  padding:30px;
+  border-radius:18px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#666678;
   font-size:13px;
-  margin:9px 0;
 }
 
-footer a:hover{
+.uganda-label{
+  display:inline-block;
+  margin-top:3px;
+  color:#c084fc;
+  font-size:11px;
+}
+
+/* =========================
+   GENRES
+========================= */
+
+.genre-grid{
+  display:grid;
+  grid-template-columns:repeat(9,1fr);
+  gap:10px;
+}
+
+.genre-card{
+  padding:17px 8px;
+  text-align:center;
+  border-radius:14px;
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.06);
+  color:#c8c8d3;
+  font-size:11px;
+  font-weight:700;
+  transition:.2s;
+}
+
+.genre-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(168,85,247,.35);
   color:#fff;
 }
 
-.copyright{
-  max-width:1400px;
-  margin:35px auto 0;
-  padding-top:20px;
-  border-top:1px solid var(--border);
-  color:#666575;
+/* =========================
+   COUNTDOWN
+========================= */
+
+.countdown{
+  padding:30px;
+  border-radius:20px;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(168,85,247,.13),
+      rgba(236,72,153,.06)
+    ),
+    #11111b;
+  border:1px solid rgba(168,85,247,.14);
+  text-align:center;
+}
+
+.countdown h2{
+  font-size:24px;
+  margin-bottom:5px;
+}
+
+.countdown p{
+  color:#9999aa;
+  font-size:13px;
+}
+
+/* =========================
+   WHY PASONG
+========================= */
+
+.why-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.why-card{
+  padding:25px;
+  border-radius:18px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.why-icon{
+  font-size:25px;
+  margin-bottom:12px;
+}
+
+.why-card h3{
+  font-size:16px;
+  margin-bottom:6px;
+}
+
+.why-card p{
+  color:#9999aa;
   font-size:12px;
 }
 
-/* MOBILE */
+/* =========================
+   PAYMENT / PROMO / POINTS
+========================= */
 
-@media(max-width:1000px){
-  .nav-links a:not(.notify):not(.account-btn){
-    display:none;
+.feature-box{
+  padding:30px;
+  border-radius:20px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.feature-box h2{
+  font-size:21px;
+  margin-bottom:8px;
+}
+
+.feature-box p{
+  color:#9d9dad;
+  font-size:13px;
+  margin-bottom:18px;
+}
+
+.payment-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.payment-badge{
+  padding:10px 14px;
+  border-radius:10px;
+  background:#171722;
+  border:1px solid rgba(255,255,255,.07);
+  font-size:12px;
+  font-weight:800;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  margin-top:50px;
+  padding:45px 22px 90px;
+  border-top:1px solid rgba(255,255,255,.07);
+  background:#07070d;
+}
+
+.footer-inner{
+  width:100%;
+  max-width:1400px;
+  margin:auto;
+}
+
+.footer-logo{
+  font-size:21px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.footer-inner p{
+  color:#77778a;
+  font-size:12px;
+  max-width:550px;
+}
+
+.footer-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+  margin-top:28px;
+}
+
+.footer-column h4{
+  font-size:13px;
+  margin-bottom:10px;
+}
+
+.footer-column a{
+  display:block;
+  margin:7px 0;
+  color:#858596;
+  font-size:12px;
+}
+
+.footer-column a:hover{
+  color:#c084fc;
+}
+
+/* =========================
+   MOBILE BOTTOM NAV
+========================= */
+
+.mobile-bottom-nav{
+  display:none;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1100px){
+
+  .nav-links a{
+    padding:9px 7px;
+    font-size:12px;
   }
 
-  .quick-nav{
-    grid-template-columns:repeat(4,1fr);
+  .genre-grid{
+    grid-template-columns:repeat(5,1fr);
   }
 
-  .feature-grid{
-    grid-template-columns:1fr;
-  }
-
-  .footer-inner{
-    grid-template-columns:1fr 1fr;
+  .choice-grid{
+    grid-template-columns:repeat(2,1fr);
   }
 }
 
-@media(max-width:650px){
-  .nav-inner{
-    gap:10px;
+@media(max-width:800px){
+
+  .navbar{
+    padding:10px 14px;
+    flex-wrap:wrap;
+  }
+
+  .search-box{
+    order:3;
+    flex-basis:100%;
+    max-width:none;
+  }
+
+  .nav-links{
+    margin-left:auto;
+  }
+
+  .nav-links a{
+    display:none;
+  }
+
+  .nav-links .notification-link,
+  .nav-links .account-link,
+  .nav-links .login-button{
+    display:flex;
+  }
+
+  .hero{
+    padding:35px 14px 25px;
+  }
+
+  .hero-box{
+    padding:42px 24px;
+  }
+
+  .container{
     padding:0 14px;
+  }
+
+  .your-choice-section{
+    padding:20px 14px 30px;
+  }
+
+  .your-choice-box{
+    padding:25px 16px;
+  }
+
+  .why-grid{
+    grid-template-columns:1fr;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:600px){
+
+  body{
+    padding-bottom:70px;
   }
 
   .logo{
     font-size:20px;
   }
 
-  .search{
-    max-width:none;
-  }
-
-  .search input{
-    padding-left:38px;
-  }
-
-  .nav-links{
-    gap:8px;
-  }
-
-  .account-btn{
+  .account-name{
     display:none;
   }
 
-  .hero{
-    padding:25px 14px 12px;
+  .account-photo{
+    width:34px;
+    height:34px;
   }
 
-  .hero-box{
-    padding:32px 22px;
-    min-height:390px;
-    border-radius:22px;
+  .login-button{
+    padding:8px 10px !important;
+    font-size:11px !important;
   }
 
   .hero h1{
     font-size:42px;
   }
 
+  .hero-box{
+    padding:35px 20px;
+    border-radius:21px;
+  }
+
   .hero p{
-    font-size:15px;
+    font-size:13px;
+  }
+
+  .hero-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .btn{
+    width:100%;
   }
 
   .quick-nav{
-    padding:14px;
-    grid-template-columns:repeat(4,1fr);
-    gap:8px;
+    padding-left:14px;
+    padding-right:14px;
   }
 
-  .quick{
-    padding:13px 5px;
+  .choice-grid{
+    grid-template-columns:1fr;
   }
 
-  .quick .icon{
-    font-size:20px;
+  .genre-grid{
+    grid-template-columns:repeat(3,1fr);
   }
 
-  .quick strong{
+  .section-heading h2{
+    font-size:18px;
+  }
+
+  .mobile-bottom-nav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:2000;
+    height:65px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    background:rgba(10,10,18,.97);
+    backdrop-filter:blur(18px);
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+
+  .mobile-bottom-nav a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    color:#858596;
     font-size:10px;
+    font-weight:700;
   }
 
-  .section{
-    padding:20px 14px;
+  .mobile-bottom-nav a span{
+    font-size:19px;
+    line-height:20px;
   }
 
-  .song-card{
-    flex-basis:170px;
+  .mobile-bottom-nav a:hover{
+    color:#c084fc;
   }
 
-  .promo{
-    display:block;
-  }
-
-  .promo .btn{
-    margin-top:18px;
-  }
-
-  .footer-inner{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .player-info{
-    flex:1;
-    min-width:0;
-  }
-
-  .player audio{
-    width:100%;
+  footer{
+    padding-bottom:90px;
   }
 }
-</style></head><body><!-- NAVIGATION --><nav>
-  <div class="nav-inner"><a href="index.html" class="logo">
-  ◈ <span>PASONG</span>
-</a>
+</style>
+</head>
 
-<div class="search">
-  <span class="search-icon">🔎</span>
-  <input
-    type="search"
-    placeholder="Search songs, artists, genres..."
-    onkeydown="if(event.key==='Enter'){goSearch(this.value)}"
-  >
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+  <div class="navbar">
+
+    <a href="index.html" class="logo">
+      ◈ <span>PASONG</span>
+    </a>
+
+    <div class="search-box">
+      <span class="search-icon">🔎</span>
+      <input
+        id="siteSearch"
+        type="search"
+        placeholder="Search songs, artists, genres..."
+        autocomplete="off"
+      >
+    </div>
+
+    <nav class="nav-links">
+
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
+      <a href="artist-dashboard.html">Upload Music</a>
+
+      <!-- BELL -->
+      <a href="notifications.html"
+         class="notification-link"
+         aria-label="Notifications">
+        🔔
+        <span class="notification-count" id="notificationCount">0</span>
+      </a>
+
+      <!-- ACCOUNT WITH OWNER PHOTO -->
+      <a href="account.html" class="account-link">
+        <img
+          id="accountPhoto"
+          class="account-photo"
+          src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
+          alt="Account"
+        >
+        <span class="account-name" id="accountName">Account</span>
+      </a>
+
+      <!-- LOGIN / SIGN UP AFTER ACCOUNT -->
+      <a href="login.html" class="login-button" id="loginButton">
+        Login / Sign Up
+      </a>
+
+    </nav>
+  </div>
+</header>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+  <div class="hero-box">
+
+    <div class="hero-kicker">
+      BUY • DOWNLOAD • SUPPORT • UPLOAD
+    </div>
+
+    <h1>
+      Your Music.<br>
+      <span>Your Choice.</span>
+    </h1>
+
+    <p>
+      Discover new music, support African artists and producers,
+      buy songs, download your music and grow with PASONG.
+    </p>
+
+    <div class="hero-actions">
+
+      <a href="store.html" class="btn btn-primary">
+        🎵 Explore Music
+      </a>
+
+      <a href="artist-dashboard.html" class="btn btn-secondary">
+        ⬆️ Upload Music
+      </a>
+
+      <a href="charts.html" class="btn btn-secondary">
+        🔥 View Charts
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     QUICK NAV
+========================= -->
+
+<div class="quick-nav">
+
+  <a href="store.html">🎵 All Songs</a>
+  <a href="store.html?filter=new">🆕 New</a>
+  <a href="charts.html">🔥 Trending</a>
+  <a href="artists.html">🎤 Artists</a>
+  <a href="playlists.html">📋 Playlists</a>
+  <a href="favorites.html">❤️ Favorites</a>
+  <a href="charts.html">🏆 Charts</a>
+
 </div>
 
-<div class="nav-links">
-  <a href="store.html">Music Store</a>
-  <a href="charts.html">Charts</a>
-  <a href="artists.html">Artists</a>
-  <a href="playlists.html">Playlists</a>
-  <a href="promotion.html">Promotion</a>
-  <a href="upload.html">Upload Music</a>
 
-  <a href="notifications.html" class="notify" aria-label="Notifications">
-    🔔
-    <span id="notificationBadge" class="badge">0</span>
+<!-- =========================
+     YOUR MUSIC YOUR CHOICE
+========================= -->
+
+<section class="your-choice-section">
+
+  <div class="your-choice-box">
+
+    <div class="your-choice-header">
+
+      <span class="choice-kicker">
+        PASONG MUSIC
+      </span>
+
+      <h2>
+        Your Music.
+        <span>Your Choice.</span>
+      </h2>
+
+      <p>
+        Discover the sounds you want, support the artists you love,
+        and own your music.
+      </p>
+
+    </div>
+
+
+    <div class="choice-grid">
+
+      <a href="store.html" class="choice-card">
+
+        <div class="choice-icon">🎧</div>
+
+        <div>
+          <h3>Listen</h3>
+          <p>Preview songs for 20 seconds.</p>
+        </div>
+
+        <span class="choice-arrow">→</span>
+
+      </a>
+
+
+      <a href="store.html" class="choice-card">
+
+        <div class="choice-icon">💜</div>
+
+        <div>
+          <h3>Support</h3>
+          <p>Buy music and support artists.</p>
+        </div>
+
+        <span class="choice-arrow">→</span>
+
+      </a>
+
+
+      <a href="account.html#downloads" class="choice-card">
+
+        <div class="choice-icon">⬇️</div>
+
+        <div>
+          <h3>Own It</h3>
+          <p>Keep it in My Downloads.</p>
+        </div>
+
+        <span class="choice-arrow">→</span>
+
+      </a>
+
+
+      <a href="promotion.html" class="choice-card">
+
+        <div class="choice-icon">🚀</div>
+
+        <div>
+          <h3>Promote</h3>
+          <p>Reach more listeners.</p>
+        </div>
+
+        <span class="choice-arrow">→</span>
+
+      </a>
+
+    </div>
+
+
+    <div class="choice-discover">
+
+      <h3>What are you looking for?</h3>
+
+      <div class="choice-pills">
+
+        <a href="store.html?filter=trending">
+          🔥 Trending
+        </a>
+
+        <a href="store.html?filter=new">
+          🆕 New Releases
+        </a>
+
+        <a href="store.html?filter=ugandan">
+          🇺🇬 Ugandan
+        </a>
+
+        <a href="store.html?filter=african">
+          🌍 African
+        </a>
+
+        <a href="artists.html">
+          🎤 Artists
+        </a>
+
+        <a href="store.html?filter=beats">
+          🎹 Beats
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<main class="container">
+
+
+<!-- =========================
+     TRENDING
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🔥 Trending Music</h2>
+    <a href="charts.html">View all →</a>
+  </div>
+
+  <div class="music-row">
+    Trending songs will appear here.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     LATEST
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🆕 Latest New Uploads</h2>
+    <a href="store.html">View all →</a>
+  </div>
+
+  <div class="music-row">
+    Latest uploaded songs will appear here.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     TOP DOWNLOADS
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>📥 Top Downloads</h2>
+    <a href="charts.html">Charts →</a>
+  </div>
+
+  <div class="music-row">
+    Most downloaded music will appear here.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     UGANDAN MUSIC
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+      <h2>🇺🇬 Top Ugandan Music</h2>
+      <span class="uganda-label">PASONG Uganda</span>
+    </div>
+
+  </div>
+
+  <div class="music-row">
+    Top Ugandan songs will appear here.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     GENRES
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🎼 Browse Genres</h2>
+  </div>
+
+  <div class="genre-grid">
+
+    <a href="store.html?genre=Afrobeats" class="genre-card">
+      Afrobeats
+    </a>
+
+    <a href="store.html?genre=Amapiano" class="genre-card">
+      Amapiano
+    </a>
+
+    <a href="store.html?genre=Gengetone" class="genre-card">
+      Gengetone
+    </a>
+
+    <a href="store.html?genre=Bongo" class="genre-card">
+      Bongo
+    </a>
+
+    <a href="store.html?genre=Dancehall" class="genre-card">
+      Dancehall
+    </a>
+
+    <a href="store.html?genre=Hip Hop" class="genre-card">
+      Hip Hop
+    </a>
+
+    <a href="store.html?genre=R&B" class="genre-card">
+      R&B
+    </a>
+
+    <a href="store.html?genre=Gospel" class="genre-card">
+      Gospel
+    </a>
+
+    <a href="store.html?genre=Reggae" class="genre-card">
+      Reggae
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     COUNTDOWN
+========================= -->
+
+<section class="section">
+
+  <div class="countdown">
+
+    <h2>⏳ Weekly Countdown</h2>
+
+    <p>
+      Top music this week
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     ARTISTS
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <h2>🎤 Popular Artists</h2>
+
+    <a href="artists.html">
+      View all →
+    </a>
+
+  </div>
+
+  <div class="music-row">
+    Popular PASONG artists will appear here.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     CONTINUE LISTENING
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🎧 Continue Listening</h2>
+  </div>
+
+  <div class="music-row">
+    Your recently played music will appear here.
+  </div>
+
+</section>
+
+
+<!-- =========================
+     WHY PASONG
+========================= -->
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>Why PASONG?</h2>
+  </div>
+
+  <div class="why-grid">
+
+    <div class="why-card">
+
+      <div class="why-icon">🎵</div>
+
+      <h3>Discover Music</h3>
+
+      <p>
+        Find new songs, artists, genres and sounds
+        from Uganda, Africa and beyond.
+      </p>
+
+    </div>
+
+
+    <div class="why-card">
+
+      <div class="why-icon">💰</div>
+
+      <h3>Support Artists</h3>
+
+      <p>
+        Every purchase helps music creators earn
+        from their work.
+      </p>
+
+    </div>
+
+
+    <div class="why-card">
+
+      <div class="why-icon">📥</div>
+
+      <h3>Buy & Download</h3>
+
+      <p>
+        Purchase your music and keep purchased songs
+        in your PASONG downloads.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     PAYMENTS
+========================= -->
+
+<section class="section">
+
+  <div class="feature-box">
+
+    <h2>💳 Easy Payments</h2>
+
+    <p>
+      PASONG supports convenient payment options.
+      Standard song price: <strong>UGX 500</strong>.
+    </p>
+
+    <div class="payment-badges">
+
+      <div class="payment-badge">
+        🟡 MTN Mobile Money
+      </div>
+
+      <div class="payment-badge">
+        🔴 Airtel Money
+      </div>
+
+    </div>
+
+    <a href="store.html" class="btn btn-primary">
+      Browse Music
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     PROMOTION
+========================= -->
+
+<section class="section">
+
+  <div class="feature-box">
+
+    <h2>📣 Promote Your Music</h2>
+
+    <p>
+      Put your music in front of more listeners
+      with PASONG promotion options for artists
+      and businesses.
+    </p>
+
+    <a href="promotion.html" class="btn btn-primary">
+      Promote Now
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     PASONG POINTS
+========================= -->
+
+<section class="section">
+
+  <div class="feature-box">
+
+    <h2>🎁 PASONG Points</h2>
+
+    <p>
+      Refer friends to PASONG. A successful qualifying
+      referral earns <strong>50 PASONG Points</strong>.
+    </p>
+
+    <a href="account.html#points" class="btn btn-primary">
+      My Points
+    </a>
+
+  </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+  <div class="footer-inner">
+
+    <div class="footer-logo">
+      ◈ PASONG
+    </div>
+
+    <p>
+      Music. Opportunity. Support.
+      A platform built to connect music creators and listeners.
+    </p>
+
+
+    <div class="footer-grid">
+
+      <div class="footer-column">
+
+        <h4>Music</h4>
+
+        <a href="store.html">Music Store</a>
+        <a href="charts.html">Charts</a>
+        <a href="artists.html">Artists</a>
+        <a href="playlists.html">Playlists</a>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4>Creators</h4>
+
+        <a href="artist-dashboard.html">
+          Upload Music
+        </a>
+
+        <a href="promotion.html">
+          Promotion
+        </a>
+
+        <a href="account.html">
+          My Account
+        </a>
+
+        <a href="account.html#points">
+          PASONG Points
+        </a>
+
+      </div>
+
+
+      <div class="footer-column">
+
+        <h4>PASONG</h4>
+
+        <a href="notifications.html">
+          Notifications
+        </a>
+
+        <a href="account.html#downloads">
+          My Downloads
+        </a>
+
+        <a href="account.html#earnings">
+          Earnings
+        </a>
+
+      </div>
+
+    </div>
+
+    <p style="margin-top:35px;">
+      PASONG © 2026 • Music • Artists • Opportunity
+    </p>
+
+  </div>
+
+</footer>
+
+
+<!-- =========================
+     MOBILE BOTTOM NAV
+     PHONE ONLY
+========================= -->
+
+<nav class="mobile-bottom-nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    Home
   </a>
 
-  <a href="account.html" class="account-btn">Account</a>
-</div>
+  <a href="store.html">
+    <span>🎵</span>
+    Music
+  </a>
 
-  </div>
-</nav><!-- HERO --><section class="hero">
-  <div class="hero-box">
-    <small>BUY • DOWNLOAD • SUPPORT • UPLOAD</small><h1>
-  Your Music.<br>
-  <span class="gradient">Your Choice.</span>
-</h1>
+  <a href="charts.html">
+    <span>📊</span>
+    Charts
+  </a>
 
-<p>
-  Discover new music, support African artists and producers,
-  buy songs, download your music and grow with PASONG.
-</p>
+  <a href="artist-dashboard.html">
+    <span>⬆️</span>
+    Upload
+  </a>
 
-<div class="hero-buttons">
-  <a href="store.html" class="btn btn-primary">🎵 Explore Music</a>
-  <a href="upload.html" class="btn btn-dark">⬆️ Upload Music</a>
-  <a href="charts.html" class="btn btn-dark">🔥 View Charts</a>
-</div>
+  <a href="account.html">
+    <span>👤</span>
+    Account
+  </a>
 
-  </div>
-</section><!-- QUICK DISCOVERY --><section class="quick-nav">  <a class="quick" href="store.html">
-    <span class="icon">🎵</span>
-    <strong>All Songs</strong>
-  </a>  <a class="quick" href="store.html">
-    <span class="icon">🆕</span>
-    <strong>New</strong>
-  </a>  <a class="quick" href="charts.html">
-    <span class="icon">🔥</span>
-    <strong>Trending</strong>
-  </a>  <a class="quick" href="artists.html">
-    <span class="icon">🎤</span>
-    <strong>Artists</strong>
-  </a>  <a class="quick" href="playlists.html">
-    <span class="icon">📋</span>
-    <strong>Playlists</strong>
-  </a>  <a class="quick" href="account.html">
-    <span class="icon">❤️</span>
-    <strong>Favorites</strong>
-  </a>  <a class="quick" href="charts.html">
-    <span class="icon">🏆</span>
-    <strong>Charts</strong>
-  </a></section><!-- TRENDING --><section class="section">
-  <div class="section-head">
-    <h2>🔥 Trending Music</h2>
-    <a href="charts.html"><span>View all →</span></a>
-  </div>  <div id="trendingSongs" class="scroll-row">
-    <div class="loading">Loading trending music...</div>
-  </div>
-</section><!-- LATEST --><section class="section">
-  <div class="section-head">
-    <h2>🆕 Latest New Uploads</h2>
-    <a href="store.html"><span>View all →</span></a>
-  </div>  <div id="latestSongs" class="scroll-row">
-    <div class="loading">Loading latest songs...</div>
-  </div>
-</section><!-- TOP DOWNLOADS --><section class="section">
-  <div class="section-head">
-    <h2>📥 Top Downloads</h2>
-    <a href="charts.html"><span>Charts →</span></a>
-  </div>  <div id="downloadsSongs" class="scroll-row">
-    <div class="loading">Loading downloads...</div>
-  </div>
-</section><!-- TOP UGANDA --><section class="section">
-  <div class="section-head">
-    <h2>🇺🇬 Top Ugandan Music</h2>
-    <span>PASONG Uganda</span>
-  </div>  <div id="ugandaSongs" class="scroll-row">
-    <div class="loading">Loading Ugandan music...</div>
-  </div>
-</section><!-- GENRES --><section class="section">
-  <div class="section-head">
-    <h2>🎼 Browse Genres</h2>
-  </div>  <div class="genre-row">
-    <a class="genre" href="search.html?genre=Afrobeats">Afrobeats</a>
-    <a class="genre" href="search.html?genre=Amapiano">Amapiano</a>
-    <a class="genre" href="search.html?genre=Gengetone">Gengetone</a>
-    <a class="genre" href="search.html?genre=Bongo">Bongo</a>
-    <a class="genre" href="search.html?genre=Dancehall">Dancehall</a>
-    <a class="genre" href="search.html?genre=Hip Hop">Hip Hop</a>
-    <a class="genre" href="search.html?genre=R&B">R&B</a>
-    <a class="genre" href="search.html?genre=Gospel">Gospel</a>
-    <a class="genre" href="search.html?genre=Reggae">Reggae</a>
-  </div>
-</section><!-- WEEKLY COUNTDOWN --><section class="section">
-  <div class="section-head">
-    <h2>⏳ Weekly Countdown</h2>
-    <span>Top music this week</span>
-  </div>  <div id="countdownSongs" class="scroll-row">
-    <div class="loading">Loading countdown...</div>
-  </div>
-</section><!-- POPULAR ARTISTS --><section class="section">
-  <div class="section-head">
-    <h2>🎤 Popular Artists</h2>
-    <a href="artists.html"><span>View all →</span></a>
-  </div>  <div id="artistsRow" class="scroll-row">
-    <div class="loading">Loading artists...</div>
-  </div>
-</section><!-- CONTINUE LISTENING --><section class="section" id="continueSection" style="display:none;">
-  <div class="section-head">
-    <h2>🎧 Continue Listening</h2>
-  </div>  <div id="continueSongs" class="scroll-row"></div>
-</section><!-- WHY PASONG --><section class="section">
-  <div class="section-head">
-    <h2>Why PASONG?</h2>
-  </div>  <div class="feature-grid"><div class="feature">
-  <div class="feature-icon">🎵</div>
-  <h3>Discover Music</h3>
-  <p>
-    Find new songs, artists, genres and sounds from Uganda,
-    Africa and beyond.
-  </p>
-</div>
+</nav>
 
-<div class="feature">
-  <div class="feature-icon">💰</div>
-  <h3>Support Artists</h3>
-  <p>
-    Every purchase helps music creators earn from their work.
-  </p>
-</div>
 
-<div class="feature">
-  <div class="feature-icon">📥</div>
-  <h3>Buy & Download</h3>
-  <p>
-    Purchase your music and keep purchased songs in your
-    PASONG downloads.
-  </p>
-</div>
+<script>
 
-  </div>
-</section><!-- PAYMENTS --><section class="section">
-  <div class="promo"><div>
-  <h2>💳 Easy Payments</h2>
-  <p>
-    PASONG supports convenient payment options including
-    MTN Mobile Money and Airtel Money. Standard song price:
-    <strong>UGX 700</strong>.
-  </p>
-</div>
-
-<a href="store.html" class="btn btn-primary">Browse Music</a>
-
-  </div>
-</section><!-- PROMOTION --><section class="section">
-  <div class="promo"><div>
-  <h2>📣 Promote Your Music</h2>
-  <p>
-    Put your music in front of more listeners with PASONG
-    promotion options for artists and businesses.
-  </p>
-</div>
-
-<a href="promotion.html" class="btn btn-primary">Promote Now</a>
-
-  </div>
-</section><!-- REFER --><section class="section">
-  <div class="promo"><div>
-  <h2>🎁 PASONG Points</h2>
-  <p>
-    Refer friends to PASONG. A successful qualifying referral
-    earns <strong>50 PASONG Points</strong>.
-  </p>
-</div>
-
-<a href="points.html" class="btn btn-primary">My Points</a>
-
-  </div>
-</section><!-- FOOTER --><footer>
-  <div class="footer-inner"><div class="footer-brand">
-  <div class="logo">◈ <span>PASONG</span></div>
-  <p>
-    Music. Opportunity. Support.
-    A platform built to connect music creators and listeners.
-  </p>
-</div>
-
-<div>
-  <h4>Music</h4>
-  <a href="store.html">Music Store</a>
-  <a href="charts.html">Charts</a>
-  <a href="artists.html">Artists</a>
-  <a href="playlists.html">Playlists</a>
-</div>
-
-<div>
-  <h4>Creators</h4>
-  <a href="upload.html">Upload Music</a>
-  <a href="promotion.html">Promotion</a>
-  <a href="account.html">My Account</a>
-  <a href="points.html">PASONG Points</a>
-</div>
-
-<div>
-  <h4>PASONG</h4>
-  <a href="notifications.html">Notifications</a>
-  <a href="account.html">My Downloads</a>
-  <a href="account.html">Earnings</a>
-</div>
-
-  </div>  <div class="copyright">
-    PASONG © 2026 • Music • Artists • Opportunity
-  </div>
-</footer><!-- PERSISTENT PLAYER --><div id="player" class="player">
-  <div class="player-inner"><img id="playerCover" class="player-cover" src="" alt="">
-
-<div class="player-info">
-  <div id="playerTitle" class="player-title">Nothing playing</div>
-  <div id="playerArtist" class="player-artist">PASONG</div>
-</div>
-
-<audio id="audioPlayer" controls></audio>
-
-  </div>
-</div><script>
 /* =========================================================
-   PASONG WORKING API CONNECTION
-   DO NOT CHANGE
-========================================================= */
-
-const PASONG_API = "https://pasong-api.onrender.com";
+   PASONG SUPABASE CONNECTION
+   Uses public anon/publishable key only.
+   ========================================================= */
 
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
 
+/*
+ IMPORTANT:
+ Replace ONLY this value with your existing
+ Supabase publishable/anon key if it is not already
+ supplied by your project.
+*/
 const SUPABASE_ANON_KEY =
   "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
-const PASONG_PRICE = 700;
+let pasongSupabase = null;
 
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function esc(value){
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
-
-function getPrice(song){
-  const value =
-    song.display_price ??
-    song.price ??
-    PASONG_PRICE;
-
-  const currency =
-    song.display_currency ??
-    song.currency ??
-    "UGX";
-
-  return `${currency} ${Number(value).toLocaleString()}`;
-}
-
-function getCover(song){
-  return song.cover_url ||
-         song.cover ||
-         song.image_url ||
-         "https://via.placeholder.com/500x500/11111b/ffffff?text=PASONG";
-}
-
-function getArtist(song){
-  return song.artist_name ||
-         song.artist ||
-         song.performing_artist ||
-         song.artist_profile?.stage_name ||
-         "PASONG Artist";
-}
-
-function getAudio(song){
-  return song.audio_url ||
-         song.audio ||
-         song.preview_url ||
-         "";
-}
-
-function getSongsFromResponse(data){
-
-  if(Array.isArray(data)){
-    return data;
-  }
-
-  if(Array.isArray(data?.songs)){
-    return data.songs;
-  }
-
-  if(Array.isArray(data?.data)){
-    return data.data;
-  }
-
-  if(Array.isArray(data?.results)){
-    return data.results;
-  }
-
-  return [];
+if(
+  window.supabase &&
+  SUPABASE_ANON_KEY &&
+  !SUPABASE_ANON_KEY.startsWith("YOUR_")
+){
+  pasongSupabase =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
 }
 
 
 /* =========================================================
-   SONG CARD
-========================================================= */
+   ACCOUNT OWNER PHOTO
+   ========================================================= */
 
-function songCard(song){
+async function loadPasongAccount(){
 
-  const id = song.id || "";
+  const photo =
+    document.getElementById("accountPhoto");
 
-  const title =
-    song.title ||
-    song.name ||
-    "Untitled Song";
+  const name =
+    document.getElementById("accountName");
 
-  const artist = getArtist(song);
-  const cover = getCover(song);
-  const audio = getAudio(song);
-  const price = getPrice(song);
+  const loginButton =
+    document.getElementById("loginButton");
 
-  return `
-    <article class="song-card">
-
-      <a href="song.html?id=${encodeURIComponent(id)}">
-        <img
-          class="cover"
-          src="${esc(cover)}"
-          alt="${esc(title)}"
-          loading="lazy"
-        >
-      </a>
-
-      <div class="song-info">
-
-        <a
-          class="song-title"
-          href="song.html?id=${encodeURIComponent(id)}"
-          title="${esc(title)}"
-        >
-          ${esc(title)}
-        </a>
-
-        <div class="artist">
-          ${esc(artist)}
-        </div>
-
-        <div class="song-bottom">
-
-          <span class="price">${esc(price)}</span>
-
-          ${
-            audio
-            ? `
-              <button
-                class="play-btn"
-                onclick='playSong(${JSON.stringify({
-                  title:title,
-                  artist:artist,
-                  cover:cover,
-                  audio:audio
-                }).replace(/'/g,"&#39;")})'
-                aria-label="Play preview"
-              >
-                ▶
-              </button>
-            `
-            : ""
-          }
-
-        </div>
-
-      </div>
-    </article>
-  `;
-}
-
-
-/* =========================================================
-   RENDER SONGS
-========================================================= */
-
-function renderSongs(id,songs){
-
-  const el = document.getElementById(id);
-
-  if(!el) return;
-
-  if(!songs.length){
-
-    el.innerHTML =
-      `<div class="empty">No songs available yet.</div>`;
-
-    return;
-  }
-
-  el.innerHTML =
-    songs.map(songCard).join("");
-}
-
-
-/* =========================================================
-   ARTISTS
-========================================================= */
-
-function renderArtists(songs){
-
-  const el = document.getElementById("artistsRow");
-
-  if(!el) return;
-
-  const map = new Map();
-
-  songs.forEach(song => {
-
-    const name = getArtist(song);
-
-    if(!name || name === "PASONG Artist") return;
-
-    if(!map.has(name)){
-
-      map.set(name,{
-        name:name,
-        image:
-          song.artist_image ||
-          song.artist_avatar ||
-          song.artist_profile?.profile_image ||
-          ""
-      });
-
-    }
-
-  });
-
-  const artists = [...map.values()].slice(0,12);
-
-  if(!artists.length){
-
-    el.innerHTML =
-      `<div class="empty">Artists will appear here as music is uploaded.</div>`;
-
-    return;
-  }
-
-  el.innerHTML = artists.map(artist => `
-
-    <a
-      class="artist-card"
-      href="artists.html?artist=${encodeURIComponent(artist.name)}"
-    >
-
-      <img
-        class="artist-photo"
-        src="${esc(
-          artist.image ||
-          "https://via.placeholder.com/300x300/11111b/ffffff?text=Artist"
-        )}"
-        alt="${esc(artist.name)}"
-        loading="lazy"
-      >
-
-      <h3>${esc(artist.name)}</h3>
-      <p>View artist</p>
-
-    </a>
-
-  `).join("");
-}
-
-
-/* =========================================================
-   LOAD MUSIC
-========================================================= */
-
-async function loadMusic(){
-
-  try{
-
-    const response =
-      await fetch(`${PASONG_API}/api/songs`,{
-        cache:"no-store"
-      });
-
-    if(!response.ok){
-      throw new Error("API request failed");
-    }
-
-    const data = await response.json();
-
-    const songs = getSongsFromResponse(data);
-
-    /*
-      Latest
-    */
-    const latest = [...songs].sort((a,b)=>{
-
-      const da =
-        new Date(a.created_at || 0).getTime();
-
-      const db =
-        new Date(b.created_at || 0).getTime();
-
-      return db-da;
-
-    }).slice(0,20);
-
-
-    /*
-      Trending
-    */
-    const trending = [...songs].sort((a,b)=>{
-
-      const scoreA =
-        Number(a.plays || 0) +
-        Number(a.downloads || 0) * 5;
-
-      const scoreB =
-        Number(b.plays || 0) +
-        Number(b.downloads || 0) * 5;
-
-      return scoreB-scoreA;
-
-    }).slice(0,20);
-
-
-    /*
-      Top downloads
-    */
-    const downloads = [...songs].sort((a,b)=>{
-
-      return Number(b.downloads || 0) -
-             Number(a.downloads || 0);
-
-    }).slice(0,20);
-
-
-    /*
-      Uganda section.
-      Current PASONG API data is used without
-      changing the existing API.
-    */
-    const uganda = [...trending].slice(0,20);
-
-
-    /*
-      Weekly countdown
-    */
-    const countdown = [...trending].slice(0,20);
-
-
-    renderSongs("trendingSongs",trending);
-    renderSongs("latestSongs",latest);
-    renderSongs("downloadsSongs",downloads);
-    renderSongs("ugandaSongs",uganda);
-    renderSongs("countdownSongs",countdown);
-
-    renderArtists(songs);
-
-    setupContinueListening(songs);
-
-  }catch(error){
-
-    console.error("PASONG music error:",error);
-
-    const ids = [
-      "trendingSongs",
-      "latestSongs",
-      "downloadsSongs",
-      "ugandaSongs",
-      "countdownSongs"
-    ];
-
-    ids.forEach(id=>{
-
-      const el=document.getElementById(id);
-
-      if(el){
-
-        el.innerHTML =
-          `<div class="empty">Music is temporarily unavailable. Please try again.</div>`;
-
-      }
-
-    });
-
-  }
-
-}
-
-
-/* =========================================================
-   PREVIEW PLAYER
-========================================================= */
-
-function playSong(song){
-
-  if(!song || !song.audio){
-
-    alert("Preview unavailable for this song.");
-
-    return;
-  }
-
-  const player =
-    document.getElementById("player");
-
-  const audio =
-    document.getElementById("audioPlayer");
-
-  document.getElementById("playerCover").src =
-    song.cover || "";
-
-  document.getElementById("playerTitle").textContent =
-    song.title || "Song";
-
-  document.getElementById("playerArtist").textContent =
-    song.artist || "Artist";
-
-  audio.src = song.audio;
-
-  player.style.display = "block";
-
-  audio.play().catch(()=>{});
+  if(!photo || !name) return;
 
   /*
-    PASONG preview limit:
-    stop after 20 seconds.
+   If Supabase is not configured on this page,
+   safely keep the default avatar.
   */
-  audio.currentTime = 0;
+  if(!pasongSupabase){
+    return;
+  }
 
-  audio.ontimeupdate = function(){
+  try{
 
-    if(audio.currentTime >= 20){
+    const {
+      data:{
+        user
+      }
+    } = await pasongSupabase.auth.getUser();
 
-      audio.pause();
-      audio.currentTime = 0;
+    if(!user){
 
+      name.textContent = "Account";
+
+      loginButton.textContent =
+        "Login / Sign Up";
+
+      photo.src =
+        "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
+
+      return;
     }
 
-  };
-
-}
-
-
-/* =========================================================
-   CONTINUE LISTENING
-========================================================= */
-
-function setupContinueListening(songs){
-
-  const section =
-    document.getElementById("continueSection");
-
-  const row =
-    document.getElementById("continueSongs");
-
-  let recent = [];
-
-  try{
-    recent =
-      JSON.parse(
-        localStorage.getItem("pasong_recent_songs") || "[]"
-      );
-  }catch(e){
-    recent=[];
-  }
-
-  if(!recent.length || !songs.length){
-    return;
-  }
-
-  const found =
-    recent
-      .map(id=>songs.find(song=>song.id===id))
-      .filter(Boolean)
-      .slice(0,10);
-
-  if(!found.length){
-    return;
-  }
-
-  row.innerHTML =
-    found.map(songCard).join("");
-
-  section.style.display="block";
-}
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-function goSearch(value){
-
-  const query =
-    String(value || "").trim();
-
-  if(!query) return;
-
-  window.location.href =
-    `search.html?q=${encodeURIComponent(query)}`;
-
-}
-
-
-/* =========================================================
-   NOTIFICATION COUNT
-   Uses existing PASONG Supabase connection.
-========================================================= */
-
-async function loadNotificationCount(){
-
-  try{
-
-    const sessionResponse =
-      await fetch(
-        `${SUPABASE_URL}/auth/v1/user`,
-        {
-          headers:{
-            apikey:SUPABASE_ANON_KEY,
-            Authorization:
-              `Bearer ${localStorage.getItem("sb-mtufczmjlkvycarxylgh-auth-token") || ""}`
-          }
-        }
-      );
 
     /*
-      If no session token is available, simply leave
-      the bell without a count.
+     Try common profile-photo metadata names.
+     This allows the account photo to work with
+     existing Supabase auth metadata.
     */
 
-    if(!sessionResponse.ok){
-      return;
-    }
+    const metadata =
+      user.user_metadata || {};
 
-    const user =
-      await sessionResponse.json();
+    const avatar =
+      metadata.avatar_url ||
+      metadata.avatar ||
+      metadata.photo_url ||
+      metadata.profile_photo ||
+      metadata.picture ||
+      "";
 
-    if(!user?.id){
-      return;
-    }
 
-    const response =
-      await fetch(
-        `${SUPABASE_URL}/rest/v1/notifications?user_id=eq.${encodeURIComponent(user.id)}&is_read=eq.false&select=id`,
-        {
-          headers:{
-            apikey:SUPABASE_ANON_KEY,
-            Authorization:
-              `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        }
-      );
+    if(avatar){
 
-    if(!response.ok){
-      return;
-    }
-
-    const rows =
-      await response.json();
-
-    const badge =
-      document.getElementById("notificationBadge");
-
-    if(!badge) return;
-
-    const count =
-      Array.isArray(rows) ? rows.length : 0;
-
-    if(count > 0){
-
-      badge.textContent =
-        count > 99 ? "99+" : count;
-
-      badge.style.display="flex";
+      photo.src = avatar;
 
     }else{
 
-      badge.style.display="none";
+      const displayName =
+        metadata.stage_name ||
+        metadata.performing_name ||
+        metadata.full_name ||
+        metadata.name ||
+        user.email ||
+        "PASONG";
+
+      photo.src =
+        "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(displayName) +
+        "&background=171722&color=c084fc&bold=true";
+    }
+
+
+    const displayName =
+      metadata.stage_name ||
+      metadata.performing_name ||
+      metadata.full_name ||
+      metadata.name ||
+      "";
+
+    if(displayName){
+
+      name.textContent =
+        displayName.length > 14
+          ? displayName.substring(0,14) + "…"
+          : displayName;
+
+    }else{
+
+      name.textContent =
+        "Account";
 
     }
 
+
+    loginButton.textContent =
+      "Account";
+
   }catch(error){
 
-    /*
-      Notification failure must never affect
-      the working homepage/music API.
-    */
-
     console.log(
-      "Notification count unavailable:",
+      "PASONG account check:",
       error
     );
 
@@ -1529,11 +1754,47 @@ async function loadNotificationCount(){
 
 
 /* =========================================================
+   SEARCH
+   Keeps search simple and safe.
+   ========================================================= */
+
+const siteSearch =
+  document.getElementById("siteSearch");
+
+if(siteSearch){
+
+  siteSearch.addEventListener(
+    "keydown",
+    function(event){
+
+      if(event.key !== "Enter"){
+        return;
+      }
+
+      const query =
+        siteSearch.value.trim();
+
+      if(!query){
+        return;
+      }
+
+      window.location.href =
+        "store.html?search=" +
+        encodeURIComponent(query);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
    START
-========================================================= */
+   ========================================================= */
 
-loadMusic();
-loadNotificationCount();
+loadPasongAccount();
 
-</script></body>
+</script>
+
+</body>
 </html>
