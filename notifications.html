@@ -1,1 +1,1615 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — notifications</title><link rel="stylesheet" href="assets/style.css"></head><body><header><a class="logo" href="index.html">◈ PASONG</a><nav><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="account.html">Account</a></nav></header><main><h1>notifications</h1><div class="card"><h2>PASONG notifications</h2><p>This page is part of the updated PASONG structure. Connect it to the PASONG API/Supabase backend for live data.</p><a class="btn" href="store.html">Open Music Store</a></div></main><footer>PASONG © 2026</footer></body></html>
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — Notifications</title><link rel="stylesheet" href="assets/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+header{
+  min-height:70px;
+  padding:14px 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  background:rgba(8,8,16,.96);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(12px);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:900;
+  white-space:nowrap;
+  background:linear-gradient(90deg,#b86cff,#ff4fa3);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+nav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+nav a{
+  padding:9px 12px;
+  border-radius:10px;
+  color:#aaa;
+  font-size:14px;
+}
+
+nav a:hover,
+nav a.active{
+  color:#fff;
+  background:rgba(180,100,255,.12);
+}
+
+main{
+  width:min(1050px,94%);
+  margin:35px auto 70px;
+}
+
+.hero{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px;
+  margin-bottom:25px;
+}
+
+.hero h1{
+  margin:0 0 8px;
+  font-size:34px;
+}
+
+.hero p{
+  margin:0;
+  color:#999;
+}
+
+.hero-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  border:0;
+  cursor:pointer;
+  border-radius:11px;
+  padding:11px 16px;
+  color:#fff;
+  background:#171522;
+  border:1px solid rgba(255,255,255,.1);
+  font-weight:700;
+}
+
+.btn:hover{
+  background:#211b31;
+}
+
+.btn.primary{
+  background:linear-gradient(135deg,#9b5cff,#ed3f9b);
+  border:0;
+}
+
+.btn.danger{
+  color:#ff8bbd;
+}
+
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+
+.stat{
+  background:linear-gradient(145deg,#11101b,#0d0c14);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:17px;
+  padding:20px;
+}
+
+.stat-icon{
+  font-size:24px;
+  margin-bottom:8px;
+}
+
+.stat-number{
+  font-size:26px;
+  font-weight:900;
+}
+
+.stat-label{
+  color:#8f8f99;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.filters{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:8px;
+  margin-bottom:18px;
+  scrollbar-width:none;
+}
+
+.filters::-webkit-scrollbar{
+  display:none;
+}
+
+.filter{
+  flex:0 0 auto;
+  border:1px solid rgba(255,255,255,.09);
+  background:#11101a;
+  color:#aaa;
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.filter.active{
+  color:#fff;
+  background:linear-gradient(135deg,#9b5cff,#ed3f9b);
+  border-color:transparent;
+}
+
+.notice{
+  padding:15px 17px;
+  border-radius:14px;
+  margin-bottom:18px;
+  background:#11101a;
+  border:1px solid rgba(255,255,255,.08);
+  color:#aaa;
+}
+
+.notice strong{
+  color:#fff;
+}
+
+.notification-list{
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+}
+
+.notification{
+  position:relative;
+  display:flex;
+  gap:15px;
+  padding:17px;
+  border-radius:17px;
+  background:#101019;
+  border:1px solid rgba(255,255,255,.07);
+  transition:.2s;
+}
+
+.notification:hover{
+  transform:translateY(-1px);
+  border-color:rgba(180,100,255,.3);
+}
+
+.notification.unread{
+  background:linear-gradient(145deg,#151122,#101019);
+  border-color:rgba(180,100,255,.25);
+}
+
+.notification.unread:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:14px;
+  bottom:14px;
+  width:3px;
+  border-radius:5px;
+  background:linear-gradient(#a85cff,#ff4fa3);
+}
+
+.icon{
+  width:48px;
+  height:48px;
+  min-width:48px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  background:rgba(170,90,255,.12);
+}
+
+.notification-content{
+  flex:1;
+  min-width:0;
+}
+
+.notification-title{
+  font-size:16px;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.notification-message{
+  color:#aaa;
+  line-height:1.5;
+  font-size:14px;
+}
+
+.notification-time{
+  color:#666;
+  font-size:12px;
+  margin-top:8px;
+}
+
+.notification-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.small-btn{
+  border:1px solid rgba(255,255,255,.09);
+  background:#15141e;
+  color:#bbb;
+  border-radius:9px;
+  padding:8px 10px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+}
+
+.small-btn:hover{
+  color:#fff;
+  background:#211b31;
+}
+
+.empty{
+  text-align:center;
+  padding:65px 20px;
+  background:#101019;
+  border:1px dashed rgba(255,255,255,.1);
+  border-radius:20px;
+}
+
+.empty-icon{
+  font-size:48px;
+  margin-bottom:12px;
+}
+
+.empty h2{
+  margin:0 0 8px;
+}
+
+.empty p{
+  color:#888;
+  margin:0;
+}
+
+.loading{
+  text-align:center;
+  padding:50px;
+  color:#888;
+}
+
+.error{
+  color:#ff8bbd;
+}
+
+footer{
+  text-align:center;
+  color:#666;
+  padding:30px 20px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+@media(max-width:800px){
+  header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  nav{
+    width:100%;
+    justify-content:flex-start;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+  }
+
+  nav a{
+    flex:0 0 auto;
+  }
+
+  .hero{
+    flex-direction:column;
+  }
+
+  .hero h1{
+    font-size:28px;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .notification{
+    padding:14px;
+  }
+
+  .notification-actions{
+    margin-top:4px;
+  }
+}
+</style></head><body><header><a class="logo" href="index.html">◈ PASONG</a>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="store.html">Music Store</a>
+    <a href="charts.html">Charts</a>
+    <a href="artists.html">Artists</a>
+    <a href="playlists.html">Playlists</a>
+    <a href="promotion.html">Promotion</a>
+    <a class="active" href="notifications.html">🔔 Notifications</a>
+    <a href="account.html">Account</a>
+  </nav></header><main>  <section class="hero"><div>
+  <h1>🔔 Notifications</h1>
+  <p>Stay updated with your PASONG account, music, earnings and activity.</p>
+</div>
+
+<div class="hero-actions">
+  <button class="btn" onclick="loadNotifications()">
+    ↻ Refresh
+  </button>
+
+  <button
+    class="btn primary"
+    id="markAllButton"
+    onclick="markAllRead()"
+  >
+    ✓ Mark All Read
+  </button>
+</div>
+
+  </section>  <section class="stats"><div class="stat">
+  <div class="stat-icon">🔔</div>
+  <div class="stat-number" id="totalCount">0</div>
+  <div class="stat-label">Total Notifications</div>
+</div>
+
+<div class="stat">
+  <div class="stat-icon">✨</div>
+  <div class="stat-number" id="unreadCount">0</div>
+  <div class="stat-label">Unread</div>
+</div>
+
+<div class="stat">
+  <div class="stat-icon">🎵</div>
+  <div class="stat-number" id="musicCount">0</div>
+  <div class="stat-label">Music Notifications</div>
+</div>
+
+  </section>  <div class="filters" id="filters"><button class="filter active" data-filter="all">
+  All
+</button>
+
+<button class="filter" data-filter="unread">
+  Unread
+</button>
+
+<button class="filter" data-filter="music">
+  🎵 Music
+</button>
+
+<button class="filter" data-filter="earnings">
+  💰 Earnings
+</button>
+
+<button class="filter" data-filter="social">
+  👤 Social
+</button>
+
+<button class="filter" data-filter="promotions">
+  📢 Promotions
+</button>
+
+<button class="filter" data-filter="account">
+  ⚙️ Account
+</button>
+
+  </div>  <div class="notice" id="statusMessage">
+    Checking your PASONG notifications...
+  </div>  <section id="notificationList" class="notification-list"><div class="loading">
+  Loading notifications...
+</div>
+
+  </section></main><footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer><script>
+
+/* =========================================================
+   PASONG SUPABASE CONFIG
+========================================================= */
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentUser = null;
+let allNotifications = [];
+let activeFilter = "all";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHTML(value){
+
+  if(value === null || value === undefined){
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+function getValue(item, keys, fallback=""){
+
+  for(const key of keys){
+
+    if(
+      item &&
+      item[key] !== undefined &&
+      item[key] !== null &&
+      item[key] !== ""
+    ){
+
+      return item[key];
+
+    }
+
+  }
+
+  return fallback;
+}
+
+
+function getTitle(item){
+
+  return getValue(
+    item,
+    ["title","notification_title","name"],
+    "PASONG Notification"
+  );
+
+}
+
+
+function getMessage(item){
+
+  return getValue(
+    item,
+    ["message","body","description","text","content"],
+    "You have a new notification."
+  );
+
+}
+
+
+function getType(item){
+
+  return String(
+    getValue(
+      item,
+      ["type","category","notification_type"],
+      "system"
+    )
+  ).toLowerCase();
+
+}
+
+
+function isRead(item){
+
+  if(typeof item.is_read === "boolean"){
+    return item.is_read;
+  }
+
+  if(typeof item.read === "boolean"){
+    return item.read;
+  }
+
+  if(item.status === "read"){
+    return true;
+  }
+
+  return false;
+
+}
+
+
+function getCreatedAt(item){
+
+  return getValue(
+    item,
+    ["created_at","createdAt","date"],
+    null
+  );
+
+}
+
+
+function formatTime(dateValue){
+
+  if(!dateValue){
+    return "Recently";
+  }
+
+  const date = new Date(dateValue);
+
+  if(Number.isNaN(date.getTime())){
+    return String(dateValue);
+  }
+
+  const now = new Date();
+
+  const seconds =
+    Math.floor((now - date) / 1000);
+
+  if(seconds < 60){
+    return "Just now";
+  }
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  if(minutes < 60){
+    return minutes + (minutes === 1 ? " minute ago" : " minutes ago");
+  }
+
+  const hours =
+    Math.floor(minutes / 60);
+
+  if(hours < 24){
+    return hours + (hours === 1 ? " hour ago" : " hours ago");
+  }
+
+  const days =
+    Math.floor(hours / 24);
+
+  if(days < 7){
+    return days + (days === 1 ? " day ago" : " days ago");
+  }
+
+  return date.toLocaleDateString(
+    undefined,
+    {
+      day:"numeric",
+      month:"short",
+      year:"numeric"
+    }
+  );
+
+}
+
+
+function getIcon(type){
+
+  if(
+    type.includes("sale") ||
+    type.includes("purchase") ||
+    type.includes("download") ||
+    type.includes("song")
+  ){
+    return "🎵";
+  }
+
+  if(
+    type.includes("earning") ||
+    type.includes("royalt") ||
+    type.includes("payment") ||
+    type.includes("money")
+  ){
+    return "💰";
+  }
+
+  if(
+    type.includes("follow") ||
+    type.includes("social")
+  ){
+    return "👤";
+  }
+
+  if(
+    type.includes("favorite") ||
+    type.includes("favourite") ||
+    type.includes("like")
+  ){
+    return "❤️";
+  }
+
+  if(
+    type.includes("promotion") ||
+    type.includes("advert")
+  ){
+    return "📢";
+  }
+
+  if(
+    type.includes("cover") ||
+    type.includes("artwork")
+  ){
+    return "🎨";
+  }
+
+  if(
+    type.includes("point") ||
+    type.includes("referral") ||
+    type.includes("reward")
+  ){
+    return "⭐";
+  }
+
+  if(
+    type.includes("security") ||
+    type.includes("warning")
+  ){
+    return "⚠️";
+  }
+
+  if(
+    type.includes("account") ||
+    type.includes("profile")
+  ){
+    return "⚙️";
+  }
+
+  return "🔔";
+
+}
+
+
+function getFilterCategory(item){
+
+  const type = getType(item);
+
+  if(isRead(item) === false && activeFilter === "unread"){
+    return "unread";
+  }
+
+  if(
+    type.includes("sale") ||
+    type.includes("purchase") ||
+    type.includes("download") ||
+    type.includes("song") ||
+    type.includes("music") ||
+    type.includes("favorite") ||
+    type.includes("favourite") ||
+    type.includes("like")
+  ){
+    return "music";
+  }
+
+  if(
+    type.includes("earning") ||
+    type.includes("royalt") ||
+    type.includes("payment") ||
+    type.includes("money")
+  ){
+    return "earnings";
+  }
+
+  if(
+    type.includes("follow") ||
+    type.includes("social")
+  ){
+    return "social";
+  }
+
+  if(
+    type.includes("promotion") ||
+    type.includes("advert")
+  ){
+    return "promotions";
+  }
+
+  if(
+    type.includes("account") ||
+    type.includes("security") ||
+    type.includes("profile") ||
+    type.includes("system")
+  ){
+    return "account";
+  }
+
+  return "account";
+
+}
+
+
+function getNotificationLink(item){
+
+  const directLink =
+    getValue(
+      item,
+      ["link","action_url","url","href"],
+      ""
+    );
+
+  if(directLink){
+    return directLink;
+  }
+
+  const songId =
+    getValue(
+      item,
+      ["song_id","songId"],
+      ""
+    );
+
+  if(songId){
+    return "song.html?id=" +
+      encodeURIComponent(songId);
+  }
+
+  const type = getType(item);
+
+  if(
+    type.includes("earning") ||
+    type.includes("royalt") ||
+    type.includes("sale")
+  ){
+    return "artist-dashboard.html#earnings";
+  }
+
+  if(
+    type.includes("point") ||
+    type.includes("referral")
+  ){
+    return "points.html";
+  }
+
+  if(
+    type.includes("promotion") ||
+    type.includes("advert")
+  ){
+    return "promotion.html";
+  }
+
+  if(
+    type.includes("cover")
+  ){
+    return "artist-dashboard.html#upload";
+  }
+
+  if(
+    type.includes("account") ||
+    type.includes("security")
+  ){
+    return "account.html";
+  }
+
+  return "";
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function setStatus(message, error=false){
+
+  const box =
+    document.getElementById("statusMessage");
+
+  box.innerHTML =
+    error
+      ? `<span class="error">${escapeHTML(message)}</span>`
+      : escapeHTML(message);
+
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+async function checkUser(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.getSession();
+
+  if(error){
+    throw error;
+  }
+
+  currentUser =
+    data &&
+    data.session &&
+    data.session.user
+      ? data.session.user
+      : null;
+
+  if(!currentUser){
+
+    setStatus(
+      "Please log in to view your PASONG notifications."
+    );
+
+    document.getElementById("notificationList").innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🔐</div>
+        <h2>Login Required</h2>
+        <p>Log in to your PASONG account to see your notifications.</p>
+        <br>
+        <a class="btn primary" href="account.html">
+          Login / Create Account
+        </a>
+      </div>
+    `;
+
+    return false;
+  }
+
+  return true;
+
+}
+
+
+/* =========================================================
+   LOAD NOTIFICATIONS
+========================================================= */
+
+async function loadNotifications(){
+
+  if(!currentUser){
+
+    const loggedIn =
+      await checkUser();
+
+    if(!loggedIn){
+      return;
+    }
+
+  }
+
+  setStatus("Loading your notifications...");
+
+  document.getElementById("notificationList").innerHTML = `
+    <div class="loading">
+      Loading notifications...
+    </div>
+  `;
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("notifications")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at",{ascending:false});
+
+    if(error){
+      throw error;
+    }
+
+    allNotifications =
+      Array.isArray(data)
+        ? data
+        : [];
+
+    updateStats();
+    renderNotifications();
+
+    setStatus(
+      allNotifications.length
+        ? "Your PASONG notifications are up to date."
+        : "You don't have any notifications yet."
+    );
+
+  }catch(error){
+
+    console.error(
+      "PASONG notifications error:",
+      error
+    );
+
+    allNotifications = [];
+
+    updateStats();
+
+    document.getElementById("notificationList").innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🔔</div>
+        <h2>Notifications unavailable</h2>
+        <p>
+          We couldn't load your notifications right now.
+          Please try refreshing the page.
+        </p>
+        <br>
+        <button class="btn primary" onclick="loadNotifications()">
+          Try Again
+        </button>
+      </div>
+    `;
+
+    setStatus(
+      error.message ||
+      "Could not load notifications.",
+      true
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+function updateStats(){
+
+  const total =
+    allNotifications.length;
+
+  const unread =
+    allNotifications.filter(
+      item => !isRead(item)
+    ).length;
+
+  const music =
+    allNotifications.filter(
+      item => getFilterCategory(item) === "music"
+    ).length;
+
+  document.getElementById("totalCount").textContent =
+    total;
+
+  document.getElementById("unreadCount").textContent =
+    unread;
+
+  document.getElementById("musicCount").textContent =
+    music;
+
+}
+
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+document
+  .querySelectorAll(".filter")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(".filter")
+          .forEach(btn =>
+            btn.classList.remove("active")
+          );
+
+        button.classList.add("active");
+
+        activeFilter =
+          button.dataset.filter;
+
+        renderNotifications();
+
+      }
+    );
+
+  });
+
+
+function getFilteredNotifications(){
+
+  if(activeFilter === "all"){
+    return allNotifications;
+  }
+
+  if(activeFilter === "unread"){
+    return allNotifications.filter(
+      item => !isRead(item)
+    );
+  }
+
+  return allNotifications.filter(
+    item =>
+      getFilterCategory(item) === activeFilter
+  );
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderNotifications(){
+
+  const list =
+    document.getElementById(
+      "notificationList"
+    );
+
+  const items =
+    getFilteredNotifications();
+
+  if(!items.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🔕</div>
+        <h2>No notifications here</h2>
+        <p>
+          You don't have any notifications in this section.
+        </p>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    items.map(
+      item => {
+
+        const id =
+          getValue(item,["id"],"");
+
+        const title =
+          getTitle(item);
+
+        const message =
+          getMessage(item);
+
+        const type =
+          getType(item);
+
+        const read =
+          isRead(item);
+
+        const link =
+          getNotificationLink(item);
+
+        const created =
+          getCreatedAt(item);
+
+        return `
+
+          <article
+            class="notification ${read ? "" : "unread"}"
+            id="notification-${escapeHTML(id)}"
+          >
+
+            <div class="icon">
+              ${getIcon(type)}
+            </div>
+
+            <div class="notification-content">
+
+              <div class="notification-title">
+                ${escapeHTML(title)}
+              </div>
+
+              <div class="notification-message">
+                ${escapeHTML(message)}
+              </div>
+
+              <div class="notification-time">
+                ${escapeHTML(formatTime(created))}
+              </div>
+
+            </div>
+
+            <div class="notification-actions">
+
+              ${
+                !read
+                  ? `
+                    <button
+                      class="small-btn"
+                      onclick="markRead('${escapeHTML(id)}')"
+                    >
+                      ✓ Read
+                    </button>
+                  `
+                  : ""
+              }
+
+              ${
+                link
+                  ? `
+                    <button
+                      class="small-btn"
+                      onclick="openNotification('${escapeHTML(id)}')"
+                    >
+                      Open
+                    </button>
+                  `
+                  : ""
+              }
+
+              <button
+                class="small-btn"
+                onclick="deleteNotification('${escapeHTML(id)}')"
+                title="Delete notification"
+              >
+                🗑
+              </button>
+
+            </div>
+
+          </article>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* =========================================================
+   MARK ONE AS READ
+========================================================= */
+
+async function markRead(id){
+
+  if(!id || !currentUser){
+    return;
+  }
+
+  try{
+
+    let result =
+      await supabaseClient
+        .from("notifications")
+        .update({
+          is_read:true
+        })
+        .eq("id",id)
+        .eq("user_id",currentUser.id);
+
+
+    /*
+      Some existing notification tables use
+      "read" instead of "is_read".
+      If is_read does not exist, try read.
+    */
+
+    if(result.error){
+
+      result =
+        await supabaseClient
+          .from("notifications")
+          .update({
+            read:true
+          })
+          .eq("id",id)
+          .eq("user_id",currentUser.id);
+
+    }
+
+
+    if(result.error){
+      throw result.error;
+    }
+
+    const item =
+      allNotifications.find(
+        notification =>
+          String(notification.id) === String(id)
+      );
+
+    if(item){
+
+      if("is_read" in item){
+        item.is_read = true;
+      }else{
+        item.read = true;
+      }
+
+    }
+
+    updateStats();
+    renderNotifications();
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Could not mark this notification as read."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MARK ALL AS READ
+========================================================= */
+
+async function markAllRead(){
+
+  if(!currentUser){
+    return;
+  }
+
+  const unread =
+    allNotifications.filter(
+      item => !isRead(item)
+    );
+
+  if(!unread.length){
+
+    alert("All notifications are already read.");
+
+    return;
+  }
+
+  const button =
+    document.getElementById(
+      "markAllButton"
+    );
+
+  button.disabled = true;
+  button.textContent = "Updating...";
+
+
+  try{
+
+    let result =
+      await supabaseClient
+        .from("notifications")
+        .update({
+          is_read:true
+        })
+        .eq("user_id",currentUser.id)
+        .eq("is_read",false);
+
+
+    if(result.error){
+
+      result =
+        await supabaseClient
+          .from("notifications")
+          .update({
+            read:true
+          })
+          .eq("user_id",currentUser.id)
+          .eq("read",false);
+
+    }
+
+
+    if(result.error){
+      throw result.error;
+    }
+
+
+    allNotifications =
+      allNotifications.map(
+        item => {
+
+          if("is_read" in item){
+            item.is_read = true;
+          }else{
+            item.read = true;
+          }
+
+          return item;
+
+        }
+      );
+
+
+    updateStats();
+    renderNotifications();
+
+    setStatus(
+      "All notifications have been marked as read."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Could not mark all notifications as read."
+    );
+
+  }finally{
+
+    button.disabled = false;
+    button.textContent = "✓ Mark All Read";
+
+  }
+
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+async function deleteNotification(id){
+
+  if(!id || !currentUser){
+    return;
+  }
+
+  const confirmed =
+    confirm(
+      "Delete this notification?"
+    );
+
+  if(!confirmed){
+    return;
+  }
+
+  try{
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("notifications")
+        .delete()
+        .eq("id",id)
+        .eq("user_id",currentUser.id);
+
+    if(error){
+      throw error;
+    }
+
+    allNotifications =
+      allNotifications.filter(
+        item =>
+          String(item.id) !== String(id)
+      );
+
+    updateStats();
+    renderNotifications();
+
+    setStatus(
+      "Notification deleted."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Could not delete this notification."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   OPEN NOTIFICATION
+========================================================= */
+
+async function openNotification(id){
+
+  const item =
+    allNotifications.find(
+      notification =>
+        String(notification.id) === String(id)
+    );
+
+  if(!item){
+    return;
+  }
+
+  if(!isRead(item)){
+    await markRead(id);
+  }
+
+  const link =
+    getNotificationLink(item);
+
+  if(link){
+
+    window.location.href =
+      link;
+
+  }
+
+}
+
+
+/* =========================================================
+   SUPABASE AUTH LISTENER
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  async (event, session) => {
+
+    currentUser =
+      session &&
+      session.user
+        ? session.user
+        : null;
+
+    if(
+      event === "SIGNED_IN" ||
+      event === "INITIAL_SESSION"
+    ){
+
+      if(currentUser){
+        await loadNotifications();
+      }
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   OPTIONAL REAL-TIME NOTIFICATIONS
+========================================================= */
+
+function startRealtime(){
+
+  if(!currentUser){
+    return;
+  }
+
+  try{
+
+    supabaseClient
+      .channel(
+        "pasong-notifications-" +
+        currentUser.id
+      )
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"notifications",
+          filter:
+            "user_id=eq." +
+            currentUser.id
+        },
+        () => {
+
+          loadNotifications();
+
+        }
+      )
+      .subscribe();
+
+  }catch(error){
+
+    /*
+      Realtime is optional.
+      Automatic polling below still keeps
+      the page updated.
+    */
+
+    console.log(
+      "Realtime notifications unavailable."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   AUTOMATIC REFRESH
+========================================================= */
+
+setInterval(
+  () => {
+
+    if(currentUser){
+      loadNotifications();
+    }
+
+  },
+  30000
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+(async function(){
+
+  try{
+
+    const loggedIn =
+      await checkUser();
+
+    if(loggedIn){
+
+      await loadNotifications();
+
+      startRealtime();
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    setStatus(
+      "Could not connect to PASONG notifications.",
+      true
+    );
+
+  }
+
+})();
+
+</script></body>
+</html>
