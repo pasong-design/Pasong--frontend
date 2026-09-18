@@ -9,13 +9,7 @@
 <link rel="stylesheet" href="assets/style.css">
 
 <style>
-/* =========================================================
-   PASONG HOME — MODERN DARK MUSIC DESIGN
-   ========================================================= */
-
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -28,8 +22,6 @@ a{
   color:inherit;
   text-decoration:none;
 }
-
-/* NAVIGATION */
 
 header{
   position:sticky;
@@ -71,6 +63,39 @@ nav a{
 nav a:hover,
 nav a.active{
   color:#fff;
+}
+
+/* NOTIFICATION */
+
+.notification-link{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:#171724;
+  border:1px solid rgba(255,255,255,.08);
+  font-size:17px;
+}
+
+.notification-count{
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  border-radius:50px;
+  background:linear-gradient(135deg,#9c55ff,#ff4fc3);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  border:2px solid #080810;
 }
 
 /* MAIN */
@@ -196,7 +221,7 @@ main{
   font-weight:700;
 }
 
-/* HORIZONTAL SONG ROW */
+/* ROW */
 
 .row{
   display:flex;
@@ -237,8 +262,7 @@ main{
   height:180px;
   object-fit:cover;
   display:block;
-  background:
-    linear-gradient(135deg,#1b1230,#251126);
+  background:linear-gradient(135deg,#1b1230,#251126);
 }
 
 .song-info{
@@ -246,6 +270,7 @@ main{
 }
 
 .song-title{
+  display:block;
   font-size:16px;
   font-weight:800;
   white-space:nowrap;
@@ -342,7 +367,7 @@ main{
   line-height:1.6;
 }
 
-/* EMPTY / ERROR */
+/* MESSAGE */
 
 .message{
   width:100%;
@@ -389,6 +414,10 @@ footer{
     white-space:nowrap;
   }
 
+  .notification-link{
+    flex-shrink:0;
+  }
+
   .hero{
     min-height:auto;
     padding:32px 24px;
@@ -421,15 +450,12 @@ footer{
 
 <body>
 
-<!-- =========================================================
-     NAVIGATION
-     ========================================================= -->
-
 <header>
 
   <a class="logo" href="index.html">◈ PASONG</a>
 
   <nav>
+
     <a class="active" href="index.html">Home</a>
     <a href="store.html">Music Store</a>
     <a href="charts.html">Charts</a>
@@ -437,17 +463,25 @@ footer{
     <a href="playlists.html">Playlists</a>
     <a href="promotion.html">Promotion</a>
     <a href="upload.html">Upload Music</a>
+
+    <a
+      class="notification-link"
+      href="notifications.html"
+      aria-label="Notifications"
+      title="Notifications"
+    >
+      🔔
+      <span id="notificationCount" class="notification-count">0</span>
+    </a>
+
     <a href="account.html">Account</a>
+
   </nav>
 
 </header>
 
 
 <main>
-
-<!-- =========================================================
-     HERO
-     ========================================================= -->
 
 <section class="hero">
 
@@ -487,9 +521,7 @@ footer{
 </section>
 
 
-<!-- =========================================================
-     TRENDING
-     ========================================================= -->
+<!-- TRENDING -->
 
 <section class="section">
 
@@ -517,9 +549,7 @@ footer{
 </section>
 
 
-<!-- =========================================================
-     LATEST SONGS
-     ========================================================= -->
+<!-- LATEST -->
 
 <section class="section">
 
@@ -547,9 +577,7 @@ footer{
 </section>
 
 
-<!-- =========================================================
-     PASONG FEATURES
-     ========================================================= -->
+<!-- FEATURES -->
 
 <section class="section">
 
@@ -605,9 +633,7 @@ footer{
 </section>
 
 
-<!-- =========================================================
-     PAYMENTS / PROMOTION
-     ========================================================= -->
+<!-- PAYMENTS / PROMOTION -->
 
 <section class="section">
 
@@ -649,9 +675,7 @@ footer{
 </section>
 
 
-<!-- =========================================================
-     WEEKLY COUNTDOWN
-     ========================================================= -->
+<!-- WEEKLY COUNTDOWN -->
 
 <section class="section">
 
@@ -675,9 +699,7 @@ footer{
 </section>
 
 
-<!-- =========================================================
-     REFERRAL
-     ========================================================= -->
+<!-- REFERRAL -->
 
 <section class="section">
 
@@ -726,470 +748,642 @@ footer{
 </footer>
 
 
-<!-- =========================================================
-     CONFIG + HOME API
-     ========================================================= -->
-
-<script src="config.js"></script>
-
 <script>
-/*
-===========================================================
-PASONG API CONNECTION
-===========================================================
+/* =========================================================
+   PASONG DIRECT API CONNECTION
+   ========================================================= */
 
-This page tries to use API_BASE_URL from config.js.
+const PASONG_API =
+  "https://pasong-api.onrender.com";
 
-Example config.js:
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
 
-const API_BASE_URL = "https://YOUR-PASONG-API-DOMAIN";
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
-If API_BASE_URL is not available, the page falls back
-to the current PASONG website origin.
-
-===========================================================
-*/
-
-(function(){
-
-  const API =
-    (typeof API_BASE_URL !== "undefined" && API_BASE_URL)
-      ? API_BASE_URL.replace(/\/$/,"")
-      : "";
-
-  const latestBox = document.getElementById("latest");
-  const trendingBox = document.getElementById("trending");
-  const countdownBox = document.getElementById("countdown");
+const PASONG_PRICE = 700;
 
 
-  /* ======================================================
-     HELPERS
-     ====================================================== */
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
 
-  function escapeHTML(value){
+const latestBox =
+  document.getElementById("latest");
 
-    return String(value ?? "")
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#039;");
+const trendingBox =
+  document.getElementById("trending");
 
+const countdownBox =
+  document.getElementById("countdown");
+
+const notificationCount =
+  document.getElementById("notificationCount");
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function getSongTitle(song){
+
+  return (
+    song.title ||
+    song.name ||
+    "Untitled Song"
+  );
+
+}
+
+
+function getArtistName(song){
+
+  return (
+    song.artist_name ||
+    song.artistName ||
+    song.artist ||
+    song.artist_profiles?.stage_name ||
+    song.artist_profiles?.performing_name ||
+    song.artist_profiles?.artist_name ||
+    "Unknown Artist"
+  );
+
+}
+
+
+function getPrice(song){
+
+  const price =
+    song.display_price ??
+    song.price ??
+    PASONG_PRICE;
+
+  const currency =
+    song.display_currency ||
+    song.currency ||
+    "UGX";
+
+  return `${currency} ${Number(price).toLocaleString()}`;
+
+}
+
+
+function getCover(song){
+
+  return (
+    song.cover_url ||
+    song.coverUrl ||
+    song.cover ||
+    "assets/default-cover.png"
+  );
+
+}
+
+
+function getSongId(song){
+
+  return (
+    song.id ||
+    song.song_id ||
+    ""
+  );
+
+}
+
+
+/* =========================================================
+   NORMALIZE API RESPONSE
+   ========================================================= */
+
+function extractSongs(data){
+
+  if(Array.isArray(data)){
+    return data;
   }
 
-
-  function getSongTitle(song){
-
-    return (
-      song.title ||
-      song.name ||
-      "Untitled Song"
-    );
-
+  if(data && Array.isArray(data.songs)){
+    return data.songs;
   }
 
-
-  function getArtistName(song){
-
-    return (
-      song.artist_name ||
-      song.artistName ||
-      song.artist ||
-      song.artist_profiles?.artist_name ||
-      song.artist_profiles?.name ||
-      "Unknown Artist"
-    );
-
+  if(data && Array.isArray(data.data)){
+    return data.data;
   }
 
-
-  function getPrice(song){
-
-    const price =
-      song.price !== undefined &&
-      song.price !== null &&
-      song.price !== ""
-        ? song.price
-        : 500;
-
-    const currency =
-      song.currency ||
-      "UGX";
-
-    return `${currency} ${Number(price).toLocaleString()}`;
-
+  if(data && Array.isArray(data.results)){
+    return data.results;
   }
 
+  return [];
 
-  function getCover(song){
-
-    return (
-      song.cover_url ||
-      song.coverUrl ||
-      song.cover ||
-      "assets/default-cover.png"
-    );
-
-  }
+}
 
 
-  function getSongId(song){
+/* =========================================================
+   CREATE SONG CARD
+   ========================================================= */
 
-    return (
-      song.id ||
-      song.song_id ||
-      ""
-    );
+function createSongCard(song){
 
-  }
+  const title =
+    getSongTitle(song);
 
+  const artist =
+    getArtistName(song);
 
-  /* ======================================================
-     SONG CARD
-     ====================================================== */
+  const price =
+    getPrice(song);
 
-  function createSongCard(song){
+  const cover =
+    getCover(song);
 
-    const title = getSongTitle(song);
-    const artist = getArtistName(song);
-    const price = getPrice(song);
-    const cover = getCover(song);
-    const id = getSongId(song);
+  const id =
+    getSongId(song);
 
-    const card = document.createElement("div");
+  const card =
+    document.createElement("div");
 
-    card.className = "song-card";
+  card.className =
+    "song-card";
 
-    card.innerHTML = `
+  card.innerHTML = `
 
-      <a href="song.html?id=${encodeURIComponent(id)}">
+    <a href="song.html?id=${encodeURIComponent(id)}">
 
-        <img
-          class="song-cover"
-          src="${escapeHTML(cover)}"
-          alt="${escapeHTML(title)}"
-          loading="lazy"
-          onerror="this.src='assets/default-cover.png'"
-        >
+      <img
+        class="song-cover"
+        src="${escapeHTML(cover)}"
+        alt="${escapeHTML(title)}"
+        loading="lazy"
+        onerror="this.src='assets/default-cover.png'"
+      >
 
+    </a>
+
+    <div class="song-info">
+
+      <a
+        class="song-title"
+        href="song.html?id=${encodeURIComponent(id)}"
+      >
+        ${escapeHTML(title)}
       </a>
 
-      <div class="song-info">
+      <div class="song-artist">
+        ${escapeHTML(artist)}
+      </div>
+
+      <div class="song-bottom">
+
+        <span class="price">
+          ${escapeHTML(price)}
+        </span>
 
         <a
-          class="song-title"
+          class="buy-btn"
           href="song.html?id=${encodeURIComponent(id)}"
         >
-          ${escapeHTML(title)}
+          BUY NOW
         </a>
 
-        <div class="song-artist">
-          ${escapeHTML(artist)}
-        </div>
-
-        <div class="song-bottom">
-
-          <span class="price">
-            ${escapeHTML(price)}
-          </span>
-
-          <a
-            class="buy-btn"
-            href="song.html?id=${encodeURIComponent(id)}"
-          >
-            BUY NOW
-          </a>
-
-        </div>
-
       </div>
-    `;
 
-    return card;
+    </div>
+
+  `;
+
+  return card;
+
+}
+
+
+/* =========================================================
+   FETCH ALL SONGS
+   ========================================================= */
+
+async function fetchSongs(){
+
+  const response =
+    await fetch(
+      `${PASONG_API}/api/songs`,
+      {
+        method:"GET",
+        headers:{
+          "Accept":"application/json"
+        },
+        cache:"no-store"
+      }
+    );
+
+  if(!response.ok){
+
+    throw new Error(
+      `PASONG API returned ${response.status}`
+    );
 
   }
 
+  const data =
+    await response.json();
 
-  /* ======================================================
-     NORMALIZE API RESPONSE
-     ====================================================== */
+  return extractSongs(data);
 
-  function extractSongs(data){
-
-    if(Array.isArray(data)){
-      return data;
-    }
-
-    if(data && Array.isArray(data.songs)){
-      return data.songs;
-    }
-
-    if(data && Array.isArray(data.data)){
-      return data.data;
-    }
-
-    if(data && Array.isArray(data.results)){
-      return data.results;
-    }
-
-    return [];
-
-  }
+}
 
 
-  /* ======================================================
-     LOAD LATEST SONGS
-     ====================================================== */
+/* =========================================================
+   LOAD LATEST
+   ========================================================= */
 
-  async function loadLatest(){
+async function loadLatest(){
 
-    latestBox.innerHTML = `
-      <div class="message">
-        Loading latest songs...
-      </div>
-    `;
+  latestBox.innerHTML = `
+    <div class="message">
+      Loading latest songs...
+    </div>
+  `;
 
-    try{
+  try{
 
-      const response = await fetch(
-        `${API}/api/songs`,
-        {
-          method:"GET",
-          headers:{
-            "Accept":"application/json"
-          }
-        }
-      );
+    const songs =
+      await fetchSongs();
 
-      if(!response.ok){
-        throw new Error(
-          `API returned ${response.status}`
-        );
-      }
+    latestBox.innerHTML = "";
 
-      const data = await response.json();
-
-      const songs = extractSongs(data);
-
-      latestBox.innerHTML = "";
-
-      if(!songs.length){
-
-        latestBox.innerHTML = `
-          <div class="message">
-            No songs are available yet.
-          </div>
-        `;
-
-        return;
-
-      }
-
-      songs
-        .slice(0,10)
-        .forEach(song => {
-          latestBox.appendChild(
-            createSongCard(song)
-          );
-        });
-
-    }catch(error){
-
-      console.error(
-        "PASONG latest songs error:",
-        error
-      );
+    if(!songs.length){
 
       latestBox.innerHTML = `
-        <div class="message error">
-          Unable to load songs right now.
+        <div class="message">
+          No songs are available yet.
         </div>
       `;
 
+      return;
+
     }
 
-  }
+    const sorted =
+      [...songs].sort(
+        (a,b) =>
+          new Date(b.created_at || 0) -
+          new Date(a.created_at || 0)
+      );
 
+    sorted
+      .slice(0,10)
+      .forEach(song => {
 
-  /* ======================================================
-     LOAD TRENDING
-     ====================================================== */
+        latestBox.appendChild(
+          createSongCard(song)
+        );
 
-  async function loadTrending(){
+      });
 
-    trendingBox.innerHTML = `
-      <div class="message">
-        Loading trending music...
+  }catch(error){
+
+    console.error(
+      "PASONG latest songs error:",
+      error
+    );
+
+    latestBox.innerHTML = `
+      <div class="message error">
+        Unable to load songs right now.
       </div>
     `;
 
-    try{
+  }
 
-      /*
-       * First try a dedicated trending endpoint.
-       */
+}
 
-      let response = await fetch(
-        `${API}/api/songs?sort=trending`,
-        {
-          method:"GET",
-          headers:{
-            "Accept":"application/json"
-          }
-        }
-      );
 
-      /*
-       * If that endpoint isn't supported,
-       * fall back to normal songs.
-       */
+/* =========================================================
+   LOAD TRENDING
+   ========================================================= */
 
-      if(!response.ok){
+async function loadTrending(){
 
-        response = await fetch(
-          `${API}/api/songs`,
-          {
-            method:"GET",
-            headers:{
-              "Accept":"application/json"
-            }
-          }
-        );
+  trendingBox.innerHTML = `
+    <div class="message">
+      Loading trending music...
+    </div>
+  `;
 
-      }
+  try{
 
-      if(!response.ok){
-        throw new Error(
-          `API returned ${response.status}`
-        );
-      }
+    const songs =
+      await fetchSongs();
 
-      const data = await response.json();
+    trendingBox.innerHTML = "";
 
-      const songs = extractSongs(data);
-
-      trendingBox.innerHTML = "";
-
-      if(!songs.length){
-
-        trendingBox.innerHTML = `
-          <div class="message">
-            Trending music will appear here.
-          </div>
-        `;
-
-        return;
-
-      }
-
-      songs
-        .slice(0,10)
-        .forEach(song => {
-          trendingBox.appendChild(
-            createSongCard(song)
-          );
-        });
-
-    }catch(error){
-
-      console.error(
-        "PASONG trending error:",
-        error
-      );
+    if(!songs.length){
 
       trendingBox.innerHTML = `
-        <div class="message error">
-          Trending music is currently unavailable.
+        <div class="message">
+          Trending music will appear here.
         </div>
       `;
 
+      return;
+
     }
 
-  }
-
-
-  /* ======================================================
-     WEEKLY COUNTDOWN
-     ====================================================== */
-
-  async function loadCountdown(){
-
     /*
-     * This does not invent songs.
-     * It uses the songs already returned by the API
-     * as the current countdown section until a dedicated
-     * countdown endpoint is added.
+     * Temporary trending calculation.
+     *
+     * Plays = 1 point
+     * Downloads = 5 points
+     *
+     * When PASONG has historical chart data,
+     * this section can use that dedicated data.
      */
 
-    try{
+    const sorted =
+      [...songs].sort(
+        (a,b) => {
 
-      const response = await fetch(
-        `${API}/api/songs`,
-        {
-          method:"GET",
-          headers:{
-            "Accept":"application/json"
+          const scoreA =
+            Number(a.plays || 0) +
+            Number(a.downloads || 0) * 5;
+
+          const scoreB =
+            Number(b.plays || 0) +
+            Number(b.downloads || 0) * 5;
+
+          if(scoreB !== scoreA){
+            return scoreB - scoreA;
           }
+
+          return (
+            new Date(b.created_at || 0) -
+            new Date(a.created_at || 0)
+          );
+
         }
       );
 
-      if(!response.ok){
-        throw new Error("Countdown API unavailable");
-      }
+    sorted
+      .slice(0,10)
+      .forEach(song => {
 
-      const data = await response.json();
+        trendingBox.appendChild(
+          createSongCard(song)
+        );
 
-      const songs = extractSongs(data);
+      });
 
-      countdownBox.innerHTML = "";
+  }catch(error){
 
-      if(!songs.length){
+    console.error(
+      "PASONG trending error:",
+      error
+    );
 
-        countdownBox.innerHTML = `
-          <div class="message">
-            Weekly Countdown will appear when songs are available.
-          </div>
-        `;
+    trendingBox.innerHTML = `
+      <div class="message error">
+        Trending music is currently unavailable.
+      </div>
+    `;
 
-        return;
+  }
 
-      }
+}
 
-      songs
-        .slice(0,5)
-        .forEach(song => {
-          countdownBox.appendChild(
-            createSongCard(song)
-          );
-        });
 
-    }catch(error){
+/* =========================================================
+   LOAD WEEKLY COUNTDOWN
+   ========================================================= */
 
-      console.error(
-        "PASONG countdown error:",
-        error
-      );
+async function loadCountdown(){
+
+  countdownBox.innerHTML = `
+    <div class="message">
+      Loading countdown...
+    </div>
+  `;
+
+  try{
+
+    const songs =
+      await fetchSongs();
+
+    countdownBox.innerHTML = "";
+
+    if(!songs.length){
 
       countdownBox.innerHTML = `
         <div class="message">
-          Weekly Countdown will appear here.
+          Weekly Countdown will appear when songs are available.
         </div>
       `;
 
+      return;
+
     }
+
+    const sorted =
+      [...songs].sort(
+        (a,b) => {
+
+          const scoreA =
+            Number(a.plays || 0) +
+            Number(a.downloads || 0) * 5;
+
+          const scoreB =
+            Number(b.plays || 0) +
+            Number(b.downloads || 0) * 5;
+
+          if(scoreB !== scoreA){
+            return scoreB - scoreA;
+          }
+
+          return (
+            new Date(b.created_at || 0) -
+            new Date(a.created_at || 0)
+          );
+
+        }
+      );
+
+    sorted
+      .slice(0,5)
+      .forEach(song => {
+
+        countdownBox.appendChild(
+          createSongCard(song)
+        );
+
+      });
+
+  }catch(error){
+
+    console.error(
+      "PASONG countdown error:",
+      error
+    );
+
+    countdownBox.innerHTML = `
+      <div class="message error">
+        Weekly Countdown is currently unavailable.
+      </div>
+    `;
 
   }
 
+}
 
-  /* ======================================================
-     START
-     ====================================================== */
 
-  loadLatest();
-  loadTrending();
-  loadCountdown();
+/* =========================================================
+   SUPABASE NOTIFICATION COUNT
+   ========================================================= */
 
-})();
+async function loadNotificationCount(){
+
+  if(
+    !SUPABASE_URL ||
+    !SUPABASE_ANON_KEY
+  ){
+    return;
+  }
+
+  try{
+
+    const authResponse =
+      await fetch(
+        `${SUPABASE_URL}/auth/v1/user`,
+        {
+          headers:{
+            "apikey":SUPABASE_ANON_KEY,
+            "Authorization":
+              `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        }
+      );
+
+    /*
+     * A visitor who is not logged in simply
+     * gets no unread badge.
+     */
+
+    if(!authResponse.ok){
+      return;
+    }
+
+    const user =
+      await authResponse.json();
+
+    if(!user || !user.id){
+      return;
+    }
+
+    /*
+     * Read the user's unread notifications.
+     */
+
+    const query =
+      `${SUPABASE_URL}/rest/v1/notifications` +
+      `?user_id=eq.${encodeURIComponent(user.id)}` +
+      `&is_read=eq.false` +
+      `&select=id`;
+
+    const response =
+      await fetch(
+        query,
+        {
+          headers:{
+            "apikey":SUPABASE_ANON_KEY,
+            "Authorization":
+              `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        }
+      );
+
+    if(!response.ok){
+      return;
+    }
+
+    const notifications =
+      await response.json();
+
+    const count =
+      Array.isArray(notifications)
+        ? notifications.length
+        : 0;
+
+    if(count > 0){
+
+      notificationCount.textContent =
+        count > 99 ? "99+" : count;
+
+      notificationCount.style.display =
+        "flex";
+
+    }else{
+
+      notificationCount.style.display =
+        "none";
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Notification count unavailable:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   START PASONG HOME
+   ========================================================= */
+
+async function initializePASONGHome(){
+
+  await Promise.all([
+    loadLatest(),
+    loadTrending(),
+    loadCountdown(),
+    loadNotificationCount()
+  ]);
+
+}
+
+
+/* =========================================================
+   RUN
+   ========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initializePASONGHome
+);
+
+
+/*
+ * Refresh notification count every 30 seconds.
+ */
+
+setInterval(
+  loadNotificationCount,
+  30000
+);
+
 </script>
 
 </body>
