@@ -1,415 +1,248 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>PASONG — My Account</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PASONG Account</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
   background:#080810;
   color:#fff;
-  font-family:Inter,Arial,sans-serif;
+  font-family:Arial,sans-serif;
   min-height:100vh;
 }
 
 header{
-  min-height:70px;
-  padding:15px 7%;
+  background:#11111d;
+  border-bottom:1px solid #25253a;
+  padding:18px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  background:#0b0b14;
-  border-bottom:1px solid rgba(255,255,255,.08);
+  align-items:center;
 }
 
 .logo{
-  font-size:22px;
+  font-size:24px;
   font-weight:800;
-  background:linear-gradient(90deg,#b56cff,#ff4fc3);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+  color:#d946ef;
 }
 
-header a{
-  color:#aaa;
+nav a{
+  color:#ddd;
   text-decoration:none;
+  margin-left:15px;
   font-size:14px;
 }
 
-header a:hover{
-  color:#fff;
-}
-
-main{
-  width:min(1050px,92%);
-  margin:40px auto 70px;
-}
-
-h1{
-  font-size:36px;
-  margin-bottom:8px;
-}
-
-.subtitle{
-  color:#999;
-  margin-bottom:30px;
-}
-
-.card{
-  background:#11111b;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:18px;
-  padding:24px;
-  margin-bottom:20px;
-}
-
-.card h2{
-  margin-bottom:10px;
-}
-
-.card p{
-  color:#999;
-  line-height:1.6;
-}
-
-.auth-box{
-  max-width:600px;
+.container{
+  width:94%;
+  max-width:850px;
   margin:30px auto;
 }
 
-.auth-tabs{
-  display:flex;
-  gap:8px;
+.card{
+  background:#11111d;
+  border:1px solid #28283d;
+  border-radius:18px;
+  padding:25px;
   margin-bottom:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
-.auth-tabs button{
-  flex:1;
-  border:0;
-  padding:12px;
-  border-radius:10px;
-  background:#171722;
+h1{
+  font-size:28px;
+  margin-bottom:8px;
+}
+
+h2{
+  font-size:20px;
+  margin-bottom:8px;
+}
+
+p{
   color:#aaa;
-  cursor:pointer;
-  font-weight:700;
+  line-height:1.5;
 }
 
-.auth-tabs button.active{
-  background:#8b5cf6;
-  color:#fff;
-}
-
-.field{
-  margin-bottom:15px;
-}
-
-.field label{
+label{
   display:block;
-  color:#aaa;
-  font-size:13px;
-  margin-bottom:7px;
+  margin:16px 0 7px;
+  color:#ddd;
+  font-size:14px;
 }
 
-.field input,
-.field select{
+input,select{
   width:100%;
   padding:13px;
   border-radius:10px;
-  border:1px solid rgba(255,255,255,.1);
+  border:1px solid #33334b;
   background:#080810;
   color:#fff;
   outline:none;
 }
 
-.field input:focus,
-.field select:focus{
-  border-color:#8b5cf6;
+input:focus,select:focus{
+  border-color:#d946ef;
 }
 
-/* ROLE SELECTION */
-
-.role-intro{
-  color:#aaa;
-  font-size:13px;
-  line-height:1.5;
-  margin-bottom:15px;
-}
-
-.account-types{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-  margin-bottom:18px;
-}
-
-.account-type{
-  position:relative;
-}
-
-.account-type input{
-  position:absolute;
-  opacity:0;
-  pointer-events:none;
-}
-
-.account-type label{
-  display:block;
-  padding:18px 14px;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:14px;
-  background:#080810;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.account-type label:hover{
-  border-color:#8b5cf6;
-}
-
-.account-type input:checked + label{
-  border-color:#8b5cf6;
-  background:#181125;
-  box-shadow:0 0 0 1px #8b5cf6;
-}
-
-.type-icon{
-  display:block;
-  font-size:28px;
-  margin-bottom:8px;
-}
-
-.type-title{
-  display:block;
-  font-weight:800;
-  margin-bottom:5px;
-}
-
-.type-description{
-  display:block;
-  color:#888;
-  font-size:12px;
-  line-height:1.4;
-}
-
-.role-note{
-  color:#777;
-  font-size:12px;
-  line-height:1.5;
-  margin-bottom:18px;
-}
-
-.primary{
+button{
   width:100%;
+  padding:14px;
   border:0;
-  padding:13px;
   border-radius:10px;
-  background:#8b5cf6;
+  margin-top:18px;
+  background:linear-gradient(90deg,#9333ea,#ec4899);
   color:#fff;
-  font-weight:800;
+  font-size:16px;
+  font-weight:700;
   cursor:pointer;
 }
 
-.primary:hover{
-  background:#a855f7;
-}
-
-.primary:disabled{
-  opacity:.6;
-  cursor:not-allowed;
+button:hover{
+  opacity:.9;
 }
 
 .secondary{
-  border:1px solid rgba(255,255,255,.12);
-  padding:11px 15px;
-  border-radius:10px;
-  background:#171722;
-  color:#fff;
-  cursor:pointer;
-  font-weight:700;
-}
-
-.secondary:hover{
-  border-color:#8b5cf6;
-}
-
-.forgot{
-  width:100%;
-  margin-top:10px;
-}
-
-.message{
-  margin-top:15px;
-  color:#c9a8e8;
-  font-size:14px;
-  line-height:1.5;
-}
-
-.user-info{
-  color:#c9a8e8;
-  margin-bottom:8px;
-}
-
-.account-badge{
-  display:inline-block;
-  margin-top:8px;
-  margin-right:5px;
-  padding:6px 10px;
-  border-radius:20px;
-  background:#181125;
-  color:#d8b4ff;
-  font-size:12px;
-  font-weight:700;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:20px;
-}
-
-.downloads{
-  margin-top:15px;
-}
-
-.download-item{
-  padding:14px;
-  background:#080810;
-  border-radius:12px;
-  margin-top:10px;
-}
-
-.download-item strong{
-  display:block;
-  margin-bottom:5px;
-}
-
-.download-item span{
-  color:#888;
-  font-size:13px;
-}
-
-.ref-input{
-  width:100%;
-  margin-top:15px;
-  margin-bottom:10px;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.1);
-  background:#080810;
-  color:#fff;
-}
-
-.logout{
-  margin-top:20px;
-  border:0;
-  padding:12px 18px;
-  border-radius:10px;
-  background:#2a172f;
-  color:#fff;
-  cursor:pointer;
-  font-weight:700;
+  background:#202033;
 }
 
 .hidden{
-  display:none !important;
+  display:none!important;
 }
 
-.admin-card{
-  border-color:rgba(168,85,247,.4);
-  background:linear-gradient(135deg,#171022,#11111b);
-}
-
-.admin-button,
-.musician-button{
-  display:inline-block;
+.status{
   margin-top:15px;
-  padding:12px 18px;
+  padding:12px;
   border-radius:10px;
-  background:#8b5cf6;
+  background:#191929;
+  color:#bbb;
+}
+
+.success{
+  color:#5ee7a5;
+}
+
+.warning{
+  color:#f6c453;
+}
+
+.error{
+  color:#ff7070;
+}
+
+.roles{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:15px;
+}
+
+.role{
+  padding:7px 12px;
+  border-radius:20px;
+  background:#24243a;
+  color:#ddd;
+  font-size:13px;
+}
+
+.role.active{
+  background:#7c3aed;
   color:#fff;
-  text-decoration:none;
-  font-weight:800;
 }
 
-.musician-card{
-  border-color:rgba(168,85,247,.25);
+.role-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px;
+  margin-top:8px;
+  background:#0b0b14;
+  border:1px solid #28283d;
+  border-radius:10px;
 }
 
-.profile-card{
-  border-color:rgba(168,85,247,.2);
+.role-box input{
+  width:auto;
+}
+
+.small{
+  font-size:13px;
+  color:#888;
+  margin-top:8px;
+}
+
+.logout{
+  background:#292936;
 }
 
 .profile-row{
-  margin-top:14px;
+  margin-top:12px;
+  padding:12px;
+  background:#0b0b14;
+  border-radius:10px;
 }
 
 .profile-label{
-  display:block;
-  color:#777;
+  color:#888;
   font-size:12px;
-  margin-bottom:5px;
+  margin-bottom:4px;
 }
 
 .profile-value{
   color:#fff;
-  font-weight:700;
+  word-break:break-word;
 }
 
-.reset-box{
-  max-width:500px;
-  margin:30px auto;
+.badge{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:15px;
+  font-size:12px;
+  margin-top:5px;
 }
 
-.back-login{
+.pending{
+  background:#403516;
+  color:#f6c453;
+}
+
+.verified{
+  background:#123d2a;
+  color:#5ee7a5;
+}
+
+.info-box{
+  background:#17172a;
+  border-left:3px solid #d946ef;
+  padding:14px;
+  margin-top:15px;
+  border-radius:8px;
+  color:#bbb;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.dashboard-link{
   display:block;
   text-align:center;
+  text-decoration:none;
+  background:#202033;
+  color:#fff;
+  padding:13px;
+  border-radius:10px;
   margin-top:15px;
-  color:#c276ff;
-  cursor:pointer;
-  font-size:14px;
-  font-weight:700;
 }
 
 footer{
   text-align:center;
   color:#666;
-  font-size:12px;
-  padding:25px;
-}
-
-@media(max-width:650px){
-
-  main{
-    width:94%;
-    margin-top:25px;
-  }
-
-  h1{
-    font-size:30px;
-  }
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .account-types{
-    grid-template-columns:1fr;
-  }
-
-  header{
-    padding:0 5%;
-  }
+  padding:30px;
+  font-size:13px;
 }
 </style>
 </head>
@@ -417,707 +250,262 @@ footer{
 <body>
 
 <header>
+  <div class="logo">◈ PASONG</div>
 
-  <div class="logo">
-    ◈ PASONG
-  </div>
-
-  <a href="index.html">
-    Home
-  </a>
-
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="store.html">Music Store</a>
+  </nav>
 </header>
 
-<main>
+<div class="container">
 
-<!-- =====================================================
-     LOGIN / SIGN UP
-     ===================================================== -->
+  <!-- LOGIN / SIGNUP -->
+  <div id="authCard" class="card">
 
-<section id="authSection" class="card auth-box">
+    <h1>Welcome to PASONG</h1>
+    <p>Login to your account or create a free PASONG account.</p>
 
-  <h1>
-    Welcome to PASONG
-  </h1>
-
-  <p class="subtitle">
-    Login to your account or create a free PASONG account.
-  </p>
-
-  <div class="auth-tabs">
-
-    <button
-      id="loginTab"
-      class="active"
-      onclick="showLogin()">
-
-      Login
-
-    </button>
-
-    <button
-      id="signupTab"
-      onclick="showSignup()">
-
-      Sign Up
-
-    </button>
-
-  </div>
-
-
-  <!-- LOGIN -->
-
-  <div id="loginForm">
-
-    <div class="field">
-
-      <label>
-        Email
-      </label>
-
-      <input
-        id="loginEmail"
-        type="email"
-        placeholder="Enter your email"
-        autocomplete="email">
-
+    <div style="margin-top:20px">
+      <button onclick="showLogin()">Login</button>
+      <button class="secondary" onclick="showSignup()">Sign Up</button>
     </div>
 
-    <div class="field">
+    <!-- LOGIN -->
+    <div id="loginBox" class="hidden">
 
-      <label>
-        Password
-      </label>
+      <label>Email</label>
+      <input id="loginEmail" type="email" placeholder="Enter your email">
 
-      <input
-        id="loginPassword"
-        type="password"
-        placeholder="Enter your password"
-        autocomplete="current-password">
+      <label>Password</label>
+      <input id="loginPassword" type="password" placeholder="Enter your password">
 
-    </div>
+      <button onclick="login()">Login</button>
 
-    <button
-      id="loginButton"
-      class="primary"
-      onclick="loginUser()">
-
-      Login
-
-    </button>
-
-    <button
-      type="button"
-      class="secondary forgot"
-      onclick="showResetPassword()">
-
-      Forgot Password?
-
-    </button>
-
-  </div>
-
-
-  <!-- SIGN UP -->
-
-  <div id="signupForm" class="hidden">
-
-    <div class="field">
-
-      <label>
-        Email
-      </label>
-
-      <input
-        id="signupEmail"
-        type="email"
-        placeholder="Enter your email"
-        autocomplete="email">
-
-    </div>
-
-    <div class="field">
-
-      <label>
-        Password
-      </label>
-
-      <input
-        id="signupPassword"
-        type="password"
-        placeholder="Create a password"
-        autocomplete="new-password">
-
-    </div>
-
-
-    <div class="field">
-
-      <label>
-        Choose your PASONG roles
-      </label>
-
-    </div>
-
-    <p class="role-intro">
-      You can select more than one role. One PASONG account can be used
-      for your different activities on the platform.
-    </p>
-
-
-    <div class="account-types">
-
-      <div class="account-type">
-
-        <input
-          type="checkbox"
-          id="listenerRole"
-          name="accountRole"
-          value="listener"
-          checked>
-
-        <label for="listenerRole">
-
-          <span class="type-icon">
-            🎧
-          </span>
-
-          <span class="type-title">
-            Listener / Fan
-          </span>
-
-          <span class="type-description">
-            Buy music, save downloads,
-            create playlists and follow artists.
-          </span>
-
-        </label>
-
-      </div>
-
-
-      <div class="account-type">
-
-        <input
-          type="checkbox"
-          id="musicianRole"
-          name="accountRole"
-          value="musician">
-
-        <label for="musicianRole">
-
-          <span class="type-icon">
-            🎤
-          </span>
-
-          <span class="type-title">
-            Musician / Artist
-          </span>
-
-          <span class="type-description">
-            Upload music, manage your artist
-            profile and receive royalties.
-          </span>
-
-        </label>
-
-      </div>
-
-
-      <div class="account-type">
-
-        <input
-          type="checkbox"
-          id="djRole"
-          name="accountRole"
-          value="dj">
-
-        <label for="djRole">
-
-          <span class="type-icon">
-            🎧
-          </span>
-
-          <span class="type-title">
-            DJ
-          </span>
-
-          <span class="type-description">
-            Build your DJ profile,
-            playlists and music activity.
-          </span>
-
-        </label>
-
-      </div>
-
-
-      <div class="account-type">
-
-        <input
-          type="checkbox"
-          id="producerRole"
-          name="accountRole"
-          value="producer">
-
-        <label for="producerRole">
-
-          <span class="type-icon">
-            🎹
-          </span>
-
-          <span class="type-title">
-            Producer
-          </span>
-
-          <span class="type-description">
-            Receive producer credits
-            and manage producer royalties.
-          </span>
-
-        </label>
-
-      </div>
-
-
-      <div class="account-type">
-
-        <input
-          type="checkbox"
-          id="writerRole"
-          name="accountRole"
-          value="writer">
-
-        <label for="writerRole">
-
-          <span class="type-icon">
-            ✍️
-          </span>
-
-          <span class="type-title">
-            Writer
-          </span>
-
-          <span class="type-description">
-            Receive songwriter credits
-            and manage writer royalties.
-          </span>
-
-        </label>
-
-      </div>
-
-    </div>
-
-
-    <p class="role-note">
-      You can add or change eligible roles later from your PASONG account.
-      Admin access is not selectable during public sign-up.
-    </p>
-
-
-    <button
-      id="signupButton"
-      class="primary"
-      onclick="signupUser()">
-
-      Create Account
-
-    </button>
-
-  </div>
-
-
-  <div
-    id="authMessage"
-    class="message">
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     PASSWORD RESET REQUEST
-     ===================================================== -->
-
-<section
-  id="resetSection"
-  class="card reset-box hidden">
-
-  <h1>
-    Reset Password
-  </h1>
-
-  <p class="subtitle">
-    Enter your PASONG email and we will send you
-    a password reset link.
-  </p>
-
-  <div class="field">
-
-    <label>
-      Email
-    </label>
-
-    <input
-      id="resetEmail"
-      type="email"
-      placeholder="Enter your email"
-      autocomplete="email">
-
-  </div>
-
-  <button
-    id="resetButton"
-    class="primary"
-    onclick="sendPasswordReset()">
-
-    Send Reset Email
-
-  </button>
-
-  <div
-    id="resetMessage"
-    class="message">
-  </div>
-
-  <span
-    class="back-login"
-    onclick="showLogin()">
-
-    ← Back to Login
-
-  </span>
-
-</section>
-
-
-<!-- =====================================================
-     UPDATE NEW PASSWORD
-     ===================================================== -->
-
-<section
-  id="updatePasswordSection"
-  class="card reset-box hidden">
-
-  <h1>
-    Create New Password
-  </h1>
-
-  <p class="subtitle">
-    Enter your new PASONG password below.
-  </p>
-
-  <div class="field">
-
-    <label>
-      New Password
-    </label>
-
-    <input
-      id="newPassword"
-      type="password"
-      placeholder="Enter new password"
-      autocomplete="new-password">
-
-  </div>
-
-  <div class="field">
-
-    <label>
-      Confirm Password
-    </label>
-
-    <input
-      id="confirmPassword"
-      type="password"
-      placeholder="Confirm new password"
-      autocomplete="new-password">
-
-  </div>
-
-  <button
-    id="updatePasswordButton"
-    class="primary"
-    onclick="updatePassword()">
-
-    Update Password
-
-  </button>
-
-  <div
-    id="updateMessage"
-    class="message">
-  </div>
-
-</section>
-
-
-<!-- =====================================================
-     ACCOUNT
-     ===================================================== -->
-
-<section
-  id="accountSection"
-  class="hidden">
-
-  <h1>
-    My Account
-  </h1>
-
-  <p class="subtitle">
-    Manage your PASONG account, roles and purchases.
-  </p>
-
-
-  <!-- USER INFORMATION -->
-
-  <div class="card">
-
-    <div class="user-info">
-
-      Logged in as:
-
-      <strong id="userEmail"></strong>
-
-      <br>
-
-      <span id="accountTypeBadge"></span>
-
-    </div>
-
-    <button
-      class="logout"
-      onclick="logoutUser()">
-
-      Logout
-
-    </button>
-
-  </div>
-
-
-  <!-- PROFILE / IDENTITY -->
-
-  <div class="card profile-card">
-
-    <h2>
-      👤 PASONG Profile
-    </h2>
-
-    <p>
-      Your legal identity is kept private. Your performing name
-      can be shown publicly on songs, profiles and credits.
-    </p>
-
-    <div class="profile-row">
-
-      <span class="profile-label">
-        Real / Legal Name
-      </span>
-
-      <span
-        id="realNameDisplay"
-        class="profile-value">
-
-        Not added yet
-
-      </span>
-
-    </div>
-
-    <div class="profile-row">
-
-      <span class="profile-label">
-        Performing / Stage Name
-      </span>
-
-      <span
-        id="performingNameDisplay"
-        class="profile-value">
-
-        Not added yet
-
-      </span>
-
-    </div>
-
-    <div class="profile-row">
-
-      <span class="profile-label">
-        Mobile Money
-      </span>
-
-      <span
-        id="mobileMoneyDisplay"
-        class="profile-value">
-
-        Not added yet
-
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <!-- ADMIN -->
-
-  <div
-    id="adminCard"
-    class="card admin-card hidden">
-
-    <h2>
-      👑 Admin Access
-    </h2>
-
-    <p>
-      Your PASONG account has administrator privileges.
-    </p>
-
-    <a
-      href="admin.html"
-      class="admin-button">
-
-      Open Admin Dashboard
-
-    </a>
-
-  </div>
-
-
-  <!-- MUSICIAN -->
-
-  <div
-    id="musicianCard"
-    class="card musician-card hidden">
-
-    <h2>
-      🎤 Musician Dashboard
-    </h2>
-
-    <p>
-      Manage your artist profile, upload songs,
-      view your music activity and manage earnings.
-    </p>
-
-    <a
-      href="artist-dashboard.html"
-      class="musician-button">
-
-      🎤 Open Artist Dashboard
-
-    </a>
-
-  </div>
-
-
-  <div class="grid">
-
-
-    <!-- DOWNLOADS -->
-
-    <div class="card">
-
-      <h2>
-        📥 My Downloads
-      </h2>
-
-      <p>
-        Purchased songs can remain available here
-        after verified payment.
-      </p>
-
-      <div
-        id="downloads"
-        class="downloads">
-
-        <div class="download-item">
-
-          <strong>
-            No purchases loaded yet
-          </strong>
-
-          <span>
-            Your verified purchases will appear here.
-          </span>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- EARNINGS -->
-
-    <div class="card">
-
-      <h2>
-        💰 Earnings
-      </h2>
-
-      <p>
-        Your Artist, Producer and Writer royalties are
-        recorded separately by PASONG.
-      </p>
-
-    </div>
-
-
-    <!-- REFERRALS -->
-
-    <div class="card">
-
-      <h2>
-        🎁 Refer a Friend
-      </h2>
-
-      <p>
-        Earn PASONG Points when your referral
-        completes the qualifying action.
-      </p>
-
-      <input
-        id="refCode"
-        class="ref-input"
-        readonly>
-
-      <button
-        class="secondary"
-        onclick="copyReferral()">
-
-        Copy Referral Link
-
+      <button class="secondary" onclick="resetPassword()">
+        Forgot Password
       </button>
 
-      <p id="refMsg"></p>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="signupBox" class="hidden">
+
+      <label>Email</label>
+      <input id="signupEmail" type="email" placeholder="Enter your email">
+
+      <label>Password</label>
+      <input id="signupPassword" type="password" placeholder="Create a password">
+
+      <label>Choose your PASONG roles</label>
+
+      <div class="role-box">
+        <input type="checkbox" name="accountRole" value="listener">
+        <span>🎧 Listener / Fan</span>
+      </div>
+
+      <div class="role-box">
+        <input type="checkbox" name="accountRole" value="musician">
+        <span>🎤 Musician / Artist</span>
+      </div>
+
+      <div class="role-box">
+        <input type="checkbox" name="accountRole" value="dj">
+        <span>🎧 DJ</span>
+      </div>
+
+      <div class="role-box">
+        <input type="checkbox" name="accountRole" value="producer">
+        <span>🎹 Producer</span>
+      </div>
+
+      <div class="role-box">
+        <input type="checkbox" name="accountRole" value="writer">
+        <span>✍️ Writer</span>
+      </div>
+
+      <div class="small">
+        You can select more than one role. Admin access is assigned separately by PASONG.
+      </div>
+
+      <button onclick="signup()">Create Account</button>
+
+    </div>
+
+    <div id="authMessage" class="status hidden"></div>
+
+  </div>
+
+
+  <!-- ACCOUNT -->
+  <div id="accountArea" class="hidden">
+
+    <div class="card">
+
+      <h1>My Account</h1>
+
+      <p>
+        Logged in as:
+        <strong id="userEmail"></strong>
+      </p>
+
+      <div class="roles" id="roleList"></div>
+
+      <a id="artistDashboardLink"
+         class="dashboard-link hidden"
+         href="artist-dashboard.html">
+         🎤 Open Artist Dashboard
+      </a>
+
+      <a id="adminDashboardLink"
+         class="dashboard-link hidden"
+         href="admin.html">
+         🛡️ Open Admin Dashboard
+      </a>
 
     </div>
 
 
-    <!-- ACCOUNT SECURITY -->
+    <!-- IDENTITY & PAYMENT PROFILE -->
+    <div class="card">
+
+      <h2>Identity & Payment Profile</h2>
+
+      <p>
+        This information is used privately for account verification,
+        song credits and future royalty withdrawals.
+      </p>
+
+      <div class="info-box">
+        Your legal name is private. Your performing/stage name may appear
+        publicly on PASONG profiles, songs and credits.
+        Before withdrawals, PASONG may require identity and mobile-money
+        verification.
+      </div>
+
+      <label>Real / Legal Name</label>
+
+      <input
+        id="realName"
+        type="text"
+        placeholder="Enter your legal name">
+
+      <label>Performing / Stage Name</label>
+
+      <input
+        id="performingName"
+        type="text"
+        placeholder="Example: KV BEATS">
+
+      <label>Mobile Money Provider</label>
+
+      <select id="mobileProvider">
+        <option value="">Select provider</option>
+        <option value="MTN">MTN Mobile Money</option>
+        <option value="Airtel">Airtel Money</option>
+      </select>
+
+      <label>Mobile Money Number</label>
+
+      <input
+        id="mobileNumber"
+        type="tel"
+        placeholder="Example: 0769719539">
+
+      <button onclick="saveProfile()">
+        Save Profile
+      </button>
+
+      <div id="profileMessage" class="status hidden"></div>
+
+      <div class="profile-row">
+        <div class="profile-label">Identity Verification</div>
+        <div id="identityStatus">
+          <span class="badge pending">Pending</span>
+        </div>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-label">Mobile Money Verification</div>
+        <div id="moneyStatus">
+          <span class="badge pending">Pending</span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- PROFILE DISPLAY -->
+    <div class="card">
+
+      <h2>My Profile</h2>
+
+      <div class="profile-row">
+        <div class="profile-label">Performing Name</div>
+        <div id="displayPerformingName" class="profile-value">
+          Not added yet
+        </div>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-label">Mobile Money Provider</div>
+        <div id="displayProvider" class="profile-value">
+          Not added yet
+        </div>
+      </div>
+
+      <div class="profile-row">
+        <div class="profile-label">Mobile Money Number</div>
+        <div id="displayNumber" class="profile-value">
+          Not added yet
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- OTHER ACCOUNT FEATURES -->
+    <div class="card">
+
+      <h2>My Downloads</h2>
+      <p>Your purchased music will appear here.</p>
+
+      <a href="downloads.html" class="dashboard-link">
+        🎵 Open My Downloads
+      </a>
+
+    </div>
+
 
     <div class="card">
 
-      <h2>
-        🔐 Account Security
-      </h2>
+      <h2>Refer a Friend</h2>
 
       <p>
-        Keep your email and password secure.
-        PASONG will never ask you to share your password.
+        Invite friends to PASONG and earn PASONG Points
+        when qualifying purchases are completed.
       </p>
+
+      <button onclick="copyReferral()">
+        Copy Referral Link
+      </button>
+
+      <div id="referralMessage" class="status hidden"></div>
+
+    </div>
+
+
+    <div class="card">
+
+      <button class="logout" onclick="logout()">
+        Logout
+      </button>
 
     </div>
 
   </div>
 
-</section>
-
-</main>
-
+</div>
 
 <footer>
   PASONG © 2026 • Music • Artists • Opportunity
@@ -1126,185 +514,80 @@ footer{
 
 <script>
 
-/* =====================================================
-   SUPABASE CONFIGURATION
-   ===================================================== */
-
 const SUPABASE_URL =
-  "https://mtufczmjlkvycarxylgh.supabase.co";
+"https://mtufczmjlkvycarxylgh.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const SUPABASE_KEY =
+"sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
 const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
+const API_BASE =
+"https://pasong-api.onrender.com";
 
-/* =====================================================
-   ELEMENTS
-   ===================================================== */
-
-const authSection =
-  document.getElementById("authSection");
-
-const resetSection =
-  document.getElementById("resetSection");
-
-const updatePasswordSection =
-  document.getElementById("updatePasswordSection");
-
-const accountSection =
-  document.getElementById("accountSection");
-
-const authMessage =
-  document.getElementById("authMessage");
-
-const userEmail =
-  document.getElementById("userEmail");
-
-const accountTypeBadge =
-  document.getElementById("accountTypeBadge");
-
-const adminCard =
-  document.getElementById("adminCard");
-
-const musicianCard =
-  document.getElementById("musicianCard");
-
-const refCode =
-  document.getElementById("refCode");
-
-const loginButton =
-  document.getElementById("loginButton");
-
-const signupButton =
-  document.getElementById("signupButton");
-
-
-/* =====================================================
-   SHOW LOGIN
-   ===================================================== */
 
 function showLogin(){
 
-  authSection.classList.remove("hidden");
-
-  resetSection.classList.add("hidden");
-
-  updatePasswordSection.classList.add("hidden");
-
-  accountSection.classList.add("hidden");
-
-  document
-    .getElementById("loginForm")
+  document.getElementById("loginBox")
     .classList.remove("hidden");
 
-  document
-    .getElementById("signupForm")
+  document.getElementById("signupBox")
     .classList.add("hidden");
 
-  document
-    .getElementById("loginTab")
-    .classList.add("active");
-
-  document
-    .getElementById("signupTab")
-    .classList.remove("active");
-
-  authMessage.textContent = "";
+  clearMessage();
 
 }
 
-
-/* =====================================================
-   SHOW SIGNUP
-   ===================================================== */
 
 function showSignup(){
 
-  authSection.classList.remove("hidden");
-
-  resetSection.classList.add("hidden");
-
-  updatePasswordSection.classList.add("hidden");
-
-  accountSection.classList.add("hidden");
-
-  document
-    .getElementById("loginForm")
-    .classList.add("hidden");
-
-  document
-    .getElementById("signupForm")
+  document.getElementById("signupBox")
     .classList.remove("hidden");
 
-  document
-    .getElementById("loginTab")
-    .classList.remove("active");
+  document.getElementById("loginBox")
+    .classList.add("hidden");
 
-  document
-    .getElementById("signupTab")
-    .classList.add("active");
-
-  authMessage.textContent = "";
+  clearMessage();
 
 }
 
 
-/* =====================================================
-   SHOW RESET PASSWORD
-   ===================================================== */
+function showMessage(message,type){
 
-function showResetPassword(){
+  const box =
+    document.getElementById("authMessage");
 
-  authSection.classList.add("hidden");
+  box.textContent = message;
 
-  resetSection.classList.remove("hidden");
+  box.className =
+    "status " + (type || "");
 
-  updatePasswordSection.classList.add("hidden");
-
-  accountSection.classList.add("hidden");
-
-  const loginEmail =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
-
-  if(loginEmail){
-
-    document
-      .getElementById("resetEmail")
-      .value = loginEmail;
-
-  }
-
-  document
-    .getElementById("resetMessage")
-    .textContent = "";
+  box.classList.remove("hidden");
 
 }
 
 
-/* =====================================================
-   SIGN UP
-   ===================================================== */
+function clearMessage(){
 
-async function signupUser(){
+  document
+    .getElementById("authMessage")
+    .classList.add("hidden");
+
+}
+
+
+async function signup(){
 
   const email =
-    document
-      .getElementById("signupEmail")
-      .value
-      .trim()
-      .toLowerCase();
+    document.getElementById("signupEmail")
+      .value.trim();
 
   const password =
-    document
-      .getElementById("signupPassword")
+    document.getElementById("signupPassword")
       .value;
 
   const selectedRoles =
@@ -1312,672 +595,342 @@ async function signupUser(){
       document.querySelectorAll(
         'input[name="accountRole"]:checked'
       )
-    ).map(function(input){
-
-      return input.value;
-
+    ).map(function(el){
+      return el.value;
     });
 
 
   if(!email || !password){
 
-    authMessage.textContent =
-      "Please enter your email and password.";
+    showMessage(
+      "Enter your email and password.",
+      "error"
+    );
 
     return;
-
-  }
-
-
-  if(selectedRoles.length === 0){
-
-    authMessage.textContent =
-      "Please choose at least one PASONG role.";
-
-    return;
-
   }
 
 
   if(password.length < 6){
 
-    authMessage.textContent =
-      "Password must be at least 6 characters.";
+    showMessage(
+      "Password must be at least 6 characters.",
+      "error"
+    );
 
     return;
-
   }
 
 
-  signupButton.disabled = true;
+  if(selectedRoles.length === 0){
 
-  signupButton.textContent =
-    "Creating Account...";
+    showMessage(
+      "Select at least one PASONG role.",
+      "error"
+    );
 
-  authMessage.textContent =
-    "Creating your PASONG account...";
+    return;
+  }
 
 
-  try{
+  showMessage(
+    "Creating your PASONG account..."
+  );
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.auth.signUp({
 
-        email:email,
+  const result =
+    await supabaseClient.auth.signUp({
 
-        password:password,
+      email: email,
 
-        options:{
+      password: password,
 
-          data:{
-            account_roles:selectedRoles
-          },
-
-          emailRedirectTo:
-            window.location.origin +
-            "/account.html"
-
+      options:{
+        data:{
+          account_roles:selectedRoles
         }
+      }
 
-      });
+    });
 
 
-    console.log(
-      "PASONG SIGNUP RESULT:",
-      data
+  if(result.error){
+
+    showMessage(
+      result.error.message,
+      "error"
     );
 
-
-    if(error){
-
-      authMessage.textContent =
-        "Signup failed: " +
-        error.message;
-
-      return;
-
-    }
+    return;
+  }
 
 
-    if(!data || !data.user){
+  if(result.data.session){
 
-      authMessage.textContent =
-        "PASONG could not create the account.";
-
-      return;
-
-    }
-
-
-    /*
-      Create selected non-admin roles
-      immediately when a session exists.
-    */
-
-    if(data.session){
-
-      await saveSelectedRoles(
-        data.user.id,
-        selectedRoles
-      );
-
-    }
-
-
-    if(!data.session){
-
-      authMessage.textContent =
-        "Account created successfully. Please check your email to confirm your PASONG account.";
-
-      return;
-
-    }
-
-
-    authMessage.textContent =
-      "Account created successfully.";
-
-    showAccount(
-      data.user
+    await saveSelectedRoles(
+      result.data.user.id,
+      selectedRoles
     );
 
-
-  }catch(error){
-
-    console.error(
-      "PASONG signup exception:",
-      error
+    showMessage(
+      "Account created successfully.",
+      "success"
     );
 
-    authMessage.textContent =
-      "Signup error: " +
-      (
-        error.message ||
-        "Unknown error."
-      );
+    await loadAccount();
 
-  }finally{
+  }else{
 
-    signupButton.disabled = false;
-
-    signupButton.textContent =
-      "Create Account";
+    showMessage(
+      "Account created successfully. Please check your email to confirm your PASONG account.",
+      "success"
+    );
 
   }
 
 }
 
 
-/* =====================================================
-   SAVE ROLES
-   ===================================================== */
-
-async function saveSelectedRoles(
-  userId,
-  roles
-){
+async function saveSelectedRoles(userId,roles){
 
   if(!userId || !roles || !roles.length){
-
     return;
-
   }
 
 
-  const rows =
-    roles
-      .filter(function(role){
+  for(const role of roles){
 
-        return [
-          "listener",
-          "musician",
-          "dj",
-          "producer",
-          "writer"
-        ].includes(role);
+    if(role === "admin"){
+      continue;
+    }
 
-      })
-      .map(function(role){
-
-        return {
-          user_id:userId,
-          role:role
-        };
-
-      });
-
-
-  if(!rows.length){
-
-    return;
-
-  }
-
-
-  const {
-    error
-  } =
     await supabaseClient
       .from("user_roles")
       .upsert(
-        rows,
+        {
+          user_id:userId,
+          role:role
+        },
         {
           onConflict:"user_id,role"
         }
       );
 
-
-  if(error){
-
-    console.error(
-      "PASONG role save error:",
-      error
-    );
-
   }
 
 }
 
 
-/* =====================================================
-   LOAD ROLES
-   ===================================================== */
+async function login(){
 
-async function loadUserRoles(
-  userId
-){
+  const email =
+    document.getElementById("loginEmail")
+      .value.trim();
 
-  if(!userId){
+  const password =
+    document.getElementById("loginPassword")
+      .value;
 
-    return [];
 
+  if(!email || !password){
+
+    showMessage(
+      "Enter your email and password.",
+      "error"
+    );
+
+    return;
   }
 
 
-  const {
-    data,
-    error
-  } =
+  showMessage("Logging in...");
+
+
+  const result =
+    await supabaseClient.auth.signInWithPassword({
+      email:email,
+      password:password
+    });
+
+
+  if(result.error){
+
+    showMessage(
+      result.error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    "Login successful.",
+    "success"
+  );
+
+
+  await loadAccount();
+
+}
+
+
+async function resetPassword(){
+
+  const email =
+    document.getElementById("loginEmail")
+      .value.trim();
+
+
+  if(!email){
+
+    showMessage(
+      "Enter your email first.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const result =
+    await supabaseClient.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo:
+          window.location.origin +
+          "/account.html"
+      }
+    );
+
+
+  if(result.error){
+
+    showMessage(
+      result.error.message,
+      "error"
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    "Password reset email sent.",
+    "success"
+  );
+
+}
+
+
+async function loadAccount(){
+
+  const sessionResult =
+    await supabaseClient.auth.getSession();
+
+  const session =
+    sessionResult.data.session;
+
+
+  if(!session){
+
+    document
+      .getElementById("authCard")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("accountArea")
+      .classList.add("hidden");
+
+    return;
+  }
+
+
+  const user =
+    session.user;
+
+
+  document
+    .getElementById("authCard")
+    .classList.add("hidden");
+
+  document
+    .getElementById("accountArea")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("userEmail")
+    .textContent =
+      user.email || "";
+
+
+  await syncRolesFromMetadata(user);
+
+  await loadRoles(user.id);
+
+  await loadProfile(user.id);
+
+}
+
+
+async function syncRolesFromMetadata(user){
+
+  const metadata =
+    user.user_metadata || {};
+
+  const roles =
+    Array.isArray(metadata.account_roles)
+      ? metadata.account_roles
+      : [];
+
+
+  if(!roles.length){
+    return;
+  }
+
+
+  await saveSelectedRoles(
+    user.id,
+    roles
+  );
+
+}
+
+
+async function loadRoles(userId){
+
+  const result =
     await supabaseClient
       .from("user_roles")
       .select("role")
       .eq("user_id",userId);
 
 
-  if(error){
-
-    console.error(
-      "PASONG role load error:",
-      error
-    );
-
-    return [];
-
-  }
-
-
-  return (data || [])
-    .map(function(row){
-
-      return row.role;
-
-    });
-
-}
-
-
-/* =====================================================
-   LOGIN
-   ===================================================== */
-
-async function loginUser(){
-
-  const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim()
-      .toLowerCase();
-
-  const password =
-    document
-      .getElementById("loginPassword")
-      .value;
-
-
-  if(!email || !password){
-
-    authMessage.textContent =
-      "Please enter your email and password.";
-
-    return;
-
-  }
-
-
-  loginButton.disabled = true;
-
-  loginButton.textContent =
-    "Logging in...";
-
-  authMessage.textContent =
-    "Logging in...";
-
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.auth.signInWithPassword({
-
-        email:email,
-
-        password:password
-
-      });
-
-
-    if(error){
-
-      authMessage.textContent =
-        error.message;
-
-      return;
-
-    }
-
-
-    if(!data || !data.user){
-
-      authMessage.textContent =
-        "Login failed. No authenticated user was returned.";
-
-      return;
-
-    }
-
-
-    showAccount(
-      data.user
-    );
-
-
-  }catch(error){
-
-    console.error(
-      "PASONG login error:",
-      error
-    );
-
-    authMessage.textContent =
-      "Login error: " +
-      (
-        error.message ||
-        "Unknown error."
-      );
-
-  }finally{
-
-    loginButton.disabled = false;
-
-    loginButton.textContent =
-      "Login";
-
-  }
-
-}
-
-
-/* =====================================================
-   SEND PASSWORD RESET EMAIL
-   ===================================================== */
-
-async function sendPasswordReset(){
-
-  const email =
-    document
-      .getElementById("resetEmail")
-      .value
-      .trim()
-      .toLowerCase();
-
-  const resetButton =
-    document.getElementById("resetButton");
-
-  const resetMessage =
-    document.getElementById("resetMessage");
-
-
-  if(!email){
-
-    resetMessage.textContent =
-      "Enter your email address first.";
-
-    return;
-
-  }
-
-
-  resetButton.disabled = true;
-
-  resetButton.textContent =
-    "Sending...";
-
-  resetMessage.textContent =
-    "Sending password reset email...";
-
-
-  try{
-
-    const {
-      error
-    } =
-      await supabaseClient.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo:
-            window.location.origin +
-            "/account.html"
-        }
-      );
-
-
-    if(error){
-
-      resetMessage.textContent =
-        "Password reset failed: " +
-        error.message;
-
-      return;
-
-    }
-
-
-    resetMessage.textContent =
-      "Password reset email sent. Check your email and follow the instructions.";
-
-
-  }catch(error){
-
-    console.error(
-      "PASONG reset error:",
-      error
-    );
-
-    resetMessage.textContent =
-      "Password reset error: " +
-      (
-        error.message ||
-        "Unknown error."
-      );
-
-  }finally{
-
-    resetButton.disabled = false;
-
-    resetButton.textContent =
-      "Send Reset Email";
-
-  }
-
-}
-
-
-/* =====================================================
-   UPDATE PASSWORD
-   ===================================================== */
-
-async function updatePassword(){
-
-  const password =
-    document
-      .getElementById("newPassword")
-      .value;
-
-  const confirmPassword =
-    document
-      .getElementById("confirmPassword")
-      .value;
-
-  const button =
-    document.getElementById(
-      "updatePasswordButton"
-    );
-
-  const message =
-    document.getElementById(
-      "updateMessage"
-    );
-
-
-  if(!password || !confirmPassword){
-
-    message.textContent =
-      "Please enter and confirm your new password.";
-
-    return;
-
-  }
-
-
-  if(password.length < 6){
-
-    message.textContent =
-      "Password must be at least 6 characters.";
-
-    return;
-
-  }
-
-
-  if(password !== confirmPassword){
-
-    message.textContent =
-      "Passwords do not match.";
-
-    return;
-
-  }
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "Updating...";
-
-  message.textContent =
-    "Updating your password...";
-
-
-  try{
-
-    const {
-      error
-    } =
-      await supabaseClient.auth.updateUser({
-
-        password:password
-
-      });
-
-
-    if(error){
-
-      message.textContent =
-        "Password update failed: " +
-        error.message;
-
-      return;
-
-    }
-
-
-    message.textContent =
-      "Password updated successfully. You can now use your new password to log in.";
-
-
-    setTimeout(
-      function(){
-
-        showLogin();
-
-      },
-      1800
-    );
-
-
-  }catch(error){
-
-    console.error(
-      "PASONG password update error:",
-      error
-    );
-
-    message.textContent =
-      "Password update error: " +
-      (
-        error.message ||
-        "Unknown error."
-      );
-
-  }finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      "Update Password";
-
-  }
-
-}
-
-
-/* =====================================================
-   SHOW ACCOUNT
-   ===================================================== */
-
-async function showAccount(user){
-
-  if(!user){
-
-    return;
-
-  }
-
-
-  authSection.classList.add("hidden");
-
-  resetSection.classList.add("hidden");
-
-  updatePasswordSection.classList.add("hidden");
-
-  accountSection.classList.remove("hidden");
-
-
-  userEmail.textContent =
-    user.email || "";
-
-
-  /* ===============================
-     LOAD ROLES
-     =============================== */
-
   const roles =
-    await loadUserRoles(
-      user.id
-    );
+    result.data || [];
 
 
-  /* ===============================
-     DISPLAY ROLES
-     =============================== */
-
-  accountTypeBadge.innerHTML = "";
+  const roleList =
+    document.getElementById("roleList");
 
 
-  if(!roles.length){
+  roleList.innerHTML = "";
 
-    const badge =
-      document.createElement("span");
 
-    badge.className =
-      "account-badge";
+  let hasArtist = false;
+  let hasAdmin = false;
 
-    badge.textContent =
-      "🎧 Listener / Fan";
 
-    accountTypeBadge.appendChild(
-      badge
-    );
+  roles.forEach(function(item){
 
-  }else{
+    const div =
+      document.createElement("div");
 
-    const roleNames = {
+    div.className =
+      "role active";
+
+    const labels = {
 
       listener:"🎧 Listener / Fan",
 
@@ -1989,126 +942,58 @@ async function showAccount(user){
 
       writer:"✍️ Writer",
 
-      admin:"👑 Admin"
+      admin:"🛡️ Admin"
 
     };
 
+    div.textContent =
+      labels[item.role] || item.role;
 
-    roles.forEach(function(role){
+    roleList.appendChild(div);
 
-      const badge =
-        document.createElement("span");
 
-      badge.className =
-        "account-badge";
+    if(item.role === "musician"){
+      hasArtist = true;
+    }
 
-      badge.textContent =
-        roleNames[role] ||
-        role;
+    if(item.role === "admin"){
+      hasAdmin = true;
+    }
 
-      accountTypeBadge.appendChild(
-        badge
-      );
+  });
 
-    });
 
+  const metadata =
+    (await supabaseClient.auth.getUser())
+      .data.user?.app_metadata || {};
+
+
+  if(metadata.role === "admin"){
+    hasAdmin = true;
   }
 
 
-  /* ===============================
-     MUSICIAN DASHBOARD
-     =============================== */
-
-  if(roles.includes("musician")){
-
-    musicianCard.classList.remove(
-      "hidden"
+  document
+    .getElementById("artistDashboardLink")
+    .classList.toggle(
+      "hidden",
+      !hasArtist
     );
 
-  }else{
 
-    musicianCard.classList.add(
-      "hidden"
+  document
+    .getElementById("adminDashboardLink")
+    .classList.toggle(
+      "hidden",
+      !hasAdmin
     );
-
-  }
-
-
-  /* ===============================
-     ADMIN
-     =============================== */
-
-  /*
-    Admin is NEVER selectable from signup.
-    It is shown only if stored securely
-    in Supabase app_metadata OR user_roles.
-  */
-
-  const metadataAdmin =
-    user.app_metadata?.role === "admin";
-
-
-  const roleAdmin =
-    roles.includes("admin");
-
-
-  if(
-    metadataAdmin ||
-    roleAdmin
-  ){
-
-    adminCard.classList.remove(
-      "hidden"
-    );
-
-  }else{
-
-    adminCard.classList.add(
-      "hidden"
-    );
-
-  }
-
-
-  /* ===============================
-     PROFILE
-     =============================== */
-
-  await loadArtistProfile(
-    user.id
-  );
-
-
-  /* ===============================
-     REFERRAL
-     =============================== */
-
-  createReferralCode(
-    user
-  );
 
 }
 
 
-/* =====================================================
-   LOAD ARTIST PROFILE
-   ===================================================== */
+async function loadProfile(userId){
 
-async function loadArtistProfile(
-  userId
-){
-
-  if(!userId){
-
-    return;
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
+  const result =
     await supabaseClient
       .from("artist_profiles")
       .select(
@@ -2118,187 +1003,242 @@ async function loadArtistProfile(
       .maybeSingle();
 
 
-  if(error){
+  if(result.error){
 
-    console.error(
-      "PASONG profile load error:",
-      error
+    console.log(
+      "Profile load:",
+      result.error.message
     );
 
     return;
-
   }
 
 
-  const realNameDisplay =
-    document.getElementById(
-      "realNameDisplay"
-    );
-
-  const performingNameDisplay =
-    document.getElementById(
-      "performingNameDisplay"
-    );
-
-  const mobileMoneyDisplay =
-    document.getElementById(
-      "mobileMoneyDisplay"
-    );
+  const profile =
+    result.data;
 
 
-  if(!data){
-
-    realNameDisplay.textContent =
-      "Not added yet";
-
-    performingNameDisplay.textContent =
-      "Not added yet";
-
-    mobileMoneyDisplay.textContent =
-      "Not added yet";
-
+  if(!profile){
     return;
-
   }
 
 
-  realNameDisplay.textContent =
-    data.real_name ||
-    "Not added yet";
+  document
+    .getElementById("realName")
+    .value =
+      profile.real_name || "";
 
 
-  performingNameDisplay.textContent =
-    data.performing_name ||
-    "Not added yet";
+  document
+    .getElementById("performingName")
+    .value =
+      profile.performing_name || "";
 
 
-  if(
-    data.mobile_money_provider &&
-    data.mobile_money_number
-  ){
+  document
+    .getElementById("mobileProvider")
+    .value =
+      profile.mobile_money_provider || "";
 
-    mobileMoneyDisplay.textContent =
-      data.mobile_money_provider +
-      " • " +
-      data.mobile_money_number;
 
-  }else{
+  document
+    .getElementById("mobileNumber")
+    .value =
+      profile.mobile_money_number || "";
 
-    mobileMoneyDisplay.textContent =
+
+  document
+    .getElementById("displayPerformingName")
+    .textContent =
+      profile.performing_name ||
       "Not added yet";
 
-  }
+
+  document
+    .getElementById("displayProvider")
+    .textContent =
+      profile.mobile_money_provider ||
+      "Not added yet";
+
+
+  document
+    .getElementById("displayNumber")
+    .textContent =
+      profile.mobile_money_number ||
+      "Not added yet";
+
+
+  document
+    .getElementById("identityStatus")
+    .innerHTML =
+      profile.identity_verified
+      ? '<span class="badge verified">Verified</span>'
+      : '<span class="badge pending">Pending</span>';
+
+
+  document
+    .getElementById("moneyStatus")
+    .innerHTML =
+      profile.mobile_money_verified
+      ? '<span class="badge verified">Verified</span>'
+      : '<span class="badge pending">Pending</span>';
 
 }
 
 
-/* =====================================================
-   LOGOUT
-   ===================================================== */
+async function saveProfile(){
 
-async function logoutUser(){
+  const realName =
+    document.getElementById("realName")
+      .value.trim();
 
-  try{
+  const performingName =
+    document.getElementById("performingName")
+      .value.trim();
 
-    await supabaseClient.auth.signOut();
+  const provider =
+    document.getElementById("mobileProvider")
+      .value;
 
-  }catch(error){
+  const mobileNumber =
+    document.getElementById("mobileNumber")
+      .value.trim();
 
-    console.error(
-      "Logout error:",
-      error
+
+  if(!realName){
+
+    showProfileMessage(
+      "Enter your real/legal name.",
+      "error"
     );
 
+    return;
   }
 
 
-  accountSection.classList.add(
-    "hidden"
+  if(!performingName){
+
+    showProfileMessage(
+      "Enter your performing/stage name.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!provider){
+
+    showProfileMessage(
+      "Select MTN or Airtel.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!mobileNumber){
+
+    showProfileMessage(
+      "Enter your mobile-money number.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const sessionResult =
+    await supabaseClient.auth.getSession();
+
+  const session =
+    sessionResult.data.session;
+
+
+  if(!session){
+
+    showProfileMessage(
+      "Please login again.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  showProfileMessage(
+    "Saving your profile..."
   );
 
-  showLogin();
-
-}
-
-
-/* =====================================================
-   SESSION CHECK
-   ===================================================== */
-
-async function checkSession(){
 
   try{
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.auth.getSession();
+    const response =
+      await fetch(
+        API_BASE +
+        "/api/artist-profile/save",
+        {
+          method:"POST",
 
+          headers:{
+            "Content-Type":
+              "application/json",
 
-    if(error){
+            "Authorization":
+              "Bearer " +
+              session.access_token
+          },
 
-      console.error(
-        "Session error:",
-        error
+          body:JSON.stringify({
+
+            real_name:realName,
+
+            performing_name:
+              performingName,
+
+            mobile_money_provider:
+              provider,
+
+            mobile_money_number:
+              mobileNumber
+
+          })
+        }
       );
 
-      return;
 
-    }
-
-
-    if(
-      window.location.hash.includes(
-        "type=recovery"
-      )
-    ){
-
-      authSection.classList.add(
-        "hidden"
-      );
-
-      resetSection.classList.add(
-        "hidden"
-      );
-
-      accountSection.classList.add(
-        "hidden"
-      );
-
-      updatePasswordSection.classList.remove(
-        "hidden"
-      );
-
-      return;
-
-    }
+    const data =
+      await response.json();
 
 
-    if(data.session){
+    if(!response.ok){
 
-      showAccount(
-        data.session.user
-      );
-
-    }else{
-
-      authSection.classList.remove(
-        "hidden"
-      );
-
-      accountSection.classList.add(
-        "hidden"
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Could not save profile."
       );
 
     }
+
+
+    showProfileMessage(
+      "Profile saved successfully.",
+      "success"
+    );
+
+
+    await loadProfile(
+      session.user.id
+    );
 
 
   }catch(error){
 
-    console.error(
-      "Session check error:",
-      error
+    showProfileMessage(
+      error.message,
+      "error"
     );
 
   }
@@ -2306,145 +1246,94 @@ async function checkSession(){
 }
 
 
-/* =====================================================
-   AUTH STATE
-   ===================================================== */
+function showProfileMessage(message,type){
+
+  const box =
+    document.getElementById(
+      "profileMessage"
+    );
+
+  box.textContent = message;
+
+  box.className =
+    "status " + (type || "");
+
+  box.classList.remove("hidden");
+
+}
+
+
+async function copyReferral(){
+
+  const sessionResult =
+    await supabaseClient.auth.getSession();
+
+  const session =
+    sessionResult.data.session;
+
+
+  if(!session){
+    return;
+  }
+
+
+  const referral =
+    window.location.origin +
+    "/account.html?ref=" +
+    session.user.id;
+
+
+  try{
+
+    await navigator.clipboard.writeText(
+      referral
+    );
+
+
+    const box =
+      document.getElementById(
+        "referralMessage"
+      );
+
+    box.textContent =
+      "Referral link copied.";
+
+    box.className =
+      "status success";
+
+    box.classList.remove("hidden");
+
+
+  }catch(error){
+
+    alert(referral);
+
+  }
+
+}
+
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  window.location.reload();
+
+}
+
 
 supabaseClient.auth.onAuthStateChange(
   function(event,session){
 
-    console.log(
-      "PASONG AUTH EVENT:",
-      event
-    );
-
-
-    if(event === "PASSWORD_RECOVERY"){
-
-      authSection.classList.add(
-        "hidden"
-      );
-
-      resetSection.classList.add(
-        "hidden"
-      );
-
-      accountSection.classList.add(
-        "hidden"
-      );
-
-      updatePasswordSection.classList.remove(
-        "hidden"
-      );
-
-      return;
-
-    }
-
-
     if(session){
-
-      showAccount(
-        session.user
-      );
-
+      loadAccount();
     }
 
   }
 );
 
 
-/* =====================================================
-   REFERRAL CODE
-   ===================================================== */
-
-function createReferralCode(
-  user
-){
-
-  if(!user){
-
-    return;
-
-  }
-
-
-  const id =
-    user.id
-      .replace(/-/g,"")
-      .substring(0,8)
-      .toUpperCase();
-
-
-  const code =
-    "PASONG-" + id;
-
-
-  const referralLink =
-    window.location.origin +
-    "/account.html?ref=" +
-    encodeURIComponent(code);
-
-
-  refCode.value =
-    referralLink;
-
-}
-
-
-/* =====================================================
-   COPY REFERRAL
-   ===================================================== */
-
-async function copyReferral(){
-
-  const value =
-    refCode.value;
-
-  const refMsg =
-    document.getElementById(
-      "refMsg"
-    );
-
-
-  if(!value){
-
-    refMsg.textContent =
-      "Referral link is not available yet.";
-
-    return;
-
-  }
-
-
-  try{
-
-    await navigator.clipboard.writeText(
-      value
-    );
-
-    refMsg.textContent =
-      "Referral link copied.";
-
-  }catch(error){
-
-    refCode.select();
-
-    document.execCommand("copy");
-
-    refMsg.textContent =
-      "Referral link copied.";
-
-  }
-
-}
-
-
-/* =====================================================
-   START
-   ===================================================== */
-
-checkSession();
+loadAccount();
 
 </script>
 
