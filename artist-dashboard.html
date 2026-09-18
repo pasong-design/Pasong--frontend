@@ -166,6 +166,21 @@ select:focus{
   background:#252538;
 }
 
+.btn-edit{
+  background:#252538;
+  border:1px solid #4b4160;
+  padding:8px 12px;
+  border-radius:8px;
+  color:#fff;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.btn-edit:hover{
+  background:#342a46;
+  border-color:#d946ef;
+}
+
 .message{
   margin-top:12px;
   padding:12px;
@@ -248,6 +263,24 @@ select:focus{
   font-size:13px;
 }
 
+.song-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:7px;
+}
+
+.song-top strong{
+  margin-bottom:0;
+}
+
+.song-actions{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+}
+
 .hidden{
   display:none!important;
 }
@@ -270,7 +303,6 @@ select:focus{
   border:1px solid #3a3047;
   border-radius:18px;
   padding:25px;
-  text-align:center;
 }
 
 .popup h2{
@@ -281,6 +313,16 @@ select:focus{
   color:#aaa;
   line-height:1.6;
   margin-bottom:20px;
+}
+
+.popup-actions{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+
+.popup-actions button{
+  flex:1;
 }
 
 .loading{
@@ -318,6 +360,19 @@ select:focus{
   .grid,
   .form-grid{
     grid-template-columns:1fr;
+  }
+
+  .song-top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .song-actions{
+    width:100%;
+  }
+
+  .song-actions button{
+    flex:1;
   }
 }
 </style>
@@ -778,6 +833,52 @@ select:focus{
 </div>
 
 
+<!-- EDIT TITLE POPUP -->
+
+<div id="editTitlePopup" class="overlay">
+
+  <div class="popup">
+
+    <h2>✏️ Edit Song Title</h2>
+
+    <p>
+      Change the title of your song.
+    </p>
+
+    <input
+      id="editTitleInput"
+      type="text"
+      maxlength="150"
+      placeholder="Enter new song title"
+    >
+
+    <div id="editTitleMessage" class="message"></div>
+
+    <div class="popup-actions">
+
+      <button
+        class="btn btn-secondary"
+        onclick="closeEditTitlePopup()"
+        id="cancelEditTitleBtn"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="btn"
+        onclick="saveEditedTitle()"
+        id="saveEditTitleBtn"
+      >
+        Save Title
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 <script>
 
 const SUPABASE_URL =
@@ -799,6 +900,8 @@ const supabaseClient =
 
 let currentUser = null;
 let currentSession = null;
+
+let editingSongId = null;
 
 
 /* =========================
@@ -2197,7 +2300,7 @@ async function loadMySongs(){
       await supabaseClient
         .from("songs")
         .select(
-          "id,title,status,price,currency,created_at"
+          "id,title,status,price,currency,created_at,uploader_user_id"
         )
         .or(
           "uploader_user_id.eq." +
@@ -2267,6 +2370,19 @@ async function loadMySongs(){
           "song-row";
 
 
+        /* =========================
+           TOP ROW
+        ========================= */
+
+        const top =
+          document.createElement(
+            "div"
+          );
+
+        top.className =
+          "song-top";
+
+
         const title =
           document.createElement(
             "strong"
@@ -2276,6 +2392,66 @@ async function loadMySongs(){
           song.title ||
           "Untitled";
 
+
+        const actions =
+          document.createElement(
+            "div"
+          );
+
+        actions.className =
+          "song-actions";
+
+
+        /*
+          Edit button is only shown when
+          this account uploaded the song.
+        */
+
+        if(
+          song.uploader_user_id ===
+          currentUser.id
+        ){
+
+          const editButton =
+            document.createElement(
+              "button"
+            );
+
+          editButton.className =
+            "btn-edit";
+
+          editButton.textContent =
+            "✏️ Edit Title";
+
+          editButton.onclick =
+            function(){
+
+              openEditTitlePopup(
+                song.id,
+                song.title || ""
+              );
+
+            };
+
+          actions.appendChild(
+            editButton
+          );
+
+        }
+
+
+        top.appendChild(
+          title
+        );
+
+        top.appendChild(
+          actions
+        );
+
+
+        /* =========================
+           DETAILS
+        ========================= */
 
         const details =
           document.createElement(
@@ -2301,7 +2477,7 @@ async function loadMySongs(){
 
 
         row.appendChild(
-          title
+          top
         );
 
         row.appendChild(
@@ -2326,6 +2502,310 @@ async function loadMySongs(){
 
     list.innerHTML =
       '<p style="color:#ff8c9b">Could not load songs.</p>';
+
+  }
+
+}
+
+
+/* =========================
+   EDIT SONG TITLE
+========================= */
+
+function openEditTitlePopup(
+  songId,
+  currentTitle
+){
+
+  editingSongId =
+    songId;
+
+
+  const input =
+    document.getElementById(
+      "editTitleInput"
+    );
+
+
+  const message =
+    document.getElementById(
+      "editTitleMessage"
+    );
+
+
+  input.value =
+    currentTitle || "";
+
+
+  message.textContent =
+    "";
+
+  message.className =
+    "message";
+
+
+  document.getElementById(
+    "editTitlePopup"
+  ).style.display =
+    "flex";
+
+
+  setTimeout(
+    function(){
+
+      input.focus();
+
+      input.select();
+
+    },
+    100
+  );
+
+}
+
+
+/* =========================
+   CLOSE EDIT TITLE
+========================= */
+
+function closeEditTitlePopup(){
+
+  editingSongId =
+    null;
+
+
+  document.getElementById(
+    "editTitlePopup"
+  ).style.display =
+    "none";
+
+
+  document.getElementById(
+    "editTitleMessage"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "editTitleMessage"
+  ).className =
+    "message";
+
+}
+
+
+/* =========================
+   SAVE EDITED TITLE
+========================= */
+
+async function saveEditedTitle(){
+
+  const input =
+    document.getElementById(
+      "editTitleInput"
+    );
+
+  const message =
+    document.getElementById(
+      "editTitleMessage"
+    );
+
+  const saveButton =
+    document.getElementById(
+      "saveEditTitleBtn"
+    );
+
+  const cancelButton =
+    document.getElementById(
+      "cancelEditTitleBtn"
+    );
+
+
+  try{
+
+    const newTitle =
+      input.value.trim();
+
+
+    if(!editingSongId){
+
+      throw new Error(
+        "No song selected."
+      );
+
+    }
+
+
+    if(!newTitle){
+
+      message.textContent =
+        "❌ Enter a song title.";
+
+      message.className =
+        "message error";
+
+      return;
+
+    }
+
+
+    if(newTitle.length > 150){
+
+      message.textContent =
+        "❌ Song title is too long.";
+
+      message.className =
+        "message error";
+
+      return;
+
+    }
+
+
+    const session =
+      await getSession();
+
+
+    if(
+      !session ||
+      !session.access_token
+    ){
+
+      throw new Error(
+        "Your login session has expired. Please log in again."
+      );
+
+    }
+
+
+    saveButton.disabled =
+      true;
+
+    cancelButton.disabled =
+      true;
+
+    saveButton.textContent =
+      "Saving...";
+
+
+    message.textContent =
+      "Updating song title...";
+
+    message.className =
+      "message loading";
+
+
+    const response =
+      await fetch(
+        API_BASE +
+        "/api/songs/" +
+        encodeURIComponent(
+          editingSongId
+        ) +
+        "/title",
+        {
+          method:"PATCH",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              session.access_token
+          },
+
+          body:JSON.stringify({
+
+            title:
+              newTitle
+
+          })
+        }
+      );
+
+
+    const responseText =
+      await response.text();
+
+    let data;
+
+
+    try{
+
+      data =
+        JSON.parse(
+          responseText
+        );
+
+    }catch(error){
+
+      throw new Error(
+        "PASONG server returned an invalid response."
+      );
+
+    }
+
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "Could not update song title."
+      );
+
+    }
+
+
+    message.textContent =
+      "✓ Song title updated successfully.";
+
+    message.className =
+      "message success";
+
+
+    await loadMySongs();
+
+
+    setTimeout(
+      function(){
+
+        closeEditTitlePopup();
+
+      },
+      700
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "EDIT TITLE ERROR:",
+      error
+    );
+
+
+    message.textContent =
+      "❌ " +
+      (
+        error.message ||
+        "Could not update song title."
+      );
+
+    message.className =
+      "message error";
+
+
+  }finally{
+
+    saveButton.disabled =
+      false;
+
+    cancelButton.disabled =
+      false;
+
+    saveButton.textContent =
+      "Save Title";
 
   }
 
