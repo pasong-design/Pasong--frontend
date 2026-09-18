@@ -2,416 +2,162 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG — Artist Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PASONG Artist Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-
 body{
   background:#080810;
   color:#fff;
   font-family:Inter,Arial,sans-serif;
   min-height:100vh;
 }
-
 a{text-decoration:none;color:inherit}
-button,input,select{font:inherit}
-
 .topbar{
-  height:70px;
+  height:65px;
+  background:#11111c;
+  border-bottom:1px solid #242438;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 22px;
-  background:#0d0d18;
-  border-bottom:1px solid #222238;
+  padding:0 20px;
   position:sticky;
   top:0;
   z-index:20;
 }
-
 .logo{
-  font-size:24px;
-  font-weight:900;
+  font-size:22px;
+  font-weight:800;
   letter-spacing:1px;
 }
-
-.logo span{color:#d946ef}
-
+.logo span{color:#c44cff}
 .menu-btn{
   display:none;
   background:none;
   border:0;
-  color:#fff;
+  color:white;
   font-size:25px;
-  cursor:pointer;
 }
-
-.user{
-  color:#aaa;
-  font-size:14px;
-}
-
-.layout{
-  display:flex;
-  min-height:calc(100vh - 70px)
-}
-
+.layout{display:flex;min-height:calc(100vh - 65px)}
 .sidebar{
   width:240px;
-  background:#0b0b15;
-  border-right:1px solid #222238;
-  padding:22px 14px;
+  background:#0e0e18;
+  border-right:1px solid #242438;
+  padding:20px 12px;
 }
-
-.sidebar h3{
-  color:#888;
-  font-size:12px;
-  text-transform:uppercase;
-  margin:12px 10px;
-  letter-spacing:1px;
-}
-
-.nav{
+.sidebar a{
   display:block;
-  padding:13px 14px;
+  padding:13px 15px;
   border-radius:10px;
-  color:#bbb;
   margin-bottom:5px;
-  cursor:pointer;
+  color:#aaaabd;
 }
-
-.nav:hover,
-.nav.active{
-  background:linear-gradient(90deg,#261238,#171126);
+.sidebar a:hover,
+.sidebar a.active{
+  background:#1d1630;
   color:#fff;
 }
-
-.nav.active{
-  border-left:3px solid #d946ef
-}
-
 .main{
   flex:1;
-  padding:28px;
-  max-width:1500px;
-  margin:auto;
-  width:100%;
+  padding:25px;
+  max-width:1400px;
 }
-
-.header{
-  margin-bottom:25px;
+h1{font-size:28px;margin-bottom:6px}
+.subtitle{color:#9999ad;margin-bottom:22px}
+.status{
+  padding:12px 15px;
+  border-radius:10px;
+  background:#121222;
+  border:1px solid #292941;
+  margin-bottom:20px;
+  color:#bbb;
 }
-
-.header h1{
-  font-size:30px;
-  margin-bottom:7px
-}
-
-.header p{
-  color:#999
-}
-
-.stats{
+.cards{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:16px;
+  gap:15px;
   margin-bottom:25px;
 }
-
 .card{
-  background:#10101c;
-  border:1px solid #24243a;
-  border-radius:16px;
+  background:#11111d;
+  border:1px solid #27273b;
+  border-radius:15px;
   padding:20px;
 }
-
-.card small{
-  color:#888
+.card small{color:#9999ad}
+.card strong{
+  display:block;
+  font-size:26px;
+  margin-top:8px;
 }
-
-.card h2{
-  margin-top:10px;
-  font-size:27px
-}
-
-.pink{
-  color:#e879f9
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:2fr 1fr;
-  gap:20px;
-}
-
 .section{
-  background:#10101c;
-  border:1px solid #24243a;
-  border-radius:16px;
-  padding:22px;
+  background:#11111d;
+  border:1px solid #27273b;
+  border-radius:15px;
+  padding:20px;
   margin-bottom:20px;
 }
-
 .section h2{
   font-size:19px;
-  margin-bottom:18px;
+  margin-bottom:15px;
 }
-
-.btn{
-  border:0;
-  border-radius:10px;
-  padding:11px 17px;
-  cursor:pointer;
-  font-weight:700;
-  display:inline-block;
-}
-
-.btn-primary{
-  color:#fff;
-  background:linear-gradient(135deg,#9333ea,#ec4899);
-}
-
-.btn-secondary{
-  color:#fff;
-  background:#1c1c2b;
-  border:1px solid #34344c;
-}
-
-.btn-danger{
-  color:#fff;
-  background:#35121d;
-  border:1px solid #7f1d35;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.upload-box{
-  border:1px dashed #44445f;
-  border-radius:14px;
-  padding:25px;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-}
-
-.field label{
-  display:block;
-  color:#aaa;
-  font-size:13px;
-  margin-bottom:7px;
-}
-
-.field input,
-.field select{
-  width:100%;
-  padding:12px;
-  background:#090912;
-  color:#fff;
-  border:1px solid #303047;
-  border-radius:9px;
-  outline:none;
-}
-
-.field input:focus,
-.field select:focus{
-  border-color:#c026d3;
-}
-
-.full{
-  grid-column:1/-1
-}
-
 .song{
   display:flex;
   align-items:center;
-  gap:14px;
-  padding:13px 0;
-  border-bottom:1px solid #222238;
-}
-
-.song:last-child{
-  border-bottom:0
-}
-
-.cover{
-  width:52px;
-  height:52px;
-  border-radius:9px;
-  background:linear-gradient(135deg,#32104d,#10101c);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#d946ef;
-  font-weight:900;
-  flex-shrink:0;
-}
-
-.song-cover{
-  width:52px;
-  height:52px;
-  border-radius:9px;
-  object-fit:cover;
-  flex-shrink:0;
-}
-
-.song-info{
-  flex:1;
-  min-width:0;
-}
-
-.song-info strong{
-  display:block;
-  margin-bottom:4px;
-}
-
-.song-info small{
-  color:#888
-}
-
-.song-actions{
-  display:flex;
-  gap:7px;
-}
-
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:11px;
-  background:#172033;
-  color:#93c5fd;
-  margin-top:5px;
-}
-
-.badge.pending{
-  background:#30220e;
-  color:#fbbf24;
-}
-
-.badge.approved{
-  background:#102d20;
-  color:#86efac;
-}
-
-.notice{
-  padding:15px;
-  background:#151124;
-  border:1px solid #35205b;
-  border-radius:12px;
-  color:#cfc4df;
-  line-height:1.5;
-}
-
-.profile{
-  display:flex;
-  align-items:center;
   gap:15px;
+  padding:12px 0;
+  border-bottom:1px solid #252538;
 }
-
-.avatar{
-  width:65px;
-  height:65px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#7e22ce,#db2777);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:25px;
-  font-weight:900;
+.song:last-child{border-bottom:0}
+.cover{
+  width:58px;
+  height:58px;
+  object-fit:cover;
+  border-radius:9px;
+  background:#202030;
 }
-
-.muted{
-  color:#888
+.song-info{flex:1}
+.song-info strong{display:block;margin-bottom:5px}
+.song-info small{color:#9999ad}
+.btn{
+  display:inline-block;
+  background:linear-gradient(135deg,#8d3cff,#d83cff);
+  border:0;
+  color:#fff;
+  padding:10px 15px;
+  border-radius:9px;
+  cursor:pointer;
 }
-
-footer{
-  padding:30px;
+.logout{
+  background:#22151f;
+  color:#ff8acb;
+}
+.empty{
+  padding:20px;
   text-align:center;
-  color:#666;
-  font-size:13px;
+  color:#88889d;
 }
-
-.loading{
-  text-align:center;
-  padding:25px;
-  color:#888;
-}
-
-.error-box{
-  padding:15px;
-  background:#24121b;
-  border:1px solid #65213d;
-  border-radius:12px;
-  color:#f9a8d4;
-  line-height:1.5;
-}
-
-@media(max-width:900px){
-
-  .stats{
-    grid-template-columns:1fr 1fr
-  }
-
-  .grid{
-    grid-template-columns:1fr
-  }
-}
-
-@media(max-width:700px){
-
-  .menu-btn{
-    display:block
-  }
-
-  .user{
-    display:none
-  }
-
+.loading{text-align:center;color:#aaa;padding:20px}
+@media(max-width:800px){
+  .menu-btn{display:block}
   .sidebar{
     position:fixed;
-    left:-260px;
-    top:70px;
+    left:-250px;
+    top:65px;
     bottom:0;
     z-index:15;
     transition:.25s;
   }
-
-  .sidebar.open{
-    left:0
-  }
-
-  .main{
-    padding:20px 14px
-  }
-
-  .stats{
-    grid-template-columns:1fr 1fr
-  }
-
-  .form-grid{
-    grid-template-columns:1fr
-  }
-
-  .full{
-    grid-column:auto
-  }
-
-  .song{
-    align-items:flex-start
-  }
-
-  .song-actions{
-    flex-direction:column
-  }
+  .sidebar.open{left:0}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .main{padding:18px}
+}
+@media(max-width:500px){
+  .cards{grid-template-columns:1fr 1fr}
+  .song .btn{padding:8px 10px;font-size:12px}
 }
 </style>
 </head>
@@ -419,727 +165,243 @@ footer{
 <body>
 
 <header class="topbar">
-
-  <div class="logo">
-    ◈ <span>PASONG</span>
-  </div>
-
-  <button class="menu-btn" onclick="toggleMenu()">
-    ☰
-  </button>
-
-  <div class="user">
-    Artist Dashboard
-  </div>
-
+  <div class="logo">◈ PASONG</div>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <button class="btn logout" onclick="logout()">Logout</button>
 </header>
-
 
 <div class="layout">
 
-
 <aside class="sidebar" id="sidebar">
-
-  <h3>Artist</h3>
-
-  <a class="nav active" href="#dashboard">
-    📊 Dashboard
-  </a>
-
-  <a class="nav" href="#upload">
-    ⬆️ Upload Song
-  </a>
-
-  <a class="nav" href="#songs">
-    🎵 My Songs
-  </a>
-
-  <a class="nav" href="#earnings">
-    💰 Earnings
-  </a>
-
-  <a class="nav" href="#analytics">
-    📈 Analytics
-  </a>
-
-  <a class="nav" href="#profile">
-    👤 Artist Profile
-  </a>
-
-  <a class="nav" href="#notifications">
-    🔔 Notifications
-  </a>
-
-
-  <h3>Account</h3>
-
-  <a class="nav" href="account.html">
-    My Account
-  </a>
-
-  <a class="nav" href="index.html">
-    ← PASONG Home
-  </a>
-
+  <a href="#" class="active">📊 Dashboard</a>
+  <a href="#upload">⬆️ Upload Song</a>
+  <a href="#songs">🎵 My Songs</a>
+  <a href="#earnings">💰 Earnings</a>
+  <a href="#analytics">📈 Analytics</a>
+  <a href="#profile">👤 Artist Profile</a>
+  <a href="account.html">⚙️ My Account</a>
+  <a href="index.html">🏠 PASONG Home</a>
 </aside>
-
 
 <main class="main">
 
+<h1>Artist Dashboard</h1>
+<p class="subtitle">Manage your music, profile and earnings.</p>
 
-<section id="dashboard">
+<div class="status" id="status">
+  Connecting to your PASONG account...
+</div>
 
-  <div class="header">
+<div class="cards">
 
-    <h1>
-      Artist Dashboard
-    </h1>
-
-    <p>
-      Manage your music, profile, earnings and performance.
-    </p>
-
+  <div class="card">
+    <small>Total Songs</small>
+    <strong id="totalSongs">0</strong>
   </div>
 
-
-  <div class="stats">
-
-    <div class="card">
-
-      <small>
-        Total Songs
-      </small>
-
-      <h2 id="totalSongs">
-        0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Total Plays
-      </small>
-
-      <h2 id="totalPlays">
-        0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Downloads
-      </small>
-
-      <h2 id="totalDownloads">
-        0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Earnings
-      </small>
-
-      <h2 class="pink" id="totalEarnings">
-        UGX 0
-      </h2>
-
-    </div>
-
+  <div class="card">
+    <small>Total Plays</small>
+    <strong id="totalPlays">0</strong>
   </div>
 
-
-  <div class="grid">
-
-
-    <div class="section">
-
-      <h2>
-        Quick Actions
-      </h2>
-
-      <div class="actions">
-
-        <a class="btn btn-primary" href="#upload">
-          ⬆️ Upload New Song
-        </a>
-
-        <a class="btn btn-secondary" href="#songs">
-          🎵 Manage Songs
-        </a>
-
-        <a class="btn btn-secondary" href="#profile">
-          👤 Edit Profile
-        </a>
-
-      </div>
-
-    </div>
-
-
-    <div class="section">
-
-      <h2>
-        Artist Status
-      </h2>
-
-      <div class="notice" id="artistStatus">
-
-        Connecting to PASONG...
-
-      </div>
-
-    </div>
-
-
+  <div class="card">
+    <small>Total Downloads</small>
+    <strong id="totalDownloads">0</strong>
   </div>
 
-</section>
-
-
-
-<section id="upload" class="section">
-
-  <h2>
-    Upload New Song
-  </h2>
-
-  <div class="upload-box">
-
-    <div class="form-grid">
-
-
-      <div class="field">
-
-        <label>
-          Song Title
-        </label>
-
-        <input
-          id="songTitle"
-          type="text"
-          placeholder="Enter song title"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Category
-        </label>
-
-        <select id="category">
-
-          <option value="">
-            Select category
-          </option>
-
-          <option>
-            Afrobeats
-          </option>
-
-          <option>
-            Amapiano
-          </option>
-
-          <option>
-            Bongo
-          </option>
-
-          <option>
-            Gengetone
-          </option>
-
-          <option>
-            Gospel
-          </option>
-
-          <option>
-            Hip Hop
-          </option>
-
-          <option>
-            Dancehall
-          </option>
-
-          <option>
-            Other
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Producer / DJ
-        </label>
-
-        <input
-          type="text"
-          id="producer"
-          placeholder="Producer name"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Writer
-        </label>
-
-        <input
-          type="text"
-          id="writer"
-          placeholder="Writer name"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Cover Image
-        </label>
-
-        <input
-          id="coverFile"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          Audio File
-        </label>
-
-        <input
-          id="audioFile"
-          type="file"
-          accept="audio/mpeg,audio/wav,audio/*"
-        >
-
-      </div>
-
-
-      <div class="field full">
-
-        <label>
-          Song Description
-        </label>
-
-        <input
-          id="description"
-          type="text"
-          placeholder="Short description"
-        >
-
-      </div>
-
-
-      <div class="full">
-
-        <button
-          class="btn btn-primary"
-          onclick="prepareUpload()"
-        >
-          Upload Song
-        </button>
-
-      </div>
-
-
-    </div>
-
+  <div class="card">
+    <small>Earnings</small>
+    <strong>UGX <span id="earnings">0</span></strong>
   </div>
-
-</section>
-
-
-
-<section id="songs" class="section">
-
-  <h2>
-    My Songs
-  </h2>
-
-  <div id="songList">
-
-    <div class="loading">
-      Loading your songs...
-    </div>
-
-  </div>
-
-</section>
-
-
-
-<section id="earnings" class="section">
-
-  <h2>
-    Earnings
-  </h2>
-
-
-  <div class="stats">
-
-    <div class="card">
-
-      <small>
-        Available Balance
-      </small>
-
-      <h2 class="pink">
-        UGX 0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Total Earned
-      </small>
-
-      <h2>
-        UGX 0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Withdrawn
-      </small>
-
-      <h2>
-        UGX 0
-      </h2>
-
-    </div>
-
-  </div>
-
-
-  <div class="notice">
-
-    Earnings and royalty calculations are controlled by the PASONG backend.
-
-  </div>
-
-</section>
-
-
-
-<section id="analytics" class="section">
-
-  <h2>
-    Analytics
-  </h2>
-
-
-  <div class="stats">
-
-    <div class="card">
-
-      <small>
-        Song Plays
-      </small>
-
-      <h2 id="analyticsPlays">
-        0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Purchases
-      </small>
-
-      <h2 id="analyticsPurchases">
-        0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Followers
-      </small>
-
-      <h2>
-        0
-      </h2>
-
-    </div>
-
-
-    <div class="card">
-
-      <small>
-        Likes
-      </small>
-
-      <h2>
-        0
-      </h2>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-
-<section id="profile" class="section">
-
-  <h2>
-    Artist Profile
-  </h2>
-
-
-  <div class="profile">
-
-    <div class="avatar">
-      KV
-    </div>
-
-    <div>
-
-      <h3>
-        Artist Profile
-      </h3>
-
-      <p class="muted">
-        Your public PASONG artist profile will appear here.
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <br>
-
-
-  <div class="form-grid">
-
-
-    <div class="field">
-
-      <label>
-        Artist Name
-      </label>
-
-      <input
-        id="artistName"
-        type="text"
-        placeholder="Artist name"
-      >
-
-    </div>
-
-
-    <div class="field">
-
-      <label>
-        Genre
-      </label>
-
-      <input
-        id="artistGenre"
-        type="text"
-        placeholder="Main genre"
-      >
-
-    </div>
-
-
-    <div class="field full">
-
-      <label>
-        Biography
-      </label>
-
-      <input
-        id="artistBio"
-        type="text"
-        placeholder="Tell listeners about the artist"
-      >
-
-    </div>
-
-
-    <div class="full">
-
-      <button
-        class="btn btn-primary"
-        onclick="saveProfile()"
-      >
-        Save Profile
-      </button>
-
-    </div>
-
-
-  </div>
-
-</section>
-
-
-
-<section id="notifications" class="section">
-
-  <h2>
-    Notifications
-  </h2>
-
-
-  <div class="notice">
-
-    🔔 No new notifications.
-
-  </div>
-
-</section>
-
-
-</main>
 
 </div>
 
+<section class="section" id="songs">
+  <h2>🎵 My Songs</h2>
+  <div id="songsList" class="loading">Loading your songs...</div>
+</section>
 
-<footer>
+<section class="section" id="upload">
+  <h2>⬆️ Upload Song</h2>
+  <p style="color:#9999ad;margin-bottom:15px">
+    Song uploading will be connected to the PASONG API next.
+  </p>
+  <button class="btn" onclick="alert('Upload system will be connected next.')">
+    Upload Song
+  </button>
+</section>
 
-  PASONG © 2026 • Music • Artists • Opportunity
+<section class="section" id="earnings">
+  <h2>💰 Earnings</h2>
+  <p style="color:#9999ad">
+    Your earnings will appear here after purchases are connected.
+  </p>
+</section>
 
-</footer>
+<section class="section" id="analytics">
+  <h2>📈 Analytics</h2>
+  <p style="color:#9999ad">
+    Plays, downloads and sales analytics will appear here.
+  </p>
+</section>
 
+<section class="section" id="profile">
+  <h2>👤 Artist Profile</h2>
+  <p id="artistEmail" style="color:#9999ad">
+    Loading artist account...
+  </p>
+</section>
 
+</main>
+</div>
 
 <script>
 
-/* =========================================
-   PASONG API
-========================================= */
+/* ==============================
+   PASONG CONFIGURATION
+============================== */
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+/*
+  IMPORTANT:
+  Put your Supabase PUBLISHABLE/ANON key below.
+
+  Do NOT put the service_role/secret key here.
+*/
+const SUPABASE_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
 const API_BASE =
   "https://pasong-api.onrender.com";
 
-
-/* =========================================
-   CURRENT ARTIST
-========================================= */
-
-const ARTIST_ID =
-  "119e7b2d-4115-44e9-ba0f-e47d4a3fa332";
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
-/* =========================================
+/* ==============================
    MOBILE MENU
-========================================= */
+============================== */
 
 function toggleMenu(){
-
   document
     .getElementById("sidebar")
-    .classList
-    .toggle("open");
-
+    .classList.toggle("open");
 }
 
 
-/* =========================================
+/* ==============================
+   ESCAPE HTML
+============================== */
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* ==============================
+   LOGOUT
+============================== */
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  window.location.href =
+    "index.html";
+}
+
+
+/* ==============================
+   LOAD ARTIST
+============================== */
+
+async function loadArtist(){
+
+  const status =
+    document.getElementById("status");
+
+  const sessionResult =
+    await supabaseClient.auth.getSession();
+
+  const session =
+    sessionResult.data.session;
+
+  if(!session){
+
+    status.textContent =
+      "You are not logged in. Redirecting to login...";
+
+    setTimeout(()=>{
+      window.location.href =
+        "index.html";
+    },1200);
+
+    return;
+  }
+
+  const user =
+    session.user;
+
+  document.getElementById("artistEmail")
+    .textContent =
+    "Logged in as: " + user.email;
+
+  status.textContent =
+    "✓ Artist account connected: " +
+    user.email;
+
+  await loadArtistSongs(user.id);
+}
+
+
+/* ==============================
    LOAD ARTIST SONGS
-========================================= */
+============================== */
 
-async function loadArtistSongs(){
+async function loadArtistSongs(userId){
 
-  const songList =
-    document.getElementById("songList");
-
-  const totalSongs =
-    document.getElementById("totalSongs");
-
-  const artistStatus =
-    document.getElementById("artistStatus");
-
+  const list =
+    document.getElementById("songsList");
 
   try{
 
-    songList.innerHTML = `
-      <div class="loading">
-        Loading your songs...
-      </div>
-    `;
-
-
-    artistStatus.innerHTML =
-      "Connecting to PASONG music service...";
-
+    /*
+      First try the PASONG API.
+    */
 
     const response =
       await fetch(
         API_BASE + "/api/songs"
       );
 
-
     if(!response.ok){
-
       throw new Error(
-        "PASONG API request failed"
+        "API returned " + response.status
       );
-
     }
-
 
     const data =
       await response.json();
 
-
     const songs =
-      Array.isArray(data)
-        ? data
-        : (data.songs || []);
+      data.songs || [];
 
+    /*
+      Standard PASONG structure:
+      artist_id should identify the artist.
+    */
 
-    console.log(
-      "PASONG songs:",
-      songs
-    );
-
-
-    const mySongs =
+    let mySongs =
       songs.filter(song => {
 
         const artistId =
@@ -1147,118 +409,118 @@ async function loadArtistSongs(){
           song.artistId ||
           song.artist?.id;
 
-        return String(artistId)
-          === String(ARTIST_ID);
+        return artistId === userId;
 
       });
 
+    /*
+      If artist profile IDs are used,
+      also try to find the artist profile.
+    */
 
-    totalSongs.textContent =
+    if(mySongs.length === 0){
+
+      try{
+
+        const profileResult =
+          await supabaseClient
+            .from("artist_profiles")
+            .select("*")
+            .eq("user_id", userId)
+            .maybeSingle();
+
+        const profile =
+          profileResult.data;
+
+        if(profile){
+
+          const profileId =
+            profile.id ||
+            profile.artist_id;
+
+          if(profileId){
+
+            mySongs =
+              songs.filter(song => {
+
+                const artistId =
+                  song.artist_id ||
+                  song.artistId ||
+                  song.artist?.id;
+
+                return artistId === profileId;
+
+              });
+
+          }
+
+        }
+
+      }catch(profileError){
+
+        console.log(
+          "Artist profile lookup:",
+          profileError
+        );
+
+      }
+
+    }
+
+
+    document.getElementById("totalSongs")
+      .textContent =
       mySongs.length;
 
 
     if(mySongs.length === 0){
 
-      songList.innerHTML = `
-        <div class="notice">
-          No songs found for this artist yet.
+      list.innerHTML = `
+        <div class="empty">
+          <div style="font-size:35px;margin-bottom:10px">
+            🎵
+          </div>
+          <div>No songs found for this artist account.</div>
         </div>
       `;
 
-      artistStatus.innerHTML = `
-        Your artist dashboard is connected.
-        No songs have been found for this artist yet.
-      `;
-
       return;
-
     }
 
 
-    artistStatus.innerHTML = `
-      ✅ PASONG connected successfully.
-      You have ${mySongs.length}
-      ${mySongs.length === 1 ? "song" : "songs"}.
-    `;
-
-
-    songList.innerHTML =
+    list.innerHTML =
       mySongs.map(song => {
+
+        const id =
+          song.id;
 
         const title =
           song.title ||
-          song.name ||
           "Untitled Song";
 
-
-        const status =
-          song.status ||
-          "pending";
-
+        const category =
+          song.category_name ||
+          song.categoryName ||
+          song.category?.name ||
+          "Music";
 
         const cover =
           song.cover_url ||
           song.coverUrl ||
-          "";
+          "https://placehold.co/120x120/171725/ffffff?text=PASONG";
 
-
-        const id =
-          song.id ||
-          "";
-
-
-        const category =
-          song.category_name ||
-          song.category ||
-          song.categoryName ||
-          "";
-
-
-        let coverHTML;
-
-
-        if(cover){
-
-          coverHTML = `
-            <img
-              class="song-cover"
-              src="${escapeHtml(cover)}"
-              alt="${escapeHtml(title)}"
-              onerror="this.style.display='none'"
-            >
-          `;
-
-        }else{
-
-          coverHTML = `
-            <div class="cover">
-              ♪
-            </div>
-          `;
-
-        }
-
-
-        let badgeClass =
-          "pending";
-
-
-        if(
-          String(status).toLowerCase()
-          === "approved"
-        ){
-
-          badgeClass =
-            "approved";
-
-        }
-
+        const status =
+          song.status ||
+          "active";
 
         return `
-
           <div class="song">
 
-            ${coverHTML}
+            <img
+              class="cover"
+              src="${escapeHtml(cover)}"
+              alt=""
+            >
 
             <div class="song-info">
 
@@ -1267,35 +529,21 @@ async function loadArtistSongs(){
               </strong>
 
               <small>
-                ${escapeHtml(
-                  category || "Music"
-                )}
+                ${escapeHtml(category)}
+                •
+                ${escapeHtml(status)}
               </small>
 
-              <br>
-
-              <span
-                class="badge ${badgeClass}"
-              >
-                ${escapeHtml(status)}
-              </span>
-
             </div>
 
-
-            <div class="song-actions">
-
-              <a
-                class="btn btn-secondary"
-                href="song.html?id=${encodeURIComponent(id)}"
-              >
-                View
-              </a>
-
-            </div>
+            <a
+              class="btn"
+              href="song.html?id=${encodeURIComponent(id)}"
+            >
+              View
+            </a>
 
           </div>
-
         `;
 
       }).join("");
@@ -1303,127 +551,30 @@ async function loadArtistSongs(){
 
   }catch(error){
 
-    console.error(
-      "PASONG artist dashboard error:",
-      error
-    );
+    console.error(error);
 
-
-    songList.innerHTML = `
-
-      <div class="error-box">
-
-        ❌ Could not load your songs.
-
+    list.innerHTML = `
+      <div class="empty">
+        Unable to load songs right now.
         <br><br>
-
-        Please check the PASONG connection.
-
-        <br><br>
-
-        <button
-          class="btn btn-secondary"
-          onclick="loadArtistSongs()"
-        >
-          Try Again
-        </button>
-
+        <small>
+          ${escapeHtml(error.message)}
+        </small>
       </div>
-
     `;
 
-
-    artistStatus.innerHTML = `
-      ⚠️ PASONG music service could not be reached.
-    `;
-
+    document.getElementById("status")
+      .textContent =
+      "Account connected, but songs could not be loaded from the PASONG API.";
   }
-
 }
 
 
-/* =========================================
-   HTML SECURITY
-========================================= */
+/* ==============================
+   START
+============================== */
 
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =========================================
-   UPLOAD — NOT CONNECTED YET
-========================================= */
-
-function prepareUpload(){
-
-  const title =
-    document
-      .getElementById("songTitle")
-      .value
-      .trim();
-
-
-  const category =
-    document
-      .getElementById("category")
-      .value;
-
-
-  if(!title){
-
-    alert(
-      "Please enter the song title."
-    );
-
-    return;
-
-  }
-
-
-  if(!category){
-
-    alert(
-      "Please select a category."
-    );
-
-    return;
-
-  }
-
-
-  alert(
-    "Song upload is ready. We will connect the real PASONG upload system next."
-  );
-
-}
-
-
-/* =========================================
-   PROFILE — NOT CONNECTED YET
-========================================= */
-
-function saveProfile(){
-
-  alert(
-    "Artist profile saving will be connected next."
-  );
-
-}
-
-
-/* =========================================
-   START DASHBOARD
-========================================= */
-
-loadArtistSongs();
+loadArtist();
 
 </script>
 
