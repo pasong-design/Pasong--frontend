@@ -315,7 +315,10 @@ input:focus,select:focus{
 
 .popup-actions button{flex:1}
 
-.loading{color:#c084fc}
+.loading{
+  color:#c084fc;
+  display:block;
+}
 
 @media(max-width:900px){
   .sidebar{width:200px}
@@ -882,7 +885,7 @@ SESSION
 
 async function getSession(){
 
-const result=
+const result =
 await supabaseClient.auth.getSession();
 
 if(result.error){
@@ -928,13 +931,13 @@ currentUser=session.user;
 
 document.getElementById(
 "connectionStatus"
-).textContent=
+).textContent =
 "✓ Artist account connected: "+
 currentUser.email;
 
 document.getElementById(
 "accountEmail"
-).textContent=
+).textContent =
 currentUser.email;
 
 await loadRoles();
@@ -944,12 +947,15 @@ await loadDashboardStats();
 
 }catch(error){
 
-console.error(error);
+console.error("INITIALIZE ERROR:",error);
 
 document.getElementById(
 "connectionStatus"
-).textContent=
-"❌ "+error.message;
+).textContent =
+"❌ "+(
+error.message||
+"Could not initialize dashboard."
+);
 
 }
 
@@ -964,7 +970,7 @@ async function loadRoles(){
 
 if(!currentUser)return;
 
-const result=
+const result =
 await supabaseClient
 .from("user_roles")
 .select("role")
@@ -981,7 +987,7 @@ return;
 
 }
 
-const box=
+const box =
 document.getElementById("rolesBox");
 
 box.innerHTML="";
@@ -989,7 +995,7 @@ box.innerHTML="";
 (result.data||[]).forEach(
 function(item){
 
-const span=
+const span =
 document.createElement("span");
 
 span.className="role";
@@ -1023,7 +1029,7 @@ const sections=[
 sections.forEach(
 function(name){
 
-const el=
+const el =
 document.getElementById(name);
 
 if(el){
@@ -1058,7 +1064,7 @@ loadMySongs();
 
 
 /* =========================
-ARTIST COUNT DISPLAY
+ARTIST COUNT
 ========================= */
 
 function updateArtistCount(){
@@ -1090,7 +1096,7 @@ if(count===0)count=1;
 
 document.getElementById(
 "artistCountMessage"
-).textContent=
+).textContent =
 count+
 (count===1
 ?" performing artist"
@@ -1105,7 +1111,7 @@ FIND PASONG USER
 
 async function findUserByEmail(email){
 
-const cleanEmail=
+const cleanEmail =
 String(email||"")
 .trim()
 .toLowerCase();
@@ -1131,25 +1137,51 @@ throw new Error(
 
 }
 
-const response=
-await fetch(
+const url =
 API_BASE+
 "/api/users/find?email="+
-encodeURIComponent(cleanEmail),
+encodeURIComponent(cleanEmail);
+
+let response;
+
+try{
+
+response =
+await fetch(
+url,
 {
 method:"GET",
 
 headers:{
 "Authorization":
 "Bearer "+
-session.access_token
+session.access_token,
+
+"Accept":
+"application/json"
 },
 
 cache:"no-store"
 }
 );
 
-const text=await response.text();
+}catch(error){
+
+console.error(
+"USER LOOKUP FETCH ERROR:",
+error
+);
+
+throw new Error(
+"Failed to connect to PASONG API while finding "+
+cleanEmail+
+". Check the /api/users/find endpoint and CORS."
+);
+
+}
+
+const text =
+await response.text();
 
 let data;
 
@@ -1160,7 +1192,10 @@ data=JSON.parse(text);
 }catch(error){
 
 throw new Error(
-"User lookup server returned an invalid response."
+"User lookup returned an invalid response. HTTP "+
+response.status+
+": "+
+text.substring(0,200)
 );
 
 }
@@ -1169,7 +1204,9 @@ if(!response.ok){
 
 throw new Error(
 data.error||
-"Could not find PASONG account."
+data.message||
+"Could not find PASONG account. HTTP "+
+response.status
 );
 
 }
@@ -1207,10 +1244,17 @@ throw new Error(
 
 }
 
-const response=
-await fetch(
+const url =
 API_BASE+
-"/api/cloudinary/signature",
+"/api/cloudinary/signature";
+
+let response;
+
+try{
+
+response =
+await fetch(
+url,
 {
 method:"POST",
 
@@ -1220,6 +1264,9 @@ headers:{
 session.access_token,
 
 "Content-Type":
+"application/json",
+
+"Accept":
 "application/json"
 },
 
@@ -1229,7 +1276,21 @@ folder:"pasong-songs"
 }
 );
 
-const text=await response.text();
+}catch(error){
+
+console.error(
+"CLOUDINARY SIGNATURE FETCH ERROR:",
+error
+);
+
+throw new Error(
+"Failed to connect to PASONG API while preparing the upload. Check CORS and /api/cloudinary/signature."
+);
+
+}
+
+const text =
+await response.text();
 
 let data;
 
@@ -1240,7 +1301,10 @@ data=JSON.parse(text);
 }catch(error){
 
 throw new Error(
-"Cloudinary server returned an invalid response."
+"Cloudinary signature endpoint returned an invalid response. HTTP "+
+response.status+
+": "+
+text.substring(0,200)
 );
 
 }
@@ -1249,7 +1313,9 @@ if(!response.ok){
 
 throw new Error(
 data.error||
-"Could not prepare upload."
+data.message||
+"Could not prepare upload. HTTP "+
+response.status
 );
 
 }
@@ -1268,12 +1334,28 @@ file,
 signatureData
 ){
 
-const formData=new FormData();
+const formData =
+new FormData();
 
-formData.append("file",file);
-formData.append("api_key",signatureData.api_key);
-formData.append("timestamp",signatureData.timestamp);
-formData.append("signature",signatureData.signature);
+formData.append(
+"file",
+file
+);
+
+formData.append(
+"api_key",
+signatureData.api_key
+);
+
+formData.append(
+"timestamp",
+signatureData.timestamp
+);
+
+formData.append(
+"signature",
+signatureData.signature
+);
 
 if(signatureData.folder){
 
@@ -1284,7 +1366,11 @@ signatureData.folder
 
 }
 
-const response=
+let response;
+
+try{
+
+response =
 await fetch(
 "https://api.cloudinary.com/v1_1/"+
 signatureData.cloud_name+
@@ -1295,7 +1381,21 @@ body:formData
 }
 );
 
-const text=await response.text();
+}catch(error){
+
+console.error(
+"CLOUDINARY UPLOAD FETCH ERROR:",
+error
+);
+
+throw new Error(
+"Failed to connect to Cloudinary while uploading the file."
+);
+
+}
+
+const text =
+await response.text();
 
 let data;
 
@@ -1306,7 +1406,8 @@ data=JSON.parse(text);
 }catch(error){
 
 throw new Error(
-"Cloudinary returned an invalid response."
+"Cloudinary returned an invalid response. HTTP "+
+response.status
 );
 
 }
@@ -1315,7 +1416,8 @@ if(!response.ok){
 
 throw new Error(
 data.error?.message||
-"Cloudinary upload failed."
+"Cloudinary upload failed. HTTP "+
+response.status
 );
 
 }
@@ -1339,27 +1441,33 @@ UPLOAD SONG
 
 async function uploadSong(){
 
-const message=
+const message =
 document.getElementById(
 "uploadMessage"
 );
 
-const button=
+const button =
 document.getElementById(
 "uploadBtn"
 );
 
 function showError(text){
 
-message.textContent="❌ "+text;
-message.className="message error";
+message.textContent =
+"❌ "+text;
+
+message.className =
+"message error";
 
 }
 
 function showSuccess(text){
 
-message.textContent="✓ "+text;
-message.className="message success";
+message.textContent =
+"✓ "+text;
+
+message.className =
+"message success";
 
 }
 
@@ -1385,65 +1493,63 @@ currentSession=session;
 currentUser=session.user;
 
 
-const title=
+const title =
 document.getElementById(
 "songTitle"
 ).value.trim();
 
-const artistEmail1=
+const artistEmail1 =
 document.getElementById(
 "songArtist"
 ).value.trim().toLowerCase();
 
-const artistEmail2=
+const artistEmail2 =
 document.getElementById(
 "songArtist2"
 ).value.trim().toLowerCase();
 
-const artistEmail3=
+const artistEmail3 =
 document.getElementById(
 "songArtist3"
 ).value.trim().toLowerCase();
 
-const genre=
+const genre =
 document.getElementById(
 "songGenre"
 ).value.trim();
 
-const label=
+const label =
 document.getElementById(
 "songLabel"
 ).value.trim();
 
-const writerEmail=
+const writerEmail =
 document.getElementById(
 "writerEmail"
 ).value.trim().toLowerCase();
 
-const producerEmail=
+const producerEmail =
 document.getElementById(
 "producerEmail"
 ).value.trim().toLowerCase();
 
-const audioFile=
+const audioFile =
 document.getElementById(
 "audioFile"
 ).files[0];
 
-const coverFile=
+const coverFile =
 document.getElementById(
 "coverFile"
 ).files[0];
 
-const agreement=
+const agreement =
 document.getElementById(
 "uploadAgreement"
 ).checked;
 
 
-/* =========================
-VALIDATION
-========================= */
+/* VALIDATION */
 
 if(!title){
 
@@ -1556,9 +1662,7 @@ button.disabled=true;
 button.textContent="Finding artists...";
 
 
-/* =========================
-PERFORMING ARTIST LOOKUPS
-========================= */
+/* ARTISTS */
 
 const artistEmails=[
 artistEmail1,
@@ -1574,17 +1678,17 @@ i<artistEmails.length;
 i++
 ){
 
-message.textContent=
+message.textContent =
 "Finding performing artist "+
 (i+1)+
 " of "+
 artistEmails.length+
 "...";
 
-message.className=
+message.className =
 "message loading";
 
-const userId=
+const userId =
 await findUserByEmail(
 artistEmails[i]
 );
@@ -1594,21 +1698,19 @@ artistUserIds.push(userId);
 }
 
 
-/* =========================
-WRITER
-========================= */
+/* WRITER */
 
 let writerUserId=null;
 
 if(writerEmail){
 
-message.textContent=
+message.textContent =
 "Finding writer PASONG account...";
 
-message.className=
+message.className =
 "message loading";
 
-writerUserId=
+writerUserId =
 await findUserByEmail(
 writerEmail
 );
@@ -1616,21 +1718,19 @@ writerEmail
 }
 
 
-/* =========================
-PRODUCER
-========================= */
+/* PRODUCER */
 
 let producerUserId=null;
 
 if(producerEmail){
 
-message.textContent=
+message.textContent =
 "Finding producer PASONG account...";
 
-message.className=
+message.className =
 "message loading";
 
-producerUserId=
+producerUserId =
 await findUserByEmail(
 producerEmail
 );
@@ -1638,46 +1738,55 @@ producerEmail
 }
 
 
-/* =========================
-CLOUDINARY
-========================= */
+/* CLOUDINARY */
 
-message.textContent=
-"Uploading cover and audio...";
+message.textContent =
+"Preparing upload...";
 
-message.className=
+message.className =
 "message loading";
 
-const signature=
+const signature =
 await getCloudinarySignature();
 
-const coverUrl=
+message.textContent =
+"Uploading cover...";
+
+const coverUrl =
 await uploadToCloudinary(
 coverFile,
 signature
 );
 
-const audioUrl=
+message.textContent =
+"Uploading audio...";
+
+const audioUrl =
 await uploadToCloudinary(
 audioFile,
 signature
 );
 
 
-/* =========================
-CREATE SONG
-========================= */
+/* CREATE SONG */
 
-message.textContent=
+message.textContent =
 "Saving song to PASONG...";
 
-message.className=
+message.className =
 "message loading";
 
-const songResponse=
-await fetch(
+const songUrl =
 API_BASE+
-"/api/songs/create",
+"/api/songs/create";
+
+let songResponse;
+
+try{
+
+songResponse =
+await fetch(
+songUrl,
 {
 method:"POST",
 
@@ -1687,7 +1796,10 @@ headers:{
 
 "Authorization":
 "Bearer "+
-session.access_token
+session.access_token,
+
+"Accept":
+"application/json"
 },
 
 body:JSON.stringify({
@@ -1731,21 +1843,37 @@ artistUserIds
 }
 );
 
+}catch(error){
 
-const responseText=
+console.error(
+"SONG CREATE FETCH ERROR:",
+error
+);
+
+throw new Error(
+"Failed to connect to PASONG API while saving the song. Check /api/songs/create and CORS."
+);
+
+}
+
+
+const responseText =
 await songResponse.text();
 
 let responseData;
 
 try{
 
-responseData=
+responseData =
 JSON.parse(responseText);
 
 }catch(error){
 
 throw new Error(
-"PASONG server returned an invalid response."
+"PASONG server returned an invalid response. HTTP "+
+songResponse.status+
+": "+
+responseText.substring(0,300)
 );
 
 }
@@ -1754,15 +1882,15 @@ if(!songResponse.ok){
 
 throw new Error(
 responseData.error||
-"Song upload failed."
+responseData.message||
+"Song upload failed. HTTP "+
+songResponse.status
 );
 
 }
 
 
-/* =========================
-SUCCESS
-========================= */
+/* SUCCESS */
 
 showSuccess(
 "Song uploaded successfully with "+
@@ -1857,7 +1985,7 @@ async function loadProfile(){
 
 if(!currentUser)return;
 
-const result=
+const result =
 await supabaseClient
 .from("artist_profiles")
 .select("*")
@@ -1881,12 +2009,12 @@ if(!profile)return;
 
 document.getElementById(
 "realName"
-).value=
+).value =
 profile.real_name||"";
 
 document.getElementById(
 "performingName"
-).value=
+).value =
 profile.performing_name||
 profile.stage_name||
 profile.artist_name||
@@ -1894,13 +2022,13 @@ profile.artist_name||
 
 document.getElementById(
 "mobileMoneyProvider"
-).value=
+).value =
 profile.mobile_money_provider||
 "";
 
 document.getElementById(
 "mobileMoneyNumber"
-).value=
+).value =
 profile.mobile_money_number||
 profile.mobile_number||
 "";
@@ -1909,7 +2037,7 @@ if(profile.profile_image_url){
 
 document.getElementById(
 "profilePicture"
-).src=
+).src =
 profile.profile_image_url;
 
 }
@@ -1923,14 +2051,15 @@ SAVE PROFILE
 
 async function saveArtistProfile(){
 
-const message=
+const message =
 document.getElementById(
 "profileMessage"
 );
 
 try{
 
-const session=await getSession();
+const session =
+await getSession();
 
 if(
 !session ||
@@ -1943,22 +2072,22 @@ throw new Error(
 
 }
 
-const realName=
+const realName =
 document.getElementById(
 "realName"
 ).value.trim();
 
-const performingName=
+const performingName =
 document.getElementById(
 "performingName"
 ).value.trim();
 
-const provider=
+const provider =
 document.getElementById(
 "mobileMoneyProvider"
 ).value.trim();
 
-const mobileNumber=
+const mobileNumber =
 document.getElementById(
 "mobileMoneyNumber"
 ).value.trim();
@@ -2015,7 +2144,7 @@ mobile_money_provider:provider
 
 };
 
-const result=
+const result =
 await supabaseClient
 .from("artist_profiles")
 .upsert(
@@ -2033,24 +2162,24 @@ throw result.error;
 
 }
 
-message.textContent=
+message.textContent =
 "✓ Profile saved successfully.";
 
-message.className=
+message.className =
 "message success";
 
 }catch(error){
 
 console.error(error);
 
-message.textContent=
+message.textContent =
 "❌ "+
 (
 error.message||
 "Could not save profile."
 );
 
-message.className=
+message.className =
 "message error";
 
 }
@@ -2066,7 +2195,7 @@ async function uploadProfilePicture(){
 
 try{
 
-const file=
+const file =
 document.getElementById(
 "profilePictureFile"
 ).files[0];
@@ -2081,16 +2210,16 @@ return;
 
 }
 
-const signature=
+const signature =
 await getCloudinarySignature();
 
-const imageUrl=
+const imageUrl =
 await uploadToCloudinary(
 file,
 signature
 );
 
-const result=
+const result =
 await supabaseClient
 .from("artist_profiles")
 .upsert(
@@ -2111,7 +2240,8 @@ throw result.error;
 
 document.getElementById(
 "profilePicture"
-).src=imageUrl;
+).src =
+imageUrl;
 
 alert(
 "Profile picture uploaded successfully."
@@ -2139,18 +2269,18 @@ async function loadMySongs(){
 
 if(!currentUser)return;
 
-const list=
+const list =
 document.getElementById(
 "songsList"
 );
 
 try{
 
-const result=
+const result =
 await supabaseClient
 .from("songs")
 .select(
-"id,title,status,price,currency,created_at,uploader_user_id"
+"id,title,status,price,currency,created_at,uploader_user_id,artist_user_id,producer_user_id,writer_user_id"
 )
 .or(
 "uploader_user_id.eq."+
@@ -2175,11 +2305,12 @@ throw result.error;
 
 }
 
-const songs=result.data||[];
+const songs =
+result.data||[];
 
 if(!songs.length){
 
-list.innerHTML=
+list.innerHTML =
 '<p style="color:#999">No songs uploaded yet.</p>';
 
 document.getElementById(
@@ -2192,7 +2323,7 @@ return;
 
 document.getElementById(
 "totalSongs"
-).textContent=
+).textContent =
 String(songs.length);
 
 list.innerHTML="";
@@ -2200,27 +2331,29 @@ list.innerHTML="";
 songs.forEach(
 function(song){
 
-const row=
+const row =
 document.createElement("div");
 
-row.className="song-row";
+row.className =
+"song-row";
 
-const top=
+const top =
 document.createElement("div");
 
-top.className="song-top";
+top.className =
+"song-top";
 
-const title=
+const title =
 document.createElement("strong");
 
-title.textContent=
+title.textContent =
 song.title||
 "Untitled";
 
-const actions=
+const actions =
 document.createElement("div");
 
-actions.className=
+actions.className =
 "song-actions";
 
 if(
@@ -2228,16 +2361,16 @@ song.uploader_user_id===
 currentUser.id
 ){
 
-const editButton=
+const editButton =
 document.createElement("button");
 
-editButton.className=
+editButton.className =
 "btn-edit";
 
-editButton.textContent=
+editButton.textContent =
 "✏️ Edit Title";
 
-editButton.onclick=
+editButton.onclick =
 function(){
 
 openEditTitlePopup(
@@ -2256,10 +2389,10 @@ editButton
 top.appendChild(title);
 top.appendChild(actions);
 
-const details=
+const details =
 document.createElement("span");
 
-details.textContent=
+details.textContent =
 "Status: "+
 (song.status||"unknown")+
 " • Price: "+
@@ -2282,8 +2415,13 @@ console.error(
 error
 );
 
-list.innerHTML=
-'<p style="color:#ff8c9b">Could not load songs.</p>';
+list.innerHTML =
+'<p style="color:#ff8c9b">Could not load songs.<br><small>'+
+(
+error.message||
+"Unknown error"
+)+
+'</small></p>';
 
 }
 
@@ -2291,7 +2429,7 @@ list.innerHTML=
 
 
 /* =========================
-EDIT SONG TITLE
+EDIT TITLE
 ========================= */
 
 function openEditTitlePopup(
@@ -2301,17 +2439,17 @@ currentTitle
 
 editingSongId=songId;
 
-const input=
+const input =
 document.getElementById(
 "editTitleInput"
 );
 
-const message=
+const message =
 document.getElementById(
 "editTitleMessage"
 );
 
-input.value=
+input.value =
 currentTitle||"";
 
 message.textContent="";
@@ -2333,10 +2471,6 @@ input.select();
 
 }
 
-
-/* =========================
-CLOSE EDIT TITLE
-========================= */
 
 function closeEditTitlePopup(){
 
@@ -2363,29 +2497,29 @@ SAVE EDITED TITLE
 
 async function saveEditedTitle(){
 
-const input=
+const input =
 document.getElementById(
 "editTitleInput"
 );
 
-const message=
+const message =
 document.getElementById(
 "editTitleMessage"
 );
 
-const saveButton=
+const saveButton =
 document.getElementById(
 "saveEditTitleBtn"
 );
 
-const cancelButton=
+const cancelButton =
 document.getElementById(
 "cancelEditTitleBtn"
 );
 
 try{
 
-const newTitle=
+const newTitle =
 input.value.trim();
 
 if(!editingSongId){
@@ -2398,10 +2532,10 @@ throw new Error(
 
 if(!newTitle){
 
-message.textContent=
+message.textContent =
 "❌ Enter a song title.";
 
-message.className=
+message.className =
 "message error";
 
 return;
@@ -2410,17 +2544,17 @@ return;
 
 if(newTitle.length>150){
 
-message.textContent=
+message.textContent =
 "❌ Song title is too long.";
 
-message.className=
+message.className =
 "message error";
 
 return;
 
 }
 
-const session=
+const session =
 await getSession();
 
 if(
@@ -2438,20 +2572,27 @@ saveButton.disabled=true;
 cancelButton.disabled=true;
 saveButton.textContent="Saving...";
 
-message.textContent=
+message.textContent =
 "Updating song title...";
 
-message.className=
+message.className =
 "message loading";
 
-const response=
-await fetch(
+const url =
 API_BASE+
 "/api/songs/"+
 encodeURIComponent(
 editingSongId
 )+
-"/title",
+"/title";
+
+let response;
+
+try{
+
+response =
+await fetch(
+url,
 {
 method:"PATCH",
 
@@ -2461,7 +2602,10 @@ headers:{
 
 "Authorization":
 "Bearer "+
-session.access_token
+session.access_token,
+
+"Accept":
+"application/json"
 },
 
 body:JSON.stringify({
@@ -2470,7 +2614,20 @@ title:newTitle
 }
 );
 
-const responseText=
+}catch(error){
+
+console.error(
+"EDIT TITLE FETCH ERROR:",
+error
+);
+
+throw new Error(
+"Failed to connect to PASONG API while updating the title."
+);
+
+}
+
+const responseText =
 await response.text();
 
 let data;
@@ -2482,7 +2639,10 @@ data=JSON.parse(responseText);
 }catch(error){
 
 throw new Error(
-"PASONG server returned an invalid response."
+"PASONG server returned an invalid response. HTTP "+
+response.status+
+": "+
+responseText.substring(0,300)
 );
 
 }
@@ -2491,15 +2651,17 @@ if(!response.ok){
 
 throw new Error(
 data.error||
-"Could not update song title."
+data.message||
+"Could not update song title. HTTP "+
+response.status
 );
 
 }
 
-message.textContent=
+message.textContent =
 "✓ Song title updated successfully.";
 
-message.className=
+message.className =
 "message success";
 
 await loadMySongs();
@@ -2520,14 +2682,14 @@ console.error(
 error
 );
 
-message.textContent=
+message.textContent =
 "❌ "+
 (
 error.message||
 "Could not update song title."
 );
 
-message.className=
+message.className =
 "message error";
 
 }finally{
@@ -2547,12 +2709,14 @@ DASHBOARD STATS
 
 async function loadDashboardStats(){
 
+if(!currentUser)return;
+
 try{
 
-const result=
+const result =
 await supabaseClient
 .from("songs")
-.select("id")
+.select("id,plays,downloads")
 .or(
 "uploader_user_id.eq."+
 currentUser.id+
@@ -2560,20 +2724,53 @@ currentUser.id+
 currentUser.id
 );
 
-if(!result.error){
+if(result.error){
 
-document.getElementById(
-"totalSongs"
-).textContent=
-String(
-(result.data||[]).length
+console.error(
+"Dashboard stats error:",
+result.error
 );
+
+return;
 
 }
 
+const songs =
+result.data||[];
+
+document.getElementById(
+"totalSongs"
+).textContent =
+String(songs.length);
+
+let plays=0;
+let downloads=0;
+
+songs.forEach(
+function(song){
+
+plays += Number(song.plays||0);
+downloads += Number(song.downloads||0);
+
+}
+);
+
+document.getElementById(
+"totalPlays"
+).textContent =
+String(plays);
+
+document.getElementById(
+"totalDownloads"
+).textContent =
+String(downloads);
+
 }catch(error){
 
-console.error(error);
+console.error(
+"Dashboard stats error:",
+error
+);
 
 }
 
