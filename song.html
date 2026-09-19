@@ -257,22 +257,47 @@ h1{
   margin-bottom:18px;
 }
 
-.buy-btn{
+.buy-btn,
+.tip-btn{
   width:100%;
   padding:17px 20px;
   border:0;
   border-radius:14px;
-  background:linear-gradient(90deg,#8c62ff,#ff459f);
   color:#fff;
   font-size:16px;
   font-weight:900;
   cursor:pointer;
-  box-shadow:0 12px 30px rgba(126,87,255,.22);
   transition:.2s;
 }
 
-.buy-btn:hover{
+.buy-btn{
+  background:linear-gradient(90deg,#8c62ff,#ff459f);
+  box-shadow:0 12px 30px rgba(126,87,255,.22);
+}
+
+.tip-btn{
+  margin-top:12px;
+  background:#171725;
+  border:1px solid rgba(255,255,255,.10);
+}
+
+.buy-btn:hover,
+.tip-btn:hover{
   transform:translateY(-2px);
+}
+
+.dj-free{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 12px;
+  margin-bottom:15px;
+  border-radius:999px;
+  background:rgba(34,197,94,.10);
+  border:1px solid rgba(34,197,94,.25);
+  color:#86efac;
+  font-size:13px;
+  font-weight:800;
 }
 
 .status{
@@ -388,7 +413,16 @@ footer{
   Enjoy this song from PASONG.
 </p>
 
-<div class="price-label">
+<!-- DJ MIX FREE STREAM BADGE -->
+<div
+  id="djFreeBadge"
+  class="dj-free"
+  style="display:none;"
+>
+  🎧 FREE DJ MIX STREAM
+</div>
+
+<div class="price-label" id="priceLabel">
   Music price
 </div>
 
@@ -398,11 +432,11 @@ footer{
 
 <div class="preview-box">
 
-<div class="preview-title">
+<div id="previewTitle" class="preview-title">
   🎧 20-Second Preview
 </div>
 
-<div class="preview-text">
+<div id="previewText" class="preview-text">
   Listen to up to 20 seconds before purchasing.
 </div>
 
@@ -430,7 +464,7 @@ footer{
 
 <div class="time">
 <span id="currentTime">0:00</span>
-<span>0:20</span>
+<span id="endTime">0:20</span>
 </div>
 
 </div>
@@ -441,11 +475,11 @@ footer{
 
 <div class="buy-box">
 
-<div class="support-title">
+<div id="supportTitle" class="support-title">
   🛒 Support the Artist
 </div>
 
-<div class="support-text">
+<div id="supportText" class="support-text">
   Enjoy the preview, then purchase the full song.
   Your purchase supports the artists and creators
   behind the music.
@@ -457,6 +491,15 @@ footer{
   type="button"
 >
   BUY NOW — UGX 700
+</button>
+
+<button
+  id="tipButton"
+  class="tip-btn"
+  type="button"
+  style="display:none;"
+>
+  💜 TIP DJ
 </button>
 
 </div>
@@ -513,8 +556,32 @@ const songDescription =
 const songPrice =
   document.getElementById("songPrice");
 
+const priceLabel =
+  document.getElementById("priceLabel");
+
 const buyButton =
   document.getElementById("buyButton");
+
+const tipButton =
+  document.getElementById("tipButton");
+
+const supportTitle =
+  document.getElementById("supportTitle");
+
+const supportText =
+  document.getElementById("supportText");
+
+const djFreeBadge =
+  document.getElementById("djFreeBadge");
+
+const previewTitle =
+  document.getElementById("previewTitle");
+
+const previewText =
+  document.getElementById("previewText");
+
+const endTime =
+  document.getElementById("endTime");
 
 const audio =
   document.getElementById("audio");
@@ -527,6 +594,14 @@ const progress =
 
 const currentTime =
   document.getElementById("currentTime");
+
+
+/* =====================================================
+   DJ MIX STATE
+===================================================== */
+
+let isDjMix = false;
+let currentDjMix = null;
 
 
 /* =====================================================
@@ -590,6 +665,79 @@ function showError(message){
       ← Back to Music Store
     </a>
   `;
+
+}
+
+
+/* =====================================================
+   COUNTRY DETECTION
+   Uganda = UG
+===================================================== */
+
+async function detectCountry(){
+
+  try{
+
+    const response =
+      await fetch(
+        "https://ipapi.co/country/",
+        {
+          method:"GET",
+          cache:"no-store"
+        }
+      );
+
+    if(!response.ok){
+      return "UG";
+    }
+
+    const country =
+      (await response.text())
+        .trim()
+        .toUpperCase();
+
+    return country || "UG";
+
+  }catch(error){
+
+    console.warn(
+      "PASONG country detection failed:",
+      error
+    );
+
+    return "UG";
+
+  }
+
+}
+
+
+/* =====================================================
+   DJ MIX PRICE
+===================================================== */
+
+async function getDjMixPrice(data){
+
+  const country =
+    await detectCountry();
+
+  if(country === "UG"){
+
+    return {
+      country:"UG",
+      currency:"UGX",
+      amount:1000,
+      label:"UGX 1,000"
+    };
+
+  }
+
+  return {
+    country:country,
+    currency:"USD",
+    amount:1,
+    label:"USD 1"
+  };
 
 }
 
@@ -672,6 +820,21 @@ async function loadSong(){
 
 
     /* =================================================
+       DETECT CONTENT TYPE
+    ================================================= */
+
+    isDjMix =
+      String(
+        data.content_type ||
+        "music"
+      ).toLowerCase()
+      === "dj_mix";
+
+    currentDjMix =
+      data;
+
+
+    /* =================================================
        TITLE
     ================================================= */
 
@@ -682,7 +845,7 @@ async function loadSong(){
 
 
     /* =================================================
-       ARTIST
+       ARTIST / DJ
     ================================================= */
 
     let artistName =
@@ -734,7 +897,7 @@ async function loadSong(){
       data.genre ||
       data.category_name ||
       data.category?.name ||
-      "Music";
+      (isDjMix ? "DJ Mix" : "Music");
 
     songGenre.textContent =
       genre;
@@ -749,36 +912,11 @@ async function loadSong(){
 
     songDescription.textContent =
       data.description ||
-      "Enjoy this song from PASONG.";
-
-
-    /* =================================================
-       PRICE
-       BACKEND VALUE IS AUTHORITATIVE
-    ================================================= */
-
-    const price =
-      Number(
-        data.marketplace_price ??
-        data.price ??
-        700
+      (
+        isDjMix
+        ? "Stream this DJ Mix free on PASONG."
+        : "Enjoy this song from PASONG."
       );
-
-    const currency =
-      data.marketplace_currency ||
-      data.currency ||
-      "UGX";
-
-    const priceLabel =
-      data.marketplace_label ||
-      `${currency} ${price.toLocaleString()}`;
-
-
-    songPrice.textContent =
-      priceLabel;
-
-    buyButton.textContent =
-      "BUY NOW — " + priceLabel;
 
 
     /* =================================================
@@ -816,37 +954,16 @@ async function loadSong(){
 
 
     /* =================================================
-       PREVIEW
+       DJ MIX MODE
     ================================================= */
 
-    const audioUrl =
-      data.preview_url ||
-      data.previewUrl ||
-      data.audio_url ||
-      data.audioUrl ||
-      "";
+    if(isDjMix){
 
-
-    if(audioUrl){
-
-      audio.src =
-        audioUrl;
-
-      audio.load();
-
-      previewButton.disabled =
-        false;
-
-      previewButton.style.opacity =
-        "1";
+      await setupDjMix(data);
 
     }else{
 
-      previewButton.disabled =
-        true;
-
-      previewButton.style.opacity =
-        ".45";
+      setupNormalSong(data);
 
     }
 
@@ -876,7 +993,209 @@ async function loadSong(){
 
 
 /* =====================================================
-   PREVIEW
+   NORMAL SONG
+   EXISTING 20 SECOND SYSTEM
+===================================================== */
+
+function setupNormalSong(data){
+
+  priceLabel.textContent =
+    "Music price";
+
+  const price =
+    Number(
+      data.marketplace_price ??
+      data.price ??
+      700
+    );
+
+  const currency =
+    data.marketplace_currency ||
+    data.currency ||
+    "UGX";
+
+  const priceLabelText =
+    data.marketplace_label ||
+    `${currency} ${price.toLocaleString()}`;
+
+
+  songPrice.textContent =
+    priceLabelText;
+
+  buyButton.textContent =
+    "BUY NOW — " + priceLabelText;
+
+  buyButton.style.display =
+    "block";
+
+  djFreeBadge.style.display =
+    "none";
+
+  tipButton.style.display =
+    "none";
+
+  supportTitle.textContent =
+    "🛒 Support the Artist";
+
+  supportText.textContent =
+    "Enjoy the preview, then purchase the full song. Your purchase supports the artists and creators behind the music.";
+
+  previewTitle.textContent =
+    "🎧 20-Second Preview";
+
+  previewText.textContent =
+    "Listen to up to 20 seconds before purchasing.";
+
+  progress.min =
+    "0";
+
+  progress.max =
+    "20";
+
+  progress.value =
+    "0";
+
+  endTime.textContent =
+    "0:20";
+
+
+  const audioUrl =
+    data.preview_url ||
+    data.previewUrl ||
+    data.audio_url ||
+    data.audioUrl ||
+    "";
+
+
+  if(audioUrl){
+
+    audio.src =
+      audioUrl;
+
+    audio.load();
+
+    previewButton.disabled =
+      false;
+
+    previewButton.style.opacity =
+      "1";
+
+  }else{
+
+    previewButton.disabled =
+      true;
+
+    previewButton.style.opacity =
+      ".45";
+
+  }
+
+}
+
+
+/* =====================================================
+   DJ MIX
+   FREE FULL STREAM
+   PAID DOWNLOAD
+===================================================== */
+
+async function setupDjMix(data){
+
+  priceLabel.textContent =
+    "DJ Mix download price";
+
+  djFreeBadge.style.display =
+    "inline-flex";
+
+  previewTitle.textContent =
+    "🎧 FREE FULL DJ MIX STREAM";
+
+  previewText.textContent =
+    "Listen to the full DJ Mix free on PASONG.";
+
+  supportTitle.textContent =
+    "🎧 Stream Free • Download to Own";
+
+  supportText.textContent =
+    "Stream the complete DJ Mix for free. Download access is available for purchase.";
+
+  tipButton.style.display =
+    "block";
+
+  buyButton.style.display =
+    "block";
+
+
+  /* -----------------------------------------------
+     COUNTRY-BASED PRICE
+  ----------------------------------------------- */
+
+  const pricing =
+    await getDjMixPrice(data);
+
+  songPrice.textContent =
+    pricing.label;
+
+  buyButton.textContent =
+    "DOWNLOAD — " + pricing.label;
+
+
+  /* -----------------------------------------------
+     FULL DJ MIX AUDIO
+  ----------------------------------------------- */
+
+  const mixAudioUrl =
+    data.mix_audio_url ||
+    data.audio_url ||
+    data.audioUrl ||
+    "";
+
+  if(mixAudioUrl){
+
+    audio.src =
+      mixAudioUrl;
+
+    audio.load();
+
+    previewButton.disabled =
+      false;
+
+    previewButton.style.opacity =
+      "1";
+
+  }else{
+
+    previewButton.disabled =
+      true;
+
+    previewButton.style.opacity =
+      ".45";
+
+  }
+
+
+  /*
+    DJ MIX HAS NO 20-SECOND LIMIT.
+    The browser audio controls the full stream.
+  */
+
+  progress.min =
+    "0";
+
+  progress.max =
+    "100";
+
+  progress.value =
+    "0";
+
+  endTime.textContent =
+    "0:00";
+
+}
+
+
+/* =====================================================
+   PREVIEW / STREAM BUTTON
 ===================================================== */
 
 previewButton.addEventListener(
@@ -886,7 +1205,9 @@ previewButton.addEventListener(
     if(!audio.src){
 
       alert(
-        "Preview is not available for this song."
+        isDjMix
+        ? "DJ Mix stream is not available."
+        : "Preview is not available for this song."
       );
 
       return;
@@ -897,12 +1218,6 @@ previewButton.addEventListener(
     try{
 
       if(audio.paused){
-
-        if(audio.currentTime >= 20){
-
-          audio.currentTime = 0;
-
-        }
 
         await audio.play();
 
@@ -921,12 +1236,12 @@ previewButton.addEventListener(
     }catch(error){
 
       console.error(
-        "Preview error:",
+        "PASONG audio error:",
         error
       );
 
       alert(
-        "Unable to play the preview."
+        "Unable to play the audio."
       );
 
     }
@@ -936,37 +1251,76 @@ previewButton.addEventListener(
 
 
 /* =====================================================
-   20 SECOND LIMIT
+   AUDIO TIME UPDATE
 ===================================================== */
 
 audio.addEventListener(
   "timeupdate",
   function(){
 
-    if(audio.currentTime >= 20){
+    /*
+      NORMAL SONG:
+      Keep the existing 20-second restriction.
+    */
 
-      audio.currentTime = 20;
+    if(!isDjMix){
 
-      audio.pause();
+      if(audio.currentTime >= 20){
 
-      previewButton.textContent =
-        "▶";
+        audio.currentTime =
+          20;
+
+        audio.pause();
+
+        previewButton.textContent =
+          "▶";
+
+      }
+
+
+      const time =
+        Math.min(
+          audio.currentTime,
+          20
+        );
+
+
+      currentTime.textContent =
+        formatTime(time);
+
+      progress.value =
+        time;
+
+      return;
 
     }
 
 
-    const time =
-      Math.min(
-        audio.currentTime,
-        20
-      );
+    /*
+      DJ MIX:
+      FULL STREAM — NO 20 SECOND LIMIT.
+    */
 
+    const duration =
+      Number.isFinite(audio.duration)
+      ? audio.duration
+      : 0;
 
     currentTime.textContent =
-      formatTime(time);
+      formatTime(audio.currentTime);
 
-    progress.value =
-      time;
+    if(duration > 0){
+
+      progress.max =
+        duration;
+
+      progress.value =
+        audio.currentTime;
+
+      endTime.textContent =
+        formatTime(duration);
+
+    }
 
   }
 );
@@ -974,15 +1328,20 @@ audio.addEventListener(
 
 /* =====================================================
    PREVENT SEEKING PAST 20 SECONDS
+   NORMAL SONGS ONLY
 ===================================================== */
 
 audio.addEventListener(
   "seeking",
   function(){
 
-    if(audio.currentTime > 20){
+    if(
+      !isDjMix &&
+      audio.currentTime > 20
+    ){
 
-      audio.currentTime = 20;
+      audio.currentTime =
+        20;
 
     }
 
@@ -1014,20 +1373,33 @@ progress.addEventListener(
   function(){
 
     const value =
-      Math.min(
-        Number(progress.value),
-        20
-      );
+      Number(progress.value);
+
+    if(isDjMix){
+
+      audio.currentTime =
+        Math.max(
+          0,
+          value
+        );
+
+      return;
+
+    }
+
 
     audio.currentTime =
-      value;
+      Math.min(
+        Math.max(value,0),
+        20
+      );
 
   }
 );
 
 
 /* =====================================================
-   BUY NOW
+   BUY / DOWNLOAD
    STORE → SONG → CHECKOUT
 ===================================================== */
 
@@ -1050,12 +1422,6 @@ buyButton.addEventListener(
     }
 
 
-    /*
-      Build checkout URL using the same
-      website/domain that is currently
-      serving this song page.
-    */
-
     const checkoutUrl =
       new URL(
         CHECKOUT_PAGE,
@@ -1069,6 +1435,21 @@ buyButton.addEventListener(
     );
 
 
+    /*
+      Tell checkout that this is a DJ Mix.
+      Normal songs continue using the existing flow.
+    */
+
+    if(isDjMix){
+
+      checkoutUrl.searchParams.set(
+        "content_type",
+        "dj_mix"
+      );
+
+    }
+
+
     console.log(
       "PASONG Checkout URL:",
       checkoutUrl.href
@@ -1077,6 +1458,36 @@ buyButton.addEventListener(
 
     window.location.href =
       checkoutUrl.href;
+
+  }
+);
+
+
+/* =====================================================
+   TIP DJ
+===================================================== */
+
+tipButton.addEventListener(
+  "click",
+  function(){
+
+    const songId =
+      getSongId();
+
+    /*
+      We are not sending a fake payment request here.
+      The actual Tip DJ payment flow should be connected
+      when the PASONG tip checkout/backend is ready.
+    */
+
+    alert(
+      "Tip DJ is coming next. Your DJ Mix remains free to stream."
+    );
+
+    console.log(
+      "PASONG DJ Tip requested for:",
+      songId
+    );
 
   }
 );
