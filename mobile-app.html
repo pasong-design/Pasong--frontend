@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,
+      maximum-scale=1.0,user-scalable=no">
+
+<meta name="theme-color" content="#080810">
+
+<title>PASONG App</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,
+body{
+  width:100%;
+  min-height:100%;
+}
+
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  padding-bottom:78px;
+}
+
+button,
+input{
+  font:inherit;
+}
+
+button{
+  border:0;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+
+/* =========================
+   APP HEADER
+========================= */
+
+.app-header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  padding:14px 16px 12px;
+  background:rgba(8,8,16,.96);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.header-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:900;
+}
+
+.logo span{
+  color:#c084fc;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+}
+
+.header-button{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#151520;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.07);
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+.search{
+  margin-top:13px;
+}
+
+.search input{
+  width:100%;
+  height:45px;
+  padding:0 15px;
+  border-radius:13px;
+  border:1px solid rgba(255,255,255,.08);
+  outline:none;
+  background:#12121d;
+  color:#fff;
+}
+
+.search input::placeholder{
+  color:#77778a;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+  padding:18px 14px 20px;
+}
+
+.welcome{
+  margin-bottom:22px;
+}
+
+.welcome small{
+  color:#888899;
+  font-size:12px;
+}
+
+.welcome h1{
+  margin-top:5px;
+  font-size:29px;
+  line-height:1.05;
+}
+
+.welcome h1 span{
+  background:linear-gradient(90deg,#a855f7,#ec4899);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+
+/* =========================
+   FEATURE BANNER
+========================= */
+
+.banner{
+  padding:23px 20px;
+  border-radius:21px;
+  background:
+    radial-gradient(
+      circle at 10% 20%,
+      rgba(168,85,247,.28),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(236,72,153,.18),
+      transparent 45%
+    ),
+    #11111d;
+  border:1px solid rgba(168,85,247,.18);
+  margin-bottom:25px;
+}
+
+.banner small{
+  color:#c084fc;
+  font-weight:800;
+  font-size:10px;
+  letter-spacing:1.5px;
+}
+
+.banner h2{
+  font-size:25px;
+  margin-top:7px;
+}
+
+.banner p{
+  color:#a4a4b5;
+  font-size:12px;
+  margin-top:8px;
+}
+
+.banner-button{
+  display:inline-flex;
+  margin-top:15px;
+  padding:10px 15px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  font-size:12px;
+  font-weight:800;
+}
+
+
+/* =========================
+   SECTION
+========================= */
+
+.section{
+  margin-top:25px;
+}
+
+.section-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+
+.section-heading h2{
+  font-size:18px;
+}
+
+.section-heading a{
+  color:#c084fc;
+  font-size:11px;
+  font-weight:700;
+}
+
+
+/* =========================
+   SONG ROW
+========================= */
+
+.song-row{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.song-row::-webkit-scrollbar{
+  display:none;
+}
+
+.song-card{
+  flex:0 0 155px;
+  min-width:155px;
+  overflow:hidden;
+  border-radius:15px;
+  background:#12121d;
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.song-cover{
+  width:100%;
+  height:155px;
+  object-fit:cover;
+  display:block;
+  background:#191927;
+}
+
+.song-info{
+  padding:10px;
+}
+
+.song-title{
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-artist{
+  margin-top:3px;
+  color:#858596;
+  font-size:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-bottom{
+  margin-top:9px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.song-price{
+  color:#c084fc;
+  font-size:11px;
+  font-weight:900;
+}
+
+.play-button{
+  width:31px;
+  height:31px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+}
+
+
+/* =========================
+   QUICK ACTIONS
+========================= */
+
+.actions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.action{
+  padding:17px 14px;
+  border-radius:15px;
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.action-icon{
+  font-size:21px;
+}
+
+.action h3{
+  margin-top:8px;
+  font-size:13px;
+}
+
+.action p{
+  margin-top:3px;
+  color:#858596;
+  font-size:10px;
+}
+
+
+/* =========================
+   MINI PLAYER
+========================= */
+
+.player{
+  position:fixed;
+  left:10px;
+  right:10px;
+  bottom:76px;
+  z-index:1500;
+  display:none;
+  padding:10px;
+  border-radius:15px;
+  background:rgba(17,17,29,.97);
+  border:1px solid rgba(168,85,247,.25);
+  backdrop-filter:blur(18px);
+}
+
+.player.show{
+  display:block;
+}
+
+.player-title{
+  font-size:11px;
+  font-weight:800;
+  margin-bottom:5px;
+}
+
+.player audio{
+  width:100%;
+  height:32px;
+}
+
+
+/* =========================
+   BOTTOM NAVIGATION
+========================= */
+
+.bottom-nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:68px;
+  z-index:2000;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  background:rgba(10,10,18,.98);
+  backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+.bottom-nav a{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  color:#77778a;
+  font-size:9px;
+  font-weight:700;
+}
+
+.bottom-nav a span{
+  font-size:19px;
+  line-height:20px;
+}
+
+.bottom-nav a.active{
+  color:#c084fc;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+  width:100%;
+  padding:30px 0;
+  text-align:center;
+  color:#77778a;
+  font-size:12px;
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header class="app-header">
+
+  <div class="header-row">
+
+    <a href="mobile-app.html" class="logo">
+      ◈ <span>PASONG</span>
+    </a>
+
+    <div class="header-actions">
+
+      <button
+        class="header-button"
+        onclick="window.location.href='notifications.html'">
+        🔔
+      </button>
+
+      <button
+        class="header-button"
+        onclick="window.location.href='account.html'">
+        👤
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="search">
+
+    <input
+      id="mobileSearch"
+      type="search"
+      placeholder="Search songs, artists..."
+      autocomplete="off">
+
+  </div>
+
+</header>
+
+
+<main>
+
+
+<section class="welcome">
+
+  <small>WELCOME TO</small>
+
+  <h1>
+    PASONG <span>Music</span>
+  </h1>
+
+</section>
+
+
+<section class="banner">
+
+  <small>YOUR MUSIC. YOUR CHOICE.</small>
+
+  <h2>
+    Discover your next song.
+  </h2>
+
+  <p>
+    Listen, support artists and own your music.
+  </p>
+
+  <a
+    href="store.html"
+    class="banner-button">
+    🎵 Explore Music
+  </a>
+
+</section>
+
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <h2>🔥 Trending</h2>
+
+    <a href="charts.html">
+      View all
+    </a>
+
+  </div>
+
+  <div
+    class="song-row"
+    id="trendingSongs">
+
+    <div class="loading">
+      Loading music...
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <h2>🆕 New Music</h2>
+
+    <a href="store.html">
+      View all
+    </a>
+
+  </div>
+
+  <div
+    class="song-row"
+    id="latestSongs">
+
+    <div class="loading">
+      Loading music...
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <h2>⚡ Quick Access</h2>
+
+  </div>
+
+
+  <div class="actions">
+
+    <a
+      class="action"
+      href="store.html">
+
+      <div class="action-icon">
+        🎵
+      </div>
+
+      <h3>Music Store</h3>
+
+      <p>
+        Buy and discover music
+      </p>
+
+    </a>
+
+
+    <a
+      class="action"
+      href="account.html#downloads">
+
+      <div class="action-icon">
+        📥
+      </div>
+
+      <h3>My Downloads</h3>
+
+      <p>
+        Your purchased music
+      </p>
+
+    </a>
+
+
+    <a
+      class="action"
+      href="charts.html">
+
+      <div class="action-icon">
+        📊
+      </div>
+
+      <h3>Charts</h3>
+
+      <p>
+        See what's trending
+      </p>
+
+    </a>
+
+
+    <a
+      class="action"
+      href="artist-dashboard.html">
+
+      <div class="action-icon">
+        ⬆️
+      </div>
+
+      <h3>Upload Music</h3>
+
+      <p>
+        Share your music
+      </p>
+
+    </a>
+
+  </div>
+
+</section>
+
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <h2>💜 PASONG</h2>
+
+  </div>
+
+  <div class="banner">
+
+    <small>
+      SUPPORT MUSIC CREATORS
+    </small>
+
+    <h2>
+      Music. Opportunity. Support.
+    </h2>
+
+    <p>
+      Buy music directly and help creators earn
+      from their work.
+    </p>
+
+  </div>
+
+</section>
+
+
+</main>
+
+
+<!-- MOBILE MUSIC PLAYER -->
+
+<div
+  class="player"
+  id="mobilePlayer">
+
+  <div
+    class="player-title"
+    id="playerTitle">
+    PASONG Music
+  </div>
+
+  <audio
+    id="playerAudio"
+    controls
+    preload="none">
+  </audio>
+
+</div>
+
+
+<!-- MOBILE NAVIGATION -->
+
+<nav class="bottom-nav">
+
+  <a
+    href="mobile-app.html"
+    class="active">
+
+    <span>⌂</span>
+    Home
+
+  </a>
+
+
+  <a href="store.html">
+
+    <span>🎵</span>
+    Music
+
+  </a>
+
+
+  <a href="charts.html">
+
+    <span>📊</span>
+    Charts
+
+  </a>
+
+
+  <a href="account.html#downloads">
+
+    <span>📥</span>
+    Library
+
+  </a>
+
+
+  <a href="account.html">
+
+    <span>👤</span>
+    Account
+
+  </a>
+
+</nav>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const pasongSupabase =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+function escapeHtml(value){
+
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function createMobileSong(song){
+
+  const title =
+    song.title ||
+    "Untitled Song";
+
+  const artist =
+    song.artist_name ||
+    song.stage_name ||
+    song.artist ||
+    "PASONG Artist";
+
+  const audio =
+    song.audio_url ||
+    "";
+
+  const cover =
+    song.cover_url ||
+    "https://ui-avatars.com/api/?name=" +
+    encodeURIComponent(title) +
+    "&background=171722&color=c084fc&bold=true";
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "song-card";
+
+  card.innerHTML = `
+
+    <img
+      class="song-cover"
+      src="${escapeHtml(cover)}"
+      alt="${escapeHtml(title)}">
+
+    <div class="song-info">
+
+      <div class="song-title">
+        ${escapeHtml(title)}
+      </div>
+
+      <div class="song-artist">
+        ${escapeHtml(artist)}
+      </div>
+
+      <div class="song-bottom">
+
+        <span class="song-price">
+          UGX 700
+        </span>
+
+        <button
+          class="play-button"
+          type="button">
+          ▶
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  const play =
+    card.querySelector(".play-button");
+
+  play.addEventListener(
+    "click",
+    function(){
+
+      if(!audio){
+
+        alert(
+          "This song does not have an audio file yet."
+        );
+
+        return;
+      }
+
+      const player =
+        document.getElementById("mobilePlayer");
+
+      const playerAudio =
+        document.getElementById("playerAudio");
+
+      const playerTitle =
+        document.getElementById("playerTitle");
+
+      playerTitle.textContent =
+        title;
+
+      playerAudio.src =
+        audio;
+
+      player.classList.add("show");
+
+      playerAudio.currentTime = 0;
+
+      playerAudio.play().catch(
+        function(error){
+          console.log(error);
+        }
+      );
+
+    }
+  );
+
+
+  card.addEventListener(
+    "click",
+    function(event){
+
+      if(event.target.closest(".play-button")){
+        return;
+      }
+
+      window.location.href =
+        "song.html?id=" +
+        encodeURIComponent(song.id || "");
+
+    }
+  );
+
+
+  return card;
+
+}
+
+
+async function loadMobileMusic(){
+
+  const trending =
+    document.getElementById("trendingSongs");
+
+  const latest =
+    document.getElementById("latestSongs");
+
+  try{
+
+    const result =
+      await pasongSupabase
+        .from("songs")
+        .select("*")
+        .order("created_at",{
+          ascending:false
+        })
+        .limit(20);
+
+
+    if(result.error){
+
+      console.error(result.error);
+
+      showEmpty(
+        trending,
+        latest
+      );
+
+      return;
+
+    }
+
+
+    const songs =
+      result.data || [];
+
+
+    if(!songs.length){
+
+      showEmpty(
+        trending,
+        latest
+      );
+
+      return;
+
+    }
+
+
+    trending.innerHTML = "";
+    latest.innerHTML = "";
+
+
+    songs.slice(0,10).forEach(
+      function(song){
+
+        trending.appendChild(
+          createMobileSong(song)
+        );
+
+      }
+    );
+
+
+    songs.slice(0,10).forEach(
+      function(song){
+
+        latest.appendChild(
+          createMobileSong(song)
+        );
+
+      }
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "PASONG mobile music:",
+      error
+    );
+
+    showEmpty(
+      trending,
+      latest
+    );
+
+  }
+
+}
+
+
+function showEmpty(
+  trending,
+  latest
+){
+
+  const message =
+    '<div class="loading">No music available yet.</div>';
+
+  trending.innerHTML =
+    message;
+
+  latest.innerHTML =
+    message;
+
+}
+
+
+const mobileSearch =
+  document.getElementById("mobileSearch");
+
+if(mobileSearch){
+
+  mobileSearch.addEventListener(
+    "keydown",
+    function(event){
+
+      if(event.key !== "Enter"){
+        return;
+      }
+
+      const query =
+        mobileSearch.value.trim();
+
+      if(!query){
+        return;
+      }
+
+      window.location.href =
+        "store.html?search=" +
+        encodeURIComponent(query);
+
+    }
+  );
+
+}
+
+
+loadMobileMusic();
+
+</script>
+
+</body>
+</html>
