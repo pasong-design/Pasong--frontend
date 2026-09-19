@@ -143,6 +143,15 @@ h1{
   margin-top:6px;
 }
 
+/* DJ MIX */
+
+.dj-free{
+  color:#5cff9c;
+  font-size:12px;
+  font-weight:800;
+  margin-top:6px;
+}
+
 /* TIP */
 
 .tipbox{
@@ -418,15 +427,17 @@ h1{
 
 <div id="content" class="card hidden">
 
-  <h1>Checkout</h1>
+  <h1 id="checkoutTitle">
+    Checkout
+  </h1>
 
-  <p class="sub">
+  <p id="checkoutSub" class="sub">
     You are one step away. Choose how you want to pay.
     Your download will be available after successful payment.
   </p>
 
 
-  <!-- SONG -->
+  <!-- SONG / DJ MIX -->
 
   <div class="song">
 
@@ -452,11 +463,11 @@ h1{
   </div>
 
 
-  <!-- SONG PRICE -->
+  <!-- PRICE -->
 
   <div class="pricebox">
 
-    <div class="price-label">
+    <div id="priceLabel" class="price-label">
       Song price
     </div>
 
@@ -464,7 +475,7 @@ h1{
       UGX 700
     </div>
 
-    <div class="keep">
+    <div id="priceNote" class="keep">
       Inclusive price — no extra checkout fee
     </div>
 
@@ -475,15 +486,15 @@ h1{
   </div>
 
 
-  <!-- ARTIST TIP -->
+  <!-- TIP -->
 
   <div class="tipbox">
 
-    <div class="tip-title">
+    <div id="tipTitle" class="tip-title">
       ❤️ Support the Artist
     </div>
 
-    <div class="tip-sub">
+    <div id="tipSub" class="tip-sub">
       Add an optional tip to support the artist directly.
       The artist receives 70% and PASONG receives 30%.
     </div>
@@ -538,7 +549,7 @@ h1{
       <div class="total-row">
 
         <span class="total-label">
-          Song
+          Purchase
         </span>
 
         <span
@@ -552,7 +563,7 @@ h1{
 
       <div class="total-row">
 
-        <span class="total-label">
+        <span id="tipTotalLabel" class="total-label">
           Artist tip
         </span>
 
@@ -737,6 +748,15 @@ let pollingTimer = null;
 
 
 /* =====================================================
+   CONTENT STATE
+===================================================== */
+
+let isDjMix = false;
+
+let currentContentType = "music";
+
+
+/* =====================================================
    PRICING
 ===================================================== */
 
@@ -771,18 +791,6 @@ let selectedTip = 0;
 /* =====================================================
    EAST AFRICA
 ===================================================== */
-
-/*
-   Uganda is handled separately at UGX 700.
-
-   East Africa:
-   Kenya
-   Tanzania
-   Rwanda
-   Burundi
-   South Sudan
-   DRC
-*/
 
 const EAST_AFRICA = [
   "KE",
@@ -834,6 +842,26 @@ function getSongId(){
     ""
 
   ).trim();
+
+}
+
+
+/* =====================================================
+   GET CONTENT TYPE FROM URL
+===================================================== */
+
+function getContentTypeFromUrl(){
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return (
+    params.get("content_type") ||
+    params.get("contentType") ||
+    ""
+  ).trim().toLowerCase();
 
 }
 
@@ -893,7 +921,7 @@ async function detectCountry(){
 
 
 /* =====================================================
-   DISPLAY PRICING
+   NORMAL SONG PRICING
 ===================================================== */
 
 function getDisplayPricing(
@@ -1022,6 +1050,69 @@ function getDisplayPricing(
 
 
 /* =====================================================
+   DJ MIX PRICING
+===================================================== */
+
+function getDjMixPricing(
+  countryCode,
+  countryName
+){
+
+  const cc =
+    (countryCode || "UG")
+    .toUpperCase();
+
+
+  /*
+    DJ MIX RULE:
+
+    Uganda = UGX 1,000
+    Outside Uganda = USD 1
+
+    DJ Mix streaming remains FREE.
+    This price is only for downloading/owning
+    the DJ Mix.
+  */
+
+  if(cc === "UG"){
+
+    return {
+
+      amount:1000,
+
+      currency:"UGX",
+
+      label:"UGX 1,000",
+
+      country:"Uganda",
+
+      countryCode:cc
+
+    };
+
+  }
+
+
+  return {
+
+    amount:1,
+
+    currency:"USD",
+
+    label:"$1",
+
+    country:
+      countryName ||
+      cc + " - International",
+
+    countryCode:cc
+
+  };
+
+}
+
+
+/* =====================================================
    FORMAT MONEY
 ===================================================== */
 
@@ -1070,7 +1161,7 @@ function formatMoney(
 
 function updateTotalUI(){
 
-  const songAmount =
+  const purchaseAmount =
     Number(
       PRICING.amount || 0
     );
@@ -1082,7 +1173,7 @@ function updateTotalUI(){
 
 
   const total =
-    songAmount +
+    purchaseAmount +
     tipAmount;
 
 
@@ -1090,7 +1181,7 @@ function updateTotalUI(){
     "songTotal"
   ).textContent =
     formatMoney(
-      songAmount,
+      purchaseAmount,
       PRICING.currency
     );
 
@@ -1140,7 +1231,13 @@ function updateTotalUI(){
     );
 
 
-  const artistTip =
+  const tipRecipient =
+    isDjMix
+      ? "DJ"
+      : "Artist";
+
+
+  const recipientTip =
     tipAmount *
     TIP_ARTIST_PERCENT /
     100;
@@ -1153,7 +1250,9 @@ function updateTotalUI(){
 
 
   let splitText =
-    "Tip split: Artist " +
+    "Tip split: " +
+    tipRecipient +
+    " " +
     TIP_ARTIST_PERCENT +
     "% • PASONG " +
     TIP_PASONG_PERCENT +
@@ -1163,9 +1262,11 @@ function updateTotalUI(){
   if(tipAmount > 0){
 
     splitText +=
-      " • Artist " +
+      " • " +
+      tipRecipient +
+      " " +
       formatMoney(
-        artistTip,
+        recipientTip,
         PRICING.currency
       ) +
       " • PASONG " +
@@ -1202,6 +1303,96 @@ function updatePriceUI(){
   ).textContent =
     "Detected: " +
     PRICING.country;
+
+
+  if(isDjMix){
+
+    document.getElementById(
+      "priceLabel"
+    ).textContent =
+      "DJ Mix download price";
+
+
+    document.getElementById(
+      "priceNote"
+    ).textContent =
+      "Full DJ Mix streaming is FREE. This price is for download / ownership.";
+
+
+    document.getElementById(
+      "tipTitle"
+    ).textContent =
+      "🎧 Tip the DJ";
+
+
+    document.getElementById(
+      "tipSub"
+    ).textContent =
+      "Add an optional tip to support the DJ directly. The DJ receives 70% and PASONG receives 30%.";
+
+
+    document.getElementById(
+      "tipTotalLabel"
+    ).textContent =
+      "DJ tip";
+
+
+    document.getElementById(
+      "checkoutTitle"
+    ).textContent =
+      "DJ Mix Checkout";
+
+
+    document.getElementById(
+      "checkoutSub"
+    ).textContent =
+      "The DJ Mix is free to stream in full. Pay only when you want to download and own it.";
+
+
+  }else{
+
+    document.getElementById(
+      "priceLabel"
+    ).textContent =
+      "Song price";
+
+
+    document.getElementById(
+      "priceNote"
+    ).textContent =
+      "Inclusive price — no extra checkout fee";
+
+
+    document.getElementById(
+      "tipTitle"
+    ).textContent =
+      "❤️ Support the Artist";
+
+
+    document.getElementById(
+      "tipSub"
+    ).textContent =
+      "Add an optional tip to support the artist directly. The artist receives 70% and PASONG receives 30%.";
+
+
+    document.getElementById(
+      "tipTotalLabel"
+    ).textContent =
+      "Artist tip";
+
+
+    document.getElementById(
+      "checkoutTitle"
+    ).textContent =
+      "Checkout";
+
+
+    document.getElementById(
+      "checkoutSub"
+    ).textContent =
+      "You are one step away. Choose how you want to pay. Your download will be available after successful payment.";
+
+  }
 
 
   updateTotalUI();
@@ -1263,11 +1454,33 @@ async function loadCheckout(){
       await detectCountry();
 
 
-    PRICING =
-      getDisplayPricing(
-        country.code,
-        country.name
-      );
+    /*
+      First read the URL.
+
+      song.html sends:
+      content_type=dj_mix
+
+      The database/API value is still authoritative
+      when it is available.
+    */
+
+    const urlContentType =
+      getContentTypeFromUrl();
+
+
+    currentContentType =
+      urlContentType ||
+      "music";
+
+
+    if(
+      currentContentType ===
+      "dj_mix"
+    ){
+
+      isDjMix = true;
+
+    }
 
 
     const response =
@@ -1316,6 +1529,65 @@ async function loadCheckout(){
       throw new Error(
         "Invalid song information received from PASONG."
       );
+
+    }
+
+
+    /*
+      API/database content_type takes priority.
+
+      This prevents a normal song from accidentally
+      receiving DJ Mix pricing.
+    */
+
+    const apiContentType =
+      String(
+        song.content_type ||
+        song.contentType ||
+        ""
+      )
+      .trim()
+      .toLowerCase();
+
+
+    if(apiContentType){
+
+      currentContentType =
+        apiContentType;
+
+      isDjMix =
+        apiContentType ===
+        "dj_mix";
+
+    }
+
+
+    /*
+      Apply the correct pricing rule.
+
+      Normal song:
+        Existing IP pricing.
+
+      DJ Mix:
+        Uganda = UGX 1,000
+        Outside Uganda = USD 1
+    */
+
+    if(isDjMix){
+
+      PRICING =
+        getDjMixPricing(
+          country.code,
+          country.name
+        );
+
+    }else{
+
+      PRICING =
+        getDisplayPricing(
+          country.code,
+          country.name
+        );
 
     }
 
@@ -1397,14 +1669,6 @@ async function loadCheckout(){
         "none";
 
     }
-
-
-    /*
-      DO NOT allow the database catalog
-      price to overwrite IP pricing.
-
-      IP pricing is the new PASONG rule.
-    */
 
 
     updatePriceUI();
@@ -1632,6 +1896,15 @@ async function startMtnPayment(){
             JSON.stringify({
 
               songId:id,
+
+              /*
+                NEW:
+                Tells the payment service whether
+                this is a normal song or DJ Mix.
+              */
+
+              content_type:
+                currentContentType,
 
               amount:
                 finalTotal,
@@ -2019,6 +2292,12 @@ function paymentSuccessful(
     getFinalTotal();
 
 
+  const purchaseName =
+    isDjMix
+      ? "DJ Mix download"
+      : "song";
+
+
   msg.innerHTML =
 
     '<span class="success">' +
@@ -2042,6 +2321,12 @@ function paymentSuccessful(
 
     '<br><br>' +
 
+    purchaseName +
+
+    ' purchase has been confirmed.' +
+
+    '<br><br>' +
+
     'Reference: ' +
 
     '<b>' +
@@ -2051,9 +2336,7 @@ function paymentSuccessful(
       currentReference
     ) +
 
-    '</b><br><br>' +
-
-    'Your purchase has been confirmed.';
+    '</b>';
 
 
   /*
