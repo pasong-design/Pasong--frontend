@@ -200,6 +200,35 @@ nav{
 }
 
 /* =========================
+   GENRE FILTER
+========================= */
+
+.genre-filter{
+  display:none;
+  margin-top:10px;
+  margin-bottom:22px;
+  padding:10px 14px;
+  width:max-content;
+  max-width:100%;
+  border-radius:12px;
+  background:#151520;
+  border:1px solid rgba(217,70,239,.2);
+  color:#d946ef;
+  font-size:12px;
+  font-weight:800;
+}
+
+.genre-filter a{
+  color:#aaa;
+  text-decoration:none;
+  margin-left:10px;
+}
+
+.genre-filter a:hover{
+  color:#fff;
+}
+
+/* =========================
    SONG GRID
 ========================= */
 
@@ -524,10 +553,6 @@ footer{
 
 <body>
 
-<!-- =========================
-     NAV
-========================= -->
-
 <nav>
 
   <div class="logo">
@@ -550,11 +575,6 @@ footer{
 
 </nav>
 
-
-<!-- =========================
-     HERO
-========================= -->
-
 <section class="hero">
 
   <div class="hero-badge">
@@ -573,15 +593,11 @@ footer{
 
 </section>
 
-
-<!-- =========================
-     SEARCH
-========================= -->
-
 <section class="search-wrap">
 
   <div class="search-box">
     <span>⌕</span>
+
     <input
       type="text"
       id="searchInput"
@@ -596,28 +612,43 @@ footer{
 
 </section>
 
-
-<!-- =========================
-     SONGS
-========================= -->
-
 <section class="section">
 
   <div class="section-head">
 
     <div>
-      <div class="section-title">
+
+      <div
+        class="section-title"
+        id="sectionTitle"
+      >
         🔥 Trending Music
       </div>
 
-      <div class="section-sub">
+      <div
+        class="section-sub"
+        id="sectionSub"
+      >
         Listen before you buy
       </div>
+
     </div>
 
   </div>
 
-  <div id="songState" class="state">
+
+  <!-- GENRE FILTER INDICATOR -->
+
+  <div
+    id="genreFilter"
+    class="genre-filter"
+  ></div>
+
+
+  <div
+    id="songState"
+    class="state"
+  >
     <div class="spinner"></div>
     Loading music...
   </div>
@@ -630,17 +661,10 @@ footer{
 
 </section>
 
-
-<!-- =========================
-     AUDIO
-========================= -->
-
-<audio id="previewAudio" preload="none"></audio>
-
-
-<!-- =========================
-     FOOTER
-========================= -->
+<audio
+  id="previewAudio"
+  preload="none"
+></audio>
 
 <footer>
 
@@ -680,23 +704,73 @@ let previewTimer = null;
 
 
 /* =====================================================
+   GENRE FILTER
+   READS:
+   store.html?genre=Afrobeats
+   store.html?genre=Amapiano
+   store.html?genre=Gengetone
+   etc.
+===================================================== */
+
+const urlParams =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const selectedGenre =
+  (urlParams.get("genre") || "").trim();
+
+
+/* =====================================================
    ELEMENTS
 ===================================================== */
 
-const songGrid = document.getElementById("songGrid");
+const songGrid =
+  document.getElementById("songGrid");
 
-const songState = document.getElementById("songState");
+const songState =
+  document.getElementById("songState");
 
-const searchInput = document.getElementById("searchInput");
+const searchInput =
+  document.getElementById("searchInput");
 
-const previewAudio = document.getElementById("previewAudio");
+const previewAudio =
+  document.getElementById("previewAudio");
 
-const priceNote = document.getElementById("priceNote");
+const priceNote =
+  document.getElementById("priceNote");
+
+const sectionTitle =
+  document.getElementById("sectionTitle");
+
+const sectionSub =
+  document.getElementById("sectionSub");
+
+const genreFilter =
+  document.getElementById("genreFilter");
+
+
+/* =====================================================
+   NORMALIZE TEXT
+   Makes:
+   R&B
+   r&b
+   R&B 
+   work as the same genre.
+===================================================== */
+
+function normalizeGenre(value){
+
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g," ");
+
+}
 
 
 /* =====================================================
    GET REAL SONG ID
-   Supports multiple API naming formats.
 ===================================================== */
 
 function getSongId(song){
@@ -742,18 +816,22 @@ function getArtistName(song){
   }
 
   if(song?.artist){
+
     if(typeof song.artist === "string"){
       return song.artist;
     }
 
     if(typeof song.artist === "object"){
+
       return (
         song.artist.name ||
         song.artist.artist_name ||
         song.artist.display_name ||
         "Unknown Artist"
       );
+
     }
+
   }
 
   return "Unknown Artist";
@@ -771,6 +849,7 @@ function getGenre(song){
     song?.genre ||
     song?.category_name ||
     song?.category?.name ||
+    song?.category ||
     "Music"
   );
 
@@ -847,6 +926,76 @@ function getPriceLabel(song){
 
 
 /* =====================================================
+   APPLY GENRE FILTER
+===================================================== */
+
+function getGenreFilteredSongs(songs){
+
+  if(!selectedGenre){
+    return songs;
+  }
+
+  const wanted =
+    normalizeGenre(selectedGenre);
+
+  return songs.filter(function(song){
+
+    const songGenre =
+      normalizeGenre(getGenre(song));
+
+    return songGenre === wanted;
+
+  });
+
+}
+
+
+/* =====================================================
+   SET PAGE FOR SELECTED GENRE
+===================================================== */
+
+function setupGenrePage(){
+
+  if(!selectedGenre){
+
+    sectionTitle.textContent =
+      "🔥 Trending Music";
+
+    sectionSub.textContent =
+      "Listen before you buy";
+
+    genreFilter.style.display =
+      "none";
+
+    return;
+
+  }
+
+
+  sectionTitle.textContent =
+    "🎵 " + selectedGenre + " Music";
+
+  sectionSub.textContent =
+    "Music in this genre";
+
+  genreFilter.style.display =
+    "block";
+
+  genreFilter.innerHTML = `
+    Showing:
+    <strong style="color:#fff;">
+      ${escapeHtml(selectedGenre)}
+    </strong>
+
+    <a href="store.html">
+      ✕ Clear filter
+    </a>
+  `;
+
+}
+
+
+/* =====================================================
    LOAD SONGS
 ===================================================== */
 
@@ -875,14 +1024,22 @@ async function loadSongs(){
     );
 
     if(!response.ok){
+
       throw new Error(
-        "API request failed: " + response.status
+        "API request failed: " +
+        response.status
       );
+
     }
 
-    const result = await response.json();
+    const result =
+      await response.json();
 
-    console.log("PASONG API /api/songs:", result);
+    console.log(
+      "PASONG API /api/songs:",
+      result
+    );
+
 
     allSongs =
       Array.isArray(result?.songs)
@@ -891,19 +1048,22 @@ async function loadSongs(){
           ? result
           : [];
 
+
     /* =================================================
-       UPDATE PRICE NOTE FROM API WHEN AVAILABLE
+       UPDATE PRICE NOTE
     ================================================= */
 
     if(result?.pricing?.label){
 
       priceNote.textContent =
-        "Your price: " + result.pricing.label;
+        "Your price: " +
+        result.pricing.label;
 
     }else if(result?.marketplace_label){
 
       priceNote.textContent =
-        "Your price: " + result.marketplace_label;
+        "Your price: " +
+        result.marketplace_label;
 
     }else{
 
@@ -936,11 +1096,16 @@ async function loadSongs(){
        RENDER
     ================================================= */
 
-    renderSongs(allSongs);
+    renderSongs(
+      getGenreFilteredSongs(allSongs)
+    );
 
   }catch(error){
 
-    console.error("PASONG Store error:", error);
+    console.error(
+      "PASONG Store error:",
+      error
+    );
 
     songGrid.style.display = "none";
 
@@ -950,9 +1115,14 @@ async function loadSongs(){
       <strong style="color:#fff;">
         Unable to load songs
       </strong>
+
       <br><br>
+
       <span style="font-size:12px;">
-        ${escapeHtml(error.message || "Failed to fetch")}
+        ${escapeHtml(
+          error.message ||
+          "Failed to fetch"
+        )}
       </span>
     `;
 
@@ -969,13 +1139,15 @@ function renderSongs(songs){
 
   songGrid.innerHTML = "";
 
-  const validSongs = songs.filter(song => {
+  const validSongs =
+    songs.filter(function(song){
 
-    const id = getSongId(song);
+      const id =
+        getSongId(song);
 
-    return id !== "";
+      return id !== "";
 
-  });
+    });
 
 
   if(validSongs.length === 0){
@@ -984,22 +1156,49 @@ function renderSongs(songs){
 
     songGrid.style.display = "none";
 
-    songState.innerHTML = `
-      <strong style="color:#fff;">
-        Songs were found, but their IDs are missing.
-      </strong>
-      <br><br>
-      <span style="font-size:12px;">
-        Please check the API song ID field.
-      </span>
-    `;
+
+    if(selectedGenre){
+
+      songState.innerHTML = `
+        <strong style="color:#fff;">
+          No ${escapeHtml(selectedGenre)} songs available
+        </strong>
+
+        <br><br>
+
+        <span style="font-size:12px;">
+          Try another genre or
+          <a
+            href="store.html"
+            style="color:#d946ef;text-decoration:none;"
+          >
+            view all songs
+          </a>.
+        </span>
+      `;
+
+    }else{
+
+      songState.innerHTML = `
+        <strong style="color:#fff;">
+          Songs were found, but their IDs are missing.
+        </strong>
+
+        <br><br>
+
+        <span style="font-size:12px;">
+          Please check the API song ID field.
+        </span>
+      `;
+
+    }
 
     return;
 
   }
 
 
-  validSongs.forEach(song => {
+  validSongs.forEach(function(song){
 
     songGrid.appendChild(
       createSongCard(song)
@@ -1021,34 +1220,36 @@ function renderSongs(songs){
 
 function createSongCard(song){
 
-  const card = document.createElement("article");
+  const card =
+    document.createElement("article");
 
-  card.className = "song-card";
-
-
-  /* -----------------------------------------------
-     IMPORTANT:
-     Get the actual database/API ID here.
-  ------------------------------------------------ */
-
-  const songId = getSongId(song);
-
-  const title = getSongTitle(song);
-
-  const artist = getArtistName(song);
-
-  const genre = getGenre(song);
-
-  const cover = getCover(song);
-
-  const preview = getPreview(song);
-
-  const price = getPriceLabel(song);
+  card.className =
+    "song-card";
 
 
-  /* -----------------------------------------------
-     COVER
-  ------------------------------------------------ */
+  const songId =
+    getSongId(song);
+
+  const title =
+    getSongTitle(song);
+
+  const artist =
+    getArtistName(song);
+
+  const genre =
+    getGenre(song);
+
+  const cover =
+    getCover(song);
+
+  const preview =
+    getPreview(song);
+
+  const price =
+    getPriceLabel(song);
+
+
+  /* COVER */
 
   let coverHTML = "";
 
@@ -1175,9 +1376,7 @@ function createSongCard(song){
   `;
 
 
-  /* =================================================
-     COVER CLICK
-  ================================================= */
+  /* COVER CLICK */
 
   const coverElement =
     card.querySelector(".cover-wrap");
@@ -1211,9 +1410,7 @@ function createSongCard(song){
   );
 
 
-  /* =================================================
-     BUY NOW
-  ================================================= */
+  /* BUY NOW */
 
   const buyButton =
     card.querySelector(".buy-btn");
@@ -1228,9 +1425,7 @@ function createSongCard(song){
   );
 
 
-  /* =================================================
-     PREVIEW
-  ================================================= */
+  /* PREVIEW */
 
   const previewButton =
     card.querySelector(".preview-btn");
@@ -1240,9 +1435,7 @@ function createSongCard(song){
     function(){
 
       if(!preview){
-
         return;
-
       }
 
       playPreview(
@@ -1261,7 +1454,6 @@ function createSongCard(song){
 
 /* =====================================================
    OPEN SONG PAGE
-   THIS IS THE IMPORTANT FIX.
 ===================================================== */
 
 function openSong(songId){
@@ -1269,10 +1461,6 @@ function openSong(songId){
   const cleanId =
     String(songId || "").trim();
 
-
-  /* -----------------------------------------------
-     Never open song.html without an ID.
-  ------------------------------------------------ */
 
   if(!cleanId){
 
@@ -1284,10 +1472,6 @@ function openSong(songId){
 
   }
 
-
-  /* -----------------------------------------------
-     Build URL safely from the current website.
-  ------------------------------------------------ */
 
   const songPage =
     new URL(
@@ -1302,10 +1486,6 @@ function openSong(songId){
   );
 
 
-  /* -----------------------------------------------
-     Debug information.
-  ------------------------------------------------ */
-
   console.log(
     "PASONG opening song:",
     cleanId
@@ -1316,10 +1496,6 @@ function openSong(songId){
     songPage.href
   );
 
-
-  /* -----------------------------------------------
-     Navigate.
-  ------------------------------------------------ */
 
   stopPreview();
 
@@ -1335,27 +1511,24 @@ function openSong(songId){
 
 function playPreview(song, button){
 
-  const audioUrl = getPreview(song);
+  const audioUrl =
+    getPreview(song);
 
   if(!audioUrl){
-
     return;
-
   }
 
 
-  /* -----------------------------------------------
-     If another preview is playing, stop it.
-  ------------------------------------------------ */
-
   stopPreview();
 
+  currentPreview =
+    button;
 
-  currentPreview = button;
+  previewAudio.src =
+    audioUrl;
 
-  previewAudio.src = audioUrl;
-
-  previewAudio.currentTime = 0;
+  previewAudio.currentTime =
+    0;
 
 
   button.textContent =
@@ -1380,7 +1553,7 @@ function playPreview(song, button){
 
 
   previewAudio.play()
-    .catch(error => {
+    .catch(function(error){
 
       console.error(
         "Preview playback failed:",
@@ -1391,10 +1564,6 @@ function playPreview(song, button){
 
     });
 
-
-  /* -----------------------------------------------
-     HARD 20-SECOND LIMIT
-  ------------------------------------------------ */
 
   previewTimer =
     setTimeout(
@@ -1425,7 +1594,9 @@ function stopPreview(){
 
   if(previewTimer){
 
-    clearTimeout(previewTimer);
+    clearTimeout(
+      previewTimer
+    );
 
     previewTimer = null;
 
@@ -1434,9 +1605,12 @@ function stopPreview(){
 
   previewAudio.pause();
 
-  previewAudio.currentTime = 0;
+  previewAudio.currentTime =
+    0;
 
-  previewAudio.removeAttribute("src");
+  previewAudio.removeAttribute(
+    "src"
+  );
 
   previewAudio.load();
 
@@ -1470,6 +1644,7 @@ function stopPreview(){
 
 /* =====================================================
    SEARCH
+   SEARCHES ONLY INSIDE CURRENT GENRE
 ===================================================== */
 
 searchInput.addEventListener(
@@ -1482,9 +1657,19 @@ searchInput.addEventListener(
         .toLowerCase();
 
 
+    /* Start with genre-filtered songs */
+
+    const genreSongs =
+      getGenreFilteredSongs(
+        allSongs
+      );
+
+
     if(!query){
 
-      renderSongs(allSongs);
+      renderSongs(
+        genreSongs
+      );
 
       return;
 
@@ -1492,7 +1677,7 @@ searchInput.addEventListener(
 
 
     const filtered =
-      allSongs.filter(song => {
+      genreSongs.filter(function(song){
 
         const title =
           getSongTitle(song)
@@ -1518,15 +1703,24 @@ searchInput.addEventListener(
 
     if(filtered.length === 0){
 
-      songGrid.style.display = "none";
+      songGrid.style.display =
+        "none";
 
-      songState.style.display = "block";
+      songState.style.display =
+        "block";
+
 
       songState.innerHTML = `
         No songs found for
         "<strong style="color:#fff;">
           ${escapeHtml(query)}
         </strong>"
+        ${selectedGenre ? `
+          in
+          <strong style="color:#d946ef;">
+            ${escapeHtml(selectedGenre)}
+          </strong>
+        ` : ""}
       `;
 
       return;
@@ -1534,7 +1728,9 @@ searchInput.addEventListener(
     }
 
 
-    renderSongs(filtered);
+    renderSongs(
+      filtered
+    );
 
   }
 );
@@ -1570,6 +1766,8 @@ function escapeAttribute(value){
 /* =====================================================
    START
 ===================================================== */
+
+setupGenrePage();
 
 loadSongs();
 
