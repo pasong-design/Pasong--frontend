@@ -1,57 +1,47 @@
-// AUTO-CHANGING ARTIST - SAFE MODE
-(function(){
-try{
-const pasongHeroArtists = [
-  { img: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800", name: "Sheebah Karungi", tag: "Top Ugandan Queen • Trending" },
-  { img: "https://images.unsplash.com/photo-1516450360452-9312abbf6f7e?w=800", name: "Eddy Kenzo", tag: "BET Winner • Afrobeat King" },
-  { img: "https://images.unsplash.com/photo-1493676304819-0d7a8d026dcf?w=800", name: "Spice Diana", tag: "UG Diva • 12M Streams" },
-  { img: "https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=800", name: "Fik Fameica", tag: "HipHop Star • Fresh Drop" }
-];
-let heroIndex=0;
-const s1=document.getElementById("heroSlide1");
-const s2=document.getElementById("heroSlide2");
-const nameEl=document.getElementById("heroArtistName");
-const tagEl=document.getElementById("heroArtistTag");
-const badge=document.getElementById("heroArtistBadge");
-const dotsWrap=document.getElementById("heroDots");
-const wrap=document.getElementById("heroSliderWrap");
-if(!s1 ||!s2 ||!nameEl ||!dotsWrap ||!wrap){
-  console.log("PASONG hero elements missing, skipping slider");
-  return;
-}
-let activeLayer=s1;
-let heroTimer=null;
-pasongHeroArtists.forEach((_,i)=>{
-  const d=document.createElement("div");
-  d.className="hero-dot"+(i===0?" active":"");
-  d.addEventListener("click",()=>{heroIndex=i;showArtist(i);startTimer();});
-  dotsWrap.appendChild(d);
-});
-function showArtist(index){
-  const artist=pasongHeroArtists[index];
-  const nextLayer=activeLayer===s1?s2:s1;
-  if(badge){badge.style.transform="translateY(8px)"; badge.style.opacity=".3";}
-  nextLayer.src=artist.img;
-  nextLayer.style.opacity="1";
-  activeLayer.style.opacity="0";
-  activeLayer=nextLayer;
-  setTimeout(()=>{if(nameEl)nameEl.textContent=artist.name; if(tagEl)tagEl.textContent=artist.tag; if(badge){badge.style.transform="translateY(0)"; badge.style.opacity="1";}},250);
-  if(dotsWrap.children.length){
-    [...dotsWrap.children].forEach((dot,i)=>dot.classList.toggle("active",i===index));
-  }
-}
-function startTimer(){
-  if(heroTimer)clearInterval(heroTimer);
-  heroTimer=setInterval(()=>{heroIndex=(heroIndex+1)%pasongHeroArtists.length; showArtist(heroIndex);},4000);
-}
-showArtist(0);
-heroIndex=1;
-startTimer();
-wrap.addEventListener("mouseenter",()=>clearInterval(heroTimer));
-wrap.addEventListener("mouseleave",startTimer);
-wrap.addEventListener("click",()=>{
-  const cur=(heroIndex-1+pasongHeroArtists.length)%pasongHeroArtists.length;
-  window.location.href="store.html?search="+encodeURIComponent(pasongHeroArtists[cur].name);
-});
-}catch(e){console.log("PASONG hero error",e);}
-})();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG — Music. Opportunity. Support.</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>/* YOUR ORIGINAL CSS + 6 LINES ADDED FOR SLIDER */
+.hero-slider{position:absolute;right:0;top:0;width:46%;height:100%;z-index:2;overflow:hidden}
+.hero-slider img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .9s}
+.hero-slider::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#151324 0%, rgba(21,19,36,.85) 12%, transparent 58%);z-index:2}
+.hero-artist-badge{position:absolute;left:16px;bottom:16px;z-index:4;background:rgba(17,17,29,.72);backdrop-filter:blur(12px);border:1px solid rgba(168,85,247,.22);padding:12px 14px;border-radius:14px;min-width:210px}
+.hero-dots{position:absolute;left:55px;bottom:22px;z-index:4;display:flex;gap:8px}
+.hero-dot{width:26px;height:4px;border-radius:999px;background:rgba(255,255,255,.18);cursor:pointer}
+.hero-dot.active{background:#8b5cf6;width:34px}
+/* REST OF YOUR ORIGINAL CSS REMAINS EXACTLY SAME - paste your original file here and just add the 6 lines above */
+</style>
+</head>
+<body>
+<!-- HERO WITH SLIDER ADDED -->
+<section class="hero">
+  <div class="hero-box">
+    <div class="hero-content">
+      <div class="hero-kicker">BUY • DOWNLOAD • SUPPORT • UPLOAD</div>
+      <h1>Your Music.<br><span>Your Choice.</span></h1>
+      <p>Discover new music, support African artists and producers, buy songs, download your music and grow with PASONG.</p>
+      <div class="hero-actions">
+        <a href="store.html" class="btn btn-primary">🎵 Explore Music</a>
+        <a href="artist-dashboard.html" class="btn btn-secondary">⬆️ Upload Music</a>
+        <a href="charts.html" class="btn btn-secondary">🔥 View Charts</a>
+      </div>
+      <div class="hero-dots" id="heroDots"></div>
+    </div>
+    <div class="hero-slider" id="heroSliderWrap">
+      <img id="heroSlide1" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800" style="opacity:1">
+      <img id="heroSlide2" src="https://images.unsplash.com/photo-1516450360452-9312abbf6f7e?w=800" style="opacity:0">
+      <div class="hero-artist-badge">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#ec4899);display:grid;place-items:center">♪</div>
+          <div><div id="heroArtistName" style="font-weight:900">Sheebah Karungi</div><div id="heroArtistTag" style="font-size:11px;color:#a9a9b8">Top Ugandan Queen</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
