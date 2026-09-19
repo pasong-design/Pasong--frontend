@@ -223,8 +223,6 @@ header{
   box-shadow:0 25px 80px rgba(0,0,0,.28);
 }
 
-/* Uploaded song-cover hero image */
-
 .hero-cover{
   position:absolute;
   inset:0;
@@ -547,6 +545,140 @@ header{
 .song-open:hover{
   background:rgba(168,85,247,.1);
   color:#fff;
+}
+
+/* =========================
+   DJ PANEL
+========================= */
+
+.dj-panel-section{
+  position:relative;
+}
+
+.dj-panel{
+  min-height:180px;
+  padding:17px;
+  border-radius:19px;
+  background:
+    radial-gradient(
+      circle at 0% 50%,
+      rgba(139,92,246,.10),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #10101a,
+      #13111e
+    );
+  border:1px solid rgba(168,85,247,.13);
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.dj-panel::-webkit-scrollbar{
+  display:none;
+}
+
+.dj-card{
+  flex:0 0 175px;
+  min-width:175px;
+  padding:15px;
+  border-radius:17px;
+  background:#151520;
+  border:1px solid rgba(255,255,255,.07);
+  text-align:center;
+  transition:.2s ease;
+}
+
+.dj-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(168,85,247,.4);
+  box-shadow:0 12px 35px rgba(0,0,0,.28);
+}
+
+.dj-photo{
+  width:92px;
+  height:92px;
+  margin:0 auto 11px;
+  display:block;
+  object-fit:cover;
+  border-radius:50%;
+  background:#191927;
+  border:3px solid rgba(192,132,252,.5);
+}
+
+.dj-name{
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.dj-role{
+  margin-top:3px;
+  color:#9292a4;
+  font-size:10px;
+}
+
+.dj-view{
+  width:100%;
+  min-height:34px;
+  margin-top:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:9px;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+}
+
+.dj-view:hover{
+  opacity:.9;
+}
+
+.dj-empty{
+  width:100%;
+  min-height:135px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  color:#666678;
+  font-size:12px;
+}
+
+.dj-loading{
+  width:100%;
+  min-height:135px;
+  display:grid;
+  place-items:center;
+  color:#666678;
+  font-size:12px;
+}
+
+@media(max-width:600px){
+
+  .dj-panel{
+    padding:14px;
+    gap:11px;
+  }
+
+  .dj-card{
+    flex:0 0 155px;
+    min-width:155px;
+    padding:13px;
+  }
+
+  .dj-photo{
+    width:82px;
+    height:82px;
+  }
+
 }
 
 /* =========================
@@ -1221,14 +1353,28 @@ footer{
 
 </section>
 
-<section class="section">
+<!-- =========================
+     PASONG DJ PANEL
+========================= -->
+
+<section class="section dj-panel-section">
 
   <div class="section-heading">
-    <h2>🎧 Continue Listening</h2>
+
+    <h2>🎧 PASONG DJs</h2>
+
+    <a href="artists.html">
+      View all →
+    </a>
+
   </div>
 
-  <div class="music-row">
-    Your recently played music will appear here.
+  <div class="dj-panel" id="deejaysMusic">
+
+    <div class="dj-loading">
+      Loading DJs...
+    </div>
+
   </div>
 
 </section>
@@ -2055,8 +2201,6 @@ async function loadPasongSongs(){
 
     }
 
-    /* Load uploaded covers into the hero */
-
     loadHeroCovers(songs);
 
     renderSongs(
@@ -2201,6 +2345,187 @@ function showMusicEmpty(
 }
 
 /* =========================
+   DJ PANEL
+========================= */
+
+async function loadPasongDeejays(){
+
+  const container =
+    document.getElementById("deejaysMusic");
+
+  if(!container){
+    return;
+  }
+
+  if(!pasongSupabase){
+
+    container.innerHTML =
+      '<div class="dj-empty">' +
+      'DJ profiles are currently unavailable.' +
+      '</div>';
+
+    return;
+
+  }
+
+  container.innerHTML =
+    '<div class="dj-loading">Loading DJs...</div>';
+
+  try{
+
+    const result =
+      await pasongSupabase
+        .from("artist_profiles")
+        .select("*")
+        .limit(50);
+
+    if(result.error){
+
+      console.error(
+        "PASONG DJ PROFILE ERROR:",
+        result.error
+      );
+
+      container.innerHTML =
+        '<div class="dj-empty">' +
+        'Unable to load DJs right now.' +
+        '</div>';
+
+      return;
+
+    }
+
+    const profiles =
+      result.data || [];
+
+    /*
+      We check common profile-type fields so
+      we don't change your existing database structure.
+    */
+
+    const deejays =
+      profiles.filter(
+        function(profile){
+
+          const roleText = [
+
+            profile.role,
+            profile.user_role,
+            profile.account_type,
+            profile.type,
+            profile.profession,
+            profile.category,
+            profile.title
+
+          ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+          return (
+            roleText.includes("dj") ||
+            roleText.includes("deejay") ||
+            roleText.includes("disc jockey")
+          );
+
+        }
+      ).slice(0,10);
+
+    if(!deejays.length){
+
+      container.innerHTML =
+        '<div class="dj-empty">' +
+        'No DJs have joined PASONG yet.' +
+        '</div>';
+
+      return;
+
+    }
+
+    container.innerHTML = "";
+
+    deejays.forEach(
+      function(profile){
+
+        const name =
+          profile.stage_name ||
+          profile.performing_name ||
+          profile.display_name ||
+          profile.artist_name ||
+          profile.name ||
+          "PASONG DJ";
+
+        const photo =
+          profile.avatar_url ||
+          profile.profile_photo ||
+          profile.photo_url ||
+          profile.image_url ||
+          profile.cover_url ||
+          (
+            "https://ui-avatars.com/api/?name=" +
+            encodeURIComponent(name) +
+            "&background=171722&color=c084fc&bold=true"
+          );
+
+        const profileId =
+          profile.id ||
+          profile.artist_id ||
+          profile.user_id ||
+          "";
+
+        const card =
+          document.createElement("div");
+
+        card.className =
+          "dj-card";
+
+        card.innerHTML = `
+
+          <img
+            class="dj-photo"
+            src="${escapeHtml(photo)}"
+            alt="${escapeHtml(name)}"
+            loading="lazy"
+          >
+
+          <div class="dj-name">
+            ${escapeHtml(name)}
+          </div>
+
+          <div class="dj-role">
+            🎧 DJ / Deejay
+          </div>
+
+          <a
+            class="dj-view"
+            href="artists.html${profileId ? "?id=" + encodeURIComponent(profileId) : ""}">
+            View DJ
+          </a>
+
+        `;
+
+        container.appendChild(card);
+
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      "PASONG DJ LOADING ERROR:",
+      error
+    );
+
+    container.innerHTML =
+      '<div class="dj-empty">' +
+      'Unable to load DJs right now.' +
+      '</div>';
+
+  }
+
+}
+
+/* =========================
    SEARCH
 ========================= */
 
@@ -2233,9 +2558,15 @@ if(siteSearch){
 
 }
 
+/* =========================
+   START PASONG
+========================= */
+
 loadPasongAccount();
 
 loadPasongSongs();
+
+loadPasongDeejays();
 
 </script>
 
