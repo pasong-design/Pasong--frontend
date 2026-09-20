@@ -151,36 +151,45 @@ header{
   font-weight:800;
 }
 
-.account-link{
+/* =========================
+   PASONG ACCOUNT BOX
+========================= */
+
+.account-box{
   display:flex !important;
   align-items:center;
-  gap:7px;
+  gap:8px;
+  padding:6px 10px !important;
+  min-height:42px;
+  border:1px solid rgba(192,132,252,.35) !important;
+  border-radius:12px !important;
+  background:rgba(168,85,247,.08);
+  color:#fff !important;
+  text-decoration:none !important;
+  transition:.2s ease;
+  white-space:nowrap;
+}
+
+.account-box:hover{
+  background:linear-gradient(135deg,#8b5cf6,#ec4899) !important;
+  border-color:transparent !important;
+  transform:translateY(-1px);
 }
 
 .account-photo{
-  width:31px;
-  height:31px;
+  width:32px;
+  height:32px;
   border-radius:50%;
   object-fit:cover;
-  border:2px solid rgba(192,132,252,.6);
+  border:2px solid rgba(192,132,252,.65);
   background:#191927;
+  flex-shrink:0;
 }
 
-.account-name{
+.account-box-text{
   font-size:12px;
-}
-
-.login-button{
-  padding:9px 13px !important;
-  border:1px solid rgba(192,132,252,.35);
-  background:rgba(168,85,247,.10);
-  color:#fff !important;
-  border-radius:10px !important;
-}
-
-.login-button:hover{
-  background:linear-gradient(135deg,#8b5cf6,#ec4899) !important;
-  border-color:transparent !important;
+  font-weight:800;
+  line-height:1;
 }
 
 /* =========================
@@ -1059,9 +1068,8 @@ footer{
   }
 
   .nav-links .notification-link,
-  .nav-links .account-link,
-  .nav-links .login-button{
-    display:flex;
+  .nav-links .account-box{
+    display:flex !important;
   }
 
   .hero{
@@ -1096,8 +1104,9 @@ footer{
     font-size:20px;
   }
 
-  .account-name{
-    display:none;
+  .account-box{
+    padding:5px 8px !important;
+    gap:6px;
   }
 
   .account-photo{
@@ -1105,9 +1114,8 @@ footer{
     height:34px;
   }
 
-  .login-button{
-    padding:8px 10px !important;
-    font-size:10px !important;
+  .account-box-text{
+    font-size:10px;
   }
 
   .hero h1{
@@ -1240,18 +1248,20 @@ footer{
         <span class="notification-count" id="notificationCount">0</span>
       </a>
 
-      <a href="account.html" class="account-link">
+      <!-- PASONG ACCOUNT BOX -->
+      <a href="login.html" class="account-box" id="accountBox">
+
         <img
           id="accountPhoto"
           class="account-photo"
           src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
           alt="Account"
         >
-        <span class="account-name" id="accountName">Account</span>
-      </a>
 
-      <a href="login.html" class="login-button" id="loginButton">
-        Login / Sign Up
+        <span class="account-box-text" id="accountName">
+          Login / Sign Up
+        </span>
+
       </a>
 
     </nav>
@@ -1747,15 +1757,23 @@ async function loadPasongAccount(){
   const name =
     document.getElementById("accountName");
 
-  const loginButton =
-    document.getElementById("loginButton");
+  const accountBox =
+    document.getElementById("accountBox");
 
-  if(!photo || !name){
+  if(!photo || !name || !accountBox){
     return;
   }
 
   if(!pasongSupabase){
+
+    name.textContent =
+      "Login / Sign Up";
+
+    accountBox.href =
+      "login.html";
+
     return;
+
   }
 
   try{
@@ -1764,22 +1782,34 @@ async function loadPasongAccount(){
       data:{
         user
       }
-    } = await pasongSupabase.auth.getUser();
+    } =
+      await pasongSupabase.auth.getUser();
+
+    /* =========================
+       NOT LOGGED IN
+    ========================= */
 
     if(!user){
 
-      name.textContent = "Account";
+      name.textContent =
+        "Login / Sign Up";
 
-      if(loginButton){
-        loginButton.textContent =
-          "Login / Sign Up";
-      }
+      accountBox.href =
+        "login.html";
 
       photo.src =
         "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
 
       return;
+
     }
+
+    /* =========================
+       LOGGED IN
+    ========================= */
+
+    accountBox.href =
+      "account.html";
 
     const metadata =
       user.user_metadata || {};
@@ -1792,19 +1822,22 @@ async function loadPasongAccount(){
       metadata.picture ||
       "";
 
+    const displayName =
+      metadata.stage_name ||
+      metadata.performing_name ||
+      metadata.full_name ||
+      metadata.name ||
+      user.email ||
+      "Account";
+
+    /* PROFILE IMAGE */
+
     if(avatar){
 
-      photo.src = avatar;
+      photo.src =
+        avatar;
 
     }else{
-
-      const displayName =
-        metadata.stage_name ||
-        metadata.performing_name ||
-        metadata.full_name ||
-        metadata.name ||
-        user.email ||
-        "PASONG";
 
       photo.src =
         "https://ui-avatars.com/api/?name=" +
@@ -1813,31 +1846,18 @@ async function loadPasongAccount(){
 
     }
 
-    const displayName =
-      metadata.stage_name ||
-      metadata.performing_name ||
-      metadata.full_name ||
-      metadata.name ||
-      "";
+    /* ACCOUNT NAME */
 
-    if(displayName){
+    if(displayName.length > 16){
 
       name.textContent =
-        displayName.length > 14
-          ? displayName.substring(0,14) + "…"
-          : displayName;
+        displayName.substring(0,16) +
+        "…";
 
     }else{
 
       name.textContent =
-        "Account";
-
-    }
-
-    if(loginButton){
-
-      loginButton.textContent =
-        "Account";
+        displayName;
 
     }
 
@@ -1847,6 +1867,12 @@ async function loadPasongAccount(){
       "PASONG account check:",
       error
     );
+
+    name.textContent =
+      "Login / Sign Up";
+
+    accountBox.href =
+      "login.html";
 
   }
 
