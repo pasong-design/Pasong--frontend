@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1.0"
+>
+
 <title>PASONG Account</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0
+}
 
 body{
   background:#080810;
@@ -64,6 +75,11 @@ h2{
   margin-bottom:8px;
 }
 
+h3{
+  font-size:17px;
+  margin-bottom:8px;
+}
+
 p{
   color:#aaa;
   line-height:1.5;
@@ -76,7 +92,8 @@ label{
   font-size:14px;
 }
 
-input,select{
+input,
+select{
   width:100%;
   padding:13px;
   border-radius:10px;
@@ -86,7 +103,8 @@ input,select{
   outline:none;
 }
 
-input:focus,select:focus{
+input:focus,
+select:focus{
   border-color:#d946ef;
 }
 
@@ -216,6 +234,11 @@ button:hover{
   color:#5ee7a5;
 }
 
+.rejected{
+  background:#421b25;
+  color:#ff7070;
+}
+
 .info-box{
   background:#17172a;
   border-left:3px solid #d946ef;
@@ -238,292 +261,850 @@ button:hover{
   margin-top:15px;
 }
 
+.verification-box{
+  background:#0b0b14;
+  border:1px solid #28283d;
+  border-radius:12px;
+  padding:16px;
+  margin-top:18px;
+}
+
+.verification-title{
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.verification-status{
+  margin-top:12px;
+  padding:12px;
+  border-radius:9px;
+  background:#17172a;
+}
+
 footer{
   text-align:center;
   color:#666;
   padding:30px;
   font-size:13px;
 }
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <header>
-  <div class="logo">◈ PASONG</div>
+
+  <div class="logo">
+    ◈ PASONG
+  </div>
 
   <nav>
-    <a href="index.html">Home</a>
-    <a href="store.html">Music Store</a>
+
+    <a href="index.html">
+      Home
+    </a>
+
+    <a href="store.html">
+      Music Store
+    </a>
+
   </nav>
+
 </header>
+
 
 <div class="container">
 
-  <!-- LOGIN / SIGNUP -->
-  <div id="authCard" class="card">
 
-    <h1>Welcome to PASONG</h1>
-    <p>Login to your account or create a free PASONG account.</p>
+<!-- ======================================================
+     LOGIN / SIGNUP
+====================================================== -->
 
-    <div style="margin-top:20px">
-      <button onclick="showLogin()">Login</button>
-      <button class="secondary" onclick="showSignup()">Sign Up</button>
-    </div>
+<div
+  id="authCard"
+  class="card"
+>
 
-    <!-- LOGIN -->
-    <div id="loginBox" class="hidden">
+  <h1>
+    Welcome to PASONG
+  </h1>
 
-      <label>Email</label>
-      <input id="loginEmail" type="email" placeholder="Enter your email">
+  <p>
+    Login to your account or create a free PASONG account.
+  </p>
 
-      <label>Password</label>
-      <input id="loginPassword" type="password" placeholder="Enter your password">
 
-      <button onclick="login()">Login</button>
+  <div style="margin-top:20px">
 
-      <button class="secondary" onclick="resetPassword()">
-        Forgot Password
-      </button>
+    <button onclick="showLogin()">
+      Login
+    </button>
 
-    </div>
-
-    <!-- SIGNUP -->
-    <div id="signupBox" class="hidden">
-
-      <label>Email</label>
-      <input id="signupEmail" type="email" placeholder="Enter your email">
-
-      <label>Password</label>
-      <input id="signupPassword" type="password" placeholder="Create a password">
-
-      <label>Choose your PASONG roles</label>
-
-      <div class="role-box">
-        <input type="checkbox" name="accountRole" value="listener">
-        <span>🎧 Listener / Fan</span>
-      </div>
-
-      <div class="role-box">
-        <input type="checkbox" name="accountRole" value="musician">
-        <span>🎤 Musician / Artist</span>
-      </div>
-
-      <div class="role-box">
-        <input type="checkbox" name="accountRole" value="dj">
-        <span>🎧 DJ</span>
-      </div>
-
-      <div class="role-box">
-        <input type="checkbox" name="accountRole" value="producer">
-        <span>🎹 Producer</span>
-      </div>
-
-      <div class="role-box">
-        <input type="checkbox" name="accountRole" value="writer">
-        <span>✍️ Writer</span>
-      </div>
-
-      <div class="small">
-        You can select more than one role. Admin access is assigned separately by PASONG.
-      </div>
-
-      <button onclick="signup()">Create Account</button>
-
-    </div>
-
-    <div id="authMessage" class="status hidden"></div>
+    <button
+      class="secondary"
+      onclick="showSignup()"
+    >
+      Sign Up
+    </button>
 
   </div>
 
 
-  <!-- ACCOUNT -->
-  <div id="accountArea" class="hidden">
+  <!-- LOGIN -->
 
-    <div class="card">
+  <div
+    id="loginBox"
+    class="hidden"
+  >
 
-      <h1>My Account</h1>
+    <label>
+      Email
+    </label>
 
-      <p>
-        Logged in as:
-        <strong id="userEmail"></strong>
-      </p>
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="Enter your email"
+    >
 
-      <div class="roles" id="roleList"></div>
 
-      <a id="artistDashboardLink"
-         class="dashboard-link hidden"
-         href="artist-dashboard.html">
-         🎤 Open Artist Dashboard
-      </a>
+    <label>
+      Password
+    </label>
 
-      <a id="djDashboardLink"
-         class="dashboard-link hidden"
-         href="dj-dashboard.html">
-         🎧 Open DJ Dashboard
-      </a>
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Enter your password"
+    >
 
-      <a id="adminDashboardLink"
-         class="dashboard-link hidden"
-         href="admin.html">
-         🛡️ Open Admin Dashboard
-      </a>
+
+    <button onclick="login()">
+      Login
+    </button>
+
+
+    <button
+      class="secondary"
+      onclick="resetPassword()"
+    >
+      Forgot Password
+    </button>
+
+  </div>
+
+
+  <!-- SIGNUP -->
+
+  <div
+    id="signupBox"
+    class="hidden"
+  >
+
+    <label>
+      Email
+    </label>
+
+    <input
+      id="signupEmail"
+      type="email"
+      placeholder="Enter your email"
+    >
+
+
+    <label>
+      Password
+    </label>
+
+    <input
+      id="signupPassword"
+      type="password"
+      placeholder="Create a password"
+    >
+
+
+    <label>
+      Choose your PASONG roles
+    </label>
+
+
+    <div class="role-box">
+
+      <input
+        type="checkbox"
+        name="accountRole"
+        value="listener"
+      >
+
+      <span>
+        🎧 Listener / Fan
+      </span>
 
     </div>
 
 
-    <!-- IDENTITY & PAYMENT PROFILE -->
-    <div class="card">
-
-      <h2>Identity & Payment Profile</h2>
-
-      <p>
-        This information is used privately for account verification,
-        song credits and future royalty withdrawals.
-      </p>
-
-      <div class="info-box">
-        Your legal name is private. Your performing/stage name may appear
-        publicly on PASONG profiles, songs and credits.
-        Before withdrawals, PASONG may require identity and mobile-money verification.
-      </div>
-
-      <label>Real / Legal Name</label>
+    <div class="role-box">
 
       <input
-        id="realName"
-        type="text"
-        placeholder="Enter your legal name">
+        type="checkbox"
+        name="accountRole"
+        value="musician"
+      >
 
-      <label>Performing / Stage Name</label>
+      <span>
+        🎤 Musician / Artist
+      </span>
+
+    </div>
+
+
+    <div class="role-box">
 
       <input
-        id="performingName"
-        type="text"
-        placeholder="Example: KV BEATS">
+        type="checkbox"
+        name="accountRole"
+        value="dj"
+      >
 
-      <label>Mobile Money Provider</label>
+      <span>
+        🎧 DJ
+      </span>
+
+    </div>
+
+
+    <div class="role-box">
+
+      <input
+        type="checkbox"
+        name="accountRole"
+        value="producer"
+      >
+
+      <span>
+        🎹 Producer
+      </span>
+
+    </div>
+
+
+    <div class="role-box">
+
+      <input
+        type="checkbox"
+        name="accountRole"
+        value="writer"
+      >
+
+      <span>
+        ✍️ Writer
+      </span>
+
+    </div>
+
+
+    <div class="small">
+
+      You can select more than one role.
+      Admin access is assigned separately by PASONG.
+
+    </div>
+
+
+    <button onclick="signup()">
+      Create Account
+    </button>
+
+  </div>
+
+
+  <div
+    id="authMessage"
+    class="status hidden"
+  ></div>
+
+</div>
+
+
+
+<!-- ======================================================
+     ACCOUNT
+====================================================== -->
+
+<div
+  id="accountArea"
+  class="hidden"
+>
+
+
+  <!-- ACCOUNT HEADER -->
+
+  <div class="card">
+
+    <h1>
+      My Account
+    </h1>
+
+    <p>
+
+      Logged in as:
+
+      <strong id="userEmail"></strong>
+
+    </p>
+
+
+    <div
+      class="roles"
+      id="roleList"
+    ></div>
+
+
+    <a
+      id="artistDashboardLink"
+      class="dashboard-link hidden"
+      href="artist-dashboard.html"
+    >
+      🎤 Open Artist Dashboard
+    </a>
+
+
+    <a
+      id="djDashboardLink"
+      class="dashboard-link hidden"
+      href="dj-dashboard.html"
+    >
+      🎧 Open DJ Dashboard
+    </a>
+
+
+    <a
+      id="adminDashboardLink"
+      class="dashboard-link hidden"
+      href="admin.html"
+    >
+      🛡️ Open Admin Dashboard
+    </a>
+
+  </div>
+
+
+
+  <!-- ====================================================
+       IDENTITY & PAYMENT PROFILE
+  ===================================================== -->
+
+  <div class="card">
+
+    <h2>
+      Identity & Payment Profile
+    </h2>
+
+
+    <p>
+
+      This information is used privately for account
+      verification, song credits and future royalty withdrawals.
+
+    </p>
+
+
+    <div class="info-box">
+
+      Your legal name is private.
+      Your performing/stage name may appear publicly
+      on PASONG profiles, songs and credits.
+
+      <br><br>
+
+      Before withdrawals, PASONG may require identity
+      and payment-method verification.
+
+    </div>
+
+
+    <label>
+      Real / Legal Name
+    </label>
+
+    <input
+      id="realName"
+      type="text"
+      placeholder="Enter your legal name"
+    >
+
+
+    <label>
+      Performing / Stage Name
+    </label>
+
+    <input
+      id="performingName"
+      type="text"
+      placeholder="Example: KV BEATS"
+    >
+
+
+    <label>
+      Country
+    </label>
+
+    <select id="paymentCountry">
+
+      <option value="">
+        Select your country
+      </option>
+
+      <option value="Uganda">
+        🇺🇬 Uganda
+      </option>
+
+      <option value="Kenya">
+        🇰🇪 Kenya
+      </option>
+
+      <option value="Tanzania">
+        🇹🇿 Tanzania
+      </option>
+
+      <option value="Nigeria">
+        🇳🇬 Nigeria
+      </option>
+
+      <option value="Ghana">
+        🇬🇭 Ghana
+      </option>
+
+      <option value="South Africa">
+        🇿🇦 South Africa
+      </option>
+
+      <option value="Rwanda">
+        🇷🇼 Rwanda
+      </option>
+
+      <option value="United Kingdom">
+        🇬🇧 United Kingdom
+      </option>
+
+      <option value="United States">
+        🇺🇸 United States
+      </option>
+
+      <option value="Other">
+        🌍 Other
+      </option>
+
+    </select>
+
+
+    <!-- UGANDA MOBILE MONEY -->
+
+    <div id="ugandaPaymentFields">
+
+      <label>
+        Mobile Money Provider
+      </label>
 
       <select id="mobileProvider">
-        <option value="">Select provider</option>
-        <option value="MTN">MTN Mobile Money</option>
-        <option value="Airtel">Airtel Money</option>
+
+        <option value="">
+          Select provider
+        </option>
+
+        <option value="MTN">
+          MTN Mobile Money
+        </option>
+
+        <option value="Airtel">
+          Airtel Money
+        </option>
+
       </select>
 
-      <label>Mobile Money Number</label>
+
+      <label>
+        Mobile Money Number
+      </label>
 
       <input
         id="mobileNumber"
         type="tel"
-        placeholder="Example: 0769719539">
+        placeholder="Example: 0769719539"
+      >
 
-      <button onclick="saveProfile()">
-        Save Profile
-      </button>
+    </div>
 
-      <div id="profileMessage" class="status hidden"></div>
 
-      <div class="profile-row">
-        <div class="profile-label">Identity Verification</div>
-        <div id="identityStatus">
-          <span class="badge pending">Pending</span>
-        </div>
+    <!-- OUTSIDE UGANDA -->
+
+    <div
+      id="outsidePaymentFields"
+      class="hidden"
+    >
+
+      <div class="info-box">
+
+        🌍 For creators outside Uganda,
+        PASONG will use a secure Card / Online
+        Payment provider.
+
+        <br><br>
+
+        <strong>
+          Do not enter your card number,
+          CVV or PIN here.
+        </strong>
+
+        <br><br>
+
+        Your card details will be handled by
+        the secure payment provider when the
+        payment integration is connected.
+
       </div>
 
-      <div class="profile-row">
-        <div class="profile-label">Mobile Money Verification</div>
-        <div id="moneyStatus">
-          <span class="badge pending">Pending</span>
-        </div>
+
+      <label>
+        Payment Provider
+      </label>
+
+      <select id="outsidePaymentProvider">
+
+        <option value="">
+          Select payment provider
+        </option>
+
+        <option value="Card">
+          Card / Online Payment
+        </option>
+
+        <option value="Flutterwave">
+          Flutterwave
+        </option>
+
+        <option value="PesaPal">
+          PesaPal
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button onclick="saveProfile()">
+      Save Profile
+    </button>
+
+
+    <div
+      id="profileMessage"
+      class="status hidden"
+    ></div>
+
+
+    <div class="profile-row">
+
+      <div class="profile-label">
+        Identity Verification
+      </div>
+
+      <div id="identityStatus">
+
+        <span class="badge pending">
+          Pending
+        </span>
+
       </div>
 
     </div>
 
 
-    <!-- PROFILE DISPLAY -->
-    <div class="card">
+    <div class="profile-row">
 
-      <h2>My Profile</h2>
-
-      <div class="profile-row">
-        <div class="profile-label">Performing Name</div>
-        <div id="displayPerformingName" class="profile-value">
-          Not added yet
-        </div>
+      <div class="profile-label">
+        Payment Verification
       </div>
 
-      <div class="profile-row">
-        <div class="profile-label">Mobile Money Provider</div>
-        <div id="displayProvider" class="profile-value">
-          Not added yet
-        </div>
+      <div id="moneyStatus">
+
+        <span class="badge pending">
+          Pending
+        </span>
+
       </div>
-
-      <div class="profile-row">
-        <div class="profile-label">Mobile Money Number</div>
-        <div id="displayNumber" class="profile-value">
-          Not added yet
-        </div>
-      </div>
-
-    </div>
-
-
-    <!-- OTHER ACCOUNT FEATURES -->
-    <div class="card">
-
-      <h2>My Downloads</h2>
-      <p>Your purchased music will appear here.</p>
-
-      <a href="downloads.html" class="dashboard-link">
-        🎵 Open My Downloads
-      </a>
-
-    </div>
-
-
-    <div class="card">
-
-      <h2>Refer a Friend</h2>
-
-      <p>
-        Invite friends to PASONG and earn PASONG Points
-        when qualifying purchases are completed.
-      </p>
-
-      <button onclick="copyReferral()">
-        Copy Referral Link
-      </button>
-
-      <div id="referralMessage" class="status hidden"></div>
-
-    </div>
-
-
-    <div class="card">
-
-      <button class="logout" onclick="logout()">
-        Logout
-      </button>
 
     </div>
 
   </div>
 
+
+
+  <!-- ====================================================
+       PAYMENT VERIFICATION
+  ===================================================== -->
+
+  <div class="card">
+
+    <h2>
+      💳 Payment Method Verification
+    </h2>
+
+
+    <p>
+      PASONG requires creators to verify the payment
+      method that will be used for future royalty withdrawals.
+    </p>
+
+
+    <div class="verification-box">
+
+      <div class="verification-title">
+        Current Payment Method
+      </div>
+
+
+      <div
+        id="currentPaymentMethod"
+        class="profile-value"
+      >
+        Not submitted yet
+      </div>
+
+
+      <div
+        id="paymentVerificationStatus"
+        class="verification-status"
+      >
+
+        <span class="badge pending">
+          Pending
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      class="info-box"
+      style="margin-top:15px;"
+    >
+
+      <strong>
+        How verification works
+      </strong>
+
+      <br><br>
+
+      🇺🇬 Uganda:
+      Submit MTN Mobile Money or Airtel Money details.
+
+      <br><br>
+
+      🌍 Outside Uganda:
+      Submit your Card / Online Payment provider.
+
+      <br><br>
+
+      PASONG Admin reviews the request and
+      approves or rejects it.
+
+    </div>
+
+
+    <button
+      onclick="submitPaymentVerification()"
+    >
+      Submit Payment Verification
+    </button>
+
+
+    <div
+      id="verificationMessage"
+      class="status hidden"
+    ></div>
+
+  </div>
+
+
+
+  <!-- ====================================================
+       PROFILE DISPLAY
+  ===================================================== -->
+
+  <div class="card">
+
+    <h2>
+      My Profile
+    </h2>
+
+
+    <div class="profile-row">
+
+      <div class="profile-label">
+        Performing Name
+      </div>
+
+      <div
+        id="displayPerformingName"
+        class="profile-value"
+      >
+        Not added yet
+      </div>
+
+    </div>
+
+
+    <div class="profile-row">
+
+      <div class="profile-label">
+        Country
+      </div>
+
+      <div
+        id="displayCountry"
+        class="profile-value"
+      >
+        Not added yet
+      </div>
+
+    </div>
+
+
+    <div class="profile-row">
+
+      <div class="profile-label">
+        Mobile Money Provider
+      </div>
+
+      <div
+        id="displayProvider"
+        class="profile-value"
+      >
+        Not added yet
+      </div>
+
+    </div>
+
+
+    <div class="profile-row">
+
+      <div class="profile-label">
+        Mobile Money Number
+      </div>
+
+      <div
+        id="displayNumber"
+        class="profile-value"
+      >
+        Not added yet
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ====================================================
+       OTHER ACCOUNT FEATURES
+  ===================================================== -->
+
+  <div class="card">
+
+    <h2>
+      My Downloads
+    </h2>
+
+    <p>
+      Your purchased music will appear here.
+    </p>
+
+
+    <a
+      href="downloads.html"
+      class="dashboard-link"
+    >
+      🎵 Open My Downloads
+    </a>
+
+  </div>
+
+
+
+  <div class="card">
+
+    <h2>
+      Refer a Friend
+    </h2>
+
+    <p>
+
+      Invite friends to PASONG and earn
+      PASONG Points when qualifying purchases
+      are completed.
+
+    </p>
+
+
+    <button onclick="copyReferral()">
+      Copy Referral Link
+    </button>
+
+
+    <div
+      id="referralMessage"
+      class="status hidden"
+    ></div>
+
+  </div>
+
+
+
+  <div class="card">
+
+    <button
+      class="logout"
+      onclick="logout()"
+    >
+      Logout
+    </button>
+
+  </div>
+
+
 </div>
 
+</div>
+
+
 <footer>
+
   PASONG © 2026 • Music • Artists • Opportunity
+
 </footer>
+
 
 
 <script>
 
+
+/* ======================================================
+   SUPABASE
+====================================================== */
+
 const SUPABASE_URL =
 "https://mtufczmjlkvycarxylgh.supabase.co";
 
+
 const SUPABASE_KEY =
 "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
 
 const supabaseClient =
 supabase.createClient(
@@ -531,17 +1112,87 @@ supabase.createClient(
   SUPABASE_KEY
 );
 
+
 const API_BASE =
 "https://pasong-api.onrender.com";
 
 
+
+/* ======================================================
+   PAYMENT COUNTRY DISPLAY
+====================================================== */
+
+function updatePaymentCountryUI(){
+
+  const country =
+    document
+      .getElementById("paymentCountry")
+      .value;
+
+
+  const ugandaFields =
+    document
+      .getElementById("ugandaPaymentFields");
+
+
+  const outsideFields =
+    document
+      .getElementById("outsidePaymentFields");
+
+
+  if(country === "Uganda"){
+
+    ugandaFields
+      .classList.remove("hidden");
+
+    outsideFields
+      .classList.add("hidden");
+
+  }else if(country){
+
+    ugandaFields
+      .classList.add("hidden");
+
+    outsideFields
+      .classList.remove("hidden");
+
+  }else{
+
+    ugandaFields
+      .classList.remove("hidden");
+
+    outsideFields
+      .classList.add("hidden");
+
+  }
+
+}
+
+
+document
+  .getElementById("paymentCountry")
+  .addEventListener(
+    "change",
+    updatePaymentCountryUI
+  );
+
+
+
+/* ======================================================
+   LOGIN / SIGNUP UI
+====================================================== */
+
 function showLogin(){
 
-  document.getElementById("loginBox")
+  document
+    .getElementById("loginBox")
     .classList.remove("hidden");
 
-  document.getElementById("signupBox")
+
+  document
+    .getElementById("signupBox")
     .classList.add("hidden");
+
 
   clearMessage();
 
@@ -550,28 +1201,44 @@ function showLogin(){
 
 function showSignup(){
 
-  document.getElementById("signupBox")
+  document
+    .getElementById("signupBox")
     .classList.remove("hidden");
 
-  document.getElementById("loginBox")
+
+  document
+    .getElementById("loginBox")
     .classList.add("hidden");
+
 
   clearMessage();
 
 }
 
 
-function showMessage(message,type){
+function showMessage(
+  message,
+  type
+){
 
   const box =
-    document.getElementById("authMessage");
+    document.getElementById(
+      "authMessage"
+    );
 
-  box.textContent = message;
+
+  box.textContent =
+    message;
+
 
   box.className =
-    "status " + (type || "");
+    "status " +
+    (type || "");
 
-  box.classList.remove("hidden");
+
+  box.classList.remove(
+    "hidden"
+  );
 
 }
 
@@ -579,21 +1246,35 @@ function showMessage(message,type){
 function clearMessage(){
 
   document
-    .getElementById("authMessage")
-    .classList.add("hidden");
+    .getElementById(
+      "authMessage"
+    )
+    .classList.add(
+      "hidden"
+    );
 
 }
 
 
+
+/* ======================================================
+   SIGNUP
+====================================================== */
+
 async function signup(){
 
   const email =
-    document.getElementById("signupEmail")
-      .value.trim();
+    document
+      .getElementById("signupEmail")
+      .value
+      .trim();
+
 
   const password =
-    document.getElementById("signupPassword")
+    document
+      .getElementById("signupPassword")
       .value;
+
 
   const selectedRoles =
     Array.from(
@@ -601,7 +1282,9 @@ async function signup(){
         'input[name="accountRole"]:checked'
       )
     ).map(function(el){
+
       return el.value;
+
     });
 
 
@@ -613,6 +1296,7 @@ async function signup(){
     );
 
     return;
+
   }
 
 
@@ -624,6 +1308,7 @@ async function signup(){
     );
 
     return;
+
   }
 
 
@@ -635,6 +1320,7 @@ async function signup(){
     );
 
     return;
+
   }
 
 
@@ -646,14 +1332,16 @@ async function signup(){
   const result =
     await supabaseClient.auth.signUp({
 
-      email: email,
+      email:email,
 
-      password: password,
+      password:password,
 
       options:{
+
         data:{
           account_roles:selectedRoles
         }
+
       }
 
     });
@@ -667,6 +1355,7 @@ async function signup(){
     );
 
     return;
+
   }
 
 
@@ -677,10 +1366,12 @@ async function signup(){
       selectedRoles
     );
 
+
     showMessage(
       "Account created successfully.",
       "success"
     );
+
 
     await loadAccount();
 
@@ -696,18 +1387,35 @@ async function signup(){
 }
 
 
-async function saveSelectedRoles(userId,roles){
 
-  if(!userId || !roles || !roles.length){
+/* ======================================================
+   SAVE ROLES
+====================================================== */
+
+async function saveSelectedRoles(
+  userId,
+  roles
+){
+
+  if(
+    !userId ||
+    !roles ||
+    !roles.length
+  ){
+
     return;
+
   }
 
 
-  for(const role of roles){
+  for(
+    const role of roles
+  ){
 
     if(role === "admin"){
       continue;
     }
+
 
     await supabaseClient
       .from("user_roles")
@@ -717,7 +1425,8 @@ async function saveSelectedRoles(userId,roles){
           role:role
         },
         {
-          onConflict:"user_id,role"
+          onConflict:
+            "user_id,role"
         }
       );
 
@@ -726,14 +1435,23 @@ async function saveSelectedRoles(userId,roles){
 }
 
 
+
+/* ======================================================
+   LOGIN
+====================================================== */
+
 async function login(){
 
   const email =
-    document.getElementById("loginEmail")
-      .value.trim();
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
 
   const password =
-    document.getElementById("loginPassword")
+    document
+      .getElementById("loginPassword")
       .value;
 
 
@@ -745,17 +1463,25 @@ async function login(){
     );
 
     return;
+
   }
 
 
-  showMessage("Logging in...");
+  showMessage(
+    "Logging in..."
+  );
 
 
   const result =
-    await supabaseClient.auth.signInWithPassword({
-      email:email,
-      password:password
-    });
+    await supabaseClient
+      .auth
+      .signInWithPassword({
+
+        email:email,
+
+        password:password
+
+      });
 
 
   if(result.error){
@@ -766,6 +1492,7 @@ async function login(){
     );
 
     return;
+
   }
 
 
@@ -780,11 +1507,18 @@ async function login(){
 }
 
 
+
+/* ======================================================
+   RESET PASSWORD
+====================================================== */
+
 async function resetPassword(){
 
   const email =
-    document.getElementById("loginEmail")
-      .value.trim();
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
 
 
   if(!email){
@@ -795,18 +1529,21 @@ async function resetPassword(){
     );
 
     return;
+
   }
 
 
   const result =
-    await supabaseClient.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo:
-          window.location.origin +
-          "/account.html"
-      }
-    );
+    await supabaseClient
+      .auth
+      .resetPasswordForEmail(
+        email,
+        {
+          redirectTo:
+            window.location.origin +
+            "/account.html"
+        }
+      );
 
 
   if(result.error){
@@ -817,6 +1554,7 @@ async function resetPassword(){
     );
 
     return;
+
   }
 
 
@@ -828,10 +1566,18 @@ async function resetPassword(){
 }
 
 
+
+/* ======================================================
+   LOAD ACCOUNT
+====================================================== */
+
 async function loadAccount(){
 
   const sessionResult =
-    await supabaseClient.auth.getSession();
+    await supabaseClient
+      .auth
+      .getSession();
+
 
   const session =
     sessionResult.data.session;
@@ -843,11 +1589,14 @@ async function loadAccount(){
       .getElementById("authCard")
       .classList.remove("hidden");
 
+
     document
       .getElementById("accountArea")
       .classList.add("hidden");
 
+
     return;
+
   }
 
 
@@ -858,6 +1607,7 @@ async function loadAccount(){
   document
     .getElementById("authCard")
     .classList.add("hidden");
+
 
   document
     .getElementById("accountArea")
@@ -870,28 +1620,56 @@ async function loadAccount(){
       user.email || "";
 
 
-  await syncRolesFromMetadata(user);
+  await syncRolesFromMetadata(
+    user
+  );
 
-  await loadRoles(user.id);
 
-  await loadProfile(user.id);
+  await loadRoles(
+    user.id
+  );
+
+
+  await loadProfile(
+    user.id
+  );
+
+
+  await loadPaymentVerification(
+    user.id
+  );
+
+
+  updatePaymentCountryUI();
 
 }
 
 
-async function syncRolesFromMetadata(user){
+
+/* ======================================================
+   SYNC ROLES
+====================================================== */
+
+async function syncRolesFromMetadata(
+  user
+){
 
   const metadata =
     user.user_metadata || {};
 
+
   const roles =
-    Array.isArray(metadata.account_roles)
-      ? metadata.account_roles
-      : [];
+    Array.isArray(
+      metadata.account_roles
+    )
+    ? metadata.account_roles
+    : [];
 
 
   if(!roles.length){
+
     return;
+
   }
 
 
@@ -903,13 +1681,23 @@ async function syncRolesFromMetadata(user){
 }
 
 
-async function loadRoles(userId){
+
+/* ======================================================
+   LOAD ROLES
+====================================================== */
+
+async function loadRoles(
+  userId
+){
 
   const result =
     await supabaseClient
       .from("user_roles")
       .select("role")
-      .eq("user_id",userId);
+      .eq(
+        "user_id",
+        userId
+      );
 
 
   const roles =
@@ -917,74 +1705,123 @@ async function loadRoles(userId){
 
 
   const roleList =
-    document.getElementById("roleList");
+    document.getElementById(
+      "roleList"
+    );
 
 
-  roleList.innerHTML = "";
+  roleList.innerHTML="";
 
 
-  let hasArtist = false;
-  let hasDj = false;
-  let hasAdmin = false;
+  let hasArtist=false;
+
+  let hasDj=false;
+
+  let hasAdmin=false;
 
 
-  roles.forEach(function(item){
+  roles.forEach(
+    function(item){
 
-    const div =
-      document.createElement("div");
-
-    div.className =
-      "role active";
-
-    const labels = {
-
-      listener:"🎧 Listener / Fan",
-
-      musician:"🎤 Musician / Artist",
-
-      dj:"🎧 DJ",
-
-      producer:"🎹 Producer",
-
-      writer:"✍️ Writer",
-
-      admin:"🛡️ Admin"
-
-    };
-
-    div.textContent =
-      labels[item.role] || item.role;
-
-    roleList.appendChild(div);
+      const div =
+        document.createElement(
+          "div"
+        );
 
 
-    if(item.role === "musician"){
-      hasArtist = true;
+      div.className =
+        "role active";
+
+
+      const labels={
+
+        listener:
+          "🎧 Listener / Fan",
+
+        musician:
+          "🎤 Musician / Artist",
+
+        dj:
+          "🎧 DJ",
+
+        producer:
+          "🎹 Producer",
+
+        writer:
+          "✍️ Writer",
+
+        admin:
+          "🛡️ Admin"
+
+      };
+
+
+      div.textContent =
+        labels[item.role]
+        ||
+        item.role;
+
+
+      roleList.appendChild(
+        div
+      );
+
+
+      if(
+        item.role === "musician"
+      ){
+
+        hasArtist=true;
+
+      }
+
+
+      if(
+        item.role === "dj"
+      ){
+
+        hasDj=true;
+
+      }
+
+
+      if(
+        item.role === "admin"
+      ){
+
+        hasAdmin=true;
+
+      }
+
     }
-
-    if(item.role === "dj"){
-      hasDj = true;
-    }
-
-    if(item.role === "admin"){
-      hasAdmin = true;
-    }
-
-  });
+  );
 
 
   const metadata =
-    (await supabaseClient.auth.getUser())
-      .data.user?.app_metadata || {};
+    (
+      await supabaseClient
+        .auth
+        .getUser()
+    )
+    .data
+    .user
+    ?.app_metadata
+    || {};
 
 
-  if(metadata.role === "admin"){
-    hasAdmin = true;
+  if(
+    metadata.role === "admin"
+  ){
+
+    hasAdmin=true;
+
   }
 
 
   document
-    .getElementById("artistDashboardLink")
+    .getElementById(
+      "artistDashboardLink"
+    )
     .classList.toggle(
       "hidden",
       !hasArtist
@@ -992,7 +1829,9 @@ async function loadRoles(userId){
 
 
   document
-    .getElementById("djDashboardLink")
+    .getElementById(
+      "djDashboardLink"
+    )
     .classList.toggle(
       "hidden",
       !hasDj
@@ -1000,7 +1839,9 @@ async function loadRoles(userId){
 
 
   document
-    .getElementById("adminDashboardLink")
+    .getElementById(
+      "adminDashboardLink"
+    )
     .classList.toggle(
       "hidden",
       !hasAdmin
@@ -1009,13 +1850,24 @@ async function loadRoles(userId){
 }
 
 
-async function loadProfile(userId){
+
+/* ======================================================
+   LOAD PROFILE
+====================================================== */
+
+async function loadProfile(
+  userId
+){
 
   const metadataResult =
-    await supabaseClient.auth.getUser();
+    await supabaseClient
+      .auth
+      .getUser();
+
 
   const user =
     metadataResult.data.user;
+
 
   const isAdmin =
     user &&
@@ -1025,8 +1877,6 @@ async function loadProfile(userId){
 
   /*
     ADMIN ACCOUNT
-    Admin uses public.profiles.
-    It must NOT use artist_profiles.
   */
 
   if(isAdmin){
@@ -1037,7 +1887,10 @@ async function loadProfile(userId){
         .select(
           "full_name,email,phone,country,role"
         )
-        .eq("id",userId)
+        .eq(
+          "id",
+          userId
+        )
         .maybeSingle();
 
 
@@ -1049,6 +1902,7 @@ async function loadProfile(userId){
       );
 
       return;
+
     }
 
 
@@ -1057,7 +1911,9 @@ async function loadProfile(userId){
 
 
     if(!profile){
+
       return;
+
     }
 
 
@@ -1067,20 +1923,25 @@ async function loadProfile(userId){
         profile.full_name || "";
 
 
-    /*
-      For the Admin account we display the
-      PASONG administrator name as the
-      performing/display name.
-    */
     document
       .getElementById("performingName")
       .value =
-        profile.full_name || "PASONG Admin";
+        profile.full_name
+        ||
+        "PASONG Admin";
+
+
+    document
+      .getElementById("paymentCountry")
+      .value =
+        profile.country
+        ||
+        "Uganda";
 
 
     document
       .getElementById("mobileProvider")
-      .value = "";
+      .value="";
 
 
     document
@@ -1090,43 +1951,66 @@ async function loadProfile(userId){
 
 
     document
-      .getElementById("displayPerformingName")
+      .getElementById(
+        "displayPerformingName"
+      )
       .textContent =
-        profile.full_name || "PASONG Admin";
+        profile.full_name
+        ||
+        "PASONG Admin";
 
 
     document
-      .getElementById("displayProvider")
+      .getElementById(
+        "displayCountry"
+      )
+      .textContent =
+        profile.country
+        ||
+        "Uganda";
+
+
+    document
+      .getElementById(
+        "displayProvider"
+      )
       .textContent =
         "Not added yet";
 
 
     document
-      .getElementById("displayNumber")
+      .getElementById(
+        "displayNumber"
+      )
       .textContent =
-        profile.phone || "Not added yet";
+        profile.phone
+        ||
+        "Not added yet";
 
 
     document
-      .getElementById("identityStatus")
+      .getElementById(
+        "identityStatus"
+      )
       .innerHTML =
         '<span class="badge pending">Pending</span>';
 
 
     document
-      .getElementById("moneyStatus")
+      .getElementById(
+        "moneyStatus"
+      )
       .innerHTML =
         '<span class="badge pending">Pending</span>';
 
 
     return;
+
   }
 
 
   /*
     CREATOR ACCOUNT
-    KV BEATS and other creator accounts
-    continue using artist_profiles.
   */
 
   const result =
@@ -1135,7 +2019,10 @@ async function loadProfile(userId){
       .select(
         "real_name,performing_name,mobile_money_number,mobile_money_provider,identity_verified,mobile_money_verified"
       )
-      .eq("user_id",userId)
+      .eq(
+        "user_id",
+        userId
+      )
       .maybeSingle();
 
 
@@ -1147,6 +2034,7 @@ async function loadProfile(userId){
     );
 
     return;
+
   }
 
 
@@ -1155,7 +2043,9 @@ async function loadProfile(userId){
 
 
   if(!profile){
+
     return;
+
   }
 
 
@@ -1174,71 +2064,111 @@ async function loadProfile(userId){
   document
     .getElementById("mobileProvider")
     .value =
-      profile.mobile_money_provider || "";
+      profile.mobile_money_provider
+      || "";
 
 
   document
     .getElementById("mobileNumber")
     .value =
-      profile.mobile_money_number || "";
+      profile.mobile_money_number
+      || "";
 
 
   document
-    .getElementById("displayPerformingName")
+    .getElementById(
+      "displayPerformingName"
+    )
     .textContent =
-      profile.performing_name ||
+      profile.performing_name
+      ||
       "Not added yet";
 
 
   document
-    .getElementById("displayProvider")
+    .getElementById(
+      "displayProvider"
+    )
     .textContent =
-      profile.mobile_money_provider ||
+      profile.mobile_money_provider
+      ||
       "Not added yet";
 
 
   document
-    .getElementById("displayNumber")
+    .getElementById(
+      "displayNumber"
+    )
     .textContent =
-      profile.mobile_money_number ||
+      profile.mobile_money_number
+      ||
       "Not added yet";
 
 
   document
-    .getElementById("identityStatus")
+    .getElementById(
+      "identityStatus"
+    )
     .innerHTML =
       profile.identity_verified
-      ? '<span class="badge verified">Verified</span>'
-      : '<span class="badge pending">Pending</span>';
+      ?
+      '<span class="badge verified">Verified</span>'
+      :
+      '<span class="badge pending">Pending</span>';
 
 
   document
-    .getElementById("moneyStatus")
+    .getElementById(
+      "moneyStatus"
+    )
     .innerHTML =
       profile.mobile_money_verified
-      ? '<span class="badge verified">Verified</span>'
-      : '<span class="badge pending">Pending</span>';
+      ?
+      '<span class="badge verified">Verified</span>'
+      :
+      '<span class="badge pending">Pending</span>';
 
 }
 
 
+
+/* ======================================================
+   SAVE PROFILE
+====================================================== */
+
 async function saveProfile(){
 
   const realName =
-    document.getElementById("realName")
-      .value.trim();
+    document
+      .getElementById("realName")
+      .value
+      .trim();
+
 
   const performingName =
-    document.getElementById("performingName")
-      .value.trim();
+    document
+      .getElementById("performingName")
+      .value
+      .trim();
 
-  const provider =
-    document.getElementById("mobileProvider")
+
+  const country =
+    document
+      .getElementById("paymentCountry")
       .value;
 
+
+  const provider =
+    document
+      .getElementById("mobileProvider")
+      .value;
+
+
   const mobileNumber =
-    document.getElementById("mobileNumber")
-      .value.trim();
+    document
+      .getElementById("mobileNumber")
+      .value
+      .trim();
 
 
   if(!realName){
@@ -1249,6 +2179,7 @@ async function saveProfile(){
     );
 
     return;
+
   }
 
 
@@ -1260,10 +2191,27 @@ async function saveProfile(){
     );
 
     return;
+
   }
 
 
-  if(!provider){
+  if(!country){
+
+    showProfileMessage(
+      "Select your country.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    country === "Uganda"
+    &&
+    !provider
+  ){
 
     showProfileMessage(
       "Select MTN or Airtel.",
@@ -1271,10 +2219,15 @@ async function saveProfile(){
     );
 
     return;
+
   }
 
 
-  if(!mobileNumber){
+  if(
+    country === "Uganda"
+    &&
+    !mobileNumber
+  ){
 
     showProfileMessage(
       "Enter your mobile-money number.",
@@ -1282,11 +2235,35 @@ async function saveProfile(){
     );
 
     return;
+
+  }
+
+
+  if(
+    country !== "Uganda"
+    &&
+    !document
+      .getElementById(
+        "outsidePaymentProvider"
+      )
+      .value
+  ){
+
+    showProfileMessage(
+      "Select your Card / Online Payment provider.",
+      "error"
+    );
+
+    return;
+
   }
 
 
   const sessionResult =
-    await supabaseClient.auth.getSession();
+    await supabaseClient
+      .auth
+      .getSession();
+
 
   const session =
     sessionResult.data.session;
@@ -1300,6 +2277,7 @@ async function saveProfile(){
     );
 
     return;
+
   }
 
 
@@ -1310,12 +2288,9 @@ async function saveProfile(){
 
   try{
 
-    /*
-      Detect Admin account.
-    */
-
     const user =
       session.user;
+
 
     const isAdmin =
       user &&
@@ -1325,9 +2300,6 @@ async function saveProfile(){
 
     /*
       ADMIN SAVE
-      Save directly into profiles.
-      This prevents the artist_profiles
-      foreign-key error.
     */
 
     if(isAdmin){
@@ -1338,10 +2310,23 @@ async function saveProfile(){
           .upsert(
             {
               id:user.id,
-              full_name:realName,
-              email:user.email || null,
-              phone:mobileNumber,
-              role:"admin"
+
+              full_name:
+                realName,
+
+              email:
+                user.email || null,
+
+              phone:
+                country === "Uganda"
+                ? mobileNumber
+                : null,
+
+              country:
+                country,
+
+              role:
+                "admin"
             },
             {
               onConflict:"id"
@@ -1370,13 +2355,13 @@ async function saveProfile(){
 
 
       return;
+
     }
 
 
     /*
       CREATOR SAVE
-      Existing working artist API remains
-      unchanged.
+      Existing API remains.
     */
 
     const response =
@@ -1384,31 +2369,40 @@ async function saveProfile(){
         API_BASE +
         "/api/artist-profile/save",
         {
+
           method:"POST",
 
           headers:{
+
             "Content-Type":
               "application/json",
 
             "Authorization":
               "Bearer " +
               session.access_token
+
           },
 
           body:JSON.stringify({
 
-            real_name:realName,
+            real_name:
+              realName,
 
             performing_name:
               performingName,
 
             mobile_money_provider:
-              provider,
+              country === "Uganda"
+              ? provider
+              : null,
 
             mobile_money_number:
-              mobileNumber
+              country === "Uganda"
+              ? mobileNumber
+              : null
 
           })
+
         }
       );
 
@@ -1451,34 +2445,663 @@ async function saveProfile(){
 }
 
 
-function showProfileMessage(message,type){
 
-  const box =
-    document.getElementById(
-      "profileMessage"
-    );
+/* ======================================================
+   SUBMIT PAYMENT VERIFICATION
+====================================================== */
 
-  box.textContent = message;
-
-  box.className =
-    "status " + (type || "");
-
-  box.classList.remove("hidden");
-
-}
-
-
-async function copyReferral(){
+async function submitPaymentVerification(){
 
   const sessionResult =
-    await supabaseClient.auth.getSession();
+    await supabaseClient
+      .auth
+      .getSession();
+
 
   const session =
     sessionResult.data.session;
 
 
   if(!session){
+
+    showVerificationMessage(
+      "Please login again.",
+      "error"
+    );
+
     return;
+
+  }
+
+
+  const user =
+    session.user;
+
+
+  const realName =
+    document
+      .getElementById("realName")
+      .value
+      .trim();
+
+
+  const country =
+    document
+      .getElementById("paymentCountry")
+      .value;
+
+
+  const performingName =
+    document
+      .getElementById("performingName")
+      .value
+      .trim();
+
+
+  if(!realName){
+
+    showVerificationMessage(
+      "Enter your real/legal name first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!performingName){
+
+    showVerificationMessage(
+      "Enter your performing/stage name first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if(!country){
+
+    showVerificationMessage(
+      "Select your country first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  let verificationType =
+    "";
+
+  let provider =
+    "";
+
+  let accountName =
+    realName;
+
+  let accountNumber =
+    "";
+
+
+  /*
+    UGANDA
+    Mobile Money verification
+  */
+
+  if(country === "Uganda"){
+
+    const mobileProvider =
+      document
+        .getElementById(
+          "mobileProvider"
+        )
+        .value;
+
+
+    const mobileNumber =
+      document
+        .getElementById(
+          "mobileNumber"
+        )
+        .value
+        .trim();
+
+
+    if(
+      mobileProvider !== "MTN"
+      &&
+      mobileProvider !== "Airtel"
+    ){
+
+      showVerificationMessage(
+        "Select MTN or Airtel Mobile Money.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if(!mobileNumber){
+
+      showVerificationMessage(
+        "Enter your Mobile Money number.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    verificationType =
+      "mobile_money";
+
+
+    provider =
+      mobileProvider;
+
+
+    accountNumber =
+      mobileNumber;
+
+  }
+
+
+  /*
+    OUTSIDE UGANDA
+    Card / Online verification
+  */
+
+  else{
+
+    const outsideProvider =
+      document
+        .getElementById(
+          "outsidePaymentProvider"
+        )
+        .value;
+
+
+    if(!outsideProvider){
+
+      showVerificationMessage(
+        "Select your Card / Online Payment provider.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    verificationType =
+      "card";
+
+
+    provider =
+      outsideProvider;
+
+
+    /*
+      IMPORTANT:
+      No card number, CVV or PIN is stored.
+      A secure provider reference will be
+      added when Flutterwave/PesaPal is connected.
+    */
+
+    accountNumber =
+      "Pending secure provider setup";
+
+  }
+
+
+  showVerificationMessage(
+    "Submitting payment verification..."
+  );
+
+
+  try{
+
+    /*
+      Check if there is already a pending
+      or approved request.
+    */
+
+    const existing =
+      await supabaseClient
+        .from("payment_verifications")
+        .select(
+          "id,status"
+        )
+        .eq(
+          "user_id",
+          user.id
+        )
+        .eq(
+          "verification_type",
+          verificationType
+        )
+        .in(
+          "status",
+          [
+            "pending",
+            "approved"
+          ]
+        )
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        )
+        .limit(1);
+
+
+    if(existing.error){
+
+      throw existing.error;
+
+    }
+
+
+    if(
+      existing.data &&
+      existing.data.length
+    ){
+
+      const current =
+        existing.data[0];
+
+
+      if(
+        current.status ===
+        "approved"
+      ){
+
+        showVerificationMessage(
+          "This payment method has already been approved.",
+          "success"
+        );
+
+
+        await loadPaymentVerification(
+          user.id
+        );
+
+
+        return;
+
+      }
+
+
+      if(
+        current.status ===
+        "pending"
+      ){
+
+        showVerificationMessage(
+          "You already have a pending payment verification request.",
+          "warning"
+        );
+
+
+        await loadPaymentVerification(
+          user.id
+        );
+
+
+        return;
+
+      }
+
+    }
+
+
+    /*
+      Create verification request.
+    */
+
+    const result =
+      await supabaseClient
+        .from("payment_verifications")
+        .insert({
+
+          user_id:
+            user.id,
+
+          country:
+            country,
+
+          verification_type:
+            verificationType,
+
+          provider:
+            provider,
+
+          account_name:
+            accountName,
+
+          account_number:
+            accountNumber,
+
+          status:
+            "pending",
+
+          submitted_at:
+            new Date().toISOString(),
+
+          updated_at:
+            new Date().toISOString()
+
+        });
+
+
+    if(result.error){
+
+      throw result.error;
+
+    }
+
+
+    showVerificationMessage(
+      "Payment verification submitted successfully. PASONG Admin will review it.",
+      "success"
+    );
+
+
+    await loadPaymentVerification(
+      user.id
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Payment verification submit error:",
+      error
+    );
+
+
+    showVerificationMessage(
+      error.message ||
+      "Unable to submit payment verification.",
+      "error"
+    );
+
+  }
+
+}
+
+
+
+/* ======================================================
+   LOAD PAYMENT VERIFICATION
+====================================================== */
+
+async function loadPaymentVerification(
+  userId
+){
+
+  try{
+
+    const result =
+      await supabaseClient
+        .from("payment_verifications")
+        .select("*")
+        .eq(
+          "user_id",
+          userId
+        )
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        )
+        .limit(1);
+
+
+    if(result.error){
+
+      console.error(
+        "Payment verification load:",
+        result.error
+      );
+
+      return;
+
+    }
+
+
+    const item =
+      result.data &&
+      result.data.length
+      ? result.data[0]
+      : null;
+
+
+    if(!item){
+
+      document
+        .getElementById(
+          "currentPaymentMethod"
+        )
+        .textContent =
+          "Not submitted yet";
+
+
+      document
+        .getElementById(
+          "paymentVerificationStatus"
+        )
+        .innerHTML =
+          '<span class="badge pending">Pending</span>';
+
+
+      document
+        .getElementById(
+          "moneyStatus"
+        )
+        .innerHTML =
+          '<span class="badge pending">Pending</span>';
+
+
+      return;
+
+    }
+
+
+    let methodText =
+      "";
+
+
+    if(
+      item.verification_type ===
+      "mobile_money"
+    ){
+
+      methodText =
+        "📱 " +
+        (
+          item.provider ||
+          "Mobile Money"
+        ) +
+        " • " +
+        (
+          item.account_number ||
+          ""
+        );
+
+    }else{
+
+      methodText =
+        "💳 " +
+        (
+          item.provider ||
+          "Card / Online Payment"
+        );
+
+    }
+
+
+    document
+      .getElementById(
+        "currentPaymentMethod"
+      )
+      .textContent =
+        methodText;
+
+
+    const status =
+      String(
+        item.status ||
+        "pending"
+      ).toLowerCase();
+
+
+    let badge =
+      '<span class="badge pending">Pending</span>';
+
+
+    if(
+      status === "approved"
+    ){
+
+      badge =
+        '<span class="badge verified">Approved</span>';
+
+    }
+
+
+    if(
+      status === "rejected"
+    ){
+
+      badge =
+        '<span class="badge rejected">Rejected</span>';
+
+    }
+
+
+    document
+      .getElementById(
+        "paymentVerificationStatus"
+      )
+      .innerHTML =
+        badge;
+
+
+    document
+      .getElementById(
+        "moneyStatus"
+      )
+      .innerHTML =
+        badge;
+
+
+  }catch(error){
+
+    console.error(
+      "Payment verification error:",
+      error
+    );
+
+  }
+
+}
+
+
+
+/* ======================================================
+   VERIFICATION MESSAGE
+====================================================== */
+
+function showVerificationMessage(
+  message,
+  type
+){
+
+  const box =
+    document.getElementById(
+      "verificationMessage"
+    );
+
+
+  box.textContent =
+    message;
+
+
+  box.className =
+    "status " +
+    (type || "");
+
+
+  box.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+
+/* ======================================================
+   PROFILE MESSAGE
+====================================================== */
+
+function showProfileMessage(
+  message,
+  type
+){
+
+  const box =
+    document.getElementById(
+      "profileMessage"
+    );
+
+
+  box.textContent =
+    message;
+
+
+  box.className =
+    "status " +
+    (type || "");
+
+
+  box.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+
+/* ======================================================
+   REFERRAL
+====================================================== */
+
+async function copyReferral(){
+
+  const sessionResult =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  const session =
+    sessionResult.data.session;
+
+
+  if(!session){
+
+    return;
+
   }
 
 
@@ -1500,31 +3123,43 @@ async function copyReferral(){
         "referralMessage"
       );
 
+
     box.textContent =
       "Referral link copied.";
+
 
     box.className =
       "status success";
 
-    box.classList.remove("hidden");
+
+    box.classList.remove(
+      "hidden"
+    );
 
 
   }catch(error){
 
-    alert(referral);
+    alert(
+      referral
+    );
 
   }
 
 }
 
 
-/* FIXED LOGOUT — KEEPING YOUR WORKING VERSION */
+
+/* ======================================================
+   LOGOUT
+====================================================== */
 
 async function logout(){
 
   try{
 
-    await supabaseClient.auth.signOut();
+    await supabaseClient
+      .auth
+      .signOut();
 
   }catch(error){
 
@@ -1535,6 +3170,7 @@ async function logout(){
 
   }
 
+
   window.location.href =
     window.location.origin +
     "/account.html";
@@ -1542,16 +3178,30 @@ async function logout(){
 }
 
 
-supabaseClient.auth.onAuthStateChange(
-  function(event,session){
 
-    if(session){
-      loadAccount();
+/* ======================================================
+   AUTH STATE
+====================================================== */
+
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    function(event,session){
+
+      if(session){
+
+        loadAccount();
+
+      }
+
     }
+  );
 
-  }
-);
 
+
+/* ======================================================
+   START
+====================================================== */
 
 loadAccount();
 
