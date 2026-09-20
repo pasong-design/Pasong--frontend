@@ -703,7 +703,8 @@ h1{
     PASONG secure checkout.<br>
 
     Your purchase is only confirmed after
-    the payment provider confirms payment.
+    the payment provider confirms payment
+    AND PASONG records the purchase.
 
   </div>
 
@@ -2223,6 +2224,90 @@ function startPolling(){
       }
 
 
+      /*
+        MTN can report successful payment
+        while PASONG is still finishing the
+        backend order/download/royalty work.
+
+        Keep polling instead of falsely
+        showing the purchase as completed.
+      */
+
+      if(
+        status ===
+        "SUCCESSFUL" &&
+        data.paid === true &&
+        data.pasong_completed !== true
+      ){
+
+        const msg =
+          document.getElementById(
+            "msg"
+          );
+
+
+        msg.innerHTML =
+
+          '<span class="pending">' +
+
+          '<b>Payment received.</b>' +
+
+          '</span><br><br>' +
+
+          'PASONG is securely recording your purchase and download.<br>' +
+
+          'Please wait...<br><br>' +
+
+          'Check ' +
+
+          attempts +
+
+          ' of ' +
+
+          MAX_POLLS;
+
+
+        if(
+          attempts >=
+          MAX_POLLS
+        ){
+
+          stopPolling();
+
+
+          msg.innerHTML =
+
+            '<span class="pending">' +
+
+            '<b>Payment received, but PASONG is still processing your purchase.</b>' +
+
+            '</span><br><br>' +
+
+            'Your payment has not been marked as a completed PASONG purchase yet. ' +
+
+            'Please do not pay again.';
+
+
+          setPaymentButtonsDisabled(
+            false
+          );
+
+          return;
+
+        }
+
+
+        pollingTimer =
+          setTimeout(
+            check,
+            POLL_INTERVAL
+          );
+
+        return;
+
+      }
+
+
       if(
         status ===
         "FAILED"
@@ -2364,6 +2449,41 @@ function startPolling(){
 function paymentSuccessful(
   data
 ){
+
+  /*
+    HARD SAFETY CHECK
+
+    This function must never display a
+    completed purchase unless PASONG itself
+    has confirmed the backend completion.
+  */
+
+  if(
+    data.pasong_completed !== true
+  ){
+
+    document.getElementById(
+      "msg"
+    ).innerHTML =
+
+      '<span class="pending">' +
+
+      '<b>Payment received.</b>' +
+
+      '</span><br><br>' +
+
+      'PASONG is still processing your purchase. ' +
+
+      'Please do not pay again.';
+
+    setPaymentButtonsDisabled(
+      false
+    );
+
+    return;
+
+  }
+
 
   const msg =
     document.getElementById(
