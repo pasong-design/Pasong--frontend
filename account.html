@@ -453,8 +453,8 @@ footer{
       publicly on PASONG profiles, songs and credits.
       <br><br>
       Identity verification is only requested when PASONG needs it,
-      such as before a royalty withdrawal. Your payment method must
-      be verified before PASONG can send royalty payouts.
+      such as before a royalty withdrawal. Your payment method must be
+      verified before PASONG can send royalty payouts.
     </p>
 
     <label>Real / Legal Name</label>
@@ -1456,6 +1456,8 @@ async function loadAccount(){
   await loadProfile(user);
 
   await loadPaymentVerification(user);
+
+  await loadEarnings();
 
   updatePaymentCountryUI();
 
@@ -2681,11 +2683,15 @@ async function submitPaymentVerification(){
 
 
 /* =========================================================
-   WITHDRAW
+   WITHDRAW / EARNINGS
 ========================================================= */
 
 let availableBalance = 0;
 
+
+/* =========================================================
+   FORMAT UGX
+========================================================= */
 
 function formatUGX(amount){
 
@@ -2699,6 +2705,10 @@ function formatUGX(amount){
 }
 
 
+/* =========================================================
+   UPDATE BALANCE DISPLAY
+========================================================= */
+
 function updateWithdrawBalance(){
 
   document
@@ -2709,6 +2719,100 @@ function updateWithdrawBalance(){
       formatUGX(
         availableBalance
       );
+
+}
+
+
+/* =========================================================
+   LOAD REAL EARNINGS
+========================================================= */
+
+async function loadEarnings(){
+
+  try{
+
+    const {
+      data:{
+        session
+      }
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+
+    if(!session){
+
+      availableBalance = 0;
+
+      updateWithdrawBalance();
+
+      return;
+
+    }
+
+
+    const response =
+      await fetch(
+        API_BASE +
+        "/api/earnings",
+        {
+          method:"GET",
+
+          headers:{
+            "Authorization":
+              "Bearer " +
+              session.access_token
+          }
+        }
+      );
+
+
+    const result =
+      await response
+        .json()
+        .catch(
+          ()=>({})
+        );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        result.error ||
+        "Unable to load earnings."
+      );
+
+    }
+
+
+    availableBalance =
+      Number(
+        result.available_balance || 0
+      );
+
+
+    updateWithdrawBalance();
+
+
+    console.log(
+      "PASONG earnings loaded:",
+      availableBalance
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Earnings loading error:",
+      error
+    );
+
+    availableBalance = 0;
+
+    updateWithdrawBalance();
+
+  }
 
 }
 
@@ -2760,6 +2864,14 @@ document
 
       status.textContent =
         "Checking your withdrawal eligibility...";
+
+
+      /*
+       * Always refresh the real balance
+       * before checking withdrawal.
+       */
+
+      await loadEarnings();
 
 
       const {
@@ -2919,13 +3031,17 @@ document
 
       showMessage(
         "withdrawMessage",
-        "Withdrawal processing will be connected when the PASONG payout system is enabled.",
+        "Withdrawal request will be connected to the PASONG payout system in the next step.",
         "warning"
       );
 
     }
   );
 
+
+/* =========================================================
+   INITIAL BALANCE
+========================================================= */
 
 updateWithdrawBalance();
 
