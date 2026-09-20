@@ -1010,7 +1010,6 @@ small{
           </div>
 
 
-          <!-- WORKING NEED COVER BUTTON -->
           <div class="form-group full">
 
             <div class="need-cover-box">
@@ -1519,7 +1518,6 @@ small{
     </div>
 
 
-    <!-- COVER SERVICE -->
     <div class="cover-service">
 
       <h3>
@@ -1562,7 +1560,6 @@ small{
     </div>
 
 
-    <!-- COVER INFORMATION -->
     <div class="form-grid">
 
       <div class="form-group">
@@ -1757,10 +1754,7 @@ small{
           type="file"
           id="coverMainPhoto"
           accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-          onchange="previewCoverRequestImage(
-            event,
-            'coverMainPhotoPreview'
-          )"
+          onchange="previewCoverRequestImage(event,'coverMainPhotoPreview')"
           required
         >
 
@@ -1793,10 +1787,7 @@ small{
           type="file"
           id="coverReferencePhoto"
           accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-          onchange="previewCoverRequestImage(
-            event,
-            'coverReferencePhotoPreview'
-          )"
+          onchange="previewCoverRequestImage(event,'coverReferencePhotoPreview')"
         >
 
         <small>
@@ -1828,10 +1819,7 @@ small{
           type="file"
           id="coverLogo"
           accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-          onchange="previewCoverRequestImage(
-            event,
-            'coverLogoPreview'
-          )"
+          onchange="previewCoverRequestImage(event,'coverLogoPreview')"
         >
 
         <small>
@@ -1847,7 +1835,6 @@ small{
       </div>
 
 
-      <!-- EXTRA DETAILS -->
       <div class="form-group full">
 
         <label>
@@ -1862,7 +1849,6 @@ small{
       </div>
 
 
-      <!-- CONTACT -->
       <div class="form-group">
 
         <label>
@@ -1896,7 +1882,6 @@ small{
     </div>
 
 
-    <!-- HOW IT WORKS -->
     <div class="cover-service" style="margin-top:20px;">
 
       <h3>
@@ -2477,7 +2462,7 @@ document
 
 
 /* =========================================================
-   SUBMIT COVER REQUEST
+   SUBMIT COVER REQUEST + CLOUDINARY PHOTOS
 ========================================================= */
 
 async function prepareCoverRequest(){
@@ -2697,7 +2682,11 @@ async function prepareCoverRequest(){
   }
 
 
-  if(mainPhoto.size > 5 * 1024 * 1024){
+  const maxImageSize =
+    5 * 1024 * 1024;
+
+
+  if(mainPhoto.size > maxImageSize){
 
     showCoverMessage(
       "The main cover photo is too large. Maximum size is 5MB.",
@@ -2711,7 +2700,7 @@ async function prepareCoverRequest(){
 
   if(
     referencePhoto &&
-    referencePhoto.size > 5 * 1024 * 1024
+    referencePhoto.size > maxImageSize
   ){
 
     showCoverMessage(
@@ -2726,7 +2715,7 @@ async function prepareCoverRequest(){
 
   if(
     logo &&
-    logo.size > 5 * 1024 * 1024
+    logo.size > maxImageSize
   ){
 
     showCoverMessage(
@@ -2743,14 +2732,20 @@ async function prepareCoverRequest(){
      PRICE
   ========================= */
 
-  let price = 10000;
-  let currency = "UGX";
+  let price =
+    10000;
+
+  let currency =
+    "UGX";
 
 
   if(location === "outside"){
 
-    price = 10;
-    currency = "USD";
+    price =
+      10;
+
+    currency =
+      "USD";
 
   }
 
@@ -2778,15 +2773,9 @@ async function prepareCoverRequest(){
 
   try{
 
-    /*
-      SAVE COVER REQUEST TO SUPABASE
-
-      The request information is saved now.
-
-      Photo URLs remain null in this step.
-      Actual Cloudinary photo upload will be
-      connected separately.
-    */
+    /* =====================================================
+       STEP 1 — SAVE COVER REQUEST
+    ===================================================== */
 
     const {
       data,
@@ -2869,7 +2858,7 @@ async function prepareCoverRequest(){
     if(error){
 
       console.error(
-        "Cover request error:",
+        "Cover request insert error:",
         error
       );
 
@@ -2878,24 +2867,250 @@ async function prepareCoverRequest(){
     }
 
 
+    const requestId =
+      data.id;
+
+
     console.log(
-      "Cover request saved:",
-      data
+      "Cover request created:",
+      requestId
     );
 
 
-    /* =========================
+    /* =====================================================
+       STEP 2 — CLOUDINARY UPLOAD HELPER
+    ===================================================== */
+
+    async function uploadCoverImage(
+      file,
+      imageName
+    ){
+
+      if(!file){
+
+        return null;
+
+      }
+
+
+      const form =
+        new FormData();
+
+
+      form.append(
+        "file",
+        file
+      );
+
+
+      form.append(
+        "upload_preset",
+        "pasong_covers"
+      );
+
+
+      showCoverMessage(
+        "Uploading " +
+        escapeHtml(imageName) +
+        "...",
+        "info"
+      );
+
+
+      const response =
+        await fetch(
+          API_BASE +
+          "/api/upload/cover",
+          {
+            method:"POST",
+            body:form
+          }
+        );
+
+
+      if(!response.ok){
+
+        let errorMessage =
+          imageName +
+          " upload failed.";
+
+
+        try{
+
+          const errorData =
+            await response.json();
+
+
+          if(
+            errorData &&
+            errorData.error
+          ){
+
+            errorMessage =
+              errorData.error;
+
+          }
+
+        }
+        catch(
+          ignored
+        ){}
+
+        
+        throw new Error(
+          errorMessage
+        );
+
+      }
+
+
+      const result =
+        await response.json();
+
+
+      if(
+        !result ||
+        !result.secure_url
+      ){
+
+        throw new Error(
+          imageName +
+          " upload did not return a Cloudinary URL."
+        );
+
+      }
+
+
+      console.log(
+        imageName +
+        " uploaded:",
+        result.secure_url
+      );
+
+
+      return result.secure_url;
+
+    }
+
+
+    /* =====================================================
+       STEP 3 — MAIN PHOTO
+    ===================================================== */
+
+    const mainPhotoUrl =
+      await uploadCoverImage(
+        mainPhoto,
+        "main photo"
+      );
+
+
+    /* =====================================================
+       STEP 4 — REFERENCE PHOTO
+    ===================================================== */
+
+    let referencePhotoUrl =
+      null;
+
+
+    if(referencePhoto){
+
+      referencePhotoUrl =
+        await uploadCoverImage(
+          referencePhoto,
+          "reference photo"
+        );
+
+    }
+
+
+    /* =====================================================
+       STEP 5 — LOGO
+    ===================================================== */
+
+    let logoUrl =
+      null;
+
+
+    if(logo){
+
+      logoUrl =
+        await uploadCoverImage(
+          logo,
+          "logo"
+        );
+
+    }
+
+
+    /* =====================================================
+       STEP 6 — SAVE CLOUDINARY URLS
+    ===================================================== */
+
+    const {
+      data:updatedRequest,
+      error:updateError
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .update({
+
+        main_photo_url:
+          mainPhotoUrl,
+
+        reference_photo_url:
+          referencePhotoUrl,
+
+        logo_url:
+          logoUrl,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        requestId
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .select()
+      .single();
+
+
+    if(updateError){
+
+      console.error(
+        "Cover image URL update error:",
+        updateError
+      );
+
+      throw new Error(
+        "The photos were uploaded, but PASONG could not save the photo links to your cover request."
+      );
+
+    }
+
+
+    console.log(
+      "Cover request updated with Cloudinary URLs:",
+      updatedRequest
+    );
+
+
+    /* =====================================================
        SUCCESS
-    ========================= */
+    ===================================================== */
 
     showCoverMessage(
       `
-        🎨 Cover request submitted successfully.
+        🎨 <strong>Cover request submitted successfully.</strong>
 
         <br><br>
 
         <strong>Request ID:</strong>
-        ${escapeHtml(data.id)}
+        ${escapeHtml(requestId)}
 
         <br><br>
 
@@ -2918,14 +3133,89 @@ async function prepareCoverRequest(){
 
         <br><br>
 
-        Your request has been sent to PASONG Admin.
+        ✅ Main photo uploaded
+
+        <br>
+
+        ${
+          referencePhotoUrl
+            ? "✅ Reference photo uploaded"
+            : "ℹ️ No reference photo provided"
+        }
+
+        <br>
+
+        ${
+          logoUrl
+            ? "✅ Logo uploaded"
+            : "ℹ️ No logo provided"
+        }
 
         <br><br>
 
-        Payment and photo-file upload will be connected
-        in the next step.
+        Your cover request and photos have been sent
+        to PASONG Admin.
+
+        <br><br>
+
+        <strong>Payment status:</strong> Pending
       `,
       "success"
+    );
+
+
+    /* Clear selected files */
+
+    document
+      .getElementById(
+        "coverMainPhoto"
+      )
+      .value =
+      "";
+
+
+    document
+      .getElementById(
+        "coverReferencePhoto"
+      )
+      .value =
+      "";
+
+
+    document
+      .getElementById(
+        "coverLogo"
+      )
+      .value =
+      "";
+
+
+    [
+      "coverMainPhotoPreview",
+      "coverReferencePhotoPreview",
+      "coverLogoPreview"
+    ]
+    .forEach(
+      function(previewId){
+
+        const preview =
+          document.getElementById(
+            previewId
+          );
+
+
+        if(preview){
+
+          preview.style.display =
+            "none";
+
+          preview.removeAttribute(
+            "src"
+          );
+
+        }
+
+      }
     );
 
 
@@ -3841,10 +4131,6 @@ document
 
     try{
 
-      /*
-        Cloudinary upload
-      */
-
       const audioForm =
         new FormData();
 
@@ -3858,12 +4144,6 @@ document
         "pasong_audio"
       );
 
-
-      /*
-        Existing backend/API upload flow.
-        The existing PASONG API remains responsible
-        for the actual Cloudinary configuration.
-      */
 
       const audioUploadResponse =
         await fetch(
@@ -3930,11 +4210,6 @@ document
       const djUserId =
         currentUser.id;
 
-
-      /*
-        Existing PASONG DJ mix payload.
-        DJ mix price remains UGX 1,000.
-      */
 
       const mixPayload = {
 
