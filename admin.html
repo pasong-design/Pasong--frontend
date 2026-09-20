@@ -557,13 +557,11 @@ button.action:hover{
 
 
   <button
-    onclick="showSection('payments')"
+    onclick="showSection('payments'); loadPaymentVerifications()"
   >
     💳 Payments & Verification
   </button>
 
-
-  <!-- NEW COVER REQUESTS -->
 
   <button
     onclick="showSection('cover-requests'); loadCoverRequests()"
@@ -802,7 +800,7 @@ button.action:hover{
 
 
 <!-- ======================================================
-     PAYMENTS
+     PAYMENTS & VERIFICATION
 ====================================================== -->
 
 <div class="section">
@@ -818,27 +816,118 @@ button.action:hover{
   >
 
     <p>
-      Monitor payment processing and verification.
+      Review and approve creator payment methods.
     </p>
 
 
-    <div class="notice">
+    <div class="refresh-row">
+
+      <button
+        class="small-btn"
+        onclick="loadPaymentVerifications()"
+      >
+        ↻ Refresh Verifications
+      </button>
+
+    </div>
+
+
+    <div
+      class="notice"
+      style="margin-bottom:18px;"
+    >
 
       <strong>
-        Payment Channels
+        Verification Rules
       </strong>
 
       <br><br>
 
-      MTN Mobile Money<br>
-      Airtel Money<br>
-      Card / Online Payments
+      🇺🇬 Uganda creators:
+      <strong>
+        MTN Mobile Money / Airtel Money
+      </strong>
+
+      <br>
+
+      🌍 Creators outside Uganda:
+      <strong>
+        Card / Online Payment
+      </strong>
 
       <br><br>
 
-      <span class="status">
-        ● System ready for payment integration
+      <span class="status-pending">
+        ● New verification requests require Admin approval
       </span>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Creator
+            </th>
+
+            <th>
+              Country
+            </th>
+
+            <th>
+              Method
+            </th>
+
+            <th>
+              Provider
+            </th>
+
+            <th>
+              Account Name
+            </th>
+
+            <th>
+              Account / Reference
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Submitted
+            </th>
+
+            <th>
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="paymentVerificationsTable">
+
+          <tr>
+
+            <td colspan="9">
+
+              Open Payments & Verification to load requests.
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
 
     </div>
 
@@ -2046,6 +2135,431 @@ async function loadOrders(){
 
 
 /* ======================================================
+   PAYMENT VERIFICATIONS
+====================================================== */
+
+async function loadPaymentVerifications(){
+
+  const table =
+    document.getElementById(
+      "paymentVerificationsTable"
+    );
+
+
+  if(!table) return;
+
+
+  table.innerHTML = `
+
+    <tr>
+
+      <td colspan="9">
+
+        Loading payment verifications...
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("payment_verifications")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+    if(error) throw error;
+
+
+    if(!data || !data.length){
+
+      table.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="9"
+            class="empty"
+          >
+
+            💳 No payment verification requests yet.
+
+          </td>
+
+        </tr>
+
+      `;
+
+      return;
+
+    }
+
+
+    table.innerHTML =
+      data.map(function(item){
+
+        const country =
+          item.country ||
+          "-";
+
+
+        const method =
+          item.verification_type === "mobile_money"
+          ? "📱 Mobile Money"
+          : "💳 Card / Online";
+
+
+        const provider =
+          item.provider ||
+          "-";
+
+
+        const accountName =
+          item.account_name ||
+          "-";
+
+
+        const accountNumber =
+          item.account_number ||
+          "-";
+
+
+        const status =
+          item.status ||
+          "pending";
+
+
+        const submitted =
+          item.created_at
+          ? new Date(
+              item.created_at
+            ).toLocaleString()
+          : "-";
+
+
+        const safeId =
+          escapeHtml(
+            String(
+              item.id ||
+              ""
+            )
+          );
+
+
+        return `
+
+        <tr>
+
+          <td>
+
+            <div class="song-title">
+
+              Creator
+
+            </div>
+
+            <div class="id-text">
+
+              ${escapeHtml(
+                String(
+                  item.user_id ||
+                  "-"
+                )
+              )}
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(country)
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(method)
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(provider)
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(accountName)
+            )}
+
+          </td>
+
+
+          <td>
+
+            <div class="id-text">
+
+              ${escapeHtml(
+                String(accountNumber)
+              )}
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            ${formatStatus(status)}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(submitted)
+            )}
+
+          </td>
+
+
+          <td>
+
+            <div
+              style="
+                display:flex;
+                gap:7px;
+                flex-wrap:wrap;
+              "
+            >
+
+              ${
+                String(status).toLowerCase()
+                === "pending"
+
+                ?
+
+                `
+
+                <button
+                  class="action"
+                  onclick="updatePaymentVerification('${safeId}','approved')"
+                >
+                  ✓ Approve
+                </button>
+
+                <button
+                  class="small-btn"
+                  onclick="updatePaymentVerification('${safeId}','rejected')"
+                >
+                  ✕ Reject
+                </button>
+
+                `
+
+                :
+
+                `<span class="id-text">
+                  Reviewed
+                </span>`
+
+              }
+
+            </div>
+
+          </td>
+
+        </tr>
+
+        `;
+
+      }).join("");
+
+
+  }catch(error){
+
+    console.error(
+      "Payment verification error:",
+      error
+    );
+
+
+    table.innerHTML = `
+
+      <tr>
+
+        <td colspan="9">
+
+          Unable to load payment verifications.
+
+          <br><br>
+
+          ${escapeHtml(
+            error.message ||
+            "Unknown Supabase error"
+          )}
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+}
+
+
+/* ======================================================
+   UPDATE PAYMENT VERIFICATION
+====================================================== */
+
+async function updatePaymentVerification(
+  verificationId,
+  newStatus
+){
+
+  if(
+    !verificationId ||
+    !newStatus
+  ){
+
+    return;
+
+  }
+
+
+  const actionText =
+    newStatus === "approved"
+    ? "approve"
+    : "reject";
+
+
+  const confirmed =
+    confirm(
+      "Are you sure you want to "
+      + actionText
+      + " this payment method?"
+    );
+
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      data:{
+        user
+      }
+    } =
+    await supabaseClient.auth.getUser();
+
+
+    if(!user){
+
+      alert(
+        "Your administrator session has expired."
+      );
+
+      window.location.href="account.html";
+
+      return;
+
+    }
+
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("payment_verifications")
+      .update({
+
+        status:newStatus,
+
+        reviewed_at:
+          new Date().toISOString(),
+
+        reviewed_by:
+          user.id,
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        verificationId
+      );
+
+
+    if(error) throw error;
+
+
+    alert(
+      newStatus === "approved"
+      ? "Payment method approved successfully."
+      : "Payment method rejected."
+    );
+
+
+    await loadPaymentVerifications();
+
+
+  }catch(error){
+
+    console.error(
+      "Payment verification update error:",
+      error
+    );
+
+
+    alert(
+      "Unable to update verification: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+
+/* ======================================================
    COVER REQUESTS
 ====================================================== */
 
@@ -3072,7 +3586,8 @@ async function viewCoverRequest(
       </div>
 
 
-      <div class="cover-detail-box"
+      <div
+        class="cover-detail-box"
         style="margin-top:15px;"
       >
 
