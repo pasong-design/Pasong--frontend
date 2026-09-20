@@ -1592,6 +1592,16 @@ async function loadCheckout(){
     }
 
 
+    /* =====================================================
+       PRICING
+
+       DJ MIX pricing remains local.
+
+       NORMAL SONG pricing now comes directly from
+       the live PASONG API so the checkout cannot use
+       an outdated duplicated frontend price.
+    ===================================================== */
+
     if(isDjMix){
 
       PRICING =
@@ -1602,11 +1612,82 @@ async function loadCheckout(){
 
     }else{
 
-      PRICING =
-        getDisplayPricing(
-          country.code,
-          country.name
+      const pricingResponse =
+        await fetch(
+          API_BASE +
+          "/api/pricing",
+          {
+            method:"GET",
+            headers:{
+              "Accept":"application/json"
+            },
+            cache:"no-store"
+          }
         );
+
+
+      if(!pricingResponse.ok){
+
+        throw new Error(
+          "Unable to load PASONG pricing."
+        );
+
+      }
+
+
+      const pricingData =
+        await pricingResponse.json();
+
+
+      const backendCountryCode =
+        String(
+          pricingData.country ||
+          country.code ||
+          "UG"
+        )
+        .toUpperCase();
+
+
+      let backendCountryName =
+        country.name ||
+        "Uganda";
+
+
+      if(
+        backendCountryCode ===
+        "UG"
+      ){
+
+        backendCountryName =
+          "Uganda";
+
+      }
+
+
+      PRICING = {
+
+        amount:
+          Number(
+            pricingData.price ??
+            pricingData.amount ??
+            700
+          ),
+
+        currency:
+          pricingData.currency ||
+          "UGX",
+
+        label:
+          pricingData.label ||
+          "UGX 700",
+
+        country:
+          backendCountryName,
+
+        countryCode:
+          backendCountryCode
+
+      };
 
     }
 
@@ -2776,8 +2857,8 @@ document
                 "active"
               );
 
-            }
-          );
+              }
+            );
 
       }
 
