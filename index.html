@@ -1797,6 +1797,11 @@ async function loadPasongAccount(){
       accountBox.href =
         "login.html";
 
+      accountBox.setAttribute(
+        "aria-label",
+        "Login / Sign Up"
+      );
+
       photo.src =
         "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
 
@@ -1805,24 +1810,41 @@ async function loadPasongAccount(){
     }
 
     /* =========================
-       LOGGED IN
+       GET ARTIST PROFILE
     ========================= */
 
-    accountBox.href =
-      "account.html";
+    const {
+      data: profile,
+      error: profileError
+    } =
+      await pasongSupabase
+        .from("artist_profiles")
+        .select(
+          "stage_name, performing_name, artist_name, profile_image_url"
+        )
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if(profileError){
+
+      console.log(
+        "PASONG artist profile:",
+        profileError
+      );
+
+    }
+
+    /* =========================
+       ACCOUNT NAME
+    ========================= */
 
     const metadata =
       user.user_metadata || {};
 
-    const avatar =
-      metadata.avatar_url ||
-      metadata.avatar ||
-      metadata.photo_url ||
-      metadata.profile_photo ||
-      metadata.picture ||
-      "";
-
     const displayName =
+      profile?.stage_name ||
+      profile?.performing_name ||
+      profile?.artist_name ||
       metadata.stage_name ||
       metadata.performing_name ||
       metadata.full_name ||
@@ -1830,12 +1852,26 @@ async function loadPasongAccount(){
       user.email ||
       "Account";
 
-    /* PROFILE IMAGE */
+    /* =========================
+       PROFILE PHOTO
+    ========================= */
 
-    if(avatar){
+    const profilePhoto =
+      profile?.profile_image_url ||
+      metadata.avatar_url ||
+      metadata.avatar ||
+      metadata.photo_url ||
+      metadata.profile_photo ||
+      metadata.picture ||
+      "";
+
+    if(profilePhoto){
 
       photo.src =
-        avatar;
+        profilePhoto;
+
+      photo.alt =
+        displayName + " profile photo";
 
     }else{
 
@@ -1844,22 +1880,27 @@ async function loadPasongAccount(){
         encodeURIComponent(displayName) +
         "&background=171722&color=c084fc&bold=true";
 
-    }
-
-    /* ACCOUNT NAME */
-
-    if(displayName.length > 16){
-
-      name.textContent =
-        displayName.substring(0,16) +
-        "…";
-
-    }else{
-
-      name.textContent =
+      photo.alt =
         displayName;
 
     }
+
+    /* =========================
+       ACCOUNT BOX
+    ========================= */
+
+    name.textContent =
+      displayName.length > 16
+        ? displayName.substring(0,16) + "…"
+        : displayName;
+
+    accountBox.href =
+      "account.html";
+
+    accountBox.setAttribute(
+      "aria-label",
+      "Open My Account"
+    );
 
   }catch(error){
 
@@ -1873,6 +1914,9 @@ async function loadPasongAccount(){
 
     accountBox.href =
       "login.html";
+
+    photo.src =
+      "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
 
   }
 
