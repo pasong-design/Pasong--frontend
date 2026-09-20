@@ -2477,10 +2477,22 @@ document
 
 
 /* =========================================================
-   PREPARE COVER REQUEST
+   SUBMIT COVER REQUEST
 ========================================================= */
 
-function prepareCoverRequest(){
+async function prepareCoverRequest(){
+
+  if(!currentUser){
+
+    showCoverMessage(
+      "Please log in again before submitting a cover request.",
+      "error"
+    );
+
+    return;
+
+  }
+
 
   const title =
     document
@@ -2500,10 +2512,72 @@ function prepareCoverRequest(){
       .trim();
 
 
+  const subtitle =
+    document
+      .getElementById(
+        "coverSubtitle"
+      )
+      .value
+      .trim();
+
+
+  const featuredArtists =
+    document
+      .getElementById(
+        "coverFeaturedArtists"
+      )
+      .value
+      .trim();
+
+
   const genre =
     document
       .getElementById(
         "coverGenre"
+      )
+      .value;
+
+
+  const edition =
+    document
+      .getElementById(
+        "coverEdition"
+      )
+      .value
+      .trim();
+
+
+  const style =
+    document
+      .getElementById(
+        "coverStyle"
+      )
+      .value
+      .trim();
+
+
+  const colours =
+    document
+      .getElementById(
+        "coverColours"
+      )
+      .value
+      .trim();
+
+
+  const locationText =
+    document
+      .getElementById(
+        "coverLocation"
+      )
+      .value
+      .trim();
+
+
+  const location =
+    document
+      .getElementById(
+        "coverRequestLocation"
       )
       .value;
 
@@ -2516,13 +2590,52 @@ function prepareCoverRequest(){
       .files[0];
 
 
-  const location =
+  const referencePhoto =
     document
       .getElementById(
-        "coverRequestLocation"
+        "coverReferencePhoto"
       )
-      .value;
+      .files[0];
 
+
+  const logo =
+    document
+      .getElementById(
+        "coverLogo"
+      )
+      .files[0];
+
+
+  const notes =
+    document
+      .getElementById(
+        "coverRequestNotes"
+      )
+      .value
+      .trim();
+
+
+  const contactEmail =
+    document
+      .getElementById(
+        "coverContactEmail"
+      )
+      .value
+      .trim();
+
+
+  const contactPhone =
+    document
+      .getElementById(
+        "coverContactPhone"
+      )
+      .value
+      .trim();
+
+
+  /* =========================
+     VALIDATION
+  ========================= */
 
   if(!djName){
 
@@ -2572,6 +2685,18 @@ function prepareCoverRequest(){
   }
 
 
+  if(!contactEmail){
+
+    showCoverMessage(
+      "Please enter your contact email.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
   if(mainPhoto.size > 5 * 1024 * 1024){
 
     showCoverMessage(
@@ -2582,22 +2707,6 @@ function prepareCoverRequest(){
     return;
 
   }
-
-
-  const referencePhoto =
-    document
-      .getElementById(
-        "coverReferencePhoto"
-      )
-      .files[0];
-
-
-  const logo =
-    document
-      .getElementById(
-        "coverLogo"
-      )
-      .files[0];
 
 
   if(
@@ -2630,76 +2739,225 @@ function prepareCoverRequest(){
   }
 
 
-  let price =
-    "UGX 10,000";
+  /* =========================
+     PRICE
+  ========================= */
+
+  let price = 10000;
+  let currency = "UGX";
 
 
   if(location === "outside"){
 
-    price =
-      "US$10";
+    price = 10;
+    currency = "USD";
 
   }
 
 
-  const message =
-    document.getElementById(
-      "coverRequestMessage"
+  /* =========================
+     SUBMIT BUTTON
+  ========================= */
+
+  const submitButton =
+    document.querySelector(
+      '#coverRequestModal .actions button.cover-btn'
     );
 
 
-  message.className =
-    "alert show success";
+  if(submitButton){
+
+    submitButton.disabled =
+      true;
+
+    submitButton.textContent =
+      "Submitting...";
+
+  }
 
 
-  message.innerHTML = `
+  try{
 
-    <strong>
-      🎨 Cover request prepared.
-    </strong>
+    /*
+      SAVE COVER REQUEST TO SUPABASE
 
-    <br><br>
+      The request information is saved now.
 
-    DJ:
-    ${escapeHtml(djName)}
+      Photo URLs remain null in this step.
+      Actual Cloudinary photo upload will be
+      connected separately.
+    */
 
-    <br>
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .insert({
 
-    Mix:
-    ${escapeHtml(title)}
+        user_id:
+          currentUser.id,
 
-    <br>
+        dj_name:
+          djName,
 
-    Genre:
-    ${escapeHtml(genre)}
+        mix_title:
+          title,
 
-    <br>
+        subtitle:
+          subtitle || null,
 
-    Cover design:
-    <strong>${price}</strong>
+        featured_artists:
+          featuredArtists || null,
 
-    <br><br>
+        genre:
+          genre,
 
-    📷 Main photo selected.
+        edition_year:
+          edition || null,
 
-    ${
-      referencePhoto
-        ? "<br>🖼️ Reference photo selected."
-        : ""
+        preferred_style:
+          style || null,
+
+        preferred_colours:
+          colours || null,
+
+        location:
+          locationText || null,
+
+        main_photo_url:
+          null,
+
+        reference_photo_url:
+          null,
+
+        logo_url:
+          null,
+
+        extra_details:
+          notes || null,
+
+        contact_email:
+          contactEmail,
+
+        contact_phone:
+          contactPhone || null,
+
+        country:
+          location === "uganda"
+            ? "Uganda"
+            : "Outside Uganda",
+
+        currency:
+          currency,
+
+        price:
+          price,
+
+        payment_status:
+          "pending",
+
+        request_status:
+          "pending"
+
+      })
+      .select()
+      .single();
+
+
+    if(error){
+
+      console.error(
+        "Cover request error:",
+        error
+      );
+
+      throw error;
+
     }
 
-    ${
-      logo
-        ? "<br>🏷️ Logo selected."
-        : ""
+
+    console.log(
+      "Cover request saved:",
+      data
+    );
+
+
+    /* =========================
+       SUCCESS
+    ========================= */
+
+    showCoverMessage(
+      `
+        🎨 Cover request submitted successfully.
+
+        <br><br>
+
+        <strong>Request ID:</strong>
+        ${escapeHtml(data.id)}
+
+        <br><br>
+
+        <strong>DJ:</strong>
+        ${escapeHtml(djName)}
+
+        <br>
+
+        <strong>Mix:</strong>
+        ${escapeHtml(title)}
+
+        <br>
+
+        <strong>Cover Design:</strong>
+        ${
+          currency === "USD"
+            ? "US$10"
+            : "UGX 10,000"
+        }
+
+        <br><br>
+
+        Your request has been sent to PASONG Admin.
+
+        <br><br>
+
+        Payment and photo-file upload will be connected
+        in the next step.
+      `,
+      "success"
+    );
+
+
+  }
+  catch(error){
+
+    console.error(
+      "Submit cover request error:",
+      error
+    );
+
+
+    showCoverMessage(
+      error.message ||
+      "Unable to submit your cover request. Please try again.",
+      "error"
+    );
+
+  }
+  finally{
+
+    if(submitButton){
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        "🎨 Submit Cover Request";
+
     }
 
-    <br><br>
-
-    PASONG Admin will use the submitted information
-    and photos to design the finished cover.
-
-  `;
+  }
 
 }
 
@@ -2718,7 +2976,7 @@ function showCoverMessage(
       "coverRequestMessage"
     );
 
-  box.textContent =
+  box.innerHTML =
     message;
 
   box.className =
