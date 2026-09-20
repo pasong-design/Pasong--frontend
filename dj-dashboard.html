@@ -102,15 +102,15 @@ a{
   background:#100d18;
   border-top:1px solid #282033;
   z-index:200;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(6,1fr);
 }
 
 .mobile-nav button{
   border:0;
   background:transparent;
   color:#aaa3b7;
-  padding:9px 3px;
-  font-size:11px;
+  padding:9px 2px;
+  font-size:10px;
 }
 
 .mobile-nav button.active{
@@ -431,6 +431,118 @@ small{
   font-weight:900;
 }
 
+/* COVER REQUEST LIST */
+.cover-request-list{
+  display:grid;
+  gap:14px;
+}
+
+.cover-request-item{
+  background:#0d0b12;
+  border:1px solid #292230;
+  border-radius:14px;
+  padding:17px;
+}
+
+.cover-request-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+}
+
+.cover-request-title{
+  font-size:16px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.cover-request-dj{
+  color:#aaa3b7;
+  font-size:13px;
+}
+
+.cover-request-id{
+  color:#777080;
+  font-size:11px;
+  margin-top:8px;
+  word-break:break-all;
+}
+
+.cover-request-date{
+  color:#88808f;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.cover-request-price{
+  color:#c084fc;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.cover-status-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.cover-status{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:900;
+  border:1px solid #3a3044;
+  background:#191520;
+  color:#cfc7d8;
+}
+
+.cover-status.pending{
+  color:#e8c98a;
+  border-color:#5b4825;
+  background:#211b11;
+}
+
+.cover-status.paid{
+  color:#8de0b0;
+  border-color:#245d3d;
+  background:#10251c;
+}
+
+.cover-status.in_design{
+  color:#cdb8ff;
+  border-color:#49376d;
+  background:#171329;
+}
+
+.cover-status.completed,
+.cover-status.approved{
+  color:#8de0b0;
+  border-color:#245d3d;
+  background:#10251c;
+}
+
+.cover-status.rejected,
+.cover-status.cancelled,
+.cover-status.failed{
+  color:#ff9fbb;
+  border-color:#6a263b;
+  background:#2a1018;
+}
+
+.cover-request-finished{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #292230;
+}
+
+.cover-request-finished a{
+  display:inline-block;
+}
+
 /* PROFILE */
 .profile-grid{
   display:grid;
@@ -665,6 +777,14 @@ small{
   .cover-prices{
     grid-template-columns:1fr;
   }
+
+  .cover-request-top{
+    flex-direction:column;
+  }
+
+  .cover-request-price{
+    white-space:normal;
+  }
 }
 
 @media(max-width:500px){
@@ -686,6 +806,10 @@ small{
 
   .mix-price{
     font-size:12px;
+  }
+
+  .mobile-nav button{
+    font-size:9px;
   }
 }
 </style>
@@ -710,6 +834,11 @@ small{
 
     <button onclick="showSection('mixes',this)">
       🎧 My DJ Mixes
+    </button>
+
+    <!-- NEW -->
+    <button onclick="showSection('cover-requests',this)">
+      🎨 My Cover Requests
     </button>
 
     <button onclick="showSection('earnings',this)">
@@ -754,6 +883,11 @@ small{
 
   <button onclick="showSection('mixes',this)">
     🎧<br>Mixes
+  </button>
+
+  <!-- NEW -->
+  <button onclick="showSection('cover-requests',this)">
+    🎨<br>Covers
   </button>
 
   <button onclick="showSection('earnings',this)">
@@ -1158,6 +1292,49 @@ small{
 
         <div class="loading">
           Loading your DJ mixes...
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       NEW — MY COVER REQUESTS
+  ====================================================== -->
+  <section id="cover-requests" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>🎨 My Cover Requests</h2>
+          <p class="muted">
+            Track your PASONG cover-design requests and finished artwork.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="loadMyCoverRequests()"
+        >
+          ↻ Refresh
+        </button>
+
+      </div>
+
+
+      <div
+        id="coverRequestList"
+        class="cover-request-list"
+      >
+
+        <div class="loading">
+          Loading your cover requests...
         </div>
 
       </div>
@@ -2063,6 +2240,10 @@ function showSection(
     dashboard:"DJ Dashboard",
     upload:"Upload DJ Mix",
     mixes:"My DJ Mixes",
+
+    /* NEW */
+    "cover-requests":"My Cover Requests",
+
     earnings:"DJ Earnings",
     analytics:"DJ Analytics",
     profile:"DJ Profile",
@@ -2079,6 +2260,12 @@ function showSection(
 
   if(sectionId === "mixes"){
     loadMyMixes();
+  }
+
+
+  /* NEW */
+  if(sectionId === "cover-requests"){
+    loadMyCoverRequests();
   }
 
 }
@@ -2419,12 +2606,16 @@ function openCoverRequest(){
   }
 
 
-  document
-    .getElementById(
+  const message =
+    document.getElementById(
       "coverRequestMessage"
-    )
-    .className =
+    );
+
+  message.className =
     "alert";
+
+  message.innerHTML =
+    "";
 
 
   modal.classList.add("show");
@@ -3164,8 +3355,6 @@ async function prepareCoverRequest(){
     );
 
 
-    /* Clear selected files */
-
     document
       .getElementById(
         "coverMainPhoto"
@@ -3217,6 +3406,10 @@ async function prepareCoverRequest(){
 
       }
     );
+
+
+    /* NEW — refresh cover requests */
+    await loadMyCoverRequests();
 
 
   }
@@ -3499,6 +3692,488 @@ async function checkAuth(){
   await loadMyMixes();
 
   await loadDashboardStats();
+
+}
+
+
+/* =========================================================
+   NEW — LOAD MY COVER REQUESTS
+========================================================= */
+
+async function loadMyCoverRequests(){
+
+  const list =
+    document.getElementById(
+      "coverRequestList"
+    );
+
+
+  if(!list){
+    return;
+  }
+
+
+  if(!currentUser){
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          Please log in.
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    `
+      <div class="loading">
+        Loading your cover requests...
+      </div>
+    `;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .select(`
+        id,
+        dj_name,
+        mix_title,
+        price,
+        currency,
+        payment_status,
+        request_status,
+        finished_cover_url,
+        created_at,
+        updated_at
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+    if(error){
+
+      console.error(
+        "Cover requests load error:",
+        error
+      );
+
+      throw error;
+
+    }
+
+
+    renderCoverRequests(
+      data || []
+    );
+
+  }
+  catch(error){
+
+    console.error(
+      "Load cover requests error:",
+      error
+    );
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          Unable to load your cover requests right now.
+          <br><br>
+          <button
+            type="button"
+            class="btn secondary"
+            onclick="loadMyCoverRequests()"
+          >
+            Try Again
+          </button>
+        </div>
+      `;
+
+  }
+
+}
+
+
+/* =========================================================
+   NEW — COVER REQUEST HELPERS
+========================================================= */
+
+function formatCoverRequestDate(
+  value
+){
+
+  if(!value){
+    return "Date unavailable";
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if(
+    Number.isNaN(
+      date.getTime()
+    )
+  ){
+
+    return "Date unavailable";
+
+  }
+
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+
+function formatCoverStatus(
+  value
+){
+
+  const status =
+    String(
+      value ||
+      "pending"
+    )
+    .toLowerCase();
+
+
+  const labels = {
+
+    pending:
+      "Pending",
+
+    paid:
+      "Paid",
+
+    in_design:
+      "In Design",
+
+    completed:
+      "Completed",
+
+    approved:
+      "Approved",
+
+    rejected:
+      "Rejected",
+
+    cancelled:
+      "Cancelled",
+
+    failed:
+      "Failed"
+
+  };
+
+
+  if(labels[status]){
+    return labels[status];
+  }
+
+
+  return status
+    .replaceAll("_"," ")
+    .replace(/\b\w/g,function(letter){
+      return letter.toUpperCase();
+    });
+
+}
+
+
+function coverStatusClass(
+  value
+){
+
+  const status =
+    String(
+      value ||
+      "pending"
+    )
+    .toLowerCase();
+
+
+  const allowed = [
+    "pending",
+    "paid",
+    "in_design",
+    "completed",
+    "approved",
+    "rejected",
+    "cancelled",
+    "failed"
+  ];
+
+
+  return allowed.includes(status)
+    ? status
+    : "pending";
+
+}
+
+
+function formatCoverPrice(
+  price,
+  currency
+){
+
+  const amount =
+    Number(price || 0);
+
+
+  if(currency === "USD"){
+
+    return (
+      "US$" +
+      amount.toLocaleString()
+    );
+
+  }
+
+
+  return (
+    "UGX " +
+    amount.toLocaleString()
+  );
+
+}
+
+
+/* =========================================================
+   NEW — RENDER COVER REQUESTS
+========================================================= */
+
+function renderCoverRequests(
+  requests
+){
+
+  const list =
+    document.getElementById(
+      "coverRequestList"
+    );
+
+
+  if(!requests.length){
+
+    list.innerHTML =
+      `
+        <div class="empty">
+
+          🎨 You have not submitted any cover requests yet.
+
+          <br><br>
+
+          <button
+            type="button"
+            class="btn cover-btn"
+            onclick="openCoverRequest()"
+          >
+            🎨 Request PASONG Cover Design
+          </button>
+
+        </div>
+      `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    requests
+      .map(
+        function(request){
+
+          const id =
+            escapeHtml(
+              request.id
+            );
+
+
+          const djName =
+            escapeHtml(
+              request.dj_name ||
+              "DJ"
+            );
+
+
+          const mixTitle =
+            escapeHtml(
+              request.mix_title ||
+              "Untitled Mix"
+            );
+
+
+          const paymentStatus =
+            coverStatusClass(
+              request.payment_status
+            );
+
+
+          const requestStatus =
+            coverStatusClass(
+              request.request_status
+            );
+
+
+          const paymentLabel =
+            formatCoverStatus(
+              request.payment_status
+            );
+
+
+          const requestLabel =
+            formatCoverStatus(
+              request.request_status
+            );
+
+
+          const price =
+            formatCoverPrice(
+              request.price,
+              request.currency
+            );
+
+
+          const date =
+            escapeHtml(
+              formatCoverRequestDate(
+                request.created_at
+              )
+            );
+
+
+          let finishedCover =
+            "";
+
+
+          if(
+            request.finished_cover_url &&
+            /^https?:\/\//i.test(
+              request.finished_cover_url
+            )
+          ){
+
+            const finishedUrl =
+              escapeHtml(
+                request.finished_cover_url
+              );
+
+
+            finishedCover =
+              `
+                <div class="cover-request-finished">
+
+                  <p
+                    class="muted"
+                    style="margin-bottom:10px;"
+                  >
+                    🎨 Finished cover available
+                  </p>
+
+                  <a
+                    class="btn cover-btn"
+                    href="${finishedUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    🖼️ View Finished Cover
+                  </a>
+
+                </div>
+              `;
+
+          }
+
+
+          return `
+
+            <div class="cover-request-item">
+
+              <div class="cover-request-top">
+
+                <div>
+
+                  <div class="cover-request-title">
+                    ${mixTitle}
+                  </div>
+
+                  <div class="cover-request-dj">
+                    🎧 ${djName}
+                  </div>
+
+                  <div class="cover-request-id">
+                    Request ID: ${id}
+                  </div>
+
+                  <div class="cover-request-date">
+                    Submitted: ${date}
+                  </div>
+
+                </div>
+
+
+                <div class="cover-request-price">
+                  ${escapeHtml(price)}
+                </div>
+
+              </div>
+
+
+              <div class="cover-status-row">
+
+                <span
+                  class="cover-status ${paymentStatus}"
+                >
+                  💳 Payment: ${escapeHtml(paymentLabel)}
+                </span>
+
+
+                <span
+                  class="cover-status ${requestStatus}"
+                >
+                  🎨 Design: ${escapeHtml(requestLabel)}
+                </span>
+
+              </div>
+
+
+              ${finishedCover}
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
 
 }
 
