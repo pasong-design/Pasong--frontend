@@ -712,6 +712,13 @@ h1{
 </main>
 
 
+<!-- =====================================================
+     SUPABASE
+===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
 <script>
 
 /* =====================================================
@@ -731,11 +738,73 @@ const API_BASE =
   "https://pasong-api.onrender.com";
 
 
-const POLL_INTERVAL =
-  3000;
+/* =====================================================
+   SUPABASE AUTH
+===================================================== */
 
-const MAX_POLLS =
-  40;
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/*
+   Keep the authenticated access token in memory
+   for the current checkout/payment flow.
+
+   It is NEVER stored in the frontend source code
+   as a secret.
+*/
+
+let currentAccessToken = null;
+
+
+/* =====================================================
+   GET CHECKOUT SESSION
+===================================================== */
+
+async function getCheckoutSession(){
+
+  const result =
+    await supabaseClient.auth.getSession();
+
+
+  if(result.error){
+
+    console.error(
+      "Supabase session error:",
+      result.error
+    );
+
+    return null;
+
+  }
+
+
+  const session =
+    result.data.session ||
+    null;
+
+
+  if(session){
+
+    currentAccessToken =
+      session.access_token ||
+      null;
+
+  }
+
+
+  return session;
+
+}
 
 
 /* =====================================================
@@ -1781,6 +1850,30 @@ async function startMtnPayment(){
     );
 
 
+  /*
+    SECURE CHECKOUT:
+
+    The purchase must belong to an authenticated
+    PASONG/Supabase account.
+  */
+
+  const session =
+    await getCheckoutSession();
+
+
+  if(!session){
+
+    msg.innerHTML =
+      '<span class="error">' +
+      '<b>Please log in to your PASONG account before purchasing.</b>' +
+      '</span><br><br>' +
+      'Your purchase must be linked to your account so your download can be saved securely.';
+
+    return;
+
+  }
+
+
   const finalTotal =
     getFinalTotal();
 
@@ -1888,7 +1981,16 @@ async function startMtnPayment(){
               "application/json",
 
             "Accept":
-              "application/json"
+              "application/json",
+
+            /*
+              Send the authenticated Supabase
+              access token to PASONG-MoMo.
+            */
+
+            "Authorization":
+              "Bearer " +
+              session.access_token
 
           },
 
@@ -2071,6 +2173,43 @@ function startPolling(){
 
     try{
 
+      /*
+        Refresh the current session before checking
+        payment status.
+
+        The authenticated token is then forwarded
+        to PASONG-MoMo.
+      */
+
+      const session =
+        await getCheckoutSession();
+
+
+      if(!session){
+
+        stopPolling();
+
+        document.getElementById(
+          "msg"
+        ).innerHTML =
+
+          '<span class="error">' +
+
+          '<b>Your login session has expired.</b>' +
+
+          '</span><br><br>' +
+
+          'Please log in again before continuing.';
+
+        setPaymentButtonsDisabled(
+          false
+        );
+
+        return;
+
+      }
+
+
       const response =
         await fetch(
 
@@ -2085,8 +2224,19 @@ function startPolling(){
             method:"GET",
 
             headers:{
+
               "Accept":
-                "application/json"
+                "application/json",
+
+              /*
+                Send the authenticated Supabase
+                access token during payment polling.
+              */
+
+              "Authorization":
+                "Bearer " +
+                session.access_token
+
             },
 
             cache:"no-store"
@@ -2341,8 +2491,11 @@ function paymentSuccessful(
 
   /*
     IMPORTANT:
-    Download/order creation still needs
-    to be completed on the backend.
+
+    The payment provider has confirmed the payment.
+
+    PASONG backend order/download completion will be
+    connected in the next backend step.
   */
 
 
