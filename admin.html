@@ -1,8 +1,21 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Admin Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>PASONG Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
 *{
   margin:0;
   padding:0;
@@ -162,7 +175,8 @@ table{
   min-width:850px;
 }
 
-th,td{
+th,
+td{
   padding:12px 10px;
   border-bottom:1px solid #29293b;
   text-align:left;
@@ -265,6 +279,86 @@ button.action:hover{
   border-color:#d946ef;
 }
 
+
+/* ======================================================
+   COVER REQUEST DETAILS
+====================================================== */
+
+.cover-details{
+  margin-top:18px;
+  background:#0b0b14;
+  border:1px solid #29293d;
+  border-radius:12px;
+  padding:18px;
+}
+
+.cover-details-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(200px,1fr));
+  gap:14px;
+}
+
+.cover-detail-box{
+  background:#11111d;
+  border:1px solid #25253a;
+  border-radius:10px;
+  padding:12px;
+}
+
+.cover-detail-label{
+  color:#777789;
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.cover-detail-value{
+  color:#fff;
+  word-break:break-word;
+  line-height:1.5;
+}
+
+.cover-images{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+  margin-top:18px;
+}
+
+.cover-image-box{
+  background:#11111d;
+  border:1px solid #25253a;
+  border-radius:12px;
+  padding:12px;
+}
+
+.cover-image-box img{
+  width:100%;
+  max-height:260px;
+  object-fit:contain;
+  border-radius:8px;
+  background:#080810;
+  margin-top:8px;
+}
+
+.cover-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.cover-link{
+  color:#e879f9;
+  text-decoration:none;
+  word-break:break-all;
+}
+
+.cover-link:hover{
+  text-decoration:underline;
+}
+
 @media(max-width:600px){
 
   h1{
@@ -286,271 +380,844 @@ button.action:hover{
   .logo{
     font-size:21px;
   }
+
+  .cover-images{
+    grid-template-columns:1fr;
+  }
+
 }
-</style></head><body><nav>
-  <div class="logo">◈ PASONG</div>
-  <div class="admin-label">ADMIN PANEL</div>
-</nav><main><div id="loading">
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     NAVIGATION
+====================================================== -->
+
+<nav>
+
+  <div class="logo">
+    ◈ PASONG
+  </div>
+
+  <div class="admin-label">
+    ADMIN PANEL
+  </div>
+
+</nav>
+
+
+<main>
+
+
+<!-- ======================================================
+     LOADING
+====================================================== -->
+
+<div id="loading">
+
   Checking administrator access...
-</div><div id="error"></div><div id="dashboard"><h1>PASONG Admin Dashboard</h1><p class="subtitle">
-Manage PASONG music, artists, orders and platform activity.
-</p><!-- SUMMARY --><div class="cards">  <div class="card">
-    <h3>Administrator</h3>
-    <div class="number">✓</div>
-  </div>  <div class="card">
-    <h3>Music</h3>
-    <div class="number" id="musicCount">0</div>
-  </div>  <div class="card">
-    <h3>Artist Profiles</h3>
-    <div class="number" id="userCount">0</div>
-  </div>  <div class="card">
-    <h3>Orders</h3>
-    <div class="number" id="orderCount">0</div>
-  </div></div><!-- ADMIN MENU --><div class="menu">  <button onclick="showSection('sales')">
-    🛒 Sales & Orders
-  </button>  <button onclick="showSection('royalties')">
-    💰 Royalty Ledger
-  </button>  <button onclick="showSection('advertisements')">
-    📢 Advertisement Campaigns
-  </button>  <button onclick="showSection('referrals')">
-    🎁 Referral Points
-  </button>  <button onclick="showSection('payments')">
-    💳 Payments & Verification
-  </button>  <button onclick="showSection('reports')">
-    📊 Reports
-  </button></div><!-- SALES & ORDERS --><div class="section">  <h2>🛒 Sales & Orders</h2>  <div id="sales" class="section-content"><p>
-  View customer purchases, songs, prices and order status.
-</p>
-
-<div class="refresh-row">
-  <button class="small-btn" onclick="loadOrders()">
-    ↻ Refresh Orders
-  </button>
-</div>
-
-<div class="table-wrap">
-
-  <table>
-
-    <thead>
-      <tr>
-        <th>Order ID</th>
-        <th>Song</th>
-        <th>Buyer</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Status</th>
-        <th>Created</th>
-      </tr>
-    </thead>
-
-    <tbody id="ordersTable">
-
-      <tr>
-        <td colspan="7">
-          Loading orders...
-        </td>
-      </tr>
-
-    </tbody>
-
-  </table>
 
 </div>
 
-  </div></div><!-- ROYALTIES --><div class="section">  <h2>💰 Royalty Ledger</h2>  <div id="royalties" class="section-content"><p>
-  Track PASONG music revenue distribution.
+
+<!-- ======================================================
+     ERROR
+====================================================== -->
+
+<div id="error"></div>
+
+
+<!-- ======================================================
+     DASHBOARD
+====================================================== -->
+
+<div id="dashboard">
+
+
+<h1>
+  PASONG Admin Dashboard
+</h1>
+
+
+<p class="subtitle">
+  Manage PASONG music, artists, orders and platform activity.
 </p>
 
-<div class="notice">
 
-  <strong>UGX 500 Song Sale Distribution</strong>
-
-  <br><br>
-
-  Artist — UGX 200 (40%)<br>
-  Producer — UGX 100 (20%)<br>
-  Writer — UGX 75 (15%)<br>
-  PASONG — UGX 125 (25%)
-
-  <br><br>
-
-  Royalty transactions will appear here as the payment system
-  records completed sales.
-
-</div>
-
-  </div></div><!-- ADVERTISEMENTS --><div class="section">  <h2>📢 Advertisement Campaigns</h2>  <div id="advertisements" class="section-content"><p>
-  Monitor PASONG advertising campaigns.
-</p>
-
-<div class="notice">
-
-  Advertiser campaigns will be managed from the PASONG advertising system.
-
-  <br><br>
-
-  Weekly promotion idea: UGX 10,000<br>
-  Monthly promotion idea: UGX 50,000
-
-</div>
-
-  </div></div><!-- REFERRALS --><div class="section">  <h2>🎁 Referral Points</h2>  <div id="referrals" class="section-content"><p>
-  Monitor PASONG referral activity.
-</p>
-
-<div class="notice">
-
-  1,000 PASONG Points = UGX 1,000
-
-  <br><br>
-
-  Successful referral = 50 PASONG Points
-
-  <br>
-
-  Referral qualifies when the referred user completes
-  their first UGX 500 song purchase.
-
-</div>
-
-  </div></div><!-- PAYMENTS --><div class="section">  <h2>💳 Payments & Verification</h2>  <div id="payments" class="section-content"><p>
-  Monitor payment processing and verification.
-</p>
-
-<div class="notice">
-
-  <strong>Payment Channels</strong>
-
-  <br><br>
-
-  MTN Mobile Money<br>
-  Airtel Money<br>
-  Card / Online Payments
-
-  <br><br>
-
-  <span class="status">
-    ● System ready for payment integration
-  </span>
-
-</div>
-
-  </div></div><!-- REPORTS --><div class="section">  <h2>📊 Reports</h2>  <div id="reports" class="section-content"><p>
-  View PASONG platform statistics.
-</p>
+<!-- ======================================================
+     SUMMARY
+====================================================== -->
 
 <div class="cards">
 
+
   <div class="card">
 
-    <h3>Total Music</h3>
+    <h3>
+      Administrator
+    </h3>
+
+    <div class="number">
+      ✓
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h3>
+      Music
+    </h3>
 
     <div
       class="number"
-      id="reportSongs">
+      id="musicCount"
+    >
       0
     </div>
 
   </div>
 
+
   <div class="card">
 
-    <h3>Total Artists</h3>
+    <h3>
+      Artist Profiles
+    </h3>
 
     <div
       class="number"
-      id="reportArtists">
+      id="userCount"
+    >
       0
     </div>
 
   </div>
 
+
   <div class="card">
 
-    <h3>Total Orders</h3>
+    <h3>
+      Orders
+    </h3>
 
     <div
       class="number"
-      id="reportOrders">
+      id="orderCount"
+    >
       0
     </div>
 
   </div>
+
 
 </div>
 
-  </div></div><!-- MUSIC CONTROL --><div class="section">  <h2>🎵 Music Control</h2>  <div class="section-content active"><p>
-  Music currently stored in PASONG.
-</p>
 
-<div class="refresh-row">
+<!-- ======================================================
+     ADMIN MENU
+====================================================== -->
+
+<div class="menu">
+
 
   <button
-    class="small-btn"
-    onclick="loadSongs()">
-    ↻ Refresh Music
+    onclick="showSection('sales')"
+  >
+    🛒 Sales & Orders
   </button>
 
+
+  <button
+    onclick="showSection('royalties')"
+  >
+    💰 Royalty Ledger
+  </button>
+
+
+  <button
+    onclick="showSection('advertisements')"
+  >
+    📢 Advertisement Campaigns
+  </button>
+
+
+  <button
+    onclick="showSection('referrals')"
+  >
+    🎁 Referral Points
+  </button>
+
+
+  <button
+    onclick="showSection('payments')"
+  >
+    💳 Payments & Verification
+  </button>
+
+
+  <!-- NEW COVER REQUESTS -->
+
+  <button
+    onclick="showSection('cover-requests'); loadCoverRequests()"
+  >
+    🎨 Cover Requests
+  </button>
+
+
+  <button
+    onclick="showSection('reports')"
+  >
+    📊 Reports
+  </button>
+
+
 </div>
 
-<div class="table-wrap">
 
-  <table>
+<!-- ======================================================
+     SALES & ORDERS
+====================================================== -->
 
-    <thead>
+<div class="section">
 
-      <tr>
-        <th>Title</th>
-        <th>Artist</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Status</th>
-        <th>Song ID</th>
-      </tr>
+  <h2>
+    🛒 Sales & Orders
+  </h2>
 
-    </thead>
 
-    <tbody id="songsTable">
+  <div
+    id="sales"
+    class="section-content"
+  >
 
-      <tr>
-        <td colspan="6">
-          Loading music...
-        </td>
-      </tr>
+    <p>
+      View customer purchases, songs, prices and order status.
+    </p>
 
-    </tbody>
 
-  </table>
+    <div class="refresh-row">
+
+      <button
+        class="small-btn"
+        onclick="loadOrders()"
+      >
+        ↻ Refresh Orders
+      </button>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Order ID
+            </th>
+
+            <th>
+              Song
+            </th>
+
+            <th>
+              Buyer
+            </th>
+
+            <th>
+              Price
+            </th>
+
+            <th>
+              Currency
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Created
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="ordersTable">
+
+          <tr>
+
+            <td colspan="7">
+              Loading orders...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
 
 </div>
 
-  </div></div><!-- PLATFORM STATUS --><div class="section">  <h2>⚙️ Platform Status</h2>  <div class="notice">Authentication:
-<span class="status">
-  ● Connected
-</span>
 
-<br>
+<!-- ======================================================
+     ROYALTIES
+====================================================== -->
 
-Supabase:
-<span class="status">
-  ● Connected
-</span>
+<div class="section">
 
-<br>
+  <h2>
+    💰 Royalty Ledger
+  </h2>
 
-Admin Role:
-<span class="status">
-  ● Verified
-</span>
 
-  </div>  <br><button
-class="action logout"
-onclick="logout()">
-Logout
-</button>
+  <div
+    id="royalties"
+    class="section-content"
+  >
 
-</div></div></main><script>
+    <p>
+      Track PASONG music revenue distribution.
+    </p>
+
+
+    <div class="notice">
+
+      <strong>
+        UGX 500 Song Sale Distribution
+      </strong>
+
+      <br><br>
+
+      Artist — UGX 200 (40%)<br>
+      Producer — UGX 100 (20%)<br>
+      Writer — UGX 75 (15%)<br>
+      PASONG — UGX 125 (25%)
+
+      <br><br>
+
+      Royalty transactions will appear here as the payment system
+      records completed sales.
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     ADVERTISEMENTS
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    📢 Advertisement Campaigns
+  </h2>
+
+
+  <div
+    id="advertisements"
+    class="section-content"
+  >
+
+    <p>
+      Monitor PASONG advertising campaigns.
+    </p>
+
+
+    <div class="notice">
+
+      Advertiser campaigns will be managed from the PASONG advertising system.
+
+      <br><br>
+
+      Weekly promotion idea: UGX 10,000<br>
+      Monthly promotion idea: UGX 50,000
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     REFERRALS
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    🎁 Referral Points
+  </h2>
+
+
+  <div
+    id="referrals"
+    class="section-content"
+  >
+
+    <p>
+      Monitor PASONG referral activity.
+    </p>
+
+
+    <div class="notice">
+
+      1,000 PASONG Points = UGX 1,000
+
+      <br><br>
+
+      Successful referral = 50 PASONG Points
+
+      <br>
+
+      Referral qualifies when the referred user completes
+      their first UGX 500 song purchase.
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     PAYMENTS
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    💳 Payments & Verification
+  </h2>
+
+
+  <div
+    id="payments"
+    class="section-content"
+  >
+
+    <p>
+      Monitor payment processing and verification.
+    </p>
+
+
+    <div class="notice">
+
+      <strong>
+        Payment Channels
+      </strong>
+
+      <br><br>
+
+      MTN Mobile Money<br>
+      Airtel Money<br>
+      Card / Online Payments
+
+      <br><br>
+
+      <span class="status">
+        ● System ready for payment integration
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     COVER REQUESTS
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    🎨 PASONG Cover Requests
+  </h2>
+
+
+  <div
+    id="cover-requests"
+    class="section-content"
+  >
+
+    <p>
+      Manage cover-design requests from artists, DJs,
+      producers and other PASONG creators.
+    </p>
+
+
+    <div class="refresh-row">
+
+      <button
+        class="small-btn"
+        onclick="loadCoverRequests()"
+      >
+        ↻ Refresh Cover Requests
+      </button>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Creator
+            </th>
+
+            <th>
+              Cover / Mix
+            </th>
+
+            <th>
+              Price
+            </th>
+
+            <th>
+              Payment
+            </th>
+
+            <th>
+              Design
+            </th>
+
+            <th>
+              Submitted
+            </th>
+
+            <th>
+              Action
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="coverRequestsTable">
+
+          <tr>
+
+            <td colspan="7">
+
+              Open Cover Requests to load requests.
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- DETAILS PANEL -->
+
+    <div
+      id="coverRequestDetails"
+      class="cover-details"
+      style="display:none;"
+    >
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:15px;
+          flex-wrap:wrap;
+        "
+      >
+
+        <div>
+
+          <h3>
+            🎨 Cover Request Details
+          </h3>
+
+        </div>
+
+
+        <button
+          class="small-btn"
+          onclick="closeCoverRequest()"
+        >
+          Close
+        </button>
+
+      </div>
+
+
+      <div
+        id="coverRequestDetailsContent"
+        style="margin-top:15px;"
+      ></div>
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     REPORTS
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    📊 Reports
+  </h2>
+
+
+  <div
+    id="reports"
+    class="section-content"
+  >
+
+    <p>
+      View PASONG platform statistics.
+    </p>
+
+
+    <div class="cards">
+
+
+      <div class="card">
+
+        <h3>
+          Total Music
+        </h3>
+
+        <div
+          class="number"
+          id="reportSongs"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>
+          Total Artists
+        </h3>
+
+        <div
+          class="number"
+          id="reportArtists"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>
+          Total Orders
+        </h3>
+
+        <div
+          class="number"
+          id="reportOrders"
+        >
+          0
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     MUSIC CONTROL
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    🎵 Music Control
+  </h2>
+
+
+  <div class="section-content active">
+
+    <p>
+      Music currently stored in PASONG.
+    </p>
+
+
+    <div class="refresh-row">
+
+      <button
+        class="small-btn"
+        onclick="loadSongs()"
+      >
+        ↻ Refresh Music
+      </button>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Title
+            </th>
+
+            <th>
+              Artist
+            </th>
+
+            <th>
+              Price
+            </th>
+
+            <th>
+              Currency
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Song ID
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="songsTable">
+
+          <tr>
+
+            <td colspan="6">
+              Loading music...
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ======================================================
+     PLATFORM STATUS
+====================================================== -->
+
+<div class="section">
+
+  <h2>
+    ⚙️ Platform Status
+  </h2>
+
+
+  <div class="notice">
+
+    Authentication:
+
+    <span class="status">
+      ● Connected
+    </span>
+
+    <br>
+
+    Supabase:
+
+    <span class="status">
+      ● Connected
+    </span>
+
+    <br>
+
+    Admin Role:
+
+    <span class="status">
+      ● Verified
+    </span>
+
+  </div>
+
+
+  <br>
+
+
+  <button
+    class="action logout"
+    onclick="logout()"
+  >
+    Logout
+  </button>
+
+
+</div>
+
+
+</div>
+
+
+</main>
+
+
+<script>
+
 
 /* ======================================================
    SUPABASE
@@ -561,6 +1228,7 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
 "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
 
 const supabaseClient =
 window.supabase.createClient(
@@ -574,8 +1242,11 @@ window.supabase.createClient(
 ====================================================== */
 
 let ordersData = [];
+
 let songsData = [];
+
 let artistsData = [];
+
 let orderItemsData = [];
 
 
@@ -594,6 +1265,7 @@ function showError(message){
   error.textContent=message;
 
   error.style.display="block";
+
 }
 
 
@@ -611,20 +1283,26 @@ async function checkAdmin(){
     } =
     await supabaseClient.auth.getSession();
 
+
     if(error) throw error;
+
 
     if(!session){
 
       window.location.href="account.html";
 
       return;
+
     }
 
+
     const user=session.user;
+
 
     const role =
       user.app_metadata &&
       user.app_metadata.role;
+
 
     if(role !== "admin"){
 
@@ -633,19 +1311,25 @@ async function checkAdmin(){
       );
 
       return;
+
     }
+
 
     document.getElementById("loading")
       .style.display="none";
 
+
     document.getElementById("dashboard")
       .style.display="block";
 
+
     await loadAllData();
+
 
   }catch(error){
 
     console.error(error);
+
 
     showError(
       "Unable to verify administrator access: "
@@ -664,9 +1348,13 @@ async function checkAdmin(){
 async function loadAllData(){
 
   await Promise.all([
+
     loadUsers(),
+
     loadSongs(),
+
     loadOrders()
+
   ]);
 
 }
@@ -688,18 +1376,24 @@ async function loadUsers(){
       .from("artist_profiles")
       .select("*");
 
+
     if(error) throw error;
 
+
     artistsData=data || [];
+
 
     const count =
       artistsData.length;
 
+
     document.getElementById("userCount")
       .textContent=count;
 
+
     document.getElementById("reportArtists")
       .textContent=count;
+
 
   }catch(error){
 
@@ -722,7 +1416,9 @@ function findArtistName(artistId){
   if(!artistId){
 
     return "Unknown Artist";
+
   }
+
 
   const artist =
     artistsData.find(
@@ -730,10 +1426,13 @@ function findArtistName(artistId){
         String(profile.id) === String(artistId)
     );
 
+
   if(!artist){
 
     return "Unknown Artist";
+
   }
+
 
   return (
     artist.stage_name ||
@@ -759,38 +1458,60 @@ async function loadSongs(){
     await supabaseClient
       .from("songs")
       .select("*")
-      .order("created_at",{ascending:false});
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
 
     if(error) throw error;
 
+
     songsData=data || [];
+
 
     document.getElementById("musicCount")
       .textContent=songsData.length;
 
+
     document.getElementById("reportSongs")
       .textContent=songsData.length;
 
+
     const table =
       document.getElementById("songsTable");
+
 
     if(!songsData.length){
 
       table.innerHTML=
       `<tr>
-        <td colspan="6" class="empty">
+
+        <td
+          colspan="6"
+          class="empty"
+        >
+
           No songs uploaded yet.
+
         </td>
+
       </tr>`;
 
       return;
+
     }
+
 
     table.innerHTML =
       songsData.map(song => {
 
+
         const title =
           song.title || "-";
+
 
         const price =
           song.price !== null &&
@@ -798,54 +1519,98 @@ async function loadSongs(){
           ? song.price
           : 500;
 
+
         const currency =
           song.currency || "UGX";
+
 
         const status =
           song.status || "active";
 
+
         const artistName =
           findArtistName(song.artist_id);
+
 
         const songId =
           song.id || "-";
 
+
         return `
+
         <tr>
 
+
           <td>
+
             <div class="song-title">
-              ${escapeHtml(String(title))}
+
+              ${escapeHtml(
+                String(title)
+              )}
+
             </div>
+
           </td>
 
+
           <td>
+
             <div class="artist-name">
-              ${escapeHtml(String(artistName))}
+
+              ${escapeHtml(
+                String(artistName)
+              )}
+
             </div>
+
           </td>
 
-          <td>
-            ${escapeHtml(String(price))}
-          </td>
 
           <td>
-            ${escapeHtml(String(currency))}
+
+            ${escapeHtml(
+              String(price)
+            )}
+
           </td>
 
+
           <td>
+
+            ${escapeHtml(
+              String(currency)
+            )}
+
+          </td>
+
+
+          <td>
+
             ${formatStatus(status)}
+
           </td>
+
 
           <td>
+
             <div class="id-text">
-              ${escapeHtml(String(songId))}
+
+              ${escapeHtml(
+                String(songId)
+              )}
+
             </div>
+
           </td>
 
-        </tr>`;
+
+        </tr>
+
+        `;
 
       }).join("");
+
 
   }catch(error){
 
@@ -854,12 +1619,17 @@ async function loadSongs(){
       error
     );
 
+
     document.getElementById("songsTable")
       .innerHTML=
       `<tr>
+
         <td colspan="6">
+
           Unable to load music.
+
         </td>
+
       </tr>`;
 
   }
@@ -884,10 +1654,14 @@ async function loadOrders(){
       .select("*")
       .order(
         "created_at",
-        {ascending:false}
+        {
+          ascending:false
+        }
       );
 
+
     if(ordersError) throw ordersError;
+
 
     ordersData=orders || [];
 
@@ -904,7 +1678,9 @@ async function loadOrders(){
       .from("order_items")
       .select("*");
 
+
     if(itemsError) throw itemsError;
+
 
     orderItemsData=items || [];
 
@@ -915,6 +1691,7 @@ async function loadOrders(){
 
     document.getElementById("orderCount")
       .textContent=ordersData.length;
+
 
     document.getElementById("reportOrders")
       .textContent=ordersData.length;
@@ -927,30 +1704,43 @@ async function loadOrders(){
     const table =
       document.getElementById("ordersTable");
 
+
     if(!ordersData.length){
 
       table.innerHTML=
       `<tr>
-        <td colspan="7" class="empty">
+
+        <td
+          colspan="7"
+          class="empty"
+        >
+
           No orders yet.
+
         </td>
+
       </tr>`;
 
       return;
+
     }
 
 
     table.innerHTML =
       ordersData.map(order => {
 
+
         const id =
           order.id || "-";
+
 
         const buyer =
           order.buyer_id || "-";
 
+
         const status =
           order.status || "pending";
+
 
         const created =
           order.created_at
@@ -979,17 +1769,21 @@ async function loadOrders(){
 
         let songHtml="";
 
+
         if(!itemsForOrder.length){
 
           songHtml =
           `<span class="id-text">
+
             No song item found
+
           </span>`;
 
         }else{
 
           songHtml =
             itemsForOrder.map(item => {
+
 
               const song =
                 songsData.find(
@@ -999,45 +1793,76 @@ async function loadOrders(){
                     String(item.song_id)
                 );
 
+
               if(!song){
 
                 return `
+
                 <div>
+
                   <div class="song-title">
+
                     Unknown Song
+
                   </div>
 
                   <div class="id-text">
+
                     Song ID:
+
                     ${escapeHtml(
-                      String(item.song_id || "-")
+                      String(
+                        item.song_id ||
+                        "-"
+                      )
                     )}
+
                   </div>
-                </div>`;
+
+                </div>
+
+                `;
 
               }
+
 
               const artistName =
                 findArtistName(
                   song.artist_id
                 );
 
+
               return `
-              <div style="margin-bottom:8px;">
+
+              <div
+                style="margin-bottom:8px;"
+              >
 
                 <div class="song-title">
+
                   ${escapeHtml(
-                    String(song.title || "-")
+                    String(
+                      song.title ||
+                      "-"
+                    )
                   )}
+
                 </div>
+
 
                 <div class="artist-name">
+
                   ${escapeHtml(
-                    String(artistName)
+                    String(
+                      artistName
+                    )
                   )}
+
                 </div>
 
-              </div>`;
+              </div>
+
+              `;
 
             }).join("");
 
@@ -1050,10 +1875,12 @@ async function loadOrders(){
 
         let priceHtml="";
 
+
         if(itemsForOrder.length){
 
           priceHtml =
             itemsForOrder.map(item => {
+
 
               const price =
                 item.price !== null &&
@@ -1061,12 +1888,18 @@ async function loadOrders(){
                 ? item.price
                 : 0;
 
+
               return `
+
               <div>
+
                 ${escapeHtml(
                   String(price)
                 )}
-              </div>`;
+
+              </div>
+
+              `;
 
             }).join("");
 
@@ -1077,6 +1910,7 @@ async function loadOrders(){
             order.amount ||
             order.total ||
             0;
+
 
           priceHtml =
             escapeHtml(
@@ -1091,6 +1925,7 @@ async function loadOrders(){
         ----------------------------------------- */
 
         let currency="UGX";
+
 
         if(itemsForOrder.length){
 
@@ -1109,43 +1944,81 @@ async function loadOrders(){
 
 
         return `
+
         <tr>
 
-          <td>
-            <div class="id-text">
-              ${escapeHtml(String(id))}
-            </div>
-          </td>
 
           <td>
+
+            <div class="id-text">
+
+              ${escapeHtml(
+                String(id)
+              )}
+
+            </div>
+
+          </td>
+
+
+          <td>
+
             ${songHtml}
+
           </td>
 
+
           <td>
+
             <div class="id-text">
-              ${escapeHtml(String(buyer))}
+
+              ${escapeHtml(
+                String(buyer)
+              )}
+
             </div>
+
           </td>
 
+
           <td>
+
             ${priceHtml}
+
           </td>
 
-          <td>
-            ${escapeHtml(String(currency))}
-          </td>
 
           <td>
+
+            ${escapeHtml(
+              String(currency)
+            )}
+
+          </td>
+
+
+          <td>
+
             ${formatStatus(status)}
+
           </td>
+
 
           <td>
-            ${escapeHtml(String(created))}
+
+            ${escapeHtml(
+              String(created)
+            )}
+
           </td>
 
-        </tr>`;
+
+        </tr>
+
+        `;
 
       }).join("");
+
 
   }catch(error){
 
@@ -1154,13 +2027,1133 @@ async function loadOrders(){
       error
     );
 
+
     document.getElementById("ordersTable")
       .innerHTML=
       `<tr>
+
         <td colspan="7">
+
           Unable to load orders.
+
         </td>
+
       </tr>`;
+
+  }
+
+}
+
+
+/* ======================================================
+   COVER REQUESTS
+====================================================== */
+
+async function loadCoverRequests(){
+
+  const table =
+    document.getElementById(
+      "coverRequestsTable"
+    );
+
+
+  if(!table) return;
+
+
+  table.innerHTML = `
+
+    <tr>
+
+      <td colspan="7">
+
+        Loading cover requests...
+
+      </td>
+
+    </tr>
+
+  `;
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .select(`
+        id,
+        user_id,
+        dj_name,
+        mix_title,
+        subtitle,
+        featured_artists,
+        genre,
+        edition_year,
+        preferred_style,
+        preferred_colours,
+        location,
+        main_photo_url,
+        reference_photo_url,
+        logo_url,
+        extra_details,
+        contact_email,
+        contact_phone,
+        country,
+        currency,
+        price,
+        payment_status,
+        request_status,
+        finished_cover_url,
+        admin_notes,
+        created_at,
+        updated_at
+      `)
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+    if(error){
+
+      console.error(
+        "Cover requests error:",
+        error
+      );
+
+
+      table.innerHTML = `
+
+        <tr>
+
+          <td colspan="7">
+
+            Unable to load cover requests.
+
+            <br><br>
+
+            ${escapeHtml(
+              error.message ||
+              "Unknown Supabase error"
+            )}
+
+          </td>
+
+        </tr>
+
+      `;
+
+
+      return;
+
+    }
+
+
+    if(!data || !data.length){
+
+      table.innerHTML = `
+
+        <tr>
+
+          <td
+            colspan="7"
+            class="empty"
+          >
+
+            🎨 No cover requests yet.
+
+          </td>
+
+        </tr>
+
+      `;
+
+
+      return;
+
+    }
+
+
+    table.innerHTML =
+      data.map(function(request){
+
+
+        const creator =
+          request.dj_name ||
+          "Unknown Creator";
+
+
+        const title =
+          request.mix_title ||
+          "Untitled";
+
+
+        const price =
+          Number(
+            request.price || 0
+          ).toLocaleString();
+
+
+        const currency =
+          request.currency ||
+          "UGX";
+
+
+        const payment =
+          request.payment_status ||
+          "pending";
+
+
+        const design =
+          request.request_status ||
+          "pending";
+
+
+        const created =
+          request.created_at
+          ? new Date(
+              request.created_at
+            ).toLocaleString()
+          : "-";
+
+
+        return `
+
+        <tr>
+
+
+          <td>
+
+            <div class="song-title">
+
+              ${escapeHtml(
+                String(creator)
+              )}
+
+            </div>
+
+
+            <div class="artist-name">
+
+              ${escapeHtml(
+                String(
+                  request.contact_email ||
+                  ""
+                )
+              )}
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            <div class="song-title">
+
+              ${escapeHtml(
+                String(title)
+              )}
+
+            </div>
+
+
+            <div class="id-text">
+
+              ${escapeHtml(
+                String(
+                  request.genre ||
+                  ""
+                )
+              )}
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(currency)
+            )}
+
+            ${escapeHtml(
+              String(price)
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${formatStatus(
+              payment
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${formatStatus(
+              design
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              String(created)
+            )}
+
+          </td>
+
+
+          <td>
+
+            <button
+              class="action"
+              onclick="viewCoverRequest('${escapeHtml(String(request.id))}')"
+            >
+
+              View
+
+            </button>
+
+          </td>
+
+
+        </tr>
+
+        `;
+
+      }).join("");
+
+
+  }catch(error){
+
+    console.error(
+      "Cover requests failed:",
+      error
+    );
+
+
+    table.innerHTML = `
+
+      <tr>
+
+        <td colspan="7">
+
+          Failed to fetch cover requests.
+
+          <br><br>
+
+          ${escapeHtml(
+            error.message ||
+            "Unknown error"
+          )}
+
+        </td>
+
+      </tr>
+
+    `;
+
+  }
+
+}
+
+
+/* ======================================================
+   VIEW COVER REQUEST
+====================================================== */
+
+async function viewCoverRequest(
+  requestId
+){
+
+  const details =
+    document.getElementById(
+      "coverRequestDetails"
+    );
+
+
+  const content =
+    document.getElementById(
+      "coverRequestDetailsContent"
+    );
+
+
+  if(!details || !content){
+
+    return;
+
+  }
+
+
+  details.style.display="block";
+
+
+  content.innerHTML = `
+
+    <div class="notice">
+
+      Loading cover request...
+
+    </div>
+
+  `;
+
+
+  details.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .select("*")
+      .eq(
+        "id",
+        requestId
+      )
+      .single();
+
+
+    if(error) throw error;
+
+
+    if(!data){
+
+      content.innerHTML = `
+
+        <div class="notice">
+
+          Cover request was not found.
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const price =
+      Number(
+        data.price || 0
+      ).toLocaleString();
+
+
+    const currency =
+      data.currency ||
+      "UGX";
+
+
+    const requestStatus =
+      data.request_status ||
+      "pending";
+
+
+    const paymentStatus =
+      data.payment_status ||
+      "pending";
+
+
+    let mainPhoto = "";
+
+
+    if(
+      data.main_photo_url &&
+      /^https?:\/\//i.test(
+        data.main_photo_url
+      )
+    ){
+
+      mainPhoto = `
+
+        <div class="cover-image-box">
+
+          <div class="cover-detail-label">
+
+            Main Photo
+
+          </div>
+
+          <img
+            src="${escapeHtml(
+              data.main_photo_url
+            )}"
+            alt="Main creator photo"
+          >
+
+          <br>
+
+          <a
+            class="cover-link"
+            href="${escapeHtml(
+              data.main_photo_url
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            Open Photo
+
+          </a>
+
+        </div>
+
+      `;
+
+    }
+
+
+    let referencePhoto = "";
+
+
+    if(
+      data.reference_photo_url &&
+      /^https?:\/\//i.test(
+        data.reference_photo_url
+      )
+    ){
+
+      referencePhoto = `
+
+        <div class="cover-image-box">
+
+          <div class="cover-detail-label">
+
+            Reference Photo
+
+          </div>
+
+          <img
+            src="${escapeHtml(
+              data.reference_photo_url
+            )}"
+            alt="Reference photo"
+          >
+
+          <br>
+
+          <a
+            class="cover-link"
+            href="${escapeHtml(
+              data.reference_photo_url
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            Open Photo
+
+          </a>
+
+        </div>
+
+      `;
+
+    }
+
+
+    let logo = "";
+
+
+    if(
+      data.logo_url &&
+      /^https?:\/\//i.test(
+        data.logo_url
+      )
+    ){
+
+      logo = `
+
+        <div class="cover-image-box">
+
+          <div class="cover-detail-label">
+
+            Logo
+
+          </div>
+
+          <img
+            src="${escapeHtml(
+              data.logo_url
+            )}"
+            alt="Creator logo"
+          >
+
+          <br>
+
+          <a
+            class="cover-link"
+            href="${escapeHtml(
+              data.logo_url
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            Open Logo
+
+          </a>
+
+        </div>
+
+      `;
+
+    }
+
+
+    let finishedCover = "";
+
+
+    if(
+      data.finished_cover_url &&
+      /^https?:\/\//i.test(
+        data.finished_cover_url
+      )
+    ){
+
+      finishedCover = `
+
+        <div class="cover-image-box">
+
+          <div class="cover-detail-label">
+
+            Finished Cover
+
+          </div>
+
+          <img
+            src="${escapeHtml(
+              data.finished_cover_url
+            )}"
+            alt="Finished PASONG cover"
+          >
+
+          <br>
+
+          <a
+            class="cover-link"
+            href="${escapeHtml(
+              data.finished_cover_url
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            Open Finished Cover
+
+          </a>
+
+        </div>
+
+      `;
+
+    }
+
+
+    content.innerHTML = `
+
+      <div class="cover-details-grid">
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Request ID
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(data.id || "-")
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Creator
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.dj_name ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Cover / Mix Title
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.mix_title ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Subtitle
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.subtitle ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Featured Artists
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.featured_artists ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Genre
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.genre ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Edition / Year
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.edition_year ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Preferred Style
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.preferred_style ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Preferred Colours
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.preferred_colours ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Location
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.location ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Country
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.country ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Contact Email
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.contact_email ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Contact Phone
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(
+                data.contact_phone ||
+                "-"
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Cover Price
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              String(currency)
+            )}
+
+            ${escapeHtml(
+              String(price)
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Payment Status
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${formatStatus(
+              paymentStatus
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Design Status
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${formatStatus(
+              requestStatus
+            )}
+
+          </div>
+
+        </div>
+
+
+        <div class="cover-detail-box">
+
+          <div class="cover-detail-label">
+            Submitted
+          </div>
+
+          <div class="cover-detail-value">
+
+            ${escapeHtml(
+              data.created_at
+              ? new Date(
+                  data.created_at
+                ).toLocaleString()
+              : "-"
+            )}
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <div
+        class="cover-detail-box"
+        style="margin-top:15px;"
+      >
+
+        <div class="cover-detail-label">
+          Extra Details / Instructions
+        </div>
+
+        <div class="cover-detail-value">
+
+          ${escapeHtml(
+            String(
+              data.extra_details ||
+              "-"
+            )
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="cover-detail-box"
+        style="margin-top:15px;"
+      >
+
+        <div class="cover-detail-label">
+          Admin Notes
+        </div>
+
+        <div class="cover-detail-value">
+
+          ${escapeHtml(
+            String(
+              data.admin_notes ||
+              "-"
+            )
+          )}
+
+        </div>
+
+      </div>
+
+
+      <div class="cover-images">
+
+        ${mainPhoto}
+
+        ${referencePhoto}
+
+        ${logo}
+
+        ${finishedCover}
+
+      </div>
+
+
+      <div class="cover-detail-box"
+        style="margin-top:15px;"
+      >
+
+        <div class="cover-detail-label">
+          User ID
+        </div>
+
+        <div class="cover-detail-value">
+
+          ${escapeHtml(
+            String(
+              data.user_id ||
+              "-"
+            )
+          )}
+
+        </div>
+
+      </div>
+
+    `;
+
+
+  }catch(error){
+
+    console.error(
+      "View cover request error:",
+      error
+    );
+
+
+    content.innerHTML = `
+
+      <div class="notice">
+
+        Unable to open cover request.
+
+        <br><br>
+
+        ${escapeHtml(
+          error.message ||
+          "Unknown error"
+        )}
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* ======================================================
+   CLOSE COVER REQUEST
+====================================================== */
+
+function closeCoverRequest(){
+
+  const details =
+    document.getElementById(
+      "coverRequestDetails"
+    );
+
+
+  const content =
+    document.getElementById(
+      "coverRequestDetailsContent"
+    );
+
+
+  if(details){
+
+    details.style.display="none";
+
+  }
+
+
+  if(content){
+
+    content.innerHTML="";
 
   }
 
@@ -1174,41 +3167,71 @@ async function loadOrders(){
 function formatStatus(status){
 
   const value =
-    String(status || "pending")
-      .toLowerCase();
+    String(
+      status ||
+      "pending"
+    ).toLowerCase();
+
 
   if(
+
     value === "completed" ||
+
     value === "paid" ||
+
     value === "success" ||
+
     value === "approved" ||
+
     value === "active"
+
   ){
 
     return `
+
     <span class="status">
+
       ● ${escapeHtml(value)}
-    </span>`;
+
+    </span>
+
+    `;
 
   }
+
 
   if(
+
     value === "failed" ||
+
     value === "cancelled" ||
+
     value === "rejected"
+
   ){
 
     return `
+
     <span class="status-failed">
+
       ● ${escapeHtml(value)}
-    </span>`;
+
+    </span>
+
+    `;
 
   }
+
 
   return `
+
   <span class="status-pending">
+
     ● ${escapeHtml(value)}
-  </span>`;
+
+  </span>
+
+  `;
 
 }
 
@@ -1223,7 +3246,9 @@ function showSection(id){
     ".section-content"
   ).forEach(section => {
 
-    section.classList.remove("active");
+    section.classList.remove(
+      "active"
+    );
 
   });
 
@@ -1231,13 +3256,20 @@ function showSection(id){
   const selected =
     document.getElementById(id);
 
+
   if(selected){
 
-    selected.classList.add("active");
+    selected.classList.add(
+      "active"
+    );
+
 
     selected.scrollIntoView({
+
       behavior:"smooth",
+
       block:"start"
+
     });
 
   }
@@ -1252,11 +3284,31 @@ function showSection(id){
 function escapeHtml(value){
 
   return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
 
@@ -1280,5 +3332,9 @@ async function logout(){
 
 checkAdmin();
 
-</script></body>
+</script>
+
+
+</body>
+
 </html>
