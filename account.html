@@ -125,6 +125,11 @@ button:hover{
   opacity:.9;
 }
 
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
 .secondary{
   background:#202033;
 }
@@ -918,7 +923,8 @@ footer{
 
 
     <button
-      onclick="submitPaymentVerification()"
+      type="button"
+      id="submitPaymentVerificationBtn"
     >
       Submit Payment Verification
     </button>
@@ -1573,74 +1579,85 @@ async function resetPassword(){
 
 async function loadAccount(){
 
-  const sessionResult =
-    await supabaseClient
-      .auth
-      .getSession();
+  try{
+
+    const sessionResult =
+      await supabaseClient
+        .auth
+        .getSession();
 
 
-  const session =
-    sessionResult.data.session;
+    const session =
+      sessionResult.data.session;
 
 
-  if(!session){
+    if(!session){
+
+      document
+        .getElementById("authCard")
+        .classList.remove("hidden");
+
+
+      document
+        .getElementById("accountArea")
+        .classList.add("hidden");
+
+
+      return;
+
+    }
+
+
+    const user =
+      session.user;
+
 
     document
       .getElementById("authCard")
-      .classList.remove("hidden");
+      .classList.add("hidden");
 
 
     document
       .getElementById("accountArea")
-      .classList.add("hidden");
+      .classList.remove("hidden");
 
 
-    return;
+    document
+      .getElementById("userEmail")
+      .textContent =
+        user.email || "";
+
+
+    await syncRolesFromMetadata(
+      user
+    );
+
+
+    await loadRoles(
+      user.id
+    );
+
+
+    await loadProfile(
+      user.id
+    );
+
+
+    await loadPaymentVerification(
+      user.id
+    );
+
+
+    updatePaymentCountryUI();
+
+  }catch(error){
+
+    console.error(
+      "Load account error:",
+      error
+    );
 
   }
-
-
-  const user =
-    session.user;
-
-
-  document
-    .getElementById("authCard")
-    .classList.add("hidden");
-
-
-  document
-    .getElementById("accountArea")
-    .classList.remove("hidden");
-
-
-  document
-    .getElementById("userEmail")
-    .textContent =
-      user.email || "";
-
-
-  await syncRolesFromMetadata(
-    user
-  );
-
-
-  await loadRoles(
-    user.id
-  );
-
-
-  await loadProfile(
-    user.id
-  );
-
-
-  await loadPaymentVerification(
-    user.id
-  );
-
-
-  updatePaymentCountryUI();
 
 }
 
@@ -2435,6 +2452,11 @@ async function saveProfile(){
 
   }catch(error){
 
+    console.error(
+      "Profile save error:",
+      error
+    );
+
     showProfileMessage(
       error.message,
       "error"
@@ -2451,6 +2473,27 @@ async function saveProfile(){
 ====================================================== */
 
 async function submitPaymentVerification(){
+
+  const messageBox =
+    document.getElementById(
+      "verificationMessage"
+    );
+
+
+  if(messageBox){
+
+    messageBox.className =
+      "status";
+
+    messageBox.textContent =
+      "Checking your account...";
+
+    messageBox.classList.remove(
+      "hidden"
+    );
+
+  }
+
 
   const sessionResult =
     await supabaseClient
@@ -2549,7 +2592,7 @@ async function submitPaymentVerification(){
 
   /*
     UGANDA
-    Mobile Money verification
+    MOBILE MONEY
   */
 
   if(country === "Uganda"){
@@ -2615,7 +2658,7 @@ async function submitPaymentVerification(){
 
   /*
     OUTSIDE UGANDA
-    Card / Online verification
+    CARD / ONLINE
   */
 
   else{
@@ -2649,10 +2692,12 @@ async function submitPaymentVerification(){
 
 
     /*
-      IMPORTANT:
-      No card number, CVV or PIN is stored.
-      A secure provider reference will be
-      added when Flutterwave/PesaPal is connected.
+      NEVER store card number,
+      CVV or PIN.
+
+      This temporary reference is only
+      used until the secure provider
+      integration is connected.
     */
 
     accountNumber =
@@ -2669,8 +2714,8 @@ async function submitPaymentVerification(){
   try{
 
     /*
-      Check if there is already a pending
-      or approved request.
+      Look for the latest existing request
+      for this user and verification type.
     */
 
     const existing =
@@ -2686,13 +2731,6 @@ async function submitPaymentVerification(){
         .eq(
           "verification_type",
           verificationType
-        )
-        .in(
-          "status",
-          [
-            "pending",
-            "approved"
-          ]
         )
         .order(
           "created_at",
@@ -2719,6 +2757,10 @@ async function submitPaymentVerification(){
         existing.data[0];
 
 
+      /*
+        Already approved
+      */
+
       if(
         current.status ===
         "approved"
@@ -2740,6 +2782,10 @@ async function submitPaymentVerification(){
       }
 
 
+      /*
+        Still pending
+      */
+
       if(
         current.status ===
         "pending"
@@ -2760,12 +2806,12 @@ async function submitPaymentVerification(){
 
       }
 
+      /*
+        If rejected, create a new request.
+      */
+
     }
 
-
-    /*
-      Create verification request.
-    */
 
     const result =
       await supabaseClient
@@ -2799,7 +2845,9 @@ async function submitPaymentVerification(){
           updated_at:
             new Date().toISOString()
 
-        });
+        })
+        .select()
+        .single();
 
 
     if(result.error){
@@ -3033,6 +3081,13 @@ function showVerificationMessage(
     );
 
 
+  if(!box){
+
+    return;
+
+  }
+
+
   box.textContent =
     message;
 
@@ -3176,6 +3231,66 @@ async function logout(){
     "/account.html";
 
 }
+
+
+
+/* ======================================================
+   PAYMENT VERIFICATION BUTTON
+====================================================== */
+
+document
+  .getElementById(
+    "submitPaymentVerificationBtn"
+  )
+  .addEventListener(
+    "click",
+    async function(){
+
+      const button =
+        document.getElementById(
+          "submitPaymentVerificationBtn"
+        );
+
+
+      button.disabled =
+        true;
+
+
+      button.textContent =
+        "Submitting...";
+
+
+      try{
+
+        await submitPaymentVerification();
+
+      }catch(error){
+
+        console.error(
+          "Payment verification button error:",
+          error
+        );
+
+
+        showVerificationMessage(
+          error.message ||
+          "Unable to submit payment verification.",
+          "error"
+        );
+
+      }finally{
+
+        button.disabled =
+          false;
+
+
+        button.textContent =
+          "Submit Payment Verification";
+
+      }
+
+    }
+  );
 
 
 
