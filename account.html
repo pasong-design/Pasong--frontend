@@ -357,7 +357,6 @@ footer{
          🎤 Open Artist Dashboard
       </a>
 
-      <!-- DJ DASHBOARD -->
       <a id="djDashboardLink"
          class="dashboard-link hidden"
          href="dj-dashboard.html">
@@ -386,8 +385,7 @@ footer{
       <div class="info-box">
         Your legal name is private. Your performing/stage name may appear
         publicly on PASONG profiles, songs and credits.
-        Before withdrawals, PASONG may require identity and mobile-money
-        verification.
+        Before withdrawals, PASONG may require identity and mobile-money verification.
       </div>
 
       <label>Real / Legal Name</label>
@@ -1013,6 +1011,124 @@ async function loadRoles(userId){
 
 async function loadProfile(userId){
 
+  const metadataResult =
+    await supabaseClient.auth.getUser();
+
+  const user =
+    metadataResult.data.user;
+
+  const isAdmin =
+    user &&
+    user.app_metadata &&
+    user.app_metadata.role === "admin";
+
+
+  /*
+    ADMIN ACCOUNT
+    Admin uses public.profiles.
+    It must NOT use artist_profiles.
+  */
+
+  if(isAdmin){
+
+    const result =
+      await supabaseClient
+        .from("profiles")
+        .select(
+          "full_name,email,phone,country,role"
+        )
+        .eq("id",userId)
+        .maybeSingle();
+
+
+    if(result.error){
+
+      console.log(
+        "Admin profile load:",
+        result.error.message
+      );
+
+      return;
+    }
+
+
+    const profile =
+      result.data;
+
+
+    if(!profile){
+      return;
+    }
+
+
+    document
+      .getElementById("realName")
+      .value =
+        profile.full_name || "";
+
+
+    /*
+      For the Admin account we display the
+      PASONG administrator name as the
+      performing/display name.
+    */
+    document
+      .getElementById("performingName")
+      .value =
+        profile.full_name || "PASONG Admin";
+
+
+    document
+      .getElementById("mobileProvider")
+      .value = "";
+
+
+    document
+      .getElementById("mobileNumber")
+      .value =
+        profile.phone || "";
+
+
+    document
+      .getElementById("displayPerformingName")
+      .textContent =
+        profile.full_name || "PASONG Admin";
+
+
+    document
+      .getElementById("displayProvider")
+      .textContent =
+        "Not added yet";
+
+
+    document
+      .getElementById("displayNumber")
+      .textContent =
+        profile.phone || "Not added yet";
+
+
+    document
+      .getElementById("identityStatus")
+      .innerHTML =
+        '<span class="badge pending">Pending</span>';
+
+
+    document
+      .getElementById("moneyStatus")
+      .innerHTML =
+        '<span class="badge pending">Pending</span>';
+
+
+    return;
+  }
+
+
+  /*
+    CREATOR ACCOUNT
+    KV BEATS and other creator accounts
+    continue using artist_profiles.
+  */
+
   const result =
     await supabaseClient
       .from("artist_profiles")
@@ -1194,6 +1310,75 @@ async function saveProfile(){
 
   try{
 
+    /*
+      Detect Admin account.
+    */
+
+    const user =
+      session.user;
+
+    const isAdmin =
+      user &&
+      user.app_metadata &&
+      user.app_metadata.role === "admin";
+
+
+    /*
+      ADMIN SAVE
+      Save directly into profiles.
+      This prevents the artist_profiles
+      foreign-key error.
+    */
+
+    if(isAdmin){
+
+      const result =
+        await supabaseClient
+          .from("profiles")
+          .upsert(
+            {
+              id:user.id,
+              full_name:realName,
+              email:user.email || null,
+              phone:mobileNumber,
+              role:"admin"
+            },
+            {
+              onConflict:"id"
+            }
+          );
+
+
+      if(result.error){
+
+        throw new Error(
+          result.error.message
+        );
+
+      }
+
+
+      showProfileMessage(
+        "Admin profile saved successfully.",
+        "success"
+      );
+
+
+      await loadProfile(
+        user.id
+      );
+
+
+      return;
+    }
+
+
+    /*
+      CREATOR SAVE
+      Existing working artist API remains
+      unchanged.
+    */
+
     const response =
       await fetch(
         API_BASE +
@@ -1333,7 +1518,7 @@ async function copyReferral(){
 }
 
 
-/* FIXED LOGOUT */
+/* FIXED LOGOUT — KEEPING YOUR WORKING VERSION */
 
 async function logout(){
 
