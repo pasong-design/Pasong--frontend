@@ -729,11 +729,6 @@ const PAYMENT_API =
   "https://pasong-mom.vercel.app/api/pay";
 
 
-/*
-   IMPORTANT:
-   Use the currently working Render API.
-*/
-
 const API_BASE =
   "https://pasong-api.onrender.com";
 
@@ -754,14 +749,6 @@ const supabaseClient =
     SUPABASE_PUBLISHABLE_KEY
   );
 
-
-/*
-   Keep the authenticated access token in memory
-   for the current checkout/payment flow.
-
-   It is NEVER stored in the frontend source code
-   as a secret.
-*/
 
 let currentAccessToken = null;
 
@@ -855,6 +842,17 @@ const TIP_PASONG_PERCENT =
   30;
 
 let selectedTip = 0;
+
+
+/* =====================================================
+   POLLING
+===================================================== */
+
+const POLL_INTERVAL =
+  5000;
+
+const MAX_POLLS =
+  60;
 
 
 /* =====================================================
@@ -1003,8 +1001,6 @@ function getDisplayPricing(
     .toUpperCase();
 
 
-  /* UGANDA */
-
   if(cc === "UG"){
 
     return {
@@ -1023,8 +1019,6 @@ function getDisplayPricing(
 
   }
 
-
-  /* EAST AFRICA */
 
   if(
     EAST_AFRICA.includes(cc)
@@ -1049,8 +1043,6 @@ function getDisplayPricing(
   }
 
 
-  /* OTHER AFRICA */
-
   if(
     AFRICA.includes(cc)
   ){
@@ -1074,8 +1066,6 @@ function getDisplayPricing(
   }
 
 
-  /* UK */
-
   if(cc === "GB"){
 
     return {
@@ -1096,8 +1086,6 @@ function getDisplayPricing(
 
   }
 
-
-  /* OTHER INTERNATIONAL */
 
   return {
 
@@ -1131,17 +1119,6 @@ function getDjMixPricing(
     (countryCode || "UG")
     .toUpperCase();
 
-
-  /*
-    DJ MIX RULE:
-
-    Uganda = UGX 1,000
-    Outside Uganda = USD 1
-
-    DJ Mix streaming remains FREE.
-    This price is only for downloading/owning
-    the DJ Mix.
-  */
 
   if(cc === "UG"){
 
@@ -1523,16 +1500,6 @@ async function loadCheckout(){
       await detectCountry();
 
 
-    /*
-      First read the URL.
-
-      song.html sends:
-      content_type=dj_mix
-
-      The database/API value is still authoritative
-      when it is available.
-    */
-
     const urlContentType =
       getContentTypeFromUrl();
 
@@ -1602,13 +1569,6 @@ async function loadCheckout(){
     }
 
 
-    /*
-      API/database content_type takes priority.
-
-      This prevents a normal song from accidentally
-      receiving DJ Mix pricing.
-    */
-
     const apiContentType =
       String(
         song.content_type ||
@@ -1630,17 +1590,6 @@ async function loadCheckout(){
 
     }
 
-
-    /*
-      Apply the correct pricing rule.
-
-      Normal song:
-        Existing IP pricing.
-
-      DJ Mix:
-        Uganda = UGX 1,000
-        Outside Uganda = USD 1
-    */
 
     if(isDjMix){
 
@@ -1850,13 +1799,6 @@ async function startMtnPayment(){
     );
 
 
-  /*
-    SECURE CHECKOUT:
-
-    The purchase must belong to an authenticated
-    PASONG/Supabase account.
-  */
-
   const session =
     await getCheckoutSession();
 
@@ -1983,11 +1925,6 @@ async function startMtnPayment(){
             "Accept":
               "application/json",
 
-            /*
-              Send the authenticated Supabase
-              access token to PASONG-MoMo.
-            */
-
             "Authorization":
               "Bearer " +
               session.access_token
@@ -1998,12 +1935,6 @@ async function startMtnPayment(){
             JSON.stringify({
 
               songId:id,
-
-              /*
-                NEW:
-                Tells the payment service whether
-                this is a normal song or DJ Mix.
-              */
 
               content_type:
                 currentContentType,
@@ -2173,14 +2104,6 @@ function startPolling(){
 
     try{
 
-      /*
-        Refresh the current session before checking
-        payment status.
-
-        The authenticated token is then forwarded
-        to PASONG-MoMo.
-      */
-
       const session =
         await getCheckoutSession();
 
@@ -2228,11 +2151,6 @@ function startPolling(){
               "Accept":
                 "application/json",
 
-              /*
-                Send the authenticated Supabase
-                access token during payment polling.
-              */
-
               "Authorization":
                 "Bearer " +
                 session.access_token
@@ -2273,10 +2191,25 @@ function startPolling(){
         ).toUpperCase();
 
 
+      /*
+        IMPORTANT:
+
+        MTN must report SUCCESSFUL
+        AND PASONG backend must confirm
+        that the order/payment/download
+        was successfully completed.
+
+        This prevents the frontend from
+        treating an MTN payment as a
+        completed PASONG purchase before
+        PASONG records it.
+      */
+
       if(
         status ===
         "SUCCESSFUL" &&
-        data.paid === true
+        data.paid === true &&
+        data.pasong_completed === true
       ){
 
         stopPolling();
@@ -2456,7 +2389,7 @@ function paymentSuccessful(
 
     '</span><br><br>' +
 
-    'MTN has confirmed your payment of ' +
+    'PASONG has confirmed your payment of ' +
 
     '<b>' +
 
@@ -2487,16 +2420,6 @@ function paymentSuccessful(
     ) +
 
     '</b>';
-
-
-  /*
-    IMPORTANT:
-
-    The payment provider has confirmed the payment.
-
-    PASONG backend order/download completion will be
-    connected in the next backend step.
-  */
 
 
   setPaymentButtonsDisabled(
