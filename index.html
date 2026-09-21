@@ -5,173 +5,3010 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#8b5cf6">
+
 <title>PASONG — Music. Opportunity. Support.</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:#080810;color:#fff;font-family:Arial,Helvetica,sans-serif;line-height:1.5}
-a{color:inherit;text-decoration:none}
-button,input{font:inherit}
-button{cursor:pointer}
-header{position:sticky;top:0;z-index:1000;background:rgba(8,8,16,.94);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
-.navbar{width:100%;max-width:1450px;margin:auto;min-height:70px;padding:12px 22px;display:flex;align-items:center;gap:18px}
-.logo{font-size:23px;font-weight:900;white-space:nowrap;letter-spacing:.3px}
-.logo span{color:#c084fc}
-.search-box{flex:1;max-width:450px;position:relative}
-.search-box input{width:100%;height:43px;padding:0 15px 0 43px;border-radius:14px;border:1px solid rgba(255,255,255,.08);outline:none;color:#fff;background:#12121d}
-.search-box input:focus{border-color:rgba(168,85,247,.55);box-shadow:0 0 0 3px rgba(168,85,247,.08)}
-.search-box input::placeholder{color:#77778a}
-.search-icon{position:absolute;left:15px;top:10px;color:#9696a9}
-.nav-links{margin-left:auto;display:flex;align-items:center;gap:4px}
-.nav-links a{padding:10px 10px;border-radius:10px;color:#b8b8c8;font-size:12px;font-weight:700;white-space:nowrap}
-.nav-links a:hover{color:#fff;background:rgba(168,85,247,.1)}
-.notification-link{position:relative}
-.notification-count{position:absolute;top:1px;right:0;min-width:16px;height:16px;display:grid;place-items:center;padding:0 4px;border-radius:50px;background:#ec4899;color:#fff;font-size:9px;font-weight:800}
-.account-box{display:flex !important;align-items:center;gap:8px;padding:6px 10px !important;min-height:42px;border:1px solid rgba(192,132,252,.35) !important;border-radius:12px !important;background:rgba(168,85,247,.08);color:#fff !important;text-decoration:none !important;transition:.2s ease;white-space:nowrap}
-.account-box:hover{background:linear-gradient(135deg,#8b5cf6,#ec4899) !important;border-color:transparent !important;transform:translateY(-1px)}
-.account-photo{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid rgba(192,132,252,.65);background:#191927;flex-shrink:0}
-.account-box-text{font-size:12px;font-weight:800;line-height:1}
-.hero{width:100%;max-width:1450px;margin:auto;padding:35px 22px 18px}
-.hero-box{position:relative;overflow:hidden;min-height:430px;padding:72px 55px;display:flex;align-items:center;border-radius:30px;background:radial-gradient(circle at 8% 15%,rgba(168,85,247,.34),transparent 30%),radial-gradient(circle at 88% 80%,rgba(236,72,153,.23),transparent 35%),linear-gradient(135deg,#151324,#0e0e19 60%,#15101f);border:1px solid rgba(168,85,247,.2);box-shadow:0 25px 80px rgba(0,0,0,.28)}
-.hero-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.34;transition:opacity .8s ease;z-index:0;filter:saturate(1.05)}
-.hero-cover-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(8,8,16,.97) 0%,rgba(8,8,16,.82) 42%,rgba(8,8,16,.48) 72%,rgba(8,8,16,.72) 100%)}
-.hero-box:before{content:"";position:absolute;width:450px;height:450px;right:-130px;top:-170px;border-radius:50%;border:1px solid rgba(192,132,252,.08);box-shadow:0 0 0 35px rgba(192,132,252,.025),0 0 0 75px rgba(192,132,252,.018);z-index:1}
-.hero-box:after{content:"";position:absolute;width:280px;height:280px;right:60px;bottom:-180px;border-radius:50%;background:rgba(236,72,153,.16);filter:blur(60px);z-index:1}
-.hero-content{position:relative;z-index:2;max-width:790px}
-.hero-kicker{color:#c084fc;font-size:11px;letter-spacing:2.5px;font-weight:900;margin-bottom:14px}
-.hero h1{font-size:clamp(43px,7vw,82px);line-height:.94;font-weight:900;letter-spacing:-2px}
-.hero h1 span{background:linear-gradient(90deg,#a855f7,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{max-width:680px;margin:22px 0;color:#aaaabb;font-size:15px}
-.hero-actions{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:12px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.08);transition:.2s ease}
-.btn:hover{transform:translateY(-2px)}
-.btn-primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;border:none;box-shadow:0 10px 30px rgba(168,85,247,.18)}
-.btn-secondary{background:#181825;color:#ddd}
-.btn-secondary:hover{border-color:rgba(168,85,247,.4);background:#1d1b2b}
-.quick-nav{max-width:1450px;margin:auto;padding:18px 22px 36px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}
-.quick-nav::-webkit-scrollbar{display:none}
-.quick-nav a{flex:0 0 auto;padding:14px 22px;border-radius:999px;background:#12121d;border:1px solid rgba(255,255,255,.07);color:#bcbccc;font-size:13px;font-weight:800;transition:.2s}
-.quick-nav a:hover{color:#fff;border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.1)}
-.container{width:100%;max-width:1450px;margin:auto;padding:0 22px}
-.section{padding:23px 0}
-.section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px}
-.section-heading h2{font-size:20px;font-weight:900}
-.section-heading a{color:#c084fc;font-size:11px;font-weight:800}
-.uganda-label{display:block;color:#77778a;font-size:9px;margin-top:2px}
-.music-row{min-height:150px;padding:17px;border-radius:19px;background:#10101a;border:1px solid rgba(255,255,255,.06);display:flex;gap:13px;overflow-x:auto;scrollbar-width:none}
-.music-row::-webkit-scrollbar{display:none}
-.loading-music,.empty-music{width:100%;min-height:110px;display:grid;place-items:center;color:#666678;font-size:12px}
-.song-card{flex:0 0 205px;min-width:205px;background:#151520;border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;transition:.2s ease}
-.song-card:hover{transform:translateY(-4px);border-color:rgba(168,85,247,.38);box-shadow:0 12px 35px rgba(0,0,0,.25)}
-.song-cover{width:100%;height:150px;object-fit:cover;display:block;background:#191927}
-.song-info{padding:12px}
-.song-title{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-artist{color:#9292a4;font-size:10px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-bottom{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:7px}
-.song-price{color:#c084fc;font-size:11px;font-weight:900}
-.song-play{border:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;display:grid;place-items:center;font-size:13px}
-.song-open{margin-top:9px;width:100%;min-height:32px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:#1b1b29;border:1px solid rgba(255,255,255,.07);color:#cfcfda;font-size:10px;font-weight:800}
-.song-open:hover{background:rgba(168,85,247,.1);color:#fff}
-.dj-mix-section{position:relative}
-.dj-mix-header-text{display:flex;flex-direction:column}
-.dj-mix-subtitle{color:#77778a;font-size:9px;margin-top:2px}
-.dj-mix-panel{min-height:250px;padding:17px;border-radius:19px;background:radial-gradient(circle at 0% 50%,rgba(139,92,246,.12),transparent 35%),radial-gradient(circle at 100% 0%,rgba(236,72,153,.08),transparent 30%),linear-gradient(135deg,#10101a,#13111e);border:1px solid rgba(168,85,247,.15);display:flex;gap:14px;overflow-x:auto;scrollbar-width:none}
-.dj-mix-panel::-webkit-scrollbar{display:none}
-.dj-mix-card{flex:0 0 250px;min-width:250px;background:#151520;border:1px solid rgba(255,255,255,.07);border-radius:17px;overflow:hidden;transition:.2s ease}
-.dj-mix-card:hover{transform:translateY(-4px);border-color:rgba(168,85,247,.42);box-shadow:0 15px 40px rgba(0,0,0,.30)}
-.dj-mix-cover{width:100%;height:155px;display:block;object-fit:cover;background:#191927}
-.dj-mix-info{padding:12px}
-.dj-mix-title{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dj-mix-dj{margin-top:3px;color:#9292a4;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dj-mix-free{margin-top:8px;color:#c084fc;font-size:10px;font-weight:900}
-.dj-mix-price{margin-top:2px;color:#fff;font-size:11px;font-weight:900}
-.dj-mix-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-.dj-mix-stream,.dj-mix-buy,.dj-mix-tip{min-height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.07);font-size:9px;font-weight:900;color:#fff}
-.dj-mix-stream{background:#1b1b29}
-.dj-mix-stream:hover{background:rgba(168,85,247,.13)}
-.dj-mix-buy{background:linear-gradient(135deg,#8b5cf6,#ec4899);border:none}
-.dj-mix-buy:hover{opacity:.9}
-.dj-mix-tip{width:100%;margin-top:7px;background:rgba(236,72,153,.10);border-color:rgba(236,72,153,.22);color:#f5b4d2}
-.dj-mix-tip:hover{background:rgba(236,72,153,.18);color:#fff}
-.dj-mix-open{display:flex;align-items:center;justify-content:center;width:100%;min-height:31px;margin-top:7px;border-radius:9px;background:#11111b;border:1px solid rgba(255,255,255,.06);color:#aaaabb;font-size:9px;font-weight:800}
-.dj-mix-open:hover{color:#fff;border-color:rgba(168,85,247,.3)}
-.dj-mix-empty{width:100%;min-height:190px;display:grid;place-items:center;text-align:center;color:#666678;font-size:12px}
-.dj-mix-loading{width:100%;min-height:190px;display:grid;place-items:center;color:#666678;font-size:12px}
-@media(max-width:600px){.dj-mix-panel{padding:14px;gap:11px}.dj-mix-card{flex:0 0 220px;min-width:220px}.dj-mix-cover{height:140px}}
-.mini-player{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);width:min(600px,calc(100% - 28px));padding:11px 13px;border-radius:16px;background:rgba(17,17,29,.97);border:1px solid rgba(168,85,247,.25);box-shadow:0 15px 50px rgba(0,0,0,.45);backdrop-filter:blur(18px);z-index:1900;display:none;align-items:center;gap:11px}
-.mini-player.show{display:flex}
-.mini-player-info{flex:1;min-width:0}
-.mini-player-title{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini-player-label{color:#888899;font-size:10px}
-.mini-player audio{width:170px;height:34px}
-.mini-player-close{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.08);background:#191927;color:#aaa}
-.genre-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:9px}
-.genre-card{padding:17px 8px;text-align:center;border-radius:14px;background:#11111b;border:1px solid rgba(255,255,255,.06);color:#c8c8d3;font-size:10px;font-weight:800;transition:.2s}
-.genre-card:hover{transform:translateY(-3px);border-color:rgba(168,85,247,.35);color:#fff;background:rgba(168,85,247,.07)}
-.countdown{position:relative;overflow:hidden;padding:34px;border-radius:22px;background:radial-gradient(circle at 20% 50%,rgba(168,85,247,.16),transparent 35%),linear-gradient(120deg,rgba(168,85,247,.12),rgba(236,72,153,.06)),#11111b;border:1px solid rgba(168,85,247,.14);text-align:center}
-.countdown h2{font-size:24px;margin-bottom:5px}
-.countdown p{color:#9999aa;font-size:12px}
-.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
-.why-card{padding:25px;border-radius:18px;background:#10101a;border:1px solid rgba(255,255,255,.06);transition:.2s}
-.why-card:hover{transform:translateY(-3px);border-color:rgba(168,85,247,.25)}
-.why-icon{font-size:25px;margin-bottom:12px}
-.why-card h3{font-size:15px;margin-bottom:6px}
-.why-card p{color:#9999aa;font-size:11px}
-.feature-box{padding:30px;border-radius:21px;background:radial-gradient(circle at 100% 0,rgba(168,85,247,.08),transparent 30%),#10101a;border:1px solid rgba(255,255,255,.06)}
-.feature-box h2{font-size:20px;margin-bottom:8px}
-.feature-box p{color:#9d9dad;font-size:12px;margin-bottom:18px}
-.payment-badges{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
-.payment-badge{padding:10px 14px;border-radius:10px;background:#171722;border:1px solid rgba(255,255,255,.07);font-size:11px;font-weight:800}
-footer{margin-top:50px;padding:45px 22px 90px;border-top:1px solid rgba(255,255,255,.07);background:#07070d}
-.footer-inner{width:100%;max-width:1450px;margin:auto}
-.footer-logo{font-size:21px;font-weight:900;margin-bottom:7px}
-.footer-inner p{color:#77778a;font-size:11px;max-width:550px}
-.footer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:28px}
-.footer-column h4{font-size:12px;margin-bottom:10px}
-.footer-column a{display:block;margin:7px 0;color:#858596;font-size:11px}
-.footer-column a:hover{color:#c084fc}
-.mobile-bottom-nav{display:none}
-@media(max-width:1100px){.nav-links a{padding:9px 7px;font-size:11px}.genre-grid{grid-template-columns:repeat(5,1fr)}}
-@media(max-width:800px){.navbar{padding:10px 14px;flex-wrap:wrap}.search-box{order:3;flex-basis:100%;max-width:none}.nav-links{margin-left:auto}.nav-links a{display:none}.nav-links .notification-link,.nav-links .account-box{display:flex !important}.hero{padding:28px 14px 20px}.hero-box{min-height:390px;padding:48px 25px}.container{padding:0 14px}.why-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}}
-@media(max-width:600px){body{padding-bottom:70px}.logo{font-size:20px}.account-box{padding:5px 8px !important;gap:6px}.account-photo{width:34px;height:34px}.account-box-text{font-size:10px}.hero h1{font-size:43px;letter-spacing:-1.5px}.hero-box{min-height:420px;padding:38px 20px;border-radius:22px}.hero p{font-size:13px}.hero-actions{display:grid;grid-template-columns:1fr}.btn{width:100%}.quick-nav{padding-left:14px;padding-right:14px}.genre-grid{grid-template-columns:repeat(3,1fr)}.section-heading h2{font-size:18px}.song-card{flex-basis:175px;min-width:175px}.song-cover{height:130px}.mini-player{bottom:76px}.mini-player audio{width:115px}.mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:2000;height:65px;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(10,10,18,.97);backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.08)}.mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#858596;font-size:10px;font-weight:700}.mobile-bottom-nav a span{font-size:19px;line-height:20px}.mobile-bottom-nav a:hover{color:#c084fc}footer{padding-bottom:90px}}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  background:#080810;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  line-height:1.5;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button,
+input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  background:rgba(8,8,16,.94);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.navbar{
+  width:100%;
+  max-width:1450px;
+  margin:auto;
+  min-height:70px;
+  padding:12px 22px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:900;
+  white-space:nowrap;
+  letter-spacing:.3px;
+}
+
+.logo span{
+  color:#c084fc;
+}
+
+.search-box{
+  flex:1;
+  max-width:450px;
+  position:relative;
+}
+
+.search-box input{
+  width:100%;
+  height:43px;
+  padding:0 15px 0 43px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  outline:none;
+  color:#fff;
+  background:#12121d;
+}
+
+.search-box input:focus{
+  border-color:rgba(168,85,247,.55);
+  box-shadow:0 0 0 3px rgba(168,85,247,.08);
+}
+
+.search-box input::placeholder{
+  color:#77778a;
+}
+
+.search-icon{
+  position:absolute;
+  left:15px;
+  top:10px;
+  color:#9696a9;
+}
+
+.nav-links{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.nav-links a{
+  padding:10px 10px;
+  border-radius:10px;
+  color:#b8b8c8;
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.nav-links a:hover{
+  color:#fff;
+  background:rgba(168,85,247,.1);
+}
+
+.notification-link{
+  position:relative;
+}
+
+.notification-count{
+  position:absolute;
+  top:1px;
+  right:0;
+  min-width:16px;
+  height:16px;
+  display:grid;
+  place-items:center;
+  padding:0 4px;
+  border-radius:50px;
+  background:#ec4899;
+  color:#fff;
+  font-size:9px;
+  font-weight:800;
+}
+
+/* =========================
+   PASONG ACCOUNT BOX
+========================= */
+
+.account-box{
+  display:flex !important;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px !important;
+  min-height:42px;
+  border:1px solid rgba(192,132,252,.35) !important;
+  border-radius:12px !important;
+  background:rgba(168,85,247,.08);
+  color:#fff !important;
+  text-decoration:none !important;
+  transition:.2s ease;
+  white-space:nowrap;
+}
+
+.account-box:hover{
+  background:linear-gradient(135deg,#8b5cf6,#ec4899) !important;
+  border-color:transparent !important;
+  transform:translateY(-1px);
+}
+
+.account-photo{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(192,132,252,.65);
+  background:#191927;
+  flex-shrink:0;
+}
+
+.account-box-text{
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  width:100%;
+  max-width:1450px;
+  margin:auto;
+  padding:35px 22px 18px;
+}
+
+.hero-box{
+  position:relative;
+  overflow:hidden;
+  min-height:430px;
+  padding:72px 55px;
+  display:flex;
+  align-items:center;
+  border-radius:30px;
+  background:
+    radial-gradient(
+      circle at 8% 15%,
+      rgba(168,85,247,.34),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 80%,
+      rgba(236,72,153,.23),
+      transparent 35%
+    ),
+    linear-gradient(
+      135deg,
+      #151324,
+      #0e0e19 60%,
+      #15101f
+    );
+  border:1px solid rgba(168,85,247,.2);
+  box-shadow:0 25px 80px rgba(0,0,0,.28);
+}
+
+.hero-cover{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center top;
+  opacity:.34;
+  transition:opacity .8s ease;
+  z-index:0;
+  filter:saturate(1.05);
+}
+
+.hero-cover-overlay{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8,8,16,.97) 0%,
+      rgba(8,8,16,.82) 42%,
+      rgba(8,8,16,.48) 72%,
+      rgba(8,8,16,.72) 100%
+    );
+}
+
+.hero-box:before{
+  content:"";
+  position:absolute;
+  width:450px;
+  height:450px;
+  right:-130px;
+  top:-170px;
+  border-radius:50%;
+  border:1px solid rgba(192,132,252,.08);
+  box-shadow:
+    0 0 0 35px rgba(192,132,252,.025),
+    0 0 0 75px rgba(192,132,252,.018);
+  z-index:1;
+}
+
+.hero-box:after{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  right:60px;
+  bottom:-180px;
+  border-radius:50%;
+  background:rgba(236,72,153,.16);
+  filter:blur(60px);
+  z-index:1;
+}
+
+.hero-content{
+  position:relative;
+  z-index:2;
+  max-width:790px;
+}
+
+.hero-kicker{
+  color:#c084fc;
+  font-size:11px;
+  letter-spacing:2.5px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.hero h1{
+  font-size:clamp(43px,7vw,82px);
+  line-height:.94;
+  font-weight:900;
+  letter-spacing:-2px;
+}
+
+.hero h1 span{
+  background:linear-gradient(90deg,#a855f7,#ec4899);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.hero p{
+  max-width:680px;
+  margin:22px 0;
+  color:#aaaabb;
+  font-size:15px;
+}
+
+.hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:0 18px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.08);
+  transition:.2s ease;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+}
+
+.btn-primary{
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+  border:none;
+  box-shadow:0 10px 30px rgba(168,85,247,.18);
+}
+
+.btn-secondary{
+  background:#181825;
+  color:#ddd;
+}
+
+.btn-secondary:hover{
+  border-color:rgba(168,85,247,.4);
+  background:#1d1b2b;
+}
+
+/* =========================
+   QUICK NAV
+========================= */
+
+.quick-nav{
+  max-width:1450px;
+  margin:auto;
+  padding:12px 22px 30px;
+  display:flex;
+  gap:9px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.quick-nav::-webkit-scrollbar{
+  display:none;
+}
+
+.quick-nav a{
+  flex:0 0 auto;
+  padding:10px 15px;
+  border-radius:999px;
+  background:#12121d;
+  border:1px solid rgba(255,255,255,.07);
+  color:#bcbccc;
+  font-size:11px;
+  font-weight:800;
+  transition:.2s;
+}
+
+.quick-nav a:hover{
+  color:#fff;
+  border-color:rgba(168,85,247,.4);
+  background:rgba(168,85,247,.1);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.container{
+  width:100%;
+  max-width:1450px;
+  margin:auto;
+  padding:0 22px;
+}
+
+.section{
+  padding:23px 0;
+}
+
+.section-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:14px;
+}
+
+.section-heading h2{
+  font-size:20px;
+  font-weight:900;
+}
+
+.section-heading a{
+  color:#c084fc;
+  font-size:11px;
+  font-weight:800;
+}
+
+.uganda-label{
+  display:block;
+  color:#77778a;
+  font-size:9px;
+  margin-top:2px;
+}
+
+.music-row{
+  min-height:150px;
+  padding:17px;
+  border-radius:19px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+  display:flex;
+  gap:13px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.music-row::-webkit-scrollbar{
+  display:none;
+}
+
+.loading-music,
+.empty-music{
+  width:100%;
+  min-height:110px;
+  display:grid;
+  place-items:center;
+  color:#666678;
+  font-size:12px;
+}
+
+.song-card{
+  flex:0 0 205px;
+  min-width:205px;
+  background:#151520;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;
+  overflow:hidden;
+  transition:.2s ease;
+}
+
+.song-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(168,85,247,.38);
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
+}
+
+.song-cover{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  display:block;
+  background:#191927;
+}
+
+.song-info{
+  padding:12px;
+}
+
+.song-title{
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-artist{
+  color:#9292a4;
+  font-size:10px;
+  margin-top:3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-bottom{
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+}
+
+.song-price{
+  color:#c084fc;
+  font-size:11px;
+  font-weight:900;
+}
+
+.song-play{
+  border:0;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-size:13px;
+}
+
+.song-open{
+  margin-top:9px;
+  width:100%;
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:9px;
+  background:#1b1b29;
+  border:1px solid rgba(255,255,255,.07);
+  color:#cfcfda;
+  font-size:10px;
+  font-weight:800;
+}
+
+.song-open:hover{
+  background:rgba(168,85,247,.1);
+  color:#fff;
+}
+
+/* =========================
+   DJ MIX PANEL
+========================= */
+
+.dj-mix-section{
+  position:relative;
+}
+
+.dj-mix-header-text{
+  display:flex;
+  flex-direction:column;
+}
+
+.dj-mix-subtitle{
+  color:#77778a;
+  font-size:9px;
+  margin-top:2px;
+}
+
+.dj-mix-panel{
+  min-height:250px;
+  padding:17px;
+  border-radius:19px;
+  background:
+    radial-gradient(
+      circle at 0% 50%,
+      rgba(139,92,246,.12),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(236,72,153,.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #10101a,
+      #13111e
+    );
+  border:1px solid rgba(168,85,247,.15);
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.dj-mix-panel::-webkit-scrollbar{
+  display:none;
+}
+
+.dj-mix-card{
+  flex:0 0 250px;
+  min-width:250px;
+  background:#151520;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:17px;
+  overflow:hidden;
+  transition:.2s ease;
+}
+
+.dj-mix-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(168,85,247,.42);
+  box-shadow:0 15px 40px rgba(0,0,0,.30);
+}
+
+.dj-mix-cover{
+  width:100%;
+  height:155px;
+  display:block;
+  object-fit:cover;
+  background:#191927;
+}
+
+.dj-mix-info{
+  padding:12px;
+}
+
+.dj-mix-title{
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.dj-mix-dj{
+  margin-top:3px;
+  color:#9292a4;
+  font-size:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.dj-mix-free{
+  margin-top:8px;
+  color:#c084fc;
+  font-size:10px;
+  font-weight:900;
+}
+
+.dj-mix-price{
+  margin-top:2px;
+  color:#fff;
+  font-size:11px;
+  font-weight:900;
+}
+
+.dj-mix-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:10px;
+}
+
+.dj-mix-stream,
+.dj-mix-buy,
+.dj-mix-tip{
+  min-height:34px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,.07);
+  font-size:9px;
+  font-weight:900;
+  color:#fff;
+}
+
+.dj-mix-stream{
+  background:#1b1b29;
+}
+
+.dj-mix-stream:hover{
+  background:rgba(168,85,247,.13);
+}
+
+.dj-mix-buy{
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  border:none;
+}
+
+.dj-mix-buy:hover{
+  opacity:.9;
+}
+
+.dj-mix-tip{
+  width:100%;
+  margin-top:7px;
+  background:rgba(236,72,153,.10);
+  border-color:rgba(236,72,153,.22);
+  color:#f5b4d2;
+}
+
+.dj-mix-tip:hover{
+  background:rgba(236,72,153,.18);
+  color:#fff;
+}
+
+.dj-mix-open{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:31px;
+  margin-top:7px;
+  border-radius:9px;
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.06);
+  color:#aaaabb;
+  font-size:9px;
+  font-weight:800;
+}
+
+.dj-mix-open:hover{
+  color:#fff;
+  border-color:rgba(168,85,247,.3);
+}
+
+.dj-mix-empty{
+  width:100%;
+  min-height:190px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  color:#666678;
+  font-size:12px;
+}
+
+.dj-mix-loading{
+  width:100%;
+  min-height:190px;
+  display:grid;
+  place-items:center;
+  color:#666678;
+  font-size:12px;
+}
+
+@media(max-width:600px){
+
+  .dj-mix-panel{
+    padding:14px;
+    gap:11px;
+  }
+
+  .dj-mix-card{
+    flex:0 0 220px;
+    min-width:220px;
+  }
+
+  .dj-mix-cover{
+    height:140px;
+  }
+
+}
+
+/* =========================
+   MINI PLAYER
+========================= */
+
+.mini-player{
+  position:fixed;
+  left:50%;
+  bottom:20px;
+  transform:translateX(-50%);
+  width:min(600px,calc(100% - 28px));
+  padding:11px 13px;
+  border-radius:16px;
+  background:rgba(17,17,29,.97);
+  border:1px solid rgba(168,85,247,.25);
+  box-shadow:0 15px 50px rgba(0,0,0,.45);
+  backdrop-filter:blur(18px);
+  z-index:1900;
+  display:none;
+  align-items:center;
+  gap:11px;
+}
+
+.mini-player.show{
+  display:flex;
+}
+
+.mini-player-info{
+  flex:1;
+  min-width:0;
+}
+
+.mini-player-title{
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mini-player-label{
+  color:#888899;
+  font-size:10px;
+}
+
+.mini-player audio{
+  width:170px;
+  height:34px;
+}
+
+.mini-player-close{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.08);
+  background:#191927;
+  color:#aaa;
+}
+
+/* =========================
+   GENRES
+========================= */
+
+.genre-grid{
+  display:grid;
+  grid-template-columns:repeat(9,1fr);
+  gap:9px;
+}
+
+.genre-card{
+  padding:17px 8px;
+  text-align:center;
+  border-radius:14px;
+  background:#11111b;
+  border:1px solid rgba(255,255,255,.06);
+  color:#c8c8d3;
+  font-size:10px;
+  font-weight:800;
+  transition:.2s;
+}
+
+.genre-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(168,85,247,.35);
+  color:#fff;
+  background:rgba(168,85,247,.07);
+}
+
+/* =========================
+   COUNTDOWN
+========================= */
+
+.countdown{
+  position:relative;
+  overflow:hidden;
+  padding:34px;
+  border-radius:22px;
+  background:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(168,85,247,.16),
+      transparent 35%
+    ),
+    linear-gradient(
+      120deg,
+      rgba(168,85,247,.12),
+      rgba(236,72,153,.06)
+    ),
+    #11111b;
+  border:1px solid rgba(168,85,247,.14);
+  text-align:center;
+}
+
+.countdown h2{
+  font-size:24px;
+  margin-bottom:5px;
+}
+
+.countdown p{
+  color:#9999aa;
+  font-size:12px;
+}
+
+/* =========================
+   WHY PASONG
+========================= */
+
+.why-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:13px;
+}
+
+.why-card{
+  padding:25px;
+  border-radius:18px;
+  background:#10101a;
+  border:1px solid rgba(255,255,255,.06);
+  transition:.2s;
+}
+
+.why-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(168,85,247,.25);
+}
+
+.why-icon{
+  font-size:25px;
+  margin-bottom:12px;
+}
+
+.why-card h3{
+  font-size:15px;
+  margin-bottom:6px;
+}
+
+.why-card p{
+  color:#9999aa;
+  font-size:11px;
+}
+
+/* =========================
+   FEATURE BOXES
+========================= */
+
+.feature-box{
+  padding:30px;
+  border-radius:21px;
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      rgba(168,85,247,.08),
+      transparent 30%
+    ),
+    #10101a;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.feature-box h2{
+  font-size:20px;
+  margin-bottom:8px;
+}
+
+.feature-box p{
+  color:#9d9dad;
+  font-size:12px;
+  margin-bottom:18px;
+}
+
+.payment-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-bottom:18px;
+}
+
+.payment-badge{
+  padding:10px 14px;
+  border-radius:10px;
+  background:#171722;
+  border:1px solid rgba(255,255,255,.07);
+  font-size:11px;
+  font-weight:800;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  margin-top:50px;
+  padding:45px 22px 90px;
+  border-top:1px solid rgba(255,255,255,.07);
+  background:#07070d;
+}
+
+.footer-inner{
+  width:100%;
+  max-width:1450px;
+  margin:auto;
+}
+
+.footer-logo{
+  font-size:21px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.footer-inner p{
+  color:#77778a;
+  font-size:11px;
+  max-width:550px;
+}
+
+.footer-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+  margin-top:28px;
+}
+
+.footer-column h4{
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+.footer-column a{
+  display:block;
+  margin:7px 0;
+  color:#858596;
+  font-size:11px;
+}
+
+.footer-column a:hover{
+  color:#c084fc;
+}
+
+/* =========================
+   MOBILE NAV
+========================= */
+
+.mobile-bottom-nav{
+  display:none;
+}
+
+@media(max-width:1100px){
+
+  .nav-links a{
+    padding:9px 7px;
+    font-size:11px;
+  }
+
+  .genre-grid{
+    grid-template-columns:repeat(5,1fr);
+  }
+}
+
+@media(max-width:800px){
+
+  .navbar{
+    padding:10px 14px;
+    flex-wrap:wrap;
+  }
+
+  .search-box{
+    order:3;
+    flex-basis:100%;
+    max-width:none;
+  }
+
+  .nav-links{
+    margin-left:auto;
+  }
+
+  .nav-links a{
+    display:none;
+  }
+
+  .nav-links .notification-link,
+  .nav-links .account-box{
+    display:flex !important;
+  }
+
+  .hero{
+    padding:28px 14px 20px;
+  }
+
+  .hero-box{
+    min-height:390px;
+    padding:48px 25px;
+  }
+
+  .container{
+    padding:0 14px;
+  }
+
+  .why-grid{
+    grid-template-columns:1fr;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:600px){
+
+  body{
+    padding-bottom:70px;
+  }
+
+  .logo{
+    font-size:20px;
+  }
+
+  .account-box{
+    padding:5px 8px !important;
+    gap:6px;
+  }
+
+  .account-photo{
+    width:34px;
+    height:34px;
+  }
+
+  .account-box-text{
+    font-size:10px;
+  }
+
+  .hero h1{
+    font-size:43px;
+    letter-spacing:-1.5px;
+  }
+
+  .hero-box{
+    min-height:420px;
+    padding:38px 20px;
+    border-radius:22px;
+  }
+
+  .hero p{
+    font-size:13px;
+  }
+
+  .hero-actions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  .btn{
+    width:100%;
+  }
+
+  .quick-nav{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .genre-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .section-heading h2{
+    font-size:18px;
+  }
+
+  .song-card{
+    flex-basis:175px;
+    min-width:175px;
+  }
+
+  .song-cover{
+    height:130px;
+  }
+
+  .mini-player{
+    bottom:76px;
+  }
+
+  .mini-player audio{
+    width:115px;
+  }
+
+  .mobile-bottom-nav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:2000;
+    height:65px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    background:rgba(10,10,18,.97);
+    backdrop-filter:blur(18px);
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+
+  .mobile-bottom-nav a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    color:#858596;
+    font-size:10px;
+    font-weight:700;
+  }
+
+  .mobile-bottom-nav a span{
+    font-size:19px;
+    line-height:20px;
+  }
+
+  .mobile-bottom-nav a:hover{
+    color:#c084fc;
+  }
+
+  footer{
+    padding-bottom:90px;
+  }
+}
 </style>
 </head>
+
 <body>
-<header><div class="navbar"><a href="index.html" class="logo">◈ <span>PASONG</span></a><div class="search-box"><span class="search-icon">🔎</span><input id="siteSearch" type="search" placeholder="Search songs, artists, genres..." autocomplete="off"></div><nav class="nav-links"><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="artist-dashboard.html">Upload Music</a><a href="notifications.html" class="notification-link" aria-label="Notifications">🔔<span class="notification-count" id="notificationCount">0</span></a><a href="login.html" class="account-box" id="accountBox"><img id="accountPhoto" class="account-photo" src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true" alt="Account"><span class="account-box-text" id="accountName">Login / Sign Up</span></a></nav></div></header>
-<section class="hero"><div class="hero-box"><img id="heroCover" class="hero-cover" src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true" alt="PASONG music"><div class="hero-cover-overlay"></div><div class="hero-content"><div class="hero-kicker">BUY • DOWNLOAD • SUPPORT • UPLOAD</div><h1>Your Music.<br><span>Your Choice.</span></h1><p id="heroDescription">Discover new music, support African artists and producers, buy songs, download your music and grow with PASONG.</p><div class="hero-actions"><a href="store.html" class="btn btn-primary">🎵 Explore Music</a><a href="artist-dashboard.html" class="btn btn-secondary">⬆️ Upload Music</a><a href="charts.html" class="btn btn-secondary">🔥 View Charts</a></div></div></div></section>
+
+<header>
+  <div class="navbar">
+
+    <a href="index.html" class="logo">
+      ◈ <span>PASONG</span>
+    </a>
+
+    <div class="search-box">
+      <span class="search-icon">🔎</span>
+      <input
+        id="siteSearch"
+        type="search"
+        placeholder="Search songs, artists, genres..."
+        autocomplete="off"
+      >
+    </div>
+
+    <nav class="nav-links">
+
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
+      <a href="artist-dashboard.html">Upload Music</a>
+
+      <a href="notifications.html"
+         class="notification-link"
+         aria-label="Notifications">
+        🔔
+        <span class="notification-count" id="notificationCount">0</span>
+      </a>
+
+      <!-- PASONG ACCOUNT BOX -->
+      <a href="login.html" class="account-box" id="accountBox">
+
+        <img
+          id="accountPhoto"
+          class="account-photo"
+          src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
+          alt="Account"
+        >
+
+        <span class="account-box-text" id="accountName">
+          Login / Sign Up
+        </span>
+
+      </a>
+
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+
+  <div class="hero-box">
+
+    <img
+      id="heroCover"
+      class="hero-cover"
+      src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
+      alt="PASONG music"
+    >
+
+    <div class="hero-cover-overlay"></div>
+
+    <div class="hero-content">
+
+      <div class="hero-kicker">
+        BUY • DOWNLOAD • SUPPORT • UPLOAD
+      </div>
+
+      <h1>
+        Your Music.<br>
+        <span>Your Choice.</span>
+      </h1>
+
+      <p id="heroDescription">
+        Discover new music, support African artists and producers,
+        buy songs, download your music and grow with PASONG.
+      </p>
+
+      <div class="hero-actions">
+
+        <a href="store.html" class="btn btn-primary">
+          🎵 Explore Music
+        </a>
+
+        <a href="artist-dashboard.html" class="btn btn-secondary">
+          ⬆️ Upload Music
+        </a>
+
+        <a href="charts.html" class="btn btn-secondary">
+          🔥 View Charts
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
 <div class="quick-nav">
-<a href="store.html">🎵 All Songs</a>
-<a href="store.html?filter=new">🆕 New</a>
-<a href="charts.html">🔥 Trending</a>
-<a href="artists.html">🎤 Artists</a>
-<a href="artists.html?type=producer">🎛️ Producers</a>
-<a href="artists.html?type=writer">✍️ Writers</a>
-<a href="store.html?type=dj-mix">🎧 GJs / DJs</a>
-<a href="playlists.html">📋 Playlists</a>
-<a href="favorites.html">❤️ Favorites</a>
-<a href="charts.html">🏆 Charts</a>
+
+  <a href="store.html">🎵 All Songs</a>
+  <a href="store.html?filter=new">🆕 New</a>
+  <a href="charts.html">🔥 Trending</a>
+  <a href="artists.html">🎤 Artists</a>
+  <a href="playlists.html">📋 Playlists</a>
+  <a href="favorites.html">❤️ Favorites</a>
+  <a href="charts.html">🏆 Charts</a>
+
+  <!-- ADDED CREATOR BOXES -->
+  <a href="producers.html">🎛️ Producers</a>
+  <a href="djs.html">🎧 DJs</a>
+  <a href="songwriters.html">✍️ Songwriters</a>
+
 </div>
+
 <main class="container">
-<section class="section"><div class="section-heading"><h2>🔥 Trending Music</h2><a href="charts.html">View all →</a></div><div class="music-row" id="trendingMusic"><div class="loading-music">Loading music...</div></div></section>
-<section class="section"><div class="section-heading"><h2>🆕 Latest New Uploads</h2><a href="store.html">View all →</a></div><div class="music-row" id="latestMusic"><div class="loading-music">Loading music...</div></div></section>
-<section class="section"><div class="section-heading"><h2>📥 Top Downloads</h2><a href="charts.html">Charts →</a></div><div class="music-row" id="downloadsMusic"><div class="loading-music">Loading music...</div></div></section>
-<section class="section"><div class="section-heading"><div><h2>🌍 African Hits</h2><span class="uganda-label">PASONG Africa</span></div></div><div class="music-row" id="ugandanMusic"><div class="loading-music">Loading music...</div></div></section>
-<section class="section"><div class="section-heading"><h2>🎼 Browse Genres</h2></div><div class="genre-grid"><a href="store.html?genre=Afrobeats" class="genre-card">Afrobeats</a><a href="store.html?genre=Amapiano" class="genre-card">Amapiano</a><a href="store.html?genre=Gengetone" class="genre-card">Gengetone</a><a href="store.html?genre=Bongo" class="genre-card">Bongo</a><a href="store.html?genre=Dancehall" class="genre-card">Dancehall</a><a href="store.html?genre=Hip Hop" class="genre-card">Hip Hop</a><a href="store.html?genre=R&B" class="genre-card">R&B</a><a href="store.html?genre=Gospel" class="genre-card">Gospel</a><a href="store.html?genre=Reggae" class="genre-card">Reggae</a></div></section>
-<section class="section"><div class="countdown"><h2>⏳ Weekly Countdown</h2><p>Top music this week</p></div></section>
-<section class="section"><div class="section-heading"><h2>🎤 Popular Artists</h2><a href="artists.html">View all →</a></div><div class="music-row">Popular PASONG artists will appear here.</div></section>
-<section class="section dj-mix-section"><div class="section-heading"><div class="dj-mix-header-text"><h2>🎧 PASONG DJ Mixes</h2><span class="dj-mix-subtitle">FREE to stream • Buy & download to support the DJ</span></div><a href="store.html?type=dj-mix">View all →</a></div><div class="dj-mix-panel" id="djMixes"><div class="dj-mix-loading">Loading DJ mixes...</div></div></section>
-<section class="section"><div class="section-heading"><h2>Why PASONG?</h2></div><div class="why-grid"><div class="why-card"><div class="why-icon">🎵</div><h3>Discover Music</h3><p>Find new songs, artists, genres and sounds from Uganda, Africa and beyond.</p></div><div class="why-card"><div class="why-icon">💰</div><h3>Support Artists</h3><p>Every purchase helps music creators earn from their work.</p></div><div class="why-card"><div class="why-icon">📥</div><h3>Buy & Download</h3><p>Purchase your music and keep purchased songs in your PASONG downloads.</p></div></div></section>
-<section class="section"><div class="feature-box"><h2>💳 Easy Payments</h2><p>PASONG supports convenient payment options. Standard song price: <strong>UGX 700</strong>. DJ Mixes are free to stream and cost <strong>UGX 1,000 in Uganda</strong> or <strong>$1 outside Uganda</strong> to buy and download.</p><div class="payment-badges"><div class="payment-badge">🟡 MTN Mobile Money</div><div class="payment-badge">🔴 Airtel Money</div></div><a href="store.html" class="btn btn-primary">Browse Music</a></div></section>
-<section class="section"><div class="feature-box"><h2>📣 Promote Your Music</h2><p>Put your music in front of more listeners with PASONG promotion options for artists and businesses.</p><a href="promotion.html" class="btn btn-primary">Promote Now</a></div></section>
-<section class="section"><div class="feature-box"><h2>🎁 PASONG Points</h2><p>Refer friends to PASONG. A successful qualifying referral earns <strong>50 PASONG Points</strong>.</p><a href="account.html#points" class="btn btn-primary">My Points</a></div></section>
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🔥 Trending Music</h2>
+    <a href="charts.html">View all →</a>
+  </div>
+
+  <div class="music-row" id="trendingMusic">
+    <div class="loading-music">Loading music...</div>
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🆕 Latest New Uploads</h2>
+    <a href="store.html">View all →</a>
+  </div>
+
+  <div class="music-row" id="latestMusic">
+    <div class="loading-music">Loading music...</div>
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>📥 Top Downloads</h2>
+    <a href="charts.html">Charts →</a>
+  </div>
+
+  <div class="music-row" id="downloadsMusic">
+    <div class="loading-music">Loading music...</div>
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <div>
+      <h2>🇺🇬 Top Ugandan Music</h2>
+      <span class="uganda-label">PASONG Uganda</span>
+    </div>
+
+  </div>
+
+  <div class="music-row" id="ugandanMusic">
+    <div class="loading-music">Loading music...</div>
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>🎼 Browse Genres</h2>
+  </div>
+
+  <div class="genre-grid">
+
+    <a href="store.html?genre=Afrobeats" class="genre-card">Afrobeats</a>
+    <a href="store.html?genre=Amapiano" class="genre-card">Amapiano</a>
+    <a href="store.html?genre=Gengetone" class="genre-card">Gengetone</a>
+    <a href="store.html?genre=Bongo" class="genre-card">Bongo</a>
+    <a href="store.html?genre=Dancehall" class="genre-card">Dancehall</a>
+    <a href="store.html?genre=Hip Hop" class="genre-card">Hip Hop</a>
+    <a href="store.html?genre=R&B" class="genre-card">R&B</a>
+    <a href="store.html?genre=Gospel" class="genre-card">Gospel</a>
+    <a href="store.html?genre=Reggae" class="genre-card">Reggae</a>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="countdown">
+
+    <h2>⏳ Weekly Countdown</h2>
+
+    <p>
+      Top music this week
+    </p>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-heading">
+
+    <h2>🎤 Popular Artists</h2>
+
+    <a href="artists.html">
+      View all →
+    </a>
+
+  </div>
+
+  <div class="music-row">
+    Popular PASONG artists will appear here.
+  </div>
+
+</section>
+
+<!-- =========================
+     PASONG DJ MIXES
+========================= -->
+
+<section class="section dj-mix-section">
+
+  <div class="section-heading">
+
+    <div class="dj-mix-header-text">
+
+      <h2>🎧 PASONG DJ Mixes</h2>
+
+      <span class="dj-mix-subtitle">
+        FREE to stream • Buy & download to support the DJ
+      </span>
+
+    </div>
+
+    <a href="store.html?type=dj-mix">
+      View all →
+    </a>
+
+  </div>
+
+  <div class="dj-mix-panel" id="djMixes">
+
+    <div class="dj-mix-loading">
+      Loading DJ mixes...
+    </div>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="section-heading">
+    <h2>Why PASONG?</h2>
+  </div>
+
+  <div class="why-grid">
+
+    <div class="why-card">
+      <div class="why-icon">🎵</div>
+      <h3>Discover Music</h3>
+      <p>
+        Find new songs, artists, genres and sounds
+        from Uganda, Africa and beyond.
+      </p>
+    </div>
+
+    <div class="why-card">
+      <div class="why-icon">💰</div>
+      <h3>Support Artists</h3>
+      <p>
+        Every purchase helps music creators earn
+        from their work.
+      </p>
+    </div>
+
+    <div class="why-card">
+      <div class="why-icon">📥</div>
+      <h3>Buy & Download</h3>
+      <p>
+        Purchase your music and keep purchased songs
+        in your PASONG downloads.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="feature-box">
+
+    <h2>💳 Easy Payments</h2>
+
+    <p>
+      PASONG supports convenient payment options.
+      Standard song price: <strong>UGX 700</strong>.
+      DJ Mixes are free to stream and cost
+      <strong>UGX 1,000 in Uganda</strong> or
+      <strong>$1 outside Uganda</strong> to buy and download.
+    </p>
+
+    <div class="payment-badges">
+
+      <div class="payment-badge">
+        🟡 MTN Mobile Money
+      </div>
+
+      <div class="payment-badge">
+        🔴 Airtel Money
+      </div>
+
+    </div>
+
+    <a href="store.html" class="btn btn-primary">
+      Browse Music
+    </a>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="feature-box">
+
+    <h2>📣 Promote Your Music</h2>
+
+    <p>
+      Put your music in front of more listeners
+      with PASONG promotion options for artists
+      and businesses.
+    </p>
+
+    <a href="promotion.html" class="btn btn-primary">
+      Promote Now
+    </a>
+
+  </div>
+
+</section>
+
+<section class="section">
+
+  <div class="feature-box">
+
+    <h2>🎁 PASONG Points</h2>
+
+    <p>
+      Refer friends to PASONG. A successful qualifying
+      referral earns <strong>50 PASONG Points</strong>.
+    </p>
+
+    <a href="account.html#points" class="btn btn-primary">
+      My Points
+    </a>
+
+  </div>
+
+</section>
+
 </main>
 
-<div id="payPrompt" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px">
-<div style="width:100%;max-width:360px;background:#151520;border:1px solid rgba(192,132,252,.35);border-radius:20px;padding:24px;text-align:center">
-<div style="font-size:38px;margin-bottom:12px">🔒</div>
-<h3 style="font-size:18px;font-weight:900;margin-bottom:8px">Preview Ended</h3>
-<p style="font-size:13px;color:#a0a0b2;margin-bottom:20px">30 second preview finished.<br>Pay <b style="color:#c084fc">UGX 700</b> to unlock full song.</p>
-<div style="display:flex;gap:10px">
-<a id="payPromptBuy" href="store.html" style="flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-weight:900">💳 Pay UGX 700</a>
-<button onclick="document.getElementBy
+<footer>
+
+  <div class="footer-inner">
+
+    <div class="footer-logo">
+      ◈ PASONG
+    </div>
+
+    <p>
+      Music. Opportunity. Support.
+      A platform built to connect music creators and listeners.
+    </p>
+
+    <div class="footer-grid">
+
+      <div class="footer-column">
+
+        <h4>Music</h4>
+
+        <a href="store.html">Music Store</a>
+        <a href="charts.html">Charts</a>
+        <a href="artists.html">Artists</a>
+        <a href="playlists.html">Playlists</a>
+
+      </div>
+
+      <div class="footer-column">
+
+        <h4>Creators</h4>
+
+        <a href="artist-dashboard.html">
+          Upload Music
+        </a>
+
+        <a href="promotion.html">
+          Promotion
+        </a>
+
+        <a href="account.html">
+          My Account
+        </a>
+
+        <a href="account.html#points">
+          PASONG Points
+        </a>
+
+      </div>
+
+      <div class="footer-column">
+
+        <h4>PASONG</h4>
+
+        <a href="notifications.html">
+          Notifications
+        </a>
+
+        <a href="account.html#downloads">
+          My Downloads
+        </a>
+
+        <a href="account.html#earnings">
+          Earnings
+        </a>
+
+      </div>
+
+    </div>
+
+    <p style="margin-top:35px;">
+      PASONG © 2026 • Music • Artists • Opportunity
+    </p>
+
+  </div>
+
+</footer>
+
+<nav class="mobile-bottom-nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    Home
+  </a>
+
+  <a href="store.html">
+    <span>🎵</span>
+    Music
+  </a>
+
+  <a href="charts.html">
+    <span>📊</span>
+    Charts
+  </a>
+
+  <a href="artist-dashboard.html">
+    <span>⬆️</span>
+    Upload
+  </a>
+
+  <a href="account.html">
+    <span>👤</span>
+    Account
+  </a>
+
+</nav>
+
+<div class="mini-player" id="miniPlayer">
+
+  <div class="mini-player-info">
+
+    <div class="mini-player-title" id="miniPlayerTitle">
+      PASONG Music
+    </div>
+
+    <div class="mini-player-label" id="miniPlayerLabel">
+      20 second preview
+    </div>
+
+  </div>
+
+  <audio id="miniAudio" controls preload="none"></audio>
+
+  <button
+    class="mini-player-close"
+    id="closeMiniPlayer"
+    type="button">
+    ✕
+  </button>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+let pasongSupabase = null;
+
+if(
+  window.supabase &&
+  SUPABASE_ANON_KEY &&
+  !SUPABASE_ANON_KEY.startsWith("YOUR_")
+){
+
+  pasongSupabase =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+}
+
+/* =========================
+   ACCOUNT
+========================= */
+
+async function loadPasongAccount(){
+
+  const photo =
+    document.getElementById("accountPhoto");
+
+  const name =
+    document.getElementById("accountName");
+
+  const accountBox =
+    document.getElementById("accountBox");
+
+  if(!photo || !name || !accountBox){
+    return;
+  }
+
+  if(!pasongSupabase){
+
+    name.textContent =
+      "Login / Sign Up";
+
+    accountBox.href =
+      "login.html";
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      data:{
+        user
+      }
+    } =
+      await pasongSupabase.auth.getUser();
+
+    if(!user){
+
+      name.textContent =
+        "Login / Sign Up";
+
+      accountBox.href =
+        "login.html";
+
+      accountBox.setAttribute(
+        "aria-label",
+        "Login / Sign Up"
+      );
+
+      photo.src =
+        "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
+
+      return;
+
+    }
+
+    const {
+      data: profile,
+      error: profileError
+    } =
+      await pasongSupabase
+        .from("artist_profiles")
+        .select(
+          "stage_name, performing_name, artist_name, profile_image_url"
+        )
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if(profileError){
+
+      console.log(
+        "PASONG artist profile:",
+        profileError
+      );
+
+    }
+
+    const metadata =
+      user.user_metadata || {};
+
+    const displayName =
+      profile?.stage_name ||
+      profile?.performing_name ||
+      profile?.artist_name ||
+      metadata.stage_name ||
+      metadata.performing_name ||
+      metadata.full_name ||
+      metadata.name ||
+      user.email ||
+      "Account";
+
+    const profilePhoto =
+      profile?.profile_image_url ||
+      metadata.avatar_url ||
+      metadata.avatar ||
+      metadata.photo_url ||
+      metadata.profile_photo ||
+      metadata.picture ||
+      "";
+
+    if(profilePhoto){
+
+      photo.src =
+        profilePhoto;
+
+      photo.alt =
+        displayName + " profile photo";
+
+    }else{
+
+      photo.src =
+        "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(displayName) +
+        "&background=171722&color=c084fc&bold=true";
+
+      photo.alt =
+        displayName;
+
+    }
+
+    name.textContent =
+      displayName.length > 16
+        ? displayName.substring(0,16) + "…"
+        : displayName;
+
+    accountBox.href =
+      "account.html";
+
+    accountBox.setAttribute(
+      "aria-label",
+      "Open My Account"
+    );
+
+  }catch(error){
+
+    console.log(
+      "PASONG account check:",
+      error
+    );
+
+    name.textContent =
+      "Login / Sign Up";
+
+    accountBox.href =
+      "login.html";
+
+    photo.src =
+      "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
+
+  }
+
+}
+
+/* =========================
+   MUSIC PLAYER
+========================= */
+
+const miniPlayer =
+  document.getElementById("miniPlayer");
+
+const miniAudio =
+  document.getElementById("miniAudio");
+
+const miniPlayerTitle =
+  document.getElementById("miniPlayerTitle");
+
+const miniPlayerLabel =
+  document.getElementById("miniPlayerLabel");
+
+const closeMiniPlayer =
+  document.getElementById("closeMiniPlayer");
+
+let previewTimer = null;
+
+function stopPreview(){
+
+  if(previewTimer){
+
+    clearTimeout(previewTimer);
+    previewTimer = null;
+
+  }
+
+  if(miniAudio){
+
+    miniAudio.pause();
+    miniAudio.removeAttribute("src");
+    miniAudio.load();
+
+  }
+
+  if(miniPlayer){
+
+    miniPlayer.classList.remove("show");
+
+  }
+
+}
+
+function playSongPreview(
+  audioUrl,
+  title
+){
+
+  if(!audioUrl){
+
+    alert(
+      "This song does not have an audio file yet."
+    );
+
+    return;
+
+  }
+
+  if(!miniPlayer || !miniAudio){
+    return;
+  }
+
+  if(previewTimer){
+
+    clearTimeout(previewTimer);
+    previewTimer = null;
+
+  }
+
+  if(miniPlayerLabel){
+
+    miniPlayerLabel.textContent =
+      "20 second preview";
+
+  }
+
+  miniPlayerTitle.textContent =
+    title || "PASONG Music";
+
+  miniAudio.src =
+    audioUrl;
+
+  miniPlayer.classList.add("show");
+
+  miniAudio.currentTime = 0;
+
+  miniAudio.play().catch(
+    function(error){
+
+      console.log(
+        "PASONG player:",
+        error
+      );
+
+    }
+  );
+
+  previewTimer =
+    setTimeout(
+      function(){
+
+        miniAudio.pause();
+        miniAudio.currentTime = 0;
+
+        if(miniPlayer){
+
+          miniPlayer.classList.remove("show");
+
+        }
+
+        previewTimer = null;
+
+      },
+      20000
+    );
+
+}
+
+/* =========================
+   DJ FULL FREE STREAM
+========================= */
+
+function playDjMix(
+  audioUrl,
+  title
+){
+
+  if(!audioUrl){
+
+    alert(
+      "This DJ mix does not have an audio file yet."
+    );
+
+    return;
+
+  }
+
+  if(!miniPlayer || !miniAudio){
+    return;
+  }
+
+  if(previewTimer){
+
+    clearTimeout(previewTimer);
+    previewTimer = null;
+
+  }
+
+  if(miniPlayerLabel){
+
+    miniPlayerLabel.textContent =
+      "FREE full DJ mix stream";
+
+  }
+
+  miniPlayerTitle.textContent =
+    title || "PASONG DJ Mix";
+
+  miniAudio.src =
+    audioUrl;
+
+  miniPlayer.classList.add("show");
+
+  miniAudio.currentTime = 0;
+
+  /*
+    IMPORTANT:
+    There is NO 1-minute timer here.
+    DJ mixes can stream for the full duration.
+  */
+
+  miniAudio.play().catch(
+    function(error){
+
+      console.log(
+        "PASONG DJ player:",
+        error
+      );
+
+    }
+  );
+
+}
+
+if(closeMiniPlayer){
+
+  closeMiniPlayer.addEventListener(
+    "click",
+    function(){
+
+      stopPreview();
+
+    }
+  );
+
+}
+
+/* =========================
+   SONG CARD
+========================= */
+
+function createSongCard(song){
+
+  const title =
+    song.title ||
+    "Untitled Song";
+
+  const audioUrl =
+    song.audio_url ||
+    song.audioUrl ||
+    "";
+
+  const cover =
+    song.cover_url ||
+    song.coverUrl ||
+    "https://ui-avatars.com/api/?name=" +
+    encodeURIComponent(title) +
+    "&background=171722&color=c084fc&bold=true";
+
+  const artist =
+    song.artist_name ||
+    song.stage_name ||
+    song.artist ||
+    "PASONG Artist";
+
+  const songId =
+    song.id || "";
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "song-card";
+
+  card.innerHTML = `
+
+    <img
+      class="song-cover"
+      src="${escapeHtml(cover)}"
+      alt="${escapeHtml(title)}"
+      loading="lazy"
+    >
+
+    <div class="song-info">
+
+      <div class="song-title">
+        ${escapeHtml(title)}
+      </div>
+
+      <div class="song-artist">
+        ${escapeHtml(artist)}
+      </div>
+
+      <div class="song-bottom">
+
+        <span class="song-price">
+          UGX 700
+        </span>
+
+        <button
+          type="button"
+          class="song-play"
+          title="Play 20 second preview"
+          aria-label="Play preview">
+          ▶
+        </button>
+
+      </div>
+
+      <a
+        class="song-open"
+        href="song.html?id=${encodeURIComponent(songId)}">
+        View Song
+      </a>
+
+    </div>
+
+  `;
+
+  const playButton =
+    card.querySelector(".song-play");
+
+  if(playButton){
+
+    playButton.addEventListener(
+      "click",
+      function(event){
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        playSongPreview(
+          audioUrl,
+          title
+        );
+
+      }
+    );
+
+  }
+
+  return card;
+
+}
+
+function escapeHtml(value){
+
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+/* =========================
+   HERO COVER SLIDER
+========================= */
+
+let heroSongs = [];
+let heroIndex = 0;
+let heroTimer = null;
+
+function startHeroSlider(){
+
+  const heroCover =
+    document.getElementById("heroCover");
+
+  if(!heroCover || !heroSongs.length){
+    return;
+  }
+
+  if(heroTimer){
+
+    clearInterval(heroTimer);
+
+  }
+
+  heroIndex = 0;
+
+  heroCover.src =
+    heroSongs[0].cover_url ||
+    heroSongs[0].coverUrl;
+
+  heroTimer =
+    setInterval(
+      function(){
+
+        heroCover.style.opacity = "0";
+
+        setTimeout(
+          function(){
+
+            heroIndex =
+              (heroIndex + 1) %
+              heroSongs.length;
+
+            const song =
+              heroSongs[heroIndex];
+
+            const cover =
+              song.cover_url ||
+              song.coverUrl ||
+              "";
+
+            if(cover){
+
+              heroCover.src = cover;
+
+            }
+
+            heroCover.style.opacity = ".34";
+
+          },
+          400
+        );
+
+      },
+      12000
+    );
+
+}
+
+function loadHeroCovers(songs){
+
+  heroSongs =
+    (songs || []).filter(
+      function(song){
+
+        return !!(
+          song.cover_url ||
+          song.coverUrl
+        );
+
+      }
+    ).slice(0,10);
+
+  startHeroSlider();
+
+}
+
+/* =========================
+   SONG LOADING
+========================= */
+
+async function loadPasongSongs(){
+
+  const containers = {
+
+    trending:
+      document.getElementById("trendingMusic"),
+
+    latest:
+      document.getElementById("latestMusic"),
+
+    downloads:
+      document.getElementById("downloadsMusic"),
+
+    ugandan:
+      document.getElementById("ugandanMusic")
+
+  };
+
+  Object.values(containers).forEach(
+    function(container){
+
+      if(container){
+
+        container.innerHTML =
+          '<div class="loading-music">Loading music...</div>';
+
+      }
+
+    }
+  );
+
+  if(!pasongSupabase){
+
+    showMusicError(
+      containers,
+      "Supabase connection is not available."
+    );
+
+    return;
+
+  }
+
+  try{
+
+    let result =
+      await pasongSupabase
+        .from("songs")
+        .select("*")
+        .order("created_at",{
+          ascending:false
+        })
+        .limit(30);
+
+    if(result.error){
+
+      console.warn(
+        "PASONG ordered songs query failed:",
+        result.error
+      );
+
+      result =
+        await pasongSupabase
+          .from("songs")
+          .select("*")
+          .limit(30);
+
+    }
+
+    if(result.error){
+
+      console.error(
+        "PASONG SUPABASE SONG ERROR:",
+        result.error
+      );
+
+      showMusicError(
+        containers,
+        "Music error: " +
+        (
+          result.error.message ||
+          "Unable to load songs from Supabase."
+        )
+      );
+
+      return;
+
+    }
+
+    const songs =
+      result.data || [];
+
+    console.log(
+      "PASONG songs loaded:",
+      songs
+    );
+
+    if(!songs.length){
+
+      showMusicEmpty(
+        containers,
+        "No songs have been uploaded yet."
+      );
+
+      return;
+
+    }
+
+    loadHeroCovers(songs);
+
+    renderSongs(
+      containers.latest,
+      songs.slice(0,10)
+    );
+
+    renderSongs(
+      containers.trending,
+      songs.slice(0,10)
+    );
+
+    renderSongs(
+      containers.downloads,
+      songs.slice(0,10)
+    );
+
+    const ugandanSongs =
+      songs.filter(
+        function(song){
+
+          const text = (
+
+            song.country ||
+            song.region ||
+            song.category ||
+            song.genre ||
+            song.category_name ||
+            ""
+
+          ).toString().toLowerCase();
+
+          return (
+            text.includes("uganda") ||
+            text.includes("ugandan")
+          );
+
+        }
+      );
+
+    renderSongs(
+      containers.ugandan,
+      ugandanSongs.length
+        ? ugandanSongs.slice(0,10)
+        : songs.slice(0,10)
+    );
+
+  }catch(error){
+
+    console.error(
+      "PASONG SONG LOADING ERROR:",
+      error
+    );
+
+    showMusicError(
+      containers,
+      "Music error: " +
+      (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+function renderSongs(
+  container,
+  songs
+){
+
+  if(!container){
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if(!songs || !songs.length){
+
+    container.innerHTML =
+      '<div class="empty-music">No music available.</div>';
+
+    return;
+
+  }
+
+  songs.forEach(
+    function(song){
+
+      container.appendChild(
+        createSongCard(song)
+      );
+
+    }
+  );
+
+}
+
+function showMusicError(
+  containers,
+  message
+){
+
+  Object.values(containers).forEach(
+    function(container){
+
+      if(container){
+
+        container.innerHTML =
+          '<div class="empty-music">' +
+          escapeHtml(message) +
+          '</div>';
+
+      }
+
+    }
+  );
+
+}
+
+function showMusicEmpty(
+  containers,
+  message
+){
+
+  Object.values(containers).forEach(
+    function(container){
+
+      if(container){
+
+        container.innerHTML =
+          '<div class="empty-music">' +
+          escapeHtml(message) +
+          '</div>';
+
+      }
+
+    }
+  );
+
+}
+
+/* =========================
+   DJ MIX DETECTION
+========================= */
+
+function isDjMix(song){
+
+  const explicitType = [
+
+    song.content_type,
+    song.contentType,
+    song.type,
+    song.song_type,
+    song.songType,
+    song.creator_type,
+    song.creatorType,
+    song.media_type,
+    song.mediaType,
+    song.role
+
+  ]
+  .filter(Boolean)
+  .join(" ")
+  .toLowerCase();
+
+  if(
+    explicitType.includes("dj") ||
+    explicitType.includes("deejay") ||
+    explicitType.includes("disc jockey") ||
+    explicitType.includes("dj mix") ||
+    explicitType.includes("dj_mix")
+  ){
+
+    return true;
+
+  }
+
+  const searchableText = [
+
+    song.title,
+    song.description,
+    song.genre,
+    song.category,
+    song.category_name,
+    song.tags
+
+  ]
+  .filter(Boolean)
+  .join(" ")
+  .toLowerCase();
+
+  return (
+    searchableText.includes("dj mix") ||
+    searchableText.includes("dj_mix") ||
+    searchableText.includes("deejay mix") ||
+    searchableText.includes("dj set") ||
+    searchableText.includes("djset") ||
+    searchableText.includes("mixtape")
+  );
+
+}
+
+/* =========================
+   DJ MIX PRICE
+========================= */
+
+let pasongDjCountry = null;
+
+async function detectDjCountry(){
+
+  /*
+    This is only for displaying the price.
+    The real payment endpoint MUST verify
+    the buyer's IP/country server-side.
+  */
+
+  try{
+
+    const response =
+      await fetch(
+        "https://ipapi.co/country_code/",
+        {
+          method:"GET",
+          cache:"no-store"
+        }
+      );
+
+    if(!response.ok){
+      throw new Error("Country lookup failed");
+    }
+
+    const country =
+      (await response.text())
+      .trim()
+      .toUpperCase();
+
+    pasongDjCountry =
+      country || null;
+
+  }catch(error){
+
+    console.log(
+      "PASONG DJ country lookup:",
+      error
+    );
+
+    /*
+      Do not guess a user's location.
+      Default display is USD when the
+      country cannot be verified.
+    */
+
+    pasongDjCountry = null;
+
+  }
+
+}
+
+function getDjPrice(){
+
+  if(
+    pasongDjCountry === "UG"
+  ){
+
+    return {
+      amount:1000,
+      currency:"UGX",
+      display:"UGX 1,000"
+    };
+
+  }
+
+  return {
+    amount:1,
+    currency:"USD",
+    display:"$1"
+  };
+
+}
+
+/* =========================
+   DJ MIX CARD
+========================= */
+
+function createDjMixCard(mix){
+
+  const title =
+    mix.title ||
+    "Untitled DJ Mix";
+
+  const audioUrl =
+    mix.audio_url ||
+    mix.audioUrl ||
+    "";
+
+  const cover =
+    mix.cover_url ||
+    mix.coverUrl ||
+    "https://ui-avatars.com/api/?name=" +
+    encodeURIComponent(title) +
+    "&background=171722&color=c084fc&bold=true";
+
+  const djName =
+    mix.dj_name ||
+    mix.deejay_name ||
+    mix.stage_name ||
+    mix.performing_name ||
+    mix.artist_name ||
+    mix.artist ||
+    "PASONG DJ";
+
+  const mixId =
+    mix.id || "";
+
+  const price =
+    getDjPrice();
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "dj-mix-card";
+
+  card.innerHTML = `
+
+    <img
+      class="dj-mix-cover"
+      src="${escapeHtml(cover)}"
+      alt="${escapeHtml(title)}"
+      loading="lazy"
+    >
+
+    <div class="dj-mix-info">
+
+      <div class="dj-mix-title">
+        ${escapeHtml(title)}
+      </div>
+
+      <div class="dj-mix-dj">
+        🎧 ${escapeHtml(djName)}
+      </div>
+
+      <div class="dj-mix-free">
+        ▶ FREE FULL STREAM
+      </div>
+
+      <div class="dj-mix-price">
+        Buy & Download: ${escapeHtml(price.display)}
+      </div>
+
+      <div class="dj-mix-actions">
+
+        <button
+          type="button"
+          class="dj-mix-stream">
+          ▶ Stream Free
+        </button>
+
+        <a
+          class="dj-mix-buy"
+          href="song.html?id=${encodeURIComponent(mixId)}&type=dj-mix&action=buy">
+          💰 Buy
+        </a>
+
+      </div>
+
+      <a
+        class="dj-mix-tip"
+        href="song.html?id=${encodeURIComponent(mixId)}&type=dj-mix&action=tip">
+        💜 Tip DJ
+      </a>
+
+      <a
+        class="dj-mix-open"
+        href="song.html?id=${encodeURIComponent(mixId)}&type=dj-mix">
+        View DJ Mix
+      </a>
+
+    </div>
+
+  `;
+
+  const streamButton =
+    card.querySelector(".dj-mix-stream");
+
+  if(streamButton){
+
+    streamButton.addEventListener(
+      "click",
+      function(event){
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        playDjMix(
+          audioUrl,
+          title
+        );
+
+      }
+    );
+
+  }
+
+  return card;
+
+}
+
+/* =========================
+   DJ MIX LOADING
+========================= */
+
+async function loadPasongDjMixes(){
+
+  const container =
+    document.getElementById("djMixes");
+
+  if(!container){
+    return;
+  }
+
+  container.innerHTML =
+    '<div class="dj-mix-loading">Loading DJ mixes...</div>';
+
+  if(!pasongSupabase){
+
+    container.innerHTML =
+      '<div class="dj-mix-empty">' +
+      'DJ mixes are currently unavailable.' +
+      '</div>';
+
+    return;
+
+  }
+
+  try{
+
+    /*
+      Keep using the existing songs table.
+      This avoids changing the current database
+      until the dedicated DJ upload/database
+      system is ready.
+    */
+
+    const result =
+      await pasongSupabase
+        .from("songs")
+        .select("*")
+        .order("created_at",{
+          ascending:false
+        })
+        .limit(100);
+
+    if(result.error){
+
+      console.error(
+        "PASONG DJ MIX QUERY ERROR:",
+        result.error
+      );
+
+      container.innerHTML =
+        '<div class="dj-mix-empty">' +
+        'Unable to load DJ mixes right now.' +
+        '</div>';
+
+      return;
+
+    }
+
+    const songs =
+      result.data || [];
+
+    const mixes =
+      songs
+        .filter(isDjMix)
+        .slice(0,10);
+
+    if(!mixes.length){
+
+      container.innerHTML =
+        '<div class="dj-mix-empty">' +
+        'No DJ mixes are available yet. DJ mixes uploaded as DJ content will appear here.' +
+        '</div>';
+
+      return;
+
+    }
+
+    container.innerHTML = "";
+
+    mixes.forEach(
+      function(mix){
+
+        container.appendChild(
+          createDjMixCard(mix)
+        );
+
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      "PASONG DJ MIX LOADING ERROR:",
+      error
+    );
+
+    container.innerHTML =
+      '<div class="dj-mix-empty">' +
+      'Unable to load DJ mixes right now.' +
+      '</div>';
+
+  }
+
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+const siteSearch =
+  document.getElementById("siteSearch");
+
+if(siteSearch){
+
+  siteSearch.addEventListener(
+    "keydown",
+    function(event){
+
+      if(event.key !== "Enter"){
+        return;
+      }
+
+      const query =
+        siteSearch.value.trim();
+
+      if(!query){
+        return;
+      }
+
+      window.location.href =
+        "store.html?search=" +
+        encodeURIComponent(query);
+
+    }
+  );
+
+}
+
+/* =========================
+   START PASONG
+========================= */
+
+loadPasongAccount();
+
+loadPasongSongs();
+
+detectDjCountry()
+  .then(
+    function(){
+
+      loadPasongDjMixes();
+
+    }
+  )
+  .catch(
+    function(){
+
+      loadPasongDjMixes();
+
+    }
+  );
+
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js")
+      .then(() => console.log("PASONG Service Worker registered"))
+      .catch(err => console.error("PASONG Service Worker error:", err));
+  });
+}
+</script>
+
+</body>
+</html>
