@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PASONG File Separator</title>
+</head>
+<body>
+
+<h2>PASONG File Separator</h2>
+
+<p>
+Select your current <b>index.html</b> file below.
+This will extract the existing CSS and JavaScript without changing their contents.
+</p>
+
+<input type="file" id="file" accept=".html">
+
+<script>
+document.getElementById("file").addEventListener("change", async function(){
+
+  const file = this.files[0];
+
+  if(!file){
+    return;
+  }
+
+  const html = await file.text();
+
+  /* =========================
+     EXTRACT CSS
+  ========================= */
+
+  const styleMatch =
+    html.match(/<style>([\s\S]*?)<\/style>/i);
+
+  if(!styleMatch){
+
+    alert("Could not find the existing <style> section.");
+
+    return;
+
+  }
+
+  const css =
+    styleMatch[1].trim();
+
+  /* =========================
+     EXTRACT MAIN JAVASCRIPT
+  ========================= */
+
+  const scripts =
+    [...html.matchAll(/<script>([\s\S]*?)<\/script>/gi)];
+
+  if(scripts.length < 2){
+
+    alert("Could not find the existing JavaScript sections.");
+
+    return;
+
+  }
+
+  const homeJs =
+    scripts[0][1].trim();
+
+  /* =========================
+     DOWNLOAD home.css
+  ========================= */
+
+  downloadFile(
+    "home.css",
+    css,
+    "text/css"
+  );
+
+  /* =========================
+     DOWNLOAD home.js
+  ========================= */
+
+  downloadFile(
+    "home.js",
+    homeJs,
+    "application/javascript"
+  );
+
+  /* =========================
+     CREATE CLEAN INDEX
+  ========================= */
+
+  let cleanHtml =
+    html.replace(
+      styleMatch[0],
+      '<link rel="stylesheet" href="home.css">'
+    );
+
+  cleanHtml =
+    cleanHtml.replace(
+      scripts[0][0],
+      '<script src="home.js"></script>'
+    );
+
+  downloadFile(
+    "index.html",
+    cleanHtml,
+    "text/html"
+  );
+
+  alert(
+    "Done! home.css, home.js and index.html have been created."
+  );
+
+});
+
+
+function downloadFile(
+  filename,
+  content,
+  type
+){
+
+  const blob =
+    new Blob(
+      [content],
+      {type:type}
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+  a.download = filename;
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+
+}
+</script>
+
+</body>
+</html>
