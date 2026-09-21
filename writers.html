@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+
+<title>PASONG — Songwriters</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#0b0b12;
+  color:#fff;
+  min-height:100vh;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  gap:22px;
+  padding:15px 28px;
+  background:rgba(11,11,18,.96);
+  border-bottom:1px solid #252532;
+  backdrop-filter:blur(12px);
+}
+
+.logo{
+  font-size:23px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.logo span{
+  background:linear-gradient(90deg,#8b5cf6,#c084fc,#ec4899);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.search-box{
+  flex:1;
+  max-width:500px;
+  position:relative;
+}
+
+.search-box input{
+  width:100%;
+  padding:12px 18px 12px 43px;
+  border-radius:25px;
+  border:1px solid #30303d;
+  outline:none;
+  background:#171722;
+  color:#fff;
+  font-size:14px;
+}
+
+.search-icon{
+  position:absolute;
+  left:16px;
+  top:11px;
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-left:auto;
+}
+
+.nav-links a{
+  color:#c9c9d5;
+  font-size:14px;
+}
+
+.nav-links a:hover{
+  color:#c084fc;
+}
+
+.notification-link{
+  position:relative;
+  font-size:18px !important;
+}
+
+.notification-count{
+  position:absolute;
+  top:-8px;
+  right:-9px;
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  border-radius:20px;
+  background:#ec4899;
+  color:#fff;
+  font-size:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.account-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border:1px solid #30303d;
+  border-radius:25px;
+  background:#171722;
+}
+
+.account-photo{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+}
+
+.page{
+  width:min(1200px,92%);
+  margin:auto;
+  padding:45px 0 120px;
+}
+
+.page-hero{
+  padding:42px 30px;
+  border-radius:24px;
+  background:
+    linear-gradient(135deg,rgba(139,92,246,.25),rgba(236,72,153,.10)),
+    #14141f;
+  border:1px solid #292936;
+  margin-bottom:35px;
+}
+
+.page-kicker{
+  color:#c084fc;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1px;
+  margin-bottom:12px;
+}
+
+.page-hero h1{
+  font-size:42px;
+  margin-bottom:12px;
+}
+
+.page-hero h1 span{
+  background:linear-gradient(90deg,#8b5cf6,#c084fc,#ec4899);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.page-hero p{
+  color:#aaaab8;
+  max-width:700px;
+  line-height:1.7;
+}
+
+.section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.section-header h2{
+  font-size:23px;
+}
+
+.section-header a{
+  color:#c084fc;
+  font-size:14px;
+}
+
+.filters{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:28px;
+}
+
+.filter-btn{
+  border:1px solid #30303d;
+  background:#171722;
+  color:#c9c9d5;
+  padding:9px 16px;
+  border-radius:20px;
+  cursor:pointer;
+}
+
+.filter-btn:hover,
+.filter-btn.active{
+  background:#8b5cf6;
+  border-color:#8b5cf6;
+  color:#fff;
+}
+
+.writer-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+
+.writer-card{
+  background:#14141f;
+  border:1px solid #292936;
+  border-radius:18px;
+  padding:20px;
+  transition:.2s;
+}
+
+.writer-card:hover{
+  transform:translateY(-3px);
+  border-color:#8b5cf6;
+}
+
+.writer-image{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  border-radius:14px;
+  margin-bottom:15px;
+  background:#20202c;
+}
+
+.writer-name{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.writer-role{
+  color:#c084fc;
+  font-size:13px;
+  margin-bottom:8px;
+}
+
+.writer-info{
+  color:#9292a1;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:15px;
+}
+
+.profile-btn{
+  display:block;
+  text-align:center;
+  padding:10px;
+  border-radius:10px;
+  background:linear-gradient(90deg,#8b5cf6,#ec4899);
+  font-weight:700;
+  font-size:13px;
+}
+
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;
+  padding:45px 20px;
+  border:1px dashed #30303d;
+  border-radius:18px;
+  color:#858592;
+}
+
+.earnings-section{
+  margin-top:45px;
+  padding:28px;
+  background:#14141f;
+  border:1px solid #292936;
+  border-radius:20px;
+}
+
+.earnings-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
+.earning-card{
+  padding:20px;
+  border-radius:15px;
+  background:#1b1b27;
+  border:1px solid #2c2c39;
+}
+
+.earning-card small{
+  color:#8f8f9e;
+  display:block;
+  margin-bottom:9px;
+}
+
+.earning-card strong{
+  font-size:21px;
+}
+
+.footer{
+  border-top:1px solid #252532;
+  padding:35px 20px;
+  text-align:center;
+  color:#777785;
+}
+
+.footer-logo{
+  color:#c084fc;
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.bottom-nav{
+  display:none;
+}
+
+@media(max-width:1000px){
+  .writer-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .earnings-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .nav-links a:nth-child(-n+6){
+    display:none;
+  }
+}
+
+@media(max-width:700px){
+  .header{
+    padding:13px 15px;
+    gap:12px;
+  }
+
+  .logo{
+    font-size:19px;
+  }
+
+  .account-box span{
+    display:none;
+  }
+
+  .search-box{
+    max-width:none;
+  }
+
+  .page{
+    width:94%;
+    padding-top:25px;
+    padding-bottom:100px;
+  }
+
+  .page-hero{
+    padding:28px 20px;
+  }
+
+  .page-hero h1{
+    font-size:31px;
+  }
+
+  .writer-grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+
+  .writer-card{
+    padding:12px;
+  }
+
+  .writer-name{
+    font-size:15px;
+  }
+
+  .earnings-section{
+    padding:20px;
+  }
+
+  .bottom-nav{
+    position:fixed;
+    display:flex;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:200;
+    justify-content:space-around;
+    padding:10px 5px;
+    background:#11111a;
+    border-top:1px solid #292936;
+  }
+
+  .bottom-nav a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    color:#9999a8;
+    font-size:11px;
+  }
+
+  .bottom-nav a:first-child{
+    color:#c084fc;
+  }
+}
+
+@media(max-width:420px){
+  .writer-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .earnings-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+  <a href="index.html" class="logo">
+    ◈ <span>PASONG</span>
+  </a>
+
+  <div class="search-box">
+    <span class="search-icon">🔎</span>
+    <input
+      id="writerSearch"
+      type="search"
+      placeholder="Search songwriters..."
+      autocomplete="off"
+    >
+  </div>
+
+  <nav class="nav-links">
+
+    <a href="store.html">Music Store</a>
+    <a href="charts.html">Charts</a>
+    <a href="artists.html">Artists</a>
+    <a href="playlists.html">Playlists</a>
+    <a href="promotion.html">Promotion</a>
+    <a href="artist-dashboard.html">Upload Music</a>
+
+    <a
+      href="notifications.html"
+      class="notification-link"
+      aria-label="Notifications"
+    >
+      🔔
+      <span class="notification-count">0</span>
+    </a>
+
+    <a href="login.html" class="account-box">
+
+      <img
+        class="account-photo"
+        src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
+        alt="Account"
+      >
+
+      <span>
+        Login / Sign Up
+      </span>
+
+    </a>
+
+  </nav>
+
+</header>
+
+
+<main class="page">
+
+  <section class="page-hero">
+
+    <div class="page-kicker">
+      PASONG CREATOR COMMUNITY
+    </div>
+
+    <h1>
+      ✍️ PASONG <span>Songwriters</span>
+    </h1>
+
+    <p>
+      Discover the writers behind the songs on PASONG.
+      Explore songwriting credits, genres and the music
+      created by talented songwriters.
+    </p>
+
+  </section>
+
+
+  <div class="section-header">
+
+    <h2>✍️ Popular Songwriters</h2>
+
+    <a href="index.html">
+      ← Back Home
+    </a>
+
+  </div>
+
+
+  <div class="filters">
+
+    <button class="filter-btn active" data-genre="all">
+      All
+    </button>
+
+    <button class="filter-btn" data-genre="Afrobeats">
+      Afrobeats
+    </button>
+
+    <button class="filter-btn" data-genre="Amapiano">
+      Amapiano
+    </button>
+
+    <button class="filter-btn" data-genre="Dancehall">
+      Dancehall
+    </button>
+
+    <button class="filter-btn" data-genre="Hip Hop">
+      Hip Hop
+    </button>
+
+    <button class="filter-btn" data-genre="Gospel">
+      Gospel
+    </button>
+
+  </div>
+
+
+  <section>
+
+    <div class="writer-grid" id="writerGrid">
+
+      <div class="empty-state">
+        Loading songwriters...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="earnings-section">
+
+    <div class="section-header">
+
+      <h2>💰 Songwriter Earnings</h2>
+
+      <a href="account.html#earnings">
+        My Earnings →
+      </a>
+
+    </div>
+
+    <div class="earnings-grid">
+
+      <div class="earning-card">
+        <small>Available Balance</small>
+        <strong>UGX 0</strong>
+      </div>
+
+      <div class="earning-card">
+        <small>Pending Earnings</small>
+        <strong>UGX 0</strong>
+      </div>
+
+      <div class="earning-card">
+        <small>Total Earned</small>
+        <strong>UGX 0</strong>
+      </div>
+
+      <div class="earning-card">
+        <small>Writing Royalties</small>
+        <strong>UGX 0</strong>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer class="footer">
+
+  <div class="footer-logo">
+    ◈ PASONG
+  </div>
+
+  <p>
+    Music. Opportunity. Support.
+  </p>
+
+  <p style="margin-top:12px;">
+    PASONG © 2026
+  </p>
+
+</footer>
+
+
+<nav class="bottom-nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    Home
+  </a>
+
+  <a href="store.html">
+    <span>🎵</span>
+    Music
+  </a>
+
+  <a href="charts.html">
+    <span>📊</span>
+    Charts
+  </a>
+
+  <a href="artist-dashboard.html">
+    <span>⬆️</span>
+    Upload
+  </a>
+
+  <a href="account.html">
+    <span>👤</span>
+    Account
+  </a>
+
+</nav>
+
+
+<script>
+
+const songwriters = [
+
+  {
+    name: "PASONG WRITER",
+    genre: "Afrobeats",
+    location: "Uganda",
+    image: "https://ui-avatars.com/api/?name=PASONG+WRITER&background=171722&color=c084fc&bold=true"
+  }
+
+];
+
+const writerGrid =
+  document.getElementById("writerGrid");
+
+const searchInput =
+  document.getElementById("writerSearch");
+
+const filterButtons =
+  document.querySelectorAll(".filter-btn");
+
+
+function renderSongwriters(list){
+
+  writerGrid.innerHTML = "";
+
+  if(!list.length){
+
+    writerGrid.innerHTML = `
+      <div class="empty-state">
+        No songwriters found.
+      </div>
+    `;
+
+    return;
+  }
+
+  list.forEach(writer => {
+
+    const card = document.createElement("div");
+
+    card.className = "writer-card";
+
+    card.innerHTML = `
+
+      <img
+        class="writer-image"
+        src="${writer.image}"
+        alt="${writer.name}"
+      >
+
+      <div class="writer-name">
+        ${writer.name}
+      </div>
+
+      <div class="writer-role">
+        ✍️ Songwriter
+      </div>
+
+      <div class="writer-info">
+        ${writer.genre}<br>
+        📍 ${writer.location}
+      </div>
+
+      <a
+        href="songwriter-profile.html?name=${encodeURIComponent(writer.name)}"
+        class="profile-btn"
+      >
+        View Profile
+      </a>
+
+    `;
+
+    writerGrid.appendChild(card);
+
+  });
+
+}
+
+
+function applyFilters(){
+
+  const search =
+    searchInput.value.toLowerCase().trim();
+
+  const activeButton =
+    document.querySelector(".filter-btn.active");
+
+  const genre =
+    activeButton
+      ? activeButton.dataset.genre
+      : "all";
+
+  const filtered =
+    songwriters.filter(writer => {
+
+      const matchesSearch =
+        writer.name.toLowerCase().includes(search) ||
+        writer.genre.toLowerCase().includes(search) ||
+        writer.location.toLowerCase().includes(search);
+
+      const matchesGenre =
+        genre === "all" ||
+        writer.genre === genre;
+
+      return matchesSearch && matchesGenre;
+
+    });
+
+  renderSongwriters(filtered);
+
+}
+
+
+searchInput.addEventListener(
+  "input",
+  applyFilters
+);
+
+
+filterButtons.forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    filterButtons.forEach(btn =>
+      btn.classList.remove("active")
+    );
+
+    button.classList.add("active");
+
+    applyFilters();
+
+  });
+
+});
+
+
+renderSongwriters(songwriters);
+
+</script>
+
+</body>
+</html>
