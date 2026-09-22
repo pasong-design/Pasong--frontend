@@ -654,7 +654,7 @@ footer{
 
     <a href="producers.html">🎛️ Producers</a>
 
-    <a href="dj.html" class="active">🎧 DJs</a>
+    <a href="djs.html" class="active">🎧 DJs</a>
 
     <a href="songwriters.html">✍️ Songwriters</a>
 
@@ -792,37 +792,123 @@ async function loadSongs(){
   allSongs = data || [];
 }
 
+async function loadDJs(){
+
+  const { data, error } = await supabaseClient
+    .from("user_roles")
+    .select("user_id, role");
+
+  if(error){
+    console.error("DJ roles loading error:", error);
+    throw error;
+  }
+
+  const djUserIds = Array.from(
+    new Set(
+      (data || [])
+        .filter(row =>
+          String(row.role || "").toLowerCase().trim() === "dj"
+        )
+        .map(row => row.user_id)
+        .filter(Boolean)
+    )
+  );
+
+  if(!djUserIds.length){
+    allDJs = [];
+    renderDJs([]);
+    renderMixes(allSongs.filter(isDjMix).slice(0,12));
+    return;
+  }
+
+  const { data: profiles, error: profileError } =
+    await supabaseClient
+      .from("artist_profiles")
+      .select("*")
+      .in("user_id", djUserIds);
+
+  if(profileError){
+    console.error("DJ profiles loading error:", profileError);
+    throw profileError;
+  }
+
+  const mixes = allSongs.filter(isDjMix);
+
+  const mixByUser = new Map();
+
+  mixes.forEach(song => {
+
+    const userId =
+      song.dj_user_id ||
+      song.uploader_user_id ||
+      song.artist_user_id;
+
+    if(!userId){
+      return;
+    }
+
+    if(!mixByUser.has(userId)){
+      mixByUser.set(userId, []);
+    }
+
+    mixByUser.get(userId).push(song);
+
+  });
+
+  allDJs = (profiles || []).map(profile => {
+
+    const profileMixes =
+      mixByUser.get(profile.user_id) || [];
+
+    const name =
+      profile.performing_name ||
+      profile.stage_name ||
+      profile.artist_name ||
+      "PASONG DJ";
+
+    const cover =
+      profile.profile_image_url ||
+      profile.cover_image_url ||
+      "";
+
+    const plays =
+      profileMixes.reduce(
+        (total, song) =>
+          total + Number(song.plays || 0),
+        0
+      );
+
+    return {
+      user_id: profile.user_id,
+      profile_id: profile.id,
+      name,
+      cover,
+      mixes: profileMixes,
+      plays
+    };
+
+  });
+
+  renderDJs(allDJs);
+
+  renderMixes(
+    mixes.slice(0,12)
+  );
+}
+
 function buildDJs(){
 
   const map = new Map();
 
-  const mixes = allSongs.filter(isDjMix);
+  allDJs.forEach(dj => {
 
-  mixes.forEach(song => {
-
-    const name = getCreatorName(song);
-
-    const key = name.toLowerCase().trim();
+    const key =
+      String(dj.user_id || dj.profile_id || dj.name)
+        .toLowerCase()
+        .trim();
 
     if(!map.has(key)){
-
-      map.set(key,{
-        name,
-        cover:getCover(song),
-        mixes:[],
-        plays:0
-      });
-
-    }
-
-    const dj = map.get(key);
-
-    dj.mixes.push(song);
-
-    dj.plays += Number(song.plays || 0);
-
-    if(!dj.cover && getCover(song)){
-      dj.cover = getCover(song);
+      map.set(key,dj);
     }
 
   });
@@ -832,7 +918,7 @@ function buildDJs(){
   renderDJs(allDJs);
 
   renderMixes(
-    mixes.slice(0,12)
+    allSongs.filter(isDjMix).slice(0,12)
   );
 }
 
@@ -888,8 +974,12 @@ function renderDJs(djs){
           </div>
 
           <div class="dj-meta">
-            ${dj.mixes.length}
-            mix${dj.mixes.length === 1 ? "" : "es"}
+            ${
+              dj.mixes.length
+              ? `${dj.mixes.length}
+                 mix${dj.mixes.length === 1 ? "" : "es"}`
+              : "DJ profile"
+            }
             ${dj.plays ? ` • ${formatNumber(dj.plays)} plays` : ""}
           </div>
 
@@ -904,20 +994,20 @@ function renderDJs(djs){
                   ▶ Play
                 </button>
               `
-              : ""
-            }
-
-            ${
-              firstMix
-              ? `
+              : `
                 <a
-                  class="view-btn"
-                  href="song.html?id=${encodeURIComponent(firstMix.id)}&type=dj-mix">
-                  View
+                  class="play-btn"
+                  href="dj.html?id=${encodeURIComponent(dj.user_id || dj.profile_id)}">
+                  🎧 View DJ
                 </a>
               `
-              : ""
             }
+
+            <a
+              class="view-btn"
+              href="dj.html?id=${encodeURIComponent(dj.user_id || dj.profile_id)}">
+              View
+            </a>
 
           </div>
 
@@ -1124,6 +1214,8 @@ async function init(){
   try{
 
     await loadSongs();
+
+    await loadDJs();
 
     buildDJs();
 
