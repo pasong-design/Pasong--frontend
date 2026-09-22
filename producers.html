@@ -3,14 +3,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#8b5cf6"><title>PASONG — Producer</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG — Producer</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
 *{
 box-sizing:border-box;
 margin:0;
 padding:0;
-}
-
-body{
+}body{
 font-family:Arial,Helvetica,sans-serif;
 background:#09090f;
 color:#fff;
@@ -109,6 +110,7 @@ gap:8px;
 width:34px;
 height:34px;
 border-radius:50%;
+object-fit:cover;
 }
 
 main{
@@ -775,7 +777,9 @@ color:#c084fc;
 }
 
 }
-</style></head><body><header class="header">
+</style>
+
+</head><body><header class="header">
 <div class="header-inner"><a href="index.html" class="logo">
 ◈ <span>PASONG</span>
 </a><div class="search-box">
@@ -796,6 +800,7 @@ autocomplete="off">
 <a href="https://pasong-frontend.vercel.app/producer-dashboard.html">
 🎹 Producer Dashboard
 </a><a href="account.html" class="account-box"><img
+id="accountPhoto"
 class="account-photo"
 src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
 alt="Account">
@@ -853,8 +858,7 @@ class="btn btn-secondary">
 🛒 Beat Store
 </a>
 
-</div></div>
-</div></section><section id="beat-store" class="section"><div class="section-header"><div><h2>🎹 Beat Store</h2><p class="section-subtitle">
+</div></div></div></section><section id="beat-store" class="section"><div class="section-header"><div><h2>🎹 Beat Store</h2><p class="section-subtitle">
 Browse and purchase beats from
 <span id="beatStoreProducer">KV BEATS</span>.
 </p></div></div><div id="beatGrid" class="beat-grid"></div><div id="beatStatus" class="loading">
@@ -1041,6 +1045,43 @@ producerName;
 
 aboutProducerName.textContent =
 producerName;
+
+async function loadAccountPhoto(){
+
+const {
+data:{
+user
+}
+} =
+await supabaseClient.auth.getUser();
+
+if(!user){
+return;
+}
+
+const accountPhoto =
+document.getElementById(
+"accountPhoto"
+);
+
+const metadata =
+user.user_metadata || {};
+
+const photo =
+metadata.avatar_url ||
+metadata.profile_photo_url ||
+metadata.photo_url ||
+metadata.picture ||
+"";
+
+if(photo){
+
+accountPhoto.src =
+photo;
+
+}
+
+}
 
 function firstValue(
 row,
@@ -1764,6 +1805,8 @@ alert(
 
 }
 );
+
+loadAccountPhoto();
 
 loadBeats();
 
