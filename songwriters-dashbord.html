@@ -169,7 +169,7 @@ button{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(5,1fr);
   gap:14px;
   margin-bottom:22px;
 }
@@ -201,6 +201,17 @@ button{
   margin-top:7px;
   color:#777181;
   font-size:12px;
+}
+
+.hit-stat{
+  border-color:rgba(236,72,153,.35);
+  background:
+    radial-gradient(circle at 90% 10%,rgba(236,72,153,.13),transparent 45%),
+    #11101b;
+}
+
+.hit-stat .stat-value{
+  color:#f0abfc;
 }
 
 .section{
@@ -333,6 +344,63 @@ td{
   color:#86efac;
 }
 
+.hit-badge{
+  display:inline-flex;
+  align-items:center;
+  margin-left:7px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(236,72,153,.12);
+  color:#f0abfc;
+  font-size:10px;
+  font-weight:800;
+}
+
+.hit-list{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.hit-card{
+  background:#0c0c14;
+  border:1px solid #3a2547;
+  border-radius:16px;
+  padding:17px;
+}
+
+.hit-card h3{
+  margin-bottom:8px;
+  font-size:16px;
+}
+
+.hit-card-artist{
+  color:#9992a5;
+  font-size:12px;
+  margin-bottom:14px;
+}
+
+.hit-card-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.hit-number{
+  padding:7px 9px;
+  border-radius:9px;
+  background:#151321;
+  color:#ddd6fe;
+  font-size:12px;
+}
+
+.hit-label{
+  margin-top:12px;
+  color:#f0abfc;
+  font-size:12px;
+  font-weight:800;
+}
+
 .empty{
   text-align:center;
   padding:35px 15px;
@@ -400,8 +468,29 @@ td{
   margin-bottom:15px;
 }
 
+.hit-rule{
+  margin-bottom:15px;
+  padding:13px 15px;
+  border-radius:12px;
+  background:rgba(236,72,153,.06);
+  border:1px solid #3a2547;
+  color:#aaa3bb;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.hit-rule strong{
+  color:#f0abfc;
+}
+
 .mobile-nav{
   display:none;
+}
+
+@media(max-width:1050px){
+  .grid{
+    grid-template-columns:repeat(3,1fr);
+  }
 }
 
 @media(max-width:900px){
@@ -409,7 +498,8 @@ td{
     grid-template-columns:repeat(2,1fr);
   }
 
-  .cards{
+  .cards,
+  .hit-list{
     grid-template-columns:repeat(2,1fr);
   }
 
@@ -460,7 +550,8 @@ td{
     font-size:20px;
   }
 
-  .cards{
+  .cards,
+  .hit-list{
     grid-template-columns:1fr;
   }
 
@@ -547,6 +638,13 @@ td{
   <div class="stat-small">Approved writing credits</div>
 </div>
 
+<div class="stat hit-stat">
+  <div class="stat-icon">🔥</div>
+  <div class="stat-label">Hit Songs</div>
+  <div class="stat-value" id="hitCount">0</div>
+  <div class="stat-small">Based on PASONG performance</div>
+</div>
+
 <div class="stat">
   <div class="stat-icon">▶️</div>
   <div class="stat-label">Total Plays</div>
@@ -566,6 +664,20 @@ td{
   <div class="stat-label">Writing Services</div>
   <div class="stat-value" id="serviceCount">0</div>
   <div class="stat-small">Your own prices</div>
+</div>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">🔥 Hit Songs</div>
+        <div class="section-subtitle">Songs where your writing credit has reached PASONG's hit threshold.</div>
+      </div>
+    </div><div class="hit-rule">
+  A song is currently counted as a <strong>🔥 Hit</strong> when it reaches <strong>10,000 plays</strong> or <strong>500 downloads</strong>.
+</div>
+
+<div class="hit-list" id="hitSongsList">
+  <div class="empty">Loading hit songs...</div>
 </div>
 
   </section>  <section class="section">
@@ -712,7 +824,7 @@ td{
   </a>  <a href="store.html">
     <span>🎵</span>
     <span>Store</span>
-  </a>  <a href="artist-dashboard.html" class="active">
+  </a>  <a href="writer-dashboard.html" class="active">
     <span>📊</span>
     <span>Dashboard</span>
   </a>
@@ -728,6 +840,9 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
+
+const HIT_PLAYS = 10000;
+const HIT_DOWNLOADS = 500;
 
 let currentUser = null;
 let currentProfile = null;
@@ -762,7 +877,21 @@ function escapeHtml(value){
     .replace(/'/g,"&#039;");
 }
 
+function isHit(song){
+  const plays =
+    Number(song.plays || 0);
+
+  const downloads =
+    Number(song.downloads || 0);
+
+  return (
+    plays >= HIT_PLAYS ||
+    downloads >= HIT_DOWNLOADS
+  );
+}
+
 async function loadAccount(){
+
   const {
     data:{
       session
@@ -770,7 +899,8 @@ async function loadAccount(){
   } = await supabaseClient.auth.getSession();
 
   if(!session || !session.user){
-    window.location.href = "login.html?redirect=writer-dashboard.html";
+    window.location.href =
+      "login.html?redirect=writer-dashboard.html";
     return;
   }
 
@@ -805,7 +935,9 @@ async function loadProfile(){
     .maybeSingle();
 
   if(error){
-    showMessage("Unable to load your writer profile.");
+    showMessage(
+      "Unable to load your writer profile."
+    );
     return;
   }
 
@@ -877,6 +1009,7 @@ async function loadWriterSongs(){
     .order("created_at",{ascending:false});
 
   if(error){
+
     document.getElementById("songsTable").innerHTML = `
       <tr>
         <td colspan="5" class="empty">
@@ -884,12 +1017,20 @@ async function loadWriterSongs(){
         </td>
       </tr>
     `;
+
+    document.getElementById("hitSongsList").innerHTML = `
+      <div class="empty">
+        Unable to load hit songs.
+      </div>
+    `;
+
     return;
   }
 
   writerSongs = data || [];
 
   renderSongs();
+  renderHitSongs();
   updateStats();
 }
 
@@ -899,6 +1040,7 @@ function renderSongs(){
     document.getElementById("songsTable");
 
   if(!writerSongs.length){
+
     table.innerHTML = `
       <tr>
         <td colspan="5" class="empty">
@@ -906,39 +1048,114 @@ function renderSongs(){
         </td>
       </tr>
     `;
+
     return;
   }
 
   table.innerHTML =
-    writerSongs.map(song => `
-      <tr>
-        <td>
-          <div class="song-title">
-            ${escapeHtml(song.title || "Untitled")}
-          </div>
-          <div class="song-artist">
-            Writer credit
-          </div>
-        </td>
+    writerSongs.map(song => {
 
-        <td>
-          ${escapeHtml(song.genre || "Not set")}
-        </td>
+      const hitBadge =
+        isHit(song)
+          ? `<span class="hit-badge">🔥 HIT</span>`
+          : "";
 
-        <td>
-          ${formatNumber(song.plays)}
-        </td>
+      return `
+        <tr>
+          <td>
+            <div class="song-title">
+              ${escapeHtml(song.title || "Untitled")}
+              ${hitBadge}
+            </div>
 
-        <td>
-          ${formatNumber(song.downloads)}
-        </td>
+            <div class="song-artist">
+              Writer credit
+            </div>
+          </td>
 
-        <td>
-          <span class="status">
-            ${escapeHtml(song.status || "approved")}
+          <td>
+            ${escapeHtml(song.genre || "Not set")}
+          </td>
+
+          <td>
+            ${formatNumber(song.plays)}
+          </td>
+
+          <td>
+            ${formatNumber(song.downloads)}
+          </td>
+
+          <td>
+            <span class="status">
+              ${escapeHtml(song.status || "approved")}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+}
+
+function renderHitSongs(){
+
+  const container =
+    document.getElementById("hitSongsList");
+
+  const hitSongs =
+    writerSongs
+      .filter(song => isHit(song))
+      .sort((a,b) => {
+
+        const aScore =
+          Number(a.plays || 0) +
+          Number(a.downloads || 0) * 10;
+
+        const bScore =
+          Number(b.plays || 0) +
+          Number(b.downloads || 0) * 10;
+
+        return bScore - aScore;
+      });
+
+  if(!hitSongs.length){
+
+    container.innerHTML = `
+      <div class="empty">
+        No hit songs yet. Keep growing your plays and downloads.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    hitSongs.map(song => `
+      <div class="hit-card">
+
+        <h3>
+          🔥 ${escapeHtml(song.title || "Untitled")}
+        </h3>
+
+        <div class="hit-card-artist">
+          ${escapeHtml(song.genre || "Genre not set")}
+        </div>
+
+        <div class="hit-card-stats">
+
+          <span class="hit-number">
+            ▶️ ${formatNumber(song.plays)} plays
           </span>
-        </td>
-      </tr>
+
+          <span class="hit-number">
+            ⬇️ ${formatNumber(song.downloads)} downloads
+          </span>
+
+        </div>
+
+        <div class="hit-label">
+          🔥 PASONG HIT
+        </div>
+
+      </div>
     `).join("");
 }
 
@@ -946,6 +1163,9 @@ function updateStats(){
 
   const songCount =
     writerSongs.length;
+
+  const hitCount =
+    writerSongs.filter(song => isHit(song)).length;
 
   const totalPlays =
     writerSongs.reduce(
@@ -964,6 +1184,9 @@ function updateStats(){
   document.getElementById("songCount").textContent =
     formatNumber(songCount);
 
+  document.getElementById("hitCount").textContent =
+    formatNumber(hitCount);
+
   document.getElementById("totalPlays").textContent =
     formatNumber(totalPlays);
 
@@ -973,91 +1196,123 @@ function updateStats(){
 
 document
   .getElementById("profileForm")
-  .addEventListener("submit",async function(event){
+  .addEventListener(
+    "submit",
+    async function(event){
 
-    event.preventDefault();
+      event.preventDefault();
 
-    hideMessage();
+      hideMessage();
 
-    if(!currentUser){
-      return;
-    }
+      if(!currentUser){
+        return;
+      }
 
-    const stageName =
-      document.getElementById("stageName").value.trim();
+      const stageName =
+        document
+          .getElementById("stageName")
+          .value
+          .trim();
 
-    const genre =
-      document.getElementById("genre").value.trim();
+      const genre =
+        document
+          .getElementById("genre")
+          .value
+          .trim();
 
-    const bio =
-      document.getElementById("bio").value.trim();
+      const bio =
+        document
+          .getElementById("bio")
+          .value
+          .trim();
 
-    const existing =
-      currentProfile || {};
+      const existing =
+        currentProfile || {};
 
-    const payload = {
-      user_id:currentUser.id,
-      stage_name:stageName,
-      performing_name:
-        existing.performing_name || stageName,
-      artist_name:
-        existing.artist_name || stageName,
-      genre:genre,
-      bio:bio,
-      profile_image_url:
-        existing.profile_image_url || null,
-      verified:
-        existing.verified || false
-    };
+      const payload = {
+        user_id:currentUser.id,
+        stage_name:stageName,
+        performing_name:
+          existing.performing_name ||
+          stageName,
+        artist_name:
+          existing.artist_name ||
+          stageName,
+        genre:genre,
+        bio:bio,
+        profile_image_url:
+          existing.profile_image_url ||
+          null,
+        verified:
+          existing.verified ||
+          false
+      };
 
-    const {
-      error
-    } = await supabaseClient
-      .from("artist_profiles")
-      .upsert(
-        payload,
-        {
-          onConflict:"user_id"
-        }
-      );
+      const {
+        error
+      } = await supabaseClient
+        .from("artist_profiles")
+        .upsert(
+          payload,
+          {
+            onConflict:"user_id"
+          }
+        );
 
-    if(error){
+      if(error){
+
+        showMessage(
+          "Profile could not be saved: " +
+          error.message
+        );
+
+        return;
+      }
+
       showMessage(
-        "Profile could not be saved: " +
-        error.message
+        "Writer profile saved successfully."
       );
-      return;
+
+      await loadProfile();
     }
-
-    showMessage("Writer profile saved successfully.");
-
-    await loadProfile();
-  });
+  );
 
 document
   .getElementById("addServiceBtn")
-  .addEventListener("click",function(){
-    showMessage(
-      "Writer services need a writer-services database table before prices can be saved. Your public profile can then show the exact prices you choose."
-    );
-  });
+  .addEventListener(
+    "click",
+    function(){
+
+      showMessage(
+        "Writer services need a writer-services database table before prices can be saved. Your public profile can then show the exact prices you choose."
+      );
+    }
+  );
 
 document
   .getElementById("withdrawBtn")
-  .addEventListener("click",function(){
-    showMessage(
-      "Withdrawals will be connected to the PASONG mobile-money withdrawal system."
-    );
-  });
+  .addEventListener(
+    "click",
+    function(){
+
+      showMessage(
+        "Withdrawals will be connected to the PASONG mobile-money withdrawal system."
+      );
+    }
+  );
 
 document
   .getElementById("logoutBtn")
-  .addEventListener("click",async function(){
+  .addEventListener(
+    "click",
+    async function(){
 
-    await supabaseClient.auth.signOut();
+      await supabaseClient.auth.signOut();
 
-    window.location.href = "login.html";
-  });
+      window.location.href =
+        "login.html";
+    }
+  );
 
 loadAccount();
 </script></body>
