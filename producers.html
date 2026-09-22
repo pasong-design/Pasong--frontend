@@ -1,1594 +1,436 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#8b5cf6">
-<title>PASONG Producer Checkout</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-*{
-box-sizing:border-box;
-margin:0;
-padding:0
-}
-
-body{
-font-family:Arial,Helvetica,sans-serif;
-background:#09090f;
-color:#fff;
-min-height:100vh
-}
-
-a{
-color:inherit;
-text-decoration:none
-}
-
-button,input,textarea,select{
-font:inherit
-}
-
-button{
-cursor:pointer
-}
-
-.header{
-position:sticky;
-top:0;
-z-index:100;
-background:rgba(10,10,18,.96);
-border-bottom:1px solid #242433;
-backdrop-filter:blur(12px)
-}
-
-.header-inner{
-max-width:900px;
-margin:auto;
-padding:14px 20px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:15px
-}
-
-.logo{
-font-size:24px;
-font-weight:800
-}
-
-.logo span{
-color:#c084fc
-}
-
-.header-link{
-color:#aaaabd;
-font-size:14px
-}
-
-.header-link:hover{
-color:#c084fc
-}
-
-main{
-max-width:900px;
-margin:auto;
-padding:35px 20px 80px
-}
-
-.checkout-card{
-background:#11111c;
-border:1px solid #292938;
-border-radius:24px;
-overflow:hidden;
-box-shadow:0 20px 60px rgba(0,0,0,.35)
-}
-
-.checkout-header{
-padding:25px;
-border-bottom:1px solid #292938;
-background:
-radial-gradient(circle at 85% 20%,rgba(236,72,153,.18),transparent 30%),
-radial-gradient(circle at 15% 80%,rgba(139,92,246,.18),transparent 35%)
-}
-
-.kicker{
-color:#ec4899;
-font-size:12px;
-font-weight:800;
-letter-spacing:2px;
-margin-bottom:8px
-}
-
-h1{
-font-size:32px;
-margin-bottom:8px
-}
-
-.subtitle{
-color:#9999aa;
-line-height:1.6
-}
-
-.product{
-display:grid;
-grid-template-columns:220px 1fr;
-gap:25px;
-padding:25px
-}
-
-.product-cover{
-width:100%;
-aspect-ratio:1/1;
-object-fit:cover;
-border-radius:16px;
-background:#171722;
-border:1px solid #292938
-}
-
-.product-info h2{
-font-size:25px;
-margin-bottom:8px
-}
-
-.product-meta{
-color:#aaaabd;
-line-height:1.7;
-margin-bottom:18px
-}
-
-.price-options{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-margin-top:18px
-}
-
-.price-option{
-background:#0b0b15;
-border:1px solid #29293e;
-border-radius:14px;
-padding:18px
-}
-
-.price-option small{
-display:block;
-color:#9999aa;
-margin-bottom:7px
-}
-
-.price-option strong{
-font-size:20px;
-color:#c084fc
-}
-
-.price-option.selected{
-border-color:#8b5cf6;
-box-shadow:0 0 0 1px #8b5cf6
-}
-
-.section{
-padding:25px;
-border-top:1px solid #292938
-}
-
-.section h3{
-font-size:20px;
-margin-bottom:16px
-}
-
-.form-group{
-margin-bottom:15px
-}
-
-.form-group label{
-display:block;
-font-size:13px;
-font-weight:bold;
-color:#d8d8e5;
-margin-bottom:7px
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select{
-width:100%;
-padding:13px 14px;
-border-radius:10px;
-border:1px solid #343449;
-background:#0b0b15;
-color:#fff;
-outline:none
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus{
-border-color:#8b5cf6
-}
-
-.form-group textarea{
-min-height:100px;
-resize:vertical
-}
-
-.form-row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px
-}
-
-.payment-box{
-background:#171722;
-border:1px solid #343449;
-border-radius:16px;
-padding:18px
-}
-
-.payment-title{
-font-weight:bold;
-margin-bottom:6px
-}
-
-.payment-subtitle{
-color:#9999aa;
-font-size:13px;
-line-height:1.6;
-margin-bottom:15px
-}
-
-.payment-buttons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px
-}
-
-.payment-button{
-border:0;
-border-radius:12px;
-padding:14px;
-font-weight:bold;
-color:#fff;
-background:#1e1e2d;
-border:1px solid #35354a
-}
-
-.payment-button.primary{
-background:linear-gradient(135deg,#8b5cf6,#ec4899);
-border:0
-}
-
-.payment-button:disabled{
-opacity:.55;
-cursor:not-allowed
-}
-
-.total-box{
-background:#0b0b15;
-border:1px solid #343449;
-border-radius:14px;
-padding:18px;
-margin-bottom:18px
-}
-
-.total-row{
-display:flex;
-justify-content:space-between;
-gap:15px;
-padding:7px 0;
-color:#aaaabd
-}
-
-.total-row.final{
-border-top:1px solid #292938;
-margin-top:8px;
-padding-top:14px;
-color:#fff;
-font-size:19px;
-font-weight:bold
-}
-
-.total-row.final strong{
-color:#c084fc
-}
-
-.notice{
-background:#1d1830;
-border:1px solid #392b56;
-color:#c084fc;
-border-radius:12px;
-padding:14px;
-font-size:13px;
-line-height:1.6;
-margin-bottom:15px
-}
-
-.message{
-display:none;
-padding:14px;
-border-radius:12px;
-margin-top:15px;
-background:#171722;
-border:1px solid #343449;
-color:#cfcfe0;
-line-height:1.6
-}
-
-.message.show{
-display:block
-}
-
-.message.success{
-border-color:#315c45;
-color:#9be7bb
-}
-
-.message.error{
-border-color:#6b3030;
-color:#ffabab
-}
-
-.loading{
-text-align:center;
-padding:60px 20px;
-color:#9999aa
-}
-
-.hidden{
-display:none!important
-}
-
-footer{
-border-top:1px solid #252532;
-padding:30px 20px;
-color:#888899;
-text-align:center;
-font-size:13px
-}
-
-@media(max-width:650px){
-
-main{
-padding:20px 14px 50px
-}
-
-.header-inner{
-padding:13px 14px
-}
-
-.product{
-grid-template-columns:1fr;
-padding:18px
-}
-
-.product-cover{
-max-width:280px;
-margin:auto
-}
-
-.checkout-header{
-padding:20px
-}
-
-h1{
-font-size:26px
-}
-
-.section{
-padding:20px
-}
-
-.price-options{
-grid-template-columns:1fr
-}
-
-.payment-buttons{
-grid-template-columns:1fr
-}
-
-.form-row{
-grid-template-columns:1fr
-}
-
-}
-</style>
-</head>
-
-<body>
+<!-- PRODUCER PUBLIC PAGE -->
 
 <header class="header">
+  <div class="header-inner">
 
-<div class="header-inner">
+    <a href="index.html" class="logo">
+      ◈ <span>PASONG</span>
+    </a>
 
-<a href="index.html" class="logo">
-◈ <span>PASONG</span>
-</a>
+    <div class="search-box">
+      <span class="search-icon">🔎</span>
+      <input
+        id="producerSearch"
+        type="search"
+        placeholder="Search producers..."
+        autocomplete="off"
+      >
+    </div>
 
-<a href="javascript:history.back()" class="header-link">
-← Back
-</a>
+    <nav class="nav-links">
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
+      <a href="artist-dashboard.html">Upload Music</a>
+      <a href="notifications.html">🔔 0</a>
 
-</div>
+      <a href="login.html" class="account-box">
+        <img
+          class="account-photo"
+          src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
+          alt="Account"
+        >
+        <span>Login / Sign Up</span>
+      </a>
+    </nav>
 
+  </div>
 </header>
 
 <main>
 
-<div id="loading" class="loading">
-Loading producer checkout...
-</div>
+  <section class="hero">
 
-<div id="checkout" class="checkout-card hidden">
+    <div class="studio-banner">
+      <img
+        src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1600&q=80"
+        alt="Producer Studio"
+      >
+    </div>
 
-<div class="checkout-header">
+    <div class="producer-profile">
 
-<div class="kicker">
-PASONG PRODUCER MARKETPLACE
-</div>
+      <img
+        class="producer-main-photo"
+        src="https://ui-avatars.com/api/?name=KV+BEATS&background=171722&color=c084fc&bold=true&size=300"
+        alt="KV BEATS"
+      >
 
-<h1>Producer Checkout</h1>
+      <div class="producer-info">
 
-<p class="subtitle">
-Purchase a producer service or beat license securely through PASONG.
-</p>
+        <div class="hero-kicker">
+          PASONG PRODUCER
+        </div>
 
-</div>
+        <h1>
+          🎛️ Producer <span>KV BEATS</span>
+        </h1>
+
+        <p class="producer-location">
+          📍 Kampala &nbsp;|&nbsp;
+          🎹 Afrobeats / Amapiano Specialist
+        </p>
 
-<div class="product">
+        <p class="producer-tagline">
+          12 beats sold • 3 hits • 5 years producing
+        </p>
 
-<img
-id="productCover"
-class="product-cover"
-src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
-alt="Producer">
+        <div class="hero-actions">
 
-<div class="product-info">
+          <button class="btn btn-primary">
+            ▶ Play Showreel
+          </button>
 
-<h2 id="productTitle">
-Producer Service
-</h2>
+          <button class="btn btn-secondary">
+            Follow
+          </button>
 
-<div id="productMeta" class="product-meta">
-Loading...
-</div>
+          <button class="btn btn-secondary">
+            💬 Hire Me
+          </button>
 
-<div class="price-options">
+          <a
+            href="#beat-store"
+            class="btn btn-secondary"
+          >
+            🛒 Beat Store
+          </a>
 
-<div id="leaseOption" class="price-option">
+        </div>
 
-<small>Beat Lease</small>
+      </div>
 
-<strong id="leasePrice">
-Price not set
-</strong>
+    </div>
 
-</div>
+  </section>
 
-<div id="exclusiveOption" class="price-option">
+  <section
+    id="beat-store"
+    class="section"
+  >
 
-<small>Exclusive Rights</small>
+    <div class="section-header">
 
-<strong id="exclusivePrice">
-Price not set
-</strong>
+      <div>
+        <h2>🎹 Beat Store</h2>
 
-</div>
+        <p class="section-subtitle">
+          Browse and purchase beats from KV BEATS.
+        </p>
+      </div>
 
-</div>
+    </div>
 
-</div>
+    <div
+      id="beatGrid"
+      class="beat-grid"
+    ></div>
 
-</div>
+    <div
+      id="beatStatus"
+      class="loading"
+    >
+      Loading beats...
+    </div>
 
-<div class="section">
+  </section>
 
-<h3>Order Details</h3>
+  <section class="section">
 
-<div class="form-group">
+    <div class="section-header">
+      <h2>🏆 Credits / Hits</h2>
+    </div>
+
+    <div
+      id="creditsGrid"
+      class="credits-grid"
+    >
+
+      <a
+        href="store.html"
+        class="credit-card"
+      >
+        <div>
+          <strong>Song A</strong>
+          <span>Artist X</span>
+        </div>
 
-<label for="buyerName">
-Your Name
-</label>
+        <span>100K plays →</span>
+      </a>
+
+      <a
+        href="store.html"
+        class="credit-card"
+      >
+        <div>
+          <strong>Song B</strong>
+          <span>Artist Y</span>
+        </div>
+
+        <span>75K plays →</span>
+      </a>
+
+    </div>
+
+  </section>
+
+  <section class="section">
 
-<input
-id="buyerName"
-type="text"
-placeholder="Your name"
-required>
+    <div class="section-header">
+      <h2>🎛️ Services &amp; Pricing</h2>
+    </div>
 
-</div>
+    <div class="services-grid">
 
-<div class="form-row">
+      <div class="service-card">
+        <span>🎛️</span>
+        <strong>Beat Lease</strong>
+        <p>From UGX 50K</p>
+      </div>
 
-<div class="form-group">
+      <div class="service-card">
+        <span>💿</span>
+        <strong>Exclusive Rights</strong>
+        <p>From UGX 300K</p>
+      </div>
 
-<label for="buyerPhone">
-Phone / WhatsApp
-</label>
+      <div class="service-card">
+        <span>🎹</span>
+        <strong>Custom Beat</strong>
+        <p>From UGX 150K</p>
+      </div>
 
-<input
-id="buyerPhone"
-type="tel"
-placeholder="+256 7XX XXX XXX"
-required>
+      <div class="service-card">
+        <span>🎚️</span>
+        <strong>Mixing &amp; Mastering</strong>
+        <p>UGX 100K</p>
+      </div>
 
-</div>
+    </div>
 
-<div class="form-group">
+    <button class="btn btn-primary">
+      💬 Request Custom Beat
+    </button>
 
-<label for="buyerEmail">
-Email
-</label>
+  </section>
 
-<input
-id="buyerEmail"
-type="email"
-placeholder="your@email.com">
+  <section class="section">
 
-</div>
+    <div class="section-header">
+      <h2>🎚️ Studio Setup / Tags</h2>
+    </div>
 
-</div>
+    <div class="studio-info">
 
-<div class="form-group">
+      <div>
+        <strong>DAW</strong>
+        <p>FL Studio • Logic</p>
+      </div>
 
-<label for="orderMessage">
-Message to Producer
-</label>
+      <div>
+        <strong>Tags</strong>
+        <p>
+          #Afrobeats #Amapiano #Dancehall
+        </p>
+      </div>
 
-<textarea
-id="orderMessage"
-placeholder="Add any instructions for the producer..."></textarea>
+      <div>
+        <strong>Availability</strong>
+        <p>
+          🟢 Yes — 24h delivery
+        </p>
+      </div>
 
-</div>
+    </div>
 
-</div>
+  </section>
 
-<div class="section">
+  <section class="section">
 
-<h3>Payment</h3>
+    <div class="section-header">
+      <h2>📊 Producer Stats</h2>
+    </div>
 
-<div class="total-box">
+    <div class="stats-grid">
 
-<div class="total-row">
+      <div class="stat-card">
+        <strong>45</strong>
+        <span>Beats Uploaded</span>
+      </div>
 
-<span>Service</span>
+      <div class="stat-card">
+        <strong>12</strong>
+        <span>Beats Sold</span>
+      </div>
 
-<span id="summaryService">
-Beat Lease
-</span>
+      <div class="stat-card">
+        <strong>4.9 ⭐</strong>
+        <span>23 Reviews</span>
+      </div>
 
-</div>
+      <div class="stat-card">
+        <strong>2 hours</strong>
+        <span>Response Time</span>
+      </div>
 
-<div class="total-row">
+    </div>
 
-<span>Producer</span>
+  </section>
 
-<span id="summaryProducer">
-KV BEATS
-</span>
+  <section class="section">
 
-</div>
+    <div class="section-header">
+      <h2>⭐ Reviews</h2>
+    </div>
 
-<div class="total-row final">
+    <div class="reviews-grid">
 
-<span>Total</span>
+      <div class="review-card">
 
-<strong id="summaryTotal">
-UGX 0
-</strong>
+        <div class="review-stars">
+          ⭐⭐⭐⭐⭐
+        </div>
 
-</div>
+        <p>
+          "Beat was fire, hit in 2 days."
+        </p>
 
-</div>
+        <strong>
+          John
+        </strong>
 
-<div class="notice">
-For Uganda mobile-money payments, use the MTN option below. The payment request will be sent to the phone number entered above.
-</div>
+      </div>
 
-<div class="payment-box">
+    </div>
 
-<div class="payment-title">
-Choose Payment Method
-</div>
+  </section>
 
-<div class="payment-subtitle">
-MTN Mobile Money is currently connected. Other payment methods can be connected later.
-</div>
+  <section class="section">
 
-<div class="payment-buttons">
+    <div class="section-header">
+      <h2>🎛️ About &amp; Studio</h2>
+    </div>
 
-<button
-id="mtnButton"
-class="payment-button primary"
-type="button">
-📱 Pay with MTN
-</button>
+    <div class="about-card">
 
-<button
-id="airtelButton"
-class="payment-button"
-type="button">
-📱 Airtel Money
-</button>
+      <h3>
+        KV BEATS
+      </h3>
 
-</div>
+      <p>
+        Kampala-based music producer creating Afrobeats,
+        Amapiano and Dancehall sounds for artists.
+      </p>
 
-<div id="paymentMessage" class="message"></div>
+      <div class="tags">
+        <span>#Afrobeats</span>
+        <span>#Amapiano</span>
+        <span>#Dancehall</span>
+      </div>
 
-</div>
+    </div>
 
-</div>
+  </section>
 
-</div>
+  <section class="section">
+
+    <div class="section-header">
+      <h2>📞 Contact / Booking</h2>
+    </div>
+
+    <div class="contact-actions">
+
+      <a
+        href="#"
+        class="btn btn-primary"
+      >
+        💬 WhatsApp
+      </a>
+
+      <a
+        href="mailto:"
+        class="btn btn-secondary"
+      >
+        ✉️ Email
+      </a>
+
+      <button class="btn btn-secondary">
+        🎙️ Book Studio Session
+      </button>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-header">
+
+      <h2>
+        🎛️ Similar Producers
+      </h2>
+
+    </div>
+
+    <div
+      id="similarProducers"
+      class="producer-grid"
+    ></div>
+
+  </section>
 
 </main>
 
 <footer>
-© 2026 PASONG — Music. Opportunity. Support.
+  <div>
+    © 2026 PASONG — Music. Opportunity. Support.
+  </div>
 </footer>
 
+<nav class="mobile-nav">
+
+  <a href="index.html">
+    🏠<br>Home
+  </a>
+
+  <a href="store.html">
+    🎵<br>Music
+  </a>
+
+  <a href="charts.html">
+    🏆<br>Charts
+  </a>
+
+  <a href="artist-dashboard.html">
+    ⬆️<br>Upload
+  </a>
+
+  <a href="login.html">
+    👤<br>Account
+  </a>
+
+</nav>
+
 <script>
+function openBeatCheckout(beat,license,buyNow){
 
-const SUPABASE_URL =
-"https://mtufczmjlkvycarxylgh.supabase.co";
+  if(!beat.id){
 
-const SUPABASE_PUBLISHABLE_KEY =
-"sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+    alert("This beat does not have a valid PASONG ID yet.");
 
-const PAYMENT_API =
-"https://pasong-mom.vercel.app/api/pay";
+    return;
 
-const API_BASE =
-"https://pasong-api.onrender.com";
+  }
 
-const supabaseClient =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_PUBLISHABLE_KEY
-);
+  const url =
+  "producer-checkout.html?beat=" +
+  encodeURIComponent(beat.id) +
+  "&license=" +
+  encodeURIComponent(license);
 
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-const beatId =
-params.get("beat");
-
-const license =
-params.get("license") ||
-"lease";
-
-let beat = null;
-let producer = null;
-let selectedLicense = license;
-
-const loading =
-document.getElementById("loading");
-
-const checkout =
-document.getElementById("checkout");
-
-const productCover =
-document.getElementById("productCover");
-
-const productTitle =
-document.getElementById("productTitle");
-
-const productMeta =
-document.getElementById("productMeta");
-
-const leasePrice =
-document.getElementById("leasePrice");
-
-const exclusivePrice =
-document.getElementById("exclusivePrice");
-
-const summaryService =
-document.getElementById("summaryService");
-
-const summaryProducer =
-document.getElementById("summaryProducer");
-
-const summaryTotal =
-document.getElementById("summaryTotal");
-
-const paymentMessage =
-document.getElementById("paymentMessage");
-
-function firstValue(
-row,
-fields,
-fallback=""
-){
-
-if(!row){
-return fallback;
-}
-
-for(const field of fields){
-
-const value =
-row[field];
-
-if(
-value !== undefined &&
-value !== null &&
-String(value).trim() !== ""
-){
-
-return value;
+  window.location.href = url;
 
 }
-
-}
-
-return fallback;
-
-}
-
-function escapeHtml(value){
-
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-function formatUGX(amount){
-
-return "UGX " +
-Number(amount || 0)
-.toLocaleString("en-UG");
-
-}
-
-function getBeatTitle(row){
-
-return firstValue(
-row,
-[
-"beat_name",
-"beat_title",
-"title",
-"name"
-],
-"Untitled Beat"
-);
-
-}
-
-function getBeatCover(row){
-
-return firstValue(
-row,
-[
-"beat_cover_url",
-"cover_url",
-"cover_image_url",
-"artwork_url",
-"image_url",
-"cover",
-"thumbnail_url"
-],
-"https://ui-avatars.com/api/?name=Beat&background=171722&color=c084fc&bold=true"
-);
-
-}
-
-function getGenre(row){
-
-return firstValue(
-row,
-[
-"genre",
-"genres",
-"music_genre"
-],
-"Beat"
-);
-
-}
-
-function getBpm(row){
-
-return firstValue(
-row,
-[
-"bpm",
-"tempo"
-],
-""
-);
-
-}
-
-function getKey(row){
-
-return firstValue(
-row,
-[
-"key",
-"musical_key"
-],
-""
-);
-
-}
-
-function getLeasePrice(row){
-
-return Number(
-firstValue(
-row,
-[
-"lease_mp3_price",
-"lease_wav_price",
-"stems_price",
-"lease_price",
-"beat_lease_price",
-"leasing_price"
-],
-0
-)
-);
-
-}
-
-function getExclusivePrice(row){
-
-return Number(
-firstValue(
-row,
-[
-"exclusive_price",
-"beat_exclusive_price",
-"exclusive_rights_price"
-],
-0
-)
-);
-
-}
-
-function getProducerName(row){
-
-return firstValue(
-row,
-[
-"performing_name",
-"artist_name",
-"stage_name",
-"name"
-],
-"Producer"
-);
-
-}
-
-function getProducerId(row){
-
-return firstValue(
-row,
-[
-"producer_id",
-"artist_id"
-],
-""
-);
-
-}
-
-function showMessage(
-message,
-type="normal"
-){
-
-paymentMessage.textContent =
-message;
-
-paymentMessage.className =
-"message show " +
-type;
-
-}
-
-function selectLicense(type){
-
-selectedLicense =
-type;
-
-const leaseOption =
-document.getElementById("leaseOption");
-
-const exclusiveOption =
-document.getElementById("exclusiveOption");
-
-if(type === "exclusive"){
-
-exclusiveOption.classList.add("selected");
-leaseOption.classList.remove("selected");
-
-summaryService.textContent =
-"Exclusive Rights";
-
-summaryTotal.textContent =
-formatUGX(
-getExclusivePrice(beat)
-);
-
-}else{
-
-leaseOption.classList.add("selected");
-exclusiveOption.classList.remove("selected");
-
-summaryService.textContent =
-"Beat Lease";
-
-summaryTotal.textContent =
-formatUGX(
-getLeasePrice(beat)
-);
-
-}
-
-}
-
-async function loadUser(){
-
-const {
-data:{user}
-} =
-await supabaseClient.auth.getUser();
-
-if(!user){
-return;
-}
-
-const metadata =
-user.user_metadata || {};
-
-const name =
-metadata.full_name ||
-metadata.name ||
-metadata.display_name ||
-"";
-
-const email =
-user.email || "";
-
-if(name){
-
-document.getElementById("buyerName").value =
-name;
-
-}
-
-if(email){
-
-document.getElementById("buyerEmail").value =
-email;
-
-}
-
-}
-
-async function loadBeat(){
-
-if(!beatId){
-
-loading.textContent =
-"No beat was selected.";
-
-return;
-
-}
-
-try{
-
-const {
-data,
-error
-} =
-await supabaseClient
-.from("beats")
-.select("*")
-.eq("id",beatId)
-.maybeSingle();
-
-if(error){
-throw error;
-}
-
-if(!data){
-
-loading.textContent =
-"Beat not found.";
-
-return;
-
-}
-
-beat =
-data;
-
-const producerId =
-getProducerId(beat);
-
-if(producerId){
-
-const {
-data:producerData
-} =
-await supabaseClient
-.from("artist_profiles")
-.select("*")
-.eq("id",producerId)
-.maybeSingle();
-
-producer =
-producerData || null;
-
-}
-
-renderCheckout();
-
-}catch(error){
-
-console.error(
-"Producer checkout error:",
-error
-);
-
-loading.textContent =
-"Unable to load this beat right now.";
-
-}
-
-}
-
-function renderCheckout(){
-
-const title =
-getBeatTitle(beat);
-
-const cover =
-getBeatCover(beat);
-
-const genre =
-getGenre(beat);
-
-const bpm =
-getBpm(beat);
-
-const musicalKey =
-getKey(beat);
-
-const producerName =
-producer
-? getProducerName(producer)
-: "Producer";
-
-productCover.src =
-cover;
-
-productCover.alt =
-title;
-
-productTitle.textContent =
-title;
-
-productMeta.innerHTML =
-"🎛️ " +
-escapeHtml(producerName) +
-"<br>" +
-"🎵 " +
-escapeHtml(genre) +
-(bpm
-? " • " +
-escapeHtml(bpm) +
-" BPM"
-: "") +
-(musicalKey
-? " • Key: " +
-escapeHtml(musicalKey)
-: "");
-
-leasePrice.textContent =
-getLeasePrice(beat) > 0
-? formatUGX(getLeasePrice(beat))
-: "Price not set";
-
-exclusivePrice.textContent =
-getExclusivePrice(beat) > 0
-? formatUGX(getExclusivePrice(beat))
-: "Price not set";
-
-summaryProducer.textContent =
-producerName;
-
-selectLicense(
-selectedLicense === "exclusive"
-? "exclusive"
-: "lease"
-);
-
-loading.classList.add("hidden");
-checkout.classList.remove("hidden");
-
-}
-
-function getSelectedAmount(){
-
-if(selectedLicense === "exclusive"){
-
-return getExclusivePrice(beat);
-
-}
-
-return getLeasePrice(beat);
-
-}
-
-async function getSession(){
-
-const {
-data
-} =
-await supabaseClient.auth.getSession();
-
-return data.session || null;
-
-}
-
-function validateUgandaPhone(phone){
-
-return /^(\+?256|0)7\d{8}$/.test(
-String(phone || "")
-.replace(/\s+/g,"")
-);
-
-}
-
-async function payWithMtn(){
-
-const session =
-await getSession();
-
-if(!session){
-
-showMessage(
-"Please login to your PASONG account before making a payment.",
-"error"
-);
-
-setTimeout(
-function(){
-
-window.location.href =
-"login.html?redirect=" +
-encodeURIComponent(
-window.location.href
-);
-
-},
-900
-);
-
-return;
-
-}
-
-const phone =
-document.getElementById("buyerPhone")
-.value
-.trim();
-
-const name =
-document.getElementById("buyerName")
-.value
-.trim();
-
-const email =
-document.getElementById("buyerEmail")
-.value
-.trim();
-
-const message =
-document.getElementById("orderMessage")
-.value
-.trim();
-
-if(!name){
-
-showMessage(
-"Please enter your name.",
-"error"
-);
-
-return;
-
-}
-
-if(!validateUgandaPhone(phone)){
-
-showMessage(
-"Enter a valid Uganda mobile-money number, for example +256 701 234 567.",
-"error"
-);
-
-return;
-
-}
-
-const amount =
-getSelectedAmount();
-
-if(!amount || amount <= 0){
-
-showMessage(
-"The selected producer price has not been set.",
-"error"
-);
-
-return;
-
-}
-
-if(!beat || !beat.id){
-
-showMessage(
-"This beat does not have a valid PASONG ID.",
-"error"
-);
-
-return;
-
-}
-
-if(
-selectedLicense === "exclusive" &&
-beat.status === "sold"
-){
-
-showMessage(
-"This beat is no longer available for exclusive purchase.",
-"error"
-);
-
-return;
-
-}
-
-const button =
-document.getElementById("mtnButton");
-
-button.disabled =
-true;
-
-button.textContent =
-"Sending payment request...";
-
-showMessage(
-"Sending MTN payment request..."
-);
-
-try{
-
-const response =
-await fetch(
-PAYMENT_API,
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-
-beatId:beat.id,
-
-content_type:
-"producer_beat",
-
-license:
-selectedLicense,
-
-amount:
-amount,
-
-currency:
-"UGX",
-
-phone:
-phone,
-
-email:
-email,
-
-name:
-name,
-
-message:
-message,
-
-method:
-"MTN",
-
-producerId:
-getProducerId(beat),
-
-producerName:
-producer
-? getProducerName(producer)
-: "Producer",
-
-buyerId:
-session.user.id
-
-})
-}
-);
-
-const result =
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-result.message ||
-result.error ||
-"Payment request failed."
-);
-
-}
-
-const reference =
-result.reference ||
-result.transactionId ||
-result.transaction_reference;
-
-if(reference){
-
-showMessage(
-"MTN payment request sent. Waiting for payment confirmation.",
-"normal"
-);
-
-pollPayment(reference);
-
-}else{
-
-showMessage(
-"MTN payment request sent.",
-"success"
-);
-
-}
-
-}catch(error){
-
-console.error(
-"MTN producer payment error:",
-error
-);
-
-showMessage(
-error.message ||
-"Unable to send the MTN payment request.",
-"error"
-);
-
-button.disabled =
-false;
-
-button.textContent =
-"📱 Pay with MTN";
-
-}
-
-}
-
-async function pollPayment(reference){
-
-let attempts =
-0;
-
-const maxAttempts =
-60;
-
-const timer =
-setInterval(
-async function(){
-
-attempts++;
-
-try{
-
-const response =
-await fetch(
-PAYMENT_API +
-"?reference=" +
-encodeURIComponent(reference)
-);
-
-const result =
-await response.json();
-
-const status =
-String(
-result.status ||
-""
-)
-.toUpperCase();
-
-if(
-status === "SUCCESSFUL" &&
-result.paid === true &&
-result.pasong_completed === true
-){
-
-clearInterval(timer);
-
-showMessage(
-"Payment successful. Your producer purchase has been completed.",
-"success"
-);
-
-const button =
-document.getElementById("mtnButton");
-
-button.disabled =
-true;
-
-button.textContent =
-"✓ Payment Successful";
-
-return;
-
-}
-
-if(
-status === "FAILED" ||
-status === "CANCELLED" ||
-status === "REJECTED"
-){
-
-clearInterval(timer);
-
-showMessage(
-"Payment was not completed.",
-"error"
-);
-
-const button =
-document.getElementById("mtnButton");
-
-button.disabled =
-false;
-
-button.textContent =
-"📱 Pay with MTN";
-
-return;
-
-}
-
-}catch(error){
-
-console.error(
-"Producer payment status error:",
-error
-);
-
-}
-
-if(attempts >= maxAttempts){
-
-clearInterval(timer);
-
-showMessage(
-"Payment status is still pending. Please check your PASONG account before trying again.",
-"normal"
-);
-
-const button =
-document.getElementById("mtnButton");
-
-button.disabled =
-false;
-
-button.textContent =
-"📱 Pay with MTN";
-
-}
-
-},
-5000
-);
-
-}
-
-document
-.getElementById("leaseOption")
-.addEventListener(
-"click",
-function(){
-
-selectLicense("lease");
-
-}
-);
-
-document
-.getElementById("exclusiveOption")
-.addEventListener(
-"click",
-function(){
-
-selectLicense("exclusive");
-
-}
-);
-
-document
-.getElementById("mtnButton")
-.addEventListener(
-"click",
-function(){
-
-payWithMtn();
-
-}
-);
-
-document
-.getElementById("airtelButton")
-.addEventListener(
-"click",
-function(){
-
-showMessage(
-"Airtel Money is not connected yet.",
-"normal"
-);
-
-}
-);
-
-loadUser();
-loadBeat();
-
-if("serviceWorker" in navigator){
-
-window.addEventListener(
-"load",
-function(){
-
-navigator.serviceWorker
-.register("sw.js")
-.catch(
-function(error){
-
-console.log(
-"Service worker:",
-error
-);
-
-}
-);
-
-}
-);
-
-}
-
 </script>
-
-</body>
-</html>
