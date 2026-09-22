@@ -733,47 +733,25 @@ document.getElementById("year").textContent =
 
 function isDjMix(song){
 
-  if(song?.content_type){
-    const contentType =
-      String(song.content_type).toLowerCase().trim();
-
-    if(
-      contentType === "dj_mix" ||
-      contentType === "dj-mix" ||
-      contentType === "djmix" ||
-      contentType === "mix"
-    ){
-      return true;
-    }
-  }
+  const contentType =
+    String(song?.content_type || "").toLowerCase().trim();
 
   if(
-    song?.mix_audio_url ||
-    song?.mix_preview_url ||
-    song?.mix_price
+    contentType === "dj_mix" ||
+    contentType === "dj-mix" ||
+    contentType === "djmix"
   ){
     return true;
   }
 
-  const text = [
-    song?.title,
-    song?.genre,
-    song?.category,
-    song?.description,
-    song?.type
-  ]
-  .filter(Boolean)
-  .join(" ")
-  .toLowerCase();
+  if(
+    song?.mix_audio_url ||
+    song?.mix_preview_url
+  ){
+    return true;
+  }
 
-  return (
-    song?.is_dj_mix === true ||
-    song?.isDjMix === true ||
-    text.includes("dj mix") ||
-    text.includes("djmix") ||
-    text.includes("dj- mix") ||
-    text.includes("mix by dj")
-  );
+  return false;
 }
 
 function getCreatorName(song){
