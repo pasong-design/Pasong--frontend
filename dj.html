@@ -1,0 +1,2611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG — DJ</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#080810;
+  --card:#11111d;
+  --card2:#171426;
+  --border:rgba(255,255,255,.08);
+  --text:#fff;
+  --muted:#a9a7b7;
+  --purple:#8b5cf6;
+  --purple2:#c084fc;
+  --pink:#ec4899;
+  --green:#22c55e;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at top right,rgba(139,92,246,.15),transparent 35%),
+    radial-gradient(circle at bottom left,rgba(236,72,153,.10),transparent 35%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(8,8,16,.94);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid var(--border);
+}
+
+.header-inner{
+  max-width:1250px;
+  margin:auto;
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.logo{
+  color:#fff;
+  text-decoration:none;
+  font-size:22px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.logo span{
+  color:var(--purple2);
+}
+
+.search{
+  flex:1;
+  max-width:430px;
+  position:relative;
+}
+
+.search input{
+  width:100%;
+  background:#12121d;
+  border:1px solid var(--border);
+  border-radius:30px;
+  color:#fff;
+  padding:11px 18px 11px 42px;
+  outline:none;
+}
+
+.search-icon{
+  position:absolute;
+  left:16px;
+  top:10px;
+  color:#aaa;
+}
+
+.header-links{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-left:auto;
+}
+
+.header-links a{
+  color:#d5d3df;
+  text-decoration:none;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.account{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#151522;
+  border:1px solid var(--border);
+  padding:7px 11px;
+  border-radius:22px;
+  color:#fff;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.account-avatar{
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:25px 20px 90px;
+}
+
+.hero{
+  position:relative;
+  min-height:430px;
+  border:1px solid var(--border);
+  border-radius:24px;
+  overflow:hidden;
+  background:#11111d;
+}
+
+.hero-cover{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(192,132,252,.4),transparent 30%),
+    linear-gradient(135deg,#17102a,#25132a);
+}
+
+.hero-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.58;
+}
+
+.hero-overlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(8,8,16,.15),rgba(8,8,16,.92) 75%),
+    linear-gradient(90deg,rgba(8,8,16,.78),transparent 65%);
+}
+
+.hero-content{
+  position:absolute;
+  left:35px;
+  right:35px;
+  bottom:30px;
+  z-index:2;
+  display:flex;
+  align-items:end;
+  gap:22px;
+}
+
+.dj-photo{
+  width:145px;
+  height:145px;
+  border-radius:50%;
+  overflow:hidden;
+  flex:none;
+  border:4px solid rgba(255,255,255,.8);
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  box-shadow:0 12px 35px rgba(0,0,0,.4);
+}
+
+.dj-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.dj-photo-placeholder{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:55px;
+}
+
+.hero-info{
+  min-width:0;
+}
+
+.dj-label{
+  color:var(--purple2);
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.verified{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:rgba(139,92,246,.18);
+  border:1px solid rgba(192,132,252,.35);
+  color:#e7d7ff;
+  border-radius:20px;
+  padding:5px 9px;
+  font-size:11px;
+  font-weight:800;
+  margin-left:7px;
+  vertical-align:middle;
+}
+
+.hero-info h1{
+  font-size:clamp(32px,6vw,58px);
+  margin-bottom:8px;
+}
+
+.hero-meta{
+  color:#d0cdd9;
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+.hero-bio{
+  color:#c0bdca;
+  line-height:1.5;
+  max-width:700px;
+}
+
+.hero-actions{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-top:17px;
+}
+
+.btn{
+  border:none;
+  border-radius:11px;
+  padding:11px 15px;
+  font-weight:800;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff;
+}
+
+.btn-secondary{
+  background:rgba(17,17,29,.85);
+  border:1px solid var(--border);
+  color:#fff;
+}
+
+.btn-success{
+  background:var(--green);
+  color:#06110a;
+}
+
+.section{
+  margin-top:32px;
+}
+
+.section-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:15px;
+}
+
+.section-head h2{
+  font-size:24px;
+}
+
+.section-head p{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:5px;
+}
+
+.pinned{
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.pinned-cover{
+  min-height:330px;
+  background:#171426;
+}
+
+.pinned-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.pinned-placeholder{
+  width:100%;
+  height:100%;
+  min-height:330px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:80px;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(236,72,153,.3),transparent 35%),
+    linear-gradient(135deg,#17102a,#0d0d18);
+}
+
+.pinned-info{
+  padding:30px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.pinned-tag{
+  color:var(--purple2);
+  font-size:12px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.pinned-info h3{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.pinned-sub{
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:20px;
+}
+
+.pinned-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.mix-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+
+.mix-card{
+  background:linear-gradient(180deg,#141421,#0f0f18);
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+}
+
+.mix-card-cover{
+  height:190px;
+  background:#171426;
+  position:relative;
+}
+
+.mix-card-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.mix-placeholder{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:55px;
+}
+
+.mix-card-info{
+  padding:14px;
+}
+
+.mix-card-title{
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mix-card-meta{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:6px;
+}
+
+.mix-card-actions{
+  display:flex;
+  gap:7px;
+  margin-top:12px;
+}
+
+.mix-card-actions button,
+.mix-card-actions a{
+  flex:1;
+  border:none;
+  border-radius:9px;
+  padding:9px 7px;
+  font-size:11px;
+  font-weight:800;
+  text-align:center;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.stream{
+  background:#211936;
+  color:#ddd3ff;
+}
+
+.buy{
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff;
+}
+
+.tracklist{
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+}
+
+.tracklist-head{
+  padding:18px;
+  border-bottom:1px solid var(--border);
+  font-weight:900;
+}
+
+.track{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:13px 18px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.track:last-child{
+  border-bottom:none;
+}
+
+.track-number{
+  width:25px;
+  color:#858292;
+  font-size:13px;
+}
+
+.track-info{
+  flex:1;
+  min-width:0;
+}
+
+.track-title{
+  font-weight:700;
+}
+
+.track-artist{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
+}
+
+.track-buy{
+  background:#211936;
+  color:#ddd3ff;
+  border:1px solid rgba(139,92,246,.25);
+  border-radius:9px;
+  padding:8px 11px;
+  font-size:11px;
+  font-weight:800;
+  text-decoration:none;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.stat{
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:20px;
+  text-align:center;
+}
+
+.stat-value{
+  font-size:25px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.info-card{
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+}
+
+.info-card h3{
+  margin-bottom:15px;
+  font-size:19px;
+}
+
+.info-line{
+  color:#d2cfdb;
+  margin:10px 0;
+  line-height:1.5;
+}
+
+.info-line span{
+  color:var(--muted);
+}
+
+.socials{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:15px;
+}
+
+.socials a{
+  color:#ddd3ff;
+  background:#211936;
+  border:1px solid rgba(139,92,246,.25);
+  border-radius:10px;
+  padding:9px 12px;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+}
+
+.supporters{
+  display:grid;
+  gap:9px;
+}
+
+.supporter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#171426;
+  border-radius:12px;
+  padding:12px 14px;
+}
+
+.supporter-name{
+  font-weight:700;
+}
+
+.supporter-amount{
+  color:var(--purple2);
+  font-weight:800;
+}
+
+.similar-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.similar{
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:15px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.similar-photo{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  overflow:hidden;
+  flex:none;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+}
+
+.similar-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.similar-name{
+  font-weight:800;
+}
+
+.similar-role{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
+}
+
+.loading,
+.empty,
+.error{
+  text-align:center;
+  padding:45px 20px;
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:18px;
+  color:var(--muted);
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(8px);
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(500px,100%);
+  background:#11111d;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.modal-head h3{
+  font-size:22px;
+}
+
+.modal-close{
+  width:35px;
+  height:35px;
+  border:none;
+  border-radius:50%;
+  background:#211936;
+  color:#fff;
+  cursor:pointer;
+  font-size:18px;
+}
+
+.tip-options{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.tip-option{
+  border:1px solid rgba(139,92,246,.3);
+  background:#211936;
+  color:#fff;
+  border-radius:10px;
+  padding:13px 8px;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.tip-custom{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#0d0d17;
+  color:#fff;
+  outline:none;
+  margin-bottom:12px;
+}
+
+.booking-form{
+  display:grid;
+  gap:12px;
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form textarea{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#0d0d17;
+  color:#fff;
+  outline:none;
+}
+
+.booking-form textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.share-box{
+  display:flex;
+  gap:8px;
+}
+
+.share-box input{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#0d0d17;
+  color:#fff;
+  outline:none;
+}
+
+footer{
+  border-top:1px solid var(--border);
+  padding:30px 20px;
+  color:#858292;
+  text-align:center;
+  font-size:13px;
+}
+
+@media(max-width:1000px){
+  .mix-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .similar-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .header-links a{
+    display:none;
+  }
+}
+
+@media(max-width:760px){
+  .header-inner{
+    flex-wrap:wrap;
+  }
+
+  .search{
+    order:3;
+    max-width:none;
+    flex-basis:100%;
+  }
+
+  .account{
+    margin-left:auto;
+  }
+
+  .hero{
+    min-height:540px;
+  }
+
+  .hero-content{
+    left:20px;
+    right:20px;
+    bottom:22px;
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .dj-photo{
+    width:105px;
+    height:105px;
+  }
+
+  .pinned{
+    grid-template-columns:1fr;
+  }
+
+  .pinned-cover{
+    min-height:270px;
+  }
+
+  .pinned-placeholder{
+    min-height:270px;
+  }
+
+  .mix-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:500px){
+  .container{
+    padding:15px 13px 80px;
+  }
+
+  .hero{
+    border-radius:18px;
+  }
+
+  .hero-info h1{
+    font-size:34px;
+  }
+
+  .pinned-info{
+    padding:20px;
+  }
+
+  .pinned-info h3{
+    font-size:24px;
+  }
+
+  .mix-grid{
+    gap:10px;
+  }
+
+  .mix-card-cover{
+    height:145px;
+  }
+
+  .mix-card-info{
+    padding:11px;
+  }
+
+  .mix-card-actions a,
+  .mix-card-actions button{
+    padding:8px 4px;
+    font-size:10px;
+  }
+
+  .similar-grid{
+    grid-template-columns:1fr;
+  }
+
+  .tip-options{
+    grid-template-columns:1fr;
+  }
+
+  .share-box{
+    flex-direction:column;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+
+    <a class="logo" href="index.html">
+      ◈ PASONG<span>.</span>
+    </a>
+
+    <div class="search">
+      <span class="search-icon">🔎</span>
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Search DJs, mixes..."
+        autocomplete="off"
+      >
+    </div>
+
+    <nav class="header-links">
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
+    </nav>
+
+    <a href="login.html" class="account">
+      <span class="account-avatar">DJ</span>
+      Account
+    </a>
+
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+
+    <div class="hero-cover" id="heroCover">
+      <div class="dj-photo-placeholder">🎧</div>
+    </div>
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+      <div class="dj-photo" id="djPhoto">
+        <div class="dj-photo-placeholder">🎧</div>
+      </div>
+
+      <div class="hero-info">
+
+        <div class="dj-label">
+          🎧 PASONG DJ
+          <span id="verifiedBadge" class="verified" style="display:none;">
+            ✓ Verified DJ
+          </span>
+        </div>
+
+        <h1 id="djName">
+          Loading...
+        </h1>
+
+        <div class="hero-meta" id="djMeta">
+          Loading DJ profile...
+        </div>
+
+        <p class="hero-bio" id="djBio">
+          Discover this DJ on PASONG.
+        </p>
+
+        <div class="hero-actions">
+
+          <button
+            id="latestPlayButton"
+            class="btn btn-primary">
+            ▶ Play Latest Mix FREE
+          </button>
+
+          <button
+            id="tipButton"
+            class="btn btn-secondary">
+            💰 Tip DJ
+          </button>
+
+          <button
+            id="bookButton"
+            class="btn btn-secondary">
+            📅 Book DJ
+          </button>
+
+          <button
+            id="followButton"
+            class="btn btn-secondary">
+            Follow
+          </button>
+
+          <button
+            id="favoriteButton"
+            class="btn btn-secondary">
+            ♡ Favorite
+          </button>
+
+          <button
+            id="shareButton"
+            class="btn btn-secondary">
+            ↗ Share
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🎧 Latest Mix</h2>
+        <p>Pinned mix — stream the full mix for free.</p>
+      </div>
+
+    </div>
+
+    <div id="pinnedMix">
+      <div class="loading">
+        Loading latest mix...
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🎧 All Mixes</h2>
+        <p>Listen to this DJ's mixes and support their work.</p>
+      </div>
+
+    </div>
+
+    <div id="mixGrid" class="mix-grid">
+      <div class="loading" style="grid-column:1/-1;">
+        Loading mixes...
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🎵 Tracklist</h2>
+        <p>Songs inside the selected DJ mix.</p>
+      </div>
+
+    </div>
+
+    <div id="tracklist" class="tracklist">
+
+      <div class="tracklist-head">
+        Select a mix to view its tracklist.
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>📊 DJ Stats</h2>
+      </div>
+
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-value" id="playsStat">0</div>
+        <div class="stat-label">🔥 Total Plays</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="downloadsStat">0</div>
+        <div class="stat-label">📥 Downloads</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="tipsStat">0</div>
+        <div class="stat-label">💜 Tips</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="ratingStat">—</div>
+        <div class="stat-label">⭐ Rating</div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="info-grid">
+
+      <div class="info-card">
+
+        <h3>👤 DJ Information</h3>
+
+        <div class="info-line">
+          <span>Location:</span>
+          <strong id="locationInfo">Not added yet</strong>
+        </div>
+
+        <div class="info-line">
+          <span>Genre:</span>
+          <strong id="genreInfo">Not added yet</strong>
+        </div>
+
+        <div class="info-line">
+          <span>Style:</span>
+          <strong id="styleInfo">Not added yet</strong>
+        </div>
+
+        <div class="info-line">
+          <span>Years active:</span>
+          <strong id="yearsInfo">Not added yet</strong>
+        </div>
+
+        <div class="info-line">
+          <span>Languages:</span>
+          <strong id="languagesInfo">Not added yet</strong>
+        </div>
+
+      </div>
+
+      <div class="info-card">
+
+        <h3>📅 Booking Info</h3>
+
+        <div class="info-line">
+          <span>Available for:</span>
+          Clubs, Weddings, Birthdays
+        </div>
+
+        <div class="info-line">
+          <span>Starting:</span>
+          <strong id="bookingPrice">Booking price available from DJ</strong>
+        </div>
+
+        <div class="info-line">
+          <span>WhatsApp:</span>
+          <strong id="whatsappInfo">Contact information not added yet</strong>
+        </div>
+
+        <button
+          id="bookingInfoButton"
+          class="btn btn-primary"
+          style="margin-top:12px;">
+          📅 Send Booking Request
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="info-grid">
+
+      <div class="info-card">
+
+        <h3>🌍 Socials</h3>
+
+        <div class="socials">
+
+          <a id="instagramLink" href="#" style="display:none;">
+            Instagram
+          </a>
+
+          <a id="tiktokLink" href="#" style="display:none;">
+            TikTok
+          </a>
+
+          <a id="youtubeLink" href="#" style="display:none;">
+            YouTube
+          </a>
+
+          <a id="mixcloudLink" href="#" style="display:none;">
+            Mixcloud
+          </a>
+
+        </div>
+
+        <div id="socialEmpty" class="info-line">
+          Social links will appear here when added by the DJ.
+        </div>
+
+      </div>
+
+      <div class="info-card">
+
+        <h3>📅 Upcoming Events</h3>
+
+        <div class="info-line">
+          <span>Next Event:</span>
+          <strong id="nextEvent">No upcoming event added yet</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🏆 DJ Achievements</h2>
+        <p>Milestones earned on PASONG.</p>
+      </div>
+
+    </div>
+
+    <div id="achievements" class="stats">
+
+      <div class="stat">
+        <div class="stat-value">🎧</div>
+        <div class="stat-label">PASONG DJ</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="mixCountAchievement">0</div>
+        <div class="stat-label">DJ Mixes</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="playAchievement">0</div>
+        <div class="stat-label">Total Plays</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" id="downloadAchievement">0</div>
+        <div class="stat-label">Downloads</div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>💜 Support This DJ</h2>
+        <p>Send a tip directly to support the DJ.</p>
+      </div>
+
+      <button id="supportButton" class="btn btn-primary">
+        💜 Tip DJ
+      </button>
+
+    </div>
+
+    <div class="supporters">
+
+      <div class="supporter">
+        <div class="supporter-name">
+          Top supporters will appear here
+        </div>
+
+        <div class="supporter-amount">
+          —
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="section">
+
+    <div class="section-head">
+
+      <div>
+        <h2>🎧 Similar DJs</h2>
+        <p>More DJs on PASONG.</p>
+      </div>
+
+    </div>
+
+    <div id="similarDJs" class="similar-grid">
+
+      <div class="loading" style="grid-column:1/-1;">
+        Loading DJs...
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  © <span id="year"></span> PASONG — Music. Opportunity. Support.
+</footer>
+
+<div id="tipModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h3>💜 Tip This DJ</h3>
+
+      <button
+        class="modal-close"
+        onclick="closeModal('tipModal')">
+        ×
+      </button>
+
+    </div>
+
+    <div class="tip-options">
+
+      <button
+        class="tip-option"
+        onclick="selectTip(2000)">
+        UGX 2,000
+      </button>
+
+      <button
+        class="tip-option"
+        onclick="selectTip(5000)">
+        UGX 5,000
+      </button>
+
+      <button
+        class="tip-option"
+        onclick="selectTip(10000)">
+        UGX 10,000
+      </button>
+
+    </div>
+
+    <input
+      id="tipCustom"
+      class="tip-custom"
+      type="number"
+      min="1"
+      placeholder="Custom amount">
+
+    <button
+      class="btn btn-primary"
+      style="width:100%;"
+      onclick="continueTip()">
+      Continue
+    </button>
+
+  </div>
+
+</div>
+
+<div id="bookingModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h3>📅 Book This DJ</h3>
+
+      <button
+        class="modal-close"
+        onclick="closeModal('bookingModal')">
+        ×
+      </button>
+
+    </div>
+
+    <div class="booking-form">
+
+      <select id="bookingType">
+        <option value="">Event type</option>
+        <option value="Club">Club</option>
+        <option value="Wedding">Wedding</option>
+        <option value="Birthday">Birthday</option>
+        <option value="Private Event">Private Event</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <input
+        id="bookingDate"
+        type="date">
+
+      <input
+        id="bookingLocation"
+        type="text"
+        placeholder="Event location">
+
+      <textarea
+        id="bookingMessage"
+        placeholder="Tell the DJ about your event"></textarea>
+
+      <button
+        class="btn btn-primary"
+        onclick="submitBooking()">
+        Send Booking Request
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="shareModal" class="modal">
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h3>↗ Share DJ</h3>
+
+      <button
+        class="modal-close"
+        onclick="closeModal('shareModal')">
+        ×
+      </button>
+
+    </div>
+
+    <div class="share-box">
+
+      <input
+        id="shareUrl"
+        type="text"
+        readonly>
+
+      <button
+        class="btn btn-primary"
+        onclick="copyDJLink()">
+        Copy
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+let currentDJ = null;
+let currentMixes = [];
+let allDJs = [];
+let selectedTipAmount = 0;
+
+document.getElementById("year").textContent =
+  new Date().getFullYear();
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const djId =
+  params.get("id");
+
+function isDjMix(song){
+
+  const contentType =
+    String(song?.content_type || "")
+      .toLowerCase()
+      .trim();
+
+  if(
+    contentType === "dj_mix" ||
+    contentType === "dj-mix" ||
+    contentType === "djmix"
+  ){
+    return true;
+  }
+
+  if(
+    song?.mix_audio_url ||
+    song?.mix_preview_url
+  ){
+    return true;
+  }
+
+  return false;
+}
+
+function getCover(song){
+
+  return (
+    song?.cover_url ||
+    song?.cover ||
+    song?.image_url ||
+    ""
+  );
+}
+
+function getDJName(profile){
+
+  return (
+    profile?.performing_name ||
+    profile?.stage_name ||
+    profile?.artist_name ||
+    "PASONG DJ"
+  );
+}
+
+function formatNumber(value){
+
+  return Number(value || 0)
+    .toLocaleString();
+}
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+async function loadDJProfile(){
+
+  if(!djId){
+    throw new Error("DJ profile ID is missing.");
+  }
+
+  const { data: profile, error } =
+    await supabaseClient
+      .from("artist_profiles")
+      .select("*")
+      .eq("user_id",djId)
+      .maybeSingle();
+
+  if(error){
+    throw error;
+  }
+
+  if(!profile){
+
+    const {
+      data: profileById,
+      error: profileByIdError
+    } =
+      await supabaseClient
+        .from("artist_profiles")
+        .select("*")
+        .eq("id",djId)
+        .maybeSingle();
+
+    if(profileByIdError){
+      throw profileByIdError;
+    }
+
+    currentDJ = profileById;
+
+  }else{
+
+    currentDJ = profile;
+
+  }
+
+  if(!currentDJ){
+    throw new Error("DJ profile not found.");
+  }
+
+  renderProfile();
+}
+
+async function loadMixes(){
+
+  const possibleUserIds = [
+    currentDJ.user_id,
+    currentDJ.id
+  ]
+  .filter(Boolean);
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("songs")
+      .select("*")
+      .eq("status","approved")
+      .order("created_at",{ascending:false});
+
+  if(error){
+    throw error;
+  }
+
+  currentMixes =
+    (data || []).filter(song => {
+
+      if(!isDjMix(song)){
+        return false;
+      }
+
+      const ids = [
+        song.dj_user_id,
+        song.uploader_user_id,
+        song.artist_user_id,
+        song.writer_user_id,
+        song.producer_user_id,
+        song.artist_id
+      ]
+      .filter(Boolean)
+      .map(String);
+
+      return possibleUserIds
+        .map(String)
+        .some(id => ids.includes(id));
+
+    });
+
+  renderMixes();
+  renderPinnedMix();
+  renderStats();
+}
+
+async function loadDJRole(){
+
+  const userId =
+    currentDJ.user_id;
+
+  if(!userId){
+    return;
+  }
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id",userId);
+
+  if(error){
+    return;
+  }
+
+  const isDJ =
+    (data || []).some(row =>
+      String(row.role || "")
+        .toLowerCase()
+        .trim() === "dj"
+    );
+
+  if(isDJ){
+    document.getElementById("verifiedBadge")
+      .style.display = "inline-flex";
+  }
+}
+
+function renderProfile(){
+
+  const name =
+    getDJName(currentDJ);
+
+  const photo =
+    currentDJ.profile_image_url ||
+    "";
+
+  const cover =
+    currentDJ.cover_image_url ||
+    "";
+
+  document.title =
+    `PASONG — ${name}`;
+
+  document.getElementById("djName")
+    .innerHTML =
+      `${escapeHtml(name)} <span id="verifiedBadge" class="verified" style="display:none;">✓ Verified DJ</span>`;
+
+  document.getElementById("djMeta")
+    .textContent =
+      "📍 Kampala, UG";
+
+  document.getElementById("djBio")
+    .textContent =
+      currentDJ.bio ||
+      "Afrobeats & Amapiano mixes every Friday...";
+
+  const photoBox =
+    document.getElementById("djPhoto");
+
+  if(photo){
+
+    photoBox.innerHTML =
+      `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}">`;
+
+  }
+
+  const heroCover =
+    document.getElementById("heroCover");
+
+  if(cover){
+
+    heroCover.innerHTML =
+      `<img src="${escapeHtml(cover)}" alt="${escapeHtml(name)}">`;
+
+  }
+
+  document.getElementById("genreInfo")
+    .textContent =
+      currentDJ.genre || "Not added yet";
+
+  document.getElementById("locationInfo")
+    .textContent =
+      currentDJ.location || "Kampala, UG";
+
+  document.getElementById("styleInfo")
+    .textContent =
+      currentDJ.style ||
+      "Not added yet";
+
+  document.getElementById("yearsInfo")
+    .textContent =
+      currentDJ.years_active ||
+      "Not added yet";
+
+  document.getElementById("languagesInfo")
+    .textContent =
+      currentDJ.languages ||
+      "Not added yet";
+
+  document.getElementById("bookingPrice")
+    .textContent =
+      currentDJ.booking_price ||
+      "Booking price available from DJ";
+
+  document.getElementById("whatsappInfo")
+    .textContent =
+      currentDJ.whatsapp ||
+      currentDJ.mobile_number ||
+      "Contact information not added yet";
+
+  document.getElementById("nextEvent")
+    .textContent =
+      currentDJ.next_event ||
+      "No upcoming event added yet";
+
+  renderSocialLink(
+    "instagramLink",
+    currentDJ.instagram
+  );
+
+  renderSocialLink(
+    "tiktokLink",
+    currentDJ.tiktok
+  );
+
+  renderSocialLink(
+    "youtubeLink",
+    currentDJ.youtube
+  );
+
+  renderSocialLink(
+    "mixcloudLink",
+    currentDJ.mixcloud
+  );
+
+  const anySocial =
+    currentDJ.instagram ||
+    currentDJ.tiktok ||
+    currentDJ.youtube ||
+    currentDJ.mixcloud;
+
+  if(anySocial){
+    document.getElementById("socialEmpty")
+      .style.display = "none";
+  }
+}
+
+function renderSocialLink(id,url){
+
+  const element =
+    document.getElementById(id);
+
+  if(!element){
+    return;
+  }
+
+  if(!url){
+    element.style.display = "none";
+    return;
+  }
+
+  element.href = url;
+  element.target = "_blank";
+  element.rel = "noopener";
+  element.style.display = "inline-flex";
+}
+
+function renderPinnedMix(){
+
+  const box =
+    document.getElementById("pinnedMix");
+
+  const mix =
+    currentMixes[0];
+
+  if(!mix){
+
+    box.innerHTML = `
+      <div class="empty">
+        🎧 No DJ mix has been uploaded yet.
+      </div>
+    `;
+
+    document.getElementById("latestPlayButton")
+      .style.display = "none";
+
+    return;
+  }
+
+  const cover =
+    getCover(mix);
+
+  box.innerHTML = `
+
+    <div class="pinned">
+
+      <div class="pinned-cover">
+
+        ${
+          cover
+          ? `
+            <img
+              src="${escapeHtml(cover)}"
+              alt="${escapeHtml(mix.title || "DJ Mix")}">
+          `
+          : `
+            <div class="pinned-placeholder">
+              🎧
+            </div>
+          `
+        }
+
+      </div>
+
+      <div class="pinned-info">
+
+        <div class="pinned-tag">
+          📌 PINNED LATEST MIX
+        </div>
+
+        <h3>
+          ${escapeHtml(mix.title || "DJ Mix")}
+        </h3>
+
+        <div class="pinned-sub">
+          Full DJ mix stream available free on PASONG.
+          Support the DJ by purchasing the downloadable mix.
+        </div>
+
+        <div class="mix-card-meta" style="margin-bottom:18px;">
+          🔥 ${formatNumber(mix.plays)} plays
+          ${Number(mix.downloads || 0) > 0
+            ? ` • 📥 ${formatNumber(mix.downloads)} downloads`
+            : ""}
+        </div>
+
+        <div class="pinned-actions">
+
+          <button
+            class="btn btn-primary"
+            onclick="playMix('${escapeHtml(mix.id)}')">
+            ▶ FREE STREAM
+          </button>
+
+          <a
+            class="btn btn-secondary"
+            href="song.html?id=${encodeURIComponent(mix.id)}&type=dj-mix&action=buy">
+            💰 Buy UGX 1,000 / $1
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.getElementById("latestPlayButton")
+    .onclick = () =>
+      playMix(mix.id);
+}
+
+function renderMixes(){
+
+  const grid =
+    document.getElementById("mixGrid");
+
+  if(!currentMixes.length){
+
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        🎧 No DJ mixes available yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  grid.innerHTML =
+    currentMixes.map(mix => {
+
+      const cover =
+        getCover(mix);
+
+      return `
+
+        <article class="mix-card">
+
+          <div class="mix-card-cover">
+
+            ${
+              cover
+              ? `
+                <img
+                  src="${escapeHtml(cover)}"
+                  alt="${escapeHtml(mix.title || "DJ Mix")}"
+                  loading="lazy">
+              `
+              : `
+                <div class="mix-placeholder">
+                  🎧
+                </div>
+              `
+            }
+
+          </div>
+
+          <div class="mix-card-info">
+
+            <div class="mix-card-title">
+              ${escapeHtml(mix.title || "DJ Mix")}
+            </div>
+
+            <div class="mix-card-meta">
+              ${formatNumber(mix.plays)} plays
+            </div>
+
+            <div class="mix-card-actions">
+
+              <button
+                class="stream"
+                onclick="playMix('${escapeHtml(mix.id)}')">
+                ▶ FREE
+              </button>
+
+              <a
+                class="buy"
+                href="song.html?id=${encodeURIComponent(mix.id)}&type=dj-mix&action=buy">
+                UGX 1,000
+              </a>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }).join("");
+}
+
+function renderStats(){
+
+  const plays =
+    currentMixes.reduce(
+      (total,mix) =>
+        total + Number(mix.plays || 0),
+      0
+    );
+
+  const downloads =
+    currentMixes.reduce(
+      (total,mix) =>
+        total + Number(mix.downloads || 0),
+      0
+    );
+
+  document.getElementById("playsStat")
+    .textContent =
+      formatNumber(plays);
+
+  document.getElementById("downloadsStat")
+    .textContent =
+      formatNumber(downloads);
+
+  document.getElementById("mixCountAchievement")
+    .textContent =
+      formatNumber(currentMixes.length);
+
+  document.getElementById("playAchievement")
+    .textContent =
+      formatNumber(plays);
+
+  document.getElementById("downloadAchievement")
+    .textContent =
+      formatNumber(downloads);
+}
+
+function renderTracklist(mix){
+
+  const box =
+    document.getElementById("tracklist");
+
+  const tracklist =
+    mix?.tracklist;
+
+  if(!tracklist){
+
+    box.innerHTML = `
+      <div class="tracklist-head">
+        🎵 Tracklist has not been added to this mix yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  let tracks = [];
+
+  try{
+
+    tracks =
+      typeof tracklist === "string"
+      ? JSON.parse(tracklist)
+      : tracklist;
+
+  }catch(error){
+
+    tracks = [];
+
+  }
+
+  if(
+    !Array.isArray(tracks) ||
+    !tracks.length
+  ){
+
+    box.innerHTML = `
+      <div class="tracklist-head">
+        🎵 Tracklist has not been added to this mix yet.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = `
+
+    <div class="tracklist-head">
+      🎵 ${escapeHtml(mix.title || "DJ Mix")}
+    </div>
+
+    ${
+      tracks.map((track,index) => `
+
+        <div class="track">
+
+          <div class="track-number">
+            ${index + 1}
+          </div>
+
+          <div class="track-info">
+
+            <div class="track-title">
+              ${escapeHtml(
+                track.title ||
+                track.name ||
+                "Song"
+              )}
+            </div>
+
+            <div class="track-artist">
+              ${escapeHtml(
+                track.artist ||
+                track.artist_name ||
+                "Artist"
+              )}
+            </div>
+
+          </div>
+
+          ${
+            track.song_id
+            ? `
+              <a
+                class="track-buy"
+                href="song.html?id=${encodeURIComponent(track.song_id)}">
+                Buy Song
+              </a>
+            `
+            : ""
+          }
+
+        </div>
+
+      `).join("")
+    }
+
+  `;
+}
+
+function playMix(id){
+
+  const mix =
+    currentMixes.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+  if(!mix){
+    return;
+  }
+
+  renderTracklist(mix);
+
+  const audioUrl =
+    mix.mix_audio_url ||
+    mix.audio_url ||
+    "";
+
+  if(!audioUrl){
+
+    window.location.href =
+      `song.html?id=${encodeURIComponent(id)}&type=dj-mix`;
+
+    return;
+  }
+
+  let player =
+    document.getElementById("djAudioPlayer");
+
+  if(!player){
+
+    player =
+      document.createElement("audio");
+
+    player.id =
+      "djAudioPlayer";
+
+    player.controls =
+      true;
+
+    player.style.position =
+      "fixed";
+
+    player.style.left =
+      "12px";
+
+    player.style.right =
+      "12px";
+
+    player.style.bottom =
+      "12px";
+
+    player.style.width =
+      "calc(100% - 24px)";
+
+    player.style.zIndex =
+      "9999";
+
+    player.style.borderRadius =
+      "12px";
+
+    player.style.background =
+      "#11111d";
+
+    document.body.appendChild(player);
+  }
+
+  player.src =
+    audioUrl;
+
+  player.play().catch(() => {
+
+    window.location.href =
+      `song.html?id=${encodeURIComponent(id)}&type=dj-mix`;
+
+  });
+}
+
+async function loadSimilarDJs(){
+
+  const box =
+    document.getElementById("similarDJs");
+
+  const {
+    data: roles,
+    error: roleError
+  } =
+    await supabaseClient
+      .from("user_roles")
+      .select("user_id,role");
+
+  if(roleError){
+
+    box.innerHTML = "";
+
+    return;
+  }
+
+  const djIds =
+    (roles || [])
+      .filter(row =>
+        String(row.role || "")
+          .toLowerCase()
+          .trim() === "dj"
+      )
+      .map(row => row.user_id)
+      .filter(Boolean);
+
+  const uniqueIds =
+    Array.from(new Set(djIds));
+
+  if(!uniqueIds.length){
+
+    box.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        More DJs will appear here as DJ profiles are created.
+      </div>
+    `;
+
+    return;
+  }
+
+  const {
+    data: profiles
+  } =
+    await supabaseClient
+      .from("artist_profiles")
+      .select("*")
+      .in("user_id",uniqueIds);
+
+  const others =
+    (profiles || [])
+      .filter(profile =>
+        String(profile.user_id) !==
+        String(currentDJ.user_id)
+      )
+      .slice(0,4);
+
+  if(!others.length){
+
+    box.innerHTML = `
+      <div class="empty" style="grid-column:1/-1;">
+        More DJs will appear here as DJ profiles are created.
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML =
+    others.map(profile => {
+
+      const name =
+        getDJName(profile);
+
+      const photo =
+        profile.profile_image_url ||
+        "";
+
+      return `
+
+        <a
+          class="similar"
+          href="dj.html?id=${encodeURIComponent(profile.user_id)}"
+          style="text-decoration:none;color:#fff;">
+
+          <div class="similar-photo">
+
+            ${
+              photo
+              ? `
+                <img
+                  src="${escapeHtml(photo)}"
+                  alt="${escapeHtml(name)}">
+              `
+              : `
+                <div class="dj-photo-placeholder">
+                  🎧
+                </div>
+              `
+            }
+
+          </div>
+
+          <div>
+
+            <div class="similar-name">
+              ${escapeHtml(name)}
+            </div>
+
+            <div class="similar-role">
+              🎧 DJ
+            </div>
+
+          </div>
+
+        </a>
+
+      `;
+
+    }).join("");
+}
+
+function openModal(id){
+
+  document.getElementById(id)
+    .classList.add("show");
+}
+
+function closeModal(id){
+
+  document.getElementById(id)
+    .classList.remove("show");
+}
+
+function selectTip(amount){
+
+  selectedTipAmount =
+    Number(amount);
+
+  document.getElementById("tipCustom")
+    .value =
+      amount;
+}
+
+function continueTip(){
+
+  const custom =
+    Number(
+      document.getElementById("tipCustom")
+        .value || 0
+    );
+
+  const amount =
+    custom || selectedTipAmount;
+
+  if(!amount || amount < 1){
+
+    alert("Please select or enter a tip amount.");
+
+    return;
+  }
+
+  alert(
+    `Tip of UGX ${formatNumber(amount)} selected. Payment will be connected when PASONG tipping is enabled.`
+  );
+
+}
+
+function submitBooking(){
+
+  const type =
+    document.getElementById("bookingType")
+      .value;
+
+  const date =
+    document.getElementById("bookingDate")
+      .value;
+
+  const location =
+    document.getElementById("bookingLocation")
+      .value
+      .trim();
+
+  if(!type || !date || !location){
+
+    alert(
+      "Please select the event type, date and location."
+    );
+
+    return;
+  }
+
+  alert(
+    "Your booking request is ready. DJ booking submission will be connected when the booking system is enabled."
+  );
+
+}
+
+async function copyDJLink(){
+
+  const input =
+    document.getElementById("shareUrl");
+
+  try{
+
+    await navigator.clipboard.writeText(
+      input.value
+    );
+
+    alert("DJ profile link copied.");
+
+  }catch(error){
+
+    input.select();
+    document.execCommand("copy");
+
+    alert("DJ profile link copied.");
+
+  }
+}
+
+async function shareDJ(){
+
+  const name =
+    getDJName(currentDJ);
+
+  const url =
+    window.location.href;
+
+  if(
+    navigator.share
+  ){
+
+    try{
+
+      await navigator.share({
+        title:`PASONG — ${name}`,
+        text:`Check out ${name} on PASONG.`,
+        url
+      });
+
+      return;
+
+    }catch(error){}
+
+  }
+
+  document.getElementById("shareUrl")
+    .value =
+      url;
+
+  openModal("shareModal");
+}
+
+function toggleFollow(){
+
+  const button =
+    document.getElementById("followButton");
+
+  if(
+    button.dataset.following === "true"
+  ){
+
+    button.dataset.following =
+      "false";
+
+    button.textContent =
+      "Follow";
+
+  }else{
+
+    button.dataset.following =
+      "true";
+
+    button.textContent =
+      "✓ Following";
+
+  }
+
+}
+
+function toggleFavorite(){
+
+  const button =
+    document.getElementById("favoriteButton");
+
+  if(
+    button.dataset.favorite === "true"
+  ){
+
+    button.dataset.favorite =
+      "false";
+
+    button.textContent =
+      "♡ Favorite";
+
+  }else{
+
+    button.dataset.favorite =
+      "true";
+
+    button.textContent =
+      "♥ Favorited";
+
+  }
+
+}
+
+document.getElementById("tipButton")
+  .onclick = () =>
+    openModal("tipModal");
+
+document.getElementById("supportButton")
+  .onclick = () =>
+    openModal("tipModal");
+
+document.getElementById("bookButton")
+  .onclick = () =>
+    openModal("bookingModal");
+
+document.getElementById("bookingInfoButton")
+  .onclick = () =>
+    openModal("bookingModal");
+
+document.getElementById("shareButton")
+  .onclick = shareDJ;
+
+document.getElementById("followButton")
+  .onclick = toggleFollow;
+
+document.getElementById("favoriteButton")
+  .onclick = toggleFavorite;
+
+document.querySelectorAll(".modal")
+  .forEach(modal => {
+
+    modal.addEventListener("click",event => {
+
+      if(event.target === modal){
+
+        modal.classList.remove("show");
+
+      }
+
+    });
+
+  });
+
+async function init(){
+
+  try{
+
+    if(!djId){
+      throw new Error("No DJ ID.");
+    }
+
+    await loadDJProfile();
+
+    await loadDJRole();
+
+    await loadMixes();
+
+    await loadSimilarDJs();
+
+  }catch(error){
+
+    console.error(error);
+
+    document.querySelector("main").innerHTML = `
+      <div class="error">
+        🎧 This DJ profile could not be found.
+      </div>
+    `;
+
+  }
+
+}
+
+init();
+</script>
+
+</body>
+</html>
