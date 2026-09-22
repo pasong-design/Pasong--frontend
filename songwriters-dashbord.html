@@ -1,0 +1,1064 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG Writer Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#080810;
+  color:#f5f3ff;
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(8,8,16,.96);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid #242033;
+}
+
+.navbar{
+  max-width:1250px;
+  margin:auto;
+  min-height:72px;
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+  color:#c084fc;
+  white-space:nowrap;
+}
+
+.logo span{
+  color:#fff;
+}
+
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.nav-btn{
+  padding:10px 14px;
+  border:1px solid #30264a;
+  border-radius:12px;
+  background:#11101b;
+  color:#ddd6fe;
+}
+
+.nav-btn:hover{
+  border-color:#8b5cf6;
+}
+
+.container{
+  width:min(1250px,calc(100% - 30px));
+  margin:0 auto;
+  padding:28px 0 50px;
+}
+
+.hero{
+  background:
+    radial-gradient(circle at 80% 20%,rgba(192,132,252,.22),transparent 30%),
+    radial-gradient(circle at 10% 80%,rgba(236,72,153,.14),transparent 28%),
+    #11101b;
+  border:1px solid #29223e;
+  border-radius:24px;
+  padding:28px;
+  margin-bottom:22px;
+}
+
+.hero-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.profile-photo{
+  width:78px;
+  height:78px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#171522;
+  border:2px solid #8b5cf6;
+}
+
+.profile h1{
+  font-size:28px;
+  margin-bottom:6px;
+}
+
+.profile p{
+  color:#aaa3bb;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-top:8px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:rgba(139,92,246,.14);
+  color:#c084fc;
+  font-size:12px;
+  font-weight:700;
+}
+
+.primary-btn{
+  border:0;
+  border-radius:12px;
+  padding:12px 17px;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;
+  font-weight:700;
+}
+
+.primary-btn:hover{
+  opacity:.9;
+}
+
+.message{
+  display:none;
+  margin-top:18px;
+  padding:14px;
+  border-radius:12px;
+  background:#171522;
+  border:1px solid #30264a;
+  color:#c4bdd3;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+
+.stat{
+  background:#11101b;
+  border:1px solid #282139;
+  border-radius:18px;
+  padding:20px;
+}
+
+.stat-icon{
+  font-size:22px;
+  margin-bottom:12px;
+}
+
+.stat-label{
+  color:#9992aa;
+  font-size:13px;
+  margin-bottom:7px;
+}
+
+.stat-value{
+  font-size:25px;
+  font-weight:800;
+}
+
+.stat-small{
+  margin-top:7px;
+  color:#777181;
+  font-size:12px;
+}
+
+.section{
+  background:#11101b;
+  border:1px solid #282139;
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:20px;
+}
+
+.section-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.section-title{
+  font-size:20px;
+  font-weight:800;
+}
+
+.section-subtitle{
+  color:#898293;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.card{
+  background:#0c0c14;
+  border:1px solid #272139;
+  border-radius:16px;
+  padding:17px;
+}
+
+.card h3{
+  font-size:16px;
+  margin-bottom:7px;
+}
+
+.card p{
+  color:#9690a0;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.card-icon{
+  font-size:25px;
+  margin-bottom:12px;
+}
+
+.service-price{
+  color:#c084fc;
+  font-weight:800;
+  margin-top:12px;
+}
+
+.service-actions{
+  display:flex;
+  gap:8px;
+  margin-top:15px;
+}
+
+.small-btn{
+  border:1px solid #342951;
+  background:#151321;
+  color:#ddd6fe;
+  border-radius:9px;
+  padding:8px 11px;
+}
+
+.small-btn:hover{
+  border-color:#8b5cf6;
+}
+
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,
+td{
+  text-align:left;
+  padding:14px 12px;
+  border-bottom:1px solid #242033;
+}
+
+th{
+  color:#8f879e;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+td{
+  color:#e6e1ef;
+  font-size:14px;
+}
+
+.song-title{
+  font-weight:700;
+}
+
+.song-artist{
+  color:#8e879b;
+  font-size:12px;
+  margin-top:4px;
+}
+
+.status{
+  display:inline-flex;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  background:rgba(34,197,94,.1);
+  color:#86efac;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#777181;
+}
+
+.profile-form{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  color:#aaa3b5;
+  font-size:13px;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  border:1px solid #302741;
+  background:#0b0b12;
+  color:#f5f3ff;
+  border-radius:11px;
+  padding:12px;
+  outline:none;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+  border-color:#8b5cf6;
+}
+
+.field textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.form-actions{
+  grid-column:1/-1;
+  display:flex;
+  justify-content:flex-end;
+}
+
+.notice{
+  padding:13px 15px;
+  border-radius:12px;
+  background:rgba(139,92,246,.08);
+  border:1px solid #30264a;
+  color:#aaa3bb;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:15px;
+}
+
+.mobile-nav{
+  display:none;
+}
+
+@media(max-width:900px){
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .hero-top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+@media(max-width:650px){
+  .navbar{
+    padding:11px 14px;
+  }
+
+  .nav-actions .nav-btn:first-child{
+    display:none;
+  }
+
+  .container{
+    width:min(100% - 20px,1250px);
+    padding-top:18px;
+  }
+
+  .hero{
+    padding:20px;
+    border-radius:18px;
+  }
+
+  .profile-photo{
+    width:65px;
+    height:65px;
+  }
+
+  .profile h1{
+    font-size:22px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+
+  .stat{
+    padding:15px;
+  }
+
+  .stat-value{
+    font-size:20px;
+  }
+
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+  .section{
+    padding:17px;
+    border-radius:17px;
+  }
+
+  .profile-form{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+
+  .form-actions{
+    grid-column:auto;
+  }
+
+  .mobile-nav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:200;
+    display:flex;
+    justify-content:space-around;
+    background:rgba(10,9,17,.97);
+    border-top:1px solid #29223e;
+    padding:9px 5px;
+    padding-bottom:calc(9px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-nav a{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    color:#8d8698;
+    font-size:11px;
+  }
+
+  .mobile-nav a.active{
+    color:#c084fc;
+  }
+
+  body{
+    padding-bottom:70px;
+  }
+}
+</style></head><body><header class="topbar">
+  <div class="navbar">
+    <a href="index.html" class="logo">◈ <span>PASONG</span></a><div class="nav-actions">
+  <a href="songwriters.html" class="nav-btn">✍️ Songwriters</a>
+  <a href="index.html" class="nav-btn">Home</a>
+  <button class="nav-btn" id="logoutBtn">Logout</button>
+</div>
+
+  </div>
+</header><main class="container">  <section class="hero">
+    <div class="hero-top">
+      <div class="profile">
+        <img
+          id="profilePhoto"
+          class="profile-photo"
+          src="https://ui-avatars.com/api/?name=Writer&background=171522&color=c084fc&bold=true"
+          alt="Writer">    <div>
+      <h1 id="writerName">Writer Dashboard</h1>
+      <p id="writerEmail">Loading account...</p>
+      <span class="badge" id="verificationBadge">✍️ Writer</span>
+    </div>
+  </div>
+
+  <a href="songwriters.html" class="primary-btn">View Public Profile</a>
+</div>
+
+<div class="message" id="message"></div>
+
+  </section>  <section class="grid"><div class="stat">
+  <div class="stat-icon">🎵</div>
+  <div class="stat-label">Songs Written</div>
+  <div class="stat-value" id="songCount">0</div>
+  <div class="stat-small">Approved writing credits</div>
+</div>
+
+<div class="stat">
+  <div class="stat-icon">▶️</div>
+  <div class="stat-label">Total Plays</div>
+  <div class="stat-value" id="totalPlays">0</div>
+  <div class="stat-small">Across your credits</div>
+</div>
+
+<div class="stat">
+  <div class="stat-icon">⬇️</div>
+  <div class="stat-label">Downloads</div>
+  <div class="stat-value" id="totalDownloads">0</div>
+  <div class="stat-small">Across your credits</div>
+</div>
+
+<div class="stat">
+  <div class="stat-icon">💰</div>
+  <div class="stat-label">Writing Services</div>
+  <div class="stat-value" id="serviceCount">0</div>
+  <div class="stat-small">Your own prices</div>
+</div>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Writing Services</div>
+        <div class="section-subtitle">Set your own prices for lyrics and co-writing.</div>
+      </div>  <button class="primary-btn" id="addServiceBtn">+ Add Service</button>
+</div>
+
+<div class="notice">
+  PASONG does not set your writing-service price here. You decide what you charge for each service.
+</div>
+
+<div class="cards" id="servicesList">
+  <div class="empty">No writing services added yet.</div>
+</div>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">My Writing Catalog</div>
+        <div class="section-subtitle">Songs connected to your PASONG writer account.</div>
+      </div>
+    </div><div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Song</th>
+        <th>Genre</th>
+        <th>Plays</th>
+        <th>Downloads</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+
+    <tbody id="songsTable">
+      <tr>
+        <td colspan="5" class="empty">Loading songs...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Writer Profile</div>
+        <div class="section-subtitle">Information displayed on your public songwriter profile.</div>
+      </div>
+    </div><form class="profile-form" id="profileForm">
+
+  <div class="field">
+    <label>Stage / Performing Name</label>
+    <input id="stageName" type="text" placeholder="Your public writer name">
+  </div>
+
+  <div class="field">
+    <label>Genre / Specialty</label>
+    <input id="genre" type="text" placeholder="Afrobeats, Gospel, Hip Hop">
+  </div>
+
+  <div class="field">
+    <label>Languages</label>
+    <input id="languages" type="text" placeholder="Luganda, English, Swahili">
+  </div>
+
+  <div class="field">
+    <label>Country</label>
+    <input id="country" type="text" placeholder="Uganda">
+  </div>
+
+  <div class="field full">
+    <label>Bio</label>
+    <textarea id="bio" placeholder="Tell artists about your writing style and experience"></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="primary-btn">Save Profile</button>
+  </div>
+
+</form>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Earnings</div>
+        <div class="section-subtitle">Your writing-service and royalty earnings.</div>
+      </div>
+    </div><div class="cards">
+
+  <div class="card">
+    <div class="card-icon">💵</div>
+    <h3>Total Earnings</h3>
+    <p>Writing-service payments and eligible royalties will appear here.</p>
+    <div class="service-price" id="totalEarnings">UGX 0</div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">⏳</div>
+    <h3>Pending</h3>
+    <p>Payments waiting to become available.</p>
+    <div class="service-price" id="pendingEarnings">UGX 0</div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon">🏦</div>
+    <h3>Available</h3>
+    <p>Balance available for withdrawal.</p>
+    <div class="service-price" id="availableEarnings">UGX 0</div>
+  </div>
+
+</div>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Hire Requests</div>
+        <div class="section-subtitle">Requests from artists will appear here.</div>
+      </div>
+    </div><div class="empty">
+  No hire requests yet.
+</div>
+
+  </section>  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Withdrawals</div>
+        <div class="section-subtitle">Your PASONG withdrawal information.</div>
+      </div>  <button class="small-btn" id="withdrawBtn">Withdraw</button>
+</div>
+
+<div class="notice">
+  Your existing PASONG mobile-money verification and withdrawal rules will be used when withdrawals are connected.
+</div>
+
+  </section></main><nav class="mobile-nav">
+  <a href="index.html">
+    <span>🏠</span>
+    <span>Home</span>
+  </a>  <a href="songwriters.html">
+    <span>✍️</span>
+    <span>Writers</span>
+  </a>  <a href="store.html">
+    <span>🎵</span>
+    <span>Store</span>
+  </a>  <a href="artist-dashboard.html" class="active">
+    <span>📊</span>
+    <span>Dashboard</span>
+  </a>
+</nav><script>
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+let currentUser = null;
+let currentProfile = null;
+let writerSongs = [];
+
+const messageBox =
+  document.getElementById("message");
+
+function showMessage(text){
+  messageBox.textContent = text;
+  messageBox.style.display = "block";
+}
+
+function hideMessage(){
+  messageBox.style.display = "none";
+}
+
+function formatNumber(value){
+  return Number(value || 0).toLocaleString();
+}
+
+function formatMoney(value){
+  return `UGX ${Number(value || 0).toLocaleString()}`;
+}
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+async function loadAccount(){
+  const {
+    data:{
+      session
+    }
+  } = await supabaseClient.auth.getSession();
+
+  if(!session || !session.user){
+    window.location.href = "login.html?redirect=writer-dashboard.html";
+    return;
+  }
+
+  currentUser = session.user;
+
+  document.getElementById("writerEmail").textContent =
+    currentUser.email || "PASONG account";
+
+  await loadProfile();
+  await loadWriterSongs();
+}
+
+async function loadProfile(){
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("artist_profiles")
+    .select(`
+      id,
+      user_id,
+      stage_name,
+      performing_name,
+      artist_name,
+      profile_image_url,
+      genre,
+      bio,
+      verified
+    `)
+    .eq("user_id",currentUser.id)
+    .maybeSingle();
+
+  if(error){
+    showMessage("Unable to load your writer profile.");
+    return;
+  }
+
+  currentProfile = data;
+
+  if(!data){
+    document.getElementById("writerName").textContent =
+      "Writer Dashboard";
+
+    document.getElementById("verificationBadge").textContent =
+      "✍️ Writer";
+
+    return;
+  }
+
+  const publicName =
+    data.stage_name ||
+    data.performing_name ||
+    data.artist_name ||
+    "Writer";
+
+  document.getElementById("writerName").textContent =
+    publicName;
+
+  document.getElementById("verificationBadge").textContent =
+    data.verified
+      ? "✍️ Verified PASONG Writer"
+      : "✍️ PASONG Writer";
+
+  if(data.profile_image_url){
+    document.getElementById("profilePhoto").src =
+      data.profile_image_url;
+  }
+
+  document.getElementById("stageName").value =
+    data.stage_name ||
+    data.performing_name ||
+    data.artist_name ||
+    "";
+
+  document.getElementById("genre").value =
+    data.genre || "";
+
+  document.getElementById("bio").value =
+    data.bio || "";
+}
+
+async function loadWriterSongs(){
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("songs")
+    .select(`
+      id,
+      title,
+      genre,
+      plays,
+      downloads,
+      featured,
+      status,
+      created_at,
+      artist_user_id,
+      writer_user_id
+    `)
+    .eq("writer_user_id",currentUser.id)
+    .eq("status","approved")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    document.getElementById("songsTable").innerHTML = `
+      <tr>
+        <td colspan="5" class="empty">
+          Unable to load your writing catalog.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  writerSongs = data || [];
+
+  renderSongs();
+  updateStats();
+}
+
+function renderSongs(){
+
+  const table =
+    document.getElementById("songsTable");
+
+  if(!writerSongs.length){
+    table.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty">
+          No approved songs are connected to your writer account yet.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  table.innerHTML =
+    writerSongs.map(song => `
+      <tr>
+        <td>
+          <div class="song-title">
+            ${escapeHtml(song.title || "Untitled")}
+          </div>
+          <div class="song-artist">
+            Writer credit
+          </div>
+        </td>
+
+        <td>
+          ${escapeHtml(song.genre || "Not set")}
+        </td>
+
+        <td>
+          ${formatNumber(song.plays)}
+        </td>
+
+        <td>
+          ${formatNumber(song.downloads)}
+        </td>
+
+        <td>
+          <span class="status">
+            ${escapeHtml(song.status || "approved")}
+          </span>
+        </td>
+      </tr>
+    `).join("");
+}
+
+function updateStats(){
+
+  const songCount =
+    writerSongs.length;
+
+  const totalPlays =
+    writerSongs.reduce(
+      (sum,song) =>
+        sum + Number(song.plays || 0),
+      0
+    );
+
+  const totalDownloads =
+    writerSongs.reduce(
+      (sum,song) =>
+        sum + Number(song.downloads || 0),
+      0
+    );
+
+  document.getElementById("songCount").textContent =
+    formatNumber(songCount);
+
+  document.getElementById("totalPlays").textContent =
+    formatNumber(totalPlays);
+
+  document.getElementById("totalDownloads").textContent =
+    formatNumber(totalDownloads);
+}
+
+document
+  .getElementById("profileForm")
+  .addEventListener("submit",async function(event){
+
+    event.preventDefault();
+
+    hideMessage();
+
+    if(!currentUser){
+      return;
+    }
+
+    const stageName =
+      document.getElementById("stageName").value.trim();
+
+    const genre =
+      document.getElementById("genre").value.trim();
+
+    const bio =
+      document.getElementById("bio").value.trim();
+
+    const existing =
+      currentProfile || {};
+
+    const payload = {
+      user_id:currentUser.id,
+      stage_name:stageName,
+      performing_name:
+        existing.performing_name || stageName,
+      artist_name:
+        existing.artist_name || stageName,
+      genre:genre,
+      bio:bio,
+      profile_image_url:
+        existing.profile_image_url || null,
+      verified:
+        existing.verified || false
+    };
+
+    const {
+      error
+    } = await supabaseClient
+      .from("artist_profiles")
+      .upsert(
+        payload,
+        {
+          onConflict:"user_id"
+        }
+      );
+
+    if(error){
+      showMessage(
+        "Profile could not be saved: " +
+        error.message
+      );
+      return;
+    }
+
+    showMessage("Writer profile saved successfully.");
+
+    await loadProfile();
+  });
+
+document
+  .getElementById("addServiceBtn")
+  .addEventListener("click",function(){
+    showMessage(
+      "Writer services need a writer-services database table before prices can be saved. Your public profile can then show the exact prices you choose."
+    );
+  });
+
+document
+  .getElementById("withdrawBtn")
+  .addEventListener("click",function(){
+    showMessage(
+      "Withdrawals will be connected to the PASONG mobile-money withdrawal system."
+    );
+  });
+
+document
+  .getElementById("logoutBtn")
+  .addEventListener("click",async function(){
+
+    await supabaseClient.auth.signOut();
+
+    window.location.href = "login.html";
+  });
+
+loadAccount();
+</script></body>
+</html>
