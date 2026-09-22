@@ -5,157 +5,394 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#8b5cf6">
-<title>PASONG — Producer</title>
+<title>PASONG Producer Checkout</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,Helvetica,sans-serif;background:#09090f;color:#fff;min-height:100vh}
-a{color:inherit;text-decoration:none}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-.header{position:sticky;top:0;z-index:100;background:rgba(10,10,18,.96);border-bottom:1px solid #242433;backdrop-filter:blur(12px)}
-.header-inner{max-width:1250px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:20px}
-.logo{font-size:24px;font-weight:800;color:#fff;white-space:nowrap}
-.logo span{color:#c084fc}
-.search-box{flex:1;max-width:500px;position:relative}
-.search-box input{width:100%;background:#171722;border:1px solid #2d2d40;color:#fff;border-radius:25px;padding:12px 18px 12px 42px;outline:none}
-.search-box input:focus{border-color:#8b5cf6}
-.search-icon{position:absolute;left:15px;top:11px;z-index:2}
-.nav-links{margin-left:auto;display:flex;align-items:center;gap:16px;font-size:14px}
-.nav-links a:hover{color:#c084fc}
-.account-box{display:flex;align-items:center;gap:8px}
-.account-photo{width:34px;height:34px;border-radius:50%;object-fit:cover}
-main{max-width:1250px;margin:auto;padding:35px 20px 80px}
-.hero{position:relative;overflow:hidden;border:1px solid #2a2038;border-radius:24px;background:#11111c;margin-bottom:30px}
-.studio-banner{width:100%;height:270px;overflow:hidden;background:#171722}
-.studio-banner img{width:100%;height:100%;object-fit:cover;display:block;opacity:.75}
-.producer-profile{display:flex;align-items:center;gap:25px;padding:28px 35px 35px;background:radial-gradient(circle at 80% 20%,rgba(236,72,153,.18),transparent 30%),radial-gradient(circle at 20% 80%,rgba(139,92,246,.18),transparent 35%)}
-.producer-main-photo{width:150px;height:150px;border-radius:50%;object-fit:cover;border:4px solid #8b5cf6;background:#171722;flex-shrink:0}
-.producer-info{flex:1}
-.hero-kicker{color:#ec4899;font-size:13px;font-weight:bold;letter-spacing:2px;margin-bottom:10px}
-.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.1;margin-bottom:12px}
-.hero h1 span{color:#c084fc}
-.producer-location{color:#b9b9c8;line-height:1.6;margin-bottom:8px}
-.producer-tagline{color:#aaaabd;line-height:1.6}
-.hero-actions{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:10px;font-weight:bold;border:0}
-.btn-primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
-.btn-secondary{background:#1c1c2a;border:1px solid #343449;color:#fff}
-.btn:hover{transform:translateY(-1px)}
-.section{margin-top:35px}
-.section-header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}
-.section-header h2{font-size:24px}
-.section-subtitle{color:#9999aa;font-size:14px;margin-top:6px}
-.beat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
-.beat-card{background:#12121c;border:1px solid #292938;border-radius:18px;overflow:hidden;transition:.2s}
-.beat-card:hover{transform:translateY(-3px);border-color:#8b5cf6;box-shadow:0 10px 30px rgba(139,92,246,.12)}
-.beat-cover{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#171722}
-.beat-content{padding:16px}
-.beat-title{font-size:18px;font-weight:700;margin-bottom:8px}
-.beat-meta{color:#aaaabd;font-size:13px;line-height:1.6;margin-bottom:12px}
-.preview-label{color:#c084fc;font-size:12px;font-weight:700;margin-bottom:7px}
-.beat-player{width:100%;margin:5px 0 10px}
-.beat-prices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.price-box{background:#0b0b15;border:1px solid #29293e;border-radius:10px;padding:10px}
-.price-box small{display:block;color:#9999aa;font-size:11px;margin-bottom:4px}
-.price-box strong{font-size:14px}
-.beat-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.beat-action{border:0;border-radius:9px;padding:10px 8px;font-weight:700;cursor:pointer;color:#fff;background:#1e1e2d;border:1px solid #35354a}
-.beat-action.primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);border:0}
-.beat-action:hover{transform:translateY(-1px)}
-.empty,.loading,.error{text-align:center;padding:40px 20px;background:#11111b;border:1px solid #282837;border-radius:18px;color:#9999aa}
-.credits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
-.credit-card{display:flex;justify-content:space-between;align-items:center;gap:15px;background:#12121c;border:1px solid #292938;border-radius:14px;padding:17px}
-.credit-card:hover{border-color:#8b5cf6}
-.credit-card div{display:flex;flex-direction:column;gap:5px}
-.credit-card strong{font-size:16px}
-.credit-card span{color:#9999aa;font-size:13px}
-.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:18px}
-.service-card{background:#12121c;border:1px solid #292938;border-radius:15px;padding:20px}
-.service-card span{display:block;font-size:24px;margin-bottom:10px}
-.service-card strong{display:block;margin-bottom:7px}
-.service-card p{color:#c084fc;font-weight:bold}
-.studio-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
-.studio-info>div{background:#12121c;border:1px solid #292938;border-radius:15px;padding:18px}
-.studio-info strong{display:block;margin-bottom:8px}
-.studio-info p{color:#aaaabd;line-height:1.6}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
-.stat-card{background:#12121c;border:1px solid #292938;border-radius:15px;padding:20px;text-align:center}
-.stat-card strong{display:block;font-size:24px;color:#c084fc;margin-bottom:7px}
-.stat-card span{color:#9999aa;font-size:13px}
-.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
-.review-card{background:#12121c;border:1px solid #292938;border-radius:15px;padding:20px}
-.review-stars{margin-bottom:12px}
-.review-card p{color:#d4d4df;line-height:1.6;margin-bottom:12px}
-.review-card strong{color:#c084fc}
-.about-card{background:#12121c;border:1px solid #292938;border-radius:18px;padding:24px}
-.about-card h3{font-size:20px;margin-bottom:10px}
-.about-card p{color:#aaaabd;line-height:1.7;max-width:750px}
-.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
-.tags span{background:#1d1830;border:1px solid #392b56;color:#c084fc;padding:7px 11px;border-radius:999px;font-size:12px}
-.contact-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%}
-.contact-actions .btn{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center}
-.producer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
-.producer-card{background:#12121c;border:1px solid #292938;border-radius:18px;padding:20px;text-align:center}
-.producer-card img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #8b5cf6;margin-bottom:12px}
-.producer-card strong{display:block;margin-bottom:6px}
-.producer-card span{color:#9999aa;font-size:13px}
-.modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
-.modal.active{display:flex}
-.modal-box{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;background:#11111c;border:1px solid #343449;border-radius:20px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.modal-header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:20px}
-.modal-header h2{font-size:22px}
-.modal-close{width:38px;height:38px;border-radius:50%;border:1px solid #343449;background:#1c1c2a;color:#fff;font-size:20px}
-.form-group{margin-bottom:15px}
-.form-group label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px;color:#d8d8e5}
-.form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #343449;background:#0b0b15;color:#fff;outline:none}
-.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#8b5cf6}
-.form-group textarea{min-height:120px;resize:vertical}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-actions{display:flex;gap:10px;margin-top:20px}
-.form-actions .btn{flex:1}
-.form-message{display:none;padding:12px;margin-top:15px;border-radius:10px;background:#1d1830;border:1px solid #392b56;color:#c084fc;line-height:1.5}
-.booking-fee{background:#171722;border:1px solid #343449;border-radius:12px;padding:14px;margin-bottom:18px;line-height:1.6;color:#cfcfe0}
-.booking-fee strong{color:#c084fc}
-footer{border-top:1px solid #252532;padding:30px 20px;color:#888899;text-align:center;font-size:13px}
-.mobile-nav{display:none}
+*{
+box-sizing:border-box;
+margin:0;
+padding:0
+}
 
-@media(max-width:900px){
-.nav-links a:nth-child(1),.nav-links a:nth-child(2),.nav-links a:nth-child(3),.nav-links a:nth-child(4),.nav-links a:nth-child(5),.nav-links a:nth-child(6){display:none}
-.header-inner{gap:12px}
-.search-box{max-width:none}
-.stats-grid{grid-template-columns:repeat(2,1fr)}
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#09090f;
+color:#fff;
+min-height:100vh
+}
+
+a{
+color:inherit;
+text-decoration:none
+}
+
+button,input,textarea,select{
+font:inherit
+}
+
+button{
+cursor:pointer
+}
+
+.header{
+position:sticky;
+top:0;
+z-index:100;
+background:rgba(10,10,18,.96);
+border-bottom:1px solid #242433;
+backdrop-filter:blur(12px)
+}
+
+.header-inner{
+max-width:900px;
+margin:auto;
+padding:14px 20px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:15px
+}
+
+.logo{
+font-size:24px;
+font-weight:800
+}
+
+.logo span{
+color:#c084fc
+}
+
+.header-link{
+color:#aaaabd;
+font-size:14px
+}
+
+.header-link:hover{
+color:#c084fc
+}
+
+main{
+max-width:900px;
+margin:auto;
+padding:35px 20px 80px
+}
+
+.checkout-card{
+background:#11111c;
+border:1px solid #292938;
+border-radius:24px;
+overflow:hidden;
+box-shadow:0 20px 60px rgba(0,0,0,.35)
+}
+
+.checkout-header{
+padding:25px;
+border-bottom:1px solid #292938;
+background:
+radial-gradient(circle at 85% 20%,rgba(236,72,153,.18),transparent 30%),
+radial-gradient(circle at 15% 80%,rgba(139,92,246,.18),transparent 35%)
+}
+
+.kicker{
+color:#ec4899;
+font-size:12px;
+font-weight:800;
+letter-spacing:2px;
+margin-bottom:8px
+}
+
+h1{
+font-size:32px;
+margin-bottom:8px
+}
+
+.subtitle{
+color:#9999aa;
+line-height:1.6
+}
+
+.product{
+display:grid;
+grid-template-columns:220px 1fr;
+gap:25px;
+padding:25px
+}
+
+.product-cover{
+width:100%;
+aspect-ratio:1/1;
+object-fit:cover;
+border-radius:16px;
+background:#171722;
+border:1px solid #292938
+}
+
+.product-info h2{
+font-size:25px;
+margin-bottom:8px
+}
+
+.product-meta{
+color:#aaaabd;
+line-height:1.7;
+margin-bottom:18px
+}
+
+.price-options{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-top:18px
+}
+
+.price-option{
+background:#0b0b15;
+border:1px solid #29293e;
+border-radius:14px;
+padding:18px
+}
+
+.price-option small{
+display:block;
+color:#9999aa;
+margin-bottom:7px
+}
+
+.price-option strong{
+font-size:20px;
+color:#c084fc
+}
+
+.price-option.selected{
+border-color:#8b5cf6;
+box-shadow:0 0 0 1px #8b5cf6
+}
+
+.section{
+padding:25px;
+border-top:1px solid #292938
+}
+
+.section h3{
+font-size:20px;
+margin-bottom:16px
+}
+
+.form-group{
+margin-bottom:15px
+}
+
+.form-group label{
+display:block;
+font-size:13px;
+font-weight:bold;
+color:#d8d8e5;
+margin-bottom:7px
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select{
+width:100%;
+padding:13px 14px;
+border-radius:10px;
+border:1px solid #343449;
+background:#0b0b15;
+color:#fff;
+outline:none
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{
+border-color:#8b5cf6
+}
+
+.form-group textarea{
+min-height:100px;
+resize:vertical
+}
+
+.form-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px
+}
+
+.payment-box{
+background:#171722;
+border:1px solid #343449;
+border-radius:16px;
+padding:18px
+}
+
+.payment-title{
+font-weight:bold;
+margin-bottom:6px
+}
+
+.payment-subtitle{
+color:#9999aa;
+font-size:13px;
+line-height:1.6;
+margin-bottom:15px
+}
+
+.payment-buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px
+}
+
+.payment-button{
+border:0;
+border-radius:12px;
+padding:14px;
+font-weight:bold;
+color:#fff;
+background:#1e1e2d;
+border:1px solid #35354a
+}
+
+.payment-button.primary{
+background:linear-gradient(135deg,#8b5cf6,#ec4899);
+border:0
+}
+
+.payment-button:disabled{
+opacity:.55;
+cursor:not-allowed
+}
+
+.total-box{
+background:#0b0b15;
+border:1px solid #343449;
+border-radius:14px;
+padding:18px;
+margin-bottom:18px
+}
+
+.total-row{
+display:flex;
+justify-content:space-between;
+gap:15px;
+padding:7px 0;
+color:#aaaabd
+}
+
+.total-row.final{
+border-top:1px solid #292938;
+margin-top:8px;
+padding-top:14px;
+color:#fff;
+font-size:19px;
+font-weight:bold
+}
+
+.total-row.final strong{
+color:#c084fc
+}
+
+.notice{
+background:#1d1830;
+border:1px solid #392b56;
+color:#c084fc;
+border-radius:12px;
+padding:14px;
+font-size:13px;
+line-height:1.6;
+margin-bottom:15px
+}
+
+.message{
+display:none;
+padding:14px;
+border-radius:12px;
+margin-top:15px;
+background:#171722;
+border:1px solid #343449;
+color:#cfcfe0;
+line-height:1.6
+}
+
+.message.show{
+display:block
+}
+
+.message.success{
+border-color:#315c45;
+color:#9be7bb
+}
+
+.message.error{
+border-color:#6b3030;
+color:#ffabab
+}
+
+.loading{
+text-align:center;
+padding:60px 20px;
+color:#9999aa
+}
+
+.hidden{
+display:none!important
+}
+
+footer{
+border-top:1px solid #252532;
+padding:30px 20px;
+color:#888899;
+text-align:center;
+font-size:13px
 }
 
 @media(max-width:650px){
-.header-inner{flex-wrap:wrap}
-.logo{order:1}
-.account-box{order:2}
-.search-box{order:3;flex-basis:100%}
-main{padding:20px 14px 90px}
-.studio-banner{height:190px}
-.producer-profile{flex-direction:column;align-items:flex-start;padding:22px}
-.producer-main-photo{width:110px;height:110px}
-.hero-actions{width:100%}
-.hero-actions .btn{flex:1;min-width:130px}
-.beat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.beat-content{padding:12px}
-.beat-title{font-size:14px}
-.beat-meta{font-size:11px}
-.beat-prices{grid-template-columns:1fr}
-.beat-actions{grid-template-columns:1fr}
-.stats-grid{grid-template-columns:1fr 1fr;gap:10px}
-.stat-card{padding:15px 8px}
-.stat-card strong{font-size:19px}
-.credit-card{align-items:flex-start;flex-direction:column}
-.contact-actions{grid-template-columns:1fr;gap:10px}
-.contact-actions .btn{min-height:50px}
-.form-row{grid-template-columns:1fr}
-.form-actions{flex-direction:column}
-.mobile-nav{position:fixed;display:flex;bottom:0;left:0;right:0;z-index:200;background:rgba(12,12,20,.97);border-top:1px solid #292938;justify-content:space-around;padding:10px 5px}
-.mobile-nav a{font-size:11px;color:#aaaabd;text-align:center}
-.mobile-nav a:first-child{color:#c084fc}
+
+main{
+padding:20px 14px 50px
+}
+
+.header-inner{
+padding:13px 14px
+}
+
+.product{
+grid-template-columns:1fr;
+padding:18px
+}
+
+.product-cover{
+max-width:280px;
+margin:auto
+}
+
+.checkout-header{
+padding:20px
+}
+
+h1{
+font-size:26px
+}
+
+.section{
+padding:20px
+}
+
+.price-options{
+grid-template-columns:1fr
+}
+
+.payment-buttons{
+grid-template-columns:1fr
+}
+
+.form-row{
+grid-template-columns:1fr
+}
+
 }
 </style>
 </head>
@@ -163,644 +400,319 @@ main{padding:20px 14px 90px}
 <body>
 
 <header class="header">
+
 <div class="header-inner">
 
 <a href="index.html" class="logo">
 ◈ <span>PASONG</span>
 </a>
 
-<div class="search-box">
-<span class="search-icon">🔎</span>
-<input id="producerSearch" type="search" placeholder="Search producers..." autocomplete="off">
-</div>
-
-<nav class="nav-links">
-
-<a href="store.html">Music Store</a>
-<a href="charts.html">Charts</a>
-<a href="artists.html">Artists</a>
-<a href="playlists.html">Playlists</a>
-<a href="promotion.html">Promotion</a>
-<a href="artist-dashboard.html">Upload Music</a>
-<a href="notifications.html">🔔 0</a>
-
-<a href="https://pasong-frontend.vercel.app/producer-dashboard.html">
-🎹 Producer Dashboard
+<a href="javascript:history.back()" class="header-link">
+← Back
 </a>
 
-<a href="account.html" class="account-box">
-<img id="accountPhoto" class="account-photo" src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true" alt="Account">
-<span>My Account</span>
-</a>
-
-</nav>
 </div>
+
 </header>
 
 <main>
 
-<section class="hero">
-
-<div class="studio-banner">
-<img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1600&q=80" alt="Producer Studio">
+<div id="loading" class="loading">
+Loading producer checkout...
 </div>
 
-<div class="producer-profile">
+<div id="checkout" class="checkout-card hidden">
 
-<img id="producerPhoto" class="producer-main-photo" src="https://ui-avatars.com/api/?name=KV+BEATS&background=171722&color=c084fc&bold=true&size=300" alt="Producer">
+<div class="checkout-header">
 
-<div class="producer-info">
-
-<div class="hero-kicker">
-PASONG PRODUCER
+<div class="kicker">
+PASONG PRODUCER MARKETPLACE
 </div>
 
-<h1>
-🎛️ Producer <span id="producerName">KV BEATS</span>
-</h1>
+<h1>Producer Checkout</h1>
 
-<p id="producerLocation" class="producer-location">
-📍 Kampala &nbsp;|&nbsp; 🎹 Music Producer
-</p>
-
-<p class="producer-tagline">
-<span id="producerSold">12</span> beats sold •
-<span id="producerHits">3</span> hits •
-<span id="producerYears">5</span> years producing
-</p>
-
-<div class="hero-actions">
-
-<button id="showreelBtn" class="btn btn-primary">
-▶ Play Showreel
-</button>
-
-<button id="followBtn" class="btn btn-secondary">
-Follow
-</button>
-
-<button id="hireBtn" class="btn btn-secondary">
-💬 Hire Me
-</button>
-
-<a href="#beat-store" class="btn btn-secondary">
-🛒 Beat Store
-</a>
-
-</div>
-
-</div>
-</div>
-</section>
-
-<section id="beat-store" class="section">
-
-<div class="section-header">
-
-<div>
-
-<h2>🎹 Beat Store</h2>
-
-<p class="section-subtitle">
-Browse and purchase beats from
-<span id="beatStoreProducer">KV BEATS</span>.
+<p class="subtitle">
+Purchase a producer service or beat license securely through PASONG.
 </p>
 
 </div>
 
+<div class="product">
+
+<img
+id="productCover"
+class="product-cover"
+src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true"
+alt="Producer">
+
+<div class="product-info">
+
+<h2 id="productTitle">
+Producer Service
+</h2>
+
+<div id="productMeta" class="product-meta">
+Loading...
 </div>
 
-<div id="beatGrid" class="beat-grid"></div>
+<div class="price-options">
 
-<div id="beatStatus" class="loading">
-Loading beats...
-</div>
+<div id="leaseOption" class="price-option">
 
-</section>
+<small>Beat Lease</small>
 
-<section class="section">
-
-<div class="section-header">
-<h2>🏆 Credits / Hits</h2>
-</div>
-
-<div id="creditsGrid" class="credits-grid">
-
-<div class="empty">
-No production credits listed yet.
-</div>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<div class="section-header">
-<h2>🎛️ Services &amp; Pricing</h2>
-</div>
-
-<div class="services-grid">
-
-<div class="service-card">
-<span>🎛️</span>
-<strong>Beat Lease</strong>
-<p id="serviceBeatLease">Price not set</p>
-</div>
-
-<div class="service-card">
-<span>💿</span>
-<strong>Exclusive Rights</strong>
-<p id="serviceExclusive">Price not set</p>
-</div>
-
-<div class="service-card">
-<span>🎹</span>
-<strong>Custom Beat</strong>
-<p id="serviceCustomBeat">Price not set</p>
-</div>
-
-<div class="service-card">
-<span>🎚️</span>
-<strong>Mixing &amp; Mastering</strong>
-<p id="serviceMixing">Price not set</p>
-</div>
+<strong id="leasePrice">
+Price not set
+</strong>
 
 </div>
 
-<button id="customBeatBtn" class="btn btn-primary">
-💬 Request Custom Beat
-</button>
+<div id="exclusiveOption" class="price-option">
 
-</section>
+<small>Exclusive Rights</small>
 
-<section class="section">
-
-<div class="section-header">
-<h2>🎚️ Studio Setup / Tags</h2>
-</div>
-
-<div class="studio-info">
-
-<div>
-<strong>DAW</strong>
-<p id="producerDaws">Not set</p>
-</div>
-
-<div>
-<strong>Music Style</strong>
-<p id="producerStyles">Not set</p>
-</div>
-
-<div>
-<strong>Tags</strong>
-<p id="producerTags">Not set</p>
-</div>
-
-<div>
-<strong>Availability</strong>
-<p id="producerAvailability">Not set</p>
-</div>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<div class="section-header">
-<h2>📊 Producer Stats</h2>
-</div>
-
-<div class="stats-grid">
-
-<div class="stat-card">
-<strong id="statUploaded">0</strong>
-<span>Beats Uploaded</span>
-</div>
-
-<div class="stat-card">
-<strong id="statSold">12</strong>
-<span>Beats Sold</span>
-</div>
-
-<div class="stat-card">
-<strong>4.9 ⭐</strong>
-<span>23 Reviews</span>
-</div>
-
-<div class="stat-card">
-<strong>2 hours</strong>
-<span>Response Time</span>
-</div>
-
-</div>
-
-</section>
-
-<section class="section">
-
-<div class="section-header">
-<h2>⭐ Reviews</h2>
-</div>
-
-<div class="reviews-grid">
-
-<div class="review-card">
-
-<div class="review-stars">
-⭐⭐⭐⭐⭐
-</div>
-
-<p>
-"Beat was fire, hit in 2 days."
-</p>
-
-<strong>
-John
+<strong id="exclusivePrice">
+Price not set
 </strong>
 
 </div>
 
 </div>
 
-</section>
-
-<section class="section">
-
-<div class="section-header">
-<h2>🎛️ About &amp; Studio</h2>
 </div>
 
-<div class="about-card">
+</div>
 
-<h3 id="aboutProducerName">
+<div class="section">
+
+<h3>Order Details</h3>
+
+<div class="form-group">
+
+<label for="buyerName">
+Your Name
+</label>
+
+<input
+id="buyerName"
+type="text"
+placeholder="Your name"
+required>
+
+</div>
+
+<div class="form-row">
+
+<div class="form-group">
+
+<label for="buyerPhone">
+Phone / WhatsApp
+</label>
+
+<input
+id="buyerPhone"
+type="tel"
+placeholder="+256 7XX XXX XXX"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label for="buyerEmail">
+Email
+</label>
+
+<input
+id="buyerEmail"
+type="email"
+placeholder="your@email.com">
+
+</div>
+
+</div>
+
+<div class="form-group">
+
+<label for="orderMessage">
+Message to Producer
+</label>
+
+<textarea
+id="orderMessage"
+placeholder="Add any instructions for the producer..."></textarea>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>Payment</h3>
+
+<div class="total-box">
+
+<div class="total-row">
+
+<span>Service</span>
+
+<span id="summaryService">
+Beat Lease
+</span>
+
+</div>
+
+<div class="total-row">
+
+<span>Producer</span>
+
+<span id="summaryProducer">
 KV BEATS
-</h3>
-
-<p id="aboutProducerText">
-Kampala-based music producer creating music for artists.
-</p>
-
-<div id="aboutProducerTags" class="tags"></div>
+</span>
 
 </div>
 
-</section>
+<div class="total-row final">
 
-<section class="section">
+<span>Total</span>
 
-<div class="section-header">
-<h2>📞 Contact / Booking</h2>
+<strong id="summaryTotal">
+UGX 0
+</strong>
+
 </div>
 
-<div class="contact-actions">
+</div>
 
-<button id="whatsappBtn" class="btn btn-primary">
-💬 WhatsApp
+<div class="notice">
+For Uganda mobile-money payments, use the MTN option below. The payment request will be sent to the phone number entered above.
+</div>
+
+<div class="payment-box">
+
+<div class="payment-title">
+Choose Payment Method
+</div>
+
+<div class="payment-subtitle">
+MTN Mobile Money is currently connected. Other payment methods can be connected later.
+</div>
+
+<div class="payment-buttons">
+
+<button
+id="mtnButton"
+class="payment-button primary"
+type="button">
+📱 Pay with MTN
 </button>
 
-<button id="emailBtn" class="btn btn-secondary">
-✉️ Email
-</button>
-
-<button id="studioBtn" class="btn btn-secondary">
-🎙️ Book Studio Session
+<button
+id="airtelButton"
+class="payment-button"
+type="button">
+📱 Airtel Money
 </button>
 
 </div>
 
-</section>
+<div id="paymentMessage" class="message"></div>
 
-<section class="section">
-
-<div class="section-header">
-<h2>🎛️ Similar Producers</h2>
 </div>
 
-<div id="similarProducers" class="producer-grid"></div>
+</div>
 
-</section>
+</div>
 
 </main>
 
 <footer>
-<div>
 © 2026 PASONG — Music. Opportunity. Support.
-</div>
 </footer>
-
-<nav class="mobile-nav">
-
-<a href="index.html">
-🏠<br>Home
-</a>
-
-<a href="store.html">
-🎵<br>Music
-</a>
-
-<a href="charts.html">
-🏆<br>Charts
-</a>
-
-<a href="artist-dashboard.html">
-⬆️<br>Upload
-</a>
-
-<a href="account.html">
-👤<br>Account
-</a>
-
-</nav>
-
-<div id="requestModal" class="modal">
-
-<div class="modal-box">
-
-<div class="modal-header">
-<h2>💬 Request Custom Beat</h2>
-<button class="modal-close" data-close="requestModal">×</button>
-</div>
-
-<form id="customBeatForm">
-
-<div class="form-group">
-<label>Your Name</label>
-<input id="requestName" type="text" required placeholder="Your name">
-</div>
-
-<div class="form-group">
-<label>Email or Phone</label>
-<input id="requestContact" type="text" required placeholder="Email or phone number">
-</div>
-
-<div class="form-row">
-
-<div class="form-group">
-<label>Genre</label>
-
-<select id="requestGenre">
-<option>Afrobeats</option>
-<option>Amapiano</option>
-<option>Dancehall</option>
-<option>Hip Hop</option>
-<option>R&B</option>
-<option>Gospel</option>
-<option>Other</option>
-</select>
-
-</div>
-
-<div class="form-group">
-<label>BPM</label>
-<input id="requestBpm" type="text" placeholder="e.g. 100">
-</div>
-
-</div>
-
-<div class="form-row">
-
-<div class="form-group">
-<label>Key</label>
-<input id="requestKey" type="text" placeholder="e.g. C Major">
-</div>
-
-<div class="form-group">
-<label>Budget</label>
-<input id="requestBudget" type="text" placeholder="e.g. UGX 150,000">
-</div>
-
-</div>
-
-<div class="form-group">
-<label>Describe the beat you want</label>
-
-<textarea id="requestDescription" required placeholder="Tell the producer about the sound, mood, instruments, reference song or anything else you want..."></textarea>
-
-</div>
-
-<div class="form-group">
-<label>Deadline</label>
-<input id="requestDeadline" type="text" placeholder="e.g. 3 days">
-</div>
-
-<div class="form-actions">
-
-<button type="button" class="btn btn-secondary" data-close="requestModal">
-Cancel
-</button>
-
-<button type="submit" class="btn btn-primary">
-Send Request
-</button>
-
-</div>
-
-<div id="customBeatMessage" class="form-message"></div>
-
-</form>
-
-</div>
-</div>
-
-<div id="contactModal" class="modal">
-
-<div class="modal-box">
-
-<div class="modal-header">
-<h2 id="contactModalTitle">📞 Contact Producer</h2>
-<button class="modal-close" data-close="contactModal">×</button>
-</div>
-
-<form id="contactForm">
-
-<div class="form-group">
-<label>Your Name</label>
-<input id="contactName" type="text" required placeholder="Your name">
-</div>
-
-<div class="form-group">
-<label>Email or Phone</label>
-<input id="contactDetails" type="text" required placeholder="Email or phone number">
-</div>
-
-<div class="form-group">
-<label>Message</label>
-<textarea id="contactMessage" required placeholder="Write your message..."></textarea>
-</div>
-
-<div class="form-actions">
-
-<button type="button" class="btn btn-secondary" data-close="contactModal">
-Cancel
-</button>
-
-<button type="submit" class="btn btn-primary">
-Send Request
-</button>
-
-</div>
-
-<div id="contactFormMessage" class="form-message"></div>
-
-</form>
-
-</div>
-</div>
-
-<div id="bookingModal" class="modal">
-
-<div class="modal-box">
-
-<div class="modal-header">
-<h2>🎙️ Book Producer</h2>
-<button class="modal-close" data-close="bookingModal">×</button>
-</div>
-
-<div class="booking-fee">
-
-<strong>PASONG Booking</strong><br>
-
-Booking requests are sent to the producer for approval.<br>
-
-When a booking is paid, PASONG takes <strong>10%</strong> and the producer receives <strong>90%</strong>.
-
-</div>
-
-<form id="bookingForm">
-
-<div class="form-group">
-
-<label>Service</label>
-
-<select id="bookingService" required>
-
-<option value="Studio Session">Studio Session</option>
-<option value="Custom Beat">Custom Beat</option>
-<option value="Mixing & Mastering">Mixing &amp; Mastering</option>
-<option value="Other">Other</option>
-
-</select>
-
-</div>
-
-<div class="form-row">
-
-<div class="form-group">
-<label>Preferred Date</label>
-<input id="bookingDate" type="date" required>
-</div>
-
-<div class="form-group">
-<label>Preferred Time</label>
-<input id="bookingTime" type="time" required>
-</div>
-
-</div>
-
-<div class="form-group">
-<label>Your Name</label>
-<input id="bookingName" type="text" required placeholder="Your name">
-</div>
-
-<div class="form-group">
-<label>Phone / WhatsApp</label>
-<input id="bookingPhone" type="text" required placeholder="2567XXXXXXXX">
-</div>
-
-<div class="form-group">
-<label>Email</label>
-<input id="bookingEmail" type="email" placeholder="your@email.com">
-</div>
-
-<div class="form-group">
-<label>Budget</label>
-<input id="bookingBudget" type="text" placeholder="e.g. UGX 100,000">
-</div>
-
-<div class="form-group">
-<label>Message</label>
-<textarea id="bookingMessage" required placeholder="Tell the producer what you need..."></textarea>
-</div>
-
-<div class="form-actions">
-
-<button type="button" class="btn btn-secondary" data-close="bookingModal">
-Cancel
-</button>
-
-<button type="submit" class="btn btn-primary">
-Send Booking Request
-</button>
-
-</div>
-
-<div id="bookingFormMessage" class="form-message"></div>
-
-</form>
-
-</div>
-</div>
 
 <script>
 
-const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const SUPABASE_URL =
+"https://mtufczmjlkvycarxylgh.supabase.co";
 
-const supabaseClient = supabase.createClient(
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const PAYMENT_API =
+"https://pasong-mom.vercel.app/api/pay";
+
+const API_BASE =
+"https://pasong-api.onrender.com";
+
+const supabaseClient =
+supabase.createClient(
 SUPABASE_URL,
-SUPABASE_ANON_KEY
+SUPABASE_PUBLISHABLE_KEY
 );
 
-const params = new URLSearchParams(window.location.search);
-const producerName = params.get("producer") || "KV BEATS";
+const params =
+new URLSearchParams(
+window.location.search
+);
 
-let producerProfile = null;
+const beatId =
+params.get("beat");
 
-const producerNameEl = document.getElementById("producerName");
-const beatStoreProducer = document.getElementById("beatStoreProducer");
-const aboutProducerName = document.getElementById("aboutProducerName");
-const beatGrid = document.getElementById("beatGrid");
-const beatStatus = document.getElementById("beatStatus");
-const producerSearch = document.getElementById("producerSearch");
-const creditsGrid = document.getElementById("creditsGrid");
-const followBtn = document.getElementById("followBtn");
+const license =
+params.get("license") ||
+"lease";
 
-producerNameEl.textContent = producerName;
-beatStoreProducer.textContent = producerName;
-aboutProducerName.textContent = producerName;
+let beat = null;
+let producer = null;
+let selectedLicense = license;
 
-async function loadAccountPhoto(){
+const loading =
+document.getElementById("loading");
 
-const {data:{user}} = await supabaseClient.auth.getUser();
+const checkout =
+document.getElementById("checkout");
 
-if(!user){
-return;
+const productCover =
+document.getElementById("productCover");
+
+const productTitle =
+document.getElementById("productTitle");
+
+const productMeta =
+document.getElementById("productMeta");
+
+const leasePrice =
+document.getElementById("leasePrice");
+
+const exclusivePrice =
+document.getElementById("exclusivePrice");
+
+const summaryService =
+document.getElementById("summaryService");
+
+const summaryProducer =
+document.getElementById("summaryProducer");
+
+const summaryTotal =
+document.getElementById("summaryTotal");
+
+const paymentMessage =
+document.getElementById("paymentMessage");
+
+function firstValue(
+row,
+fields,
+fallback=""
+){
+
+if(!row){
+return fallback;
 }
-
-const accountPhoto = document.getElementById("accountPhoto");
-
-const metadata = user.user_metadata || {};
-
-const photo =
-metadata.avatar_url ||
-metadata.profile_photo_url ||
-metadata.photo_url ||
-metadata.picture ||
-"";
-
-if(photo){
-accountPhoto.src = photo;
-}
-
-}
-
-function firstValue(row,fields,fallback=""){
 
 for(const field of fields){
 
-const value = row[field];
+const value =
+row[field];
 
 if(
 value !== undefined &&
@@ -818,11 +730,35 @@ return fallback;
 
 }
 
+function escapeHtml(value){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+function formatUGX(amount){
+
+return "UGX " +
+Number(amount || 0)
+.toLocaleString("en-UG");
+
+}
+
 function getBeatTitle(row){
 
 return firstValue(
 row,
-["beat_name","beat_title","title","name"],
+[
+"beat_name",
+"beat_title",
+"title",
+"name"
+],
 "Untitled Beat"
 );
 
@@ -846,27 +782,15 @@ row,
 
 }
 
-function getBeatAudio(row){
-
-return firstValue(
-row,
-[
-"beat_audio_url",
-"preview_url",
-"audio_url",
-"file_url",
-"audio"
-],
-""
-);
-
-}
-
 function getGenre(row){
 
 return firstValue(
 row,
-["genre","genres","music_genre"],
+[
+"genre",
+"genres",
+"music_genre"
+],
 "Beat"
 );
 
@@ -876,7 +800,10 @@ function getBpm(row){
 
 return firstValue(
 row,
-["bpm","tempo"],
+[
+"bpm",
+"tempo"
+],
 ""
 );
 
@@ -886,7 +813,10 @@ function getKey(row){
 
 return firstValue(
 row,
-["key","musical_key"],
+[
+"key",
+"musical_key"
+],
 ""
 );
 
@@ -905,7 +835,7 @@ row,
 "beat_lease_price",
 "leasing_price"
 ],
-50000
+0
 )
 );
 
@@ -921,1462 +851,736 @@ row,
 "beat_exclusive_price",
 "exclusive_rights_price"
 ],
-300000
+0
 )
 );
 
 }
 
-function formatUGX(amount){
+function getProducerName(row){
 
-return "UGX " + Number(amount || 0).toLocaleString("en-UG");
-
-}
-
-function formatServicePrice(value){
-
-if(
-value === undefined ||
-value === null ||
-String(value).trim() === ""
-){
-
-return "Price not set";
-
-}
-
-const text = String(value).trim();
-
-if(
-text.toLowerCase().includes("ugx") ||
-text.toLowerCase().includes("$") ||
-text.toLowerCase().includes("usd")
-){
-
-return text;
-
-}
-
-const numeric = Number(
-text.replace(/,/g,"")
+return firstValue(
+row,
+[
+"performing_name",
+"artist_name",
+"stage_name",
+"name"
+],
+"Producer"
 );
 
-if(Number.isFinite(numeric)){
+}
 
-return formatUGX(numeric);
+function getProducerId(row){
+
+return firstValue(
+row,
+[
+"producer_id",
+"artist_id"
+],
+""
+);
 
 }
 
-return text;
+function showMessage(
+message,
+type="normal"
+){
+
+paymentMessage.textContent =
+message;
+
+paymentMessage.className =
+"message show " +
+type;
 
 }
 
-function getServicePrice(profile,fields){
+function selectLicense(type){
 
-return firstValue(profile,fields,"");
+selectedLicense =
+type;
+
+const leaseOption =
+document.getElementById("leaseOption");
+
+const exclusiveOption =
+document.getElementById("exclusiveOption");
+
+if(type === "exclusive"){
+
+exclusiveOption.classList.add("selected");
+leaseOption.classList.remove("selected");
+
+summaryService.textContent =
+"Exclusive Rights";
+
+summaryTotal.textContent =
+formatUGX(
+getExclusivePrice(beat)
+);
+
+}else{
+
+leaseOption.classList.add("selected");
+exclusiveOption.classList.remove("selected");
+
+summaryService.textContent =
+"Beat Lease";
+
+summaryTotal.textContent =
+formatUGX(
+getLeasePrice(beat)
+);
 
 }
 
-function renderServicePrices(profile){
+}
 
-if(!profile){
+async function loadUser(){
 
-document.getElementById("serviceBeatLease").textContent = "Price not set";
-document.getElementById("serviceExclusive").textContent = "Price not set";
-document.getElementById("serviceCustomBeat").textContent = "Price not set";
-document.getElementById("serviceMixing").textContent = "Price not set";
+const {
+data:{user}
+} =
+await supabaseClient.auth.getUser();
+
+if(!user){
+return;
+}
+
+const metadata =
+user.user_metadata || {};
+
+const name =
+metadata.full_name ||
+metadata.name ||
+metadata.display_name ||
+"";
+
+const email =
+user.email || "";
+
+if(name){
+
+document.getElementById("buyerName").value =
+name;
+
+}
+
+if(email){
+
+document.getElementById("buyerEmail").value =
+email;
+
+}
+
+}
+
+async function loadBeat(){
+
+if(!beatId){
+
+loading.textContent =
+"No beat was selected.";
 
 return;
 
 }
-
-const beatLease = getServicePrice(
-profile,
-[
-"beat_lease_service_price",
-"beat_lease_price",
-"lease_service_price",
-"lease_price"
-]
-);
-
-const exclusive = getServicePrice(
-profile,
-[
-"exclusive_rights_service_price",
-"exclusive_service_price",
-"exclusive_rights_price",
-"exclusive_price"
-]
-);
-
-const customBeat = getServicePrice(
-profile,
-[
-"custom_beat_service_price",
-"custom_beat_price",
-"custom_price"
-]
-);
-
-const mixing = getServicePrice(
-profile,
-[
-"mixing_mastering_service_price",
-"mixing_mastering_price",
-"mixing_price",
-"mastering_price"
-]
-);
-
-document.getElementById("serviceBeatLease").textContent =
-formatServicePrice(beatLease);
-
-document.getElementById("serviceExclusive").textContent =
-formatServicePrice(exclusive);
-
-document.getElementById("serviceCustomBeat").textContent =
-formatServicePrice(customBeat);
-
-document.getElementById("serviceMixing").textContent =
-formatServicePrice(mixing);
-
-}
-
-function getProducerStyles(profile){
-
-return firstValue(
-profile,
-[
-"music_styles",
-"music_style",
-"genres",
-"genre",
-"specialty",
-"specialties",
-"producer_style",
-"producer_styles"
-],
-""
-);
-
-}
-
-function getProducerDaws(profile){
-
-return firstValue(
-profile,
-[
-"daws",
-"daw",
-"software",
-"production_software",
-"production_tools"
-],
-""
-);
-
-}
-
-function getProducerTags(profile){
-
-return firstValue(
-profile,
-[
-"tags",
-"producer_tags",
-"music_tags"
-],
-""
-);
-
-}
-
-function getProducerAvailability(profile){
-
-return firstValue(
-profile,
-[
-"availability",
-"delivery_time",
-"response_availability",
-"available"
-],
-""
-);
-
-}
-
-function formatList(value){
-
-if(
-value === undefined ||
-value === null ||
-String(value).trim() === ""
-){
-
-return "Not set";
-
-}
-
-if(Array.isArray(value)){
-
-return value
-.map(item=>String(item).trim())
-.filter(Boolean)
-.join(" • ");
-
-}
-
-return String(value)
-.replace(/\s*,\s*/g," • ")
-.replace(/\s*\|\s*/g," • ")
-.trim();
-
-}
-
-function renderProducerSetup(profile){
-
-if(!profile){
-
-document.getElementById("producerDaws").textContent = "Not set";
-document.getElementById("producerStyles").textContent = "Not set";
-document.getElementById("producerTags").textContent = "Not set";
-document.getElementById("producerAvailability").textContent = "Not set";
-
-return;
-
-}
-
-const styles = getProducerStyles(profile);
-const daws = getProducerDaws(profile);
-const tags = getProducerTags(profile);
-const availability = getProducerAvailability(profile);
-
-document.getElementById("producerDaws").textContent =
-formatList(daws);
-
-document.getElementById("producerStyles").textContent =
-formatList(styles);
-
-document.getElementById("producerTags").textContent =
-formatList(tags);
-
-document.getElementById("producerAvailability").textContent =
-formatList(availability);
-
-const location = firstValue(
-profile,
-[
-"location",
-"city",
-"producer_location"
-],
-"Kampala"
-);
-
-document.getElementById("producerLocation").innerHTML =
-"📍 " +
-escapeHtml(location) +
-" &nbsp;|&nbsp; 🎹 " +
-escapeHtml(formatList(styles) === "Not set" ? "Music Producer" : formatList(styles));
-
-const aboutText = document.getElementById("aboutProducerText");
-
-const styleText =
-formatList(styles) === "Not set"
-? "music"
-: formatList(styles);
-
-aboutText.textContent =
-String(location) +
-"-based music producer creating " +
-styleText +
-" sounds for artists.";
-
-const aboutTags =
-document.getElementById("aboutProducerTags");
-
-aboutTags.innerHTML = "";
-
-if(tags){
-
-const tagList = Array.isArray(tags)
-? tags
-: String(tags)
-.split(/[,|]/)
-.map(item=>item.trim())
-.filter(Boolean);
-
-tagList.forEach(tag=>{
-
-const span = document.createElement("span");
-
-span.textContent =
-String(tag).startsWith("#")
-? String(tag)
-: "#" + String(tag);
-
-aboutTags.appendChild(span);
-
-});
-
-}
-
-}
-
-function escapeHtml(value){
-
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
-function renderBeats(beats){
-
-beatGrid.innerHTML = "";
-
-if(!beats.length){
-
-beatStatus.style.display = "block";
-beatStatus.className = "empty";
-beatStatus.textContent =
-"No beats found for this producer yet.";
-
-return;
-
-}
-
-beatStatus.style.display = "none";
-
-beats.forEach((beat)=>{
-
-const title = getBeatTitle(beat);
-const cover = getBeatCover(beat);
-const audio = getBeatAudio(beat);
-const genre = getGenre(beat);
-const bpm = getBpm(beat);
-const musicalKey = getKey(beat);
-const leasePrice = getLeasePrice(beat);
-const exclusivePrice = getExclusivePrice(beat);
-
-const card = document.createElement("article");
-
-card.className = "beat-card";
-
-card.innerHTML = `
-
-<img
-class="beat-cover"
-src="${escapeHtml(cover)}"
-alt="${escapeHtml(title)}"
-onerror="this.src='https://ui-avatars.com/api/?name=Beat&background=171722&color=c084fc&bold=true'"
->
-
-<div class="beat-content">
-
-<div class="beat-title">
-${escapeHtml(title)}
-</div>
-
-<div class="beat-meta">
-🎛️ ${escapeHtml(genre)}
-${bpm ? " • " + escapeHtml(bpm) + " BPM" : ""}
-${musicalKey ? " • Key: " + escapeHtml(musicalKey) : ""}
-</div>
-
-${
-audio
-?
-`
-<div class="preview-label">
-▶ 30s preview FREE
-</div>
-
-<audio class="beat-player" controls preload="none">
-<source src="${escapeHtml(audio)}">
-</audio>
-`
-:
-`
-<div class="preview-label">
-🎵 Preview unavailable
-</div>
-`
-}
-
-<div class="beat-prices">
-
-<div class="price-box">
-<small>Lease</small>
-<strong>${formatUGX(leasePrice)}</strong>
-</div>
-
-<div class="price-box">
-<small>Exclusive</small>
-<strong>${formatUGX(exclusivePrice)}</strong>
-</div>
-
-</div>
-
-<div class="beat-actions">
-
-<button class="beat-action" data-action="cart">
-🛒 Add to Cart
-</button>
-
-<button class="beat-action primary" data-action="buy">
-Buy Now
-</button>
-
-</div>
-
-</div>
-`;
-
-beatGrid.appendChild(card);
-
-const audioPlayer = card.querySelector("audio");
-
-if(audioPlayer){
-
-audioPlayer.addEventListener(
-"timeupdate",
-function(){
-
-if(this.currentTime >= 30){
-
-this.pause();
-this.currentTime = 30;
-
-}
-
-}
-);
-
-}
-
-const cartButton =
-card.querySelector('[data-action="cart"]');
-
-const buyButton =
-card.querySelector('[data-action="buy"]');
-
-cartButton.addEventListener(
-"click",
-function(){
-
-openBeatCheckout(
-beat,
-"lease",
-false
-);
-
-}
-);
-
-buyButton.addEventListener(
-"click",
-function(){
-
-openBeatCheckout(
-beat,
-"lease",
-true
-);
-
-}
-);
-
-});
-
-}
-
-async function loadBeats(){
-
-beatStatus.style.display = "block";
-beatStatus.className = "loading";
-beatStatus.textContent = "Loading beats...";
 
 try{
 
-const {data:profiles,error:profileError} =
-await supabaseClient
-.from("artist_profiles")
-.select("*");
-
-if(profileError){
-throw profileError;
-}
-
-const targetName =
-String(producerName)
-.trim()
-.toLowerCase();
-
-producerProfile =
-(profiles || []).find(profile=>{
-
-const names = [
-profile.performing_name,
-profile.artist_name,
-profile.stage_name,
-profile.name
-];
-
-return names.some(
-name =>
-name &&
-String(name)
-.trim()
-.toLowerCase() === targetName
-);
-
-});
-
-if(producerProfile){
-
-setProducerContactDetails(
-producerProfile
-);
-
-renderServicePrices(
-producerProfile
-);
-
-renderProducerSetup(
-producerProfile
-);
-
-await loadFollowState();
-
-}
-
-if(!producerProfile){
-
-document.getElementById("statUploaded").textContent = "0";
-
-renderServicePrices(null);
-renderProducerSetup(null);
-
-renderBeats([]);
-
-creditsGrid.innerHTML = `
-<div class="empty">
-No production credits listed yet.
-</div>
-`;
-
-return;
-
-}
-
-const {data,error} =
+const {
+data,
+error
+} =
 await supabaseClient
 .from("beats")
 .select("*")
-.eq("producer_id",producerProfile.id)
-.eq("status","approved")
-.order("created_at",{ascending:false});
+.eq("id",beatId)
+.maybeSingle();
 
 if(error){
 throw error;
 }
 
-const beats = data || [];
+if(!data){
 
-document.getElementById("statUploaded").textContent =
-beats.length;
+loading.textContent =
+"Beat not found.";
 
-renderBeats(beats);
+return;
 
-setupBeatSearch(beats);
+}
 
-creditsGrid.innerHTML = `
-<div class="empty">
-No production credits listed yet.
-</div>
-`;
+beat =
+data;
+
+const producerId =
+getProducerId(beat);
+
+if(producerId){
+
+const {
+data:producerData
+} =
+await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("id",producerId)
+.maybeSingle();
+
+producer =
+producerData || null;
+
+}
+
+renderCheckout();
 
 }catch(error){
 
 console.error(
-"Beat Store loading error:",
+"Producer checkout error:",
 error
 );
 
-beatGrid.innerHTML = "";
-
-beatStatus.style.display = "block";
-beatStatus.className = "error";
-beatStatus.textContent =
-"Unable to load beats right now.";
+loading.textContent =
+"Unable to load this beat right now.";
 
 }
 
 }
 
-function setProducerContactDetails(profile){
+function renderCheckout(){
 
-producerProfile = profile;
+const title =
+getBeatTitle(beat);
 
-const producerPhoto =
-document.getElementById("producerPhoto");
+const cover =
+getBeatCover(beat);
 
-const photo =
-firstValue(
-profile,
-[
-"photo_url",
-"profile_photo_url",
-"avatar_url",
-"image_url",
-"photo",
-"picture"
-],
-""
-);
+const genre =
+getGenre(beat);
 
-if(photo){
-producerPhoto.src = photo;
-}
+const bpm =
+getBpm(beat);
 
-}
+const musicalKey =
+getKey(beat);
 
-function getProducerWhatsApp(){
+const producerName =
+producer
+? getProducerName(producer)
+: "Producer";
 
-if(!producerProfile){
-return "";
-}
+productCover.src =
+cover;
 
-return firstValue(
-producerProfile,
-[
-"whatsapp_number",
-"whatsapp",
-"whatsapp_phone",
-"phone",
-"phone_number"
-],
-""
-);
+productCover.alt =
+title;
 
-}
+productTitle.textContent =
+title;
 
-function getProducerEmail(){
+productMeta.innerHTML =
+"🎛️ " +
+escapeHtml(producerName) +
+"<br>" +
+"🎵 " +
+escapeHtml(genre) +
+(bpm
+? " • " +
+escapeHtml(bpm) +
+" BPM"
+: "") +
+(musicalKey
+? " • Key: " +
+escapeHtml(musicalKey)
+: "");
 
-if(!producerProfile){
-return "";
-}
+leasePrice.textContent =
+getLeasePrice(beat) > 0
+? formatUGX(getLeasePrice(beat))
+: "Price not set";
 
-return firstValue(
-producerProfile,
-[
-"email",
-"producer_email",
-"artist_email",
-"contact_email"
-],
-""
-);
+exclusivePrice.textContent =
+getExclusivePrice(beat) > 0
+? formatUGX(getExclusivePrice(beat))
+: "Price not set";
 
-}
-
-function normalizeWhatsAppNumber(number){
-
-let value =
-String(number || "").trim();
-
-value =
-value.replace(/[^\d+]/g,"");
-
-if(value.startsWith("+")){
-value = value.substring(1);
-}
-
-if(value.startsWith("0")){
-value =
-"256" +
-value.substring(1);
-}
-
-return value;
-
-}
-
-function openProducerWhatsApp(){
-
-const number =
-normalizeWhatsAppNumber(
-getProducerWhatsApp()
-);
-
-if(!number){
-
-alert(
-"This producer has not added a WhatsApp number yet."
-);
-
-return;
-
-}
-
-const url =
-"https://wa.me/" +
-number;
-
-window.open(
-url,
-"_blank"
-);
-
-}
-
-function openProducerEmail(){
-
-const email =
-getProducerEmail();
-
-if(!email){
-
-alert(
-"This producer has not added an email address yet."
-);
-
-return;
-
-}
-
-const subject =
-"PASONG Contact - " +
+summaryProducer.textContent =
 producerName;
 
-const body =
-"Hello " +
-producerName +
-",\n\nI found your producer profile on PASONG and would like to contact you.";
-
-window.location.href =
-"mailto:" +
-email +
-"?subject=" +
-encodeURIComponent(subject) +
-"&body=" +
-encodeURIComponent(body);
-
-}
-
-async function loadFollowState(){
-
-if(!producerProfile){
-return;
-}
-
-const {
-data:{user}
-} =
-await supabaseClient.auth.getUser();
-
-if(!user){
-
-followBtn.textContent = "Follow";
-return;
-
-}
-
-const {data,error} =
-await supabaseClient
-.from("producer_follows")
-.select("id")
-.eq("producer_id",producerProfile.id)
-.eq("follower_id",user.id)
-.maybeSingle();
-
-if(error){
-
-console.error(
-"Follow state error:",
-error
+selectLicense(
+selectedLicense === "exclusive"
+? "exclusive"
+: "lease"
 );
 
-followBtn.textContent = "Follow";
-return;
+loading.classList.add("hidden");
+checkout.classList.remove("hidden");
 
 }
 
-followBtn.textContent =
+function getSelectedAmount(){
+
+if(selectedLicense === "exclusive"){
+
+return getExclusivePrice(beat);
+
+}
+
+return getLeasePrice(beat);
+
+}
+
+async function getSession(){
+
+const {
 data
-? "Following"
-: "Follow";
-
-}
-
-async function toggleFollow(){
-
-if(!producerProfile){
-
-alert(
-"Producer profile could not be found."
-);
-
-return;
-
-}
-
-const {
-data:{user}
 } =
-await supabaseClient.auth.getUser();
+await supabaseClient.auth.getSession();
 
-if(!user){
+return data.session || null;
 
-alert(
-"Please login to follow this producer."
+}
+
+function validateUgandaPhone(phone){
+
+return /^(\+?256|0)7\d{8}$/.test(
+String(phone || "")
+.replace(/\s+/g,"")
 );
+
+}
+
+async function payWithMtn(){
+
+const session =
+await getSession();
+
+if(!session){
+
+showMessage(
+"Please login to your PASONG account before making a payment.",
+"error"
+);
+
+setTimeout(
+function(){
 
 window.location.href =
-"login.html";
+"login.html?redirect=" +
+encodeURIComponent(
+window.location.href
+);
+
+},
+900
+);
 
 return;
 
 }
 
-followBtn.disabled = true;
+const phone =
+document.getElementById("buyerPhone")
+.value
+.trim();
 
-const {data:existing,error:findError} =
-await supabaseClient
-.from("producer_follows")
-.select("id")
-.eq("producer_id",producerProfile.id)
-.eq("follower_id",user.id)
-.maybeSingle();
+const name =
+document.getElementById("buyerName")
+.value
+.trim();
 
-if(findError){
+const email =
+document.getElementById("buyerEmail")
+.value
+.trim();
 
-console.error(
-"Follow lookup error:",
-findError
+const message =
+document.getElementById("orderMessage")
+.value
+.trim();
+
+if(!name){
+
+showMessage(
+"Please enter your name.",
+"error"
 );
-
-alert(
-"Unable to check follow status right now."
-);
-
-followBtn.disabled = false;
 
 return;
 
 }
 
-if(existing){
+if(!validateUgandaPhone(phone)){
 
-const {error} =
-await supabaseClient
-.from("producer_follows")
-.delete()
-.eq("id",existing.id);
-
-if(error){
-
-console.error(
-"Unfollow error:",
-error
+showMessage(
+"Enter a valid Uganda mobile-money number, for example +256 701 234 567.",
+"error"
 );
-
-alert(
-"Unable to unfollow this producer right now."
-);
-
-followBtn.disabled = false;
 
 return;
 
 }
 
-followBtn.textContent = "Follow";
+const amount =
+getSelectedAmount();
+
+if(!amount || amount <= 0){
+
+showMessage(
+"The selected producer price has not been set.",
+"error"
+);
+
+return;
+
+}
+
+if(!beat || !beat.id){
+
+showMessage(
+"This beat does not have a valid PASONG ID.",
+"error"
+);
+
+return;
+
+}
+
+if(
+selectedLicense === "exclusive" &&
+beat.status === "sold"
+){
+
+showMessage(
+"This beat is no longer available for exclusive purchase.",
+"error"
+);
+
+return;
+
+}
+
+const button =
+document.getElementById("mtnButton");
+
+button.disabled =
+true;
+
+button.textContent =
+"Sending payment request...";
+
+showMessage(
+"Sending MTN payment request..."
+);
+
+try{
+
+const response =
+await fetch(
+PAYMENT_API,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+beatId:beat.id,
+
+content_type:
+"producer_beat",
+
+license:
+selectedLicense,
+
+amount:
+amount,
+
+currency:
+"UGX",
+
+phone:
+phone,
+
+email:
+email,
+
+name:
+name,
+
+message:
+message,
+
+method:
+"MTN",
+
+producerId:
+getProducerId(beat),
+
+producerName:
+producer
+? getProducerName(producer)
+: "Producer",
+
+buyerId:
+session.user.id
+
+})
+}
+);
+
+const result =
+await response.json();
+
+if(!response.ok){
+
+throw new Error(
+result.message ||
+result.error ||
+"Payment request failed."
+);
+
+}
+
+const reference =
+result.reference ||
+result.transactionId ||
+result.transaction_reference;
+
+if(reference){
+
+showMessage(
+"MTN payment request sent. Waiting for payment confirmation.",
+"normal"
+);
+
+pollPayment(reference);
 
 }else{
 
-const {error} =
-await supabaseClient
-.from("producer_follows")
-.insert({
-producer_id:producerProfile.id,
-follower_id:user.id
-});
+showMessage(
+"MTN payment request sent.",
+"success"
+);
 
-if(error){
+}
+
+}catch(error){
 
 console.error(
-"Follow error:",
+"MTN producer payment error:",
 error
 );
 
-alert(
-"Unable to follow this producer right now."
+showMessage(
+error.message ||
+"Unable to send the MTN payment request.",
+"error"
 );
 
-followBtn.disabled = false;
+button.disabled =
+false;
 
-return;
-
-}
-
-followBtn.textContent = "Following";
+button.textContent =
+"📱 Pay with MTN";
 
 }
 
-followBtn.disabled = false;
-
 }
 
-function openProducerShowreel(){
+async function pollPayment(reference){
 
-if(!producerProfile){
+let attempts =
+0;
 
-alert(
-"Producer profile could not be found."
+const maxAttempts =
+60;
+
+const timer =
+setInterval(
+async function(){
+
+attempts++;
+
+try{
+
+const response =
+await fetch(
+PAYMENT_API +
+"?reference=" +
+encodeURIComponent(reference)
 );
 
-return;
+const result =
+await response.json();
 
-}
-
-const showreel =
-firstValue(
-producerProfile,
-[
-"showreel_url",
-"showreel",
-"showreel_link"
-],
+const status =
+String(
+result.status ||
 ""
-);
+)
+.toUpperCase();
 
-if(!showreel){
-
-alert(
-"This producer has not added a showreel yet."
-);
-
-return;
-
-}
-
-window.open(
-showreel,
-"_blank"
-);
-
-}
-
-function setupBeatSearch(beats){
-
-producerSearch.oninput =
-function(){
-
-const search =
-this.value
-.trim()
-.toLowerCase();
-
-if(!search){
-
-renderBeats(beats);
-return;
-
-}
-
-const filtered =
-beats.filter(beat=>{
-
-const title =
-getBeatTitle(beat)
-.toLowerCase();
-
-const genre =
-String(getGenre(beat))
-.toLowerCase();
-
-return(
-title.includes(search) ||
-genre.includes(search)
-);
-
-});
-
-renderBeats(filtered);
-
-};
-
-}
-
-function openBeatCheckout(
-beat,
-license,
-buyNow
+if(
+status === "SUCCESSFUL" &&
+result.paid === true &&
+result.pasong_completed === true
 ){
 
-if(!beat.id){
+clearInterval(timer);
 
-alert(
-"This beat does not have a valid PASONG ID yet."
+showMessage(
+"Payment successful. Your producer purchase has been completed.",
+"success"
 );
+
+const button =
+document.getElementById("mtnButton");
+
+button.disabled =
+true;
+
+button.textContent =
+"✓ Payment Successful";
 
 return;
 
 }
 
-const url =
-"store.html?beat=" +
-encodeURIComponent(beat.id) +
-"&license=" +
-encodeURIComponent(license);
+if(
+status === "FAILED" ||
+status === "CANCELLED" ||
+status === "REJECTED"
+){
 
-window.location.href = url;
+clearInterval(timer);
 
-}
-
-function openModal(id){
-
-const modal =
-document.getElementById(id);
-
-if(modal){
-
-modal.classList.add("active");
-
-document.body.style.overflow =
-"hidden";
-
-}
-
-}
-
-function closeModal(id){
-
-const modal =
-document.getElementById(id);
-
-if(modal){
-
-modal.classList.remove("active");
-
-document.body.style.overflow =
-"";
-
-}
-
-}
-
-document
-.querySelectorAll("[data-close]")
-.forEach(button=>{
-
-button.addEventListener(
-"click",
-function(){
-
-closeModal(
-this.dataset.close
+showMessage(
+"Payment was not completed.",
+"error"
 );
 
-}
-);
+const button =
+document.getElementById("mtnButton");
 
-});
+button.disabled =
+false;
 
-document
-.querySelectorAll(".modal")
-.forEach(modal=>{
-
-modal.addEventListener(
-"click",
-function(event){
-
-if(event.target === modal){
-
-closeModal(modal.id);
-
-}
-
-}
-);
-
-});
-
-document
-.getElementById("showreelBtn")
-.addEventListener(
-"click",
-function(){
-
-openProducerShowreel();
-
-}
-);
-
-document
-.getElementById("followBtn")
-.addEventListener(
-"click",
-function(){
-
-toggleFollow();
-
-}
-);
-
-document
-.getElementById("hireBtn")
-.addEventListener(
-"click",
-function(){
-
-openModal("requestModal");
-
-}
-);
-
-document
-.getElementById("customBeatBtn")
-.addEventListener(
-"click",
-function(){
-
-openModal("requestModal");
-
-}
-);
-
-document
-.getElementById("whatsappBtn")
-.addEventListener(
-"click",
-function(){
-
-openProducerWhatsApp();
-
-}
-);
-
-document
-.getElementById("emailBtn")
-.addEventListener(
-"click",
-function(){
-
-openProducerEmail();
-
-}
-);
-
-document
-.getElementById("studioBtn")
-.addEventListener(
-"click",
-function(){
-
-openModal("bookingModal");
-
-}
-);
-
-document
-.getElementById("customBeatForm")
-.addEventListener(
-"submit",
-function(event){
-
-event.preventDefault();
-
-const name =
-document.getElementById("requestName")
-.value
-.trim();
-
-const contact =
-document.getElementById("requestContact")
-.value
-.trim();
-
-const genre =
-document.getElementById("requestGenre")
-.value;
-
-const bpm =
-document.getElementById("requestBpm")
-.value
-.trim();
-
-const key =
-document.getElementById("requestKey")
-.value
-.trim();
-
-const budget =
-document.getElementById("requestBudget")
-.value
-.trim();
-
-const description =
-document.getElementById("requestDescription")
-.value
-.trim();
-
-const deadline =
-document.getElementById("requestDeadline")
-.value
-.trim();
-
-const email =
-getProducerEmail();
-
-if(!email){
-
-alert(
-"This producer has not added an email address yet."
-);
+button.textContent =
+"📱 Pay with MTN";
 
 return;
 
 }
 
-const subject =
-"PASONG Custom Beat Request - " +
-producerName;
+}catch(error){
 
-const body =
-"Producer: " +
-producerName +
-"\n\n" +
-"Name: " +
-name +
-"\n" +
-"Contact: " +
-contact +
-"\n" +
-"Genre: " +
-genre +
-"\n" +
-"BPM: " +
-(bpm || "Not specified") +
-"\n" +
-"Key: " +
-(key || "Not specified") +
-"\n" +
-"Budget: " +
-(budget || "Not specified") +
-"\n" +
-"Deadline: " +
-(deadline || "Not specified") +
-"\n\n" +
-"Beat Request:\n" +
-description;
+console.error(
+"Producer payment status error:",
+error
+);
 
-window.location.href =
-"mailto:" +
-email +
-"?subject=" +
-encodeURIComponent(subject) +
-"&body=" +
-encodeURIComponent(body);
+}
+
+if(attempts >= maxAttempts){
+
+clearInterval(timer);
+
+showMessage(
+"Payment status is still pending. Please check your PASONG account before trying again.",
+"normal"
+);
+
+const button =
+document.getElementById("mtnButton");
+
+button.disabled =
+false;
+
+button.textContent =
+"📱 Pay with MTN";
+
+}
+
+},
+5000
+);
+
+}
+
+document
+.getElementById("leaseOption")
+.addEventListener(
+"click",
+function(){
+
+selectLicense("lease");
 
 }
 );
 
 document
-.getElementById("contactForm")
+.getElementById("exclusiveOption")
 .addEventListener(
-"submit",
-function(event){
+"click",
+function(){
 
-event.preventDefault();
-
-const name =
-document.getElementById("contactName")
-.value
-.trim();
-
-const contact =
-document.getElementById("contactDetails")
-.value
-.trim();
-
-const messageText =
-document.getElementById("contactMessage")
-.value
-.trim();
-
-const email =
-getProducerEmail();
-
-if(!email){
-
-alert(
-"This producer has not added an email address yet."
-);
-
-return;
-
-}
-
-const subject =
-"PASONG Contact Request - " +
-producerName;
-
-const body =
-"Producer: " +
-producerName +
-"\n\n" +
-"Name: " +
-name +
-"\n" +
-"Contact: " +
-contact +
-"\n\n" +
-"Message:\n" +
-messageText;
-
-window.location.href =
-"mailto:" +
-email +
-"?subject=" +
-encodeURIComponent(subject) +
-"&body=" +
-encodeURIComponent(body);
+selectLicense("exclusive");
 
 }
 );
 
 document
-.getElementById("bookingForm")
+.getElementById("mtnButton")
 .addEventListener(
-"submit",
-function(event){
+"click",
+function(){
 
-event.preventDefault();
-
-const service =
-document.getElementById("bookingService")
-.value;
-
-const date =
-document.getElementById("bookingDate")
-.value;
-
-const time =
-document.getElementById("bookingTime")
-.value;
-
-const name =
-document.getElementById("bookingName")
-.value
-.trim();
-
-const phone =
-document.getElementById("bookingPhone")
-.value
-.trim();
-
-const email =
-document.getElementById("bookingEmail")
-.value
-.trim();
-
-const budget =
-document.getElementById("bookingBudget")
-.value
-.trim();
-
-const bookingMessage =
-document.getElementById("bookingMessage")
-.value
-.trim();
-
-const producerEmail =
-getProducerEmail();
-
-if(!producerEmail){
-
-alert(
-"This producer has not added an email address yet. The booking cannot be sent until the producer adds one."
-);
-
-return;
-
-}
-
-const subject =
-"PASONG Booking Request - " +
-producerName;
-
-const body =
-"PASONG BOOKING REQUEST\n\n" +
-"Producer: " +
-producerName +
-"\n" +
-"Service: " +
-service +
-"\n" +
-"Preferred Date: " +
-date +
-"\n" +
-"Preferred Time: " +
-time +
-"\n\n" +
-"Customer Name: " +
-name +
-"\n" +
-"Phone / WhatsApp: " +
-phone +
-"\n" +
-"Email: " +
-(email || "Not provided") +
-"\n" +
-"Budget: " +
-(budget || "Not specified") +
-"\n\n" +
-"Message:\n" +
-bookingMessage +
-"\n\n" +
-"BOOKING COMMISSION\n" +
-"PASONG: 10%\n" +
-"Producer: 90%\n\n" +
-"Booking status: PENDING PRODUCER APPROVAL";
-
-window.location.href =
-"mailto:" +
-producerEmail +
-"?subject=" +
-encodeURIComponent(subject) +
-"&body=" +
-encodeURIComponent(body);
+payWithMtn();
 
 }
 );
 
-loadAccountPhoto();
-loadBeats();
+document
+.getElementById("airtelButton")
+.addEventListener(
+"click",
+function(){
+
+showMessage(
+"Airtel Money is not connected yet.",
+"normal"
+);
+
+}
+);
+
+loadUser();
+loadBeat();
 
 if("serviceWorker" in navigator){
 
 window.addEventListener(
 "load",
-()=>{
+function(){
 
 navigator.serviceWorker
 .register("sw.js")
 .catch(
-error =>
+function(error){
+
 console.log(
 "Service worker:",
 error
-)
+);
+
+}
 );
 
 }
