@@ -221,6 +221,48 @@ main{
   font-size:14px;
 }
 
+.quick-filters{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding:3px 2px 12px;
+  margin-bottom:12px;
+  scrollbar-width:none;
+}
+
+.quick-filters::-webkit-scrollbar{
+  display:none;
+}
+
+.quick-filter{
+  flex:0 0 auto;
+  border:1px solid #303044;
+  background:#151520;
+  color:#c8c8d6;
+  padding:10px 15px;
+  border-radius:22px;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap;
+  font-weight:bold;
+  font-size:13px;
+}
+
+.quick-filter:hover{
+  border-color:#8b5cf6;
+  color:#fff;
+}
+
+.quick-filter.active{
+  background:linear-gradient(
+    135deg,
+    #8b5cf6,
+    #ec4899
+  );
+  border-color:transparent;
+  color:#fff;
+}
+
 .filters{
   display:grid;
   grid-template-columns:
@@ -360,10 +402,39 @@ main{
   line-height:1.5;
 }
 
-.writer-price{
+.writer-services{
+  background:#171722;
+  border:1px solid #292938;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:12px;
+  text-align:left;
+}
+
+.services-title{
+  color:#888899;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  margin-bottom:7px;
+}
+
+.services-text{
   color:#c084fc;
   font-size:13px;
+  line-height:1.5;
   font-weight:bold;
+}
+
+.writer-language{
+  color:#aaaabd;
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.writer-specialty{
+  color:#aaaabd;
+  font-size:12px;
   margin-bottom:15px;
 }
 
@@ -616,6 +687,11 @@ footer{
     font-size:38px;
   }
 
+  .quick-filters{
+    margin-right:-14px;
+    padding-right:14px;
+  }
+
   .filters{
     grid-template-columns:1fr;
   }
@@ -657,20 +733,24 @@ footer{
     padding:5px 6px;
   }
 
-  .writer-credits{
+  .writer-credits,
+  .writer-services{
     padding:9px;
   }
 
-  .credit-title{
+  .credit-title,
+  .services-title{
     font-size:9px;
   }
 
-  .credit-songs{
+  .credit-songs,
+  .services-text{
     font-size:10px;
   }
 
-  .writer-price{
-    font-size:10px;
+  .writer-language,
+  .writer-specialty{
+    font-size:9px;
     line-height:1.4;
   }
 
@@ -838,6 +918,50 @@ footer{
 
     </div>
 
+    <div class="quick-filters">
+
+      <button
+        type="button"
+        class="quick-filter active"
+        data-filter="all"
+      >
+        ✨ All Writers
+      </button>
+
+      <button
+        type="button"
+        class="quick-filter"
+        data-filter="trending"
+      >
+        🔥 Trending Writers
+      </button>
+
+      <button
+        type="button"
+        class="quick-filter"
+        data-filter="new"
+      >
+        🆕 New Writers
+      </button>
+
+      <button
+        type="button"
+        class="quick-filter"
+        data-filter="affordable"
+      >
+        💰 Affordable
+      </button>
+
+      <button
+        type="button"
+        class="quick-filter"
+        data-filter="hits"
+      >
+        🏆 Hit Makers
+      </button>
+
+    </div>
+
     <div class="filters">
 
       <input
@@ -904,7 +1028,7 @@ footer{
     </div>
 
     <div class="modal-subtitle">
-      Contact this songwriter for lyrics, co-writing or a custom writing project.
+      Connect with this songwriter for lyrics, co-writing or a custom writing project.
     </div>
 
     <div class="modal-writer">
@@ -925,7 +1049,7 @@ footer{
         </div>
 
         <div class="modal-price">
-          Lyrics / Co-write: UGX 50K–200K or $20+
+          Writer sets their own service prices
         </div>
 
       </div>
@@ -989,7 +1113,6 @@ footer{
 </nav>
 
 <script>
-
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
 
@@ -1062,7 +1185,15 @@ const closeHire =
     "closeHire"
   );
 
+const quickFilters =
+  document.querySelectorAll(
+    ".quick-filter"
+  );
+
 let writers = [];
+
+let activeQuickFilter =
+  "all";
 
 function escapeHtml(value){
 
@@ -1085,8 +1216,21 @@ function getWriterCountry(writer){
 function getHitCount(writer){
 
   return writer.songs.filter(
-    song => song.featured === true
+    song =>
+      song.featured === true
   ).length;
+
+}
+
+function getWriterActivity(writer){
+
+  return writer.songs.reduce(
+    (total,song) =>
+      total +
+      Number(song.plays || 0) +
+      Number(song.downloads || 0),
+    0
+  );
 
 }
 
@@ -1108,8 +1252,86 @@ function getTopSongs(writer){
 
   return sorted
     .slice(0,3)
-    .map(song => song.title)
+    .map(
+      song =>
+        song.title
+    )
     .filter(Boolean);
+
+}
+
+function getNewestDate(writer){
+
+  const dates =
+    writer.songs
+      .map(
+        song =>
+          song.created_at
+      )
+      .filter(Boolean)
+      .map(
+        date =>
+          new Date(date).getTime()
+      )
+      .filter(
+        value =>
+          !Number.isNaN(value)
+      );
+
+  return dates.length
+    ? Math.max(...dates)
+    : 0;
+
+}
+
+function isNewWriter(writer){
+
+  const newest =
+    getNewestDate(
+      writer
+    );
+
+  if(!newest){
+
+    return false;
+
+  }
+
+  const thirtyDays =
+    30 *
+    24 *
+    60 *
+    60 *
+    1000;
+
+  return (
+    Date.now() -
+    newest
+  ) <= thirtyDays;
+
+}
+
+function isTrendingWriter(writer){
+
+  return getWriterActivity(
+    writer
+  ) > 0;
+
+}
+
+function isHitMaker(writer){
+
+  return getHitCount(
+    writer
+  ) > 0;
+
+}
+
+function isAffordableWriter(writer){
+
+  return Boolean(
+    writer.affordable
+  );
 
 }
 
@@ -1199,6 +1421,74 @@ function populateCountries(){
 
 }
 
+function applyQuickFilter(list){
+
+  if(
+    activeQuickFilter ===
+    "trending"
+  ){
+
+    return [...list]
+      .sort(
+        (a,b) =>
+          getWriterActivity(b) -
+          getWriterActivity(a)
+      );
+
+  }
+
+  if(
+    activeQuickFilter ===
+    "new"
+  ){
+
+    return list.filter(
+      writer =>
+        isNewWriter(
+          writer
+        )
+    );
+
+  }
+
+  if(
+    activeQuickFilter ===
+    "affordable"
+  ){
+
+    return list.filter(
+      writer =>
+        isAffordableWriter(
+          writer
+        )
+    );
+
+  }
+
+  if(
+    activeQuickFilter ===
+    "hits"
+  ){
+
+    return [...list]
+      .filter(
+        writer =>
+          isHitMaker(
+            writer
+          )
+      )
+      .sort(
+        (a,b) =>
+          getHitCount(b) -
+          getHitCount(a)
+      );
+
+  }
+
+  return list;
+
+}
+
 function renderWriters(list){
 
   writerGrid.innerHTML = "";
@@ -1211,8 +1501,20 @@ function renderWriters(list){
     writerStatus.className =
       "empty";
 
-    writerStatus.innerHTML =
-      "No songwriters match your search or filters.";
+    if(
+      activeQuickFilter ===
+      "affordable"
+    ){
+
+      writerStatus.innerHTML =
+        "Writer service pricing has not been added yet.";
+
+    }else{
+
+      writerStatus.innerHTML =
+        "No songwriters match your search or filters.";
+
+    }
 
     writerGrid.style.display =
       "none";
@@ -1256,11 +1558,6 @@ function renderWriters(list){
       const songCount =
         writer.songs.length;
 
-      const country =
-        getWriterCountry(
-          writer
-        );
-
       const songsText =
         topSongs.length
           ? topSongs.join(", ")
@@ -1271,7 +1568,7 @@ function renderWriters(list){
           ? `
             <div
               class="verified-badge"
-              title="Verified Writer"
+              title="Verified PASONG Writer"
             >
               ✓
             </div>
@@ -1329,8 +1626,27 @@ function renderWriters(list){
 
         </div>
 
-        <div class="writer-price">
-          💰 Lyrics / Co-write: UGX 50K–200K or $20+
+        <div class="writer-services">
+
+          <div class="services-title">
+            Services & Pricing
+          </div>
+
+          <div class="services-text">
+            Writer sets their own prices
+          </div>
+
+        </div>
+
+        <div class="writer-language">
+          🌍 Languages: Profile information coming soon
+        </div>
+
+        <div class="writer-specialty">
+          🎵 Specialty: ${escapeHtml(
+            writer.genre ||
+            "Music & songwriting"
+          )}
         </div>
 
         <div class="writer-status">
@@ -1368,7 +1684,9 @@ function renderWriters(list){
   );
 
   document
-    .querySelectorAll(".hire-btn")
+    .querySelectorAll(
+      ".hire-btn"
+    )
     .forEach(
       button => {
 
@@ -1409,7 +1727,7 @@ function applyFilters(){
   const credits =
     creditFilter.value;
 
-  const filtered =
+  let filtered =
     writers.filter(
       writer => {
 
@@ -1466,7 +1784,10 @@ function applyFilters(){
         let matchesCredits =
           true;
 
-        if(credits === "1-5"){
+        if(
+          credits ===
+          "1-5"
+        ){
 
           matchesCredits =
             writer.songs.length >= 1 &&
@@ -1474,7 +1795,10 @@ function applyFilters(){
 
         }
 
-        if(credits === "6-10"){
+        if(
+          credits ===
+          "6-10"
+        ){
 
           matchesCredits =
             writer.songs.length >= 6 &&
@@ -1482,7 +1806,10 @@ function applyFilters(){
 
         }
 
-        if(credits === "10+"){
+        if(
+          credits ===
+          "10+"
+        ){
 
           matchesCredits =
             writer.songs.length >= 10;
@@ -1497,6 +1824,11 @@ function applyFilters(){
         );
 
       }
+    );
+
+  filtered =
+    applyQuickFilter(
+      filtered
     );
 
   renderWriters(
@@ -1553,6 +1885,111 @@ function closeHireModal(){
   );
 
 }
+
+quickFilters.forEach(
+  button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        quickFilters.forEach(
+          item =>
+            item.classList.remove(
+              "active"
+            )
+        );
+
+        button.classList.add(
+          "active"
+        );
+
+        activeQuickFilter =
+          button.dataset.filter;
+
+        applyFilters();
+
+      }
+    );
+
+  }
+);
+
+writerSearch.addEventListener(
+  "input",
+  () => {
+
+    writerSearchFilter.value =
+      writerSearch.value;
+
+    applyFilters();
+
+  }
+);
+
+writerSearchFilter.addEventListener(
+  "input",
+  () => {
+
+    writerSearch.value =
+      writerSearchFilter.value;
+
+    applyFilters();
+
+  }
+);
+
+genreFilter.addEventListener(
+  "change",
+  applyFilters
+);
+
+countryFilter.addEventListener(
+  "change",
+  applyFilters
+);
+
+creditFilter.addEventListener(
+  "change",
+  applyFilters
+);
+
+closeHire.addEventListener(
+  "click",
+  closeHireModal
+);
+
+hireModal.addEventListener(
+  "click",
+  event => {
+
+    if(
+      event.target ===
+      hireModal
+    ){
+
+      closeHireModal();
+
+    }
+
+  }
+);
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key ===
+      "Escape"
+    ){
+
+      closeHireModal();
+
+    }
+
+  }
+);
 
 async function loadWriters(){
 
@@ -1670,8 +2107,9 @@ async function loadWriters(){
             verified:
               profile.verified === true,
 
-            country:
-              ""
+            country:"",
+
+            affordable:false
           }
         );
 
@@ -1761,82 +2199,6 @@ async function loadWriters(){
 
 }
 
-writerSearch.addEventListener(
-  "input",
-  () => {
-
-    writerSearchFilter.value =
-      writerSearch.value;
-
-    applyFilters();
-
-  }
-);
-
-writerSearchFilter.addEventListener(
-  "input",
-  () => {
-
-    writerSearch.value =
-      writerSearchFilter.value;
-
-    applyFilters();
-
-  }
-);
-
-genreFilter.addEventListener(
-  "change",
-  applyFilters
-);
-
-countryFilter.addEventListener(
-  "change",
-  applyFilters
-);
-
-creditFilter.addEventListener(
-  "change",
-  applyFilters
-);
-
-closeHire.addEventListener(
-  "click",
-  closeHireModal
-);
-
-hireModal.addEventListener(
-  "click",
-  event => {
-
-    if(
-      event.target ===
-      hireModal
-    ){
-
-      closeHireModal();
-
-    }
-
-  }
-);
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if(
-      event.key ===
-      "Escape"
-    ){
-
-      closeHireModal();
-
-    }
-
-  }
-);
-
 loadWriters();
 
 if(
@@ -1861,7 +2223,6 @@ if(
   );
 
 }
-
 </script>
 
 </body>
