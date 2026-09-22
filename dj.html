@@ -913,8 +913,7 @@ footer{
         id="searchInput"
         type="search"
         placeholder="Search DJs, mixes..."
-        autocomplete="off"
-      >
+        autocomplete="off">
     </div>
 
     <nav class="header-links">
@@ -1157,12 +1156,16 @@ footer{
 
         <div class="info-line">
           <span>Starting:</span>
-          <strong id="bookingPrice">Booking price available from DJ</strong>
+          <strong id="bookingPrice">
+            Booking price available from DJ
+          </strong>
         </div>
 
         <div class="info-line">
           <span>WhatsApp:</span>
-          <strong id="whatsappInfo">Contact information not added yet</strong>
+          <strong id="whatsappInfo">
+            Contact information not added yet
+          </strong>
         </div>
 
         <button
@@ -1218,7 +1221,9 @@ footer{
 
         <div class="info-line">
           <span>Next Event:</span>
-          <strong id="nextEvent">No upcoming event added yet</strong>
+          <strong id="nextEvent">
+            No upcoming event added yet
+          </strong>
         </div>
 
       </div>
@@ -1273,7 +1278,9 @@ footer{
         <p>Send a tip directly to support the DJ.</p>
       </div>
 
-      <button id="supportButton" class="btn btn-primary">
+      <button
+        id="supportButton"
+        class="btn btn-primary">
         💜 Tip DJ
       </button>
 
@@ -1480,7 +1487,6 @@ const supabaseClient =
 
 let currentDJ = null;
 let currentMixes = [];
-let allDJs = [];
 let selectedTipAmount = 0;
 
 document.getElementById("year").textContent =
@@ -1553,13 +1559,36 @@ function escapeHtml(value){
     .replace(/'/g,"&#039;");
 }
 
+function getOptional(profile,keys,fallback){
+
+  for(const key of keys){
+
+    const value =
+      profile?.[key];
+
+    if(
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    ){
+      return value;
+    }
+
+  }
+
+  return fallback;
+}
+
 async function loadDJProfile(){
 
   if(!djId){
     throw new Error("DJ profile ID is missing.");
   }
 
-  const { data: profile, error } =
+  const {
+    data: profile,
+    error
+  } =
     await supabaseClient
       .from("artist_profiles")
       .select("*")
@@ -1586,11 +1615,13 @@ async function loadDJProfile(){
       throw profileByIdError;
     }
 
-    currentDJ = profileById;
+    currentDJ =
+      profileById;
 
   }else{
 
-    currentDJ = profile;
+    currentDJ =
+      profile;
 
   }
 
@@ -1601,61 +1632,10 @@ async function loadDJProfile(){
   renderProfile();
 }
 
-async function loadMixes(){
-
-  const possibleUserIds = [
-    currentDJ.user_id,
-    currentDJ.id
-  ]
-  .filter(Boolean);
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("songs")
-      .select("*")
-      .eq("status","approved")
-      .order("created_at",{ascending:false});
-
-  if(error){
-    throw error;
-  }
-
-  currentMixes =
-    (data || []).filter(song => {
-
-      if(!isDjMix(song)){
-        return false;
-      }
-
-      const ids = [
-        song.dj_user_id,
-        song.uploader_user_id,
-        song.artist_user_id,
-        song.writer_user_id,
-        song.producer_user_id,
-        song.artist_id
-      ]
-      .filter(Boolean)
-      .map(String);
-
-      return possibleUserIds
-        .map(String)
-        .some(id => ids.includes(id));
-
-    });
-
-  renderMixes();
-  renderPinnedMix();
-  renderStats();
-}
-
 async function loadDJRole(){
 
   const userId =
-    currentDJ.user_id;
+    currentDJ?.user_id;
 
   if(!userId){
     return;
@@ -1681,9 +1661,14 @@ async function loadDJRole(){
         .trim() === "dj"
     );
 
-  if(isDJ){
-    document.getElementById("verifiedBadge")
-      .style.display = "inline-flex";
+  const badge =
+    document.getElementById(
+      "verifiedBadge"
+    );
+
+  if(isDJ && badge){
+    badge.style.display =
+      "inline-flex";
   }
 }
 
@@ -1704,12 +1689,56 @@ function renderProfile(){
     `PASONG — ${name}`;
 
   document.getElementById("djName")
-    .innerHTML =
-      `${escapeHtml(name)} <span id="verifiedBadge" class="verified" style="display:none;">✓ Verified DJ</span>`;
+    .textContent =
+      name;
+
+  const badge =
+    document.getElementById(
+      "verifiedBadge"
+    );
+
+  if(badge){
+    badge.style.display =
+      "none";
+  }
+
+  const location =
+    getOptional(
+      currentDJ,
+      ["location","city"],
+      "Kampala, UG"
+    );
+
+  const followers =
+    getOptional(
+      currentDJ,
+      ["followers_count","followers"],
+      null
+    );
+
+  const profilePlays =
+    getOptional(
+      currentDJ,
+      ["plays_count","total_plays"],
+      null
+    );
+
+  let meta =
+    `📍 ${location}`;
+
+  if(followers !== null){
+    meta +=
+      ` • ${formatNumber(followers)} followers`;
+  }
+
+  if(profilePlays !== null){
+    meta +=
+      ` • ${formatNumber(profilePlays)} plays`;
+  }
 
   document.getElementById("djMeta")
     .textContent =
-      "📍 Kampala, UG";
+      meta;
 
   document.getElementById("djBio")
     .textContent =
@@ -1738,73 +1767,149 @@ function renderProfile(){
 
   document.getElementById("genreInfo")
     .textContent =
-      currentDJ.genre || "Not added yet";
+      currentDJ.genre ||
+      "Not added yet";
 
   document.getElementById("locationInfo")
     .textContent =
-      currentDJ.location || "Kampala, UG";
+      location;
 
   document.getElementById("styleInfo")
     .textContent =
-      currentDJ.style ||
-      "Not added yet";
+      getOptional(
+        currentDJ,
+        ["style","dj_style","mix_style"],
+        "Not added yet"
+      );
 
   document.getElementById("yearsInfo")
     .textContent =
-      currentDJ.years_active ||
-      "Not added yet";
+      getOptional(
+        currentDJ,
+        ["years_active","experience_years"],
+        "Not added yet"
+      );
 
   document.getElementById("languagesInfo")
     .textContent =
-      currentDJ.languages ||
-      "Not added yet";
+      getOptional(
+        currentDJ,
+        ["languages","language"],
+        "Not added yet"
+      );
 
   document.getElementById("bookingPrice")
     .textContent =
-      currentDJ.booking_price ||
-      "Booking price available from DJ";
+      getOptional(
+        currentDJ,
+        ["booking_price","starting_price"],
+        "Booking price available from DJ"
+      );
 
   document.getElementById("whatsappInfo")
     .textContent =
-      currentDJ.whatsapp ||
-      currentDJ.mobile_number ||
-      "Contact information not added yet";
+      getOptional(
+        currentDJ,
+        ["whatsapp","whatsapp_number","mobile_number"],
+        "Contact information not added yet"
+      );
 
   document.getElementById("nextEvent")
     .textContent =
-      currentDJ.next_event ||
-      "No upcoming event added yet";
+      getOptional(
+        currentDJ,
+        ["next_event","upcoming_event"],
+        "No upcoming event added yet"
+      );
 
   renderSocialLink(
     "instagramLink",
-    currentDJ.instagram
+    getOptional(
+      currentDJ,
+      ["instagram","instagram_url"],
+      ""
+    )
   );
 
   renderSocialLink(
     "tiktokLink",
-    currentDJ.tiktok
+    getOptional(
+      currentDJ,
+      ["tiktok","tiktok_url"],
+      ""
+    )
   );
 
   renderSocialLink(
     "youtubeLink",
-    currentDJ.youtube
+    getOptional(
+      currentDJ,
+      ["youtube","youtube_url"],
+      ""
+    )
   );
 
   renderSocialLink(
     "mixcloudLink",
-    currentDJ.mixcloud
+    getOptional(
+      currentDJ,
+      ["mixcloud","mixcloud_url"],
+      ""
+    )
   );
 
   const anySocial =
-    currentDJ.instagram ||
-    currentDJ.tiktok ||
-    currentDJ.youtube ||
-    currentDJ.mixcloud;
+    getOptional(
+      currentDJ,
+      [
+        "instagram",
+        "instagram_url",
+        "tiktok",
+        "tiktok_url",
+        "youtube",
+        "youtube_url",
+        "mixcloud",
+        "mixcloud_url"
+      ],
+      ""
+    );
 
-  if(anySocial){
-    document.getElementById("socialEmpty")
-      .style.display = "none";
+  document.getElementById("socialEmpty")
+    .style.display =
+      anySocial
+      ? "none"
+      : "block";
+
+  const tips =
+    getOptional(
+      currentDJ,
+      ["tips_count","tip_count","tips"],
+      null
+    );
+
+  const rating =
+    getOptional(
+      currentDJ,
+      ["rating","average_rating"],
+      null
+    );
+
+  if(tips !== null){
+
+    document.getElementById("tipsStat")
+      .textContent =
+        formatNumber(tips);
+
   }
+
+  if(rating !== null){
+
+    document.getElementById("ratingStat")
+      .textContent =
+        rating;
+
+  }
+
 }
 
 function renderSocialLink(id,url){
@@ -1817,20 +1922,89 @@ function renderSocialLink(id,url){
   }
 
   if(!url){
-    element.style.display = "none";
+
+    element.style.display =
+      "none";
+
     return;
   }
 
-  element.href = url;
-  element.target = "_blank";
-  element.rel = "noopener";
-  element.style.display = "inline-flex";
+  element.href =
+    url;
+
+  element.target =
+    "_blank";
+
+  element.rel =
+    "noopener noreferrer";
+
+  element.style.display =
+    "inline-flex";
+}
+
+async function loadMixes(){
+
+  const possibleUserIds = [
+    currentDJ.user_id,
+    currentDJ.id
+  ]
+  .filter(Boolean);
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("songs")
+      .select("*")
+      .eq("status","approved")
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+  if(error){
+    throw error;
+  }
+
+  currentMixes =
+    (data || [])
+      .filter(song => {
+
+        if(!isDjMix(song)){
+          return false;
+        }
+
+        const ids = [
+          song.dj_user_id,
+          song.uploader_user_id,
+          song.artist_user_id,
+          song.writer_user_id,
+          song.producer_user_id,
+          song.artist_id
+        ]
+        .filter(Boolean)
+        .map(String);
+
+        return possibleUserIds
+          .map(String)
+          .some(id =>
+            ids.includes(id)
+          );
+
+      });
+
+  renderMixes();
+  renderPinnedMix();
+  renderStats();
 }
 
 function renderPinnedMix(){
 
   const box =
-    document.getElementById("pinnedMix");
+    document.getElementById(
+      "pinnedMix"
+    );
 
   const mix =
     currentMixes[0];
@@ -1843,8 +2017,10 @@ function renderPinnedMix(){
       </div>
     `;
 
-    document.getElementById("latestPlayButton")
-      .style.display = "none";
+    document.getElementById(
+      "latestPlayButton"
+    ).style.display =
+      "none";
 
     return;
   }
@@ -1863,7 +2039,9 @@ function renderPinnedMix(){
           ? `
             <img
               src="${escapeHtml(cover)}"
-              alt="${escapeHtml(mix.title || "DJ Mix")}">
+              alt="${escapeHtml(
+                mix.title || "DJ Mix"
+              )}">
           `
           : `
             <div class="pinned-placeholder">
@@ -1881,7 +2059,9 @@ function renderPinnedMix(){
         </div>
 
         <h3>
-          ${escapeHtml(mix.title || "DJ Mix")}
+          ${escapeHtml(
+            mix.title || "DJ Mix"
+          )}
         </h3>
 
         <div class="pinned-sub">
@@ -1889,24 +2069,31 @@ function renderPinnedMix(){
           Support the DJ by purchasing the downloadable mix.
         </div>
 
-        <div class="mix-card-meta" style="margin-bottom:18px;">
+        <div class="mix-card-meta"
+             style="margin-bottom:18px;">
           🔥 ${formatNumber(mix.plays)} plays
-          ${Number(mix.downloads || 0) > 0
+          ${
+            Number(mix.downloads || 0) > 0
             ? ` • 📥 ${formatNumber(mix.downloads)} downloads`
-            : ""}
+            : ""
+          }
         </div>
 
         <div class="pinned-actions">
 
           <button
             class="btn btn-primary"
-            onclick="playMix('${escapeHtml(mix.id)}')">
+            onclick="playMix('${escapeHtml(
+              mix.id
+            )}')">
             ▶ FREE STREAM
           </button>
 
           <a
             class="btn btn-secondary"
-            href="song.html?id=${encodeURIComponent(mix.id)}&type=dj-mix&action=buy">
+            href="song.html?id=${encodeURIComponent(
+              mix.id
+            )}&type=dj-mix&action=buy">
             💰 Buy UGX 1,000 / $1
           </a>
 
@@ -1918,20 +2105,30 @@ function renderPinnedMix(){
 
   `;
 
-  document.getElementById("latestPlayButton")
-    .onclick = () =>
-      playMix(mix.id);
+  document.getElementById(
+    "latestPlayButton"
+  ).onclick =
+    () => playMix(mix.id);
+
+  document.getElementById(
+    "latestPlayButton"
+  ).style.display =
+    "inline-flex";
 }
 
 function renderMixes(){
 
   const grid =
-    document.getElementById("mixGrid");
+    document.getElementById(
+      "mixGrid"
+    );
 
   if(!currentMixes.length){
 
     grid.innerHTML = `
-      <div class="empty" style="grid-column:1/-1;">
+      <div
+        class="empty"
+        style="grid-column:1/-1;">
         🎧 No DJ mixes available yet.
       </div>
     `;
@@ -1940,67 +2137,79 @@ function renderMixes(){
   }
 
   grid.innerHTML =
-    currentMixes.map(mix => {
+    currentMixes
+      .map(mix => {
 
-      const cover =
-        getCover(mix);
+        const cover =
+          getCover(mix);
 
-      return `
+        return `
 
-        <article class="mix-card">
+          <article class="mix-card">
 
-          <div class="mix-card-cover">
+            <div class="mix-card-cover">
 
-            ${
-              cover
-              ? `
-                <img
-                  src="${escapeHtml(cover)}"
-                  alt="${escapeHtml(mix.title || "DJ Mix")}"
-                  loading="lazy">
-              `
-              : `
-                <div class="mix-placeholder">
-                  🎧
-                </div>
-              `
-            }
-
-          </div>
-
-          <div class="mix-card-info">
-
-            <div class="mix-card-title">
-              ${escapeHtml(mix.title || "DJ Mix")}
-            </div>
-
-            <div class="mix-card-meta">
-              ${formatNumber(mix.plays)} plays
-            </div>
-
-            <div class="mix-card-actions">
-
-              <button
-                class="stream"
-                onclick="playMix('${escapeHtml(mix.id)}')">
-                ▶ FREE
-              </button>
-
-              <a
-                class="buy"
-                href="song.html?id=${encodeURIComponent(mix.id)}&type=dj-mix&action=buy">
-                UGX 1,000
-              </a>
+              ${
+                cover
+                ? `
+                  <img
+                    src="${escapeHtml(cover)}"
+                    alt="${escapeHtml(
+                      mix.title || "DJ Mix"
+                    )}"
+                    loading="lazy">
+                `
+                : `
+                  <div class="mix-placeholder">
+                    🎧
+                  </div>
+                `
+              }
 
             </div>
 
-          </div>
+            <div class="mix-card-info">
 
-        </article>
+              <div class="mix-card-title">
+                ${escapeHtml(
+                  mix.title || "DJ Mix"
+                )}
+              </div>
 
-      `;
+              <div class="mix-card-meta">
+                🔥 ${formatNumber(
+                  mix.plays
+                )} plays
+              </div>
 
-    }).join("");
+              <div class="mix-card-actions">
+
+                <button
+                  class="stream"
+                  onclick="playMix('${escapeHtml(
+                    mix.id
+                  )}')">
+                  ▶ FREE
+                </button>
+
+                <a
+                  class="buy"
+                  href="song.html?id=${encodeURIComponent(
+                    mix.id
+                  )}&type=dj-mix&action=buy">
+                  UGX 1,000
+                </a>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        `;
+
+      })
+      .join("");
 }
 
 function renderStats(){
@@ -2008,42 +2217,90 @@ function renderStats(){
   const plays =
     currentMixes.reduce(
       (total,mix) =>
-        total + Number(mix.plays || 0),
+        total +
+        Number(
+          mix.plays || 0
+        ),
       0
     );
 
   const downloads =
     currentMixes.reduce(
       (total,mix) =>
-        total + Number(mix.downloads || 0),
+        total +
+        Number(
+          mix.downloads || 0
+        ),
       0
     );
 
-  document.getElementById("playsStat")
-    .textContent =
-      formatNumber(plays);
+  document.getElementById(
+    "playsStat"
+  ).textContent =
+    formatNumber(plays);
 
-  document.getElementById("downloadsStat")
-    .textContent =
-      formatNumber(downloads);
+  document.getElementById(
+    "downloadsStat"
+  ).textContent =
+    formatNumber(downloads);
 
-  document.getElementById("mixCountAchievement")
-    .textContent =
-      formatNumber(currentMixes.length);
+  document.getElementById(
+    "mixCountAchievement"
+  ).textContent =
+    formatNumber(
+      currentMixes.length
+    );
 
-  document.getElementById("playAchievement")
-    .textContent =
-      formatNumber(plays);
+  document.getElementById(
+    "playAchievement"
+  ).textContent =
+    formatNumber(plays);
 
-  document.getElementById("downloadAchievement")
-    .textContent =
-      formatNumber(downloads);
+  document.getElementById(
+    "downloadAchievement"
+  ).textContent =
+    formatNumber(downloads);
+
+  const profileTips =
+    getOptional(
+      currentDJ,
+      ["tips_count","tip_count","tips"],
+      null
+    );
+
+  const profileRating =
+    getOptional(
+      currentDJ,
+      ["rating","average_rating"],
+      null
+    );
+
+  if(profileTips !== null){
+
+    document.getElementById(
+      "tipsStat"
+    ).textContent =
+      formatNumber(profileTips);
+
+  }
+
+  if(profileRating !== null){
+
+    document.getElementById(
+      "ratingStat"
+    ).textContent =
+      profileRating;
+
+  }
+
 }
 
 function renderTracklist(mix){
 
   const box =
-    document.getElementById("tracklist");
+    document.getElementById(
+      "tracklist"
+    );
 
   const tracklist =
     mix?.tracklist;
@@ -2091,53 +2348,59 @@ function renderTracklist(mix){
   box.innerHTML = `
 
     <div class="tracklist-head">
-      🎵 ${escapeHtml(mix.title || "DJ Mix")}
+      🎵 ${escapeHtml(
+        mix.title || "DJ Mix"
+      )}
     </div>
 
     ${
-      tracks.map((track,index) => `
+      tracks
+        .map((track,index) => `
 
-        <div class="track">
+          <div class="track">
 
-          <div class="track-number">
-            ${index + 1}
-          </div>
-
-          <div class="track-info">
-
-            <div class="track-title">
-              ${escapeHtml(
-                track.title ||
-                track.name ||
-                "Song"
-              )}
+            <div class="track-number">
+              ${index + 1}
             </div>
 
-            <div class="track-artist">
-              ${escapeHtml(
-                track.artist ||
-                track.artist_name ||
-                "Artist"
-              )}
+            <div class="track-info">
+
+              <div class="track-title">
+                ${escapeHtml(
+                  track.title ||
+                  track.name ||
+                  "Song"
+                )}
+              </div>
+
+              <div class="track-artist">
+                ${escapeHtml(
+                  track.artist ||
+                  track.artist_name ||
+                  "Artist"
+                )}
+              </div>
+
             </div>
+
+            ${
+              track.song_id
+              ? `
+                <a
+                  class="track-buy"
+                  href="song.html?id=${encodeURIComponent(
+                    track.song_id
+                  )}">
+                  Buy Song
+                </a>
+              `
+              : ""
+            }
 
           </div>
 
-          ${
-            track.song_id
-            ? `
-              <a
-                class="track-buy"
-                href="song.html?id=${encodeURIComponent(track.song_id)}">
-                Buy Song
-              </a>
-            `
-            : ""
-          }
-
-        </div>
-
-      `).join("")
+        `)
+        .join("")
     }
 
   `;
@@ -2166,18 +2429,24 @@ function playMix(id){
   if(!audioUrl){
 
     window.location.href =
-      `song.html?id=${encodeURIComponent(id)}&type=dj-mix`;
+      `song.html?id=${encodeURIComponent(
+        id
+      )}&type=dj-mix`;
 
     return;
   }
 
   let player =
-    document.getElementById("djAudioPlayer");
+    document.getElementById(
+      "djAudioPlayer"
+    );
 
   if(!player){
 
     player =
-      document.createElement("audio");
+      document.createElement(
+        "audio"
+      );
 
     player.id =
       "djAudioPlayer";
@@ -2209,24 +2478,33 @@ function playMix(id){
     player.style.background =
       "#11111d";
 
-    document.body.appendChild(player);
+    document.body.appendChild(
+      player
+    );
+
   }
 
   player.src =
     audioUrl;
 
-  player.play().catch(() => {
+  player.play()
+    .catch(() => {
 
-    window.location.href =
-      `song.html?id=${encodeURIComponent(id)}&type=dj-mix`;
+      window.location.href =
+        `song.html?id=${encodeURIComponent(
+          id
+        )}&type=dj-mix`;
 
-  });
+    });
+
 }
 
 async function loadSimilarDJs(){
 
   const box =
-    document.getElementById("similarDJs");
+    document.getElementById(
+      "similarDJs"
+    );
 
   const {
     data: roles,
@@ -2234,11 +2512,19 @@ async function loadSimilarDJs(){
   } =
     await supabaseClient
       .from("user_roles")
-      .select("user_id,role");
+      .select(
+        "user_id,role"
+      );
 
   if(roleError){
 
-    box.innerHTML = "";
+    box.innerHTML = `
+      <div
+        class="empty"
+        style="grid-column:1/-1;">
+        DJ profiles could not be loaded.
+      </div>
+    `;
 
     return;
   }
@@ -2250,16 +2536,22 @@ async function loadSimilarDJs(){
           .toLowerCase()
           .trim() === "dj"
       )
-      .map(row => row.user_id)
+      .map(row =>
+        row.user_id
+      )
       .filter(Boolean);
 
   const uniqueIds =
-    Array.from(new Set(djIds));
+    Array.from(
+      new Set(djIds)
+    );
 
   if(!uniqueIds.length){
 
     box.innerHTML = `
-      <div class="empty" style="grid-column:1/-1;">
+      <div
+        class="empty"
+        style="grid-column:1/-1;">
         More DJs will appear here as DJ profiles are created.
       </div>
     `;
@@ -2268,25 +2560,48 @@ async function loadSimilarDJs(){
   }
 
   const {
-    data: profiles
+    data: profiles,
+    error: profileError
   } =
     await supabaseClient
       .from("artist_profiles")
       .select("*")
-      .in("user_id",uniqueIds);
+      .in(
+        "user_id",
+        uniqueIds
+      );
+
+  if(profileError){
+
+    box.innerHTML = `
+      <div
+        class="empty"
+        style="grid-column:1/-1;">
+        DJ profiles could not be loaded.
+      </div>
+    `;
+
+    return;
+  }
 
   const others =
     (profiles || [])
       .filter(profile =>
-        String(profile.user_id) !==
-        String(currentDJ.user_id)
+        String(
+          profile.user_id
+        ) !==
+        String(
+          currentDJ.user_id
+        )
       )
       .slice(0,4);
 
   if(!others.length){
 
     box.innerHTML = `
-      <div class="empty" style="grid-column:1/-1;">
+      <div
+        class="empty"
+        style="grid-column:1/-1;">
         More DJs will appear here as DJ profiles are created.
       </div>
     `;
@@ -2295,69 +2610,86 @@ async function loadSimilarDJs(){
   }
 
   box.innerHTML =
-    others.map(profile => {
+    others
+      .map(profile => {
 
-      const name =
-        getDJName(profile);
+        const name =
+          getDJName(profile);
 
-      const photo =
-        profile.profile_image_url ||
-        "";
+        const photo =
+          profile.profile_image_url ||
+          "";
 
-      return `
+        return `
 
-        <a
-          class="similar"
-          href="dj.html?id=${encodeURIComponent(profile.user_id)}"
-          style="text-decoration:none;color:#fff;">
+          <a
+            class="similar"
+            href="dj.html?id=${encodeURIComponent(
+              profile.user_id
+            )}"
+            style="text-decoration:none;color:#fff;">
 
-          <div class="similar-photo">
+            <div class="similar-photo">
 
-            ${
-              photo
-              ? `
-                <img
-                  src="${escapeHtml(photo)}"
-                  alt="${escapeHtml(name)}">
-              `
-              : `
-                <div class="dj-photo-placeholder">
-                  🎧
-                </div>
-              `
-            }
+              ${
+                photo
+                ? `
+                  <img
+                    src="${escapeHtml(photo)}"
+                    alt="${escapeHtml(
+                      name
+                    )}">
+                `
+                : `
+                  <div class="dj-photo-placeholder">
+                    🎧
+                  </div>
+                `
+              }
 
-          </div>
-
-          <div>
-
-            <div class="similar-name">
-              ${escapeHtml(name)}
             </div>
 
-            <div class="similar-role">
-              🎧 DJ
+            <div>
+
+              <div class="similar-name">
+                ${escapeHtml(name)}
+              </div>
+
+              <div class="similar-role">
+                🎧 DJ
+              </div>
+
             </div>
 
-          </div>
+          </a>
 
-        </a>
+        `;
 
-      `;
+      })
+      .join("");
 
-    }).join("");
 }
 
 function openModal(id){
 
-  document.getElementById(id)
-    .classList.add("show");
+  const modal =
+    document.getElementById(id);
+
+  if(modal){
+    modal.classList.add("show");
+  }
+
 }
 
 function closeModal(id){
 
-  document.getElementById(id)
-    .classList.remove("show");
+  const modal =
+    document.getElementById(id);
+
+  if(modal){
+    modal.classList.remove("show");
+  }
+
 }
 
 function selectTip(amount){
@@ -2365,25 +2697,34 @@ function selectTip(amount){
   selectedTipAmount =
     Number(amount);
 
-  document.getElementById("tipCustom")
-    .value =
-      amount;
+  document.getElementById(
+    "tipCustom"
+  ).value =
+    amount;
+
 }
 
 function continueTip(){
 
   const custom =
     Number(
-      document.getElementById("tipCustom")
-        .value || 0
+      document.getElementById(
+        "tipCustom"
+      ).value || 0
     );
 
   const amount =
-    custom || selectedTipAmount;
+    custom ||
+    selectedTipAmount;
 
-  if(!amount || amount < 1){
+  if(
+    !amount ||
+    amount < 1
+  ){
 
-    alert("Please select or enter a tip amount.");
+    alert(
+      "Please select or enter a tip amount."
+    );
 
     return;
   }
@@ -2397,19 +2738,26 @@ function continueTip(){
 function submitBooking(){
 
   const type =
-    document.getElementById("bookingType")
-      .value;
+    document.getElementById(
+      "bookingType"
+    ).value;
 
   const date =
-    document.getElementById("bookingDate")
-      .value;
+    document.getElementById(
+      "bookingDate"
+    ).value;
 
   const location =
-    document.getElementById("bookingLocation")
-      .value
-      .trim();
+    document.getElementById(
+      "bookingLocation"
+    ).value
+    .trim();
 
-  if(!type || !date || !location){
+  if(
+    !type ||
+    !date ||
+    !location
+  ){
 
     alert(
       "Please select the event type, date and location."
@@ -2427,7 +2775,9 @@ function submitBooking(){
 async function copyDJLink(){
 
   const input =
-    document.getElementById("shareUrl");
+    document.getElementById(
+      "shareUrl"
+    );
 
   try{
 
@@ -2435,19 +2785,31 @@ async function copyDJLink(){
       input.value
     );
 
-    alert("DJ profile link copied.");
+    alert(
+      "DJ profile link copied."
+    );
 
   }catch(error){
 
     input.select();
-    document.execCommand("copy");
 
-    alert("DJ profile link copied.");
+    document.execCommand(
+      "copy"
+    );
+
+    alert(
+      "DJ profile link copied."
+    );
 
   }
+
 }
 
 async function shareDJ(){
+
+  if(!currentDJ){
+    return;
+  }
 
   const name =
     getDJName(currentDJ);
@@ -2455,15 +2817,15 @@ async function shareDJ(){
   const url =
     window.location.href;
 
-  if(
-    navigator.share
-  ){
+  if(navigator.share){
 
     try{
 
       await navigator.share({
-        title:`PASONG — ${name}`,
-        text:`Check out ${name} on PASONG.`,
+        title:
+          `PASONG — ${name}`,
+        text:
+          `Check out ${name} on PASONG.`,
         url
       });
 
@@ -2473,20 +2835,27 @@ async function shareDJ(){
 
   }
 
-  document.getElementById("shareUrl")
-    .value =
-      url;
+  document.getElementById(
+    "shareUrl"
+  ).value =
+    url;
 
-  openModal("shareModal");
+  openModal(
+    "shareModal"
+  );
+
 }
 
 function toggleFollow(){
 
   const button =
-    document.getElementById("followButton");
+    document.getElementById(
+      "followButton"
+    );
 
   if(
-    button.dataset.following === "true"
+    button.dataset.following ===
+    "true"
   ){
 
     button.dataset.following =
@@ -2510,10 +2879,13 @@ function toggleFollow(){
 function toggleFavorite(){
 
   const button =
-    document.getElementById("favoriteButton");
+    document.getElementById(
+      "favoriteButton"
+    );
 
   if(
-    button.dataset.favorite === "true"
+    button.dataset.favorite ===
+    "true"
   ){
 
     button.dataset.favorite =
@@ -2534,52 +2906,117 @@ function toggleFavorite(){
 
 }
 
-document.getElementById("tipButton")
-  .onclick = () =>
-    openModal("tipModal");
+document.getElementById(
+  "tipButton"
+).onclick =
+  () =>
+    openModal(
+      "tipModal"
+    );
 
-document.getElementById("supportButton")
-  .onclick = () =>
-    openModal("tipModal");
+document.getElementById(
+  "supportButton"
+).onclick =
+  () =>
+    openModal(
+      "tipModal"
+    );
 
-document.getElementById("bookButton")
-  .onclick = () =>
-    openModal("bookingModal");
+document.getElementById(
+  "bookButton"
+).onclick =
+  () =>
+    openModal(
+      "bookingModal"
+    );
 
-document.getElementById("bookingInfoButton")
-  .onclick = () =>
-    openModal("bookingModal");
+document.getElementById(
+  "bookingInfoButton"
+).onclick =
+  () =>
+    openModal(
+      "bookingModal"
+    );
 
-document.getElementById("shareButton")
-  .onclick = shareDJ;
+document.getElementById(
+  "shareButton"
+).onclick =
+  shareDJ;
 
-document.getElementById("followButton")
-  .onclick = toggleFollow;
+document.getElementById(
+  "followButton"
+).onclick =
+  toggleFollow;
 
-document.getElementById("favoriteButton")
-  .onclick = toggleFavorite;
+document.getElementById(
+  "favoriteButton"
+).onclick =
+  toggleFavorite;
 
-document.querySelectorAll(".modal")
-  .forEach(modal => {
+document.querySelectorAll(
+  ".modal"
+)
+.forEach(modal => {
 
-    modal.addEventListener("click",event => {
+  modal.addEventListener(
+    "click",
+    event => {
 
-      if(event.target === modal){
+      if(
+        event.target ===
+        modal
+      ){
 
-        modal.classList.remove("show");
+        modal.classList.remove(
+          "show"
+        );
 
       }
 
-    });
+    }
+  );
 
-  });
+});
+
+document.getElementById(
+  "searchInput"
+).addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key ===
+      "Enter"
+    ){
+
+      const query =
+        event.target.value
+          .trim();
+
+      if(query){
+
+        window.location.href =
+          `djs.html?search=${encodeURIComponent(
+            query
+          )}`;
+
+      }
+
+    }
+
+  }
+);
 
 async function init(){
 
   try{
 
     if(!djId){
-      throw new Error("No DJ ID.");
+
+      throw new Error(
+        "No DJ ID."
+      );
+
     }
 
     await loadDJProfile();
@@ -2594,7 +3031,9 @@ async function init(){
 
     console.error(error);
 
-    document.querySelector("main").innerHTML = `
+    document.querySelector(
+      "main"
+    ).innerHTML = `
       <div class="error">
         🎧 This DJ profile could not be found.
       </div>
