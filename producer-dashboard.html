@@ -7,638 +7,106 @@
 <title>PASONG Producer Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-body{
-font-family:Arial,Helvetica,sans-serif;
-background:#090612;
-color:#fff;
-min-height:100vh;
-}
-
-header{
-background:#10091c;
-border-bottom:1px solid #28153d;
-padding:16px 22px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:15px;
-position:sticky;
-top:0;
-z-index:20;
-}
-
-.logo{
-color:#c084fc;
-font-size:24px;
-font-weight:800;
-white-space:nowrap;
-}
-
-.header-right{
-display:flex;
-align-items:center;
-gap:12px;
-}
-
-.header-right a{
-color:#ddd;
-text-decoration:none;
-font-size:14px;
-}
-
-.header-right a:hover{
-color:#c084fc;
-}
-
-.account{
-background:#1d1230;
-border:1px solid #38205a;
-padding:8px 12px;
-border-radius:20px;
-font-size:13px;
-}
-
-.container{
-width:min(1180px,94%);
-margin:auto;
-}
-
-.hero{
-margin-top:25px;
-padding:28px;
-border:1px solid #38205a;
-border-radius:20px;
-background:linear-gradient(135deg,#160b27,#0d0715);
-}
-
-.hero h1{
-font-size:30px;
-margin-bottom:8px;
-}
-
-.hero p{
-color:#aaa;
-line-height:1.6;
-}
-
-.producer-name{
-color:#c084fc;
-}
-
-.dashboard{
-display:grid;
-grid-template-columns:280px 1fr;
-gap:20px;
-margin:20px 0 40px;
-}
-
-.sidebar{
-background:#10091c;
-border:1px solid #28153d;
-border-radius:18px;
-padding:18px;
-height:max-content;
-}
-
-.sidebar button{
-width:100%;
-text-align:left;
-padding:13px 14px;
-margin-bottom:8px;
-border:0;
-border-radius:10px;
-background:transparent;
-color:#ddd;
-cursor:pointer;
-font-size:14px;
-}
-
-.sidebar button:hover,
-.sidebar button.active{
-background:#241238;
-color:#fff;
-}
-
-.content{
-min-width:0;
-}
-
-.card{
-background:#10091c;
-border:1px solid #28153d;
-border-radius:18px;
-padding:22px;
-margin-bottom:20px;
-}
-
-.card h2{
-font-size:21px;
-margin-bottom:7px;
-}
-
-.card-subtitle{
-color:#999;
-font-size:13px;
-margin-bottom:20px;
-}
-
-.stats{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:12px;
-margin-bottom:20px;
-}
-
-.stat{
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:14px;
-padding:18px;
-}
-
-.stat-number{
-font-size:25px;
-font-weight:700;
-color:#c084fc;
-}
-
-.stat-label{
-color:#999;
-font-size:12px;
-margin-top:5px;
-}
-
-.earnings-top{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:20px;
-}
-
-.balance-card{
-background:linear-gradient(135deg,#1b0d2d,#241238);
-border:1px solid #4b2870;
-border-radius:16px;
-padding:20px;
-flex:1;
-min-width:220px;
-}
-
-.balance-label{
-color:#aaa;
-font-size:13px;
-margin-bottom:7px;
-}
-
-.balance-number{
-color:#c084fc;
-font-size:28px;
-font-weight:800;
-}
-
-.withdraw-btn{
-border:0;
-border-radius:10px;
-padding:13px 18px;
-cursor:pointer;
-font-weight:700;
-background:linear-gradient(135deg,#8b5cf6,#ec4899);
-color:#fff;
-}
-
-.earnings-stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px;
-margin-bottom:20px;
-}
-
-.earning-stat{
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:14px;
-padding:17px;
-}
-
-.earning-number{
-color:#c084fc;
-font-size:22px;
-font-weight:700;
-}
-
-.earning-label{
-color:#999;
-font-size:12px;
-margin-top:6px;
-}
-
-.table-wrap{
-width:100%;
-overflow-x:auto;
-}
-
-.earnings-table{
-width:100%;
-border-collapse:collapse;
-min-width:650px;
-}
-
-.earnings-table th,
-.earnings-table td{
-padding:13px 12px;
-text-align:left;
-border-bottom:1px solid #28153d;
-font-size:13px;
-}
-
-.earnings-table th{
-color:#aaa;
-font-weight:600;
-}
-
-.earnings-table td{
-color:#ddd;
-}
-
-.earnings-table td:last-child{
-color:#c084fc;
-font-weight:700;
-}
-
-.split-note{
-margin-top:15px;
-color:#888;
-font-size:12px;
-line-height:1.5;
-}
-
-.form-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-}
-
-.field{
-display:flex;
-flex-direction:column;
-gap:7px;
-}
-
-.field.full{
-grid-column:1/-1;
-}
-
-label{
-font-size:13px;
-color:#ccc;
-}
-
-input,
-select,
-textarea{
-width:100%;
-background:#0b0611;
-border:1px solid #392151;
-border-radius:10px;
-padding:13px;
-color:#fff;
-outline:none;
-}
-
-textarea{
-min-height:100px;
-resize:vertical;
-font-family:Arial,Helvetica,sans-serif;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-border-color:#8b5cf6;
-}
-
-input[type="file"]{
-padding:10px;
-}
-
-.price-help{
-color:#888;
-font-size:11px;
-}
-
-.btn{
-border:0;
-border-radius:10px;
-padding:12px 18px;
-cursor:pointer;
-font-weight:700;
-}
-
-.btn-primary{
-background:linear-gradient(135deg,#8b5cf6,#ec4899);
-color:#fff;
-}
-
-.btn-primary:disabled{
-opacity:.45;
-cursor:not-allowed;
-}
-
-.btn-secondary{
-background:#241238;
-color:#fff;
-border:1px solid #452567;
-}
-
-.form-actions{
-margin-top:20px;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.message{
-display:none;
-margin-top:15px;
-padding:12px;
-border-radius:10px;
-font-size:13px;
-}
-
-.message.success{
-display:block;
-background:#102617;
-border:1px solid #245d32;
-color:#9ae6a8;
-}
-
-.message.error{
-display:block;
-background:#2a1017;
-border:1px solid #6c2636;
-color:#ff9caf;
-}
-
-.profile-preview{
-display:flex;
-align-items:center;
-gap:18px;
-padding:15px;
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:14px;
-margin-bottom:20px;
-}
-
-.profile-preview img{
-width:90px;
-height:90px;
-border-radius:50%;
-object-fit:cover;
-border:2px solid #8b5cf6;
-background:#21122f;
-}
-
-.profile-preview-text{
-min-width:0;
-}
-
-.profile-preview-text strong{
-display:block;
-font-size:18px;
-margin-bottom:5px;
-}
-
-.profile-preview-text span{
-color:#999;
-font-size:12px;
-}
-
-.showreel-box{
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:14px;
-padding:15px;
-margin-top:10px;
-}
-
-.agreement-box{
-background:#0b0611;
-border:1px solid #392151;
-border-radius:12px;
-padding:16px;
-margin-top:20px;
-max-height:360px;
-overflow-y:auto;
-}
-
-.agreement-box h3{
-font-size:18px;
-color:#c084fc;
-margin-bottom:15px;
-}
-
-.agreement-box h4{
-font-size:14px;
-color:#fff;
-margin:18px 0 7px;
-}
-
-.agreement-box p{
-font-size:12px;
-color:#aaa;
-line-height:1.6;
-}
-
-.agreement-box ul{
-padding-left:20px;
-margin-top:7px;
-}
-
-.agreement-box li{
-font-size:12px;
-color:#aaa;
-line-height:1.6;
-margin-bottom:4px;
-}
-
-.agreement-version{
-margin-top:15px;
-font-size:11px;
-color:#777;
-}
-
-.agreement-check{
-display:flex;
-align-items:flex-start;
-gap:10px;
-margin-top:15px;
-padding:14px;
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:12px;
-}
-
-.agreement-check input{
-width:18px;
-height:18px;
-margin-top:1px;
-accent-color:#8b5cf6;
-flex-shrink:0;
-}
-
-.agreement-check label{
-font-size:13px;
-color:#ddd;
-line-height:1.5;
-cursor:pointer;
-}
-
-.beats-grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
-}
-
-.beat-card{
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:15px;
-overflow:hidden;
-}
-
-.beat-cover{
-width:100%;
-aspect-ratio:1/1;
-background:#21122f;
-object-fit:cover;
-display:block;
-}
-
-.beat-info{
-padding:15px;
-}
-
-.beat-title{
-font-weight:700;
-margin-bottom:7px;
-}
-
-.beat-meta{
-color:#999;
-font-size:12px;
-line-height:1.6;
-}
-
-.beat-status{
-display:inline-block;
-margin-top:10px;
-padding:5px 8px;
-border-radius:8px;
-background:#241238;
-color:#c084fc;
-font-size:11px;
-}
-
-.empty{
-padding:30px 15px;
-text-align:center;
-color:#888;
-border:1px dashed #38204f;
-border-radius:12px;
-}
-
-.rules{
-display:grid;
-gap:10px;
-}
-
-.rule{
-background:#160d24;
-border:1px solid #2d1944;
-border-radius:11px;
-padding:13px;
-color:#bbb;
-font-size:13px;
-line-height:1.5;
-}
-
-.rule strong{
-color:#fff;
-}
-
-.hidden{
-display:none;
-}
-
-footer{
-text-align:center;
-color:#666;
-padding:25px;
-border-top:1px solid #20132e;
-font-size:12px;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#090612;color:#fff;min-height:100vh}
+header{background:#10091c;border-bottom:1px solid #28153d;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:20}
+.logo{color:#c084fc;font-size:24px;font-weight:800;white-space:nowrap}
+.header-right{display:flex;align-items:center;gap:12px}
+.header-right a{color:#ddd;text-decoration:none;font-size:14px}
+.header-right a:hover{color:#c084fc}
+.account{background:#1d1230;border:1px solid #38205a;padding:8px 12px;border-radius:20px;font-size:13px}
+.container{width:min(1180px,94%);margin:auto}
+.hero{margin-top:25px;padding:28px;border:1px solid #38205a;border-radius:20px;background:linear-gradient(135deg,#160b27,#0d0715)}
+.hero h1{font-size:30px;margin-bottom:8px}
+.hero p{color:#aaa;line-height:1.6}
+.producer-name{color:#c084fc}
+.dashboard{display:grid;grid-template-columns:280px 1fr;gap:20px;margin:20px 0 40px}
+.sidebar{background:#10091c;border:1px solid #28153d;border-radius:18px;padding:18px;height:max-content}
+.sidebar button{width:100%;text-align:left;padding:13px 14px;margin-bottom:8px;border:0;border-radius:10px;background:transparent;color:#ddd;cursor:pointer;font-size:14px}
+.sidebar button:hover,.sidebar button.active{background:#241238;color:#fff}
+.content{min-width:0}
+.card{background:#10091c;border:1px solid #28153d;border-radius:18px;padding:22px;margin-bottom:20px}
+.card h2{font-size:21px;margin-bottom:7px}
+.card-subtitle{color:#999;font-size:13px;margin-bottom:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#160d24;border:1px solid #2d1944;border-radius:14px;padding:18px}
+.stat-number{font-size:25px;font-weight:700;color:#c084fc}
+.stat-label{color:#999;font-size:12px;margin-top:5px}
+.earnings-top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:20px}
+.balance-card{background:linear-gradient(135deg,#1b0d2d,#241238);border:1px solid #4b2870;border-radius:16px;padding:20px;flex:1;min-width:220px}
+.balance-label{color:#aaa;font-size:13px;margin-bottom:7px}
+.balance-number{color:#c084fc;font-size:28px;font-weight:800}
+.withdraw-btn{border:0;border-radius:10px;padding:13px 18px;cursor:pointer;font-weight:700;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
+.earnings-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.earning-stat{background:#160d24;border:1px solid #2d1944;border-radius:14px;padding:17px}
+.earning-number{color:#c084fc;font-size:22px;font-weight:700}
+.earning-label{color:#999;font-size:12px;margin-top:6px}
+.table-wrap{width:100%;overflow-x:auto}
+.earnings-table{width:100%;border-collapse:collapse;min-width:650px}
+.earnings-table th,.earnings-table td{padding:13px 12px;text-align:left;border-bottom:1px solid #28153d;font-size:13px}
+.earnings-table th{color:#aaa;font-weight:600}
+.earnings-table td{color:#ddd}
+.earnings-table td:last-child{color:#c084fc;font-weight:700}
+.split-note{margin-top:15px;color:#888;font-size:12px;line-height:1.5}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+label{font-size:13px;color:#ccc}
+input,select,textarea{width:100%;background:#0b0611;border:1px solid #392151;border-radius:10px;padding:13px;color:#fff;outline:none}
+textarea{min-height:100px;resize:vertical;font-family:Arial,Helvetica,sans-serif}
+input:focus,select:focus,textarea:focus{border-color:#8b5cf6}
+input[type="file"]{padding:10px}
+.price-help{color:#888;font-size:11px}
+.btn{border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font-weight:700}
+.btn-primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-secondary{background:#241238;color:#fff;border:1px solid #452567}
+.form-actions{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+.message{display:none;margin-top:15px;padding:12px;border-radius:10px;font-size:13px}
+.message.success{display:block;background:#102617;border:1px solid #245d32;color:#9ae6a8}
+.message.error{display:block;background:#2a1017;border:1px solid #6c2636;color:#ff9caf}
+.profile-preview{display:flex;align-items:center;gap:18px;padding:15px;background:#160d24;border:1px solid #2d1944;border-radius:14px;margin-bottom:20px}
+.profile-preview img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid #8b5cf6;background:#21122f}
+.profile-preview-text{min-width:0}
+.profile-preview-text strong{display:block;font-size:18px;margin-bottom:5px}
+.profile-preview-text span{color:#999;font-size:12px}
+.showreel-box{background:#160d24;border:1px solid #2d1944;border-radius:14px;padding:15px;margin-top:10px}
+.agreement-box{background:#0b0611;border:1px solid #392151;border-radius:12px;padding:16px;margin-top:20px;max-height:360px;overflow-y:auto}
+.agreement-box h3{font-size:18px;color:#c084fc;margin-bottom:15px}
+.agreement-box h4{font-size:14px;color:#fff;margin:18px 0 7px}
+.agreement-box p{font-size:12px;color:#aaa;line-height:1.6}
+.agreement-box ul{padding-left:20px;margin-top:7px}
+.agreement-box li{font-size:12px;color:#aaa;line-height:1.6;margin-bottom:4px}
+.agreement-version{margin-top:15px;font-size:11px;color:#777}
+.agreement-check{display:flex;align-items:flex-start;gap:10px;margin-top:15px;padding:14px;background:#160d24;border:1px solid #2d1944;border-radius:12px}
+.agreement-check input{width:18px;height:18px;margin-top:1px;accent-color:#8b5cf6;flex-shrink:0}
+.agreement-check label{font-size:13px;color:#ddd;line-height:1.5;cursor:pointer}
+.beats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.beat-card{background:#160d24;border:1px solid #2d1944;border-radius:15px;overflow:hidden}
+.beat-cover{width:100%;aspect-ratio:1/1;background:#21122f;object-fit:cover;display:block}
+.beat-info{padding:15px}
+.beat-title{font-weight:700;margin-bottom:7px}
+.beat-meta{color:#999;font-size:12px;line-height:1.6}
+.beat-status{display:inline-block;margin-top:10px;padding:5px 8px;border-radius:8px;background:#241238;color:#c084fc;font-size:11px}
+.empty{padding:30px 15px;text-align:center;color:#888;border:1px dashed #38204f;border-radius:12px}
+.rules{display:grid;gap:10px}
+.rule{background:#160d24;border:1px solid #2d1944;border-radius:11px;padding:13px;color:#bbb;font-size:13px;line-height:1.5}
+.rule strong{color:#fff}
+.hidden{display:none}
+footer{text-align:center;color:#666;padding:25px;border-top:1px solid #20132e;font-size:12px}
 @media(max-width:800px){
-.dashboard{
-grid-template-columns:1fr;
-}
-
-.sidebar{
-display:flex;
-overflow-x:auto;
-gap:8px;
-}
-
-.sidebar button{
-min-width:max-content;
-margin:0;
-}
-
-.form-grid{
-grid-template-columns:1fr;
-}
-
-.field.full{
-grid-column:auto;
-}
-
-.beats-grid{
-grid-template-columns:1fr;
-}
-
-.stats{
-grid-template-columns:1fr;
-}
-
-.earnings-stats{
-grid-template-columns:1fr 1fr;
-}
-
-header{
-padding:13px 15px;
-}
-
-.header-right a{
-display:none;
-}
-
-.profile-preview{
-align-items:flex-start;
-}
-
-.profile-preview img{
-width:75px;
-height:75px;
-}
+.dashboard{grid-template-columns:1fr}
+.sidebar{display:flex;overflow-x:auto;gap:8px}
+.sidebar button{min-width:max-content;margin:0}
+.form-grid{grid-template-columns:1fr}
+.field.full{grid-column:auto}
+.beats-grid{grid-template-columns:1fr}
+.stats{grid-template-columns:1fr}
+.earnings-stats{grid-template-columns:1fr 1fr}
+header{padding:13px 15px}
+.header-right a{display:none}
+.profile-preview{align-items:flex-start}
+.profile-preview img{width:75px;height:75px}
 }
 </style>
 </head>
@@ -646,33 +114,33 @@ height:75px;
 <body>
 
 <header>
-  <div class="logo">◈ PASONG</div>
-  <div class="header-right">
-    <a href="index.html">Home</a>
-    <a href="producer.html">Producer Page</a>
-    <div class="account" id="accountName">Producer</div>
-  </div>
+<div class="logo">◈ PASONG</div>
+<div class="header-right">
+<a href="index.html">Home</a>
+<a href="producer.html">Producer Page</a>
+<div class="account" id="accountName">Producer</div>
+</div>
 </header>
 
 <main class="container">
 
 <section class="hero">
-  <h1>🎛️ Producer Dashboard</h1>
-  <p>
-    Manage your beats, prices and producer profile.
-    Your <span class="producer-name" id="heroProducerName">Producer</span>
-    clean beat files remain separate from PASONG's free streaming version.
-  </p>
+<h1>🎛️ Producer Dashboard</h1>
+<p>
+Manage your beats, prices and producer profile. Your
+<span class="producer-name" id="heroProducerName">Producer</span>
+clean beat files remain separate from PASONG's free streaming version.
+</p>
 </section>
 
 <div class="dashboard">
 
 <aside class="sidebar">
-  <button class="active" data-section="overview">📊 Overview</button>
-  <button data-section="profile">👤 Public Profile</button>
-  <button data-section="upload">🎛️ Upload Beat</button>
-  <button data-section="my-beats">🎵 My Beats</button>
-  <button data-section="rules">📜 Beat Rules</button>
+<button class="active" data-section="overview">📊 Overview</button>
+<button data-section="profile">👤 Public Profile</button>
+<button data-section="upload">🎛️ Upload Beat</button>
+<button data-section="my-beats">🎵 My Beats</button>
+<button data-section="rules">📜 Beat Rules</button>
 </aside>
 
 <section class="content">
@@ -685,9 +153,7 @@ height:75px;
 
 <div class="balance-card">
 <div class="balance-label">💰 Balance</div>
-<div class="balance-number" id="producerBalance">
-UGX 87,500
-</div>
+<div class="balance-number" id="producerBalance">UGX 87,500</div>
 </div>
 
 <button class="withdraw-btn" id="withdrawButton">
@@ -699,39 +165,23 @@ Withdraw to MoMo
 <div class="earnings-stats">
 
 <div class="earning-stat">
-<div class="earning-number" id="totalStreams">
-3,402
-</div>
-<div class="earning-label">
-🎧 Total Streams
-</div>
+<div class="earning-number" id="totalStreams">3,402</div>
+<div class="earning-label">🎧 Total Streams</div>
 </div>
 
 <div class="earning-stat">
-<div class="earning-number" id="totalSales">
-12
-</div>
-<div class="earning-label">
-💿 Total Sales
-</div>
+<div class="earning-number" id="totalSales">12</div>
+<div class="earning-label">💿 Total Sales</div>
 </div>
 
 <div class="earning-stat">
-<div class="earning-number" id="totalFans">
-89
-</div>
-<div class="earning-label">
-👥 Fans
-</div>
+<div class="earning-number" id="totalFans">89</div>
+<div class="earning-label">👥 Fans</div>
 </div>
 
 <div class="earning-stat">
-<div class="earning-number" id="thisMonth">
-UGX 52,500
-</div>
-<div class="earning-label">
-📈 This Month
-</div>
+<div class="earning-number" id="thisMonth">UGX 52,500</div>
+<div class="earning-label">📈 This Month</div>
 </div>
 
 </div>
@@ -800,9 +250,7 @@ Song royalties are not included here and will be handled separately.
 
 <div class="card">
 
-<h2>
-Welcome, <span id="welcomeName">Producer</span>
-</h2>
+<h2>Welcome, <span id="welcomeName">Producer</span></h2>
 
 <div class="card-subtitle">
 Your producer account is connected to PASONG.
@@ -840,9 +288,7 @@ alt="Producer"
 
 <div class="profile-preview-text">
 
-<strong id="profilePreviewName">
-Producer
-</strong>
+<strong id="profilePreviewName">Producer</strong>
 
 <span>
 This picture will appear on your public Producer Page.
@@ -1069,10 +515,7 @@ Clear
 
 </div>
 
-<div
-id="profileMessage"
-class="message"
-></div>
+<div id="profileMessage" class="message"></div>
 
 </form>
 
@@ -1096,120 +539,56 @@ Upload your clean original beat. PASONG will handle the free-streaming version s
 
 <div class="field full">
 <label for="beatTitle">Beat Title *</label>
-<input
-id="beatTitle"
-type="text"
-placeholder="Enter beat title"
-required
->
+<input id="beatTitle" type="text" placeholder="Enter beat title" required>
 </div>
 
 <div class="field">
 <label for="genre">Genre</label>
-<input
-id="genre"
-type="text"
-placeholder="Afrobeats, Amapiano..."
->
+<input id="genre" type="text" placeholder="Afrobeats, Amapiano...">
 </div>
 
 <div class="field">
 <label for="bpm">BPM</label>
-<input
-id="bpm"
-type="number"
-min="1"
-max="400"
-placeholder="120"
->
+<input id="bpm" type="number" min="1" max="400" placeholder="120">
 </div>
 
 <div class="field">
 <label for="musicalKey">Key</label>
-<input
-id="musicalKey"
-type="text"
-placeholder="C Major"
->
+<input id="musicalKey" type="text" placeholder="C Major">
 </div>
 
 <div class="field">
 <label for="cover">Beat Cover</label>
-<input
-id="cover"
-type="file"
-accept="image/jpeg,image/png,image/webp"
->
+<input id="cover" type="file" accept="image/jpeg,image/png,image/webp">
 </div>
 
 <div class="field full">
 <label for="audio">Clean Beat File *</label>
-<input
-id="audio"
-type="file"
-accept="audio/mpeg,audio/wav,audio/x-wav"
-required
->
+<input id="audio" type="file" accept="audio/mpeg,audio/wav,audio/x-wav" required>
 </div>
 
 <div class="field">
 <label for="leaseMp3">MP3 Lease Price (UGX) *</label>
-<input
-id="leaseMp3"
-type="number"
-min="10000"
-max="1500000"
-value="10000"
-required
->
-<div class="price-help">
-Minimum UGX 10,000 • Maximum UGX 1,500,000
-</div>
+<input id="leaseMp3" type="number" min="10000" max="1500000" value="10000" required>
+<div class="price-help">Minimum UGX 10,000 • Maximum UGX 1,500,000</div>
 </div>
 
 <div class="field">
 <label for="leaseWav">WAV Lease Price (UGX) *</label>
-<input
-id="leaseWav"
-type="number"
-min="10000"
-max="1500000"
-value="10000"
-required
->
-<div class="price-help">
-Minimum UGX 10,000 • Maximum UGX 1,500,000
-</div>
+<input id="leaseWav" type="number" min="10000" max="1500000" value="10000" required>
+<div class="price-help">Minimum UGX 10,000 • Maximum UGX 1,500,000</div>
 </div>
 
 <div class="field">
 <label for="stemsPrice">Stems / Trackout Price (UGX) *</label>
-<input
-id="stemsPrice"
-type="number"
-min="10000"
-max="1500000"
-value="10000"
-required
->
-<div class="price-help">
-Minimum UGX 10,000 • Maximum UGX 1,500,000
-</div>
+<input id="stemsPrice" type="number" min="10000" max="1500000" value="10000" required>
+<div class="price-help">Minimum UGX 10,000 • Maximum UGX 1,500,000</div>
 </div>
 
 <div class="field">
 <label for="exclusivePrice">Exclusive Price (UGX) *</label>
-<input
-id="exclusivePrice"
-type="number"
-min="500000"
-max="10000000"
-value="500000"
-required
->
-<div class="price-help">
-Minimum UGX 500,000 • Maximum UGX 10,000,000
-</div>
+<input id="exclusivePrice" type="number" min="500000" max="10000000" value="500000" required>
+<div class="price-help">Minimum UGX 500,000 • Maximum UGX 10,000,000</div>
 </div>
 
 </div>
@@ -1219,66 +598,44 @@ Minimum UGX 500,000 • Maximum UGX 10,000,000
 <h3>📜 PASONG Producer Beat Agreement</h3>
 
 <h4>1. Ownership</h4>
-<p>
-The Producer confirms that they own 100% of the beat and have the rights needed to license it through PASONG. PASONG does not take ownership of the beat.
-</p>
+<p>The Producer confirms that they own 100% of the beat and have the rights needed to license it through PASONG. PASONG does not take ownership of the beat.</p>
 
 <h4>2. Money Split</h4>
-<p>
-For every beat sale, the Producer receives 75% and PASONG receives 25%.
-</p>
+<p>For every beat sale, the Producer receives 75% and PASONG receives 25%.</p>
+
 <ul>
 <li>Example: UGX 10,000 non-exclusive licence → Producer UGX 7,500 / PASONG UGX 2,500.</li>
 <li>Example: UGX 500,000 exclusive licence → Producer UGX 375,000 / PASONG UGX 125,000.</li>
 </ul>
 
 <h4>3. Non-Exclusive Licence</h4>
-<p>
-A non-exclusive beat may be licensed to multiple buyers. There is no fixed maximum number of non-exclusive sales. Each buyer receives the licence rights attached to the package they purchase.
-</p>
+<p>A non-exclusive beat may be licensed to multiple buyers. There is no fixed maximum number of non-exclusive sales. Each buyer receives the licence rights attached to the package they purchase.</p>
 
 <h4>4. Exclusive Licence</h4>
-<p>
-When an exclusive licence is sold, PASONG will remove the beat from new sales. Existing valid non-exclusive licences granted before the exclusive sale remain valid according to their licence terms.
-</p>
-<p>
-An exclusive licence does not transfer copyright ownership unless a separate written agreement expressly transfers copyright ownership.
-</p>
+<p>When an exclusive licence is sold, PASONG will remove the beat from new sales. Existing valid non-exclusive licences granted before the exclusive sale remain valid according to their licence terms.</p>
+
+<p>An exclusive licence does not transfer copyright ownership unless a separate written agreement expressly transfers copyright ownership.</p>
 
 <h4>5. Payment</h4>
-<p>
-Producer earnings are paid to the registered MTN MoMo or Airtel Money details connected to the PASONG producer account. The minimum withdrawal amount is UGX 10,000. Payout timing is subject to PASONG processing, verification and payment-provider requirements.
-</p>
+<p>Producer earnings are paid to the registered MTN MoMo or Airtel Money details connected to the PASONG producer account. The minimum withdrawal amount is UGX 10,000. Payout timing is subject to PASONG processing, verification and payment-provider requirements.</p>
 
 <h4>6. Producer Responsibility</h4>
-<p>
-The Producer confirms that the beat is original or that the Producer has obtained all necessary rights, permissions and licences for every element used in the beat. The Producer must not upload stolen or unauthorized copyrighted material.
-</p>
+<p>The Producer confirms that the beat is original or that the Producer has obtained all necessary rights, permissions and licences for every element used in the beat. The Producer must not upload stolen or unauthorized copyrighted material.</p>
 
 <h4>7. Buyer Protection</h4>
-<p>
-A buyer may use the beat only according to the licence package purchased. Buyers may not resell or redistribute the standalone beat. Required producer credit must be given where applicable.
-</p>
+<p>A buyer may use the beat only according to the licence package purchased. Buyers may not resell or redistribute the standalone beat. Required producer credit must be given where applicable.</p>
 
 <h4>8. Free Streaming</h4>
-<p>
-PASONG may provide a free streaming version for listening. PASONG may add its streaming protection tag and advertising to the free-streaming experience. The clean licensed file supplied after payment remains separate from the protected free-streaming version.
-</p>
+<p>PASONG may provide a free streaming version for listening. PASONG may add its streaming protection tag and advertising to the free-streaming experience. The clean licensed file supplied after payment remains separate from the protected free-streaming version.</p>
 
 <h4>9. Content ID and Rights Management</h4>
-<p>
-PASONG may assist with rights-management or Content ID reporting where requested by the Producer and where the beat is eligible for such services.
-</p>
+<p>PASONG may assist with rights-management or Content ID reporting where requested by the Producer and where the beat is eligible for such services.</p>
 
 <h4>10. Beat Removal</h4>
-<p>
-The Producer may request removal of a beat from PASONG. Removing a beat does not cancel licences that were already legally granted to buyers before removal.
-</p>
+<p>The Producer may request removal of a beat from PASONG. Removing a beat does not cancel licences that were already legally granted to buyers before removal.</p>
 
 <h4>11. Digital Acceptance</h4>
-<p>
-By checking the agreement box and uploading the beat, the Producer confirms that they have read and accepted this Producer Beat Agreement and agree to the terms stated above.
-</p>
+<p>By checking the agreement box and uploading the beat, the Producer confirms that they have read and accepted this Producer Beat Agreement and agree to the terms stated above.</p>
 
 <div class="agreement-version">
 Agreement Version: PASONG-PRODUCER-BEAT-v2.0
@@ -1288,10 +645,7 @@ Agreement Version: PASONG-PRODUCER-BEAT-v2.0
 
 <div class="agreement-check">
 
-<input
-type="checkbox"
-id="agreementAccepted"
->
+<input type="checkbox" id="agreementAccepted">
 
 <label for="agreementAccepted">
 I agree: My beat is mine. I receive 75% of each beat sale and PASONG receives 25%. My beat may be licensed to multiple buyers on a non-exclusive basis with no fixed sales limit. An exclusive licence removes the beat from new sales on PASONG. PASONG keeps 100% of applicable advertising revenue from free streaming. I confirm that I have the rights needed to license my beat through PASONG.
@@ -1358,8 +712,7 @@ Current Producer Beat Store rules.
 
 <div class="rule">
 <strong>Free Streaming:</strong>
-Beats can be streamed free on PASONG for listening only.
-PASONG adds its streaming tag every 20 seconds and uses 5 ad opportunities during the streaming experience.
+Beats can be streamed free on PASONG for listening only. PASONG adds its streaming tag every 20 seconds and uses 5 ad opportunities during the streaming experience.
 </div>
 
 <div class="rule">
@@ -1436,6 +789,7 @@ Beat must be original. Stolen material is not allowed.
 </section>
 
 </div>
+
 </main>
 
 <footer>
@@ -1443,1554 +797,1076 @@ Beat must be original. Stolen material is not allowed.
 </footer>
 
 <script>
-const SUPABASE_URL =
-  "https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const API_URL="https://pasong-api.onrender.com";
+const CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload";
+const AGREEMENT_VERSION="PASONG-PRODUCER-BEAT-v2.0";
 
-const SUPABASE_KEY =
-  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const supabaseClient=window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
-const API_URL =
-  "https://pasong-api.onrender.com";
-
-const CLOUDINARY_UPLOAD_URL =
-  "https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload";
-
-const AGREEMENT_VERSION =
-  "PASONG-PRODUCER-BEAT-v2.0";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-const sections = [
-  "overview",
-  "profile",
-  "upload",
-  "my-beats",
-  "rules"
-];
-
-let currentProducerProfile = null;
+const sections=["overview","profile","upload","my-beats","rules"];
+let currentProducerProfile=null;
 
 function showSection(section){
+sections.forEach(name=>{
+const element=document.getElementById("section-"+name);
+if(element) element.classList.toggle("hidden",name!==section);
+});
 
-  sections.forEach(name => {
+document.querySelectorAll(".sidebar button").forEach(button=>{
+button.classList.toggle("active",button.dataset.section===section);
+});
 
-    const element =
-      document.getElementById(
-        "section-" + name
-      );
-
-    if(element){
-      element.classList.toggle(
-        "hidden",
-        name !== section
-      );
-    }
-
-  });
-
-  document
-    .querySelectorAll(".sidebar button")
-    .forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.section === section
-      );
-
-    });
-
-  if(section === "profile"){
-    fillProfileForm(currentProducerProfile);
-  }
-
+if(section==="profile"){
+fillProfileForm(currentProducerProfile);
+}
 }
 
-document
-  .querySelectorAll(".sidebar button")
-  .forEach(button => {
+document.querySelectorAll(".sidebar button").forEach(button=>{
+button.addEventListener("click",()=>{
+showSection(button.dataset.section);
+});
+});
 
-    button.addEventListener(
-      "click",
-      () => showSection(
-        button.dataset.section
-      )
-    );
+document.getElementById("goUpload").addEventListener("click",()=>{
+showSection("upload");
+});
 
-  });
+document.getElementById("goProfile").addEventListener("click",()=>{
+showSection("profile");
+});
 
-document
-  .getElementById("goUpload")
-  .addEventListener(
-    "click",
-    () => showSection("upload")
-  );
-
-document
-  .getElementById("goProfile")
-  .addEventListener(
-    "click",
-    () => showSection("profile")
-  );
-
-document
-  .getElementById("withdrawButton")
-  .addEventListener(
-    "click",
-    () => {
-
-      alert(
-        "MoMo withdrawal will be connected when producer payouts are ready."
-      );
-
-    }
-  );
+document.getElementById("withdrawButton").addEventListener("click",()=>{
+alert("MoMo withdrawal will be connected when producer payouts are ready.");
+});
 
 function formatUGX(value){
-
-  return "UGX " +
-    Number(value || 0)
-      .toLocaleString("en-US");
-
+return "UGX "+Number(value||0).toLocaleString("en-US");
 }
 
-function showMessage(
-  type,
-  message
-){
-
-  const box =
-    document.getElementById(
-      "formMessage"
-    );
-
-  box.className =
-    "message " + type;
-
-  box.textContent =
-    message;
-
+function showMessage(type,message){
+const box=document.getElementById("formMessage");
+box.className="message "+type;
+box.textContent=message;
 }
 
-function showProfileMessage(
-  type,
-  message
-){
-
-  const box =
-    document.getElementById(
-      "profileMessage"
-    );
-
-  box.className =
-    "message " + type;
-
-  box.textContent =
-    message;
-
+function showProfileMessage(type,message){
+const box=document.getElementById("profileMessage");
+box.className="message "+type;
+box.textContent=message;
 }
 
-function getProfileValue(
-  profile,
-  keys
+function getProfileValue(profile,keys){
+if(!profile) return "";
+
+for(const key of keys){
+if(
+profile[key]!==undefined &&
+profile[key]!==null &&
+String(profile[key]).trim()!==""
 ){
+return profile[key];
+}
+}
 
-  if(!profile){
-    return "";
-  }
-
-  for(
-    const key of keys
-  ){
-
-    if(
-      profile[key] !== undefined &&
-      profile[key] !== null &&
-      String(profile[key]).trim() !== ""
-    ){
-
-      return profile[key];
-
-    }
-
-  }
-
-  return "";
-
+return "";
 }
 
 function getProfilePicture(profile){
-
-  return getProfileValue(
-    profile,
-    [
-      "profile_photo_url",
-      "profile_picture_url",
-      "avatar_url",
-      "photo_url",
-      "image_url",
-      "profile_image"
-    ]
-  );
-
+return getProfileValue(profile,[
+"profile_photo_url",
+"profile_picture_url",
+"avatar_url",
+"photo_url",
+"image_url",
+"profile_image"
+]);
 }
 
 function getShowreel(profile){
-
-  return getProfileValue(
-    profile,
-    [
-      "showreel_url",
-      "showreel",
-      "showreel_link"
-    ]
-  );
-
+return getProfileValue(profile,[
+"showreel_url",
+"showreel",
+"showreel_link"
+]);
 }
 
 function fillProfileForm(profile){
 
-  if(!profile){
-    return;
-  }
+if(!profile) return;
 
-  const producerName =
-    profile.performing_name ||
-    profile.artist_name ||
-    profile.stage_name ||
-    profile.name ||
-    "Producer";
+const producerName=
+profile.performing_name||
+profile.artist_name||
+profile.stage_name||
+profile.name||
+"Producer";
 
-  const picture =
-    getProfilePicture(profile);
+const picture=getProfilePicture(profile);
+const showreel=getShowreel(profile);
 
-  const showreel =
-    getShowreel(profile);
+document.getElementById("profilePreviewName").textContent=producerName;
 
-  document.getElementById(
-    "profilePreviewName"
-  ).textContent =
-    producerName;
+document.getElementById("profilePreview").src=
+picture||
+"https://ui-avatars.com/api/?name="+
+encodeURIComponent(producerName)+
+"&background=171722&color=c084fc&bold=true&size=300";
 
-  document.getElementById(
-    "profilePreview"
-  ).src =
-    picture ||
-    "https://ui-avatars.com/api/?name=" +
-    encodeURIComponent(producerName) +
-    "&background=171722&color=c084fc&bold=true&size=300";
+document.getElementById("showreelUrl").value=
+showreel||"";
 
-  document.getElementById(
-    "showreelUrl"
-  ).value =
-    showreel || "";
+document.getElementById("musicStyles").value=
+getProfileValue(profile,[
+"music_styles",
+"music_style",
+"genres",
+"genre",
+"specialty",
+"specialties",
+"producer_style",
+"producer_styles"
+])||"";
 
-  document.getElementById(
-    "musicStyles"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "music_styles",
-        "music_style",
-        "genres",
-        "genre",
-        "specialty",
-        "specialties",
-        "producer_style",
-        "producer_styles"
-      ]
-    ) || "";
+document.getElementById("daws").value=
+getProfileValue(profile,[
+"daws",
+"daw",
+"software",
+"production_software",
+"production_tools"
+])||"";
 
-  document.getElementById(
-    "daws"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "daws",
-        "daw",
-        "software",
-        "production_software",
-        "production_tools"
-      ]
-    ) || "";
+document.getElementById("producerTags").value=
+getProfileValue(profile,[
+"tags",
+"producer_tags",
+"music_tags"
+])||"";
 
-  document.getElementById(
-    "producerTags"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "tags",
-        "producer_tags",
-        "music_tags"
-      ]
-    ) || "";
+document.getElementById("availability").value=
+getProfileValue(profile,[
+"availability",
+"delivery_time",
+"response_availability",
+"available"
+])||"";
 
-  document.getElementById(
-    "availability"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "availability",
-        "delivery_time",
-        "response_availability",
-        "available"
-      ]
-    ) || "";
+document.getElementById("producerLocation").value=
+getProfileValue(profile,[
+"location",
+"city",
+"producer_location"
+])||"";
 
-  document.getElementById(
-    "producerLocation"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "location",
-        "city",
-        "producer_location"
-      ]
-    ) || "Kampala";
+document.getElementById("producerBio").value=
+getProfileValue(profile,[
+"bio",
+"about",
+"description",
+"producer_bio",
+"profile_bio"
+])||"";
 
-  document.getElementById(
-    "producerBio"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "bio",
-        "about",
-        "description",
-        "producer_bio",
-        "profile_bio"
-      ]
-    ) || "";
+document.getElementById("beatLeaseServicePrice").value=
+getProfileValue(profile,[
+"beat_lease_service_price",
+"beat_lease_price",
+"lease_service_price",
+"lease_price"
+])||"";
 
-  document.getElementById(
-    "beatLeaseServicePrice"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "beat_lease_service_price",
-        "beat_lease_price",
-        "lease_service_price",
-        "lease_price"
-      ]
-    ) || "";
+document.getElementById("exclusiveServicePrice").value=
+getProfileValue(profile,[
+"exclusive_rights_service_price",
+"exclusive_service_price",
+"exclusive_rights_price",
+"exclusive_price"
+])||"";
 
-  document.getElementById(
-    "exclusiveServicePrice"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "exclusive_rights_service_price",
-        "exclusive_service_price",
-        "exclusive_rights_price",
-        "exclusive_price"
-      ]
-    ) || "";
+document.getElementById("customBeatServicePrice").value=
+getProfileValue(profile,[
+"custom_beat_service_price",
+"custom_beat_price",
+"custom_price"
+])||"";
 
-  document.getElementById(
-    "customBeatServicePrice"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "custom_beat_service_price",
-        "custom_beat_price",
-        "custom_price"
-      ]
-    ) || "";
-
-  document.getElementById(
-    "mixingServicePrice"
-  ).value =
-    getProfileValue(
-      profile,
-      [
-        "mixing_mastering_service_price",
-        "mixing_mastering_price",
-        "mixing_price",
-        "mastering_price"
-      ]
-    ) || "";
-
+document.getElementById("mixingServicePrice").value=
+getProfileValue(profile,[
+"mixing_mastering_service_price",
+"mixing_mastering_price",
+"mixing_price",
+"mastering_price"
+])||"";
 }
 
 async function loadProducer(){
 
-  const {
-    data: {
-      user
-    }
-  } =
-    await supabaseClient.auth.getUser();
+const {
+data:{user},
+error:userError
+}=await supabaseClient.auth.getUser();
 
-  if(!user){
+if(userError) throw userError;
 
-    document.getElementById(
-      "accountName"
-    ).textContent =
-      "Not logged in";
+if(!user){
 
-    document.getElementById(
-      "heroProducerName"
-    ).textContent =
-      "Producer";
+document.getElementById("accountName").textContent="Not logged in";
+document.getElementById("heroProducerName").textContent="Producer";
+document.getElementById("welcomeName").textContent="Producer";
 
-    document.getElementById(
-      "welcomeName"
-    ).textContent =
-      "Producer";
+return null;
+}
 
-    return null;
+const {
+data:profile,
+error:profileError
+}=await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("user_id",user.id)
+.maybeSingle();
 
-  }
+if(profileError) throw profileError;
 
-  const {
-    data: profile
-  } =
-    await supabaseClient
-      .from("artist_profiles")
-      .select("*")
-      .eq(
-        "user_id",
-        user.id
-      )
-      .maybeSingle();
+if(!profile){
 
-  if(!profile){
+document.getElementById("accountName").textContent=
+user.email||"Producer";
 
-    document.getElementById(
-      "accountName"
-    ).textContent =
-      user.email || "Producer";
+return null;
+}
 
-    return null;
+const producerName=
+profile.performing_name||
+profile.artist_name||
+profile.stage_name||
+profile.name||
+"Producer";
 
-  }
+currentProducerProfile=profile;
 
-  const producerName =
-    profile.performing_name ||
-    profile.artist_name ||
-    profile.stage_name ||
-    profile.name ||
-    "Producer";
+document.getElementById("accountName").textContent=producerName;
+document.getElementById("heroProducerName").textContent=producerName;
+document.getElementById("welcomeName").textContent=producerName;
 
-  currentProducerProfile =
-    profile;
+fillProfileForm(profile);
 
-  document.getElementById(
-    "accountName"
-  ).textContent =
-    producerName;
+return profile;
+}
 
-  document.getElementById(
-    "heroProducerName"
-  ).textContent =
-    producerName;
+async function uploadProducerProfilePicture(file,accessToken){
 
-  document.getElementById(
-    "welcomeName"
-  ).textContent =
-    producerName;
+return await uploadToCloudinary(
+file,
+"pasong-producers/profile",
+accessToken
+);
+}
 
-  fillProfileForm(profile);
+document.getElementById("profilePhoto").addEventListener(
+"change",
+event=>{
 
-  return profile;
+const file=event.target.files[0];
+
+if(!file) return;
+
+document.getElementById("profilePreview").src=
+URL.createObjectURL(file);
+
+}
+);
+
+document.getElementById("profileForm").addEventListener(
+"submit",
+async event=>{
+
+event.preventDefault();
+
+const saveButton=
+document.getElementById("saveProfileButton");
+
+saveButton.disabled=true;
+saveButton.textContent="Saving...";
+
+try{
+
+const {
+data:{user},
+error:userError
+}=await supabaseClient.auth.getUser();
+
+if(userError) throw userError;
+
+if(!user){
+throw new Error(
+"Please log in before editing your producer profile."
+);
+}
+
+let profile=currentProducerProfile;
+
+if(!profile){
+
+const {
+data:foundProfile,
+error:profileError
+}=await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("user_id",user.id)
+.maybeSingle();
+
+if(profileError) throw profileError;
+
+profile=foundProfile;
+currentProducerProfile=profile;
+}
+
+if(!profile){
+throw new Error("Producer profile was not found.");
+}
+
+let profilePhotoUrl=getProfilePicture(profile);
+
+const photoFile=
+document.getElementById("profilePhoto").files[0];
+
+if(photoFile){
+
+saveButton.textContent="Uploading Picture...";
+
+const {
+data:{session},
+error:sessionError
+}=await supabaseClient.auth.getSession();
+
+if(sessionError) throw sessionError;
+
+if(!session){
+throw new Error(
+"Your login session has expired. Please log in again."
+);
+}
+
+profilePhotoUrl=
+await uploadProducerProfilePicture(
+photoFile,
+session.access_token
+);
+}
+
+const updateData={
+
+music_styles:
+document.getElementById("musicStyles").value.trim()||null,
+
+daws:
+document.getElementById("daws").value.trim()||null,
+
+tags:
+document.getElementById("producerTags").value.trim()||null,
+
+availability:
+document.getElementById("availability").value.trim()||null,
+
+location:
+document.getElementById("producerLocation").value.trim()||null,
+
+bio:
+document.getElementById("producerBio").value.trim()||null,
+
+showreel_url:
+document.getElementById("showreelUrl").value.trim()||null,
+
+profile_photo_url:
+profilePhotoUrl||null,
+
+beat_lease_service_price:
+document.getElementById("beatLeaseServicePrice").value
+?Number(document.getElementById("beatLeaseServicePrice").value)
+:null,
+
+exclusive_rights_service_price:
+document.getElementById("exclusiveServicePrice").value
+?Number(document.getElementById("exclusiveServicePrice").value)
+:null,
+
+custom_beat_service_price:
+document.getElementById("customBeatServicePrice").value
+?Number(document.getElementById("customBeatServicePrice").value)
+:null,
+
+mixing_mastering_service_price:
+document.getElementById("mixingServicePrice").value
+?Number(document.getElementById("mixingServicePrice").value)
+:null
+
+};
+
+saveButton.textContent="Saving Profile...";
+
+const {
+error:updateError
+}=await supabaseClient
+.from("artist_profiles")
+.update(updateData)
+.eq("id",profile.id);
+
+if(updateError) throw updateError;
+
+const {
+data:updatedProfile,
+error:reloadError
+}=await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("id",profile.id)
+.maybeSingle();
+
+if(reloadError) throw reloadError;
+
+if(!updatedProfile){
+throw new Error(
+"Profile was updated, but PASONG could not reload the profile."
+);
+}
+
+currentProducerProfile=updatedProfile;
+
+fillProfileForm(updatedProfile);
+
+document.getElementById("profilePhoto").value="";
+
+showProfileMessage(
+"success",
+"Public Producer Profile saved successfully."
+);
+
+}catch(error){
+
+console.error("Producer profile save error:",error);
+
+let message=
+error?.message||
+"Unable to save producer profile.";
+
+if(message==="Failed to fetch"){
+message=
+"Connection to PASONG could not be completed. Please check your internet connection and try Save Public Profile again.";
+}
+
+showProfileMessage("error",message);
+
+}finally{
+
+saveButton.disabled=false;
+saveButton.textContent="Save Public Profile";
 
 }
 
-async function uploadProducerProfilePicture(
-  file,
-  accessToken
-){
+}
+);
 
-  return await uploadToCloudinary(
-    file,
-    "pasong-producers/profile",
-    accessToken
-  );
+document.getElementById("clearProfileForm").addEventListener(
+"click",
+()=>{
 
+if(currentProducerProfile){
+fillProfileForm(currentProducerProfile);
 }
 
-document
-  .getElementById("profilePhoto")
-  .addEventListener(
-    "change",
-    event => {
+document.getElementById("profilePhoto").value="";
 
-      const file =
-        event.target.files[0];
+document.getElementById("profileMessage").className="message";
 
-      if(!file){
-        return;
-      }
-
-      const preview =
-        document.getElementById(
-          "profilePreview"
-        );
-
-      preview.src =
-        URL.createObjectURL(file);
-
-    }
-  );
-
-document
-  .getElementById("profileForm")
-  .addEventListener(
-    "submit",
-    async event => {
-
-      event.preventDefault();
-
-      if(!currentProducerProfile){
-
-        showProfileMessage(
-          "error",
-          "Please log in before editing your producer profile."
-        );
-
-        return;
-
-      }
-
-      const {
-        data: sessionData,
-        error: sessionError
-      } =
-        await supabaseClient.auth.getSession();
-
-      if(sessionError){
-
-        showProfileMessage(
-          "error",
-          sessionError.message
-        );
-
-        return;
-
-      }
-
-      const session =
-        sessionData.session;
-
-      if(!session){
-
-        showProfileMessage(
-          "error",
-          "Your login session has expired. Please log in again."
-        );
-
-        return;
-
-      }
-
-      const saveButton =
-        document.getElementById(
-          "saveProfileButton"
-        );
-
-      saveButton.disabled =
-        true;
-
-      saveButton.textContent =
-        "Saving...";
-
-      try{
-
-        let profilePhotoUrl =
-          getProfilePicture(
-            currentProducerProfile
-          );
-
-        const photoFile =
-          document.getElementById(
-            "profilePhoto"
-          ).files[0];
-
-        if(photoFile){
-
-          saveButton.textContent =
-            "Uploading Picture...";
-
-          profilePhotoUrl =
-            await uploadProducerProfilePicture(
-              photoFile,
-              session.access_token
-            );
-
-        }
-
-        const updateData = {
-
-          music_styles:
-            document.getElementById(
-              "musicStyles"
-            ).value.trim() || null,
-
-          daws:
-            document.getElementById(
-              "daws"
-            ).value.trim() || null,
-
-          tags:
-            document.getElementById(
-              "producerTags"
-            ).value.trim() || null,
-
-          availability:
-            document.getElementById(
-              "availability"
-            ).value.trim() || null,
-
-          location:
-            document.getElementById(
-              "producerLocation"
-            ).value.trim() || null,
-
-          bio:
-            document.getElementById(
-              "producerBio"
-            ).value.trim() || null,
-
-          showreel_url:
-            document.getElementById(
-              "showreelUrl"
-            ).value.trim() || null,
-
-          profile_photo_url:
-            profilePhotoUrl || null,
-
-          beat_lease_service_price:
-            document.getElementById(
-              "beatLeaseServicePrice"
-            ).value
-              ? Number(
-                  document.getElementById(
-                    "beatLeaseServicePrice"
-                  ).value
-                )
-              : null,
-
-          exclusive_rights_service_price:
-            document.getElementById(
-              "exclusiveServicePrice"
-            ).value
-              ? Number(
-                  document.getElementById(
-                    "exclusiveServicePrice"
-                  ).value
-                )
-              : null,
-
-          custom_beat_service_price:
-            document.getElementById(
-              "customBeatServicePrice"
-            ).value
-              ? Number(
-                  document.getElementById(
-                    "customBeatServicePrice"
-                  ).value
-                )
-              : null,
-
-          mixing_mastering_service_price:
-            document.getElementById(
-              "mixingServicePrice"
-            ).value
-              ? Number(
-                  document.getElementById(
-                    "mixingServicePrice"
-                  ).value
-                )
-              : null
-
-        };
-
-        saveButton.textContent =
-          "Saving Profile...";
-
-        const {
-          data: updatedProfile,
-          error
-        } =
-          await supabaseClient
-            .from("artist_profiles")
-            .update(
-              updateData
-            )
-            .eq(
-              "id",
-              currentProducerProfile.id
-            )
-            .select()
-            .single();
-
-        if(error){
-
-          throw error;
-
-        }
-
-        currentProducerProfile =
-          updatedProfile;
-
-        fillProfileForm(
-          updatedProfile
-        );
-
-        showProfileMessage(
-          "success",
-          "Public Producer Profile saved successfully."
-        );
-
-      }catch(error){
-
-        console.error(
-          "Producer profile save error:",
-          error
-        );
-
-        showProfileMessage(
-          "error",
-          error.message ||
-          "Unable to save producer profile."
-        );
-
-      }finally{
-
-        saveButton.disabled =
-          false;
-
-        saveButton.textContent =
-          "Save Public Profile";
-
-      }
-
-    }
-  );
-
-document
-  .getElementById("clearProfileForm")
-  .addEventListener(
-    "click",
-    () => {
-
-      if(currentProducerProfile){
-
-        fillProfileForm(
-          currentProducerProfile
-        );
-
-      }
-
-      document.getElementById(
-        "profilePhoto"
-      ).value = "";
-
-      document.getElementById(
-        "profileMessage"
-      ).className =
-        "message";
-
-    }
-  );
+}
+);
 
 async function loadBeats(){
 
-  const profile =
-    await loadProducer();
+try{
 
-  if(!profile){
+const profile=await loadProducer();
 
-    renderBeats([]);
+if(!profile){
 
-    return;
+renderBeats([]);
 
-  }
+return;
+}
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("beats")
-      .select("*")
-      .eq(
-        "producer_id",
-        profile.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
+const {
+data,
+error
+}=await supabaseClient
+.from("beats")
+.select("*")
+.eq("producer_id",profile.id)
+.order("created_at",{ascending:false});
 
-  if(error){
+if(error) throw error;
 
-    console.error(
-      "Beat loading error:",
-      error
-    );
+renderBeats(data||[]);
 
-    renderBeats([]);
+}catch(error){
 
-    return;
+console.error("Dashboard loading error:",error);
 
-  }
+renderBeats([]);
 
-  renderBeats(
-    data || []
-  );
-
+}
 }
 
 function renderBeats(beats){
 
-  const grid =
-    document.getElementById(
-      "beatsGrid"
-    );
+const grid=document.getElementById("beatsGrid");
 
-  document.getElementById(
-    "statBeats"
-  ).textContent =
-    beats.length;
+document.getElementById("statBeats").textContent=
+beats.length;
 
-  document.getElementById(
-    "statPublished"
-  ).textContent =
-    beats.filter(
-      beat =>
-        beat.status === "approved" ||
-        beat.status === "published"
-    ).length;
+document.getElementById("statPublished").textContent=
+beats.filter(
+beat=>
+beat.status==="approved"||
+beat.status==="published"
+).length;
 
-  document.getElementById(
-    "statExclusive"
-  ).textContent =
-    beats.filter(
-      beat =>
-        beat.is_exclusive_sold
-    ).length;
+document.getElementById("statExclusive").textContent=
+beats.filter(
+beat=>beat.is_exclusive_sold
+).length;
 
-  if(!beats.length){
+if(!beats.length){
 
-    grid.innerHTML = `
-      <div class="empty">
-        No beats uploaded yet.
-      </div>
-    `;
+grid.innerHTML=
+`<div class="empty">No beats uploaded yet.</div>`;
 
-    return;
+return;
+}
 
-  }
+grid.innerHTML=beats.map(beat=>{
 
-  grid.innerHTML =
-    beats.map(
-      beat => {
+const cover=
+beat.cover_url||
+"https://via.placeholder.com/600x600/160d24/c084fc?text=PASONG+BEAT";
 
-        const cover =
-          beat.cover_url ||
-          "https://via.placeholder.com/600x600/160d24/c084fc?text=PASONG+BEAT";
+return`
 
-        return `
-          <article class="beat-card">
+<article class="beat-card">
 
-            <img
-              class="beat-cover"
-              src="${escapeHtml(cover)}"
-              alt=""
-            >
+<img
+class="beat-cover"
+src="${escapeHtml(cover)}"
+alt=""
+>
 
-            <div class="beat-info">
+<div class="beat-info">
 
-              <div class="beat-title">
-                ${escapeHtml(
-                  beat.title ||
-                  "Untitled Beat"
-                )}
-              </div>
+<div class="beat-title">
+${escapeHtml(beat.title||"Untitled Beat")}
+</div>
 
-              <div class="beat-meta">
-                ${escapeHtml(
-                  beat.genre ||
-                  "Genre not set"
-                )}
-                ${beat.bpm ? " • " + escapeHtml(beat.bpm) + " BPM" : ""}
-                ${beat.musical_key ? " • " + escapeHtml(beat.musical_key) : ""}
-                <br>
-                MP3 Lease:
-                ${formatUGX(beat.lease_mp3_price)}
-                <br>
-                WAV Lease:
-                ${formatUGX(beat.lease_wav_price)}
-                <br>
-                Stems:
-                ${formatUGX(beat.stems_price)}
-                <br>
-                Exclusive:
-                ${formatUGX(beat.exclusive_price)}
-              </div>
+<div class="beat-meta">
 
-              <div class="beat-status">
-                ${escapeHtml(
-                  beat.is_exclusive_sold
-                    ? "Exclusive Sold"
-                    : beat.status || "Pending"
-                )}
-              </div>
+${escapeHtml(beat.genre||"Genre not set")}
 
-            </div>
+${beat.bpm
+?" • "+escapeHtml(beat.bpm)+" BPM"
+:""}
 
-          </article>
-        `;
+${beat.musical_key
+?" • "+escapeHtml(beat.musical_key)
+:""}
 
-      }
-    )
-    .join("");
+<br>
+
+MP3 Lease:
+${formatUGX(beat.lease_mp3_price)}
+
+<br>
+
+WAV Lease:
+${formatUGX(beat.lease_wav_price)}
+
+<br>
+
+Stems:
+${formatUGX(beat.stems_price)}
+
+<br>
+
+Exclusive:
+${formatUGX(beat.exclusive_price)}
+
+</div>
+
+<div class="beat-status">
+
+${escapeHtml(
+beat.is_exclusive_sold
+?"Exclusive Sold"
+:beat.status||"Pending"
+)}
+
+</div>
+
+</div>
+
+</article>
+
+`;
+
+}).join("");
 
 }
 
 function escapeHtml(value){
 
-  return String(
-    value ?? ""
-  )
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+return String(value??"")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
 }
 
 function validatePrices(){
 
-  const prices = [
-    {
-      id:"leaseMp3",
-      min:10000,
-      max:1500000
-    },
-    {
-      id:"leaseWav",
-      min:10000,
-      max:1500000
-    },
-    {
-      id:"stemsPrice",
-      min:10000,
-      max:1500000
-    },
-    {
-      id:"exclusivePrice",
-      min:500000,
-      max:10000000
-    }
-  ];
+const prices=[
 
-  for(
-    const price of prices
-  ){
+{
+id:"leaseMp3",
+min:10000,
+max:1500000
+},
 
-    const input =
-      document.getElementById(
-        price.id
-      );
+{
+id:"leaseWav",
+min:10000,
+max:1500000
+},
 
-    const value =
-      Number(input.value);
+{
+id:"stemsPrice",
+min:10000,
+max:1500000
+},
 
-    if(
-      !Number.isFinite(value) ||
-      value < price.min ||
-      value > price.max
-    ){
+{
+id:"exclusivePrice",
+min:500000,
+max:10000000
+}
 
-      return false;
+];
 
-    }
+for(const price of prices){
 
-  }
+const input=document.getElementById(price.id);
+const value=Number(input.value);
 
-  return true;
+if(
+!Number.isFinite(value)||
+value<price.min||
+value>price.max
+){
 
+return false;
+
+}
+
+}
+
+return true;
 }
 
 async function uploadToCloudinary(
-  file,
-  folder,
-  accessToken
+file,
+folder,
+accessToken
 ){
 
-  const signatureResponse =
-    await fetch(
-      API_URL +
-      "/api/cloudinary/signature",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":
-            "application/json",
-          "Authorization":
-            "Bearer " +
-            accessToken
-        },
-        body:
-          JSON.stringify({
-            folder:
-              folder
-          })
-      }
-    );
+const signatureResponse=
+await fetch(
+API_URL+"/api/cloudinary/signature",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+accessToken
+},
+body:JSON.stringify({folder})
+}
+);
 
-  const signatureData =
-    await signatureResponse.json();
+const signatureData=
+await signatureResponse.json();
 
-  if(
-    !signatureResponse.ok
-  ){
+if(!signatureResponse.ok){
 
-    throw new Error(
-      signatureData.error ||
-      "Could not prepare Cloudinary upload."
-    );
-
-  }
-
-  const formData =
-    new FormData();
-
-  formData.append(
-    "file",
-    file
-  );
-
-  formData.append(
-    "api_key",
-    signatureData.api_key
-  );
-
-  formData.append(
-    "timestamp",
-    signatureData.timestamp
-  );
-
-  formData.append(
-    "signature",
-    signatureData.signature
-  );
-
-  formData.append(
-    "folder",
-    signatureData.folder
-  );
-
-  const uploadResponse =
-    await fetch(
-      CLOUDINARY_UPLOAD_URL,
-      {
-        method:"POST",
-        body:formData
-      }
-    );
-
-  const uploadData =
-    await uploadResponse.json();
-
-  if(
-    !uploadResponse.ok
-  ){
-
-    throw new Error(
-      uploadData.error?.message ||
-      "Cloudinary upload failed."
-    );
-
-  }
-
-  if(
-    !uploadData.secure_url
-  ){
-
-    throw new Error(
-      "Cloudinary did not return a file URL."
-    );
-
-  }
-
-  return uploadData.secure_url;
+throw new Error(
+signatureData.error||
+"Could not prepare Cloudinary upload."
+);
 
 }
 
-const agreementAccepted =
-  document.getElementById(
-    "agreementAccepted"
-  );
+const formData=new FormData();
 
-const uploadButton =
-  document.getElementById(
-    "uploadButton"
-  );
+formData.append("file",file);
+formData.append("api_key",signatureData.api_key);
+formData.append("timestamp",signatureData.timestamp);
+formData.append("signature",signatureData.signature);
+formData.append("folder",signatureData.folder);
 
-agreementAccepted.addEventListener(
-  "change",
-  () => {
-
-    uploadButton.disabled =
-      !agreementAccepted.checked;
-
-  }
+const uploadResponse=
+await fetch(
+CLOUDINARY_UPLOAD_URL,
+{
+method:"POST",
+body:formData
+}
 );
 
-document
-  .getElementById("beatForm")
-  .addEventListener(
-    "submit",
-    async event => {
+const uploadData=
+await uploadResponse.json();
 
-      event.preventDefault();
+if(!uploadResponse.ok){
 
-      if(!agreementAccepted.checked){
+throw new Error(
+uploadData.error?.message||
+"Cloudinary upload failed."
+);
 
-        showMessage(
-          "error",
-          "You must read and accept the Producer Beat Agreement before uploading."
-        );
+}
 
-        return;
+if(!uploadData.secure_url){
 
-      }
+throw new Error(
+"Cloudinary did not return a file URL."
+);
 
-      const profile =
-        await loadProducer();
+}
 
-      if(!profile){
+return uploadData.secure_url;
+}
 
-        showMessage(
-          "error",
-          "Please log in before uploading a beat."
-        );
+const agreementAccepted=
+document.getElementById("agreementAccepted");
 
-        return;
+const uploadButton=
+document.getElementById("uploadButton");
 
-      }
+agreementAccepted.addEventListener(
+"change",
+()=>{
+uploadButton.disabled=
+!agreementAccepted.checked;
+}
+);
 
-      if(!validatePrices()){
+document.getElementById("beatForm").addEventListener(
+"submit",
+async event=>{
 
-        showMessage(
-          "error",
-          "Please enter prices within the allowed PASONG ranges."
-        );
+event.preventDefault();
 
-        return;
+if(!agreementAccepted.checked){
 
-      }
+showMessage(
+"error",
+"You must read and accept the Producer Beat Agreement before uploading."
+);
 
-      const title =
-        document.getElementById(
-          "beatTitle"
-        ).value.trim();
+return;
+}
 
-      const genre =
-        document.getElementById(
-          "genre"
-        ).value.trim();
+const profile=await loadProducer();
 
-      const bpm =
-        document.getElementById(
-          "bpm"
-        ).value;
+if(!profile){
 
-      const musicalKey =
-        document.getElementById(
-          "musicalKey"
-        ).value.trim();
+showMessage(
+"error",
+"Please log in before uploading a beat."
+);
 
-      const audioFile =
-        document.getElementById(
-          "audio"
-        ).files[0];
+return;
+}
 
-      const coverFile =
-        document.getElementById(
-          "cover"
-        ).files[0];
+if(!validatePrices()){
 
-      if(!title || !audioFile){
+showMessage(
+"error",
+"Please enter prices within the allowed PASONG ranges."
+);
 
-        showMessage(
-          "error",
-          "Beat title and clean beat file are required."
-        );
+return;
+}
 
-        return;
+const title=
+document.getElementById("beatTitle").value.trim();
 
-      }
+const genre=
+document.getElementById("genre").value.trim();
 
-      uploadButton.disabled =
-        true;
+const bpm=
+document.getElementById("bpm").value;
 
-      try{
+const musicalKey=
+document.getElementById("musicalKey").value.trim();
 
-        const {
-          data: sessionData,
-          error: sessionError
-        } =
-          await supabaseClient.auth.getSession();
+const audioFile=
+document.getElementById("audio").files[0];
 
-        if(sessionError){
+const coverFile=
+document.getElementById("cover").files[0];
 
-          throw sessionError;
+if(!title||!audioFile){
 
-        }
-
-        const session =
-          sessionData.session;
-
-        if(!session){
-
-          throw new Error(
-            "Your login session has expired. Please log in again."
-          );
-
-        }
-
-        const accessToken =
-          session.access_token;
-
-        uploadButton.textContent =
-          "Uploading Beat...";
-
-        const audioUrl =
-          await uploadToCloudinary(
-            audioFile,
-            "pasong-beats/audio",
-            accessToken
-          );
-
-        let coverUrl =
-          null;
-
-        if(coverFile){
-
-          uploadButton.textContent =
-            "Uploading Cover...";
-
-          coverUrl =
-            await uploadToCloudinary(
-              coverFile,
-              "pasong-beats/covers",
-              accessToken
-            );
-
-        }
-
-        uploadButton.textContent =
-          "Saving Beat...";
-
-        const beatResponse =
-          await fetch(
-            API_URL +
-            "/api/beats/create",
-            {
-              method:"POST",
-              headers:{
-                "Content-Type":
-                  "application/json",
-                "Authorization":
-                  "Bearer " +
-                  accessToken
-              },
-              body:
-                JSON.stringify({
-
-                  title:
-                    title,
+showMessage(
+"error",
+"Beat title and clean beat file are required."
+);
 
-                  genre:
-                    genre ||
-                    null,
+return;
+}
 
-                  bpm:
-                    bpm
-                      ? Number(bpm)
-                      : null,
-
-                  musical_key:
-                    musicalKey ||
-                    null,
-
-                  audio_url:
-                    audioUrl,
+uploadButton.disabled=true;
 
-                  cover_url:
-                    coverUrl,
+try{
 
-                  lease_mp3_price:
-                    Number(
-                      document.getElementById(
-                        "leaseMp3"
-                      ).value
-                    ),
+const {
+data:sessionData,
+error:sessionError
+}=await supabaseClient.auth.getSession();
 
-                  lease_wav_price:
-                    Number(
-                      document.getElementById(
-                        "leaseWav"
-                      ).value
-                    ),
+if(sessionError) throw sessionError;
 
-                  stems_price:
-                    Number(
-                      document.getElementById(
-                        "stemsPrice"
-                      ).value
-                    ),
+const session=sessionData.session;
 
-                  exclusive_price:
-                    Number(
-                      document.getElementById(
-                        "exclusivePrice"
-                      ).value
-                    )
+if(!session){
 
-                })
-            }
-          );
+throw new Error(
+"Your login session has expired. Please log in again."
+);
 
-        const beatData =
-          await beatResponse.json();
+}
 
-        if(!beatResponse.ok){
+const accessToken=session.access_token;
 
-          throw new Error(
-            beatData.error ||
-            "Unable to save beat."
-          );
+uploadButton.textContent="Uploading Beat...";
 
-        }
+const audioUrl=
+await uploadToCloudinary(
+audioFile,
+"pasong-beats/audio",
+accessToken
+);
 
-        const beat =
-          beatData.beat ||
-          beatData.data ||
-          beatData;
+let coverUrl=null;
 
-        const beatId =
-          beat?.id;
+if(coverFile){
 
-        if(!beatId){
+uploadButton.textContent="Uploading Cover...";
 
-          throw new Error(
-            "Beat was created, but PASONG did not return the beat ID needed to save the agreement."
-          );
+coverUrl=
+await uploadToCloudinary(
+coverFile,
+"pasong-beats/covers",
+accessToken
+);
 
-        }
+}
 
-        uploadButton.textContent =
-          "Saving Agreement...";
+uploadButton.textContent="Saving Beat...";
 
-        const {
-          data: {
-            user
-          },
-          error: userError
-        } =
-          await supabaseClient.auth.getUser();
+const beatResponse=
+await fetch(
+API_URL+"/api/beats/create",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+accessToken
+},
+body:JSON.stringify({
 
-        if(userError){
+title:title,
 
-          throw userError;
+genre:genre||null,
 
-        }
+bpm:bpm?Number(bpm):null,
 
-        if(!user){
+musical_key:musicalKey||null,
 
-          throw new Error(
-            "Unable to verify your account for the agreement."
-          );
+audio_url:audioUrl,
 
-        }
+cover_url:coverUrl,
 
-        const {
-          error: agreementError
-        } =
-          await supabaseClient
-            .from("upload_agreements")
-            .insert({
+lease_mp3_price:
+Number(
+document.getElementById("leaseMp3").value
+),
 
-              user_id:
-                user.id,
+lease_wav_price:
+Number(
+document.getElementById("leaseWav").value
+),
 
-              beat_id:
-                beatId,
+stems_price:
+Number(
+document.getElementById("stemsPrice").value
+),
 
-              song_id:
-                null,
+exclusive_price:
+Number(
+document.getElementById("exclusivePrice").value
+)
 
-              agreement_version:
-                AGREEMENT_VERSION,
+})
+}
+);
 
-              agreed:
-                true,
+const beatData=
+await beatResponse.json();
 
-              agreed_at:
-                new Date().toISOString(),
+if(!beatResponse.ok){
 
-              agreement_type:
-                "producer_beat",
+throw new Error(
+beatData.error||
+"Unable to save beat."
+);
 
-              accepted_at:
-                new Date().toISOString()
+}
 
-            });
+const beat=
+beatData.beat||
+beatData.data||
+beatData;
 
-        if(agreementError){
+const beatId=beat?.id;
 
-          throw new Error(
-            "Beat was created, but the Producer Agreement could not be saved. Please contact PASONG support before uploading again."
-          );
+if(!beatId){
 
-        }
+throw new Error(
+"Beat was created, but PASONG did not return the beat ID needed to save the agreement."
+);
 
-        console.log(
-          "Beat created:",
-          beatData
-        );
+}
 
-        console.log(
-          "Producer agreement saved:",
-          beatId
-        );
+uploadButton.textContent="Saving Agreement...";
 
-        showMessage(
-          "success",
-          "Beat uploaded successfully and Producer Agreement accepted."
-        );
+const {
+data:{user},
+error:userError
+}=await supabaseClient.auth.getUser();
 
-        document
-          .getElementById(
-            "beatForm"
-          )
-          .reset();
+if(userError) throw userError;
 
-        document.getElementById(
-          "leaseMp3"
-        ).value =
-          "10000";
+if(!user){
 
-        document.getElementById(
-          "leaseWav"
-        ).value =
-          "10000";
-
-        document.getElementById(
-          "stemsPrice"
-        ).value =
-          "10000";
-
-        document.getElementById(
-          "exclusivePrice"
-        ).value =
-          "500000";
-
-        agreementAccepted.checked =
-          false;
-
-        uploadButton.disabled =
-          true;
-
-        await loadBeats();
-
-      }catch(error){
-
-        console.error(
-          "Beat upload error:",
-          error
-        );
-
-        showMessage(
-          "error",
-          error.message ||
-          "Unable to upload beat."
-        );
-
-      }finally{
-
-        uploadButton.textContent =
-          "Upload Beat";
-
-        if(
-          agreementAccepted.checked
-        ){
-          uploadButton.disabled =
-            false;
-        }else{
-          uploadButton.disabled =
-            true;
-        }
-
-      }
-
-    }
-  );
-
-document
-  .getElementById("clearForm")
-  .addEventListener(
-    "click",
-    () => {
-
-      document
-        .getElementById(
-          "beatForm"
-        )
-        .reset();
-
-      document.getElementById(
-        "leaseMp3"
-      ).value =
-        "10000";
-
-      document.getElementById(
-        "leaseWav"
-      ).value =
-        "10000";
-
-      document.getElementById(
-        "stemsPrice"
-      ).value =
-        "10000";
-
-      document.getElementById(
-        "exclusivePrice"
-      ).value =
-        "500000";
-
-      agreementAccepted.checked =
-        false;
-
-      uploadButton.disabled =
-        true;
-
-      document.getElementById(
-        "formMessage"
-      ).className =
-        "message";
-
-    }
-  );
+throw new Error(
+"Unable to verify your account for the agreement."
+);
+
+}
+
+const {
+error:agreementError
+}=await supabaseClient
+.from("upload_agreements")
+.insert({
+
+user_id:user.id,
+
+beat_id:beatId,
+
+song_id:null,
+
+agreement_version:AGREEMENT_VERSION,
+
+agreed:true,
+
+agreed_at:new Date().toISOString(),
+
+agreement_type:"producer_beat",
+
+accepted_at:new Date().toISOString()
+
+});
+
+if(agreementError){
+
+throw new Error(
+"Beat was created, but the Producer Agreement could not be saved. Please contact PASONG support before uploading again."
+);
+
+}
+
+showMessage(
+"success",
+"Beat uploaded successfully and Producer Agreement accepted."
+);
+
+document.getElementById("beatForm").reset();
+
+document.getElementById("leaseMp3").value="10000";
+document.getElementById("leaseWav").value="10000";
+document.getElementById("stemsPrice").value="10000";
+document.getElementById("exclusivePrice").value="500000";
+
+agreementAccepted.checked=false;
+uploadButton.disabled=true;
+
+await loadBeats();
+
+}catch(error){
+
+console.error("Beat upload error:",error);
+
+showMessage(
+"error",
+error.message||"Unable to upload beat."
+);
+
+}finally{
+
+uploadButton.textContent="Upload Beat";
+
+uploadButton.disabled=
+!agreementAccepted.checked;
+
+}
+
+}
+);
+
+document.getElementById("clearForm").addEventListener(
+"click",
+()=>{
+
+document.getElementById("beatForm").reset();
+
+document.getElementById("leaseMp3").value="10000";
+document.getElementById("leaseWav").value="10000";
+document.getElementById("stemsPrice").value="10000";
+document.getElementById("exclusivePrice").value="500000";
+
+agreementAccepted.checked=false;
+
+uploadButton.disabled=true;
+
+document.getElementById("formMessage").className="message";
+
+}
+);
 
 loadBeats();
 </script>
