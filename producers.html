@@ -765,6 +765,7 @@ const beatGrid = document.getElementById("beatGrid");
 const beatStatus = document.getElementById("beatStatus");
 const producerSearch = document.getElementById("producerSearch");
 const creditsGrid = document.getElementById("creditsGrid");
+const followBtn = document.getElementById("followBtn");
 
 producerNameEl.textContent = producerName;
 beatStoreProducer.textContent = producerName;
@@ -1451,6 +1452,8 @@ renderProducerSetup(
 producerProfile
 );
 
+await loadFollowState();
+
 }
 
 if(!producerProfile){
@@ -1667,6 +1670,210 @@ encodeURIComponent(body);
 
 }
 
+async function loadFollowState(){
+
+if(!producerProfile){
+return;
+}
+
+const {
+data:{user}
+} =
+await supabaseClient.auth.getUser();
+
+if(!user){
+
+followBtn.textContent = "Follow";
+return;
+
+}
+
+const {data,error} =
+await supabaseClient
+.from("producer_follows")
+.select("id")
+.eq("producer_id",producerProfile.id)
+.eq("follower_id",user.id)
+.maybeSingle();
+
+if(error){
+
+console.error(
+"Follow state error:",
+error
+);
+
+followBtn.textContent = "Follow";
+return;
+
+}
+
+followBtn.textContent =
+data
+? "Following"
+: "Follow";
+
+}
+
+async function toggleFollow(){
+
+if(!producerProfile){
+
+alert(
+"Producer profile could not be found."
+);
+
+return;
+
+}
+
+const {
+data:{user}
+} =
+await supabaseClient.auth.getUser();
+
+if(!user){
+
+alert(
+"Please login to follow this producer."
+);
+
+window.location.href =
+"login.html";
+
+return;
+
+}
+
+followBtn.disabled = true;
+
+const {data:existing,error:findError} =
+await supabaseClient
+.from("producer_follows")
+.select("id")
+.eq("producer_id",producerProfile.id)
+.eq("follower_id",user.id)
+.maybeSingle();
+
+if(findError){
+
+console.error(
+"Follow lookup error:",
+findError
+);
+
+alert(
+"Unable to check follow status right now."
+);
+
+followBtn.disabled = false;
+
+return;
+
+}
+
+if(existing){
+
+const {error} =
+await supabaseClient
+.from("producer_follows")
+.delete()
+.eq("id",existing.id);
+
+if(error){
+
+console.error(
+"Unfollow error:",
+error
+);
+
+alert(
+"Unable to unfollow this producer right now."
+);
+
+followBtn.disabled = false;
+
+return;
+
+}
+
+followBtn.textContent = "Follow";
+
+}else{
+
+const {error} =
+await supabaseClient
+.from("producer_follows")
+.insert({
+producer_id:producerProfile.id,
+follower_id:user.id
+});
+
+if(error){
+
+console.error(
+"Follow error:",
+error
+);
+
+alert(
+"Unable to follow this producer right now."
+);
+
+followBtn.disabled = false;
+
+return;
+
+}
+
+followBtn.textContent = "Following";
+
+}
+
+followBtn.disabled = false;
+
+}
+
+function openProducerShowreel(){
+
+if(!producerProfile){
+
+alert(
+"Producer profile could not be found."
+);
+
+return;
+
+}
+
+const showreel =
+firstValue(
+producerProfile,
+[
+"showreel_url",
+"showreel",
+"showreel_link"
+],
+""
+);
+
+if(!showreel){
+
+alert(
+"This producer has not added a showreel yet."
+);
+
+return;
+
+}
+
+window.open(
+showreel,
+"_blank"
+);
+
+}
+
 function setupBeatSearch(beats){
 
 producerSearch.oninput =
@@ -1808,9 +2015,7 @@ document
 "click",
 function(){
 
-alert(
-"Producer showreel will be available here."
-);
+openProducerShowreel();
 
 }
 );
@@ -1821,9 +2026,7 @@ document
 "click",
 function(){
 
-alert(
-"Login to follow this producer."
-);
+toggleFollow();
 
 }
 );
