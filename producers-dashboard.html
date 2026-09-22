@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#8b5cf6">
-
-<title>PASONG Producer Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<meta name="theme-color" content="#8b5cf6"><title>PASONG Producer Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 *{
   box-sizing:border-box;
   margin:0;
@@ -396,356 +389,341 @@ footer{
     display:none;
   }
 }
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo">◈ PASONG</div>
-
-  <div class="header-right">
+</style></head><body><header>
+  <div class="logo">◈ PASONG</div>  <div class="header-right">
     <a href="index.html">Home</a>
     <a href="producer.html">Producer Page</a>
     <div class="account" id="accountName">Producer</div>
   </div>
-</header>
-
-<main class="container">
-
-  <section class="hero">
+</header><main class="container">  <section class="hero">
     <h1>🎛️ Producer Dashboard</h1>
     <p>
       Manage your beats, prices and producer profile.
       Your <span class="producer-name" id="heroProducerName">Producer</span>
       clean beat files remain separate from PASONG's free streaming version.
     </p>
-  </section>
+  </section>  <div class="dashboard"><aside class="sidebar">
+  <button class="active" data-section="overview">📊 Overview</button>
+  <button data-section="upload">🎛️ Upload Beat</button>
+  <button data-section="my-beats">🎵 My Beats</button>
+  <button data-section="rules">📜 Beat Rules</button>
+</aside>
 
-  <div class="dashboard">
+<section class="content">
 
-    <aside class="sidebar">
-      <button class="active" data-section="overview">📊 Overview</button>
-      <button data-section="upload">🎛️ Upload Beat</button>
-      <button data-section="my-beats">🎵 My Beats</button>
-      <button data-section="rules">📜 Beat Rules</button>
-    </aside>
+  <div id="section-overview">
 
-    <section class="content">
+    <div class="stats">
 
-      <div id="section-overview">
-
-        <div class="stats">
-
-          <div class="stat">
-            <div class="stat-number" id="statBeats">0</div>
-            <div class="stat-label">Beats Uploaded</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-number" id="statPublished">0</div>
-            <div class="stat-label">Published Beats</div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-number" id="statExclusive">0</div>
-            <div class="stat-label">Exclusive Sales</div>
-          </div>
-
-        </div>
-
-        <div class="card">
-          <h2>Welcome, <span id="welcomeName">Producer</span></h2>
-          <div class="card-subtitle">
-            Your producer account is connected to PASONG.
-          </div>
-
-          <button class="btn btn-primary" id="goUpload">
-            🎛️ Upload New Beat
-          </button>
-        </div>
-
+      <div class="stat">
+        <div class="stat-number" id="statBeats">0</div>
+        <div class="stat-label">Beats Uploaded</div>
       </div>
 
-
-      <div id="section-upload" class="hidden">
-
-        <div class="card">
-
-          <h2>🎛️ Upload Beat</h2>
-
-          <div class="card-subtitle">
-            Upload your clean original beat. PASONG will handle the free-streaming version separately.
-          </div>
-
-          <form id="beatForm">
-
-            <div class="form-grid">
-
-              <div class="field full">
-                <label for="beatTitle">Beat Title *</label>
-                <input
-                  id="beatTitle"
-                  type="text"
-                  placeholder="Enter beat title"
-                  required
-                >
-              </div>
-
-              <div class="field">
-                <label for="genre">Genre</label>
-                <input
-                  id="genre"
-                  type="text"
-                  placeholder="Afrobeats, Amapiano..."
-                >
-              </div>
-
-              <div class="field">
-                <label for="bpm">BPM</label>
-                <input
-                  id="bpm"
-                  type="number"
-                  min="1"
-                  max="400"
-                  placeholder="120"
-                >
-              </div>
-
-              <div class="field">
-                <label for="musicalKey">Key</label>
-                <input
-                  id="musicalKey"
-                  type="text"
-                  placeholder="C Major"
-                >
-              </div>
-
-              <div class="field">
-                <label for="cover">Beat Cover</label>
-                <input
-                  id="cover"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                >
-              </div>
-
-              <div class="field full">
-                <label for="audio">Clean Beat File *</label>
-                <input
-                  id="audio"
-                  type="file"
-                  accept="audio/mpeg,audio/wav,audio/x-wav"
-                  required
-                >
-              </div>
-
-              <div class="field">
-                <label for="leaseMp3">MP3 Lease Price (UGX) *</label>
-                <input
-                  id="leaseMp3"
-                  type="number"
-                  min="10000"
-                  max="1500000"
-                  value="10000"
-                  required
-                >
-                <div class="price-help">
-                  Minimum UGX 10,000 • Maximum UGX 1,500,000
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="leaseWav">WAV Lease Price (UGX) *</label>
-                <input
-                  id="leaseWav"
-                  type="number"
-                  min="10000"
-                  max="1500000"
-                  value="10000"
-                  required
-                >
-                <div class="price-help">
-                  Minimum UGX 10,000 • Maximum UGX 1,500,000
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="stemsPrice">Stems / Trackout Price (UGX) *</label>
-                <input
-                  id="stemsPrice"
-                  type="number"
-                  min="10000"
-                  max="1500000"
-                  value="10000"
-                  required
-                >
-                <div class="price-help">
-                  Minimum UGX 10,000 • Maximum UGX 1,500,000
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="exclusivePrice">Exclusive Price (UGX) *</label>
-                <input
-                  id="exclusivePrice"
-                  type="number"
-                  min="500000"
-                  max="10000000"
-                  value="500000"
-                  required
-                >
-                <div class="price-help">
-                  Minimum UGX 500,000 • Maximum UGX 10,000,000
-                </div>
-              </div>
-
-            </div>
-
-            <div class="form-actions">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                id="uploadButton"
-              >
-                Upload Beat
-              </button>
-
-              <button
-                type="button"
-                class="btn btn-secondary"
-                id="clearForm"
-              >
-                Clear
-              </button>
-            </div>
-
-            <div id="formMessage" class="message"></div>
-
-          </form>
-
-        </div>
-
+      <div class="stat">
+        <div class="stat-number" id="statPublished">0</div>
+        <div class="stat-label">Published Beats</div>
       </div>
 
-
-      <div id="section-my-beats" class="hidden">
-
-        <div class="card">
-
-          <h2>🎵 My Beats</h2>
-
-          <div class="card-subtitle">
-            Beats uploaded through your Producer Dashboard.
-          </div>
-
-          <div id="beatsGrid" class="beats-grid"></div>
-
-        </div>
-
+      <div class="stat">
+        <div class="stat-number" id="statExclusive">0</div>
+        <div class="stat-label">Exclusive Sales</div>
       </div>
 
+    </div>
 
-      <div id="section-rules" class="hidden">
-
-        <div class="card">
-
-          <h2>📜 PASONG Beat Rules</h2>
-
-          <div class="card-subtitle">
-            Current Producer Beat Store rules.
-          </div>
-
-          <div class="rules">
-
-            <div class="rule">
-              <strong>Free Streaming:</strong>
-              Beats can be streamed free on PASONG for listening only.
-              PASONG adds its streaming tag every 20 seconds and uses 5 ad opportunities during the streaming experience.
-            </div>
-
-            <div class="rule">
-              <strong>Lease Pricing:</strong>
-              Producer sets the price. Minimum UGX 10,000 and maximum UGX 1,500,000.
-            </div>
-
-            <div class="rule">
-              <strong>Exclusive Pricing:</strong>
-              Minimum UGX 500,000 and maximum UGX 10,000,000.
-            </div>
-
-            <div class="rule">
-              <strong>MP3 Lease:</strong>
-              One song, MP3 only, maximum 10K streams.
-            </div>
-
-            <div class="rule">
-              <strong>WAV Lease:</strong>
-              One song, WAV + MP3, maximum 50K streams.
-            </div>
-
-            <div class="rule">
-              <strong>Stems / Trackout:</strong>
-              All files, maximum 200K streams.
-            </div>
-
-            <div class="rule">
-              <strong>Exclusive:</strong>
-              Unlimited use and the beat is removed from the store after the exclusive sale.
-            </div>
-
-            <div class="rule">
-              <strong>Payment Split:</strong>
-              PASONG 30% / Producer 70%.
-            </div>
-
-            <div class="rule">
-              <strong>Tip Split:</strong>
-              Producer 85% / PASONG 15%.
-            </div>
-
-            <div class="rule">
-              <strong>Payout:</strong>
-              Producer payout eligibility begins after 3 days.
-            </div>
-
-            <div class="rule">
-              <strong>Buyer Credit:</strong>
-              Buyer must credit the producer as Prod. by [Producer Name].
-            </div>
-
-            <div class="rule">
-              <strong>Lease:</strong>
-              Lease expires after 3 years.
-            </div>
-
-            <div class="rule">
-              <strong>Producer Requirement:</strong>
-              Beat must be original. Stolen material is not allowed.
-            </div>
-
-          </div>
-
-        </div>
-
+    <div class="card">
+      <h2>Welcome, <span id="welcomeName">Producer</span></h2>
+      <div class="card-subtitle">
+        Your producer account is connected to PASONG.
       </div>
 
-    </section>
+      <button class="btn btn-primary" id="goUpload">
+        🎛️ Upload New Beat
+      </button>
+    </div>
 
   </div>
 
-</main>
 
-<footer>
+  <div id="section-upload" class="hidden">
+
+    <div class="card">
+
+      <h2>🎛️ Upload Beat</h2>
+
+      <div class="card-subtitle">
+        Upload your clean original beat. PASONG will handle the free-streaming version separately.
+      </div>
+
+      <form id="beatForm">
+
+        <div class="form-grid">
+
+          <div class="field full">
+            <label for="beatTitle">Beat Title *</label>
+            <input
+              id="beatTitle"
+              type="text"
+              placeholder="Enter beat title"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="genre">Genre</label>
+            <input
+              id="genre"
+              type="text"
+              placeholder="Afrobeats, Amapiano..."
+            >
+          </div>
+
+          <div class="field">
+            <label for="bpm">BPM</label>
+            <input
+              id="bpm"
+              type="number"
+              min="1"
+              max="400"
+              placeholder="120"
+            >
+          </div>
+
+          <div class="field">
+            <label for="musicalKey">Key</label>
+            <input
+              id="musicalKey"
+              type="text"
+              placeholder="C Major"
+            >
+          </div>
+
+          <div class="field">
+            <label for="cover">Beat Cover</label>
+            <input
+              id="cover"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+            >
+          </div>
+
+          <div class="field full">
+            <label for="audio">Clean Beat File *</label>
+            <input
+              id="audio"
+              type="file"
+              accept="audio/mpeg,audio/wav,audio/x-wav"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="leaseMp3">MP3 Lease Price (UGX) *</label>
+            <input
+              id="leaseMp3"
+              type="number"
+              min="10000"
+              max="1500000"
+              value="10000"
+              required
+            >
+            <div class="price-help">
+              Minimum UGX 10,000 • Maximum UGX 1,500,000
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="leaseWav">WAV Lease Price (UGX) *</label>
+            <input
+              id="leaseWav"
+              type="number"
+              min="10000"
+              max="1500000"
+              value="10000"
+              required
+            >
+            <div class="price-help">
+              Minimum UGX 10,000 • Maximum UGX 1,500,000
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="stemsPrice">Stems / Trackout Price (UGX) *</label>
+            <input
+              id="stemsPrice"
+              type="number"
+              min="10000"
+              max="1500000"
+              value="10000"
+              required
+            >
+            <div class="price-help">
+              Minimum UGX 10,000 • Maximum UGX 1,500,000
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="exclusivePrice">Exclusive Price (UGX) *</label>
+            <input
+              id="exclusivePrice"
+              type="number"
+              min="500000"
+              max="10000000"
+              value="500000"
+              required
+            >
+            <div class="price-help">
+              Minimum UGX 500,000 • Maximum UGX 10,000,000
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            id="uploadButton"
+          >
+            Upload Beat
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="clearForm"
+          >
+            Clear
+          </button>
+        </div>
+
+        <div id="formMessage" class="message"></div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <div id="section-my-beats" class="hidden">
+
+    <div class="card">
+
+      <h2>🎵 My Beats</h2>
+
+      <div class="card-subtitle">
+        Beats uploaded through your Producer Dashboard.
+      </div>
+
+      <div id="beatsGrid" class="beats-grid"></div>
+
+    </div>
+
+  </div>
+
+
+  <div id="section-rules" class="hidden">
+
+    <div class="card">
+
+      <h2>📜 PASONG Beat Rules</h2>
+
+      <div class="card-subtitle">
+        Current Producer Beat Store rules.
+      </div>
+
+      <div class="rules">
+
+        <div class="rule">
+          <strong>Free Streaming:</strong>
+          Beats can be streamed free on PASONG for listening only.
+          PASONG adds its streaming tag every 20 seconds and uses 5 ad opportunities during the streaming experience.
+        </div>
+
+        <div class="rule">
+          <strong>Lease Pricing:</strong>
+          Producer sets the price. Minimum UGX 10,000 and maximum UGX 1,500,000.
+        </div>
+
+        <div class="rule">
+          <strong>Exclusive Pricing:</strong>
+          Minimum UGX 500,000 and maximum UGX 10,000,000.
+        </div>
+
+        <div class="rule">
+          <strong>MP3 Lease:</strong>
+          One song, MP3 only, maximum 10K streams.
+        </div>
+
+        <div class="rule">
+          <strong>WAV Lease:</strong>
+          One song, WAV + MP3, maximum 50K streams.
+        </div>
+
+        <div class="rule">
+          <strong>Stems / Trackout:</strong>
+          All files, maximum 200K streams.
+        </div>
+
+        <div class="rule">
+          <strong>Exclusive:</strong>
+          Unlimited use and the beat is removed from the store after the exclusive sale.
+        </div>
+
+        <div class="rule">
+          <strong>Payment Split:</strong>
+          PASONG 30% / Producer 70%.
+        </div>
+
+        <div class="rule">
+          <strong>Tip Split:</strong>
+          Producer 85% / PASONG 15%.
+        </div>
+
+        <div class="rule">
+          <strong>Payout:</strong>
+          Producer payout eligibility begins after 3 days.
+        </div>
+
+        <div class="rule">
+          <strong>Buyer Credit:</strong>
+          Buyer must credit the producer as Prod. by [Producer Name].
+        </div>
+
+        <div class="rule">
+          <strong>Lease:</strong>
+          Lease expires after 3 years.
+        </div>
+
+        <div class="rule">
+          <strong>Producer Requirement:</strong>
+          Beat must be original. Stolen material is not allowed.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+  </div></main><footer>
   © PASONG — Producer Dashboard
-</footer>
-
-<script>
+</footer><script>
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
 
 const SUPABASE_KEY =
   "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const API_URL =
+  "https://pasong-api.onrender.com";
+
+const CLOUDINARY_UPLOAD_URL =
+  "https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload";
 
 const supabaseClient =
   window.supabase.createClient(
@@ -1147,6 +1125,113 @@ function validatePrices(){
 }
 
 
+async function uploadToCloudinary(
+  file,
+  folder,
+  accessToken
+){
+
+  const signatureResponse =
+    await fetch(
+      API_URL +
+      "/api/cloudinary/signature",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":
+            "application/json",
+          "Authorization":
+            "Bearer " +
+            accessToken
+        },
+        body:
+          JSON.stringify({
+            folder:
+              folder
+          })
+      }
+    );
+
+  const signatureData =
+    await signatureResponse.json();
+
+  if(
+    !signatureResponse.ok
+  ){
+
+    throw new Error(
+      signatureData.error ||
+      "Could not prepare Cloudinary upload."
+    );
+
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "file",
+    file
+  );
+
+  formData.append(
+    "api_key",
+    signatureData.api_key
+  );
+
+  formData.append(
+    "timestamp",
+    signatureData.timestamp
+  );
+
+  formData.append(
+    "signature",
+    signatureData.signature
+  );
+
+  formData.append(
+    "folder",
+    signatureData.folder
+  );
+
+  const uploadResponse =
+    await fetch(
+      CLOUDINARY_UPLOAD_URL,
+      {
+        method:"POST",
+        body:formData
+      }
+    );
+
+  const uploadData =
+    await uploadResponse.json();
+
+  if(
+    !uploadResponse.ok
+  ){
+
+    throw new Error(
+      uploadData.error?.message ||
+      "Cloudinary upload failed."
+    );
+
+  }
+
+  if(
+    !uploadData.secure_url
+  ){
+
+    throw new Error(
+      "Cloudinary did not return a file URL."
+    );
+
+  }
+
+  return uploadData.secure_url;
+
+}
+
+
 document
   .getElementById("beatForm")
   .addEventListener(
@@ -1229,97 +1314,154 @@ document
       button.disabled =
         true;
 
-      button.textContent =
-        "Saving Beat...";
-
       try{
 
         const {
-          data,
-          error
+          data: sessionData,
+          error: sessionError
         } =
-          await supabaseClient
-            .from("beats")
-            .insert({
+          await supabaseClient.auth.getSession();
 
-              producer_id:
-                profile.id,
+        if(sessionError){
 
-              title:
-                title,
+          throw sessionError;
 
-              genre:
-                genre || null,
+        }
 
-              bpm:
-                bpm
-                  ? Number(bpm)
-                  : null,
+        const session =
+          sessionData.session;
 
-              musical_key:
-                musicalKey ||
-                null,
+        if(!session){
 
-              audio_url:
-                audioFile.name,
+          throw new Error(
+            "Your login session has expired. Please log in again."
+          );
 
-              cover_url:
-                coverFile
-                  ? coverFile.name
-                  : null,
+        }
 
-              lease_mp3_price:
-                Number(
-                  document.getElementById(
-                    "leaseMp3"
-                  ).value
-                ),
+        const accessToken =
+          session.access_token;
 
-              lease_wav_price:
-                Number(
-                  document.getElementById(
-                    "leaseWav"
-                  ).value
-                ),
+        button.textContent =
+          "Uploading Beat...";
 
-              stems_price:
-                Number(
-                  document.getElementById(
-                    "stemsPrice"
-                  ).value
-                ),
+        const audioUrl =
+          await uploadToCloudinary(
+            audioFile,
+            "pasong-beats/audio",
+            accessToken
+          );
 
-              exclusive_price:
-                Number(
-                  document.getElementById(
-                    "exclusivePrice"
-                  ).value
-                ),
+        let coverUrl =
+          null;
 
-              status:
-                "pending",
+        if(coverFile){
 
-              is_exclusive_sold:
-                false
+          button.textContent =
+            "Uploading Cover...";
 
-            })
-            .select()
-            .single();
+          coverUrl =
+            await uploadToCloudinary(
+              coverFile,
+              "pasong-beats/covers",
+              accessToken
+            );
 
-        if(error){
+        }
 
-          throw error;
+        button.textContent =
+          "Saving Beat...";
+
+        const beatResponse =
+          await fetch(
+            API_URL +
+            "/api/beats/create",
+            {
+              method:"POST",
+              headers:{
+                "Content-Type":
+                  "application/json",
+                "Authorization":
+                  "Bearer " +
+                  accessToken
+              },
+              body:
+                JSON.stringify({
+
+                  title:
+                    title,
+
+                  genre:
+                    genre ||
+                    null,
+
+                  bpm:
+                    bpm
+                      ? Number(bpm)
+                      : null,
+
+                  musical_key:
+                    musicalKey ||
+                    null,
+
+                  audio_url:
+                    audioUrl,
+
+                  cover_url:
+                    coverUrl,
+
+                  lease_mp3_price:
+                    Number(
+                      document.getElementById(
+                        "leaseMp3"
+                      ).value
+                    ),
+
+                  lease_wav_price:
+                    Number(
+                      document.getElementById(
+                        "leaseWav"
+                      ).value
+                    ),
+
+                  stems_price:
+                    Number(
+                      document.getElementById(
+                        "stemsPrice"
+                      ).value
+                    ),
+
+                  exclusive_price:
+                    Number(
+                      document.getElementById(
+                        "exclusivePrice"
+                      ).value
+                    )
+
+                })
+            }
+          );
+
+        const beatData =
+          await beatResponse.json();
+
+        if(!beatResponse.ok){
+
+          throw new Error(
+            beatData.error ||
+            "Unable to save beat."
+          );
 
         }
 
         console.log(
           "Beat created:",
-          data
+          beatData
         );
 
         showMessage(
           "success",
-          "Beat saved successfully."
+          "Beat uploaded successfully."
         );
 
         document
@@ -1360,7 +1502,7 @@ document
         showMessage(
           "error",
           error.message ||
-          "Unable to save beat."
+          "Unable to upload beat."
         );
 
       }finally{
@@ -1419,7 +1561,5 @@ document
 
 
 loadBeats();
-</script>
-
-</body>
+</script></body>
 </html>
