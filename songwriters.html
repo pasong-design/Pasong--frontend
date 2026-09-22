@@ -470,7 +470,6 @@ footer{
 
 </header>
 
-
 <main>
 
   <section class="hero">
@@ -509,7 +508,6 @@ footer{
 
   </section>
 
-
   <section class="section">
 
     <div class="section-header">
@@ -524,14 +522,12 @@ footer{
 
     </div>
 
-
     <div
       id="writerStatus"
       class="loading"
     >
       Loading songwriters...
     </div>
-
 
     <div
       id="writerGrid"
@@ -543,7 +539,6 @@ footer{
 
 </main>
 
-
 <footer>
 
   <div>
@@ -551,7 +546,6 @@ footer{
   </div>
 
 </footer>
-
 
 <nav class="mobile-nav">
 
@@ -577,21 +571,19 @@ footer{
 
 </nav>
 
-
 <script>
 
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
 
 const SUPABASE_ANON_KEY =
-  "sb_publishable_XDIZ0_nd4PAYQ_R4Trs3VP";
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
 const supabaseClient =
   supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
-
 
 const writerGrid =
   document.getElementById(
@@ -608,46 +600,22 @@ const writerSearch =
     "writerSearch"
   );
 
-
 let writers = [];
-
 
 function escapeHtml(value){
 
   return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
-
 
 function renderWriters(list){
 
   writerGrid.innerHTML = "";
-
 
   if(!list.length){
 
@@ -667,13 +635,11 @@ function renderWriters(list){
 
   }
 
-
   writerStatus.style.display =
     "none";
 
   writerGrid.style.display =
     "grid";
-
 
   list.forEach(writer => {
 
@@ -685,12 +651,10 @@ function renderWriters(list){
     card.className =
       "writer-card";
 
-
     const encodedName =
       encodeURIComponent(
         writer.name
       );
-
 
     card.innerHTML = `
 
@@ -718,7 +682,6 @@ function renderWriters(list){
 
     `;
 
-
     writerGrid.appendChild(
       card
     );
@@ -726,7 +689,6 @@ function renderWriters(list){
   });
 
 }
-
 
 async function loadWriters(){
 
@@ -739,45 +701,23 @@ async function loadWriters(){
   writerStatus.textContent =
     "Loading songwriters...";
 
-
   try{
-
-    /*
-      STEP 1:
-      Get approved songs that have
-      a real writer_user_id.
-    */
 
     const {
       data: songs,
       error: songsError
     } =
       await supabaseClient
-
         .from("songs")
-
-        .select(
-          "writer_user_id"
-        )
-
-        .eq(
-          "status",
-          "approved"
-        )
-
-        .not(
-          "writer_user_id",
-          "is",
-          null
-        );
-
+        .select("writer_user_id")
+        .eq("status","approved")
+        .not("writer_user_id","is",null);
 
     if(songsError){
 
       throw songsError;
 
     }
-
 
     const writerIds =
       [
@@ -791,7 +731,6 @@ async function loadWriters(){
         )
       ];
 
-
     if(!writerIds.length){
 
       renderWriters([]);
@@ -800,30 +739,19 @@ async function loadWriters(){
 
     }
 
-
-    /*
-      STEP 2:
-      Match writer_user_id with
-      artist_profiles.user_id.
-    */
-
     const {
       data: profiles,
       error: profilesError
     } =
       await supabaseClient
-
         .from("artist_profiles")
-
         .select(
           "user_id,stage_name,performing_name,artist_name,profile_image_url"
         )
-
         .in(
           "user_id",
           writerIds
         );
-
 
     if(profilesError){
 
@@ -831,15 +759,8 @@ async function loadWriters(){
 
     }
 
-
-    /*
-      STEP 3:
-      Build the public songwriter list.
-    */
-
     const map =
       new Map();
-
 
     (profiles || []).forEach(
       profile => {
@@ -847,19 +768,14 @@ async function loadWriters(){
         const name =
           (
             profile.stage_name ||
-
             profile.performing_name ||
-
             profile.artist_name ||
-
             "Songwriter"
           )
           .trim();
 
-
         const key =
           name.toLowerCase();
-
 
         if(!map.has(key)){
 
@@ -870,7 +786,6 @@ async function loadWriters(){
 
               image:
                 profile.profile_image_url ||
-
                 "https://ui-avatars.com/api/?name=" +
                 encodeURIComponent(name) +
                 "&background=171722&color=c084fc&bold=true"
@@ -882,17 +797,14 @@ async function loadWriters(){
       }
     );
 
-
     writers =
       Array.from(
         map.values()
       );
 
-
     renderWriters(
       writers
     );
-
 
   }catch(error){
 
@@ -901,10 +813,8 @@ async function loadWriters(){
       error
     );
 
-
     writerGrid.style.display =
       "none";
-
 
     writerStatus.style.display =
       "block";
@@ -919,7 +829,6 @@ async function loadWriters(){
 
 }
 
-
 writerSearch.addEventListener(
   "input",
   function(){
@@ -928,7 +837,6 @@ writerSearch.addEventListener(
       this.value
         .trim()
         .toLowerCase();
-
 
     if(!search){
 
@@ -940,7 +848,6 @@ writerSearch.addEventListener(
 
     }
 
-
     const filtered =
       writers.filter(
         writer =>
@@ -949,7 +856,6 @@ writerSearch.addEventListener(
             .includes(search)
       );
 
-
     renderWriters(
       filtered
     );
@@ -957,9 +863,7 @@ writerSearch.addEventListener(
   }
 );
 
-
 loadWriters();
-
 
 if(
   "serviceWorker" in navigator
@@ -970,9 +874,7 @@ if(
     () => {
 
       navigator.serviceWorker
-
         .register("sw.js")
-
         .catch(
           error =>
             console.log(
