@@ -283,6 +283,111 @@ hr{
   margin:20px 0;
 }
 
+.beat-orders{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:18px;
+}
+
+.beat-order{
+  background:#0b0b15;
+  border:1px solid #29293e;
+  border-radius:14px;
+  padding:16px;
+}
+
+.beat-order-header{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.beat-order-title{
+  font-size:17px;
+  font-weight:800;
+}
+
+.beat-order-number{
+  color:#85859a;
+  font-size:12px;
+  margin-top:5px;
+  word-break:break-word;
+}
+
+.beat-order-meta{
+  color:#aaaabd;
+  font-size:13px;
+  line-height:1.6;
+  margin-top:10px;
+}
+
+.beat-delivery{
+  margin-top:14px;
+  padding:14px;
+  border-radius:12px;
+  background:#121221;
+  border:1px solid #302448;
+}
+
+.beat-delivery-title{
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.delivery-status{
+  display:inline-block;
+  margin-top:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.delivery-status.delivered{
+  background:#123b29;
+  color:#6dffae;
+}
+
+.delivery-status.waiting{
+  background:#3b3212;
+  color:#ffd76a;
+}
+
+.delivery-files{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:12px;
+}
+
+.delivery-download{
+  margin-top:0;
+  padding:10px 13px;
+  font-size:13px;
+}
+
+.delivery-download.disabled{
+  background:#25253a;
+  color:#77778b;
+  cursor:not-allowed;
+}
+
+.beat-empty{
+  background:#0b0b15;
+  border:1px dashed #35354d;
+  border-radius:12px;
+  padding:18px;
+  color:#9999ad;
+  text-align:center;
+}
+
+.beat-loading{
+  color:#9999ad;
+  font-size:13px;
+}
+
 footer{
   text-align:center;
   color:#77778b;
@@ -301,6 +406,18 @@ footer{
 
   .container{
     width:94%;
+  }
+
+  .beat-order-header{
+    flex-direction:column;
+  }
+
+  .delivery-files{
+    flex-direction:column;
+  }
+
+  .delivery-download{
+    width:100%;
   }
 }
 </style>
@@ -794,6 +911,15 @@ footer{
     >
       🎵 Open My Downloads
     </a>
+
+    <div
+      id="beatOrders"
+      class="beat-orders"
+    >
+      <div class="beat-loading">
+        Loading beat purchases...
+      </div>
+    </div>
 
   </div>
 
@@ -1346,6 +1472,8 @@ async function loadAccount(){
 
   await loadEarnings();
 
+  await loadBeatOrders(user);
+
   updatePaymentCountryUI();
 
 }
@@ -1561,7 +1689,7 @@ async function loadProfile(user){
     document
       .getElementById("displayCountry")
       .textContent =
-        baseProfile.country ||
+      baseProfile.country ||
         "Not added yet";
 
     document
@@ -2508,6 +2636,678 @@ async function loadEarnings(){
     updateWithdrawBalance();
 
   }
+
+}
+
+async function loadBeatOrders(user){
+
+  const container =
+    document.getElementById(
+      "beatOrders"
+    );
+
+  if(!container)return;
+
+  container.innerHTML =
+    '<div class="beat-loading">Loading beat purchases...</div>';
+
+  try{
+
+    const {
+      data:orders,
+      error:ordersError
+    } =
+      await supabaseClient
+        .from("beat_orders")
+        .select(
+          "id,order_number,buyer_id,beat_id,package,price,currency,status,paid_at,delivered_at,completed_at,created_at"
+        )
+        .eq(
+          "buyer_id",
+          user.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        );
+
+    if(ordersError)
+      throw ordersError;
+
+    const paidOrders =
+      (orders || [])
+        .filter(
+          order=>
+            isBeatOrderPaid(order)
+        );
+
+    if(!paidOrders.length){
+
+      container.innerHTML =
+        '<div class="beat-empty">No beat purchases yet.</div>';
+
+      return;
+
+    }
+
+    const beatIds =
+      [
+        ...new Set(
+          paidOrders
+            .map(
+              order=>order.beat_id
+            )
+            .filter(Boolean)
+        )
+      ];
+
+    let beats = [];
+
+    if(beatIds.length){
+
+      const {
+        data:beatData,
+        error:beatError
+      } =
+        await supabaseClient
+          .from("beats")
+          .select(
+            "id,title,cover_url"
+          )
+          .in(
+            "id",
+            beatIds
+          );
+
+      if(beatError){
+
+        console.error(
+          "Beat lookup error:",
+          beatError
+        );
+
+      }else{
+
+        beats =
+          beatData || [];
+
+      }
+
+    }
+
+    const {
+      data:deliveries,
+      error:deliveryError
+    } =
+      await supabaseClient
+        .from("beat_deliveries")
+        .select(
+          "id,order_id,version,mp3_url,wav_url,stems_url,exclusive_file_url,status,delivered_at,created_at"
+        )
+        .in(
+          "order_id",
+          paidOrders.map(
+            order=>order.id
+          )
+        )
+        .eq(
+          "status",
+          "delivered"
+        )
+        .order(
+          "version",
+          {
+            ascending:false
+          }
+        );
+
+    if(deliveryError)
+      throw deliveryError;
+
+    const deliveryMap =
+      new Map();
+
+    (deliveries || [])
+      .forEach(
+        delivery=>{
+
+          if(
+            !deliveryMap.has(
+              delivery.order_id
+            )
+          ){
+
+            deliveryMap.set(
+              delivery.order_id,
+              delivery
+            );
+
+          }
+
+        }
+      );
+
+    const beatMap =
+      new Map();
+
+    beats.forEach(
+      beat=>{
+        beatMap.set(
+          beat.id,
+          beat
+        );
+      }
+    );
+
+    container.innerHTML = "";
+
+    paidOrders.forEach(
+      order=>{
+
+        const beat =
+          beatMap.get(
+            order.beat_id
+          );
+
+        const delivery =
+          deliveryMap.get(
+            order.id
+          );
+
+        container.appendChild(
+          renderBeatOrder(
+            order,
+            beat,
+            delivery
+          )
+        );
+
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      "Beat orders loading error:",
+      error
+    );
+
+    container.innerHTML =
+      '<div class="beat-empty">Unable to load your beat purchases right now.</div>';
+
+  }
+
+}
+
+function isBeatOrderPaid(order){
+
+  const status =
+    String(
+      order.status || ""
+    )
+    .toLowerCase()
+    .trim();
+
+  const failedStatuses = [
+    "pending",
+    "unpaid",
+    "failed",
+    "cancelled",
+    "canceled",
+    "refunded",
+    "reversed",
+    "expired",
+    "void"
+  ];
+
+  if(
+    failedStatuses.includes(
+      status
+    )
+  ){
+
+    return false;
+
+  }
+
+  const successfulStatuses = [
+    "paid",
+    "completed",
+    "complete",
+    "success",
+    "succeeded",
+    "successful",
+    "approved",
+    "delivered"
+  ];
+
+  if(
+    successfulStatuses.includes(
+      status
+    )
+  ){
+
+    return true;
+
+  }
+
+  return Boolean(
+    order.paid_at ||
+    order.completed_at
+  );
+
+}
+
+function renderBeatOrder(
+  order,
+  beat,
+  delivery
+){
+
+  const article =
+    document.createElement(
+      "div"
+    );
+
+  article.className =
+    "beat-order";
+
+  const title =
+    beat &&
+    beat.title
+      ? beat.title
+      : "Purchased Beat";
+
+  const currency =
+    order.currency ||
+    "UGX";
+
+  const price =
+    Number(
+      order.price || 0
+    )
+    .toLocaleString(
+      "en-UG"
+    );
+
+  const packageName =
+    order.package ||
+    "Beat License";
+
+  const purchaseDate =
+    formatBeatDate(
+      order.paid_at ||
+      order.completed_at ||
+      order.created_at
+    );
+
+  const deliveryHtml =
+    delivery
+      ? renderDeliveredFiles(
+          order,
+          delivery
+        )
+      : `
+        <div class="beat-delivery">
+          <div class="beat-delivery-title">
+            📦 Files not delivered yet
+          </div>
+          <span class="delivery-status waiting">
+            Waiting for producer
+          </span>
+          <p class="info" style="margin-top:10px">
+            Your payment is recorded. The producer has not uploaded the purchased files yet.
+          </p>
+        </div>
+      `;
+
+  article.innerHTML = `
+    <div class="beat-order-header">
+
+      <div>
+        <div class="beat-order-title">
+          ${escapeHtml(title)}
+        </div>
+
+        <div class="beat-order-number">
+          Order:
+          ${escapeHtml(
+            order.order_number ||
+            order.id
+          )}
+        </div>
+      </div>
+
+      <span class="status approved">
+        Paid
+      </span>
+
+    </div>
+
+    <div class="beat-order-meta">
+
+      Package:
+      <strong>
+        ${escapeHtml(packageName)}
+      </strong>
+
+      <br>
+
+      Price:
+      <strong>
+        ${escapeHtml(currency)}
+        ${escapeHtml(price)}
+      </strong>
+
+      <br>
+
+      Purchased:
+      ${escapeHtml(purchaseDate)}
+
+    </div>
+
+    ${deliveryHtml}
+  `;
+
+  const downloadButtons =
+    article.querySelectorAll(
+      "[data-download-url]"
+    );
+
+  downloadButtons.forEach(
+    button=>{
+
+      button.addEventListener(
+        "click",
+        ()=>{
+
+          downloadBeatFile(
+            button.dataset.downloadUrl,
+            button.dataset.fileType,
+            order,
+            delivery
+          );
+
+        }
+      );
+
+    }
+  );
+
+  return article;
+
+}
+
+function renderDeliveredFiles(
+  order,
+  delivery
+){
+
+  const files = [];
+
+  if(delivery.mp3_url){
+
+    files.push(
+      createDownloadButton(
+        "🎵 Download MP3",
+        delivery.mp3_url,
+        "mp3"
+      )
+    );
+
+  }
+
+  if(delivery.wav_url){
+
+    files.push(
+      createDownloadButton(
+        "🎧 Download WAV",
+        delivery.wav_url,
+        "wav"
+      )
+    );
+
+  }
+
+  if(delivery.stems_url){
+
+    files.push(
+      createDownloadButton(
+        "🎚️ Download Stems",
+        delivery.stems_url,
+        "stems"
+      )
+    );
+
+  }
+
+  if(delivery.exclusive_file_url){
+
+    files.push(
+      createDownloadButton(
+        "📦 Download Project Files",
+        delivery.exclusive_file_url,
+        "exclusive"
+      )
+    );
+
+  }
+
+  const filesHtml =
+    files.length
+      ? `
+        <div class="delivery-files">
+          ${files.join("")}
+        </div>
+      `
+      : `
+        <p class="info" style="margin-top:10px">
+          The producer marked this order as delivered, but no downloadable file is currently attached.
+        </p>
+      `;
+
+  return `
+    <div class="beat-delivery">
+
+      <div class="beat-delivery-title">
+        📦 Beat Files
+      </div>
+
+      <span class="delivery-status delivered">
+        Delivered
+      </span>
+
+      ${delivery.delivered_at
+        ? `
+          <p class="info" style="margin-top:8px">
+            Delivered:
+            ${escapeHtml(
+              formatBeatDate(
+                delivery.delivered_at
+              )
+            )}
+          </p>
+        `
+        : ""
+      }
+
+      ${filesHtml}
+
+    </div>
+  `;
+
+}
+
+function createDownloadButton(
+  label,
+  url,
+  type
+){
+
+  return `
+    <button
+      type="button"
+      class="delivery-download"
+      data-download-url="${escapeAttribute(url)}"
+      data-file-type="${escapeAttribute(type)}"
+    >
+      ${label}
+    </button>
+  `;
+
+}
+
+async function downloadBeatFile(
+  url,
+  fileType,
+  order,
+  delivery
+){
+
+  if(!url)return;
+
+  try{
+
+    const {
+      data:{
+        session
+      }
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+    if(
+      session &&
+      session.user
+    ){
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("beat_downloads")
+          .insert({
+
+            order_id:
+              order.id,
+
+            delivery_id:
+              delivery.id,
+
+            buyer_id:
+              session.user.id,
+
+            file_type:
+              fileType,
+
+            file_url:
+              url
+
+          });
+
+      if(error){
+
+        console.error(
+          "Beat download record error:",
+          error
+        );
+
+      }
+
+    }
+
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+  }catch(error){
+
+    console.error(
+      "Beat download error:",
+      error
+    );
+
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+  }
+
+}
+
+function formatBeatDate(value){
+
+  if(!value)
+    return "Not available";
+
+  const date =
+    new Date(value);
+
+  if(
+    Number.isNaN(
+      date.getTime()
+    )
+  ){
+
+    return String(value);
+
+  }
+
+  return date.toLocaleString(
+    "en-UG",
+    {
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"numeric",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+function escapeHtml(value){
+
+  return String(
+    value == null
+      ? ""
+      : value
+  )
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+  .replace(
+    /</g,
+    "&lt;"
+  )
+  .replace(
+    />/g,
+    "&gt;"
+  )
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+  .replace(
+    /'/g,
+    "&#039;"
+  );
+
+}
+
+function escapeAttribute(value){
+
+  return escapeHtml(
+    value
+  );
 
 }
 
