@@ -156,9 +156,10 @@ header{padding:13px 15px}
 <section class="hero">
 <h1>🎛️ Producer Dashboard</h1>
 <p>
-Manage your beats, prices and producer profile. Your
-<span class="producer-name" id="heroProducerName">Producer</span>
-clean beat files remain separate from PASONG's free streaming version.
+Manage your beats, prices and producer profile.
+Your <span class="producer-name" id="heroProducerName">Producer</span>
+beats can be streamed free in full length on PASONG.
+Paid licences provide the downloadable files and usage rights attached to each package.
 </p>
 </section>
 
@@ -429,7 +430,8 @@ Clear
 <h2>🎛️ Upload Beat</h2>
 
 <div class="card-subtitle">
-Upload your clean original beat. PASONG will create a protected 60-second preview from the uploaded file.
+Upload your clean original beat. PASONG allows the beat to be streamed free in full length.
+Paid licences provide downloadable files and the usage rights attached to the purchased package.
 </div>
 
 <form id="beatForm">
@@ -525,7 +527,7 @@ Upload your clean original beat. PASONG will create a protected 60-second previe
 <p>A buyer may use the beat only according to the licence package purchased. Buyers may not resell or redistribute the standalone beat. Required producer credit must be given where applicable.</p>
 
 <h4>8. Free Streaming</h4>
-<p>PASONG may provide a free streaming version for listening. PASONG may add its streaming protection tag and advertising to the free-streaming experience. The clean licensed file supplied after payment remains separate from the protected free-streaming version.</p>
+<p>PASONG provides free full-length streaming of producer beats for listening. Free streaming does not provide the buyer with a downloadable clean beat file or commercial usage rights. PASONG may apply streaming protection, tagging and advertising to the free-streaming experience.</p>
 
 <h4>9. Content ID and Rights Management</h4>
 <p>PASONG may assist with rights-management or Content ID reporting where requested by the Producer and where the beat is eligible for such services.</p>
@@ -620,13 +622,14 @@ Current Producer Beat Store rules.
 
 <div class="rules">
 
-<div class="rule"><strong>Free Streaming:</strong> Beats can be streamed free on PASONG for listening only. PASONG adds its streaming tag every 20 seconds and uses 5 ad opportunities during the streaming experience.</div>
+<div class="rule"><strong>Free Streaming:</strong> Producer beats can be streamed free on PASONG in full length for listening. Free streaming does not provide downloadable clean files or commercial usage rights. PASONG may apply streaming protection, tagging and advertising.</div>
 <div class="rule"><strong>Lease Pricing:</strong> Producer sets the price. Minimum UGX 10,000 and maximum UGX 1,500,000.</div>
 <div class="rule"><strong>Exclusive Pricing:</strong> Minimum UGX 500,000 and maximum UGX 10,000,000.</div>
 <div class="rule"><strong>MP3 Lease:</strong> One song, MP3 only, maximum 10K streams.</div>
 <div class="rule"><strong>WAV Lease:</strong> One song, WAV + MP3, maximum 50K streams.</div>
 <div class="rule"><strong>Stems / Trackout:</strong> All files, maximum 200K streams.</div>
 <div class="rule"><strong>Exclusive:</strong> Unlimited use and the beat is removed from the store after the exclusive sale.</div>
+<div class="rule"><strong>Non-Exclusive Sales:</strong> There is no fixed maximum number of non-exclusive beat sales.</div>
 <div class="rule"><strong>Payment Split:</strong> Producer 75% / PASONG 25% on every beat sale.</div>
 <div class="rule"><strong>AdSense:</strong> PASONG keeps AdSense revenue generated from free streaming of producer beats.</div>
 <div class="rule"><strong>Tip Split:</strong> Producer 85% / PASONG 15%.</div>
@@ -953,22 +956,13 @@ currentUser=user;
 document.getElementById("accountName").textContent=
 user.email||"Producer";
 
-let profileResult;
-
-try{
-
-profileResult=
+const profileResult=
 await supabaseClient
 .from("artist_profiles")
 .select("*")
 .eq("user_id",user.id)
 .order("created_at",{ascending:false})
 .limit(1);
-
-}catch(error){
-
-throw error;
-}
 
 if(profileResult.error)throw profileResult.error;
 
@@ -2233,6 +2227,11 @@ ${formatUGX(beat.stems_price)}
 Exclusive:
 ${formatUGX(beat.exclusive_price)}
 
+<br>
+
+Free Streaming:
+Full Length
+
 </div>
 
 <div class="beat-status">
@@ -2560,30 +2559,6 @@ throw new Error(
 return uploadData.secure_url;
 }
 
-function createBeatPreviewUrl(audioUrl){
-
-if(!audioUrl){
-
-throw new Error(
-"PASONG could not create the beat preview because the audio URL is missing."
-);
-}
-
-const uploadMarker="/upload/";
-
-if(!audioUrl.includes(uploadMarker)){
-
-throw new Error(
-"PASONG could not create the 60-second beat preview from the Cloudinary audio URL."
-);
-}
-
-return audioUrl.replace(
-uploadMarker,
-"/upload/so_0,du_60/"
-);
-}
-
 const agreementAccepted=
 document.getElementById("agreementAccepted");
 
@@ -2737,22 +2712,7 @@ throw new Error(
 );
 }
 
-let audioUrlPreview=null;
-
-try{
-
-audioUrlPreview=
-createBeatPreviewUrl(audioUrl);
-
-}catch(error){
-
-console.error(
-"Preview URL creation error:",
-error
-);
-
-audioUrlPreview=audioUrl;
-}
+const audioUrlPreview=audioUrl;
 
 let coverUrl=null;
 
@@ -2776,35 +2736,16 @@ title:title,
 
 producer_id:profile.id,
 
-audio_url_preview:
-audioUrlPreview,
+audio_url:audioUrl,
 
-audio_url:
-audioUrl,
+preview_url:audioUrlPreview,
 
-audio_url_mp3:
-audioUrl,
-
-audio_url_wav:
-audioUrl,
-
-audio_url_stems:
-null,
-
-audio_url_exclusive:
-null,
-
-cover_url:
-coverUrl,
+cover_url:coverUrl,
 
 bpm:
 bpm
 ?Number(bpm)
 :null,
-
-key:
-musicalKey||
-null,
 
 musical_key:
 musicalKey||
