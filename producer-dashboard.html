@@ -91,7 +91,8 @@ input[type="file"]{padding:10px}
 .rule{background:#160d24;border:1px solid #2d1944;border-radius:11px;padding:13px;color:#bbb;font-size:13px;line-height:1.5}
 .rule strong{color:#fff}
 .hidden{display:none}
-footer{text-align:center;color:#666;padding:25px;border-top:1px solid #20132e;font-size:12px}@media(max-width:800px){
+footer{text-align:center;color:#666;padding:25px;border-top:1px solid #20132e;font-size:12px}
+@media(max-width:800px){
 .dashboard{grid-template-columns:1fr}
 .sidebar{display:flex;overflow-x:auto;gap:8px}
 .sidebar button{min-width:max-content;margin:0}
@@ -106,8 +107,8 @@ header{padding:13px 15px}
 .profile-preview img{width:75px;height:75px}
 }
 </style>
-
-</head><body><header>
+</head>
+<body><header>
 <div class="logo">◈ PASONG</div>
 <div class="header-right">
 <a href="index.html">Home</a>
@@ -129,20 +130,20 @@ clean beat files remain separate from PASONG's free streaming version.
 <button data-section="rules">📜 Beat Rules</button>
 </aside><section class="content"><div id="section-overview"><div class="card"><div class="earnings-top"><div class="balance-card">
 <div class="balance-label">💰 Balance</div>
-<div class="balance-number" id="producerBalance">UGX 87,500</div>
+<div class="balance-number" id="producerBalance">UGX 0</div>
 </div><button class="withdraw-btn" id="withdrawButton">
 Withdraw to MoMo
 </button></div><div class="earnings-stats"><div class="earning-stat">
-<div class="earning-number" id="totalStreams">3,402</div>
+<div class="earning-number" id="totalStreams">Not tracked</div>
 <div class="earning-label">🎧 Total Streams</div>
 </div><div class="earning-stat">
-<div class="earning-number" id="totalSales">12</div>
+<div class="earning-number" id="totalSales">0</div>
 <div class="earning-label">💿 Total Sales</div>
 </div><div class="earning-stat">
-<div class="earning-number" id="totalFans">89</div>
+<div class="earning-number" id="totalFans">0</div>
 <div class="earning-label">👥 Fans</div>
 </div><div class="earning-stat">
-<div class="earning-number" id="thisMonth">UGX 52,500</div>
+<div class="earning-number" id="thisMonth">UGX 0</div>
 <div class="earning-label">📈 This Month</div>
 </div></div><h2>💰 Beat Earnings</h2><div class="card-subtitle">
 Producer receives 75% of every beat sale. PASONG receives 25%.
@@ -157,7 +158,7 @@ AdSense revenue from free beat streaming belongs to PASONG.
 </thead><tbody id="earningsTableBody">
 <tr>
 <td>No beat sales yet</td>
-<td>0</td>
+<td>Not tracked</td>
 <td>0</td>
 <td>UGX 0</td>
 </tr>
@@ -189,12 +190,11 @@ alt="Producer"
 
 «»
 
-<div class="profile-preview-text">
-<strong id="profilePreviewName">Producer</strong>
+<div class="profile-preview-text"><strong id="profilePreviewName">Producer</strong>
+
 <span>
 This picture will appear on your public Producer Page.
-</span>
-</div></div><form id="profileForm"><div class="form-grid"><div class="field full">
+</span></div></div><form id="profileForm"><div class="form-grid"><div class="field full">
 <label for="profilePhoto">🖼️ Producer Picture</label>
 <input id="profilePhoto" type="file" accept="image/jpeg,image/png,image/webp">
 <div class="price-help">
@@ -377,7 +377,9 @@ Current Producer Beat Store rules.
 <strong>Lease:</strong> Lease expires after 3 years.
 </div><div class="rule">
 <strong>Producer Requirement:</strong> Beat must be original. Stolen material is not allowed.
-</div></div></div></div></section></div></main><footer>
+</div></div></div></div></section>
+</div>
+</main><footer>
 © PASONG — Producer Dashboard
 </footer><script>
 
@@ -392,23 +394,39 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
-const sections=["overview","profile","upload","my-beats","rules"];
+const sections=[
+"overview",
+"profile",
+"upload",
+"my-beats",
+"rules"
+];
 
 let currentProducerProfile=null;
+let currentProducerBeats=[];
 
 function showSection(section){
 
 sections.forEach(name=>{
 
-const element=document.getElementById("section-"+name);
+const element=document.getElementById(
+"section-"+name
+);
 
 if(element){
-element.classList.toggle("hidden",name!==section);
+
+element.classList.toggle(
+"hidden",
+name!==section
+);
+
 }
 
 });
 
-document.querySelectorAll(".sidebar button").forEach(button=>{
+document.querySelectorAll(
+".sidebar button"
+).forEach(button=>{
 
 button.classList.toggle(
 "active",
@@ -418,58 +436,122 @@ button.dataset.section===section
 });
 
 if(section==="profile"){
-fillProfileForm(currentProducerProfile);
+
+fillProfileForm(
+currentProducerProfile
+);
+
 }
 
 if(section==="my-beats"){
+
 loadBeats();
-}
 
 }
 
-document.querySelectorAll(".sidebar button").forEach(button=>{
+}
 
-button.addEventListener("click",()=>{
-showSection(button.dataset.section);
+document.querySelectorAll(
+".sidebar button"
+).forEach(button=>{
+
+button.addEventListener(
+"click",
+()=>{
+
+showSection(
+button.dataset.section
+);
+
+}
+);
+
 });
 
-});
+document.getElementById(
+"goUpload"
+).addEventListener(
+"click",
+()=>{
 
-document.getElementById("goUpload").addEventListener("click",()=>{
 showSection("upload");
-});
 
-document.getElementById("goProfile").addEventListener("click",()=>{
+}
+);
+
+document.getElementById(
+"goProfile"
+).addEventListener(
+"click",
+()=>{
+
 showSection("profile");
-});
 
-document.getElementById("withdrawButton").addEventListener("click",()=>{
-alert("MoMo withdrawal will be connected when producer payouts are ready.");
-});
+}
+);
+
+document.getElementById(
+"withdrawButton"
+).addEventListener(
+"click",
+()=>{
+
+alert(
+"Producer withdrawals will be available when PASONG payout processing is connected."
+);
+
+}
+);
 
 function formatUGX(value){
-return "UGX "+Number(value||0).toLocaleString("en-US");
-}
 
-function showMessage(type,message){
-
-const box=document.getElementById("formMessage");
-
-box.className="message "+type;
-box.textContent=message;
+return "UGX "+
+Number(value||0).toLocaleString(
+"en-US"
+);
 
 }
 
-function showProfileMessage(type,message){
+function showMessage(
+type,
+message
+){
 
-const box=document.getElementById("profileMessage");
+const box=
+document.getElementById(
+"formMessage"
+);
 
-box.className="message "+type;
-box.textContent=message;
+box.className=
+"message "+type;
+
+box.textContent=
+message;
 
 }
 
-function getProfileValue(profile,keys){
+function showProfileMessage(
+type,
+message
+){
+
+const box=
+document.getElementById(
+"profileMessage"
+);
+
+box.className=
+"message "+type;
+
+box.textContent=
+message;
+
+}
+
+function getProfileValue(
+profile,
+keys
+){
 
 if(!profile)return "";
 
@@ -478,7 +560,9 @@ for(const key of keys){
 if(
 profile[key]!==undefined &&
 profile[key]!==null &&
-String(profile[key]).trim()!==""
+String(
+profile[key]
+).trim()!==""
 ){
 
 return profile[key];
@@ -491,30 +575,42 @@ return "";
 
 }
 
-function getProfilePicture(profile){
+function getProfilePicture(
+profile
+){
 
-return getProfileValue(profile,[
+return getProfileValue(
+profile,
+[
 "profile_photo_url",
 "profile_picture_url",
 "avatar_url",
 "photo_url",
 "image_url",
 "profile_image"
-]);
+]
+);
 
 }
 
-function getShowreel(profile){
+function getShowreel(
+profile
+){
 
-return getProfileValue(profile,[
+return getProfileValue(
+profile,
+[
 "showreel_url",
 "showreel",
 "showreel_link"
-]);
+]
+);
 
 }
 
-function fillProfileForm(profile){
+function fillProfileForm(
+profile
+){
 
 if(!profile)return;
 
@@ -525,22 +621,36 @@ profile.stage_name||
 profile.name||
 "Producer";
 
-const picture=getProfilePicture(profile);
-const showreel=getShowreel(profile);
+const picture=
+getProfilePicture(profile);
 
-document.getElementById("profilePreviewName").textContent=producerName;
+const showreel=
+getShowreel(profile);
 
-document.getElementById("profilePreview").src=
+document.getElementById(
+"profilePreviewName"
+).textContent=
+producerName;
+
+document.getElementById(
+"profilePreview"
+).src=
 picture||
 "https://ui-avatars.com/api/?name="+
 encodeURIComponent(producerName)+
 "&background=171722&color=c084fc&bold=true&size=300";
 
-document.getElementById("showreelUrl").value=
+document.getElementById(
+"showreelUrl"
+).value=
 showreel||"";
 
-document.getElementById("musicStyles").value=
-getProfileValue(profile,[
+document.getElementById(
+"musicStyles"
+).value=
+getProfileValue(
+profile,
+[
 "music_styles",
 "music_style",
 "genres",
@@ -549,87 +659,138 @@ getProfileValue(profile,[
 "specialties",
 "producer_style",
 "producer_styles"
-])||"";
+]
+)||"";
 
-document.getElementById("daws").value=
-getProfileValue(profile,[
+document.getElementById(
+"daws"
+).value=
+getProfileValue(
+profile,
+[
 "daws",
 "daw",
 "software",
 "production_software",
 "production_tools"
-])||"";
+]
+)||"";
 
-document.getElementById("producerTags").value=
-getProfileValue(profile,[
+document.getElementById(
+"producerTags"
+).value=
+getProfileValue(
+profile,
+[
 "tags",
 "producer_tags",
 "music_tags"
-])||"";
+]
+)||"";
 
-document.getElementById("availability").value=
-getProfileValue(profile,[
+document.getElementById(
+"availability"
+).value=
+getProfileValue(
+profile,
+[
 "availability",
 "delivery_time",
 "response_availability",
 "available"
-])||"";
+]
+)||"";
 
-document.getElementById("producerLocation").value=
-getProfileValue(profile,[
+document.getElementById(
+"producerLocation"
+).value=
+getProfileValue(
+profile,
+[
 "location",
 "city",
 "producer_location"
-])||"";
+]
+)||"";
 
-document.getElementById("whatsappNumber").value=
-getProfileValue(profile,[
+document.getElementById(
+"whatsappNumber"
+).value=
+getProfileValue(
+profile,
+[
 "whatsapp_number",
 "whatsapp",
 "whatsapp_phone",
 "phone",
 "phone_number"
-])||"";
+]
+)||"";
 
-document.getElementById("producerBio").value=
-getProfileValue(profile,[
+document.getElementById(
+"producerBio"
+).value=
+getProfileValue(
+profile,
+[
 "bio",
 "about",
 "description",
 "producer_bio",
 "profile_bio"
-])||"";
+]
+)||"";
 
-document.getElementById("beatLeaseServicePrice").value=
-getProfileValue(profile,[
+document.getElementById(
+"beatLeaseServicePrice"
+).value=
+getProfileValue(
+profile,
+[
 "beat_lease_service_price",
 "beat_lease_price",
 "lease_service_price",
 "lease_price"
-])||"";
+]
+)||"";
 
-document.getElementById("exclusiveServicePrice").value=
-getProfileValue(profile,[
+document.getElementById(
+"exclusiveServicePrice"
+).value=
+getProfileValue(
+profile,
+[
 "exclusive_rights_service_price",
 "exclusive_service_price",
 "exclusive_rights_price",
 "exclusive_price"
-])||"";
+]
+)||"";
 
-document.getElementById("customBeatServicePrice").value=
-getProfileValue(profile,[
+document.getElementById(
+"customBeatServicePrice"
+).value=
+getProfileValue(
+profile,
+[
 "custom_beat_service_price",
 "custom_beat_price",
 "custom_price"
-])||"";
+]
+)||"";
 
-document.getElementById("mixingServicePrice").value=
-getProfileValue(profile,[
+document.getElementById(
+"mixingServicePrice"
+).value=
+getProfileValue(
+profile,
+[
 "mixing_mastering_service_price",
 "mixing_mastering_price",
 "mixing_price",
 "mastering_price"
-])||"";
+]
+)||"";
 
 }
 
@@ -638,15 +799,27 @@ async function loadProducer(){
 const {
 data:{user},
 error:userError
-}=await supabaseClient.auth.getUser();
+}=
+await supabaseClient.auth.getUser();
 
 if(userError)throw userError;
 
 if(!user){
 
-document.getElementById("accountName").textContent="Not logged in";
-document.getElementById("heroProducerName").textContent="Producer";
-document.getElementById("welcomeName").textContent="Producer";
+document.getElementById(
+"accountName"
+).textContent=
+"Not logged in";
+
+document.getElementById(
+"heroProducerName"
+).textContent=
+"Producer";
+
+document.getElementById(
+"welcomeName"
+).textContent=
+"Producer";
 
 return null;
 
@@ -655,7 +828,8 @@ return null;
 const {
 data:profile,
 error:profileError
-}=await supabaseClient
+}=
+await supabaseClient
 .from("artist_profiles")
 .select("*")
 .eq("user_id",user.id)
@@ -665,7 +839,9 @@ if(profileError)throw profileError;
 
 if(!profile){
 
-document.getElementById("accountName").textContent=
+document.getElementById(
+"accountName"
+).textContent=
 user.email||"Producer";
 
 return null;
@@ -679,11 +855,23 @@ profile.stage_name||
 profile.name||
 "Producer";
 
-currentProducerProfile=profile;
+currentProducerProfile=
+profile;
 
-document.getElementById("accountName").textContent=producerName;
-document.getElementById("heroProducerName").textContent=producerName;
-document.getElementById("welcomeName").textContent=producerName;
+document.getElementById(
+"accountName"
+).textContent=
+producerName;
+
+document.getElementById(
+"heroProducerName"
+).textContent=
+producerName;
+
+document.getElementById(
+"welcomeName"
+).textContent=
+producerName;
 
 fillProfileForm(profile);
 
@@ -691,7 +879,408 @@ return profile;
 
 }
 
-async function uploadProducerProfilePicture(file,accessToken){
+async function loadProducerDashboard(){
+
+try{
+
+const profile=
+currentProducerProfile||
+await loadProducer();
+
+if(!profile){
+
+resetDashboardStats();
+
+return;
+
+}
+
+const producerProfileId=
+profile.id;
+
+const producerUserId=
+profile.user_id;
+
+const [
+beatsResult,
+ordersResult,
+fansResult
+]=await Promise.all([
+
+supabaseClient
+.from("beats")
+.select("*")
+.eq(
+"producer_id",
+producerProfileId
+)
+.order(
+"created_at",
+{
+ascending:false
+}
+),
+
+supabaseClient
+.from("beat_orders")
+.select("*")
+.eq(
+"producer_profile_id",
+producerProfileId
+)
+.order(
+"created_at",
+{
+ascending:false
+}),
+
+supabaseClient
+.from("producer_follows")
+.select(
+"id",
+{
+count:"exact",
+head:true
+}
+)
+.eq(
+"producer_id",
+producerProfileId
+)
+
+]);
+
+if(beatsResult.error){
+
+throw beatsResult.error;
+
+}
+
+if(ordersResult.error){
+
+throw ordersResult.error;
+
+}
+
+if(fansResult.error){
+
+throw fansResult.error;
+
+}
+
+const beats=
+beatsResult.data||[];
+
+const orders=
+ordersResult.data||[];
+
+currentProducerBeats=
+beats;
+
+renderBeats(beats);
+
+renderProducerEarnings(
+beats,
+orders,
+fansResult.count||0,
+producerUserId
+);
+
+}catch(error){
+
+console.error(
+"Producer dashboard loading error:",
+error
+);
+
+resetDashboardStats();
+
+}
+
+}
+
+function isPaidOrder(order){
+
+const status=
+String(
+order?.status||""
+).toLowerCase().trim();
+
+return [
+"paid",
+"completed",
+"complete",
+"success",
+"succeeded",
+"successful",
+"approved",
+"delivered"
+].includes(status);
+
+}
+
+function renderProducerEarnings(
+beats,
+orders,
+fans
+){
+
+const paidOrders=
+orders.filter(
+isPaidOrder
+);
+
+const totalSales=
+paidOrders.length;
+
+const grossSales=
+paidOrders.reduce(
+(sum,order)=>
+sum+Number(order.price||0),
+0
+);
+
+const producerEarnings=
+grossSales*0.75;
+
+const monthStart=
+new Date();
+
+monthStart.setDate(1);
+monthStart.setHours(
+0,
+0,
+0,
+0
+);
+
+const monthlyOrders=
+paidOrders.filter(order=>{
+
+const dateValue=
+order.paid_at||
+order.completed_at||
+order.created_at;
+
+if(!dateValue)return false;
+
+const date=
+new Date(dateValue);
+
+return date>=monthStart;
+
+});
+
+const monthlyGross=
+monthlyOrders.reduce(
+(sum,order)=>
+sum+Number(order.price||0),
+0
+);
+
+const monthlyProducerEarnings=
+monthlyGross*0.75;
+
+document.getElementById(
+"producerBalance"
+).textContent=
+formatUGX(
+producerEarnings
+);
+
+document.getElementById(
+"totalSales"
+).textContent=
+totalSales.toLocaleString(
+"en-US"
+);
+
+document.getElementById(
+"totalFans"
+).textContent=
+Number(fans||0).toLocaleString(
+"en-US"
+);
+
+document.getElementById(
+"thisMonth"
+).textContent=
+formatUGX(
+monthlyProducerEarnings
+);
+
+document.getElementById(
+"totalStreams"
+).textContent=
+"Not tracked";
+
+renderEarningsTable(
+beats,
+paidOrders
+);
+
+}
+
+function renderEarningsTable(
+beats,
+paidOrders
+){
+
+const tbody=
+document.getElementById(
+"earningsTableBody"
+);
+
+if(!beats.length){
+
+tbody.innerHTML=`
+<tr>
+<td>No beats uploaded yet</td>
+<td>Not tracked</td>
+<td>0</td>
+<td>UGX 0</td>
+</tr>
+`;
+
+return;
+
+}
+
+const beatMap=
+new Map(
+beats.map(
+beat=>[
+String(beat.id),
+beat
+]
+)
+);
+
+const grouped=
+new Map();
+
+paidOrders.forEach(order=>{
+
+const beatId=
+String(order.beat_id||"");
+
+if(!beatMap.has(beatId))return;
+
+if(!grouped.has(beatId)){
+
+grouped.set(
+beatId,
+{
+sales:0,
+gross:0
+}
+);
+
+}
+
+const item=
+grouped.get(beatId);
+
+item.sales+=1;
+
+item.gross+=
+Number(order.price||0);
+
+});
+
+tbody.innerHTML=
+beats.map(beat=>{
+
+const item=
+grouped.get(
+String(beat.id)
+)||{
+sales:0,
+gross:0
+};
+
+const earnings=
+item.gross*0.75;
+
+return`
+<tr>
+<td>${escapeHtml(
+beat.title||
+"Untitled Beat"
+)}</td>
+<td>Not tracked</td>
+<td>${item.sales.toLocaleString(
+"en-US"
+)}</td>
+<td>${formatUGX(
+earnings
+)}</td>
+</tr>
+`;
+
+}).join("");
+
+}
+
+function resetDashboardStats(){
+
+document.getElementById(
+"producerBalance"
+).textContent=
+"UGX 0";
+
+document.getElementById(
+"totalStreams"
+).textContent=
+"Not tracked";
+
+document.getElementById(
+"totalSales"
+).textContent=
+"0";
+
+document.getElementById(
+"totalFans"
+).textContent=
+"0";
+
+document.getElementById(
+"thisMonth"
+).textContent=
+"UGX 0";
+
+document.getElementById(
+"earningsTableBody"
+).innerHTML=`
+<tr>
+<td>No beat sales yet</td>
+<td>Not tracked</td>
+<td>0</td>
+<td>UGX 0</td>
+</tr>
+`;
+
+document.getElementById(
+"statBeats"
+).textContent=
+"0";
+
+document.getElementById(
+"statPublished"
+).textContent=
+"0";
+
+document.getElementById(
+"statExclusive"
+).textContent=
+"0";
+
+}
+
+async function uploadProducerProfilePicture(
+file,
+accessToken
+){
 
 return await uploadToCloudinary(
 file,
@@ -701,38 +1290,49 @@ accessToken
 
 }
 
-document.getElementById("profilePhoto").addEventListener(
+document.getElementById(
+"profilePhoto"
+).addEventListener(
 "change",
 event=>{
 
-const file=event.target.files[0];
+const file=
+event.target.files[0];
 
 if(!file)return;
 
-document.getElementById("profilePreview").src=
+document.getElementById(
+"profilePreview"
+).src=
 URL.createObjectURL(file);
 
 }
 );
 
-document.getElementById("profileForm").addEventListener(
+document.getElementById(
+"profileForm"
+).addEventListener(
 "submit",
 async event=>{
 
 event.preventDefault();
 
 const saveButton=
-document.getElementById("saveProfileButton");
+document.getElementById(
+"saveProfileButton"
+);
 
 saveButton.disabled=true;
-saveButton.textContent="Saving...";
+saveButton.textContent=
+"Saving...";
 
 try{
 
 const {
 data:{user},
 error:userError
-}=await supabaseClient.auth.getUser();
+}=
+await supabaseClient.auth.getUser();
 
 if(userError)throw userError;
 
@@ -744,14 +1344,16 @@ throw new Error(
 
 }
 
-let profile=currentProducerProfile;
+let profile=
+currentProducerProfile;
 
 if(!profile){
 
 const {
 data:foundProfile,
 error:profileError
-}=await supabaseClient
+}=
+await supabaseClient
 .from("artist_profiles")
 .select("*")
 .eq("user_id",user.id)
@@ -759,30 +1361,40 @@ error:profileError
 
 if(profileError)throw profileError;
 
-profile=foundProfile;
-currentProducerProfile=profile;
+profile=
+foundProfile;
+
+currentProducerProfile=
+profile;
 
 }
 
 if(!profile){
 
-throw new Error("Producer profile was not found.");
+throw new Error(
+"Producer profile was not found."
+);
 
 }
 
-let profilePhotoUrl=getProfilePicture(profile);
+let profilePhotoUrl=
+getProfilePicture(profile);
 
 const photoFile=
-document.getElementById("profilePhoto").files[0];
+document.getElementById(
+"profilePhoto"
+).files[0];
 
 if(photoFile){
 
-saveButton.textContent="Uploading Picture...";
+saveButton.textContent=
+"Uploading Picture...";
 
 const {
 data:{session},
 error:sessionError
-}=await supabaseClient.auth.getSession();
+}=
+await supabaseClient.auth.getSession();
 
 if(sessionError)throw sessionError;
 
@@ -805,72 +1417,121 @@ session.access_token
 const updateData={
 
 music_styles:
-document.getElementById("musicStyles").value.trim()||null,
+document.getElementById(
+"musicStyles"
+).value.trim()||null,
 
 daws:
-document.getElementById("daws").value.trim()||null,
+document.getElementById(
+"daws"
+).value.trim()||null,
 
 tags:
-document.getElementById("producerTags").value.trim()||null,
+document.getElementById(
+"producerTags"
+).value.trim()||null,
 
 availability:
-document.getElementById("availability").value.trim()||null,
+document.getElementById(
+"availability"
+).value.trim()||null,
 
 location:
-document.getElementById("producerLocation").value.trim()||null,
+document.getElementById(
+"producerLocation"
+).value.trim()||null,
 
 whatsapp_number:
-document.getElementById("whatsappNumber").value.trim()||null,
+document.getElementById(
+"whatsappNumber"
+).value.trim()||null,
 
 bio:
-document.getElementById("producerBio").value.trim()||null,
+document.getElementById(
+"producerBio"
+).value.trim()||null,
 
 showreel_url:
-document.getElementById("showreelUrl").value.trim()||null,
+document.getElementById(
+"showreelUrl"
+).value.trim()||null,
 
 profile_photo_url:
 profilePhotoUrl||null,
 
 beat_lease_service_price:
-document.getElementById("beatLeaseServicePrice").value
-?Number(document.getElementById("beatLeaseServicePrice").value)
+document.getElementById(
+"beatLeaseServicePrice"
+).value
+?Number(
+document.getElementById(
+"beatLeaseServicePrice"
+).value
+)
 :null,
 
 exclusive_rights_service_price:
-document.getElementById("exclusiveServicePrice").value
-?Number(document.getElementById("exclusiveServicePrice").value)
+document.getElementById(
+"exclusiveServicePrice"
+).value
+?Number(
+document.getElementById(
+"exclusiveServicePrice"
+).value
+)
 :null,
 
 custom_beat_service_price:
-document.getElementById("customBeatServicePrice").value
-?Number(document.getElementById("customBeatServicePrice").value)
+document.getElementById(
+"customBeatServicePrice"
+).value
+?Number(
+document.getElementById(
+"customBeatServicePrice"
+).value
+)
 :null,
 
 mixing_mastering_service_price:
-document.getElementById("mixingServicePrice").value
-?Number(document.getElementById("mixingServicePrice").value)
+document.getElementById(
+"mixingServicePrice"
+).value
+?Number(
+document.getElementById(
+"mixingServicePrice"
+).value
+)
 :null
 
 };
 
-saveButton.textContent="Saving Profile...";
+saveButton.textContent=
+"Saving Profile...";
 
 const {
 error:updateError
-}=await supabaseClient
+}=
+await supabaseClient
 .from("artist_profiles")
 .update(updateData)
-.eq("id",profile.id);
+.eq(
+"id",
+profile.id
+);
 
 if(updateError)throw updateError;
 
 const {
 data:updatedProfile,
 error:reloadError
-}=await supabaseClient
+}=
+await supabaseClient
 .from("artist_profiles")
 .select("*")
-.eq("id",profile.id)
+.eq(
+"id",
+profile.id
+)
 .maybeSingle();
 
 if(reloadError)throw reloadError;
@@ -883,11 +1544,16 @@ throw new Error(
 
 }
 
-currentProducerProfile=updatedProfile;
+currentProducerProfile=
+updatedProfile;
 
-fillProfileForm(updatedProfile);
+fillProfileForm(
+updatedProfile
+);
 
-document.getElementById("profilePhoto").value="";
+document.getElementById(
+"profilePhoto"
+).value="";
 
 showProfileMessage(
 "success",
@@ -920,26 +1586,37 @@ message
 }finally{
 
 saveButton.disabled=false;
-saveButton.textContent="Save Public Profile";
+
+saveButton.textContent=
+"Save Public Profile";
 
 }
 
 }
 );
 
-document.getElementById("clearProfileForm").addEventListener(
+document.getElementById(
+"clearProfileForm"
+).addEventListener(
 "click",
 ()=>{
 
 if(currentProducerProfile){
 
-fillProfileForm(currentProducerProfile);
+fillProfileForm(
+currentProducerProfile
+);
 
 }
 
-document.getElementById("profilePhoto").value="";
+document.getElementById(
+"profilePhoto"
+).value="";
 
-document.getElementById("profileMessage").className="message";
+document.getElementById(
+"profileMessage"
+).className=
+"message";
 
 }
 );
@@ -963,15 +1640,31 @@ return;
 const {
 data,
 error
-}=await supabaseClient
+}=
+await supabaseClient
 .from("beats")
 .select("*")
-.eq("producer_id",profile.id)
-.order("created_at",{ascending:false});
+.eq(
+"producer_id",
+profile.id
+)
+.order(
+"created_at",
+{
+ascending:false
+}
+);
 
 if(error)throw error;
 
-renderBeats(data||[]);
+currentProducerBeats=
+data||[];
+
+renderBeats(
+data||[]
+);
+
+await loadProducerDashboard();
 
 }catch(error){
 
@@ -986,24 +1679,35 @@ renderBeats([]);
 
 }
 
-function renderBeats(beats){
+function renderBeats(
+beats
+){
 
 const grid=
-document.getElementById("beatsGrid");
+document.getElementById(
+"beatsGrid"
+);
 
-document.getElementById("statBeats").textContent=
+document.getElementById(
+"statBeats"
+).textContent=
 beats.length;
 
-document.getElementById("statPublished").textContent=
+document.getElementById(
+"statPublished"
+).textContent=
 beats.filter(
 beat=>
 beat.status==="approved"||
 beat.status==="published"
 ).length;
 
-document.getElementById("statExclusive").textContent=
+document.getElementById(
+"statExclusive"
+).textContent=
 beats.filter(
-beat=>beat.is_exclusive_sold
+beat=>
+beat.is_exclusive_sold
 ).length;
 
 if(!beats.length){
@@ -1015,7 +1719,9 @@ return;
 
 }
 
-grid.innerHTML=beats.map(beat=>{
+grid.innerHTML=
+beats.map(
+beat=>{
 
 const cover=
 beat.cover_url||
@@ -1034,36 +1740,59 @@ alt=""
 <div class="beat-info">
 
 <div class="beat-title">
-${escapeHtml(beat.title||"Untitled Beat")}
+${escapeHtml(
+beat.title||
+"Untitled Beat"
+)}
 </div>
 
 <div class="beat-meta">
 
-${escapeHtml(beat.genre||"Genre not set")}
+${escapeHtml(
+beat.genre||
+"Genre not set"
+)}
 
 ${beat.bpm
-?" • "+escapeHtml(beat.bpm)+" BPM"
+?" • "+
+escapeHtml(beat.bpm)+
+" BPM"
 :""}
 
 ${beat.musical_key
-?" • "+escapeHtml(beat.musical_key)
+?" • "+
+escapeHtml(
+beat.musical_key
+)
 :""}
 
 <br>
 
-MP3 Lease: ${formatUGX(beat.lease_mp3_price)}
+MP3 Lease:
+${formatUGX(
+beat.lease_mp3_price
+)}
 
 <br>
 
-WAV Lease: ${formatUGX(beat.lease_wav_price)}
+WAV Lease:
+${formatUGX(
+beat.lease_wav_price
+)}
 
 <br>
 
-Stems: ${formatUGX(beat.stems_price)}
+Stems:
+${formatUGX(
+beat.stems_price
+)}
 
 <br>
 
-Exclusive: ${formatUGX(beat.exclusive_price)}
+Exclusive:
+${formatUGX(
+beat.exclusive_price
+)}
 
 </div>
 
@@ -1072,7 +1801,8 @@ Exclusive: ${formatUGX(beat.exclusive_price)}
 ${escapeHtml(
 beat.is_exclusive_sold
 ?"Exclusive Sold"
-:beat.status||"Pending"
+:beat.status||
+"Pending"
 )}
 
 </div>
@@ -1083,18 +1813,38 @@ beat.is_exclusive_sold
 
 `;
 
-}).join("");
+}
+).join("");
 
 }
 
-function escapeHtml(value){
+function escapeHtml(
+value
+){
 
-return String(value??"")
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
+return String(
+value??""
+)
+.replaceAll(
+"&",
+"&amp;"
+)
+.replaceAll(
+"<",
+"&lt;"
+)
+.replaceAll(
+">",
+"&gt;"
+)
+.replaceAll(
+'"',
+"&quot;"
+)
+.replaceAll(
+"'",
+"&#039;"
+);
 
 }
 
@@ -1128,12 +1878,17 @@ max:10000000
 
 ];
 
-for(const price of prices){
+for(
+const price of prices
+){
 
 const input=
-document.getElementById(price.id);
+document.getElementById(
+price.id
+);
 
-const value=Number(input.value);
+const value=
+Number(input.value);
 
 if(
 !Number.isFinite(value)||
@@ -1163,14 +1918,20 @@ try{
 
 signatureResponse=
 await fetch(
-API_URL+"/api/cloudinary/signature",
+API_URL+
+"/api/cloudinary/signature",
 {
 method:"POST",
 headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+accessToken
+"Content-Type":
+"application/json",
+"Authorization":
+"Bearer "+
+accessToken
 },
-body:JSON.stringify({folder})
+body:JSON.stringify({
+folder
+})
 }
 );
 
@@ -1226,9 +1987,13 @@ throw new Error(
 
 }
 
-const formData=new FormData();
+const formData=
+new FormData();
 
-formData.append("file",file);
+formData.append(
+"file",
+file
+);
 
 formData.append(
 "api_key",
@@ -1315,10 +2080,14 @@ return uploadData.secure_url;
 }
 
 const agreementAccepted=
-document.getElementById("agreementAccepted");
+document.getElementById(
+"agreementAccepted"
+);
 
 const uploadButton=
-document.getElementById("uploadButton");
+document.getElementById(
+"uploadButton"
+);
 
 agreementAccepted.addEventListener(
 "change",
@@ -1330,7 +2099,9 @@ uploadButton.disabled=
 }
 );
 
-document.getElementById("beatForm").addEventListener(
+document.getElementById(
+"beatForm"
+).addEventListener(
 "submit",
 async event=>{
 
@@ -1395,22 +2166,34 @@ return;
 }
 
 const title=
-document.getElementById("beatTitle").value.trim();
+document.getElementById(
+"beatTitle"
+).value.trim();
 
 const genre=
-document.getElementById("genre").value.trim();
+document.getElementById(
+"genre"
+).value.trim();
 
 const bpm=
-document.getElementById("bpm").value;
+document.getElementById(
+"bpm"
+).value;
 
 const musicalKey=
-document.getElementById("musicalKey").value.trim();
+document.getElementById(
+"musicalKey"
+).value.trim();
 
 const audioFile=
-document.getElementById("audio").files[0];
+document.getElementById(
+"audio"
+).files[0];
 
 const coverFile=
-document.getElementById("cover").files[0];
+document.getElementById(
+"cover"
+).files[0];
 
 if(!title||!audioFile){
 
@@ -1430,7 +2213,8 @@ try{
 const {
 data:sessionData,
 error:sessionError
-}=await supabaseClient.auth.getSession();
+}=
+await supabaseClient.auth.getSession();
 
 if(sessionError)throw sessionError;
 
@@ -1483,18 +2267,24 @@ try{
 
 beatResponse=
 await fetch(
-API_URL+"/api/beats/create",
+API_URL+
+"/api/beats/create",
 {
 method:"POST",
 headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+accessToken
+"Content-Type":
+"application/json",
+"Authorization":
+"Bearer "+
+accessToken
 },
 body:JSON.stringify({
 
 title:title,
 
-genre:genre||null,
+genre:
+genre||
+null,
 
 bpm:
 bpm
@@ -1513,22 +2303,30 @@ coverUrl,
 
 lease_mp3_price:
 Number(
-document.getElementById("leaseMp3").value
+document.getElementById(
+"leaseMp3"
+).value
 ),
 
 lease_wav_price:
 Number(
-document.getElementById("leaseWav").value
+document.getElementById(
+"leaseWav"
+).value
 ),
 
 stems_price:
 Number(
-document.getElementById("stemsPrice").value
+document.getElementById(
+"stemsPrice"
+).value
 ),
 
 exclusive_price:
 Number(
-document.getElementById("exclusivePrice").value
+document.getElementById(
+"exclusivePrice"
+).value
 )
 
 })
@@ -1596,7 +2394,8 @@ uploadButton.textContent=
 const {
 data:sessionCheck,
 error:sessionCheckError
-}=await supabaseClient.auth.getSession();
+}=
+await supabaseClient.auth.getSession();
 
 if(sessionCheckError)throw sessionCheckError;
 
@@ -1619,7 +2418,8 @@ new Date().toISOString();
 
 const {
 error:agreementError
-}=await supabaseClient
+}=
+await supabaseClient
 .from("upload_agreements")
 .insert({
 
@@ -1679,25 +2479,31 @@ document.getElementById(
 
 document.getElementById(
 "leaseMp3"
-).value="10000";
+).value=
+"10000";
 
 document.getElementById(
 "leaseWav"
-).value="10000";
+).value=
+"10000";
 
 document.getElementById(
 "stemsPrice"
-).value="10000";
+).value=
+"10000";
 
 document.getElementById(
 "exclusivePrice"
-).value="500000";
+).value=
+"500000";
 
-agreementAccepted.checked=false;
+agreementAccepted.checked=
+false;
 
-uploadButton.disabled=true;
+uploadButton.disabled=
+true;
 
-await loadBeats();
+await loadProducerDashboard();
 
 }catch(error){
 
@@ -1725,7 +2531,9 @@ uploadButton.disabled=
 }
 );
 
-document.getElementById("clearForm").addEventListener(
+document.getElementById(
+"clearForm"
+).addEventListener(
 "click",
 ()=>{
 
@@ -1735,32 +2543,56 @@ document.getElementById(
 
 document.getElementById(
 "leaseMp3"
-).value="10000";
+).value=
+"10000";
 
 document.getElementById(
 "leaseWav"
-).value="10000";
+).value=
+"10000";
 
 document.getElementById(
 "stemsPrice"
-).value="10000";
+).value=
+"10000";
 
 document.getElementById(
 "exclusivePrice"
-).value="500000";
+).value=
+"500000";
 
-agreementAccepted.checked=false;
+agreementAccepted.checked=
+false;
 
-uploadButton.disabled=true;
+uploadButton.disabled=
+true;
 
 document.getElementById(
 "formMessage"
-).className="message";
+).className=
+"message";
 
 }
 );
 
-loadBeats();
+(async()=>{
+
+try{
+
+await loadProducerDashboard();
+
+}catch(error){
+
+console.error(
+"Initial producer dashboard error:",
+error
+);
+
+resetDashboardStats();
+
+}
+
+})();
 
 </script></body>
 </html>
