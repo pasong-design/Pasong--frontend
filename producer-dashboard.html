@@ -8,24 +8,1120 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,Helvetica,sans-serif;background:#090612;color:#fff;min-height:100vh}
-header{background:#10091c;border-bottom:1px solid #28153d;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:20}
-.logo{color:#c084fc;font-size:24px;font-weight:800;white-space:nowrap}
-.header-right{display:flex;align-items:center;gap:12px}
-.header-right a{color:#ddd;text-decoration:none;font-size:14px}
-.header-right a:hover{color:#c084fc}
-.account{background:#1d1230;border:1px solid #38205a;padding:8px 12px;border-radius:20px;font-size:13px}
+body{font-family:Arial,sans-serif;background:#090612;color:#fff;min-height:100vh}
+header{background:#10091c;border-bottom:1px solid #28153d;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+.logo{color:#c084fc;font-size:24px;font-weight:800}
+.account{background:#1d1230;border:1px solid #38205a;padding:8px 12px;border-radius:20px;font-size:13px;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .container{width:min(1180px,94%);margin:auto}
 .hero{margin-top:25px;padding:28px;border:1px solid #38205a;border-radius:20px;background:linear-gradient(135deg,#160b27,#0d0715)}
-.hero h1{font-size:30px;margin-bottom:8px}
-.hero p{color:#aaa;line-height:1.6}
-.producer-name{color:#c084fc}
+.hero h1{margin-bottom:8px}
+.hero p{color:#aaa;font-size:14px}
 .dashboard{display:grid;grid-template-columns:280px 1fr;gap:20px;margin:20px 0 40px}
 .sidebar{background:#10091c;border:1px solid #28153d;border-radius:18px;padding:18px;height:max-content}
 .sidebar button{width:100%;text-align:left;padding:13px 14px;margin-bottom:8px;border:0;border-radius:10px;background:transparent;color:#ddd;cursor:pointer;font-size:14px}
-.sidebar button:hover,.sidebar button.active{background:#241238;color:#fff}
+.sidebar button:hover{background:#1d1030}
+.sidebar button.active{background:#241238;color:#fff}
 .content{min-width:0}
 .card{background:#10091c;border:1px solid #28153d;border-radius:18px;padding:22px;margin-bottom:20px}
-.card h2{font-size:21px;margin-bottom:7px}
-.card-subtitle{color:#999;font-size:13px;margin-bottom:20px}
+.card h2{margin-bottom:10px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#160d24;border:1px solid #2d1944;border-radius:14px;padding:18px}
+.stat-number{font-size:25px;font-weight:700;color:#c084fc}
+.stat-label{color:#999;font-size:12px;margin-top:5px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1/-1}
+.field label{font-size:13px;color:#ddd}
+input,textarea,select{width:100%;background:#0b0611;border:1px solid #392151;border-radius:10px;padding:13px;color:#fff;outline:none}
+input:focus,textarea:focus,select:focus{border-color:#8b5cf6}
+input[type="file"]{padding:10px}
+input[type="checkbox"]{width:auto;margin-right:7px}
+.btn{border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font-weight:700}
+.btn-primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.message{display:none;margin-top:15px;padding:12px;border-radius:10px;font-size:13px}
+.message.success{display:block;background:#102617;border:1px solid #245d32;color:#9ae6a8}
+.message.error{display:block;background:#2a1017;border:1px solid #6c2636;color:#ff9caf}
+.message.info{display:block;background:#171127;border:1px solid #38205a;color:#d8c5ff}
+.beats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.beat-card{background:#160d24;border:1px solid #2d1944;border-radius:15px;overflow:hidden}
+.beat-cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#0b0611}
+.beat-info{padding:15px}
+.beat-info strong{display:block;margin-bottom:7px}
+.beat-status{font-size:12px;color:#aaa}
+.beat-price{margin-top:8px;color:#c084fc;font-size:13px}
+.empty{padding:30px;text-align:center;color:#888;border:1px dashed #38204f;border-radius:12px}
+.hidden{display:none!important}
+#errorBox{display:none;background:#ff1a1a;color:#fff;padding:15px;border-radius:10px;margin:15px auto;width:min(1180px,94%);font-size:12px;white-space:pre-wrap;overflow:auto}
+.loading{opacity:.7}
+@media(max-width:800px){
+.dashboard{grid-template-columns:1fr}
+.sidebar{display:flex;overflow-x:auto;gap:8px;padding:12px}
+.sidebar button{min-width:max-content;margin-bottom:0}
+.form-grid{grid-template-columns:1fr}
+.beats-grid{grid-template-columns:1fr}
+.stats{grid-template-columns:1fr}
+.hero{padding:22px}
+.account{max-width:45%}
+}
+</style>
+</head>
+
+<body>
+
+<div id="errorBox"></div>
+
+<header>
+<div class="logo">◈ PASONG</div>
+<div class="account" id="accountName">Loading...</div>
+</header>
+
+<main class="container">
+
+<section class="hero">
+<h1>🎛️ Producer Dashboard</h1>
+<p id="heroText">Checking your producer account...</p>
+</section>
+
+<div class="dashboard">
+
+<aside class="sidebar">
+<button class="active" data-section="overview">📊 Overview</button>
+<button data-section="upload">🎛️ Upload Beat</button>
+<button data-section="my-beats">🎵 My Beats</button>
+<button data-section="orders">📦 Orders</button>
+</aside>
+
+<section class="content">
+
+<div id="section-overview">
+
+<div class="card">
+<h2>Welcome <span id="welcomeName">Producer</span></h2>
+<p style="color:#999;font-size:13px;margin-top:6px">
+Manage your beats, uploads and producer orders from here.
+</p>
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-number" id="statBeats">0</div>
+<div class="stat-label">Beats</div>
+</div>
+
+<div class="stat">
+<div class="stat-number" id="statPublished">0</div>
+<div class="stat-label">Published</div>
+</div>
+
+<div class="stat">
+<div class="stat-number" id="statExclusive">0</div>
+<div class="stat-label">Exclusive Sold</div>
+</div>
+
+</div>
+
+</div>
+
+<div id="section-upload" class="hidden">
+
+<div class="card">
+
+<h2>🎛️ Upload Beat</h2>
+
+<form id="beatForm">
+
+<div class="form-grid">
+
+<div class="field full">
+<label>Title *</label>
+<input id="beatTitle" maxlength="150" required>
+</div>
+
+<div class="field">
+<label>Genre</label>
+<input id="genre" value="Afrobeat" maxlength="80">
+</div>
+
+<div class="field">
+<label>BPM</label>
+<input id="bpm" type="number" min="1" max="400">
+</div>
+
+<div class="field">
+<label>Cover</label>
+<input id="cover" type="file" accept="image/jpeg,image/png,image/webp">
+</div>
+
+<div class="field full">
+<label>Beat File *</label>
+<input id="audio" type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/wave" required>
+</div>
+
+<div class="field">
+<label>MP3 UGX</label>
+<input id="leaseMp3" type="number" min="0" value="10000">
+</div>
+
+<div class="field">
+<label>WAV UGX</label>
+<input id="leaseWav" type="number" min="0" value="25000">
+</div>
+
+<div class="field">
+<label>Stems UGX</label>
+<input id="stemsPrice" type="number" min="0" value="50000">
+</div>
+
+<div class="field">
+<label>Exclusive UGX</label>
+<input id="exclusivePrice" type="number" min="0" value="500000">
+</div>
+
+</div>
+
+<div style="margin-top:15px">
+<label style="font-size:13px;color:#ddd">
+<input type="checkbox" id="agreementAccepted">
+I agree to the PASONG 75/25 producer agreement
+</label>
+</div>
+
+<button type="submit" class="btn btn-primary" id="uploadButton" disabled style="margin-top:15px">
+Upload Beat
+</button>
+
+<div id="formMessage" class="message"></div>
+
+</form>
+
+</div>
+
+</div>
+
+<div id="section-my-beats" class="hidden">
+
+<div class="card">
+
+<h2>🎵 My Beats</h2>
+
+<div id="beatsGrid" class="beats-grid">
+<div class="empty">Loading...</div>
+</div>
+
+</div>
+
+</div>
+
+<div id="section-orders" class="hidden">
+
+<div class="card">
+
+<h2>📦 Orders</h2>
+
+<div id="ordersList">
+<div class="empty">Loading...</div>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+</main>
+
+<script>
+
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const API_URL="https://pasong-api.onrender.com";
+const CLOUD_URL="https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload";
+
+let supabaseClient=null;
+let currentUser=null;
+let currentSession=null;
+
+function showFatalError(message){
+ const box=document.getElementById("errorBox");
+ if(!box)return;
+ box.style.display="block";
+ box.textContent=message;
+}
+
+window.onerror=function(msg,url,line){
+ showFatalError(
+  "PASONG DASHBOARD ERROR\n\n"+
+  "Message: "+msg+
+  "\nLine: "+line+
+  "\nURL: "+url
+ );
+ return true;
+};
+
+window.addEventListener("unhandledrejection",function(event){
+ const reason=event.reason;
+ const message=reason?.message||String(reason||"Unknown promise error");
+ showFatalError("PASONG DASHBOARD PROMISE ERROR\n\n"+message);
+});
+
+function escapeHtml(value){
+ return String(value??"")
+ .replaceAll("&","&amp;")
+ .replaceAll("<","&lt;")
+ .replaceAll(">","&gt;")
+ .replaceAll('"',"&quot;")
+ .replaceAll("'","&#039;");
+}
+
+function formatUGX(value){
+ const number=Number(value||0);
+ return "UGX "+number.toLocaleString();
+}
+
+function showMsg(type,message){
+ const box=document.getElementById("formMessage");
+ if(!box)return;
+ box.className="message "+type;
+ box.textContent=message;
+ box.style.display="block";
+}
+
+function clearMsg(){
+ const box=document.getElementById("formMessage");
+ if(!box)return;
+ box.className="message";
+ box.textContent="";
+ box.style.display="none";
+}
+
+function setUploadButton(){
+ const accepted=document.getElementById("agreementAccepted")?.checked;
+ const button=document.getElementById("uploadButton");
+ if(button){
+  button.disabled=!accepted;
+ }
+}
+
+function safeError(error,fallback){
+ if(!error)return fallback;
+ if(typeof error==="string")return error;
+ return error.message||error.error_description||fallback;
+}
+
+async function initSupabase(){
+
+ if(!window.supabase){
+  throw new Error("Supabase library failed to load.");
+ }
+
+ try{
+  supabaseClient=window.supabase.createClient(
+   SUPABASE_URL,
+   SUPABASE_KEY,
+   {
+    auth:{
+     persistSession:true,
+     autoRefreshToken:true,
+     detectSessionInUrl:true
+    }
+   }
+  );
+ }catch(error){
+  throw new Error("Supabase initialization failed: "+safeError(error,"Unknown error"));
+ }
+
+}
+
+async function getSessionSafe(){
+
+ if(!supabaseClient){
+  throw new Error("Supabase is not initialized.");
+ }
+
+ const result=await supabaseClient.auth.getSession();
+
+ if(result.error){
+  throw result.error;
+ }
+
+ const session=result.data?.session||null;
+
+ currentSession=session;
+ currentUser=session?.user||null;
+
+ return session;
+}
+
+async function loadProducerSafe(){
+
+ try{
+
+  const session=await getSessionSafe();
+
+  if(!session){
+
+   document.getElementById("accountName").textContent="Not logged in";
+
+   document.getElementById("welcomeName").textContent="Producer";
+
+   document.getElementById("heroText").textContent=
+    "Please login to access your producer dashboard.";
+
+   return null;
+  }
+
+  const user=session.user;
+
+  let profile=null;
+
+  try{
+
+   const result=await supabaseClient
+    .from("artist_profiles")
+    .select("*")
+    .eq("user_id",user.id)
+    .maybeSingle();
+
+   if(result.error){
+    console.warn("artist_profiles lookup:",result.error);
+   }else{
+    profile=result.data||null;
+   }
+
+  }catch(profileError){
+   console.warn("Profile lookup failed:",profileError);
+  }
+
+  const name=
+   profile?.performing_name||
+   profile?.artist_name||
+   profile?.stage_name||
+   user.user_metadata?.performing_name||
+   user.user_metadata?.full_name||
+   user.email||
+   "Producer";
+
+  document.getElementById("accountName").textContent=name;
+  document.getElementById("welcomeName").textContent=name;
+
+  document.getElementById("heroText").textContent=
+   "Logged in as "+name;
+
+  return profile;
+
+ }catch(error){
+
+  console.error("Producer load error:",error);
+
+  document.getElementById("accountName").textContent="Producer";
+
+  document.getElementById("welcomeName").textContent="Producer";
+
+  document.getElementById("heroText").textContent=
+   "Dashboard loaded. Some account information could not be loaded.";
+
+  return null;
+ }
+
+}
+
+function showSection(section){
+
+ document.querySelectorAll('[id^="section-"]').forEach(function(element){
+  element.classList.add("hidden");
+ });
+
+ const target=document.getElementById("section-"+section);
+
+ if(target){
+  target.classList.remove("hidden");
+ }
+
+ document.querySelectorAll(".sidebar button").forEach(function(button){
+  button.classList.toggle(
+   "active",
+   button.dataset.section===section
+  );
+ });
+
+ if(section==="my-beats"){
+  loadBeatsSafe();
+ }
+
+ if(section==="orders"){
+  loadOrdersSafe();
+ }
+
+}
+
+document.querySelectorAll(".sidebar button").forEach(function(button){
+
+ button.addEventListener("click",function(){
+  showSection(button.dataset.section);
+ });
+
+});
+
+async function loadBeatsSafe(){
+
+ const grid=document.getElementById("beatsGrid");
+
+ if(!grid)return;
+
+ grid.innerHTML='<div class="empty loading">Loading beats...</div>';
+
+ try{
+
+  const session=await getSessionSafe();
+
+  if(!session){
+
+   grid.innerHTML=
+    '<div class="empty">Please login first.</div>';
+
+   return;
+  }
+
+  const result=await supabaseClient
+   .from("beats")
+   .select("*")
+   .eq("producer_user_id",session.user.id)
+   .order("created_at",{ascending:false});
+
+  if(result.error){
+
+   console.error("beats query error:",result.error);
+
+   grid.innerHTML=
+    '<div class="empty">'+
+    escapeHtml(
+     "Unable to load beats: "+
+     safeError(result.error,"Database error")
+    )+
+    "</div>";
+
+   return;
+  }
+
+  const beats=Array.isArray(result.data)?result.data:[];
+
+  document.getElementById("statBeats").textContent=beats.length;
+
+  document.getElementById("statPublished").textContent=
+   beats.filter(function(beat){
+    return String(beat.status||"").toLowerCase()==="approved"||
+           String(beat.status||"").toLowerCase()==="published";
+   }).length;
+
+  const exclusiveSold=beats.filter(function(beat){
+   return beat.exclusive_sold===true||
+          String(beat.exclusive_status||"").toLowerCase()==="sold"||
+          String(beat.status||"").toLowerCase()==="exclusive_sold";
+  }).length;
+
+  document.getElementById("statExclusive").textContent=exclusiveSold;
+
+  if(beats.length===0){
+
+   grid.innerHTML=
+    '<div class="empty">No beats yet — upload your first beat.</div>';
+
+   return;
+  }
+
+  grid.innerHTML=beats.map(function(beat){
+
+   const cover=
+    beat.cover_url||
+    "https://via.placeholder.com/600/160d24/c084fc?text=BEAT";
+
+   const status=
+    beat.status||
+    "pending";
+
+   const mp3=
+    beat.lease_mp3_price||
+    beat.mp3_price||
+    0;
+
+   return `
+    <div class="beat-card">
+
+     <img
+      class="beat-cover"
+      src="${escapeHtml(cover)}"
+      alt="${escapeHtml(beat.title||"Beat")}"
+      loading="lazy"
+      onerror="this.src='https://via.placeholder.com/600/160d24/c084fc?text=BEAT'"
+     >
+
+     <div class="beat-info">
+
+      <strong>${escapeHtml(beat.title||"Untitled Beat")}</strong>
+
+      <div class="beat-status">
+       ${escapeHtml(status)}
+      </div>
+
+      ${
+       mp3
+       ?
+       `<div class="beat-price">${formatUGX(mp3)} MP3</div>`
+       :
+       ""
+      }
+
+     </div>
+
+    </div>
+   `;
+
+  }).join("");
+
+ }catch(error){
+
+  console.error("loadBeatsSafe error:",error);
+
+  grid.innerHTML=
+   '<div class="empty">Unable to load beats right now.</div>';
+
+ }
+
+}
+
+async function loadOrdersSafe(){
+
+ const list=document.getElementById("ordersList");
+
+ if(!list)return;
+
+ list.innerHTML=
+  '<div class="empty loading">Loading orders...</div>';
+
+ try{
+
+  const session=await getSessionSafe();
+
+  if(!session){
+
+   list.innerHTML=
+    '<div class="empty">Please login first.</div>';
+
+   return;
+  }
+
+  const response=await fetch(
+   API_URL+"/api/beats/orders/producer",
+   {
+    method:"GET",
+    headers:{
+     "Authorization":"Bearer "+session.access_token,
+     "Accept":"application/json"
+    }
+   }
+  );
+
+  if(!response.ok){
+
+   let message="No orders yet";
+
+   try{
+    const data=await response.json();
+    if(data?.error){
+     message=data.error;
+    }
+   }catch(_){}
+
+   list.innerHTML=
+    '<div class="empty">'+
+    escapeHtml(message)+
+    "</div>";
+
+   return;
+  }
+
+  const data=await response.json();
+
+  const orders=
+   Array.isArray(data)
+   ?
+   data
+   :
+   Array.isArray(data?.orders)
+   ?
+   data.orders
+   :
+   [];
+
+  if(orders.length===0){
+
+   list.innerHTML=
+    '<div class="empty">No paid orders yet.</div>';
+
+   return;
+  }
+
+  list.innerHTML=orders.map(function(order){
+
+   const beatTitle=
+    order?.beats?.title||
+    order?.beat?.title||
+    order?.beat_title||
+    "Beat";
+
+   const price=
+    order?.price||
+    order?.amount||
+    0;
+
+   const status=
+    order?.status||
+    "paid";
+
+   return `
+    <div style="
+     background:#160d24;
+     border:1px solid #2d1944;
+     border-radius:10px;
+     padding:14px;
+     margin-bottom:8px
+    ">
+
+     <strong>${escapeHtml(beatTitle)}</strong>
+
+     <div style="color:#c084fc;margin-top:5px">
+      ${formatUGX(price)}
+     </div>
+
+     <div style="color:#999;font-size:12px;margin-top:4px">
+      ${escapeHtml(status)}
+     </div>
+
+    </div>
+   `;
+
+  }).join("");
+
+ }catch(error){
+
+  console.error("Orders error:",error);
+
+  list.innerHTML=
+   '<div class="empty">Orders could not be loaded right now.</div>';
+
+ }
+
+}
+
+async function uploadToCloudinary(file,folder,token){
+
+ if(!file){
+  throw new Error("File is missing.");
+ }
+
+ if(!token){
+  throw new Error("Login session expired.");
+ }
+
+ const signatureResponse=await fetch(
+  API_URL+"/api/cloudinary/signature",
+  {
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json",
+    "Authorization":"Bearer "+token
+   },
+   body:JSON.stringify({
+    folder:folder
+   })
+  }
+ );
+
+ let signatureData=null;
+
+ try{
+  signatureData=await signatureResponse.json();
+ }catch(error){
+  throw new Error("Cloudinary signature response was invalid.");
+ }
+
+ if(!signatureResponse.ok){
+
+  throw new Error(
+   signatureData?.error||
+   signatureData?.message||
+   "Cloudinary signature failed."
+  );
+
+ }
+
+ if(
+  !signatureData?.api_key||
+  !signatureData?.timestamp||
+  !signatureData?.signature||
+  !signatureData?.folder
+ ){
+
+  throw new Error("Cloudinary signature data is incomplete.");
+
+ }
+
+ const formData=new FormData();
+
+ formData.append("file",file);
+ formData.append("api_key",signatureData.api_key);
+ formData.append("timestamp",String(signatureData.timestamp));
+ formData.append("signature",signatureData.signature);
+ formData.append("folder",signatureData.folder);
+
+ const uploadResponse=await fetch(
+  CLOUD_URL,
+  {
+   method:"POST",
+   body:formData
+  }
+ );
+
+ let uploadData=null;
+
+ try{
+  uploadData=await uploadResponse.json();
+ }catch(error){
+  throw new Error("Cloudinary upload response was invalid.");
+ }
+
+ if(!uploadResponse.ok){
+
+  throw new Error(
+   uploadData?.error?.message||
+   uploadData?.error||
+   "Cloudinary upload failed."
+  );
+
+ }
+
+ if(!uploadData?.secure_url){
+
+  throw new Error("Cloudinary did not return a secure URL.");
+
+ }
+
+ return uploadData.secure_url;
+
+}
+
+function validateAudio(file){
+
+ if(!file){
+  throw new Error("Please select a beat file.");
+ }
+
+ const maxSize=50*1024*1024;
+
+ if(file.size>maxSize){
+  throw new Error("Beat file is too large. Maximum size is 50MB.");
+ }
+
+ const name=file.name.toLowerCase();
+
+ const allowed=
+  file.type==="audio/mpeg"||
+  file.type==="audio/mp3"||
+  file.type==="audio/wav"||
+  file.type==="audio/x-wav"||
+  file.type==="audio/wave"||
+  name.endsWith(".mp3")||
+  name.endsWith(".wav");
+
+ if(!allowed){
+  throw new Error("Please upload an MP3 or WAV beat.");
+ }
+
+}
+
+function validateCover(file){
+
+ if(!file)return;
+
+ const maxSize=5*1024*1024;
+
+ if(file.size>maxSize){
+  throw new Error("Cover image is too large. Maximum size is 5MB.");
+ }
+
+ const name=file.name.toLowerCase();
+
+ const allowed=
+  file.type==="image/jpeg"||
+  file.type==="image/png"||
+  file.type==="image/webp"||
+  name.endsWith(".jpg")||
+  name.endsWith(".jpeg")||
+  name.endsWith(".png")||
+  name.endsWith(".webp");
+
+ if(!allowed){
+  throw new Error("Cover must be JPG, JPEG, PNG or WEBP.");
+ }
+
+}
+
+document.getElementById("agreementAccepted")
+.addEventListener("change",function(){
+ setUploadButton();
+});
+
+document.getElementById("beatForm")
+.addEventListener("submit",async function(event){
+
+ event.preventDefault();
+
+ clearMsg();
+
+ const button=document.getElementById("uploadButton");
+
+ try{
+
+  if(!document.getElementById("agreementAccepted").checked){
+
+   showMsg(
+    "error",
+    "Please accept the 75/25 producer agreement."
+   );
+
+   return;
+  }
+
+  const session=await getSessionSafe();
+
+  if(!session){
+
+   throw new Error("Login session expired. Please login again.");
+  }
+
+  const title=
+   document.getElementById("beatTitle")
+   .value
+   .trim();
+
+  const genre=
+   document.getElementById("genre")
+   .value
+   .trim()||
+   "Afrobeat";
+
+  const bpmValue=
+   document.getElementById("bpm").value.trim();
+
+  const audioFile=
+   document.getElementById("audio").files[0];
+
+  const coverFile=
+   document.getElementById("cover").files[0];
+
+  if(!title){
+   throw new Error("Beat title is required.");
+  }
+
+  if(!audioFile){
+   throw new Error("Beat file is required.");
+  }
+
+  validateAudio(audioFile);
+  validateCover(coverFile);
+
+  const bpm=
+   bpmValue
+   ?
+   Number(bpmValue)
+   :
+   null;
+
+  if(bpm!==null&&(!Number.isFinite(bpm)||bpm<1||bpm>400)){
+   throw new Error("BPM must be between 1 and 400.");
+  }
+
+  const mp3Price=Number(
+   document.getElementById("leaseMp3").value||0
+  );
+
+  const wavPrice=Number(
+   document.getElementById("leaseWav").value||0
+  );
+
+  const stemsPrice=Number(
+   document.getElementById("stemsPrice").value||0
+  );
+
+  const exclusivePrice=Number(
+   document.getElementById("exclusivePrice").value||0
+  );
+
+  if(
+   !Number.isFinite(mp3Price)||
+   !Number.isFinite(wavPrice)||
+   !Number.isFinite(stemsPrice)||
+   !Number.isFinite(exclusivePrice)
+  ){
+   throw new Error("Please enter valid beat prices.");
+  }
+
+  button.disabled=true;
+  button.textContent="Uploading beat...";
+
+  const audioUrl=await uploadToCloudinary(
+   audioFile,
+   "pasong-beats/audio",
+   session.access_token
+  );
+
+  const previewUrl=
+   audioUrl.replace(
+    "/upload/",
+    "/upload/so_0,du_60/"
+   );
+
+  let coverUrl=null;
+
+  if(coverFile){
+
+   button.textContent="Uploading cover...";
+
+   coverUrl=await uploadToCloudinary(
+    coverFile,
+    "pasong-beats/covers",
+    session.access_token
+   );
+
+  }
+
+  button.textContent="Saving beat...";
+
+  const payload={
+   title:title,
+   genre:genre,
+   bpm:bpm,
+   cover_url:coverUrl,
+   audio_url_preview:previewUrl,
+   audio_url_mp3:audioUrl,
+   audio_url_wav:audioUrl,
+   lease_mp3_price:mp3Price,
+   lease_wav_price:wavPrice,
+   stems_price:stemsPrice,
+   exclusive_price:exclusivePrice
+  };
+
+  const response=await fetch(
+   API_URL+"/api/beats/create",
+   {
+    method:"POST",
+    headers:{
+     "Content-Type":"application/json",
+     "Authorization":"Bearer "+session.access_token,
+     "Accept":"application/json"
+    },
+    body:JSON.stringify(payload)
+   }
+  );
+
+  let result=null;
+
+  try{
+   result=await response.json();
+  }catch(error){
+   throw new Error("Beat API returned an invalid response.");
+  }
+
+  if(!response.ok){
+
+   throw new Error(
+    result?.error||
+    result?.message||
+    "Beat could not be saved."
+   );
+
+  }
+
+  const beatId=
+   result?.beat?.id||
+   result?.id||
+   "";
+
+  showMsg(
+   "success",
+   beatId
+   ?
+   "✅ Beat uploaded successfully. ID: "+beatId
+   :
+   "✅ Beat uploaded successfully."
+  );
+
+  document.getElementById("beatForm").reset();
+
+  document.getElementById("genre").value="Afrobeat";
+
+  document.getElementById("leaseMp3").value="10000";
+  document.getElementById("leaseWav").value="25000";
+  document.getElementById("stemsPrice").value="50000";
+  document.getElementById("exclusivePrice").value="500000";
+
+  document.getElementById("agreementAccepted").checked=false;
+
+  setUploadButton();
+
+  await loadBeatsSafe();
+
+  showSection("my-beats");
+
+ }catch(error){
+
+  console.error("Beat upload error:",error);
+
+  showMsg(
+   "error",
+   "❌ "+safeError(error,"Beat upload failed.")
+  );
+
+ }finally{
+
+  button.textContent="Upload Beat";
+
+  setUploadButton();
+
+ }
+
+});
+
+(async function(){
+
+ try{
+
+  await initSupabase();
+
+  await loadProducerSafe();
+
+  await loadBeatsSafe();
+
+ }catch(error){
+
+  console.error("Dashboard initialization error:",error);
+
+  document.getElementById("accountName").textContent="Producer";
+
+  document.getElementById("heroText").textContent=
+   "Dashboard loaded. Please check your login connection.";
+
+  document.getElementById("beatsGrid").innerHTML=
+   '<div class="empty">Unable to load beats right now.</div>';
+
+ }
+
+})();
+</script>
+
+</body>
+</html>
