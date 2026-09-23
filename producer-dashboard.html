@@ -129,7 +129,7 @@ clean beat files remain separate from PASONG's free streaming version.
 <button data-section="my-beats">🎵 My Beats</button>
 <button data-section="rules">📜 Beat Rules</button>
 </aside><section class="content"><div id="section-overview"><div class="card"><div class="earnings-top"><div class="balance-card">
-<div class="balance-label">💰 Balance</div>
+<div class="balance-label">💰 Earned Balance</div>
 <div class="balance-number" id="producerBalance">UGX 0</div>
 </div><button class="withdraw-btn" id="withdrawButton">
 Withdraw to MoMo
@@ -187,11 +187,7 @@ Choose what visitors see on your public Producer Page.
 id="profilePreview"
 src="https://ui-avatars.com/api/?name=Producer&background=171722&color=c084fc&bold=true&size=300"
 alt="Producer"
-
-«»
-
-<div class="profile-preview-text"><strong id="profilePreviewName">Producer</strong>
-
+><div class="profile-preview-text"><strong id="profilePreviewName">Producer</strong>
 <span>
 This picture will appear on your public Producer Page.
 </span></div></div><form id="profileForm"><div class="form-grid"><div class="field full">
@@ -898,9 +894,6 @@ return;
 const producerProfileId=
 profile.id;
 
-const producerUserId=
-profile.user_id;
-
 const [
 beatsResult,
 ordersResult,
@@ -923,7 +916,9 @@ ascending:false
 
 supabaseClient
 .from("beat_orders")
-.select("*")
+.select(
+"id,beat_id,package,price,currency,status,paid_at,completed_at,created_at"
+)
 .eq(
 "producer_profile_id",
 producerProfileId
@@ -932,7 +927,8 @@ producerProfileId
 "created_at",
 {
 ascending:false
-}),
+}
+),
 
 supabaseClient
 .from("producer_follows")
@@ -982,8 +978,7 @@ renderBeats(beats);
 renderProducerEarnings(
 beats,
 orders,
-fansResult.count||0,
-producerUserId
+fansResult.count||0
 );
 
 }catch(error){
@@ -1006,7 +1001,27 @@ String(
 order?.status||""
 ).toLowerCase().trim();
 
-return [
+const failedStatuses=[
+"pending",
+"unpaid",
+"failed",
+"cancelled",
+"canceled",
+"refunded",
+"reversed",
+"expired",
+"void"
+];
+
+if(
+failedStatuses.includes(status)
+){
+
+return false;
+
+}
+
+const successfulStatuses=[
 "paid",
 "completed",
 "complete",
@@ -1015,7 +1030,69 @@ return [
 "successful",
 "approved",
 "delivered"
-].includes(status);
+];
+
+if(
+successfulStatuses.includes(status)
+){
+
+return true;
+
+}
+
+return Boolean(
+order?.paid_at||
+order?.completed_at
+);
+
+}
+
+function getOrderDate(order){
+
+return (
+order?.paid_at||
+order?.completed_at||
+order?.created_at||
+null
+);
+
+}
+
+function isCurrentMonth(order){
+
+const dateValue=
+getOrderDate(order);
+
+if(!dateValue)return false;
+
+const date=
+new Date(dateValue);
+
+if(Number.isNaN(date.getTime())){
+
+return false;
+
+}
+
+const now=
+new Date();
+
+return (
+date.getFullYear()===
+now.getFullYear() &&
+date.getMonth()===
+now.getMonth()
+);
+
+}
+
+function isExclusiveOrder(order){
+
+return String(
+order?.package||""
+).toLowerCase().includes(
+"exclusive"
+);
 
 }
 
@@ -1036,50 +1113,34 @@ paidOrders.length;
 const grossSales=
 paidOrders.reduce(
 (sum,order)=>
-sum+Number(order.price||0),
+sum+
+Number(order.price||0),
 0
 );
 
 const producerEarnings=
 grossSales*0.75;
 
-const monthStart=
-new Date();
-
-monthStart.setDate(1);
-monthStart.setHours(
-0,
-0,
-0,
-0
-);
-
 const monthlyOrders=
-paidOrders.filter(order=>{
-
-const dateValue=
-order.paid_at||
-order.completed_at||
-order.created_at;
-
-if(!dateValue)return false;
-
-const date=
-new Date(dateValue);
-
-return date>=monthStart;
-
-});
+paidOrders.filter(
+isCurrentMonth
+);
 
 const monthlyGross=
 monthlyOrders.reduce(
 (sum,order)=>
-sum+Number(order.price||0),
+sum+
+Number(order.price||0),
 0
 );
 
 const monthlyProducerEarnings=
 monthlyGross*0.75;
+
+const exclusiveSales=
+paidOrders.filter(
+isExclusiveOrder
+).length;
 
 document.getElementById(
 "producerBalance"
@@ -1113,6 +1174,29 @@ document.getElementById(
 "totalStreams"
 ).textContent=
 "Not tracked";
+
+const exclusiveStat=
+document.getElementById(
+"statExclusive"
+);
+
+if(exclusiveSales>0){
+
+exclusiveStat.textContent=
+exclusiveSales.toLocaleString(
+"en-US"
+);
+
+}else{
+
+exclusiveStat.textContent=
+beats.filter(
+beat=>beat.is_exclusive_sold
+).length.toLocaleString(
+"en-US"
+);
+
+}
 
 renderEarningsTable(
 beats,
