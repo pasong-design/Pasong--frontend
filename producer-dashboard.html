@@ -3411,6 +3411,35 @@ return uploadData.secure_url;
 
 }
 
+function createBeatPreviewUrl(
+audioUrl
+){
+
+if(!audioUrl){
+
+throw new Error(
+"PASONG could not create the beat preview because the audio URL is missing."
+);
+
+}
+
+const uploadMarker="/upload/";
+
+if(!audioUrl.includes(uploadMarker)){
+
+throw new Error(
+"PASONG could not create the beat preview from the Cloudinary audio URL."
+);
+
+}
+
+return audioUrl.replace(
+uploadMarker,
+"/upload/so_0,du_60/"
+);
+
+}
+
 const agreementAccepted=
 document.getElementById(
 "agreementAccepted"
@@ -3574,6 +3603,11 @@ audioFile,
 accessToken
 );
 
+const audioUrlPreview=
+createBeatPreviewUrl(
+audioUrl
+);
+
 let coverUrl=null;
 
 if(coverFile){
@@ -3614,6 +3648,12 @@ body:JSON.stringify({
 
 title:title,
 
+audio_url_preview:
+audioUrlPreview,
+
+audio_url:
+audioUrl,
+
 genre:
 genre||
 null,
@@ -3623,12 +3663,13 @@ bpm
 ?Number(bpm)
 :null,
 
-musical_key:
+key:
 musicalKey||
 null,
 
-audio_url:
-audioUrl,
+musical_key:
+musicalKey||
+null,
 
 cover_url:
 coverUrl,
