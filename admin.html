@@ -1,20 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
 
-<head>
+«»
 
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>PASONG Admin Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<title>PASONG Admin Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 
 *{
   margin:0;
@@ -240,6 +230,48 @@ button.action:hover{
   opacity:.85;
 }
 
+button.success-btn{
+  background:#16a34a;
+  color:#fff;
+  border:0;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+button.success-btn:hover{
+  opacity:.85;
+}
+
+button.danger-btn{
+  background:#be123c;
+  color:#fff;
+  border:0;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+button.danger-btn:hover{
+  opacity:.85;
+}
+
+button.info-btn{
+  background:#2563eb;
+  color:#fff;
+  border:0;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+button.info-btn:hover{
+  opacity:.85;
+}
+
 .logout{
   background:#21121e !important;
   border-color:#57263f !important;
@@ -279,10 +311,53 @@ button.action:hover{
   border-color:#d946ef;
 }
 
+.admin-actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  min-width:190px;
+}
 
-/* ======================================================
-   COVER REQUEST DETAILS
-====================================================== */
+.edit-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;
+  margin-top:15px;
+}
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.form-group label{
+  color:#aaaabb;
+  font-size:13px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select{
+  width:100%;
+  background:#080810;
+  color:#fff;
+  border:1px solid #34344b;
+  border-radius:8px;
+  padding:11px;
+  outline:none;
+}
+
+.form-group textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{
+  border-color:#d946ef;
+}
 
 .cover-details{
   margin-top:18px;
@@ -294,8 +369,7 @@ button.action:hover{
 
 .cover-details-grid{
   display:grid;
-  grid-template-columns:
-    repeat(auto-fit,minmax(200px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
   gap:14px;
 }
 
@@ -320,8 +394,7 @@ button.action:hover{
 
 .cover-images{
   display:grid;
-  grid-template-columns:
-    repeat(auto-fit,minmax(180px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:15px;
   margin-top:18px;
 }
@@ -359,6 +432,20 @@ button.action:hover{
   text-decoration:underline;
 }
 
+.upload-box{
+  background:#151522;
+  border:1px dashed #45455d;
+  border-radius:10px;
+  padding:15px;
+  margin-top:15px;
+}
+
+.upload-box input{
+  width:100%;
+  color:#fff;
+  margin-top:10px;
+}
+
 @media(max-width:600px){
 
   h1{
@@ -387,930 +474,461 @@ button.action:hover{
 
 }
 
-</style>
-
-</head>
-
-
-<body>
-
-
-<!-- ======================================================
-     NAVIGATION
-====================================================== -->
-
-<nav>
-
-  <div class="logo">
+</style></head><body><nav>  <div class="logo">
     ◈ PASONG
-  </div>
-
-  <div class="admin-label">
+  </div>  <div class="admin-label">
     ADMIN PANEL
-  </div>
-
-</nav>
-
-
-<main>
-
-
-<!-- ======================================================
-     LOADING
-====================================================== -->
-
-<div id="loading">
-
+  </div></nav><main><div id="loading">
   Checking administrator access...
-
-</div>
-
-
-<!-- ======================================================
-     ERROR
-====================================================== -->
-
-<div id="error"></div>
-
-
-<!-- ======================================================
-     DASHBOARD
-====================================================== -->
-
-<div id="dashboard">
-
-
-<h1>
+</div><div id="error"></div><div id="dashboard"><h1>
   PASONG Admin Dashboard
-</h1>
-
-
-<p class="subtitle">
+</h1><p class="subtitle">
   Manage PASONG music, artists, orders and platform activity.
+</p><div class="cards">  <div class="card">
+    <h3>Administrator</h3>
+    <div class="number">✓</div>
+  </div>  <div class="card">
+    <h3>Music</h3>
+    <div class="number" id="musicCount">0</div>
+  </div>  <div class="card">
+    <h3>Artist Profiles</h3>
+    <div class="number" id="userCount">0</div>
+  </div>  <div class="card">
+    <h3>Orders</h3>
+    <div class="number" id="orderCount">0</div>
+  </div></div><div class="menu">  <button onclick="showSection('sales')">
+    🛒 Sales & Orders
+  </button>  <button onclick="showSection('royalties')">
+    💰 Royalty Ledger
+  </button>  <button onclick="showSection('advertisements')">
+    📢 Advertisement Campaigns
+  </button>  <button onclick="showSection('referrals')">
+    🎁 Referral Points
+  </button>  <button onclick="showSection('payments'); loadPaymentVerifications()">
+    💳 Payments & Verification
+  </button>  <button onclick="showSection('cover-requests'); loadCoverRequests()">
+    🎨 Cover Requests
+  </button>  <button onclick="showSection('reports')">
+    📊 Reports
+  </button></div><div class="section">  <h2>
+    🛒 Sales & Orders
+  </h2>  <div id="sales" class="section-content"><p>
+  View customer purchases, songs, prices and order status.
 </p>
 
+<div class="refresh-row">
 
-<!-- ======================================================
-     SUMMARY
-====================================================== -->
-
-<div class="cards">
-
-
-  <div class="card">
-
-    <h3>
-      Administrator
-    </h3>
-
-    <div class="number">
-      ✓
-    </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h3>
-      Music
-    </h3>
-
-    <div
-      class="number"
-      id="musicCount"
-    >
-      0
-    </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h3>
-      Artist Profiles
-    </h3>
-
-    <div
-      class="number"
-      id="userCount"
-    >
-      0
-    </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h3>
-      Orders
-    </h3>
-
-    <div
-      class="number"
-      id="orderCount"
-    >
-      0
-    </div>
-
-  </div>
-
+  <button class="small-btn" onclick="loadOrders()">
+    ↻ Refresh Orders
+  </button>
 
 </div>
 
+<div class="table-wrap">
 
-<!-- ======================================================
-     ADMIN MENU
-====================================================== -->
+  <table>
 
-<div class="menu">
+    <thead>
 
+      <tr>
 
-  <button
-    onclick="showSection('sales')"
-  >
-    🛒 Sales & Orders
-  </button>
+        <th>Order ID</th>
+        <th>Song</th>
+        <th>Buyer</th>
+        <th>Price</th>
+        <th>Currency</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Action</th>
 
+      </tr>
 
-  <button
-    onclick="showSection('royalties')"
-  >
+    </thead>
+
+    <tbody id="ordersTable">
+
+      <tr>
+
+        <td colspan="8">
+          Loading orders...
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
+  </div></div><div class="section">  <h2>
     💰 Royalty Ledger
-  </button>
+  </h2>  <div id="royalties" class="section-content"><p>
+  Track PASONG music revenue distribution.
+</p>
 
+<div class="notice">
 
-  <button
-    onclick="showSection('advertisements')"
-  >
+  <strong>
+    Current Uganda Song Price: UGX 700
+  </strong>
+
+  <br><br>
+
+  PASONG royalty records are generated from completed music sales.
+
+  <br><br>
+
+  Royalty transactions will appear here as the payment system
+  records completed sales.
+
+</div>
+
+  </div></div><div class="section">  <h2>
     📢 Advertisement Campaigns
-  </button>
+  </h2>  <div id="advertisements" class="section-content"><p>
+  Monitor PASONG advertising campaigns.
+</p>
 
+<div class="notice">
 
-  <button
-    onclick="showSection('referrals')"
-  >
+  Advertiser campaigns will be managed from the PASONG advertising system.
+
+  <br><br>
+
+  Weekly promotion idea: UGX 10,000<br>
+  Monthly promotion idea: UGX 50,000
+
+</div>
+
+  </div></div><div class="section">  <h2>
     🎁 Referral Points
-  </button>
+  </h2>  <div id="referrals" class="section-content"><p>
+  Monitor PASONG referral activity.
+</p>
 
+<div class="notice">
 
-  <button
-    onclick="showSection('payments'); loadPaymentVerifications()"
-  >
+  1,000 PASONG Points = UGX 1,000
+
+  <br><br>
+
+  Successful referral = 50 PASONG Points
+
+  <br><br>
+
+  Referral qualifies when the referred user completes
+  their first qualifying song purchase.
+
+</div>
+
+  </div></div><div class="section">  <h2>
     💳 Payments & Verification
+  </h2>  <div id="payments" class="section-content"><p>
+  Review and approve creator payment methods.
+</p>
+
+<div class="refresh-row">
+
+  <button class="small-btn" onclick="loadPaymentVerifications()">
+    ↻ Refresh Verifications
   </button>
 
-
-  <button
-    onclick="showSection('cover-requests'); loadCoverRequests()"
-  >
-    🎨 Cover Requests
-  </button>
-
-
-  <button
-    onclick="showSection('reports')"
-  >
-    📊 Reports
-  </button>
-
-
 </div>
 
+<div class="notice" style="margin-bottom:18px;">
 
-<!-- ======================================================
-     SALES & ORDERS
-====================================================== -->
+  <strong>
+    Verification Rules
+  </strong>
 
-<div class="section">
+  <br><br>
 
-  <h2>
-    🛒 Sales & Orders
-  </h2>
-
-
-  <div
-    id="sales"
-    class="section-content"
-  >
-
-    <p>
-      View customer purchases, songs, prices and order status.
-    </p>
-
-
-    <div class="refresh-row">
-
-      <button
-        class="small-btn"
-        onclick="loadOrders()"
-      >
-        ↻ Refresh Orders
-      </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              Order ID
-            </th>
-
-            <th>
-              Song
-            </th>
-
-            <th>
-              Buyer
-            </th>
-
-            <th>
-              Price
-            </th>
-
-            <th>
-              Currency
-            </th>
-
-            <th>
-              Status
-            </th>
-
-            <th>
-              Created
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody id="ordersTable">
-
-          <tr>
-
-            <td colspan="7">
-              Loading orders...
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     ROYALTIES
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    💰 Royalty Ledger
-  </h2>
-
-
-  <div
-    id="royalties"
-    class="section-content"
-  >
-
-    <p>
-      Track PASONG music revenue distribution.
-    </p>
-
-
-    <div class="notice">
-
-      <strong>
-        UGX 500 Song Sale Distribution
-      </strong>
-
-      <br><br>
-
-      Artist — UGX 200 (40%)<br>
-      Producer — UGX 100 (20%)<br>
-      Writer — UGX 75 (15%)<br>
-      PASONG — UGX 125 (25%)
-
-      <br><br>
-
-      Royalty transactions will appear here as the payment system
-      records completed sales.
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     ADVERTISEMENTS
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    📢 Advertisement Campaigns
-  </h2>
-
-
-  <div
-    id="advertisements"
-    class="section-content"
-  >
-
-    <p>
-      Monitor PASONG advertising campaigns.
-    </p>
-
-
-    <div class="notice">
-
-      Advertiser campaigns will be managed from the PASONG advertising system.
-
-      <br><br>
-
-      Weekly promotion idea: UGX 10,000<br>
-      Monthly promotion idea: UGX 50,000
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     REFERRALS
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    🎁 Referral Points
-  </h2>
-
-
-  <div
-    id="referrals"
-    class="section-content"
-  >
-
-    <p>
-      Monitor PASONG referral activity.
-    </p>
-
-
-    <div class="notice">
-
-      1,000 PASONG Points = UGX 1,000
-
-      <br><br>
-
-      Successful referral = 50 PASONG Points
-
-      <br>
-
-      Referral qualifies when the referred user completes
-      their first UGX 500 song purchase.
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     PAYMENTS & VERIFICATION
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    💳 Payments & Verification
-  </h2>
-
-
-  <div
-    id="payments"
-    class="section-content"
-  >
-
-    <p>
-      Review and approve creator payment methods.
-    </p>
-
-
-    <div class="refresh-row">
-
-      <button
-        class="small-btn"
-        onclick="loadPaymentVerifications()"
-      >
-        ↻ Refresh Verifications
-      </button>
-
-    </div>
-
-
-    <div
-      class="notice"
-      style="margin-bottom:18px;"
-    >
-
-      <strong>
-        Verification Rules
-      </strong>
-
-      <br><br>
-
-      🇺🇬 Uganda creators:
-      <strong>
-        MTN Mobile Money / Airtel Money
-      </strong>
-
-      <br>
-
-      🌍 Creators outside Uganda:
-      <strong>
-        Card / Online Payment
-      </strong>
-
-      <br><br>
-
-      <span class="status-pending">
-        ● New verification requests require Admin approval
-      </span>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              Creator
-            </th>
-
-            <th>
-              Country
-            </th>
-
-            <th>
-              Method
-            </th>
-
-            <th>
-              Provider
-            </th>
-
-            <th>
-              Account Name
-            </th>
-
-            <th>
-              Account / Reference
-            </th>
-
-            <th>
-              Status
-            </th>
-
-            <th>
-              Submitted
-            </th>
-
-            <th>
-              Action
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody id="paymentVerificationsTable">
-
-          <tr>
-
-            <td colspan="9">
-
-              Open Payments & Verification to load requests.
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     COVER REQUESTS
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    🎨 PASONG Cover Requests
-  </h2>
-
-
-  <div
-    id="cover-requests"
-    class="section-content"
-  >
-
-    <p>
-      Manage cover-design requests from artists, DJs,
-      producers and other PASONG creators.
-    </p>
-
-
-    <div class="refresh-row">
-
-      <button
-        class="small-btn"
-        onclick="loadCoverRequests()"
-      >
-        ↻ Refresh Cover Requests
-      </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              Creator
-            </th>
-
-            <th>
-              Cover / Mix
-            </th>
-
-            <th>
-              Price
-            </th>
-
-            <th>
-              Payment
-            </th>
-
-            <th>
-              Design
-            </th>
-
-            <th>
-              Submitted
-            </th>
-
-            <th>
-              Action
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody id="coverRequestsTable">
-
-          <tr>
-
-            <td colspan="7">
-
-              Open Cover Requests to load requests.
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-
-    <!-- DETAILS PANEL -->
-
-    <div
-      id="coverRequestDetails"
-      class="cover-details"
-      style="display:none;"
-    >
-
-      <div
-        style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:15px;
-          flex-wrap:wrap;
-        "
-      >
-
-        <div>
-
-          <h3>
-            🎨 Cover Request Details
-          </h3>
-
-        </div>
-
-
-        <button
-          class="small-btn"
-          onclick="closeCoverRequest()"
-        >
-          Close
-        </button>
-
-      </div>
-
-
-      <div
-        id="coverRequestDetailsContent"
-        style="margin-top:15px;"
-      ></div>
-
-    </div>
-
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     REPORTS
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    📊 Reports
-  </h2>
-
-
-  <div
-    id="reports"
-    class="section-content"
-  >
-
-    <p>
-      View PASONG platform statistics.
-    </p>
-
-
-    <div class="cards">
-
-
-      <div class="card">
-
-        <h3>
-          Total Music
-        </h3>
-
-        <div
-          class="number"
-          id="reportSongs"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <h3>
-          Total Artists
-        </h3>
-
-        <div
-          class="number"
-          id="reportArtists"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <h3>
-          Total Orders
-        </h3>
-
-        <div
-          class="number"
-          id="reportOrders"
-        >
-          0
-        </div>
-
-      </div>
-
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     MUSIC CONTROL
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    🎵 Music Control
-  </h2>
-
-
-  <div class="section-content active">
-
-    <p>
-      Music currently stored in PASONG.
-    </p>
-
-
-    <div class="refresh-row">
-
-      <button
-        class="small-btn"
-        onclick="loadSongs()"
-      >
-        ↻ Refresh Music
-      </button>
-
-    </div>
-
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              Title
-            </th>
-
-            <th>
-              Artist
-            </th>
-
-            <th>
-              Price
-            </th>
-
-            <th>
-              Currency
-            </th>
-
-            <th>
-              Status
-            </th>
-
-            <th>
-              Song ID
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody id="songsTable">
-
-          <tr>
-
-            <td colspan="6">
-              Loading music...
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- ======================================================
-     PLATFORM STATUS
-====================================================== -->
-
-<div class="section">
-
-  <h2>
-    ⚙️ Platform Status
-  </h2>
-
-
-  <div class="notice">
-
-    Authentication:
-
-    <span class="status">
-      ● Connected
-    </span>
-
-    <br>
-
-    Supabase:
-
-    <span class="status">
-      ● Connected
-    </span>
-
-    <br>
-
-    Admin Role:
-
-    <span class="status">
-      ● Verified
-    </span>
-
-  </div>
-
+  🇺🇬 Uganda creators:
+  <strong>
+    MTN Mobile Money / Airtel Money
+  </strong>
 
   <br>
 
+  🌍 Creators outside Uganda:
+  <strong>
+    Card / Online Payment
+  </strong>
 
-  <button
-    class="action logout"
-    onclick="logout()"
-  >
-    Logout
+  <br><br>
+
+  <span class="status-pending">
+    ● New verification requests require Admin approval
+  </span>
+
+</div>
+
+<div class="table-wrap">
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>Creator</th>
+        <th>Country</th>
+        <th>Method</th>
+        <th>Provider</th>
+        <th>Account Name</th>
+        <th>Account / Reference</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Action</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="paymentVerificationsTable">
+
+      <tr>
+
+        <td colspan="9">
+          Open Payments & Verification to load requests.
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
+  </div></div><div class="section">  <h2>
+    🎨 PASONG Cover Requests
+  </h2>  <div id="cover-requests" class="section-content"><p>
+  Manage cover-design requests from artists, DJs,
+  producers and other PASONG creators.
+</p>
+
+<div class="refresh-row">
+
+  <button class="small-btn" onclick="loadCoverRequests()">
+    ↻ Refresh Cover Requests
   </button>
 
+</div>
+
+<div class="table-wrap">
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>Creator</th>
+        <th>Cover / Mix</th>
+        <th>Price</th>
+        <th>Payment</th>
+        <th>Design</th>
+        <th>Submitted</th>
+        <th>Action</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="coverRequestsTable">
+
+      <tr>
+
+        <td colspan="7">
+          Open Cover Requests to load requests.
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
 
 </div>
 
+<div
+  id="coverRequestDetails"
+  class="cover-details"
+  style="display:none;"
+>
+
+  <div
+    style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:15px;
+      flex-wrap:wrap;
+    "
+  >
+
+    <div>
+      <h3>
+        🎨 Cover Request Details
+      </h3>
+    </div>
+
+    <button
+      class="small-btn"
+      onclick="closeCoverRequest()"
+    >
+      Close
+    </button>
+
+  </div>
+
+  <div
+    id="coverRequestDetailsContent"
+    style="margin-top:15px;"
+  ></div>
 
 </div>
 
+  </div></div><div class="section">  <h2>
+    📊 Reports
+  </h2>  <div id="reports" class="section-content"><p>
+  View PASONG platform statistics.
+</p>
 
-</main>
+<div class="cards">
 
+  <div class="card">
 
-<script>
+    <h3>
+      Total Music
+    </h3>
 
+    <div
+      class="number"
+      id="reportSongs"
+    >
+      0
+    </div>
 
-/* ======================================================
-   SUPABASE
-====================================================== */
+  </div>
+
+  <div class="card">
+
+    <h3>
+      Total Artists
+    </h3>
+
+    <div
+      class="number"
+      id="reportArtists"
+    >
+      0
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h3>
+      Total Orders
+    </h3>
+
+    <div
+      class="number"
+      id="reportOrders"
+    >
+      0
+    </div>
+
+  </div>
+
+</div>
+
+  </div></div><div class="section">  <h2>
+    🎵 Music Control
+  </h2>  <div class="section-content active"><p>
+  Music currently stored in PASONG.
+</p>
+
+<div class="refresh-row">
+
+  <button
+    class="small-btn"
+    onclick="loadSongs()"
+  >
+    ↻ Refresh Music
+  </button>
+
+</div>
+
+<div class="table-wrap">
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>Title</th>
+        <th>Artist</th>
+        <th>Price</th>
+        <th>Currency</th>
+        <th>Status</th>
+        <th>Song ID</th>
+        <th>Action</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody id="songsTable">
+
+      <tr>
+
+        <td colspan="7">
+          Loading music...
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+</div>
+
+  </div></div><div class="section">  <h2>
+    ⚙️ Platform Status
+  </h2>  <div class="notice">Authentication:
+<span class="status">
+  ● Connected
+</span>
+
+<br>
+
+Supabase:
+<span class="status">
+  ● Connected
+</span>
+
+<br>
+
+Admin Role:
+<span class="status">
+  ● Verified
+</span>
+
+  </div>  <br><button
+class="action logout"
+onclick="logout()"
+
+«»
+
+Logout
+
+  </button></div></div></main><script>
 
 const SUPABASE_URL =
 "https://mtufczmjlkvycarxylgh.supabase.co";
@@ -1318,6 +936,8 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
+const API_BASE =
+"https://pasong-api.onrender.com";
 
 const supabaseClient =
 window.supabase.createClient(
@@ -1325,23 +945,12 @@ window.supabase.createClient(
   SUPABASE_KEY
 );
 
-
-/* ======================================================
-   DATA
-====================================================== */
-
 let ordersData = [];
-
 let songsData = [];
-
 let artistsData = [];
-
 let orderItemsData = [];
-
-
-/* ======================================================
-   ERROR
-====================================================== */
+let coverRequestsData = [];
+let currentCoverRequest = null;
 
 function showError(message){
 
@@ -1357,11 +966,6 @@ function showError(message){
 
 }
 
-
-/* ======================================================
-   ADMIN CHECK
-====================================================== */
-
 async function checkAdmin(){
 
   try{
@@ -1372,9 +976,7 @@ async function checkAdmin(){
     } =
     await supabaseClient.auth.getSession();
 
-
     if(error) throw error;
-
 
     if(!session){
 
@@ -1384,14 +986,11 @@ async function checkAdmin(){
 
     }
 
-
     const user=session.user;
-
 
     const role =
       user.app_metadata &&
       user.app_metadata.role;
-
 
     if(role !== "admin"){
 
@@ -1403,22 +1002,17 @@ async function checkAdmin(){
 
     }
 
-
     document.getElementById("loading")
       .style.display="none";
-
 
     document.getElementById("dashboard")
       .style.display="block";
 
-
     await loadAllData();
-
 
   }catch(error){
 
     console.error(error);
-
 
     showError(
       "Unable to verify administrator access: "
@@ -1429,29 +1023,15 @@ async function checkAdmin(){
 
 }
 
-
-/* ======================================================
-   LOAD EVERYTHING
-====================================================== */
-
 async function loadAllData(){
 
   await Promise.all([
-
     loadUsers(),
-
     loadSongs(),
-
     loadOrders()
-
   ]);
 
 }
-
-
-/* ======================================================
-   LOAD ARTIST PROFILES
-====================================================== */
 
 async function loadUsers(){
 
@@ -1465,24 +1045,18 @@ async function loadUsers(){
       .from("artist_profiles")
       .select("*");
 
-
     if(error) throw error;
 
-
     artistsData=data || [];
-
 
     const count =
       artistsData.length;
 
-
     document.getElementById("userCount")
       .textContent=count;
 
-
     document.getElementById("reportArtists")
       .textContent=count;
-
 
   }catch(error){
 
@@ -1495,11 +1069,6 @@ async function loadUsers(){
 
 }
 
-
-/* ======================================================
-   FIND ARTIST NAME
-====================================================== */
-
 function findArtistName(artistId){
 
   if(!artistId){
@@ -1508,13 +1077,11 @@ function findArtistName(artistId){
 
   }
 
-
   const artist =
     artistsData.find(
       profile =>
         String(profile.id) === String(artistId)
     );
-
 
   if(!artist){
 
@@ -1522,19 +1089,14 @@ function findArtistName(artistId){
 
   }
 
-
   return (
     artist.stage_name ||
     artist.artist_name ||
+    artist.performing_name ||
     "Unnamed Artist"
   );
 
 }
-
-
-/* ======================================================
-   LOAD SONGS
-====================================================== */
 
 async function loadSongs(){
 
@@ -1554,81 +1116,124 @@ async function loadSongs(){
         }
       );
 
-
     if(error) throw error;
 
-
     songsData=data || [];
-
 
     document.getElementById("musicCount")
       .textContent=songsData.length;
 
-
     document.getElementById("reportSongs")
       .textContent=songsData.length;
 
-
     const table =
       document.getElementById("songsTable");
-
 
     if(!songsData.length){
 
       table.innerHTML=
       `<tr>
-
-        <td
-          colspan="6"
-          class="empty"
-        >
-
+        <td colspan="7" class="empty">
           No songs uploaded yet.
-
         </td>
-
       </tr>`;
 
       return;
 
     }
 
-
     table.innerHTML =
       songsData.map(song => {
 
-
         const title =
           song.title || "-";
-
 
         const price =
           song.price !== null &&
           song.price !== undefined
           ? song.price
-          : 500;
-
+          : 700;
 
         const currency =
           song.currency || "UGX";
 
-
         const status =
           song.status || "active";
-
 
         const artistName =
           findArtistName(song.artist_id);
 
-
         const songId =
           song.id || "-";
 
+        const safeId =
+          escapeHtml(
+            String(songId)
+          );
+
+        const normalizedStatus =
+          String(status).toLowerCase();
+
+        let buttons = `
+
+          <button
+            class="info-btn"
+            onclick="editSong('${safeId}')"
+          >
+            Edit
+          </button>
+
+        `;
+
+        if(
+          normalizedStatus !== "approved" &&
+          normalizedStatus !== "active"
+        ){
+
+          buttons += `
+
+            <button
+              class="success-btn"
+              onclick="updateSongStatus('${safeId}','approved')"
+            >
+              ✓ Approve
+            </button>
+
+          `;
+
+        }
+
+        if(
+          normalizedStatus !== "rejected"
+        ){
+
+          buttons += `
+
+            <button
+              class="danger-btn"
+              onclick="updateSongStatus('${safeId}','rejected')"
+            >
+              ✕ Reject
+            </button>
+
+          `;
+
+        }
+
+        buttons += `
+
+          <button
+            class="danger-btn"
+            onclick="deleteSong('${safeId}')"
+          >
+            Delete
+          </button>
+
+        `;
 
         return `
 
         <tr>
-
 
           <td>
 
@@ -1642,7 +1247,6 @@ async function loadSongs(){
 
           </td>
 
-
           <td>
 
             <div class="artist-name">
@@ -1655,7 +1259,6 @@ async function loadSongs(){
 
           </td>
 
-
           <td>
 
             ${escapeHtml(
@@ -1663,7 +1266,6 @@ async function loadSongs(){
             )}
 
           </td>
-
 
           <td>
 
@@ -1673,13 +1275,11 @@ async function loadSongs(){
 
           </td>
 
-
           <td>
 
             ${formatStatus(status)}
 
           </td>
-
 
           <td>
 
@@ -1693,13 +1293,21 @@ async function loadSongs(){
 
           </td>
 
+          <td>
+
+            <div class="admin-actions">
+
+              ${buttons}
+
+            </div>
+
+          </td>
 
         </tr>
 
         `;
 
       }).join("");
-
 
   }catch(error){
 
@@ -1708,27 +1316,269 @@ async function loadSongs(){
       error
     );
 
-
     document.getElementById("songsTable")
       .innerHTML=
       `<tr>
-
-        <td colspan="6">
-
+        <td colspan="7">
           Unable to load music.
-
+          <br><br>
+          ${escapeHtml(
+            error.message ||
+            "Unknown error"
+          )}
         </td>
-
       </tr>`;
 
   }
 
 }
 
+async function updateSongStatus(
+  songId,
+  newStatus
+){
 
-/* ======================================================
-   LOAD ORDERS
-====================================================== */
+  if(!songId){
+
+    return;
+
+  }
+
+  const confirmed =
+    confirm(
+      newStatus === "approved"
+      ? "Approve this song for PASONG?"
+      : "Reject this song?"
+    );
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("songs")
+      .update({
+        status:newStatus,
+        updated_at:
+          new Date().toISOString()
+      })
+      .eq(
+        "id",
+        songId
+      );
+
+    if(error) throw error;
+
+    alert(
+      newStatus === "approved"
+      ? "Song approved successfully."
+      : "Song rejected."
+    );
+
+    await loadSongs();
+
+  }catch(error){
+
+    console.error(
+      "Song status update error:",
+      error
+    );
+
+    alert(
+      "Unable to update song status: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+async function editSong(songId){
+
+  const song =
+    songsData.find(
+      item =>
+        String(item.id) ===
+        String(songId)
+    );
+
+  if(!song){
+
+    alert("Song was not found.");
+
+    return;
+
+  }
+
+  const newTitle =
+    prompt(
+      "Song title:",
+      song.title || ""
+    );
+
+  if(newTitle === null){
+
+    return;
+
+  }
+
+  const newPrice =
+    prompt(
+      "Song price:",
+      song.price !== null &&
+      song.price !== undefined
+      ? song.price
+      : 700
+    );
+
+  if(newPrice === null){
+
+    return;
+
+  }
+
+  const newCurrency =
+    prompt(
+      "Currency:",
+      song.currency || "UGX"
+    );
+
+  if(newCurrency === null){
+
+    return;
+
+  }
+
+  const numericPrice =
+    Number(newPrice);
+
+  if(
+    !Number.isFinite(numericPrice) ||
+    numericPrice < 0
+  ){
+
+    alert("Please enter a valid price.");
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("songs")
+      .update({
+
+        title:newTitle.trim(),
+
+        price:numericPrice,
+
+        currency:
+          newCurrency.trim().toUpperCase(),
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        songId
+      );
+
+    if(error) throw error;
+
+    alert("Song updated successfully.");
+
+    await loadSongs();
+
+  }catch(error){
+
+    console.error(
+      "Song edit error:",
+      error
+    );
+
+    alert(
+      "Unable to edit song: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+async function deleteSong(songId){
+
+  if(!songId){
+
+    return;
+
+  }
+
+  const confirmed =
+    confirm(
+      "Delete this song from PASONG? This action cannot be undone."
+    );
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("songs")
+      .delete()
+      .eq(
+        "id",
+        songId
+      );
+
+    if(error) throw error;
+
+    alert("Song deleted successfully.");
+
+    await loadSongs();
+
+  }catch(error){
+
+    console.error(
+      "Song delete error:",
+      error
+    );
+
+    alert(
+      "Unable to delete song: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
 
 async function loadOrders(){
 
@@ -1748,16 +1598,9 @@ async function loadOrders(){
         }
       );
 
-
     if(ordersError) throw ordersError;
 
-
     ordersData=orders || [];
-
-
-    /* -----------------------------------------------
-       LOAD ORDER ITEMS
-    ----------------------------------------------- */
 
     const {
       data:items,
@@ -1767,69 +1610,43 @@ async function loadOrders(){
       .from("order_items")
       .select("*");
 
-
     if(itemsError) throw itemsError;
 
-
     orderItemsData=items || [];
-
-
-    /* -----------------------------------------------
-       SUMMARY
-    ----------------------------------------------- */
 
     document.getElementById("orderCount")
       .textContent=ordersData.length;
 
-
     document.getElementById("reportOrders")
       .textContent=ordersData.length;
 
-
-    /* -----------------------------------------------
-       TABLE
-    ----------------------------------------------- */
-
     const table =
       document.getElementById("ordersTable");
-
 
     if(!ordersData.length){
 
       table.innerHTML=
       `<tr>
-
-        <td
-          colspan="7"
-          class="empty"
-        >
-
+        <td colspan="8" class="empty">
           No orders yet.
-
         </td>
-
       </tr>`;
 
       return;
 
     }
 
-
     table.innerHTML =
       ordersData.map(order => {
-
 
         const id =
           order.id || "-";
 
-
         const buyer =
           order.buyer_id || "-";
 
-
         const status =
           order.status || "pending";
-
 
         const created =
           order.created_at
@@ -1837,11 +1654,6 @@ async function loadOrders(){
               order.created_at
             ).toLocaleString()
           : "-";
-
-
-        /* -----------------------------------------
-           FIND ITEMS FOR THIS ORDER
-        ----------------------------------------- */
 
         const itemsForOrder =
           orderItemsData.filter(
@@ -1851,28 +1663,19 @@ async function loadOrders(){
               String(order.id)
           );
 
-
-        /* -----------------------------------------
-           BUILD SONG DISPLAY
-        ----------------------------------------- */
-
         let songHtml="";
-
 
         if(!itemsForOrder.length){
 
           songHtml =
           `<span class="id-text">
-
             No song item found
-
           </span>`;
 
         }else{
 
           songHtml =
             itemsForOrder.map(item => {
-
 
               const song =
                 songsData.find(
@@ -1882,94 +1685,65 @@ async function loadOrders(){
                     String(item.song_id)
                 );
 
-
               if(!song){
 
                 return `
-
                 <div>
-
                   <div class="song-title">
-
                     Unknown Song
-
                   </div>
-
                   <div class="id-text">
-
                     Song ID:
-
                     ${escapeHtml(
                       String(
                         item.song_id ||
                         "-"
                       )
                     )}
-
                   </div>
-
                 </div>
-
                 `;
 
               }
-
 
               const artistName =
                 findArtistName(
                   song.artist_id
                 );
 
-
               return `
-
-              <div
-                style="margin-bottom:8px;"
-              >
+              <div style="margin-bottom:8px;">
 
                 <div class="song-title">
-
                   ${escapeHtml(
                     String(
                       song.title ||
                       "-"
                     )
                   )}
-
                 </div>
 
-
                 <div class="artist-name">
-
                   ${escapeHtml(
                     String(
                       artistName
                     )
                   )}
-
                 </div>
 
               </div>
-
               `;
 
             }).join("");
 
         }
 
-
-        /* -----------------------------------------
-           PRICE
-        ----------------------------------------- */
-
         let priceHtml="";
-
 
         if(itemsForOrder.length){
 
           priceHtml =
             itemsForOrder.map(item => {
-
 
               const price =
                 item.price !== null &&
@@ -1977,17 +1751,12 @@ async function loadOrders(){
                 ? item.price
                 : 0;
 
-
               return `
-
               <div>
-
                 ${escapeHtml(
                   String(price)
                 )}
-
               </div>
-
               `;
 
             }).join("");
@@ -2000,7 +1769,6 @@ async function loadOrders(){
             order.total ||
             0;
 
-
           priceHtml =
             escapeHtml(
               String(amount)
@@ -2008,13 +1776,7 @@ async function loadOrders(){
 
         }
 
-
-        /* -----------------------------------------
-           CURRENCY
-        ----------------------------------------- */
-
         let currency="UGX";
-
 
         if(itemsForOrder.length){
 
@@ -2031,83 +1793,84 @@ async function loadOrders(){
 
         }
 
+        const safeOrderId =
+          escapeHtml(
+            String(id)
+          );
 
         return `
 
         <tr>
 
-
           <td>
 
             <div class="id-text">
-
-              ${escapeHtml(
-                String(id)
-              )}
-
+              ${safeOrderId}
             </div>
 
           </td>
 
-
           <td>
-
             ${songHtml}
-
           </td>
-
 
           <td>
 
             <div class="id-text">
-
               ${escapeHtml(
                 String(buyer)
               )}
-
             </div>
 
           </td>
 
-
           <td>
-
             ${priceHtml}
-
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(currency)
             )}
-
           </td>
 
-
           <td>
-
             ${formatStatus(status)}
-
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(created)
             )}
-
           </td>
 
+          <td>
+
+            <div class="admin-actions">
+
+              <button
+                class="info-btn"
+                onclick="viewOrder('${safeOrderId}')"
+              >
+                View
+              </button>
+
+              <button
+                class="action"
+                onclick="editOrderStatus('${safeOrderId}')"
+              >
+                Update
+              </button>
+
+            </div>
+
+          </td>
 
         </tr>
 
         `;
 
       }).join("");
-
 
   }catch(error){
 
@@ -2116,27 +1879,162 @@ async function loadOrders(){
       error
     );
 
-
     document.getElementById("ordersTable")
       .innerHTML=
       `<tr>
-
-        <td colspan="7">
-
+        <td colspan="8">
           Unable to load orders.
-
+          <br><br>
+          ${escapeHtml(
+            error.message ||
+            "Unknown error"
+          )}
         </td>
-
       </tr>`;
 
   }
 
 }
 
+function viewOrder(orderId){
 
-/* ======================================================
-   PAYMENT VERIFICATIONS
-====================================================== */
+  const order =
+    ordersData.find(
+      item =>
+        String(item.id) ===
+        String(orderId)
+    );
+
+  if(!order){
+
+    alert("Order was not found.");
+
+    return;
+
+  }
+
+  const items =
+    orderItemsData.filter(
+      item =>
+        String(item.order_id) ===
+        String(order.id)
+    );
+
+  const details =
+    items.map(
+      item =>
+        "Song ID: "
+        + String(
+          item.song_id ||
+          "-"
+        )
+        + "\nPrice: "
+        + String(
+          item.price ||
+          0
+        )
+    ).join("\n\n");
+
+  alert(
+    "Order ID:\n"
+    + String(order.id || "-")
+    + "\n\nBuyer:\n"
+    + String(order.buyer_id || "-")
+    + "\n\nStatus:\n"
+    + String(order.status || "pending")
+    + "\n\nCurrency:\n"
+    + String(order.currency || "UGX")
+    + "\n\nItems:\n"
+    + (
+      details ||
+      "No order items found."
+    )
+  );
+
+}
+
+async function editOrderStatus(orderId){
+
+  const order =
+    ordersData.find(
+      item =>
+        String(item.id) ===
+        String(orderId)
+    );
+
+  if(!order){
+
+    alert("Order was not found.");
+
+    return;
+
+  }
+
+  const current =
+    order.status || "pending";
+
+  const newStatus =
+    prompt(
+      "Enter order status:\npending, paid, completed, failed, cancelled, rejected",
+      current
+    );
+
+  if(newStatus === null){
+
+    return;
+
+  }
+
+  const cleanStatus =
+    newStatus.trim().toLowerCase();
+
+  if(!cleanStatus){
+
+    alert("Status cannot be empty.");
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("orders")
+      .update({
+        status:cleanStatus
+      })
+      .eq(
+        "id",
+        orderId
+      );
+
+    if(error) throw error;
+
+    alert("Order status updated.");
+
+    await loadOrders();
+
+  }catch(error){
+
+    console.error(
+      "Order status error:",
+      error
+    );
+
+    alert(
+      "Unable to update order: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
 
 async function loadPaymentVerifications(){
 
@@ -2145,24 +2043,15 @@ async function loadPaymentVerifications(){
       "paymentVerificationsTable"
     );
 
-
   if(!table) return;
 
-
   table.innerHTML = `
-
     <tr>
-
       <td colspan="9">
-
         Loading payment verifications...
-
       </td>
-
     </tr>
-
   `;
-
 
   try{
 
@@ -2180,33 +2069,21 @@ async function loadPaymentVerifications(){
         }
       );
 
-
     if(error) throw error;
-
 
     if(!data || !data.length){
 
       table.innerHTML = `
-
         <tr>
-
-          <td
-            colspan="9"
-            class="empty"
-          >
-
+          <td colspan="9" class="empty">
             💳 No payment verification requests yet.
-
           </td>
-
         </tr>
-
       `;
 
       return;
 
     }
-
 
     table.innerHTML =
       data.map(function(item){
@@ -2215,32 +2092,26 @@ async function loadPaymentVerifications(){
           item.country ||
           "-";
 
-
         const method =
           item.verification_type === "mobile_money"
           ? "📱 Mobile Money"
           : "💳 Card / Online";
 
-
         const provider =
           item.provider ||
           "-";
-
 
         const accountName =
           item.account_name ||
           "-";
 
-
         const accountNumber =
           item.account_number ||
           "-";
 
-
         const status =
           item.status ||
           "pending";
-
 
         const submitted =
           item.created_at
@@ -2248,7 +2119,6 @@ async function loadPaymentVerifications(){
               item.created_at
             ).toLocaleString()
           : "-";
-
 
         const safeId =
           escapeHtml(
@@ -2258,7 +2128,6 @@ async function loadPaymentVerifications(){
             )
           );
 
-
         return `
 
         <tr>
@@ -2266,99 +2135,74 @@ async function loadPaymentVerifications(){
           <td>
 
             <div class="song-title">
-
               Creator
-
             </div>
 
             <div class="id-text">
-
               ${escapeHtml(
                 String(
                   item.user_id ||
                   "-"
                 )
               )}
-
             </div>
 
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(country)
             )}
-
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(method)
             )}
-
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(provider)
             )}
-
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(accountName)
             )}
-
           </td>
-
 
           <td>
 
             <div class="id-text">
-
               ${escapeHtml(
                 String(accountNumber)
               )}
-
             </div>
 
           </td>
 
-
           <td>
-
             ${formatStatus(status)}
-
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(submitted)
             )}
-
           </td>
-
 
           <td>
 
-            <div
-              style="
-                display:flex;
-                gap:7px;
-                flex-wrap:wrap;
-              "
-            >
+            <div class="admin-actions">
+
+              <button
+                class="info-btn"
+                onclick="viewPaymentVerification('${safeId}')"
+              >
+                View
+              </button>
 
               ${
                 String(status).toLowerCase()
@@ -2369,14 +2213,14 @@ async function loadPaymentVerifications(){
                 `
 
                 <button
-                  class="action"
+                  class="success-btn"
                   onclick="updatePaymentVerification('${safeId}','approved')"
                 >
                   ✓ Approve
                 </button>
 
                 <button
-                  class="small-btn"
+                  class="danger-btn"
                   onclick="updatePaymentVerification('${safeId}','rejected')"
                 >
                   ✕ Reject
@@ -2402,7 +2246,6 @@ async function loadPaymentVerifications(){
 
       }).join("");
 
-
   }catch(error){
 
     console.error(
@@ -2410,36 +2253,32 @@ async function loadPaymentVerifications(){
       error
     );
 
-
     table.innerHTML = `
-
       <tr>
-
         <td colspan="9">
-
           Unable to load payment verifications.
-
           <br><br>
-
           ${escapeHtml(
             error.message ||
-            "Unknown Supabase error"
+            "Unknown error"
           )}
-
         </td>
-
       </tr>
-
     `;
 
   }
 
 }
 
+function viewPaymentVerification(id){
 
-/* ======================================================
-   UPDATE PAYMENT VERIFICATION
-====================================================== */
+  alert(
+    "Payment verification ID:\n"
+    + String(id)
+    + "\n\nUse Approve or Reject to review this request."
+  );
+
+}
 
 async function updatePaymentVerification(
   verificationId,
@@ -2455,12 +2294,10 @@ async function updatePaymentVerification(
 
   }
 
-
   const actionText =
     newStatus === "approved"
     ? "approve"
     : "reject";
-
 
   const confirmed =
     confirm(
@@ -2469,13 +2306,11 @@ async function updatePaymentVerification(
       + " this payment method?"
     );
 
-
   if(!confirmed){
 
     return;
 
   }
-
 
   try{
 
@@ -2485,7 +2320,6 @@ async function updatePaymentVerification(
       }
     } =
     await supabaseClient.auth.getUser();
-
 
     if(!user){
 
@@ -2498,7 +2332,6 @@ async function updatePaymentVerification(
       return;
 
     }
-
 
     const {
       error
@@ -2524,9 +2357,7 @@ async function updatePaymentVerification(
         verificationId
       );
 
-
     if(error) throw error;
-
 
     alert(
       newStatus === "approved"
@@ -2534,9 +2365,7 @@ async function updatePaymentVerification(
       : "Payment method rejected."
     );
 
-
     await loadPaymentVerifications();
-
 
   }catch(error){
 
@@ -2544,7 +2373,6 @@ async function updatePaymentVerification(
       "Payment verification update error:",
       error
     );
-
 
     alert(
       "Unable to update verification: "
@@ -2558,11 +2386,6 @@ async function updatePaymentVerification(
 
 }
 
-
-/* ======================================================
-   COVER REQUESTS
-====================================================== */
-
 async function loadCoverRequests(){
 
   const table =
@@ -2570,24 +2393,15 @@ async function loadCoverRequests(){
       "coverRequestsTable"
     );
 
-
   if(!table) return;
 
-
   table.innerHTML = `
-
     <tr>
-
       <td colspan="7">
-
         Loading cover requests...
-
       </td>
-
     </tr>
-
   `;
-
 
   try{
 
@@ -2632,7 +2446,6 @@ async function loadCoverRequests(){
         }
       );
 
-
     if(error){
 
       console.error(
@@ -2640,93 +2453,67 @@ async function loadCoverRequests(){
         error
       );
 
-
       table.innerHTML = `
-
         <tr>
-
           <td colspan="7">
-
             Unable to load cover requests.
-
             <br><br>
-
             ${escapeHtml(
               error.message ||
               "Unknown Supabase error"
             )}
-
           </td>
-
         </tr>
-
       `;
-
 
       return;
 
     }
 
+    coverRequestsData =
+      data || [];
 
-    if(!data || !data.length){
+    if(!coverRequestsData.length){
 
       table.innerHTML = `
-
         <tr>
-
-          <td
-            colspan="7"
-            class="empty"
-          >
-
+          <td colspan="7" class="empty">
             🎨 No cover requests yet.
-
           </td>
-
         </tr>
-
       `;
-
 
       return;
 
     }
 
-
     table.innerHTML =
-      data.map(function(request){
-
+      coverRequestsData.map(function(request){
 
         const creator =
           request.dj_name ||
           "Unknown Creator";
 
-
         const title =
           request.mix_title ||
           "Untitled";
-
 
         const price =
           Number(
             request.price || 0
           ).toLocaleString();
 
-
         const currency =
           request.currency ||
           "UGX";
-
 
         const payment =
           request.payment_status ||
           "pending";
 
-
         const design =
           request.request_status ||
           "pending";
-
 
         const created =
           request.created_at
@@ -2735,122 +2522,119 @@ async function loadCoverRequests(){
             ).toLocaleString()
           : "-";
 
+        const safeId =
+          escapeHtml(
+            String(request.id)
+          );
 
         return `
 
         <tr>
 
-
           <td>
 
             <div class="song-title">
-
               ${escapeHtml(
                 String(creator)
               )}
-
             </div>
 
-
             <div class="artist-name">
-
               ${escapeHtml(
                 String(
                   request.contact_email ||
                   ""
                 )
               )}
-
             </div>
 
           </td>
 
-
           <td>
 
             <div class="song-title">
-
               ${escapeHtml(
                 String(title)
               )}
-
             </div>
 
-
             <div class="id-text">
-
               ${escapeHtml(
                 String(
                   request.genre ||
                   ""
                 )
               )}
-
             </div>
 
           </td>
-
 
           <td>
 
             ${escapeHtml(
               String(currency)
             )}
-
             ${escapeHtml(
               String(price)
             )}
 
           </td>
 
-
           <td>
-
-            ${formatStatus(
-              payment
-            )}
-
+            ${formatStatus(payment)}
           </td>
 
-
           <td>
-
-            ${formatStatus(
-              design
-            )}
-
+            ${formatStatus(design)}
           </td>
 
-
           <td>
-
             ${escapeHtml(
               String(created)
             )}
-
           </td>
-
 
           <td>
 
-            <button
-              class="action"
-              onclick="viewCoverRequest('${escapeHtml(String(request.id))}')"
-            >
+            <div class="admin-actions">
 
-              View
+              <button
+                class="info-btn"
+                onclick="viewCoverRequest('${safeId}')"
+              >
+                View
+              </button>
 
-            </button>
+              <button
+                class="action"
+                onclick="editCoverRequest('${safeId}')"
+              >
+                Edit
+              </button>
+
+              <button
+                class="success-btn"
+                onclick="completeCoverRequest('${safeId}')"
+              >
+                ✓ Complete
+              </button>
+
+              <button
+                class="danger-btn"
+                onclick="rejectCoverRequest('${safeId}')"
+              >
+                ✕ Reject
+              </button>
+
+            </div>
 
           </td>
-
 
         </tr>
 
         `;
 
       }).join("");
-
 
   }catch(error){
 
@@ -2859,36 +2643,22 @@ async function loadCoverRequests(){
       error
     );
 
-
     table.innerHTML = `
-
       <tr>
-
         <td colspan="7">
-
           Failed to fetch cover requests.
-
           <br><br>
-
           ${escapeHtml(
             error.message ||
             "Unknown error"
           )}
-
         </td>
-
       </tr>
-
     `;
 
   }
 
 }
-
-
-/* ======================================================
-   VIEW COVER REQUEST
-====================================================== */
 
 async function viewCoverRequest(
   requestId
@@ -2899,12 +2669,10 @@ async function viewCoverRequest(
       "coverRequestDetails"
     );
 
-
   const content =
     document.getElementById(
       "coverRequestDetailsContent"
     );
-
 
   if(!details || !content){
 
@@ -2912,26 +2680,18 @@ async function viewCoverRequest(
 
   }
 
-
   details.style.display="block";
 
-
   content.innerHTML = `
-
     <div class="notice">
-
       Loading cover request...
-
     </div>
-
   `;
-
 
   details.scrollIntoView({
     behavior:"smooth",
     block:"start"
   });
-
 
   try{
 
@@ -2948,668 +2708,23 @@ async function viewCoverRequest(
       )
       .single();
 
-
     if(error) throw error;
-
 
     if(!data){
 
       content.innerHTML = `
-
         <div class="notice">
-
           Cover request was not found.
-
         </div>
-
       `;
 
       return;
 
     }
 
+    currentCoverRequest=data;
 
-    const price =
-      Number(
-        data.price || 0
-      ).toLocaleString();
-
-
-    const currency =
-      data.currency ||
-      "UGX";
-
-
-    const requestStatus =
-      data.request_status ||
-      "pending";
-
-
-    const paymentStatus =
-      data.payment_status ||
-      "pending";
-
-
-    let mainPhoto = "";
-
-
-    if(
-      data.main_photo_url &&
-      /^https?:\/\//i.test(
-        data.main_photo_url
-      )
-    ){
-
-      mainPhoto = `
-
-        <div class="cover-image-box">
-
-          <div class="cover-detail-label">
-
-            Main Photo
-
-          </div>
-
-          <img
-            src="${escapeHtml(
-              data.main_photo_url
-            )}"
-            alt="Main creator photo"
-          >
-
-          <br>
-
-          <a
-            class="cover-link"
-            href="${escapeHtml(
-              data.main_photo_url
-            )}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            Open Photo
-
-          </a>
-
-        </div>
-
-      `;
-
-    }
-
-
-    let referencePhoto = "";
-
-
-    if(
-      data.reference_photo_url &&
-      /^https?:\/\//i.test(
-        data.reference_photo_url
-      )
-    ){
-
-      referencePhoto = `
-
-        <div class="cover-image-box">
-
-          <div class="cover-detail-label">
-
-            Reference Photo
-
-          </div>
-
-          <img
-            src="${escapeHtml(
-              data.reference_photo_url
-            )}"
-            alt="Reference photo"
-          >
-
-          <br>
-
-          <a
-            class="cover-link"
-            href="${escapeHtml(
-              data.reference_photo_url
-            )}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            Open Photo
-
-          </a>
-
-        </div>
-
-      `;
-
-    }
-
-
-    let logo = "";
-
-
-    if(
-      data.logo_url &&
-      /^https?:\/\//i.test(
-        data.logo_url
-      )
-    ){
-
-      logo = `
-
-        <div class="cover-image-box">
-
-          <div class="cover-detail-label">
-
-            Logo
-
-          </div>
-
-          <img
-            src="${escapeHtml(
-              data.logo_url
-            )}"
-            alt="Creator logo"
-          >
-
-          <br>
-
-          <a
-            class="cover-link"
-            href="${escapeHtml(
-              data.logo_url
-            )}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            Open Logo
-
-          </a>
-
-        </div>
-
-      `;
-
-    }
-
-
-    let finishedCover = "";
-
-
-    if(
-      data.finished_cover_url &&
-      /^https?:\/\//i.test(
-        data.finished_cover_url
-      )
-    ){
-
-      finishedCover = `
-
-        <div class="cover-image-box">
-
-          <div class="cover-detail-label">
-
-            Finished Cover
-
-          </div>
-
-          <img
-            src="${escapeHtml(
-              data.finished_cover_url
-            )}"
-            alt="Finished PASONG cover"
-          >
-
-          <br>
-
-          <a
-            class="cover-link"
-            href="${escapeHtml(
-              data.finished_cover_url
-            )}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            Open Finished Cover
-
-          </a>
-
-        </div>
-
-      `;
-
-    }
-
-
-    content.innerHTML = `
-
-      <div class="cover-details-grid">
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Request ID
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(data.id || "-")
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Creator
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.dj_name ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Cover / Mix Title
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.mix_title ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Subtitle
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.subtitle ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Featured Artists
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.featured_artists ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Genre
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.genre ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Edition / Year
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.edition_year ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Preferred Style
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.preferred_style ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Preferred Colours
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.preferred_colours ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Location
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.location ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Country
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.country ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Contact Email
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.contact_email ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Contact Phone
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(
-                data.contact_phone ||
-                "-"
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Cover Price
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              String(currency)
-            )}
-
-            ${escapeHtml(
-              String(price)
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Payment Status
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${formatStatus(
-              paymentStatus
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Design Status
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${formatStatus(
-              requestStatus
-            )}
-
-          </div>
-
-        </div>
-
-
-        <div class="cover-detail-box">
-
-          <div class="cover-detail-label">
-            Submitted
-          </div>
-
-          <div class="cover-detail-value">
-
-            ${escapeHtml(
-              data.created_at
-              ? new Date(
-                  data.created_at
-                ).toLocaleString()
-              : "-"
-            )}
-
-          </div>
-
-        </div>
-
-
-      </div>
-
-
-      <div
-        class="cover-detail-box"
-        style="margin-top:15px;"
-      >
-
-        <div class="cover-detail-label">
-          Extra Details / Instructions
-        </div>
-
-        <div class="cover-detail-value">
-
-          ${escapeHtml(
-            String(
-              data.extra_details ||
-              "-"
-            )
-          )}
-
-        </div>
-
-      </div>
-
-
-      <div
-        class="cover-detail-box"
-        style="margin-top:15px;"
-      >
-
-        <div class="cover-detail-label">
-          Admin Notes
-        </div>
-
-        <div class="cover-detail-value">
-
-          ${escapeHtml(
-            String(
-              data.admin_notes ||
-              "-"
-            )
-          )}
-
-        </div>
-
-      </div>
-
-
-      <div class="cover-images">
-
-        ${mainPhoto}
-
-        ${referencePhoto}
-
-        ${logo}
-
-        ${finishedCover}
-
-      </div>
-
-
-      <div
-        class="cover-detail-box"
-        style="margin-top:15px;"
-      >
-
-        <div class="cover-detail-label">
-          User ID
-        </div>
-
-        <div class="cover-detail-value">
-
-          ${escapeHtml(
-            String(
-              data.user_id ||
-              "-"
-            )
-          )}
-
-        </div>
-
-      </div>
-
-    `;
-
+    renderCoverRequestDetails(data);
 
   }catch(error){
 
@@ -3618,32 +2733,1161 @@ async function viewCoverRequest(
       error
     );
 
-
     content.innerHTML = `
-
       <div class="notice">
-
         Unable to open cover request.
-
         <br><br>
-
         ${escapeHtml(
           error.message ||
           "Unknown error"
         )}
-
       </div>
-
     `;
 
   }
 
 }
 
+function renderCoverRequestDetails(data){
 
-/* ======================================================
-   CLOSE COVER REQUEST
-====================================================== */
+  const content =
+    document.getElementById(
+      "coverRequestDetailsContent"
+    );
+
+  if(!content){
+
+    return;
+
+  }
+
+  const price =
+    Number(
+      data.price || 0
+    ).toLocaleString();
+
+  const currency =
+    data.currency ||
+    "UGX";
+
+  const requestStatus =
+    data.request_status ||
+    "pending";
+
+  const paymentStatus =
+    data.payment_status ||
+    "pending";
+
+  let mainPhoto = "";
+
+  if(
+    data.main_photo_url &&
+    /^https?:\/\//i.test(
+      data.main_photo_url
+    )
+  ){
+
+    mainPhoto = `
+      <div class="cover-image-box">
+
+        <div class="cover-detail-label">
+          Main Photo
+        </div>
+
+        <img
+          src="${escapeHtml(
+            data.main_photo_url
+          )}"
+          alt="Main creator photo"
+        >
+
+        <br>
+
+        <a
+          class="cover-link"
+          href="${escapeHtml(
+            data.main_photo_url
+          )}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open Photo
+        </a>
+
+      </div>
+    `;
+
+  }
+
+  let referencePhoto = "";
+
+  if(
+    data.reference_photo_url &&
+    /^https?:\/\//i.test(
+      data.reference_photo_url
+    )
+  ){
+
+    referencePhoto = `
+      <div class="cover-image-box">
+
+        <div class="cover-detail-label">
+          Reference Photo
+        </div>
+
+        <img
+          src="${escapeHtml(
+            data.reference_photo_url
+          )}"
+          alt="Reference photo"
+        >
+
+        <br>
+
+        <a
+          class="cover-link"
+          href="${escapeHtml(
+            data.reference_photo_url
+          )}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open Photo
+        </a>
+
+      </div>
+    `;
+
+  }
+
+  let logo = "";
+
+  if(
+    data.logo_url &&
+    /^https?:\/\//i.test(
+      data.logo_url
+    )
+  ){
+
+    logo = `
+      <div class="cover-image-box">
+
+        <div class="cover-detail-label">
+          Logo
+        </div>
+
+        <img
+          src="${escapeHtml(
+            data.logo_url
+          )}"
+          alt="Creator logo"
+        >
+
+        <br>
+
+        <a
+          class="cover-link"
+          href="${escapeHtml(
+            data.logo_url
+          )}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open Logo
+        </a>
+
+      </div>
+    `;
+
+  }
+
+  let finishedCover = "";
+
+  if(
+    data.finished_cover_url &&
+    /^https?:\/\//i.test(
+      data.finished_cover_url
+    )
+  ){
+
+    finishedCover = `
+      <div class="cover-image-box">
+
+        <div class="cover-detail-label">
+          Finished Cover
+        </div>
+
+        <img
+          src="${escapeHtml(
+            data.finished_cover_url
+          )}"
+          alt="Finished PASONG cover"
+        >
+
+        <br>
+
+        <a
+          class="cover-link"
+          href="${escapeHtml(
+            data.finished_cover_url
+          )}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open Finished Cover
+        </a>
+
+      </div>
+    `;
+
+  }
+
+  content.innerHTML = `
+
+    <div class="cover-details-grid">
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Request ID
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.id || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Creator
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.dj_name || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Cover / Mix Title
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.mix_title || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Subtitle
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.subtitle || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Featured Artists
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(
+              data.featured_artists ||
+              "-"
+            )
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Genre
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.genre || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Edition / Year
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(
+              data.edition_year ||
+              "-"
+            )
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Preferred Style
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(
+              data.preferred_style ||
+              "-"
+            )
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Preferred Colours
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(
+              data.preferred_colours ||
+              "-"
+            )
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Location
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.location || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Country
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(data.country || "-")
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Contact Email
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(
+              data.contact_email ||
+              "-"
+            )
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Contact Phone
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(
+              data.contact_phone ||
+              "-"
+            )
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Cover Price
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            String(currency)
+          )}
+          ${escapeHtml(
+            String(price)
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Payment Status
+        </div>
+
+        <div class="cover-detail-value">
+          ${formatStatus(
+            paymentStatus
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Design Status
+        </div>
+
+        <div class="cover-detail-value">
+          ${formatStatus(
+            requestStatus
+          )}
+        </div>
+
+      </div>
+
+      <div class="cover-detail-box">
+
+        <div class="cover-detail-label">
+          Submitted
+        </div>
+
+        <div class="cover-detail-value">
+          ${escapeHtml(
+            data.created_at
+            ? new Date(
+                data.created_at
+              ).toLocaleString()
+            : "-"
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      class="cover-detail-box"
+      style="margin-top:15px;"
+    >
+
+      <div class="cover-detail-label">
+        Extra Details / Instructions
+      </div>
+
+      <div class="cover-detail-value">
+        ${escapeHtml(
+          String(
+            data.extra_details ||
+            "-"
+          )
+        )}
+      </div>
+
+    </div>
+
+    <div
+      class="cover-detail-box"
+      style="margin-top:15px;"
+    >
+
+      <div class="cover-detail-label">
+        Admin Notes
+      </div>
+
+      <div class="cover-detail-value">
+        ${escapeHtml(
+          String(
+            data.admin_notes ||
+            "-"
+          )
+        )}
+      </div>
+
+    </div>
+
+    <div class="cover-images">
+
+      ${mainPhoto}
+
+      ${referencePhoto}
+
+      ${logo}
+
+      ${finishedCover}
+
+    </div>
+
+    <div class="upload-box">
+
+      <strong>
+        🎨 Upload Finished Cover
+      </strong>
+
+      <input
+        id="finishedCoverFile"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+      >
+
+      <div class="cover-actions">
+
+        <button
+          class="action"
+          onclick="uploadFinishedCover('${escapeHtml(String(data.id))}')"
+        >
+          Upload Cover
+        </button>
+
+        <button
+          class="success-btn"
+          onclick="completeCoverRequest('${escapeHtml(String(data.id))}')"
+        >
+          ✓ Mark Complete
+        </button>
+
+        <button
+          class="danger-btn"
+          onclick="rejectCoverRequest('${escapeHtml(String(data.id))}')"
+        >
+          ✕ Reject Request
+        </button>
+
+      </div>
+
+    </div>
+
+    <div
+      class="cover-detail-box"
+      style="margin-top:15px;"
+    >
+
+      <div class="cover-detail-label">
+        User ID
+      </div>
+
+      <div class="cover-detail-value">
+        ${escapeHtml(
+          String(
+            data.user_id ||
+            "-"
+          )
+        )}
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+async function editCoverRequest(requestId){
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .select("*")
+      .eq(
+        "id",
+        requestId
+      )
+      .single();
+
+    if(error) throw error;
+
+    const title =
+      prompt(
+        "Cover / Mix Title:",
+        data.mix_title || ""
+      );
+
+    if(title === null) return;
+
+    const subtitle =
+      prompt(
+        "Subtitle:",
+        data.subtitle || ""
+      );
+
+    if(subtitle === null) return;
+
+    const style =
+      prompt(
+        "Preferred Style:",
+        data.preferred_style || ""
+      );
+
+    if(style === null) return;
+
+    const colours =
+      prompt(
+        "Preferred Colours:",
+        data.preferred_colours || ""
+      );
+
+    if(colours === null) return;
+
+    const notes =
+      prompt(
+        "Admin Notes:",
+        data.admin_notes || ""
+      );
+
+    if(notes === null) return;
+
+    const {
+      error:updateError
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .update({
+
+        mix_title:title.trim(),
+
+        subtitle:subtitle.trim(),
+
+        preferred_style:
+          style.trim(),
+
+        preferred_colours:
+          colours.trim(),
+
+        admin_notes:
+          notes.trim(),
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        requestId
+      );
+
+    if(updateError) throw updateError;
+
+    alert(
+      "Cover request updated successfully."
+    );
+
+    await loadCoverRequests();
+
+    await viewCoverRequest(
+      requestId
+    );
+
+  }catch(error){
+
+    console.error(
+      "Cover edit error:",
+      error
+    );
+
+    alert(
+      "Unable to edit cover request: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+async function completeCoverRequest(requestId){
+
+  if(!requestId){
+
+    return;
+
+  }
+
+  const confirmed =
+    confirm(
+      "Mark this cover request as completed?"
+    );
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .update({
+
+        request_status:
+          "completed",
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        requestId
+      );
+
+    if(error) throw error;
+
+    alert(
+      "Cover request marked as completed."
+    );
+
+    await loadCoverRequests();
+
+    await viewCoverRequest(
+      requestId
+    );
+
+  }catch(error){
+
+    console.error(
+      "Complete cover request error:",
+      error
+    );
+
+    alert(
+      "Unable to complete cover request: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+async function rejectCoverRequest(requestId){
+
+  if(!requestId){
+
+    return;
+
+  }
+
+  const confirmed =
+    confirm(
+      "Reject this cover request?"
+    );
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+  try{
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .update({
+
+        request_status:
+          "rejected",
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        requestId
+      );
+
+    if(error) throw error;
+
+    alert(
+      "Cover request rejected."
+    );
+
+    await loadCoverRequests();
+
+    await viewCoverRequest(
+      requestId
+    );
+
+  }catch(error){
+
+    console.error(
+      "Reject cover request error:",
+      error
+    );
+
+    alert(
+      "Unable to reject cover request: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }
+
+}
+
+async function uploadFinishedCover(
+  requestId
+){
+
+  const input =
+    document.getElementById(
+      "finishedCoverFile"
+    );
+
+  if(!input || !input.files || !input.files[0]){
+
+    alert(
+      "Please select the finished cover image first."
+    );
+
+    return;
+
+  }
+
+  const file =
+    input.files[0];
+
+  if(
+    ![
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ].includes(file.type)
+  ){
+
+    alert(
+      "Please upload JPG, PNG or WEBP."
+    );
+
+    return;
+
+  }
+
+  if(file.size > 5 * 1024 * 1024){
+
+    alert(
+      "Cover image must be 5MB or smaller."
+    );
+
+    return;
+
+  }
+
+  try{
+
+    const sessionResult =
+      await supabaseClient.auth.getSession();
+
+    const session =
+      sessionResult &&
+      sessionResult.data &&
+      sessionResult.data.session;
+
+    if(!session){
+
+      alert(
+        "Your administrator session has expired."
+      );
+
+      window.location.href="account.html";
+
+      return;
+
+    }
+
+    const button =
+      document.querySelector(
+        `button[onclick*="uploadFinishedCover"]`
+      );
+
+    if(button){
+
+      button.disabled=true;
+
+      button.textContent=
+        "Uploading...";
+
+    }
+
+    const signatureResponse =
+      await fetch(
+        API_BASE +
+        "/api/cloudinary/signature",
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json",
+            "Authorization":
+              "Bearer " +
+              session.access_token
+          },
+          body:JSON.stringify({
+            folder:
+              "pasong/covers"
+          })
+        }
+      );
+
+    let signatureData=null;
+
+    try{
+
+      signatureData =
+        await signatureResponse.json();
+
+    }catch(error){
+
+      signatureData=null;
+
+    }
+
+    if(
+      !signatureResponse.ok ||
+      !signatureData
+    ){
+
+      throw new Error(
+        "Cloudinary signing failed."
+      );
+
+    }
+
+    const signature =
+      signatureData.signature;
+
+    const timestamp =
+      signatureData.timestamp;
+
+    const cloudName =
+      signatureData.cloud_name ||
+      signatureData.cloudName;
+
+    const apiKey =
+      signatureData.api_key ||
+      signatureData.apiKey;
+
+    if(
+      !signature ||
+      !timestamp ||
+      !cloudName ||
+      !apiKey
+    ){
+
+      throw new Error(
+        "Cloudinary signing response is incomplete."
+      );
+
+    }
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "file",
+      file
+    );
+
+    formData.append(
+      "api_key",
+      apiKey
+    );
+
+    formData.append(
+      "timestamp",
+      timestamp
+    );
+
+    formData.append(
+      "signature",
+      signature
+    );
+
+    if(signatureData.folder){
+
+      formData.append(
+        "folder",
+        signatureData.folder
+      );
+
+    }else{
+
+      formData.append(
+        "folder",
+        "pasong/covers"
+      );
+
+    }
+
+    const uploadResponse =
+      await fetch(
+        "https://api.cloudinary.com/v1_1/"
+        + encodeURIComponent(
+          cloudName
+        )
+        + "/image/upload",
+        {
+          method:"POST",
+          body:formData
+        }
+      );
+
+    const uploadData =
+      await uploadResponse.json();
+
+    if(!uploadResponse.ok){
+
+      throw new Error(
+        uploadData.error &&
+        uploadData.error.message
+        ? uploadData.error.message
+        : "Cloudinary upload failed."
+      );
+
+    }
+
+    const coverUrl =
+      uploadData.secure_url ||
+      uploadData.url;
+
+    if(!coverUrl){
+
+      throw new Error(
+        "Cloudinary did not return a cover URL."
+      );
+
+    }
+
+    const {
+      error:updateError
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .update({
+
+        finished_cover_url:
+          coverUrl,
+
+        request_status:
+          "completed",
+
+        updated_at:
+          new Date().toISOString()
+
+      })
+      .eq(
+        "id",
+        requestId
+      );
+
+    if(updateError) throw updateError;
+
+    alert(
+      "Finished cover uploaded successfully."
+    );
+
+    await loadCoverRequests();
+
+    await viewCoverRequest(
+      requestId
+    );
+
+  }catch(error){
+
+    console.error(
+      "Finished cover upload error:",
+      error
+    );
+
+    alert(
+      "Unable to upload finished cover: "
+      + (
+        error.message ||
+        "Unknown error"
+      )
+    );
+
+  }finally{
+
+    const button =
+      document.querySelector(
+        `button[onclick*="uploadFinishedCover"]`
+      );
+
+    if(button){
+
+      button.disabled=false;
+
+      button.textContent=
+        "Upload Cover";
+
+    }
+
+  }
+
+}
 
 function closeCoverRequest(){
 
@@ -3652,12 +3896,10 @@ function closeCoverRequest(){
       "coverRequestDetails"
     );
 
-
   const content =
     document.getElementById(
       "coverRequestDetailsContent"
     );
-
 
   if(details){
 
@@ -3665,19 +3907,15 @@ function closeCoverRequest(){
 
   }
 
-
   if(content){
 
     content.innerHTML="";
 
   }
 
+  currentCoverRequest=null;
+
 }
-
-
-/* ======================================================
-   STATUS FORMAT
-====================================================== */
 
 function formatStatus(status){
 
@@ -3687,73 +3925,47 @@ function formatStatus(status){
       "pending"
     ).toLowerCase();
 
-
   if(
 
     value === "completed" ||
-
     value === "paid" ||
-
     value === "success" ||
-
     value === "approved" ||
-
     value === "active"
 
   ){
 
     return `
-
-    <span class="status">
-
-      ● ${escapeHtml(value)}
-
-    </span>
-
+      <span class="status">
+        ● ${escapeHtml(value)}
+      </span>
     `;
 
   }
 
-
   if(
 
     value === "failed" ||
-
     value === "cancelled" ||
-
     value === "rejected"
 
   ){
 
     return `
-
-    <span class="status-failed">
-
-      ● ${escapeHtml(value)}
-
-    </span>
-
+      <span class="status-failed">
+        ● ${escapeHtml(value)}
+      </span>
     `;
 
   }
 
-
   return `
-
-  <span class="status-pending">
-
-    ● ${escapeHtml(value)}
-
-  </span>
-
+    <span class="status-pending">
+      ● ${escapeHtml(value)}
+    </span>
   `;
 
 }
-
-
-/* ======================================================
-   SECTION NAVIGATION
-====================================================== */
 
 function showSection(id){
 
@@ -3767,10 +3979,8 @@ function showSection(id){
 
   });
 
-
   const selected =
     document.getElementById(id);
-
 
   if(selected){
 
@@ -3778,23 +3988,14 @@ function showSection(id){
       "active"
     );
 
-
     selected.scrollIntoView({
-
       behavior:"smooth",
-
       block:"start"
-
     });
 
   }
 
 }
-
-
-/* ======================================================
-   HTML SECURITY
-====================================================== */
 
 function escapeHtml(value){
 
@@ -3827,11 +4028,6 @@ function escapeHtml(value){
 
 }
 
-
-/* ======================================================
-   LOGOUT
-====================================================== */
-
 async function logout(){
 
   await supabaseClient.auth.signOut();
@@ -3840,16 +4036,6 @@ async function logout(){
 
 }
 
-
-/* ======================================================
-   START
-====================================================== */
-
 checkAdmin();
 
-</script>
-
-
-</body>
-
-</html>
+</script></body></html>
