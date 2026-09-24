@@ -1002,6 +1002,10 @@ return profile;
 
 async function queryBeats(profile){
 
+if(!profile?.id){
+throw new Error("Producer profile ID is missing.");
+}
+
 const result=
 await supabaseClient
 .from("beats")
@@ -1054,6 +1058,8 @@ await loadProducer();
 if(!profile){
 
 resetDashboardStats();
+currentProducerBeats=[];
+renderBeats([]);
 
 showDashboardMessage(
 "error",
@@ -1063,6 +1069,8 @@ showDashboardMessage(
 return;
 }
 
+currentProducerProfile=profile;
+
 let beats=[];
 let orders=[];
 let fans=0;
@@ -1070,18 +1078,17 @@ let fans=0;
 try{
 
 beats=await queryBeats(profile);
-
 currentProducerBeats=beats;
-
-renderBeats(beats);
 
 }catch(error){
 
-console.error("Beat loading error:",error);
+console.error(
+"Beat loading error:",
+error
+);
 
 currentProducerBeats=[];
-
-renderBeats([]);
+beats=[];
 
 showDashboardMessage(
 "error",
@@ -1090,15 +1097,21 @@ showDashboardMessage(
 );
 }
 
+renderBeats(beats);
+
 try{
 
 orders=await queryOrders(profile);
 
 }catch(error){
 
-console.error("Order loading error:",error);
+console.error(
+"Order loading error:",
+error
+);
 
 orders=[];
+
 }
 
 try{
@@ -1107,12 +1120,20 @@ fans=await queryFans(profile);
 
 }catch(error){
 
-console.error("Fan loading error:",error);
+console.error(
+"Fan loading error:",
+error
+);
 
 fans=0;
+
 }
 
-renderProducerEarnings(beats,orders,fans);
+renderProducerEarnings(
+beats,
+orders,
+fans
+);
 
 }catch(error){
 
@@ -1122,6 +1143,9 @@ error
 );
 
 resetDashboardStats();
+
+currentProducerBeats=[];
+renderBeats([]);
 
 showDashboardMessage(
 "error",
@@ -2105,21 +2129,33 @@ async function loadBeats(){
 
 const grid=document.getElementById("beatsGrid");
 
+if(!grid)return;
+
 grid.innerHTML=
 `<div class="loading">Loading beats...</div>`;
 
 try{
 
-const profile=
-currentProducerProfile||
-await loadProducer();
+let profile=currentProducerProfile;
 
 if(!profile){
 
+profile=await loadProducer();
+}
+
+if(!profile){
+
+currentProducerBeats=[];
+
 renderBeats([]);
+
+grid.innerHTML=
+`<div class="empty">Please log in as a producer to view your beats.</div>`;
 
 return;
 }
+
+currentProducerProfile=profile;
 
 const beats=await queryBeats(profile);
 
@@ -2130,11 +2166,11 @@ renderBeats(beats);
 }catch(error){
 
 console.error(
-"Beat list loading error:",
+"My Beats loading error:",
 error
 );
 
-renderBeats([]);
+currentProducerBeats=[];
 
 grid.innerHTML=
 `<div class="empty">Unable to load beats: ${escapeHtml(
@@ -2147,22 +2183,43 @@ function renderBeats(beats){
 
 const grid=document.getElementById("beatsGrid");
 
+if(!grid)return;
+
+const safeBeats=
+Array.isArray(beats)
+?beats
+:[];
+
 document.getElementById("statBeats").textContent=
-beats.length.toLocaleString("en-US");
+safeBeats.length.toLocaleString("en-US");
 
 document.getElementById("statPublished").textContent=
-beats.filter(
-beat=>
-beat.status==="approved"||
-beat.status==="published"
-).length.toLocaleString("en-US");
+safeBeats.filter(beat=>{
+
+const status=
+String(beat?.status||"")
+.toLowerCase()
+.trim();
+
+return(
+status==="approved"||
+status==="published"
+);
+
+}).length.toLocaleString("en-US");
 
 document.getElementById("statExclusive").textContent=
-beats.filter(
-beat=>beat.is_exclusive_sold
-).length.toLocaleString("en-US");
+safeBeats.filter(beat=>{
 
-if(!beats.length){
+return(
+beat?.is_exclusive_sold===true||
+beat?.is_exclusive_sold===1||
+beat?.is_exclusive_sold==="true"
+);
+
+}).length.toLocaleString("en-US");
+
+if(!safeBeats.length){
 
 grid.innerHTML=
 `<div class="empty">No beats uploaded yet.</div>`;
@@ -2171,12 +2228,48 @@ return;
 }
 
 grid.innerHTML=
-beats.map(
-beat=>{
+safeBeats.map(beat=>{
 
 const cover=
-beat.cover_url||
+beat?.cover_url||
 "https://via.placeholder.com/600x600/160d24/c084fc?text=PASONG+BEAT";
+
+const title=
+beat?.title||
+"Untitled Beat";
+
+const genre=
+beat?.genre||
+"Genre not set";
+
+const bpm=
+beat?.bpm;
+
+const musicalKey=
+beat?.musical_key;
+
+const leaseMp3=
+beat?.lease_mp3_price;
+
+const leaseWav=
+beat?.lease_wav_price;
+
+const stems=
+beat?.stems_price;
+
+const exclusive=
+beat?.exclusive_price;
+
+const status=
+String(
+beat?.status||
+"Pending"
+);
+
+const exclusiveSold=
+beat?.is_exclusive_sold===true||
+beat?.is_exclusive_sold===1||
+beat?.is_exclusive_sold==="true";
 
 return`
 
@@ -2185,47 +2278,50 @@ return`
 <img
 class="beat-cover"
 src="${escapeHtml(cover)}"
-alt=""
+alt="${escapeHtml(title)}"
+loading="lazy"
 onerror="this.src='https://via.placeholder.com/600x600/160d24/c084fc?text=PASONG+BEAT'"
 >
 
 <div class="beat-info">
 
 <div class="beat-title">
-${escapeHtml(beat.title||"Untitled Beat")}
+${escapeHtml(title)}
 </div>
 
 <div class="beat-meta">
 
-${escapeHtml(beat.genre||"Genre not set")}
+${escapeHtml(genre)}
 
-${beat.bpm
-?" • "+escapeHtml(beat.bpm)+" BPM"
-:""}
+${bpm
+?" • "+escapeHtml(bpm)+" BPM"
+:""
+}
 
-${beat.musical_key
-?" • "+escapeHtml(beat.musical_key)
-:""}
+${musicalKey
+?" • "+escapeHtml(musicalKey)
+:""
+}
 
 <br>
 
 MP3 Lease:
-${formatUGX(beat.lease_mp3_price)}
+${formatUGX(leaseMp3)}
 
 <br>
 
 WAV Lease:
-${formatUGX(beat.lease_wav_price)}
+${formatUGX(leaseWav)}
 
 <br>
 
 Stems:
-${formatUGX(beat.stems_price)}
+${formatUGX(stems)}
 
 <br>
 
 Exclusive:
-${formatUGX(beat.exclusive_price)}
+${formatUGX(exclusive)}
 
 <br>
 
@@ -2237,9 +2333,9 @@ Full Length
 <div class="beat-status">
 
 ${escapeHtml(
-beat.is_exclusive_sold
+exclusiveSold
 ?"Exclusive Sold"
-:beat.status||"Pending"
+:status
 )}
 
 </div>
@@ -2249,8 +2345,8 @@ beat.is_exclusive_sold
 </article>
 
 `;
-}
-).join("");
+
+}).join("");
 }
 
 function validatePrices(){
@@ -2981,6 +3077,7 @@ document.getElementById("welcomeName").textContent=
 "Producer";
 
 resetDashboardStats();
+
 }
 
 if(event==="SIGNED_IN"&&session){
@@ -2991,6 +3088,7 @@ loadProducerDashboard();
 },
 0
 );
+
 }
 }
 );
