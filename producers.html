@@ -184,14 +184,10 @@ main{padding:20px 14px 90px}
 <a href="artist-dashboard.html">Upload Music</a>
 <a href="notifications.html">🔔 0</a>
 
-<a href="https://pasong-frontend.vercel.app/producer-dashboard.html">
-🎹 Producer Dashboard
-</a>
-
-<a href="account.html" class="account-box">
-<img id="accountPhoto" class="account-photo" src="https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true" alt="Account">
-<span>My Account</span>
-</a>
+<div id="authNav" class="account-box">
+<a href="login.html" class="btn btn-secondary">Login</a>
+<a href="signup.html" class="btn btn-primary">Sign Up</a>
+</div>
 
 </nav>
 </div>
@@ -501,10 +497,6 @@ Kampala-based music producer creating music for artists.
 🏆<br>Charts
 </a>
 
-<a href="artist-dashboard.html">
-⬆️<br>Upload
-</a>
-
 <a href="account.html">
 👤<br>Account
 </a>
@@ -761,14 +753,18 @@ beatStoreProducer.textContent = producerName;
 aboutProducerName.textContent = producerName;
 
 async function loadAccountPhoto(){
-const {data:{user}} = await supabaseClient.auth.getUser();
+
+const {
+data:{user}
+} =
+await supabaseClient.auth.getUser();
 
 if(!user){
 return;
 }
 
-const accountPhoto = document.getElementById("accountPhoto");
-const metadata = user.user_metadata || {};
+const metadata =
+user.user_metadata || {};
 
 const photo =
 metadata.avatar_url ||
@@ -778,12 +774,79 @@ metadata.picture ||
 "";
 
 if(photo){
+
+const accountPhoto =
+document.getElementById("accountPhoto");
+
+if(accountPhoto){
 accountPhoto.src = photo;
+}
+
 }
 }
 
+async function setupAuthNavigation(){
+
+const authNav =
+document.getElementById("authNav");
+
+if(!authNav){
+return;
+}
+
+const {
+data:{user}
+} =
+await supabaseClient.auth.getUser();
+
+if(!user){
+
+authNav.innerHTML = `
+<a href="login.html" class="btn btn-secondary">
+Login
+</a>
+
+<a href="signup.html" class="btn btn-primary">
+Sign Up
+</a>
+`;
+
+return;
+}
+
+const metadata =
+user.user_metadata || {};
+
+const photo =
+metadata.avatar_url ||
+metadata.profile_photo_url ||
+metadata.photo_url ||
+metadata.picture ||
+"https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
+
+authNav.innerHTML = `
+<a
+href="https://pasong-frontend.vercel.app/producer-dashboard.html"
+class="btn btn-secondary"
+>
+🎹 Producer Dashboard
+</a>
+
+<a href="account.html" class="account-box">
+<img
+class="account-photo"
+src="${escapeHtml(photo)}"
+alt="Account"
+>
+<span>My Account</span>
+</a>
+`;
+}
+
 function firstValue(row,fields,fallback=""){
+
 for(const field of fields){
+
 const value = row[field];
 
 if(
@@ -793,20 +856,24 @@ String(value).trim() !== ""
 ){
 return value;
 }
+
 }
 
 return fallback;
 }
 
 function getBeatTitle(row){
+
 return firstValue(
 row,
 ["beat_name","beat_title","title","name"],
 "Untitled Beat"
 );
+
 }
 
 function getBeatCover(row){
+
 return firstValue(
 row,
 [
@@ -820,9 +887,11 @@ row,
 ],
 "https://ui-avatars.com/api/?name=Beat&background=171722&color=c084fc&bold=true"
 );
+
 }
 
 function getBeatAudio(row){
+
 return firstValue(
 row,
 [
@@ -834,33 +903,41 @@ row,
 ],
 ""
 );
+
 }
 
 function getGenre(row){
+
 return firstValue(
 row,
 ["genre","genres","music_genre"],
 "Beat"
 );
+
 }
 
 function getBpm(row){
+
 return firstValue(
 row,
 ["bpm","tempo"],
 ""
 );
+
 }
 
 function getKey(row){
+
 return firstValue(
 row,
 ["key","musical_key"],
 ""
 );
+
 }
 
 function getLeasePrice(row){
+
 return Number(
 firstValue(
 row,
@@ -875,9 +952,11 @@ row,
 50000
 )
 );
+
 }
 
 function getExclusivePrice(row){
+
 return Number(
 firstValue(
 row,
@@ -889,10 +968,14 @@ row,
 300000
 )
 );
+
 }
 
 function formatUGX(amount){
-return "UGX " + Number(amount || 0).toLocaleString("en-UG");
+
+return "UGX " +
+Number(amount || 0).toLocaleString("en-UG");
+
 }
 
 function formatServicePrice(value){
@@ -905,7 +988,8 @@ String(value).trim() === ""
 return "Price not set";
 }
 
-const text = String(value).trim();
+const text =
+String(value).trim();
 
 if(
 text.toLowerCase().includes("ugx") ||
@@ -915,7 +999,8 @@ text.toLowerCase().includes("usd")
 return text;
 }
 
-const numeric = Number(text.replace(/,/g,""));
+const numeric =
+Number(text.replace(/,/g,""));
 
 if(Number.isFinite(numeric)){
 return formatUGX(numeric);
@@ -925,7 +1010,13 @@ return text;
 }
 
 function getServicePrice(profile,fields){
-return firstValue(profile,fields,"");
+
+return firstValue(
+profile,
+fields,
+""
+);
+
 }
 
 function renderServicePrices(profile){
@@ -947,7 +1038,8 @@ document.getElementById("serviceMixing").textContent =
 return;
 }
 
-const beatLease = getServicePrice(
+const beatLease =
+getServicePrice(
 profile,
 [
 "beat_lease_service_price",
@@ -957,7 +1049,8 @@ profile,
 ]
 );
 
-const exclusive = getServicePrice(
+const exclusive =
+getServicePrice(
 profile,
 [
 "exclusive_rights_service_price",
@@ -967,7 +1060,8 @@ profile,
 ]
 );
 
-const customBeat = getServicePrice(
+const customBeat =
+getServicePrice(
 profile,
 [
 "custom_beat_service_price",
@@ -976,7 +1070,8 @@ profile,
 ]
 );
 
-const mixing = getServicePrice(
+const mixing =
+getServicePrice(
 profile,
 [
 "mixing_mastering_service_price",
@@ -997,9 +1092,11 @@ formatServicePrice(customBeat);
 
 document.getElementById("serviceMixing").textContent =
 formatServicePrice(mixing);
+
 }
 
 function getProducerStyles(profile){
+
 return firstValue(
 profile,
 [
@@ -1014,9 +1111,11 @@ profile,
 ],
 ""
 );
+
 }
 
 function getProducerDaws(profile){
+
 return firstValue(
 profile,
 [
@@ -1028,9 +1127,11 @@ profile,
 ],
 ""
 );
+
 }
 
 function getProducerTags(profile){
+
 return firstValue(
 profile,
 [
@@ -1040,9 +1141,11 @@ profile,
 ],
 ""
 );
+
 }
 
 function getProducerAvailability(profile){
+
 return firstValue(
 profile,
 [
@@ -1053,6 +1156,7 @@ profile,
 ],
 ""
 );
+
 }
 
 function formatList(value){
@@ -1066,16 +1170,19 @@ return "Not set";
 }
 
 if(Array.isArray(value)){
+
 return value
 .map(item=>String(item).trim())
 .filter(Boolean)
 .join(" • ");
+
 }
 
 return String(value)
 .replace(/\s*,\s*/g," • ")
 .replace(/\s*\|\s*/g," • ")
 .trim();
+
 }
 
 function renderProducerSetup(profile){
@@ -1097,10 +1204,17 @@ document.getElementById("producerAvailability").textContent =
 return;
 }
 
-const styles = getProducerStyles(profile);
-const daws = getProducerDaws(profile);
-const tags = getProducerTags(profile);
-const availability = getProducerAvailability(profile);
+const styles =
+getProducerStyles(profile);
+
+const daws =
+getProducerDaws(profile);
+
+const tags =
+getProducerTags(profile);
+
+const availability =
+getProducerAvailability(profile);
 
 document.getElementById("producerDaws").textContent =
 formatList(daws);
@@ -1114,7 +1228,8 @@ formatList(tags);
 document.getElementById("producerAvailability").textContent =
 formatList(availability);
 
-const location = firstValue(
+const location =
+firstValue(
 profile,
 [
 "location",
@@ -1165,7 +1280,8 @@ Array.isArray(tags)
 
 tagList.forEach(tag=>{
 
-const span = document.createElement("span");
+const span =
+document.createElement("span");
 
 span.textContent =
 String(tag).startsWith("#")
@@ -1175,7 +1291,9 @@ String(tag).startsWith("#")
 aboutTags.appendChild(span);
 
 });
+
 }
+
 }
 
 function escapeHtml(value){
@@ -1186,6 +1304,7 @@ return String(value)
 .replace(/>/g,"&gt;")
 .replace(/"/g,"&quot;")
 .replace(/'/g,"&#039;");
+
 }
 
 function renderBeats(beats){
@@ -1206,18 +1325,35 @@ beatStatus.style.display = "none";
 
 beats.forEach((beat)=>{
 
-const title = getBeatTitle(beat);
-const cover = getBeatCover(beat);
-const audio = getBeatAudio(beat);
-const genre = getGenre(beat);
-const bpm = getBpm(beat);
-const musicalKey = getKey(beat);
-const leasePrice = getLeasePrice(beat);
-const exclusivePrice = getExclusivePrice(beat);
+const title =
+getBeatTitle(beat);
 
-const card = document.createElement("article");
+const cover =
+getBeatCover(beat);
 
-card.className = "beat-card";
+const audio =
+getBeatAudio(beat);
+
+const genre =
+getGenre(beat);
+
+const bpm =
+getBpm(beat);
+
+const musicalKey =
+getKey(beat);
+
+const leasePrice =
+getLeasePrice(beat);
+
+const exclusivePrice =
+getExclusivePrice(beat);
+
+const card =
+document.createElement("article");
+
+card.className =
+"beat-card";
 
 card.innerHTML = `
 <img
@@ -1300,7 +1436,8 @@ Buy Now
 
 beatGrid.appendChild(card);
 
-const audioPlayer = card.querySelector("audio");
+const audioPlayer =
+card.querySelector("audio");
 
 if(audioPlayer){
 
@@ -1329,33 +1466,39 @@ card.querySelector('[data-action="buy"]');
 cartButton.addEventListener(
 "click",
 function(){
+
 openBeatCheckout(
 beat,
 "lease",
 false
 );
+
 }
 );
 
 buyButton.addEventListener(
 "click",
 function(){
+
 openBeatCheckout(
 beat,
 "lease",
 true
 );
+
 }
 );
 
 });
+
 }
 
 async function loadBeats(){
 
 beatStatus.style.display = "block";
 beatStatus.className = "loading";
-beatStatus.textContent = "Loading beats...";
+beatStatus.textContent =
+"Loading beats...";
 
 try{
 
@@ -1372,9 +1515,17 @@ throw profileError;
 }
 
 const targetName =
-String(producerName)
+String(producerName || "")
 .trim()
-.toLowerCase();
+.toLowerCase()
+.replace(/\s+/g," ");
+
+const normalizeProducerName =
+value =>
+String(value || "")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
 
 producerProfile =
 (profiles || []).find(profile=>{
@@ -1388,13 +1539,32 @@ profile.name
 
 return names.some(
 name =>
-name &&
-String(name)
-.trim()
-.toLowerCase() === targetName
+normalizeProducerName(name) === targetName
 );
 
 });
+
+if(!producerProfile){
+
+producerProfile =
+(profiles || []).find(profile=>{
+
+const names = [
+profile.performing_name,
+profile.artist_name,
+profile.stage_name,
+profile.name
+];
+
+return names.some(
+name =>
+normalizeProducerName(name).includes(targetName) ||
+targetName.includes(normalizeProducerName(name))
+);
+
+});
+
+}
 
 if(producerProfile){
 
@@ -1416,11 +1586,11 @@ await loadFollowState();
 
 if(!producerProfile){
 
-document.getElementById("statUploaded").textContent = "0";
+document.getElementById("statUploaded").textContent =
+"0";
 
 renderServicePrices(null);
 renderProducerSetup(null);
-
 renderBeats([]);
 
 creditsGrid.innerHTML = `
@@ -1440,14 +1610,19 @@ await supabaseClient
 .from("beats")
 .select("*")
 .eq("producer_id",producerProfile.id)
-.eq("status","approved")
 .order("created_at",{ascending:false});
 
 if(error){
 throw error;
 }
 
-const beats = data || [];
+const beats =
+(data || []).filter(
+beat =>
+String(beat.status || "")
+.trim()
+.toLowerCase() === "approved"
+);
 
 document.getElementById("statUploaded").textContent =
 beats.length;
@@ -1477,6 +1652,7 @@ beatStatus.textContent =
 "Unable to load beats right now.";
 
 }
+
 }
 
 function setProducerContactDetails(profile){
@@ -1503,6 +1679,7 @@ profile,
 if(photo){
 producerPhoto.src = photo;
 }
+
 }
 
 function getProducerWhatsApp(){
@@ -1522,6 +1699,7 @@ producerProfile,
 ],
 ""
 );
+
 }
 
 function getProducerEmail(){
@@ -1540,6 +1718,7 @@ producerProfile,
 ],
 ""
 );
+
 }
 
 function normalizeWhatsAppNumber(number){
@@ -1551,14 +1730,17 @@ value =
 value.replace(/[^\d+]/g,"");
 
 if(value.startsWith("+")){
-value = value.substring(1);
+value =
+value.substring(1);
 }
 
 if(value.startsWith("0")){
-value = "256" + value.substring(1);
+value =
+"256" + value.substring(1);
 }
 
 return value;
+
 }
 
 function openProducerWhatsApp(){
@@ -1584,6 +1766,7 @@ window.open(
 url,
 "_blank"
 );
+
 }
 
 function openProducerEmail(){
@@ -1601,7 +1784,8 @@ return;
 }
 
 const subject =
-"PASONG Contact - " + producerName;
+"PASONG Contact - " +
+producerName;
 
 const body =
 "Hello " +
@@ -1615,6 +1799,7 @@ email +
 encodeURIComponent(subject) +
 "&body=" +
 encodeURIComponent(body);
+
 }
 
 async function loadFollowState(){
@@ -1664,6 +1849,7 @@ followBtn.textContent =
 data
 ? "Following"
 : "Follow";
+
 }
 
 async function toggleFollow(){
@@ -1778,9 +1964,11 @@ return;
 
 followBtn.textContent =
 "Following";
+
 }
 
 followBtn.disabled = false;
+
 }
 
 function openProducerShowreel(){
@@ -1818,6 +2006,7 @@ window.open(
 showreel,
 "_blank"
 );
+
 }
 
 function setupBeatSearch(beats){
@@ -1858,6 +2047,7 @@ genre.includes(search)
 renderBeats(filtered);
 
 };
+
 }
 
 function openBeatCheckout(
@@ -1881,7 +2071,9 @@ encodeURIComponent(beat.id) +
 "&license=" +
 encodeURIComponent(license);
 
-window.location.href = url;
+window.location.href =
+url;
+
 }
 
 function openModal(id){
@@ -1895,7 +2087,9 @@ modal.classList.add("active");
 
 document.body.style.overflow =
 "hidden";
+
 }
+
 }
 
 function closeModal(id){
@@ -1909,7 +2103,9 @@ modal.classList.remove("active");
 
 document.body.style.overflow =
 "";
+
 }
+
 }
 
 document
@@ -2127,7 +2323,9 @@ encodeURIComponent(subject) +
 encodeURIComponent(body);
 
 const message =
-document.getElementById("customBeatMessage");
+document.getElementById(
+"customBeatMessage"
+);
 
 message.style.display =
 "block";
@@ -2326,6 +2524,7 @@ formMessage.textContent =
 );
 
 loadAccountPhoto();
+setupAuthNavigation();
 loadBeats();
 
 if("serviceWorker" in navigator){
@@ -2338,10 +2537,12 @@ navigator.serviceWorker.register(
 "sw.js"
 ).catch(
 function(error){
+
 console.error(
 "Service worker registration failed:",
 error
 );
+
 }
 );
 
