@@ -203,7 +203,7 @@ main{padding:20px 14px 90px}
 
 <div class="producer-profile">
 
-<img id="producerPhoto" class="producer-main-photo" src="https://ui-avatars.com/api/?name=KV+BEATS&background=171722&color=c084fc&bold=true&size=300" alt="Producer">
+<img id="producerPhoto" class="producer-main-photo" src="https://ui-avatars.com/api/?name=Producer&background=171722&color=c084fc&bold=true&size=300" alt="Producer">
 
 <div class="producer-info">
 
@@ -212,7 +212,7 @@ PASONG PRODUCER
 </div>
 
 <h1>
-🎛️ Producer <span id="producerName">KV BEATS</span>
+🎛️ Producer <span id="producerName">Producer</span>
 </h1>
 
 <p id="producerLocation" class="producer-location">
@@ -220,9 +220,9 @@ PASONG PRODUCER
 </p>
 
 <p class="producer-tagline">
-<span id="producerSold">12</span> beats sold •
-<span id="producerHits">3</span> hits •
-<span id="producerYears">5</span> years producing
+<span id="producerSold">0</span> beats sold •
+<span id="producerHits">0</span> hits •
+<span id="producerYears">0</span> years producing
 </p>
 
 <div class="hero-actions">
@@ -244,7 +244,6 @@ Follow
 </a>
 
 </div>
-
 </div>
 </div>
 </section>
@@ -257,8 +256,9 @@ Follow
 <h2>🎹 Beat Store</h2>
 
 <p class="section-subtitle">
-Browse and purchase beats from <span id="beatStoreProducer">KV BEATS</span>.
+Browse and purchase beats from <span id="beatStoreProducer">Producer</span>.
 </p>
+
 </div>
 
 </div>
@@ -266,7 +266,7 @@ Browse and purchase beats from <span id="beatStoreProducer">KV BEATS</span>.
 <div id="beatGrid" class="beat-grid"></div>
 
 <div id="beatStatus" class="loading">
-Loading beats...
+Loading producer profile...
 </div>
 
 </section>
@@ -373,7 +373,7 @@ No production credits listed yet.
 </div>
 
 <div class="stat-card">
-<strong id="statSold">12</strong>
+<strong id="statSold">0</strong>
 <span>Beats Sold</span>
 </div>
 
@@ -428,11 +428,11 @@ John
 <div class="about-card">
 
 <h3 id="aboutProducerName">
-KV BEATS
+Producer
 </h3>
 
 <p id="aboutProducerText">
-Kampala-based music producer creating music for artists.
+Music producer creating music for artists.
 </p>
 
 <div id="aboutProducerTags" class="tags"></div>
@@ -726,7 +726,9 @@ Send Booking Request
 </div>
 
 <script>
+
 const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
+
 const SUPABASE_ANON_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
 const supabaseClient = supabase.createClient(
@@ -735,29 +737,99 @@ SUPABASE_ANON_KEY
 );
 
 const params = new URLSearchParams(window.location.search);
-const producerName = params.get("producer") || "KV BEATS";
+
+let producerName = params.get("producer") || "";
 
 let producerProfile = null;
 
-const producerNameEl = document.getElementById("producerName");
-const beatStoreProducer = document.getElementById("beatStoreProducer");
-const aboutProducerName = document.getElementById("aboutProducerName");
-const beatGrid = document.getElementById("beatGrid");
-const beatStatus = document.getElementById("beatStatus");
-const producerSearch = document.getElementById("producerSearch");
-const creditsGrid = document.getElementById("creditsGrid");
-const followBtn = document.getElementById("followBtn");
+let currentUser = null;
 
-producerNameEl.textContent = producerName;
-beatStoreProducer.textContent = producerName;
-aboutProducerName.textContent = producerName;
+const producerNameEl =
+document.getElementById("producerName");
+
+const beatStoreProducer =
+document.getElementById("beatStoreProducer");
+
+const aboutProducerName =
+document.getElementById("aboutProducerName");
+
+const beatGrid =
+document.getElementById("beatGrid");
+
+const beatStatus =
+document.getElementById("beatStatus");
+
+const producerSearch =
+document.getElementById("producerSearch");
+
+const creditsGrid =
+document.getElementById("creditsGrid");
+
+const followBtn =
+document.getElementById("followBtn");
+
+function escapeHtml(value){
+
+return String(value)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+function firstValue(row,fields,fallback=""){
+
+for(const field of fields){
+
+const value = row[field];
+
+if(
+value !== undefined &&
+value !== null &&
+String(value).trim() !== ""
+){
+
+return value;
+
+}
+
+}
+
+return fallback;
+
+}
+
+function normalizeProducerName(value){
+
+return String(value || "")
+.trim()
+.toLowerCase()
+.replace(/\s+/g," ");
+
+}
+
+function getProducerDisplayName(profile){
+
+return firstValue(
+profile,
+[
+"performing_name",
+"artist_name",
+"stage_name",
+"name"
+],
+"Producer"
+);
+
+}
 
 async function loadAccountPhoto(){
 
 const {
 data:{user}
-} =
-await supabaseClient.auth.getUser();
+} = await supabaseClient.auth.getUser();
 
 if(!user){
 return;
@@ -783,6 +855,7 @@ accountPhoto.src = photo;
 }
 
 }
+
 }
 
 async function setupAuthNavigation(){
@@ -796,22 +869,19 @@ return;
 
 const {
 data:{user}
-} =
-await supabaseClient.auth.getUser();
+} = await supabaseClient.auth.getUser();
+
+currentUser = user || null;
 
 if(!user){
 
 authNav.innerHTML = `
-<a href="login.html" class="btn btn-secondary">
-Login
-</a>
-
-<a href="signup.html" class="btn btn-primary">
-Sign Up
-</a>
+<a href="login.html" class="btn btn-secondary">Login</a>
+<a href="signup.html" class="btn btn-primary">Sign Up</a>
 `;
 
 return;
+
 }
 
 const metadata =
@@ -824,49 +894,63 @@ metadata.photo_url ||
 metadata.picture ||
 "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
 
-authNav.innerHTML = `
-<a
-href="https://pasong-frontend.vercel.app/producer-dashboard.html"
-class="btn btn-secondary"
->
-🎹 Producer Dashboard
-</a>
+let profile = null;
 
+const {
+data,
+error
+} = await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("user_id",user.id)
+.maybeSingle();
+
+if(!error && data){
+profile = data;
+}
+
+let profileLink = "producer.html";
+
+if(profile){
+
+const name =
+getProducerDisplayName(profile);
+
+profileLink =
+"producer.html?producer=" +
+encodeURIComponent(name);
+
+authNav.innerHTML = `
+<a href="producer-dashboard.html" class="btn btn-secondary">🎹 Producer Dashboard</a>
+<a href="${profileLink}" class="account-box">
+<img class="account-photo" src="${escapeHtml(photo)}" alt="Account">
+<span>My Page</span>
+</a>
+`;
+
+}else{
+
+authNav.innerHTML = `
 <a href="account.html" class="account-box">
-<img
-class="account-photo"
-src="${escapeHtml(photo)}"
-alt="Account"
->
+<img class="account-photo" src="${escapeHtml(photo)}" alt="Account">
 <span>My Account</span>
 </a>
 `;
-}
-
-function firstValue(row,fields,fallback=""){
-
-for(const field of fields){
-
-const value = row[field];
-
-if(
-value !== undefined &&
-value !== null &&
-String(value).trim() !== ""
-){
-return value;
-}
 
 }
 
-return fallback;
 }
 
 function getBeatTitle(row){
 
 return firstValue(
 row,
-["beat_name","beat_title","title","name"],
+[
+"beat_name",
+"beat_title",
+"title",
+"name"
+],
 "Untitled Beat"
 );
 
@@ -910,7 +994,11 @@ function getGenre(row){
 
 return firstValue(
 row,
-["genre","genres","music_genre"],
+[
+"genre",
+"genres",
+"music_genre"
+],
 "Beat"
 );
 
@@ -920,7 +1008,10 @@ function getBpm(row){
 
 return firstValue(
 row,
-["bpm","tempo"],
+[
+"bpm",
+"tempo"
+],
 ""
 );
 
@@ -930,7 +1021,10 @@ function getKey(row){
 
 return firstValue(
 row,
-["key","musical_key"],
+[
+"key",
+"musical_key"
+],
 ""
 );
 
@@ -974,7 +1068,8 @@ row,
 function formatUGX(amount){
 
 return "UGX " +
-Number(amount || 0).toLocaleString("en-UG");
+Number(amount || 0)
+.toLocaleString("en-UG");
 
 }
 
@@ -985,7 +1080,9 @@ value === undefined ||
 value === null ||
 String(value).trim() === ""
 ){
+
 return "Price not set";
+
 }
 
 const text =
@@ -996,17 +1093,22 @@ text.toLowerCase().includes("ugx") ||
 text.toLowerCase().includes("$") ||
 text.toLowerCase().includes("usd")
 ){
+
 return text;
+
 }
 
 const numeric =
 Number(text.replace(/,/g,""));
 
 if(Number.isFinite(numeric)){
+
 return formatUGX(numeric);
+
 }
 
 return text;
+
 }
 
 function getServicePrice(profile,fields){
@@ -1036,6 +1138,7 @@ document.getElementById("serviceMixing").textContent =
 "Price not set";
 
 return;
+
 }
 
 const beatLease =
@@ -1166,7 +1269,9 @@ value === undefined ||
 value === null ||
 String(value).trim() === ""
 ){
+
 return "Not set";
+
 }
 
 if(Array.isArray(value)){
@@ -1202,6 +1307,7 @@ document.getElementById("producerAvailability").textContent =
 "Not set";
 
 return;
+
 }
 
 const styles =
@@ -1245,8 +1351,10 @@ escapeHtml(location) +
 " &nbsp;|&nbsp; 🎹 " +
 escapeHtml(
 formatList(styles) === "Not set"
-? "Music Producer"
-: formatList(styles)
+?
+"Music Producer"
+:
+formatList(styles)
 );
 
 const aboutText =
@@ -1254,8 +1362,10 @@ document.getElementById("aboutProducerText");
 
 const styleText =
 formatList(styles) === "Not set"
-? "music"
-: formatList(styles);
+?
+"music"
+:
+formatList(styles);
 
 aboutText.textContent =
 String(location) +
@@ -1272,8 +1382,10 @@ if(tags){
 
 const tagList =
 Array.isArray(tags)
-? tags
-: String(tags)
+?
+tags
+:
+String(tags)
 .split(/[,|]/)
 .map(item=>item.trim())
 .filter(Boolean);
@@ -1285,25 +1397,16 @@ document.createElement("span");
 
 span.textContent =
 String(tag).startsWith("#")
-? String(tag)
-: "#" + String(tag);
+?
+String(tag)
+:
+"#" + String(tag);
 
 aboutTags.appendChild(span);
 
 });
 
 }
-
-}
-
-function escapeHtml(value){
-
-return String(value)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
 
 }
 
@@ -1316,9 +1419,10 @@ if(!beats.length){
 beatStatus.style.display = "block";
 beatStatus.className = "empty";
 beatStatus.textContent =
-"No beats found for this producer yet.";
+"No approved beats found for this producer yet.";
 
 return;
+
 }
 
 beatStatus.style.display = "none";
@@ -1356,6 +1460,7 @@ card.className =
 "beat-card";
 
 card.innerHTML = `
+
 <img
 class="beat-cover"
 src="${escapeHtml(cover)}"
@@ -1403,12 +1508,16 @@ preload="none"
 
 <div class="price-box">
 <small>Lease</small>
-<strong>${formatUGX(leasePrice)}</strong>
+<strong>
+${formatUGX(leasePrice)}
+</strong>
 </div>
 
 <div class="price-box">
 <small>Exclusive</small>
-<strong>${formatUGX(exclusivePrice)}</strong>
+<strong>
+${formatUGX(exclusivePrice)}
+</strong>
 </div>
 
 </div>
@@ -1458,10 +1567,14 @@ this.currentTime = 30;
 }
 
 const cartButton =
-card.querySelector('[data-action="cart"]');
+card.querySelector(
+'[data-action="cart"]'
+);
 
 const buyButton =
-card.querySelector('[data-action="buy"]');
+card.querySelector(
+'[data-action="buy"]'
+);
 
 cartButton.addEventListener(
 "click",
@@ -1493,14 +1606,15 @@ true
 
 }
 
-async function loadBeats(){
+async function findProducerProfile(){
 
-beatStatus.style.display = "block";
-beatStatus.className = "loading";
-beatStatus.textContent =
-"Loading beats...";
+const {
+data:{user}
+} =
+await supabaseClient.auth.getUser();
 
-try{
+currentUser =
+user || null;
 
 const {
 data:profiles,
@@ -1511,30 +1625,32 @@ await supabaseClient
 .select("*");
 
 if(profileError){
+
 throw profileError;
+
 }
 
+const list =
+profiles || [];
+
+let profile = null;
+
+if(producerName){
+
 const targetName =
-String(producerName || "")
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ");
+normalizeProducerName(
+producerName
+);
 
-const normalizeProducerName =
-value =>
-String(value || "")
-.trim()
-.toLowerCase()
-.replace(/\s+/g," ");
-
-producerProfile =
-(profiles || []).find(profile=>{
+profile =
+list.find(
+item=>{
 
 const names = [
-profile.performing_name,
-profile.artist_name,
-profile.stage_name,
-profile.name
+item.performing_name,
+item.artist_name,
+item.stage_name,
+item.name
 ];
 
 return names.some(
@@ -1542,122 +1658,111 @@ name =>
 normalizeProducerName(name) === targetName
 );
 
-});
+}
+);
 
-if(!producerProfile){
+if(!profile){
 
-producerProfile =
-(profiles || []).find(profile=>{
+profile =
+list.find(
+item=>{
 
 const names = [
-profile.performing_name,
-profile.artist_name,
-profile.stage_name,
-profile.name
+item.performing_name,
+item.artist_name,
+item.stage_name,
+item.name
 ];
 
 return names.some(
-name =>
-normalizeProducerName(name).includes(targetName) ||
-targetName.includes(normalizeProducerName(name))
+name=>{
+
+const normalized =
+normalizeProducerName(name);
+
+return(
+normalized &&
+(
+normalized.includes(targetName) ||
+targetName.includes(normalized)
+)
 );
 
-});
+}
+);
+
+}
+);
 
 }
 
-if(producerProfile){
+}else if(user){
 
-setProducerContactDetails(
-producerProfile
+profile =
+list.find(
+item =>
+String(item.user_id || "") ===
+String(user.id)
 );
-
-renderServicePrices(
-producerProfile
-);
-
-renderProducerSetup(
-producerProfile
-);
-
-await loadFollowState();
 
 }
 
-if(!producerProfile){
+return profile;
 
-document.getElementById("statUploaded").textContent =
+}
+
+function applyProducerProfile(profile){
+
+producerProfile =
+profile;
+
+if(!profile){
+
+producerName = "";
+
+producerNameEl.textContent =
+"Producer";
+
+beatStoreProducer.textContent =
+"Producer";
+
+aboutProducerName.textContent =
+"Producer";
+
+document.title =
+"PASONG — Producer";
+
+document.getElementById("producerLocation").textContent =
+"Producer profile not selected.";
+
+document.getElementById("producerSold").textContent =
 "0";
 
-renderServicePrices(null);
-renderProducerSetup(null);
-renderBeats([]);
+document.getElementById("producerHits").textContent =
+"0";
 
-creditsGrid.innerHTML = `
-<div class="empty">
-No production credits listed yet.
-</div>
-`;
+document.getElementById("producerYears").textContent =
+"0";
 
 return;
-}
-
-const {
-data,
-error
-} =
-await supabaseClient
-.from("beats")
-.select("*")
-.eq("producer_id",producerProfile.id)
-.order("created_at",{ascending:false});
-
-if(error){
-throw error;
-}
-
-const beats =
-(data || []).filter(
-beat =>
-String(beat.status || "")
-.trim()
-.toLowerCase() === "approved"
-);
-
-document.getElementById("statUploaded").textContent =
-beats.length;
-
-renderBeats(beats);
-
-setupBeatSearch(beats);
-
-creditsGrid.innerHTML = `
-<div class="empty">
-No production credits listed yet.
-</div>
-`;
-
-}catch(error){
-
-console.error(
-"Beat Store loading error:",
-error
-);
-
-beatGrid.innerHTML = "";
-
-beatStatus.style.display = "block";
-beatStatus.className = "error";
-beatStatus.textContent =
-"Unable to load beats right now.";
 
 }
 
-}
+producerName =
+getProducerDisplayName(profile);
 
-function setProducerContactDetails(profile){
+producerNameEl.textContent =
+producerName;
 
-producerProfile = profile;
+beatStoreProducer.textContent =
+producerName;
+
+aboutProducerName.textContent =
+producerName;
+
+document.title =
+"PASONG — " +
+producerName;
 
 const producerPhoto =
 document.getElementById("producerPhoto");
@@ -1677,7 +1782,210 @@ profile,
 );
 
 if(photo){
-producerPhoto.src = photo;
+
+producerPhoto.src =
+photo;
+
+}
+
+const sold =
+firstValue(
+profile,
+[
+"beats_sold",
+"beat_sales",
+"sold_beats",
+"sales"
+],
+0
+);
+
+const hits =
+firstValue(
+profile,
+[
+"hits",
+"hit_songs",
+"productions"
+],
+0
+);
+
+const years =
+firstValue(
+profile,
+[
+"years_producing",
+"production_years",
+"years"
+],
+0
+);
+
+document.getElementById("producerSold").textContent =
+sold;
+
+document.getElementById("producerHits").textContent =
+hits;
+
+document.getElementById("producerYears").textContent =
+years;
+
+}
+
+async function loadBeats(){
+
+beatStatus.style.display = "block";
+beatStatus.className = "loading";
+beatStatus.textContent =
+"Loading producer profile...";
+
+try{
+
+const profile =
+await findProducerProfile();
+
+if(!profile){
+
+producerProfile = null;
+
+beatGrid.innerHTML = "";
+
+beatStatus.style.display = "block";
+beatStatus.className = "empty";
+
+if(currentUser && !producerName){
+
+beatStatus.textContent =
+"Your Producer Profile could not be found.";
+
+}else if(!producerName){
+
+beatStatus.textContent =
+"Select a producer to view their profile.";
+
+}else{
+
+beatStatus.textContent =
+"Producer profile could not be found.";
+
+}
+
+creditsGrid.innerHTML = `
+<div class="empty">
+No production credits listed yet.
+</div>
+`;
+
+renderServicePrices(null);
+renderProducerSetup(null);
+
+applyProducerProfile(null);
+
+return;
+
+}
+
+applyProducerProfile(profile);
+
+setProducerContactDetails(profile);
+
+renderServicePrices(profile);
+
+renderProducerSetup(profile);
+
+await loadFollowState();
+
+const {
+data,
+error
+} =
+await supabaseClient
+.from("beats")
+.select("*")
+.eq("producer_id",profile.id)
+.eq("status","approved")
+.order("created_at",{ascending:false});
+
+if(error){
+
+throw error;
+
+}
+
+const beats =
+data || [];
+
+document.getElementById("statUploaded").textContent =
+beats.length;
+
+document.getElementById("statSold").textContent =
+firstValue(
+profile,
+[
+"beats_sold",
+"beat_sales",
+"sold_beats",
+"sales"
+],
+0
+);
+
+renderBeats(beats);
+
+setupBeatSearch(beats);
+
+creditsGrid.innerHTML = `
+<div class="empty">
+No production credits listed yet.
+</div>
+`;
+
+}catch(error){
+
+console.error(
+"Producer profile loading error:",
+error
+);
+
+beatGrid.innerHTML = "";
+
+beatStatus.style.display = "block";
+beatStatus.className = "error";
+beatStatus.textContent =
+"Unable to load this producer right now.";
+
+}
+
+}
+
+function setProducerContactDetails(profile){
+
+producerProfile =
+profile;
+
+const producerPhoto =
+document.getElementById("producerPhoto");
+
+const photo =
+firstValue(
+profile,
+[
+"photo_url",
+"profile_photo_url",
+"avatar_url",
+"image_url",
+"photo",
+"picture"
+],
+""
+);
+
+if(photo){
+
+producerPhoto.src =
+photo;
+
 }
 
 }
@@ -1730,13 +2038,18 @@ value =
 value.replace(/[^\d+]/g,"");
 
 if(value.startsWith("+")){
+
 value =
 value.substring(1);
+
 }
 
 if(value.startsWith("0")){
+
 value =
-"256" + value.substring(1);
+"256" +
+value.substring(1);
+
 }
 
 return value;
@@ -1757,10 +2070,12 @@ alert(
 );
 
 return;
+
 }
 
 const url =
-"https://wa.me/" + number;
+"https://wa.me/" +
+number;
 
 window.open(
 url,
@@ -1781,6 +2096,7 @@ alert(
 );
 
 return;
+
 }
 
 const subject =
@@ -1819,6 +2135,7 @@ followBtn.textContent =
 "Follow";
 
 return;
+
 }
 
 const {
@@ -1843,12 +2160,15 @@ followBtn.textContent =
 "Follow";
 
 return;
+
 }
 
 followBtn.textContent =
 data
-? "Following"
-: "Follow";
+?
+"Following"
+:
+"Follow";
 
 }
 
@@ -1861,6 +2181,7 @@ alert(
 );
 
 return;
+
 }
 
 const {
@@ -1878,9 +2199,11 @@ window.location.href =
 "login.html";
 
 return;
+
 }
 
-followBtn.disabled = true;
+followBtn.disabled =
+true;
 
 const {
 data:existing,
@@ -1904,9 +2227,11 @@ alert(
 "Unable to check follow status right now."
 );
 
-followBtn.disabled = false;
+followBtn.disabled =
+false;
 
 return;
+
 }
 
 if(existing){
@@ -1928,9 +2253,11 @@ alert(
 "Unable to unfollow this producer right now."
 );
 
-followBtn.disabled = false;
+followBtn.disabled =
+false;
 
 return;
+
 }
 
 followBtn.textContent =
@@ -1957,9 +2284,11 @@ alert(
 "Unable to follow this producer right now."
 );
 
-followBtn.disabled = false;
+followBtn.disabled =
+false;
 
 return;
+
 }
 
 followBtn.textContent =
@@ -1967,7 +2296,8 @@ followBtn.textContent =
 
 }
 
-followBtn.disabled = false;
+followBtn.disabled =
+false;
 
 }
 
@@ -1980,6 +2310,7 @@ alert(
 );
 
 return;
+
 }
 
 const showreel =
@@ -2000,6 +2331,7 @@ alert(
 );
 
 return;
+
 }
 
 window.open(
@@ -2024,10 +2356,12 @@ if(!search){
 renderBeats(beats);
 
 return;
+
 }
 
 const filtered =
-beats.filter(beat=>{
+beats.filter(
+beat=>{
 
 const title =
 getBeatTitle(beat)
@@ -2042,7 +2376,8 @@ title.includes(search) ||
 genre.includes(search)
 );
 
-});
+}
+);
 
 renderBeats(filtered);
 
@@ -2063,6 +2398,7 @@ alert(
 );
 
 return;
+
 }
 
 const url =
@@ -2174,7 +2510,9 @@ document
 "click",
 function(){
 
-openModal("requestModal");
+openModal(
+"requestModal"
+);
 
 }
 );
@@ -2185,7 +2523,9 @@ document
 "click",
 function(){
 
-openModal("requestModal");
+openModal(
+"requestModal"
+);
 
 }
 );
@@ -2218,7 +2558,9 @@ document
 "click",
 function(){
 
-openModal("bookingModal");
+openModal(
+"bookingModal"
+);
 
 }
 );
@@ -2280,6 +2622,7 @@ alert(
 );
 
 return;
+
 }
 
 const subject =
@@ -2369,6 +2712,7 @@ alert(
 );
 
 return;
+
 }
 
 const subject =
@@ -2465,6 +2809,7 @@ alert(
 );
 
 return;
+
 }
 
 const subject =
@@ -2523,9 +2868,17 @@ formMessage.textContent =
 }
 );
 
-loadAccountPhoto();
-setupAuthNavigation();
-loadBeats();
+async function initProducerPage(){
+
+await setupAuthNavigation();
+
+await loadAccountPhoto();
+
+await loadBeats();
+
+}
+
+initProducerPage();
 
 if("serviceWorker" in navigator){
 
@@ -2533,9 +2886,9 @@ window.addEventListener(
 "load",
 function(){
 
-navigator.serviceWorker.register(
-"sw.js"
-).catch(
+navigator.serviceWorker
+.register("sw.js")
+.catch(
 function(error){
 
 console.error(
@@ -2550,6 +2903,7 @@ error
 );
 
 }
+
 </script>
 
 </body>
