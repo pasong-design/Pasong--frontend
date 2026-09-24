@@ -858,6 +858,39 @@ accountPhoto.src = photo;
 
 }
 
+async function getCurrentProducerProfile(user){
+
+if(!user){
+return null;
+}
+
+const {
+data,
+error
+} =
+await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("user_id",user.id)
+.order("created_at",{ascending:false})
+.limit(1)
+.maybeSingle();
+
+if(error){
+
+console.error(
+"Current producer profile lookup error:",
+error
+);
+
+return null;
+
+}
+
+return data || null;
+
+}
+
 async function setupAuthNavigation(){
 
 const authNav =
@@ -894,29 +927,15 @@ metadata.photo_url ||
 metadata.picture ||
 "https://ui-avatars.com/api/?name=PASONG&background=171722&color=c084fc&bold=true";
 
-let profile = null;
-
-const {
-data,
-error
-} = await supabaseClient
-.from("artist_profiles")
-.select("*")
-.eq("user_id",user.id)
-.maybeSingle();
-
-if(!error && data){
-profile = data;
-}
-
-let profileLink = "producer.html";
+const profile =
+await getCurrentProducerProfile(user);
 
 if(profile){
 
 const name =
 getProducerDisplayName(profile);
 
-profileLink =
+const profileLink =
 "producer.html?producer=" +
 encodeURIComponent(name);
 
@@ -1622,7 +1641,8 @@ error:profileError
 } =
 await supabaseClient
 .from("artist_profiles")
-.select("*");
+.select("*")
+.order("created_at",{ascending:false});
 
 if(profileError){
 
