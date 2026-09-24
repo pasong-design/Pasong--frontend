@@ -554,6 +554,14 @@ footer{
         🎹 Open Producer Dashboard
       </a>
 
+      <a
+        id="adminDashboardLink"
+        class="hidden"
+        href="https://pasong-frontend.vercel.app/admin.html"
+      >
+        🛡️ Open Admin Dashboard
+      </a>
+
     </div>
 
   </div>
@@ -1529,8 +1537,11 @@ async function loadRoles(user){
     user.app_metadata &&
     user.app_metadata.role;
 
+  const isAdmin =
+    appRole === "admin";
+
   if(
-    appRole === "admin" &&
+    isAdmin &&
     !roles.includes("admin")
   ){
 
@@ -1627,6 +1638,16 @@ async function loadRoles(user){
     .toggle(
       "hidden",
       !roles.includes("producer")
+    );
+
+  document
+    .getElementById(
+      "adminDashboardLink"
+    )
+    .classList
+    .toggle(
+      "hidden",
+      !isAdmin
     );
 
 }
@@ -2711,15 +2732,15 @@ async function loadBeatOrders(user){
         data:beatData,
         error:beatError
       } =
-        await supabaseClient
-          .from("beats")
-          .select(
-            "id,title,cover_url"
-          )
-          .in(
-            "id",
-            beatIds
-          );
+      await supabaseClient
+        .from("beats")
+        .select(
+          "id,title,cover_url"
+        )
+        .in(
+          "id",
+          beatIds
+        );
 
       if(beatError){
 
