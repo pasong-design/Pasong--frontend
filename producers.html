@@ -1086,8 +1086,7 @@ const result =
 await response.json();
 
 allProducerProfiles =
-(result.producers || [])
-.map(
+(result.producers || []).map(
 producer=>({
 
 ...producer,
@@ -2207,29 +2206,16 @@ if(
 user
 ){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from("artist_profiles")
-.select("*")
-.eq("user_id",user.id)
-.maybeSingle();
-
-if(
-!error &&
-data
-){
-
 profile =
-data;
+profiles.find(
+item =>
+String(item.user_id || "") ===
+String(user.id)
+);
 
 }
 
-}
-
-return profile;
+return profile || null;
 
 }catch(error){
 
@@ -2341,6 +2327,10 @@ profile,
 "sold_beats",
 "sales"
 ],
+Array.isArray(profile.beats)
+?
+profile.beats.length
+:
 0
 );
 
@@ -3243,8 +3233,7 @@ document.getElementById(
 const genre =
 document.getElementById(
 "requestGenre"
-)
-.value;
+).value;
 
 const bpm =
 document.getElementById(
