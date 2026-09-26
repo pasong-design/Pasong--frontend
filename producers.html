@@ -769,6 +769,9 @@ const SUPABASE_URL =
 const SUPABASE_ANON_KEY =
 "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
+const API_BASE =
+"https://pasong-api.onrender.com";
+
 const supabaseClient =
 supabase.createClient(
 SUPABASE_URL,
@@ -928,6 +931,7 @@ profile
 return firstValue(
 profile,
 [
+"profile_image_url",
 "photo_url",
 "profile_photo_url",
 "avatar_url",
@@ -1063,28 +1067,39 @@ producerDirectoryStatus.textContent =
 
 try{
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from("artist_profiles")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
+const response =
+await fetch(
+API_BASE +
+"/api/producers"
 );
 
-if(error){
+if(!response.ok){
 
-throw error;
+throw new Error(
+"Producer API returned " +
+response.status
+);
 
 }
 
+const result =
+await response.json();
+
 allProducerProfiles =
-data || [];
+(result.producers || [])
+.map(
+producer=>({
+
+...producer,
+
+photo_url:
+producer.profile_image_url || "",
+
+profile_photo_url:
+producer.profile_image_url || ""
+
+})
+);
 
 renderProducerDirectory(
 allProducerProfiles
@@ -1972,7 +1987,7 @@ audio
 ?
 `
 <div class="preview-label">
-▶ 30s preview FREE
+▶ FREE FULL-LENGTH STREAM
 </div>
 
 <audio
@@ -2034,33 +2049,6 @@ beatGrid.appendChild(
 card
 );
 
-const audioPlayer =
-card.querySelector(
-"audio"
-);
-
-if(audioPlayer){
-
-audioPlayer.addEventListener(
-"timeupdate",
-function(){
-
-if(
-this.currentTime >= 30
-){
-
-this.pause();
-
-this.currentTime =
-30;
-
-}
-
-}
-);
-
-}
-
 const cartButton =
 card.querySelector(
 '[data-action="cart"]'
@@ -2112,33 +2100,40 @@ await supabaseClient.auth.getUser();
 currentUser =
 user || null;
 
+try{
+
+const response =
+await fetch(
+API_BASE +
+"/api/producers"
+);
+
+if(!response.ok){
+
+throw new Error(
+"Producer API returned " +
+response.status
+);
+
+}
+
+const result =
+await response.json();
+
+const profiles =
+result.producers || [];
+
 let profile =
 null;
 
 if(producerId){
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from("artist_profiles")
-.select("*")
-.eq("id",producerId)
-.maybeSingle();
-
-if(error){
-
-throw error;
-
-}
-
-if(data){
-
 profile =
-data;
-
-}
+profiles.find(
+item =>
+String(item.id) ===
+String(producerId)
+);
 
 }
 
@@ -2147,63 +2142,39 @@ if(
 producerName
 ){
 
-const {
-data:profiles,
-error:profileError
-} =
-await supabaseClient
-.from("artist_profiles")
-.select("*");
-
-if(profileError){
-
-throw profileError;
-
-}
-
-const list =
-profiles || [];
-
 const targetName =
 normalizeProducerName(
 producerName
 );
 
 profile =
-list.find(
-item=>{
-
-const names = [
+profiles.find(
+item =>
+[
 item.performing_name,
 item.artist_name,
 item.stage_name,
 item.name
-];
-
-return names.some(
+]
+.some(
 name =>
-normalizeProducerName(
-name
-) === targetName
-);
-
-}
+normalizeProducerName(name) ===
+targetName
+)
 );
 
 if(!profile){
 
 profile =
-list.find(
-item=>{
-
-const names = [
+profiles.find(
+item =>
+[
 item.performing_name,
 item.artist_name,
 item.stage_name,
 item.name
-];
-
-return names.some(
+]
+.some(
 name=>{
 
 const normalized =
@@ -2224,9 +2195,7 @@ normalized
 );
 
 }
-);
-
-}
+)
 );
 
 }
@@ -2248,13 +2217,10 @@ await supabaseClient
 .eq("user_id",user.id)
 .maybeSingle();
 
-if(error){
-
-throw error;
-
-}
-
-if(data){
+if(
+!error &&
+data
+){
 
 profile =
 data;
@@ -2264,6 +2230,17 @@ data;
 }
 
 return profile;
+
+}catch(error){
+
+console.error(
+"Producer API loading error:",
+error
+);
+
+throw error;
+
+}
 
 }
 
@@ -2344,17 +2321,8 @@ document.getElementById(
 );
 
 const photo =
-firstValue(
-profile,
-[
-"photo_url",
-"profile_photo_url",
-"avatar_url",
-"image_url",
-"photo",
-"picture"
-],
-""
+getProducerPhoto(
+profile
 );
 
 if(photo){
@@ -2509,30 +2477,12 @@ profile
 
 await loadFollowState();
 
-const {
-data,
-error
-} =
-await supabaseClient
-.from("beats")
-.select("*")
-.eq("producer_id",profile.id)
-.eq("status","approved")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
-
-if(error){
-
-throw error;
-
-}
-
 const beats =
-data || [];
+Array.isArray(profile.beats)
+?
+profile.beats
+:
+[];
 
 document.getElementById(
 "statUploaded"
@@ -2603,17 +2553,8 @@ document.getElementById(
 );
 
 const photo =
-firstValue(
-profile,
-[
-"photo_url",
-"profile_photo_url",
-"avatar_url",
-"image_url",
-"photo",
-"picture"
-],
-""
+getProducerPhoto(
+profile
 );
 
 if(photo){
