@@ -98,9 +98,14 @@ main{max-width:1250px;margin:auto;padding:35px 20px 80px}
 .contact-actions .btn{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center}
 .producer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
 .producer-card{background:#12121c;border:1px solid #292938;border-radius:18px;padding:20px;text-align:center}
+.producer-card:hover{border-color:#8b5cf6;transform:translateY(-2px)}
 .producer-card img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #8b5cf6;margin-bottom:12px}
 .producer-card strong{display:block;margin-bottom:6px}
 .producer-card span{color:#9999aa;font-size:13px}
+.producer-card .btn{margin-top:14px;width:100%}
+.producer-directory-search{max-width:500px;margin-bottom:18px}
+.producer-directory-search input{width:100%;background:#171722;border:1px solid #2d2d40;color:#fff;border-radius:12px;padding:12px 15px;outline:none}
+.producer-directory-search input:focus{border-color:#8b5cf6}
 .modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px)}
 .modal.active{display:flex}
 .modal-box{width:100%;max-width:600px;max-height:90vh;overflow-y:auto;background:#11111c;border:1px solid #343449;border-radius:20px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -171,7 +176,7 @@ main{padding:20px 14px 90px}
 
 <div class="search-box">
 <span class="search-icon">🔎</span>
-<input id="producerSearch" type="search" placeholder="Search producers..." autocomplete="off">
+<input id="producerSearch" type="search" placeholder="Search beats..." autocomplete="off">
 </div>
 
 <nav class="nav-links">
@@ -194,6 +199,37 @@ main{padding:20px 14px 90px}
 </header>
 
 <main>
+
+<section class="section" id="producerDirectorySection">
+
+<div class="section-header">
+
+<div>
+<h2>🎛️ Discover Producers</h2>
+
+<p class="section-subtitle">
+Choose a producer to view their profile and beats.
+</p>
+</div>
+
+</div>
+
+<div class="producer-directory-search">
+<input
+id="producerDirectorySearch"
+type="search"
+placeholder="Search producers..."
+autocomplete="off"
+>
+</div>
+
+<div id="producerDirectory" class="producer-grid"></div>
+
+<div id="producerDirectoryStatus" class="loading">
+Loading producers...
+</div>
+
+</section>
 
 <section class="hero">
 
@@ -759,6 +795,9 @@ null;
 let currentUser =
 null;
 
+let allProducerProfiles =
+[];
+
 const producerNameEl =
 document.getElementById(
 "producerName"
@@ -797,6 +836,21 @@ document.getElementById(
 const followBtn =
 document.getElementById(
 "followBtn"
+);
+
+const producerDirectory =
+document.getElementById(
+"producerDirectory"
+);
+
+const producerDirectorySearch =
+document.getElementById(
+"producerDirectorySearch"
+);
+
+const producerDirectoryStatus =
+document.getElementById(
+"producerDirectoryStatus"
 );
 
 function escapeHtml(value){
@@ -866,6 +920,254 @@ profile,
 );
 
 }
+
+function getProducerPhoto(
+profile
+){
+
+return firstValue(
+profile,
+[
+"photo_url",
+"profile_photo_url",
+"avatar_url",
+"image_url",
+"photo",
+"picture"
+],
+"https://ui-avatars.com/api/?name=Producer&background=171722&color=c084fc&bold=true&size=300"
+);
+
+}
+
+function getProducerLocation(
+profile
+){
+
+return firstValue(
+profile,
+[
+"location",
+"city",
+"producer_location"
+],
+"Kampala"
+);
+
+}
+
+function renderProducerDirectory(
+profiles
+){
+
+producerDirectory.innerHTML =
+"";
+
+if(!profiles.length){
+
+producerDirectoryStatus.style.display =
+"block";
+
+producerDirectoryStatus.className =
+"empty";
+
+producerDirectoryStatus.textContent =
+"No producers found.";
+
+return;
+
+}
+
+producerDirectoryStatus.style.display =
+"none";
+
+profiles.forEach(
+profile=>{
+
+const name =
+getProducerDisplayName(
+profile
+);
+
+const location =
+getProducerLocation(
+profile
+);
+
+const photo =
+getProducerPhoto(
+profile
+);
+
+const profileId =
+String(
+profile.id || ""
+);
+
+if(!profileId){
+return;
+}
+
+const card =
+document.createElement(
+"article"
+);
+
+card.className =
+"producer-card";
+
+card.innerHTML = `
+
+<img
+src="${escapeHtml(photo)}"
+alt="${escapeHtml(name)}"
+onerror="this.src='https://ui-avatars.com/api/?name=Producer&background=171722&color=c084fc&bold=true&size=300'"
+>
+
+<strong>
+${escapeHtml(name)}
+</strong>
+
+<span>
+📍 ${escapeHtml(location)}
+</span>
+
+<a
+class="btn btn-primary"
+href="producer.html?id=${encodeURIComponent(profileId)}"
+>
+View Producer
+</a>
+
+`;
+
+producerDirectory.appendChild(
+card
+);
+
+}
+);
+
+}
+
+async function loadProducerDirectory(){
+
+producerDirectoryStatus.style.display =
+"block";
+
+producerDirectoryStatus.className =
+"loading";
+
+producerDirectoryStatus.textContent =
+"Loading producers...";
+
+try{
+
+const {
+data,
+error
+} =
+await supabaseClient
+.from("artist_profiles")
+.select("*")
+.order(
+"created_at",
+{
+ascending:false
+}
+);
+
+if(error){
+
+throw error;
+
+}
+
+allProducerProfiles =
+data || [];
+
+renderProducerDirectory(
+allProducerProfiles
+);
+
+}catch(error){
+
+console.error(
+"Producer directory loading error:",
+error
+);
+
+producerDirectory.innerHTML =
+"";
+
+producerDirectoryStatus.style.display =
+"block";
+
+producerDirectoryStatus.className =
+"error";
+
+producerDirectoryStatus.textContent =
+"Unable to load producers right now.";
+
+}
+
+}
+
+producerDirectorySearch.addEventListener(
+"input",
+function(){
+
+const search =
+this.value
+.trim()
+.toLowerCase();
+
+if(!search){
+
+renderProducerDirectory(
+allProducerProfiles
+);
+
+return;
+
+}
+
+const filtered =
+allProducerProfiles.filter(
+profile=>{
+
+const name =
+getProducerDisplayName(
+profile
+).toLowerCase();
+
+const location =
+getProducerLocation(
+profile
+).toLowerCase();
+
+const styles =
+String(
+getProducerStyles(
+profile
+)
+).toLowerCase();
+
+return(
+name.includes(search) ||
+location.includes(search) ||
+styles.includes(search)
+);
+
+}
+);
+
+renderProducerDirectory(
+filtered
+);
+
+}
+);
 
 async function loadAccountPhoto(){
 
@@ -3334,6 +3636,8 @@ async function initProducerPage(){
 await setupAuthNavigation();
 
 await loadAccountPhoto();
+
+await loadProducerDirectory();
 
 await loadBeats();
 
