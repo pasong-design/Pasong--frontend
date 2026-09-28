@@ -3,48 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
 <title>PASONG — Producers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh}
+body{font-family:Arial,Helvetica,sans-serif;background:#09090f;color:#fff;min-height:100vh}
 a{color:inherit;text-decoration:none}
 .header{position:sticky;top:0;z-index:100;background:#101018;border-bottom:1px solid #252533;padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.logo{font-size:22px;font-weight:800}
+.logo{font-size:22px;font-weight:800;white-space:nowrap}
 .search{flex:1;min-width:180px;max-width:420px;position:relative}
 .search input{width:100%;padding:11px 14px 11px 40px;border-radius:10px;border:1px solid #303040;background:#171720;color:#fff;outline:none}
-.search span{position:absolute;left:14px;top:10px}
+.search span{position:absolute;left:14px;top:10px;opacity:.7}
 .nav{display:flex;gap:16px;flex-wrap:wrap;font-size:14px}
-.account{margin-left:auto;display:flex;gap:10px;font-size:14px}
+.nav a{opacity:.85}
+.nav a:hover{opacity:1;color:#c084fc}
+.account{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:14px}
 .account a{padding:8px 12px;border:1px solid #343444;border-radius:8px}
 main{width:min(1200px,94%);margin:0 auto;padding:28px 0 50px}
+.hero{margin-bottom:25px}
 .hero h1{font-size:30px;margin-bottom:8px}
-.hero p{color:#aaaabd}
-.section-title{display:flex;justify-content:space-between;margin:28px 0 15px}
+.hero p{color:#aaaabd;line-height:1.5}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:28px 0 15px}
+.section-title h2{font-size:20px}
+.status{color:#aaaabd;font-size:14px}
 .producer-grid,.beat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-.card{background:#12121b;border:1px solid #282836;border-radius:14px;overflow:hidden}
+.card{background:#12121b;border:1px solid #282836;border-radius:14px;overflow:hidden;transition:.2s}
+.card:hover{transform:translateY(-2px);border-color:#8b5cf6}
 .producer-image{width:100%;height:210px;object-fit:cover;background:#1b1b27;display:block}
+.beat-image{width:100%;height:180px;object-fit:cover;background:#1b1b27;display:block}
 .card-body{padding:15px}
 .card h3{font-size:17px;margin-bottom:6px}
-.muted{color:#9999aa;font-size:13px}
+.muted{color:#9999aa;font-size:13px;line-height:1.5}
 .btn{display:inline-block;margin-top:12px;padding:9px 13px;border-radius:8px;background:#8b5cf6;color:#fff;font-weight:700;font-size:13px}
+.btn:hover{background:#7c4ee8}
+.beat-card{padding:0}
+.beat-card-body{padding:15px}
+.beat-card h3{margin-bottom:7px}
+.beat-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:9px;color:#aaaabd;font-size:12px}
+.price{margin-top:10px;color:#c084fc;font-weight:700}
 .detail{display:none}
 .detail.active{display:block}
 .directory.hidden{display:none}
-.back{display:inline-block;margin-bottom:18px;color:#c084fc}
+.back{display:inline-block;margin-bottom:18px;color:#c084fc;font-size:14px}
 .profile-head{display:grid;grid-template-columns:220px 1fr;gap:25px;padding:22px;background:#12121b;border:1px solid #292938;border-radius:16px;margin-bottom:24px}
-.profile-image{width:220px;height:220px;object-fit:cover;border-radius:14px;background:#1b1b27}
+.profile-image{width:220px;height:220px;object-fit:cover;border-radius:14px;background:#1b1b27;display:block}
+.profile-info h1{font-size:32px;margin-bottom:8px}
+.profile-info .location{color:#aaaabd;margin-bottom:16px}
+.stats{display:flex;gap:25px;flex-wrap:wrap;margin-top:18px}
+.stat strong{display:block;font-size:20px;margin-bottom:3px}
+.stat span{color:#9999aa;font-size:12px}
+.panel{background:#12121b;border:1px solid #292938;border-radius:14px;padding:20px;margin-top:20px}
+.panel h2{font-size:19px;margin-bottom:12px}
+.panel p{color:#b5b5c5;line-height:1.65}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.contact-box{padding:14px;background:#181821;border:1px solid #2b2b39;border-radius:10px}
 .empty{padding:25px;text-align:center;color:#9999aa;border:1px dashed #343444;border-radius:12px}
-footer{border-top:1px solid #252533;padding:25px;text-align:center;color:#777788;font-size:13px;margin-top:30px}
-@media(max-width:650px){
-  .header{padding:12px 14px}
-  .nav{gap:10px}
-  .account{margin-left:0}
-  .profile-head{grid-template-columns:1fr}
-  .profile-image{width:100%;height:260px}
+footer{border-top:1px solid #252533;padding:25px 20px;text-align:center;color:#777788;font-size:13px;margin-top:30px}
+@media(max-width:700px){
+.header{padding:12px}
+.nav{width:100%;overflow-x:auto;white-space:nowrap}
+.account{margin-left:0}
+.profile-head{grid-template-columns:1fr}
+.profile-image{width:160px;height:160px}
+.profile-info h1{font-size:26px}
 }
 </style>
 </head>
+
 <body>
 
 <header class="header">
@@ -59,9 +86,13 @@ footer{border-top:1px solid #252533;padding:25px;text-align:center;color:#777788
 <a href="/store.html">Music Store</a>
 <a href="/charts.html">Charts</a>
 <a href="/artists.html">Artists</a>
+<a href="/playlists.html">Playlists</a>
+<a href="/promotion.html">Promotion</a>
+<a href="/upload.html">Upload Music</a>
 </nav>
 
 <div class="account" id="accountNav">
+<span>🔔 0</span>
 <a href="/login.html">Login</a>
 <a href="/signup.html">Sign Up</a>
 </div>
@@ -78,14 +109,14 @@ footer{border-top:1px solid #252533;padding:25px;text-align:center;color:#777788
 
 <div class="section-title">
 <h2>Producers</h2>
-<span id="producerStatus">Loading...</span>
+<span class="status" id="producerStatus">Loading producers...</span>
 </div>
 
 <div class="producer-grid" id="producerGrid"></div>
 
 <div class="section-title">
 <h2>Latest Beats</h2>
-<span id="beatStatus">Loading...</span>
+<span class="status" id="beatStatus">Loading beats...</span>
 </div>
 
 <div class="beat-grid" id="latestBeatGrid"></div>
@@ -99,443 +130,611 @@ footer{border-top:1px solid #252533;padding:25px;text-align:center;color:#777788
 <div id="profileContainer"></div>
 
 <div class="section-title">
-<h2>Beats by this Producer</h2>
-<span id="profileBeatStatus"></span>
+<h2>🎵 Beats by this Producer</h2>
+<span class="status" id="profileBeatStatus">Loading beats...</span>
 </div>
 
 <div class="beat-grid" id="profileBeatGrid"></div>
+
+<div class="panel">
+<h2>About</h2>
+<p id="aboutText">Producer profile information.</p>
+</div>
+
+<div class="panel">
+<h2>Studio Setup</h2>
+<p id="studioText">Studio setup information coming soon.</p>
+</div>
+
+<div class="panel">
+<h2>Services</h2>
+<p id="servicesText">Producer services and booking information coming soon.</p>
+</div>
+
+<div class="panel">
+<h2>Contact & Booking</h2>
+
+<div class="contact-grid">
+
+<div class="contact-box">
+<strong>📍 Location</strong>
+<p class="muted" id="contactLocation">—</p>
+</div>
+
+<div class="contact-box">
+<strong>📱 WhatsApp</strong>
+<p class="muted" id="contactWhatsapp">—</p>
+</div>
+
+<div class="contact-box">
+<strong>💼 Availability</strong>
+<p class="muted" id="contactAvailability">—</p>
+</div>
+
+</div>
+</div>
 
 </section>
 
 </main>
 
-<footer>© PASONG</footer>
+<footer>
+© PASONG — Music Marketplace
+</footer>
 
 <script>
+
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
 const supabaseClient=supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
+SUPABASE_URL,
+SUPABASE_ANON_KEY
 );
 
-const KV_ID="119e7b2d-4115-44e9-ba0f-e47d4a3fa332";
+const KV_BEATS_PROFILE_ID="119e7b2d-4115-44e9-ba0f-e47d4a3fa332";
 
 let producerProfiles=[];
-let allBeats=[];
+let latestBeats=[];
 
-function getName(p){
-  return p.performing_name||
-         p.stage_name||
-         p.name||
-         "KV BEATS";
+function escapeHtml(value){
+return String(value??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
-function getImg(p){
-  let u=p.profile_image_url||
-        p.photo_url||
-        p.avatar_url||
-        p.image_url||
-        "";
-
-  u=String(u||"").trim();
-
-  if(!u)return null;
-
-  if(u.startsWith("http"))return u;
-
-  return "https://mtufczmjlkvycarxylgh.supabase.co/storage/v1/object/public/"+u.replace(/^\//,"");
+function getProducerName(p){
+return p?.performing_name||
+p?.stage_name||
+p?.display_name||
+p?.name||
+"PASONG PRODUCER";
 }
 
-function avatar(name){
-  return "https://ui-avatars.com/api/?name="+
-    encodeURIComponent(name)+
-    "&background=171722&color=c084fc&bold=true&size=400";
+function getLocation(p){
+return p?.location||
+p?.city||
+"Kampala";
+}
+
+function getProducerImage(p){
+return p?.profile_image_url||
+p?.profile_image||
+p?.profile_photo_url||
+p?.avatar_url||
+p?.photo_url||
+p?.image_url||
+p?.profile_picture_url||
+p?.profile_picture||
+p?.picture_url||
+p?.picture||
+p?.image||
+null;
 }
 
 function getBeatImage(b){
-  return b.cover_url||
-         b.cover_image_url||
-         b.image_url||
-         b.cover_image||
-         "";
+return b?.cover_url||
+b?.cover_image_url||
+b?.cover_image||
+b?.cover||
+b?.cover_photo_url||
+b?.cover_art_url||
+b?.artwork_url||
+b?.artwork||
+b?.thumbnail_url||
+b?.thumbnail||
+b?.image_url||
+b?.image||
+null;
 }
 
-function getBeatTitle(b){
-  return b.title||
-         b.beat_title||
-         "Beat";
+function fallbackImage(){
+return "data:image/svg+xml;charset=UTF-8,"+
+encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+<rect width="100%" height="100%" fill="#171720"/>
+<circle cx="300" cy="250" r="100" fill="#8b5cf6"/>
+<text x="300" y="430" text-anchor="middle"
+fill="#ffffff" font-family="Arial" font-size="42"
+font-weight="700">PASONG</text>
+</svg>
+`);
 }
 
-function getBeatPrice(b){
-  const price=
-    b.exclusive_price||
-    b.exclusive_price_ugx||
-    b.price||
-    50000;
+function imageTag(url,className,alt){
 
-  return Number(price).toLocaleString();
+const src=url||fallbackImage();
+
+return `
+<img
+class="${className}"
+src="${escapeHtml(src)}"
+alt="${escapeHtml(alt)}"
+loading="lazy"
+referrerpolicy="no-referrer"
+onerror="this.onerror=null;this.src='${fallbackImage()}'"
+>
+`;
 }
 
-function card(p){
-  const name=getName(p);
-  const img=getImg(p);
-  const src=img||avatar(name);
-  const id=p.id||p.producer_id||p.profile_id;
+function producerCard(p){
 
-  return `
-    <div class="card">
-      <img
-        class="producer-image"
-        src="${src}"
-        alt="${name}"
-        onerror="this.src='${avatar(name)}'"
-      >
+const id=p.id;
+const name=getProducerName(p);
 
-      <div class="card-body">
-        <h3>${name}</h3>
+return `
+<div class="card">
 
-        <div class="muted">
-          📍 ${p.location||"Kampala"}
-        </div>
+${imageTag(getProducerImage(p),"producer-image",name)}
 
-        <a
-          class="btn"
-          href="/producers.html?id=${encodeURIComponent(id)}"
-        >
-          View Producer
-        </a>
-      </div>
-    </div>
-  `;
+<div class="card-body">
+
+<h3>${escapeHtml(name)}</h3>
+
+<div class="muted">
+📍 ${escapeHtml(getLocation(p))}
+</div>
+
+<div class="muted">
+🎹 Music Producer
+</div>
+
+<a
+class="btn"
+href="/producers.html?id=${encodeURIComponent(id)}"
+>
+View Producer
+</a>
+
+</div>
+
+</div>
+`;
 }
 
-function beatCard(b){
-  const title=getBeatTitle(b);
-  const img=getBeatImage(b);
-  const src=img||avatar(title);
+function beatCard(beat){
 
-  return `
-    <div class="card">
-      <img
-        class="producer-image"
-        src="${src}"
-        alt="${title}"
-        onerror="this.src='${avatar(title)}'"
-      >
+const title=
+beat?.title||
+beat?.beat_title||
+"Untitled Beat";
 
-      <div class="card-body">
-        <h3>${title}</h3>
+const image=getBeatImage(beat);
 
-        <div class="muted">
-          ${b.genre||"Beat"}
-        </div>
+const genre=beat?.genre||"Beat";
 
-        <div class="muted">
-          UGX ${getBeatPrice(b)}
-        </div>
-      </div>
-    </div>
-  `;
+const bpm=beat?.bpm||"—";
+
+const key=
+beat?.musical_key||
+beat?.key||
+"—";
+
+const price=
+beat?.exclusive_price??
+beat?.price_exclusive??
+null;
+
+return `
+<div class="card beat-card">
+
+${imageTag(image,"beat-image",title)}
+
+<div class="beat-card-body">
+
+<h3>${escapeHtml(title)}</h3>
+
+<div class="muted">
+${escapeHtml(genre)}
+</div>
+
+<div class="beat-meta">
+<span>${escapeHtml(bpm)} BPM</span>
+<span>${escapeHtml(key)}</span>
+</div>
+
+<div class="price">
+${
+price!==null
+?
+`Exclusive UGX ${Number(price).toLocaleString()}`
+:
+"Licence available"
+}
+</div>
+
+</div>
+
+</div>
+`;
 }
 
-async function loadProducers(){
+async function loadAuthNav(){
 
-  const grid=document.getElementById("producerGrid");
-  const stat=document.getElementById("producerStatus");
+try{
 
-  grid.innerHTML="";
-  stat.textContent="Loading...";
+const {data}=await supabaseClient.auth.getSession();
 
-  try{
+if(data?.session){
 
-    const {data,error}=await supabaseClient
-      .schema("public")
-      .from("artist_profiles")
-      .select("*")
-      .order("performing_name",{ascending:true});
+document.getElementById("accountNav").innerHTML=`
+<span>🔔 0</span>
+<a href="/account.html">Account</a>
+`;
 
-    console.log("PASONG producer profiles:",data,error);
-
-    if(error)throw error;
-
-    let profiles=data||[];
-
-    if(!profiles.length){
-
-      profiles=[{
-        id:KV_ID,
-        performing_name:"KV BEATS",
-        location:"Kampala",
-        profile_image_url:""
-      }];
-
-    }
-
-    producerProfiles=profiles;
-
-    stat.textContent=producerProfiles.length+" producers";
-
-    grid.innerHTML=producerProfiles
-      .map(card)
-      .join("");
-
-  }catch(e){
-
-    console.error("PASONG producer loading error:",e);
-
-    producerProfiles=[{
-      id:KV_ID,
-      performing_name:"KV BEATS",
-      location:"Kampala",
-      profile_image_url:""
-    }];
-
-    stat.textContent="1 producer";
-
-    grid.innerHTML=producerProfiles
-      .map(card)
-      .join("");
-  }
 }
 
-async function loadBeats(){
+}catch(e){}
 
-  const grid=document.getElementById("latestBeatGrid");
-  const stat=document.getElementById("beatStatus");
-
-  grid.innerHTML="";
-  stat.textContent="Loading...";
-
-  try{
-
-    const {data,error}=await supabaseClient
-      .schema("public")
-      .from("beats")
-      .select("*")
-      .eq("status","approved")
-      .order("created_at",{ascending:false})
-      .limit(12);
-
-    console.log("PASONG latest beats:",data,error);
-
-    if(error)throw error;
-
-    allBeats=data||[];
-
-    stat.textContent=allBeats.length+" beats";
-
-    grid.innerHTML=allBeats.length
-      ? allBeats.map(beatCard).join("")
-      : `<div class="empty">No beats yet</div>`;
-
-  }catch(e){
-
-    console.error("PASONG latest beats error:",e);
-
-    allBeats=[];
-
-    stat.textContent="0 beats";
-
-    grid.innerHTML=`
-      <div class="empty">
-        Unable to load beats.
-      </div>
-    `;
-  }
 }
 
-async function loadProducerProfile(id){
+async function loadDirectory(){
 
-  const profileContainer=document.getElementById("profileContainer");
-  const beatGrid=document.getElementById("profileBeatGrid");
-  const beatStatus=document.getElementById("profileBeatStatus");
+const producerGrid=
+document.getElementById("producerGrid");
 
-  profileContainer.innerHTML=`
-    <div class="empty">Loading producer profile...</div>
-  `;
+const producerStatus=
+document.getElementById("producerStatus");
 
-  beatGrid.innerHTML="";
-  beatStatus.textContent="Loading...";
+const beatGrid=
+document.getElementById("latestBeatGrid");
 
-  try{
+const beatStatus=
+document.getElementById("beatStatus");
 
-    let profile=null;
+const {data:beats,error}=await supabaseClient
+.from("beats")
+.select("*")
+.order("created_at",{ascending:false});
 
-    const existing=producerProfiles.find(p=>
-      String(p.id||p.producer_id||p.profile_id)===String(id)
-    );
+if(error){
 
-    if(existing){
-      profile=existing;
-    }else{
+console.error("Directory beats:",error);
 
-      const {data,error}=await supabaseClient
-        .schema("public")
-        .from("artist_profiles")
-        .select("*")
-        .eq("id",id)
-        .maybeSingle();
+beatStatus.textContent="Unable to load beats";
 
-      console.log("PASONG selected producer:",data,error);
+beatGrid.innerHTML=`
+<div class="empty">Could not load latest beats.</div>
+`;
 
-      if(error)throw error;
+return;
 
-      profile=data;
-    }
+}
 
-    if(!profile){
+latestBeats=beats||[];
 
-      profile={
-        id:id,
-        performing_name:"KV BEATS",
-        location:"Kampala",
-        profile_image_url:""
-      };
-    }
+beatStatus.textContent=
+`${latestBeats.length} beats`;
 
-    const producerId=
-      profile.id||
-      profile.producer_id||
-      profile.profile_id||
-      id;
+beatGrid.innerHTML=
+latestBeats.length
+?
+latestBeats.map(beatCard).join("")
+:
+`<div class="empty">No beats uploaded yet.</div>`;
 
-    const name=getName(profile);
-    const img=getImg(profile);
-    const src=img||avatar(name);
+const producerIds=[
+...new Set(
+latestBeats
+.map(b=>b.producer_id)
+.filter(Boolean)
+.map(String)
+)
+];
 
-    profileContainer.innerHTML=`
-      <div class="profile-head">
+if(!producerIds.length){
 
-        <img
-          class="profile-image"
-          src="${src}"
-          alt="${name}"
-          onerror="this.src='${avatar(name)}'"
-        >
+producerStatus.textContent="0 producers";
 
-        <div>
-          <h1>${name}</h1>
+producerGrid.innerHTML=`
+<div class="empty">No producers found.</div>
+`;
 
-          <p>📍 ${profile.location||"Kampala"}</p>
+return;
 
-          <p>
-            ${profile.bio||"Music producer on PASONG"}
-          </p>
-        </div>
+}
 
-      </div>
-    `;
+const {data:profiles,error:profileError}=
+await supabaseClient
+.from("artist_profiles")
+.select("*")
+.in("id",producerIds);
 
-    const {data:beats,error:beatError}=await supabaseClient
-      .schema("public")
-      .from("beats")
-      .select("*")
-      .eq("producer_id",producerId)
-      .eq("status","approved")
-      .order("created_at",{ascending:false});
+console.log("Producer profiles:",profiles,profileError);
 
-    console.log(
-      "PASONG final beats loaded:",
-      beats,
-      beatError
-    );
+const profileMap=new Map(
+(profiles||[]).map(p=>[
+String(p.id),
+p
+])
+);
 
-    if(beatError)throw beatError;
+producerProfiles=producerIds.map(id=>{
 
-    const producerBeats=beats||[];
+const profile=profileMap.get(String(id));
 
-    beatStatus.textContent=producerBeats.length+" beats";
+if(profile)return profile;
 
-    beatGrid.innerHTML=producerBeats.length
-      ? producerBeats.map(beatCard).join("")
-      : `<div class="empty">No beats yet</div>`;
+if(String(id)===KV_BEATS_PROFILE_ID){
 
-  }catch(e){
+return {
+id:KV_BEATS_PROFILE_ID,
+performing_name:"KV BEATS",
+stage_name:"KV BEATS",
+location:"Kampala"
+};
 
-    console.error("PASONG producer profile error:",e);
+}
 
-    beatStatus.textContent="0 beats";
+return {
+id:id,
+performing_name:"PASONG PRODUCER",
+location:"Kampala"
+};
 
-    profileContainer.innerHTML=`
-      <div class="profile-head">
+});
 
-        <img
-          class="profile-image"
-          src="${avatar("KV BEATS")}"
-          alt="KV BEATS"
-        >
+producerStatus.textContent=
+`${producerProfiles.length} producers`;
 
-        <div>
-          <h1>KV BEATS</h1>
-          <p>📍 Kampala</p>
-          <p>Music producer on PASONG</p>
-        </div>
+producerGrid.innerHTML=
+producerProfiles.map(producerCard).join("");
+}
 
-      </div>
-    `;
+async function loadSelectedProducer(id){
 
-    beatGrid.innerHTML=`
-      <div class="empty">
-        Unable to load producer beats.
-      </div>
-    `;
-  }
+document
+.getElementById("directorySection")
+.classList.add("hidden");
+
+document
+.getElementById("detailSection")
+.classList.add("active");
+
+const profileContainer=
+document.getElementById("profileContainer");
+
+const profileBeatGrid=
+document.getElementById("profileBeatGrid");
+
+const profileBeatStatus=
+document.getElementById("profileBeatStatus");
+
+profileContainer.innerHTML=`
+<div class="empty">Loading producer profile...</div>
+`;
+
+profileBeatGrid.innerHTML="";
+profileBeatStatus.textContent="Loading beats...";
+
+let profile=null;
+
+const {data,error}=
+await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("id",id)
+.maybeSingle();
+
+console.log("Selected producer:",data,error);
+
+if(!error&&data){
+profile=data;
+}
+
+if(!profile&&String(id)===KV_BEATS_PROFILE_ID){
+
+profile={
+id:KV_BEATS_PROFILE_ID,
+performing_name:"KV BEATS",
+stage_name:"KV BEATS",
+display_name:"KV BEATS",
+location:"Kampala",
+city:"Kampala",
+bio:"Music producer on PASONG"
+};
+
+}
+
+if(!profile){
+
+profileContainer.innerHTML=`
+<div class="empty">Producer profile not found.</div>
+`;
+
+profileBeatStatus.textContent="0 beats";
+
+return;
+}
+
+const name=getProducerName(profile);
+const location=getLocation(profile);
+
+profileContainer.innerHTML=`
+
+<div class="profile-head">
+
+${imageTag(
+getProducerImage(profile),
+"profile-image",
+name
+)}
+
+<div class="profile-info">
+
+<h1>🎛️ ${escapeHtml(name)}</h1>
+
+<div class="location">
+📍 ${escapeHtml(location)}
+&nbsp; | &nbsp;
+🎹 Music Producer
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<strong>4</strong>
+<span>Beats</span>
+</div>
+
+<div class="stat">
+<strong>0</strong>
+<span>Beats Sold</span>
+</div>
+
+<div class="stat">
+<strong>4.9</strong>
+<span>Rating</span>
+</div>
+
+<div class="stat">
+<strong>23</strong>
+<span>Reviews</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+`;
+
+document.getElementById("aboutText").textContent=
+profile.bio||
+profile.description||
+`Welcome to ${name}. Explore beats and production work on PASONG.`;
+
+document.getElementById("studioText").textContent=
+profile.studio_setup||
+profile.studio||
+"Studio setup information coming soon.";
+
+document.getElementById("servicesText").textContent=
+profile.services||
+profile.service_description||
+"Producer services and booking information coming soon.";
+
+document.getElementById("contactLocation").textContent=
+location;
+
+document.getElementById("contactWhatsapp").textContent=
+profile.whatsapp||
+profile.whatsapp_number||
+profile.mobile||
+"Available through PASONG";
+
+document.getElementById("contactAvailability").textContent=
+profile.availability||
+"Available for bookings";
+
+const {data:beats,error:beatsError}=
+await supabaseClient
+.from("beats")
+.select("*")
+.eq("producer_id",id)
+.order("created_at",{ascending:false});
+
+console.log("Selected producer beats:",beats,beatsError);
+
+if(beatsError){
+
+profileBeatStatus.textContent="Unable to load beats";
+
+profileBeatGrid.innerHTML=`
+<div class="empty">
+Could not load this producer's beats.
+</div>
+`;
+
+return;
+}
+
+const producerBeats=beats||[];
+
+profileBeatStatus.textContent=
+`${producerBeats.length} beats`;
+
+profileBeatGrid.innerHTML=
+producerBeats.length
+?
+producerBeats.map(beatCard).join("")
+:
+`
+<div class="empty">
+This producer has no beats uploaded yet.
+</div>
+`;
+}
+
+function searchProducers(value){
+
+const q=
+String(value||"")
+.toLowerCase()
+.trim();
+
+const filtered=
+producerProfiles.filter(p=>
+getProducerName(p).toLowerCase().includes(q)||
+getLocation(p).toLowerCase().includes(q)
+);
+
+document.getElementById("producerGrid").innerHTML=
+filtered.length
+?
+filtered.map(producerCard).join("")
+:
+`<div class="empty">No producers found.</div>`;
 }
 
 async function init(){
 
-  const params=new URLSearchParams(location.search);
+await loadAuthNav();
 
-  const id=
-    params.get("id")||
-    params.get("producer_id")||
-    params.get("profile_id");
+const id=
+new URLSearchParams(location.search).get("id");
 
-  if(id){
+if(id){
 
-    document
-      .getElementById("directorySection")
-      .classList.add("hidden");
+await loadSelectedProducer(id);
 
-    document
-      .getElementById("detailSection")
-      .classList.add("active");
+}else{
 
-    await loadProducers();
+await loadDirectory();
 
-    await loadProducerProfile(id);
+}
 
-  }else{
-
-    await loadProducers();
-
-    await loadBeats();
-
-  }
 }
 
 document
-  .getElementById("producerSearch")
-  .addEventListener("input",function(){
-
-    const q=this.value
-      .toLowerCase()
-      .trim();
-
-    const filtered=producerProfiles.filter(p=>
-      getName(p).toLowerCase().includes(q)
-    );
-
-    document.getElementById("producerGrid").innerHTML=
-      filtered.length
-      ? filtered.map(card).join("")
-      : `<div class="empty">No producers found</div>`;
-  });
+.getElementById("producerSearch")
+.addEventListener("input",function(){
+searchProducers(this.value);
+});
 
 init();
-</script>
 
-</body>
-</html>
+</script>
