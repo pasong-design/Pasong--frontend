@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PASONG — Sign Up</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.box{width:min(440px,92%);background:#12121b;border:1px solid #282836;border-radius:16px;padding:28px}
+h1{font-size:26px;margin-bottom:6px}.sub{color:#9999aa;font-size:14px;margin-bottom:20px}
+label{font-size:13px;color:#aaaabd;display:block;margin:14px 0 6px}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #303040;background:#171720;color:#fff;outline:none}
+input:focus{border-color:#8b5cf6}
+.btn{width:100%;margin-top:20px;padding:12px;border:none;border-radius:10px;background:#8b5cf6;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+.btn:disabled{opacity:.6}
+.muted{margin-top:14px;text-align:center;color:#9999aa;font-size:13px}
+.muted a{color:#c084fc;text-decoration:none}
+.msg{margin-top:12px;padding:10px;border-radius:8px;font-size:13px;display:none}
+.msg.err{display:block;background:#2a1212;color:#ff8a8a;border:1px solid #5a2222}
+.msg.ok{display:block;background:#122a18;color:#8aff9a;border:1px solid #224a2e}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>◈ Create Account</h1>
+<p class="sub">Join PASONG as Producer — sell beats</p>
+
+<label>Stage Name</label>
+<input id="stageName" placeholder="e.g. KV BEATS">
+
+<label>Email</label>
+<input id="email" type="email" placeholder="you@email.com">
+
+<label>Password</label>
+<input id="password" type="password" placeholder="Min 6 characters">
+
+<button id="signupBtn" class="btn">Sign Up</button>
+<div id="msg" class="msg"></div>
+<p class="muted">Already have account? <a href="/login.html">Login</a></p>
+</div>
+
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const supa=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+function show(t,ok=false){
+  const m=document.getElementById("msg");
+  m.textContent=t; m.className= ok ? "msg ok" : "msg err";
+}
+
+document.getElementById("signupBtn").onclick=async()=>{
+  const stage=document.getElementById("stageName").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  const btn=document.getElementById("signupBtn");
+
+  if(!stage||!email||!password){ show("Fill all fields"); return; }
+  if(password.length<6){ show("Password min 6 chars"); return; }
+
+  btn.disabled=true; btn.textContent="Creating...";
+
+  // 1. Sign up auth
+  const {data,error}=await supa.auth.signUp({email,password});
+  if(error){ show(error.message); btn.disabled=false; btn.textContent="Sign Up"; return; }
+
+  const user=data.user || (await supa.auth.getUser()).data.user;
+  if(!user){ show("Check email to confirm",true); btn.disabled=false; btn.textContent="Sign Up"; return; }
+
+  // 2. Create artist_profiles
+  const {error:profErr}=await supa.from("artist_profiles").insert({
+    id:user.id,
+    stage_name:stage,
+    performing_name:stage,
+    location:"Kampala",
+    bio:"Producer on PASONG"
+  });
+
+  if(profErr){ console.log(profErr); /* ignore if exists */ }
+
+  show("Account created! Redirecting...",true);
+  setTimeout(()=>location.href="/producer-dashboard.html",1200);
+};
+</script>
+</body>
+</html>
