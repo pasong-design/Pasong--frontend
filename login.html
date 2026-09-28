@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PASONG — Login</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#12121b;border:1px solid #292938;border-radius:16px;padding:30px;width:100%;max-width:380px}
+h1{font-size:24px;margin-bottom:20px}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #303040;background:#171720;color:#fff;margin-bottom:12px;outline:none}
+button{width:100%;padding:12px;border-radius:10px;border:0;background:#8b5cf6;color:#fff;font-weight:700;cursor:pointer}
+button:hover{background:#7c4ee8}
+.muted{color:#aaaabd;font-size:13px;margin-top:12px;text-align:center}
+a{color:#c084fc}
+.error{color:#ff6b6b;font-size:13px;margin-bottom:10px;display:none}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>◈ PASONG Login</h1>
+<div id="err" class="error"></div>
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<div class="muted">No account? <a href="/signup.html">Sign Up</a> • <a href="/index.html">Home</a></div>
+<div class="muted" id="status"></div>
+</div>
+<script>
+const supabaseClient = supabase.createClient("https://mtufczmjlkvycarxylgh.supabase.co","sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP");
+async function login(){
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  const errBox=document.getElementById("err");
+  errBox.style.display="none";
+  document.getElementById("status").textContent="Logging in...";
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){
+    errBox.textContent=error.message;
+    errBox.style.display="block";
+    document.getElementById("status").textContent="";
+    return;
+  }
+  document.getElementById("status").textContent="Success! Redirecting...";
+  // Check if producer
+  let {data:profile}=await supabaseClient.from("artist_profiles").select("id").eq("id",data.user.id).single();
+  if(profile) location.href="/producer-dashboard.html";
+  else location.href="/index.html";
+}
+</script>
+</div>
+</body>
+</html>
