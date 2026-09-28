@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -6,173 +7,1180 @@
 <meta name="theme-color" content="#8b5cf6">
 <title>PASONG — Producers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh}
-a{color:inherit;text-decoration:none}
-button{font-family:inherit}
-.header{position:sticky;top:0;z-index:100;background:#101018;border-bottom:1px solid #252533;padding:12px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.logo{font-size:22px;font-weight:800;white-space:nowrap}
-.search{flex:1;min-width:180px;max-width:400px;position:relative}
-.search input{width:100%;padding:10px 14px 10px 40px;border-radius:10px;border:1px solid #303040;background:#171720;color:#fff;outline:none}
-.search input:focus{border-color:#8b5cf6}
-.search span{position:absolute;left:14px;top:9px}
-.nav{display:flex;gap:15px;font-size:14px;align-items:center}
-.nav a:hover{color:#c084fc}
-.account{margin-left:auto;display:flex;gap:10px}
-.account a{padding:8px 12px;border:1px solid #343444;border-radius:8px}
-.account a:hover{border-color:#8b5cf6}main{width:min(1180px,94%);margin:0 auto;padding:30px 0 45px}
 
-.hero{background:linear-gradient(135deg,#12121d,#101017);border:1px solid #292938;border-radius:16px;padding:25px;margin-bottom:28px}
-.hero-label{display:inline-block;color:#c084fc;font-size:12px;font-weight:700;letter-spacing:.8px;margin-bottom:9px}
-.hero h1{font-size:28px;margin-bottom:8px}
-.hero p{color:#aaaabd;font-size:14px;line-height:1.6;max-width:700px}
-.hero-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.hero-stat{padding:9px 13px;background:#171720;border:1px solid #292938;border-radius:9px;color:#bbb;font-size:13px}
-.hero-stat strong{color:#fff}
+body{
+font-family:Arial,sans-serif;
+background:#07070d;
+color:#fff;
+min-height:100vh;
+}
 
-.section-title{display:flex;justify-content:space-between;align-items:center;margin:26px 0 14px}
-.section-title h2{font-size:19px}
-.section-title span{color:#9999aa;font-size:13px}
+a{
+color:inherit;
+text-decoration:none;
+}
 
-.producer-grid,.beat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+button{
+font-family:inherit;
+}
 
-.card{background:#12121b;border:1px solid #282836;border-radius:13px;overflow:hidden;transition:.18s ease}
-.card:hover{border-color:#8b5cf6;transform:translateY(-2px)}
+.header{
+position:sticky;
+top:0;
+z-index:100;
+background:rgba(10,10,17,.96);
+backdrop-filter:blur(14px);
+border-bottom:1px solid #252533;
+padding:13px 20px;
+display:flex;
+align-items:center;
+gap:18px;
+flex-wrap:wrap;
+}
 
-.producer-image,.beat-image{width:100%;height:155px;object-fit:cover;background:#1b1b27;display:block}
+.logo{
+font-size:22px;
+font-weight:800;
+white-space:nowrap;
+}
 
-.card-body{padding:13px}
-.card h3{font-size:16px;margin-bottom:6px}
-.muted{color:#9999aa;font-size:13px;line-height:1.6}
+.search{
+flex:1;
+min-width:180px;
+max-width:420px;
+position:relative;
+}
 
-.btn{display:inline-block;margin-top:10px;padding:8px 12px;border-radius:8px;background:#8b5cf6;color:#fff;font-weight:700;font-size:13px;border:0;cursor:pointer}
-.btn:hover{background:#7c4ee8}
+.search input{
+width:100%;
+padding:11px 14px 11px 40px;
+border-radius:11px;
+border:1px solid #303040;
+background:#15151f;
+color:#fff;
+outline:none;
+}
 
-.beat-card{position:relative}
-.beat-tag{display:inline-block;color:#c084fc;font-size:10px;font-weight:800;letter-spacing:.7px;margin-bottom:7px}
-.beat-meta{display:flex;gap:8px;flex-wrap:wrap;color:#9999aa;font-size:12px;margin-top:6px}
-.beat-price{color:#c084fc;font-weight:700;margin-top:8px;font-size:14px}
-.beat-actions{display:flex;gap:7px;margin-top:11px}
-.play-btn,.license-btn{flex:1;padding:9px 8px;border-radius:8px;border:1px solid #383848;background:#191923;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
-.play-btn:hover,.license-btn:hover{border-color:#8b5cf6}
-.play-btn.playing{background:#8b5cf6;border-color:#8b5cf6}
-.license-btn{background:#8b5cf6;border-color:#8b5cf6}
-.license-btn:hover{background:#7c4ee8}
+.search input:focus{
+border-color:#8b5cf6;
+box-shadow:0 0 0 3px rgba(139,92,246,.12);
+}
 
-.player{margin-top:10px;padding:9px;background:#0e0e15;border:1px solid #292938;border-radius:9px}
-.player audio{width:100%;height:34px}
+.search span{
+position:absolute;
+left:14px;
+top:10px;
+}
 
-.beat-producer{display:block;margin-top:6px;color:#c084fc;font-size:12px}
-.beat-producer:hover{color:#fff}
+.nav{
+display:flex;
+gap:17px;
+font-size:14px;
+align-items:center;
+}
 
-.detail{display:none}
-.detail.active{display:block}
-.directory.hidden{display:none}
+.nav a{
+color:#c5c5d1;
+}
 
-.back{display:inline-block;margin-bottom:18px;color:#c084fc;font-size:14px}
-.back:hover{color:#fff}
+.nav a:hover{
+color:#c084fc;
+}
 
-.profile-head{display:grid;grid-template-columns:180px 1fr;gap:22px;padding:20px;background:#12121b;border:1px solid #292938;border-radius:16px;margin-bottom:24px}
-.profile-image{width:180px;height:180px;object-fit:cover;border-radius:13px;background:#1b1b27}
-.profile-head h1{font-size:25px;margin-bottom:10px}
-.profile-head p{color:#aaaabd;font-size:14px;line-height:1.6}
-.profile-location{margin-bottom:5px}
+.account{
+margin-left:auto;
+display:flex;
+gap:10px;
+}
 
-.profile-info{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
-.profile-pill{padding:7px 10px;background:#181821;border:1px solid #292938;border-radius:8px;color:#aaaabd;font-size:12px}
+.account a{
+padding:8px 13px;
+border:1px solid #343444;
+border-radius:9px;
+}
 
-.empty{padding:25px;text-align:center;color:#9999aa;border:1px dashed #343444;border-radius:12px;grid-column:1/-1}
+.account a:hover{
+border-color:#8b5cf6;
+}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:500}
-.modal.active{display:flex}
-.modal-box{width:min(520px,100%);background:#12121b;border:1px solid #343444;border-radius:16px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.5)}
-.modal-head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:18px}
-.modal-head h2{font-size:20px}
-.close{border:0;background:none;color:#aaa;font-size:25px;cursor:pointer}
-.close:hover{color:#fff}
-.modal-sub{color:#9999aa;font-size:13px;line-height:1.5;margin-bottom:15px}
-.package-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.package{padding:14px;background:#181821;border:1px solid #2b2b39;border-radius:10px;transition:.18s ease}
-.package:hover{border-color:#8b5cf6;background:#1d1d29}
-.package h3{font-size:14px;margin-bottom:5px}
-.package-price{color:#c084fc;font-weight:700;font-size:13px}
-.package-note{color:#888897;font-size:11px;margin-top:5px}
-.package-buy{display:block;width:100%;margin-top:10px;padding:8px 10px;border:0;border-radius:7px;background:#8b5cf6;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
-.package-buy:hover{background:#7c4ee8}
-.modal-footer{margin-top:16px;color:#777788;font-size:11px;line-height:1.5}
+main{
+width:min(1180px,94%);
+margin:0 auto;
+padding:30px 0 50px;
+}
 
-footer{border-top:1px solid #252533;padding:22px;text-align:center;color:#777788;font-size:13px;margin-top:25px}
+/* HERO */
+
+.hero{
+position:relative;
+overflow:hidden;
+background:
+radial-gradient(circle at 85% 20%,rgba(139,92,246,.20),transparent 32%),
+radial-gradient(circle at 15% 100%,rgba(192,132,252,.10),transparent 35%),
+linear-gradient(135deg,#151521,#0e0e16);
+border:1px solid #2a2a3b;
+border-radius:22px;
+padding:36px;
+margin-bottom:34px;
+}
+
+.hero:after{
+content:"";
+position:absolute;
+right:-90px;
+bottom:-110px;
+width:260px;
+height:260px;
+border:1px solid rgba(192,132,252,.12);
+border-radius:50%;
+box-shadow:0 0 0 35px rgba(139,92,246,.025),0 0 0 70px rgba(139,92,246,.02);
+}
+
+.hero-label{
+display:inline-flex;
+align-items:center;
+gap:7px;
+color:#c084fc;
+font-size:11px;
+font-weight:800;
+letter-spacing:1.2px;
+margin-bottom:13px;
+text-transform:uppercase;
+}
+
+.hero h1{
+font-size:clamp(28px,4vw,46px);
+line-height:1.08;
+max-width:720px;
+margin-bottom:13px;
+letter-spacing:-1px;
+}
+
+.hero p{
+color:#aaaabd;
+font-size:15px;
+line-height:1.7;
+max-width:690px;
+}
+
+.hero-search{
+margin-top:24px;
+max-width:600px;
+position:relative;
+}
+
+.hero-search input{
+width:100%;
+padding:14px 18px 14px 45px;
+border-radius:12px;
+border:1px solid #38384a;
+background:#0c0c14;
+color:#fff;
+font-size:14px;
+outline:none;
+}
+
+.hero-search input:focus{
+border-color:#8b5cf6;
+}
+
+.hero-search span{
+position:absolute;
+left:16px;
+top:12px;
+font-size:18px;
+}
+
+.hero-stats{
+display:grid;
+grid-template-columns:repeat(3,minmax(130px,1fr));
+gap:10px;
+margin-top:25px;
+max-width:720px;
+}
+
+.hero-stat{
+padding:14px 16px;
+background:rgba(20,20,30,.85);
+border:1px solid #2c2c3c;
+border-radius:12px;
+}
+
+.hero-stat strong{
+display:block;
+font-size:21px;
+margin-bottom:3px;
+}
+
+.hero-stat span{
+color:#9292a4;
+font-size:11px;
+}
+
+/* SECTION */
+
+.section-title{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:30px 0 15px;
+}
+
+.section-title h2{
+font-size:20px;
+letter-spacing:-.3px;
+}
+
+.section-title span{
+color:#858596;
+font-size:12px;
+}
+
+/* PRODUCERS */
+
+.producer-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+gap:16px;
+}
+
+.producer-card{
+position:relative;
+background:#11111a;
+border:1px solid #292938;
+border-radius:17px;
+overflow:hidden;
+transition:.2s ease;
+}
+
+.producer-card:hover{
+transform:translateY(-4px);
+border-color:#7650d0;
+box-shadow:0 15px 45px rgba(0,0,0,.28);
+}
+
+.producer-image-wrap{
+position:relative;
+height:205px;
+overflow:hidden;
+background:#1a1a26;
+}
+
+.producer-image{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+transition:.3s ease;
+}
+
+.producer-card:hover .producer-image{
+transform:scale(1.04);
+}
+
+.producer-overlay{
+position:absolute;
+inset:0;
+background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.75));
+}
+
+.producer-badge{
+position:absolute;
+left:12px;
+top:12px;
+padding:6px 9px;
+border-radius:8px;
+background:rgba(9,9,15,.78);
+border:1px solid rgba(255,255,255,.12);
+font-size:10px;
+font-weight:800;
+color:#ddd;
+}
+
+.producer-body{
+padding:16px;
+}
+
+.producer-name{
+font-size:19px;
+font-weight:800;
+margin-bottom:7px;
+}
+
+.producer-location{
+color:#9d9dac;
+font-size:12px;
+margin-bottom:12px;
+}
+
+.producer-description{
+color:#878796;
+font-size:12px;
+line-height:1.55;
+min-height:38px;
+}
+
+.producer-bottom{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+margin-top:15px;
+}
+
+.producer-beats{
+color:#c084fc;
+font-size:11px;
+font-weight:700;
+}
+
+.btn{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:9px 13px;
+border-radius:9px;
+background:#8b5cf6;
+color:#fff;
+font-weight:700;
+font-size:12px;
+border:0;
+cursor:pointer;
+}
+
+.btn:hover{
+background:#7c4ee8;
+}
+
+/* BEATS */
+
+.beat-grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(235px,1fr));
+gap:16px;
+}
+
+.beat-card{
+background:#11111a;
+border:1px solid #292938;
+border-radius:16px;
+overflow:hidden;
+transition:.2s ease;
+}
+
+.beat-card:hover{
+transform:translateY(-3px);
+border-color:#7650d0;
+}
+
+.beat-image-wrap{
+position:relative;
+height:205px;
+background:#181824;
+overflow:hidden;
+}
+
+.beat-image{
+width:100%;
+height:100%;
+object-fit:cover;
+display:block;
+}
+
+.beat-cover-gradient{
+position:absolute;
+inset:0;
+background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.7));
+pointer-events:none;
+}
+
+.beat-play-circle{
+position:absolute;
+left:14px;
+bottom:14px;
+width:45px;
+height:45px;
+border-radius:50%;
+border:0;
+background:#8b5cf6;
+color:#fff;
+font-size:17px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+box-shadow:0 8px 25px rgba(0,0,0,.4);
+}
+
+.beat-play-circle:hover{
+background:#7c4ee8;
+transform:scale(1.04);
+}
+
+.beat-tag{
+position:absolute;
+right:12px;
+top:12px;
+padding:6px 8px;
+border-radius:7px;
+background:rgba(8,8,14,.8);
+border:1px solid rgba(255,255,255,.12);
+color:#c084fc;
+font-size:9px;
+font-weight:800;
+letter-spacing:.7px;
+}
+
+.beat-body{
+padding:15px;
+}
+
+.beat-title{
+font-size:17px;
+font-weight:800;
+margin-bottom:5px;
+}
+
+.beat-producer{
+display:block;
+color:#c084fc;
+font-size:12px;
+margin-top:3px;
+}
+
+.beat-producer:hover{
+color:#fff;
+}
+
+.beat-meta{
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+color:#8e8e9e;
+font-size:11px;
+margin-top:10px;
+}
+
+.beat-price-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+margin-top:14px;
+}
+
+.beat-price-label{
+color:#777787;
+font-size:10px;
+}
+
+.beat-price{
+color:#fff;
+font-weight:800;
+font-size:13px;
+}
+
+.beat-price small{
+color:#c084fc;
+font-size:10px;
+font-weight:700;
+display:block;
+margin-bottom:2px;
+}
+
+.player{
+margin-top:12px;
+padding:7px;
+background:#0b0b12;
+border:1px solid #282835;
+border-radius:9px;
+}
+
+.player audio{
+width:100%;
+height:32px;
+}
+
+.beat-actions{
+display:flex;
+gap:8px;
+margin-top:11px;
+}
+
+.play-btn,
+.license-btn{
+flex:1;
+padding:9px 8px;
+border-radius:8px;
+border:1px solid #373746;
+background:#191923;
+color:#fff;
+font-size:11px;
+font-weight:700;
+cursor:pointer;
+}
+
+.play-btn:hover,
+.license-btn:hover{
+border-color:#8b5cf6;
+}
+
+.play-btn.playing{
+background:#8b5cf6;
+border-color:#8b5cf6;
+}
+
+.license-btn{
+background:#8b5cf6;
+border-color:#8b5cf6;
+}
+
+.license-btn:hover{
+background:#7c4ee8;
+}
+
+/* DETAIL */
+
+.detail{
+display:none;
+}
+
+.detail.active{
+display:block;
+}
+
+.directory.hidden{
+display:none;
+}
+
+.back{
+display:inline-flex;
+align-items:center;
+gap:5px;
+margin-bottom:18px;
+color:#c084fc;
+font-size:13px;
+}
+
+.back:hover{
+color:#fff;
+}
+
+.profile-head{
+position:relative;
+overflow:hidden;
+display:grid;
+grid-template-columns:210px 1fr;
+gap:25px;
+padding:24px;
+background:
+radial-gradient(circle at 80% 20%,rgba(139,92,246,.14),transparent 35%),
+#11111a;
+border:1px solid #292938;
+border-radius:20px;
+margin-bottom:27px;
+}
+
+.profile-image{
+width:210px;
+height:210px;
+object-fit:cover;
+border-radius:15px;
+background:#1b1b27;
+}
+
+.profile-head h1{
+font-size:30px;
+margin-bottom:9px;
+}
+
+.profile-head p{
+color:#aaaabd;
+font-size:13px;
+line-height:1.65;
+}
+
+.profile-location{
+margin-bottom:4px;
+}
+
+.profile-info{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+margin-top:17px;
+}
+
+.profile-pill{
+padding:8px 11px;
+background:#181821;
+border:1px solid #2c2c3a;
+border-radius:9px;
+color:#aaaabd;
+font-size:11px;
+}
+
+.empty{
+padding:35px 20px;
+text-align:center;
+color:#858595;
+border:1px dashed #343444;
+border-radius:14px;
+grid-column:1/-1;
+background:#0e0e16;
+}
+
+/* MODAL */
+
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.78);
+backdrop-filter:blur(7px);
+display:none;
+align-items:center;
+justify-content:center;
+padding:18px;
+z-index:500;
+}
+
+.modal.active{
+display:flex;
+}
+
+.modal-box{
+width:min(540px,100%);
+max-height:90vh;
+overflow:auto;
+background:#11111a;
+border:1px solid #373747;
+border-radius:18px;
+padding:21px;
+box-shadow:0 25px 90px rgba(0,0,0,.65);
+}
+
+.modal-head{
+display:flex;
+justify-content:space-between;
+gap:15px;
+align-items:center;
+margin-bottom:17px;
+}
+
+.modal-head h2{
+font-size:20px;
+}
+
+.close{
+border:0;
+background:none;
+color:#aaa;
+font-size:26px;
+cursor:pointer;
+}
+
+.close:hover{
+color:#fff;
+}
+
+.modal-sub{
+color:#9999aa;
+font-size:12px;
+line-height:1.5;
+margin-bottom:15px;
+}
+
+.package-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.package{
+padding:14px;
+background:#181821;
+border:1px solid #2b2b39;
+border-radius:11px;
+transition:.18s ease;
+}
+
+.package:hover{
+border-color:#8b5cf6;
+background:#1c1c27;
+}
+
+.package h3{
+font-size:14px;
+margin-bottom:5px;
+}
+
+.package-price{
+color:#c084fc;
+font-weight:700;
+font-size:13px;
+}
+
+.package-note{
+color:#888897;
+font-size:11px;
+margin-top:5px;
+line-height:1.4;
+}
+
+.package-buy{
+display:block;
+width:100%;
+margin-top:10px;
+padding:9px 10px;
+border:0;
+border-radius:8px;
+background:#8b5cf6;
+color:#fff;
+font-size:11px;
+font-weight:700;
+cursor:pointer;
+}
+
+.package-buy:hover{
+background:#7c4ee8;
+}
+
+.modal-footer{
+margin-top:16px;
+color:#777788;
+font-size:10px;
+line-height:1.5;
+}
+
+footer{
+border-top:1px solid #252533;
+padding:24px 20px;
+text-align:center;
+color:#777788;
+font-size:12px;
+margin-top:25px;
+}
+
+/* TABLET */
 
 @media(max-width:800px){
-.header{padding:11px 14px;gap:12px}
-.nav{width:100%;order:3;overflow-x:auto;padding-bottom:2px}
-.account{margin-left:0}
-main{width:94%;padding-top:22px}
-.hero{padding:20px}
-.hero h1{font-size:24px}
-.producer-grid,.beat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.producer-image,.beat-image{height:135px}
-.card-body{padding:11px}
-.card h3{font-size:15px}
-.profile-head{grid-template-columns:110px 1fr;gap:15px;padding:15px}
-.profile-image{width:110px;height:110px}
-.profile-head h1{font-size:20px}
+
+.header{
+padding:11px 14px;
+gap:12px;
 }
+
+.nav{
+width:100%;
+order:3;
+overflow-x:auto;
+padding-bottom:2px;
+}
+
+.account{
+margin-left:0;
+}
+
+main{
+width:94%;
+padding-top:22px;
+}
+
+.hero{
+padding:26px 21px;
+border-radius:18px;
+}
+
+.hero h1{
+font-size:29px;
+}
+
+.producer-grid{
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:11px;
+}
+
+.beat-grid{
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:11px;
+}
+
+.producer-image-wrap,
+.beat-image-wrap{
+height:160px;
+}
+
+.producer-body,
+.beat-body{
+padding:12px;
+}
+
+.producer-name{
+font-size:16px;
+}
+
+.beat-title{
+font-size:15px;
+}
+
+.profile-head{
+grid-template-columns:130px 1fr;
+gap:17px;
+padding:16px;
+}
+
+.profile-image{
+width:130px;
+height:130px;
+}
+
+.profile-head h1{
+font-size:22px;
+}
+
+}
+
+/* MOBILE */
 
 @media(max-width:480px){
-.search{order:2;max-width:none;flex-basis:100%}
-.nav{order:3}
-.account{position:absolute;right:14px;top:10px}
-.logo{padding-right:75px}
-.hero{margin-bottom:22px}
-.producer-grid,.beat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.producer-image,.beat-image{height:120px}
-.btn{width:100%;text-align:center}
-.profile-head{grid-template-columns:1fr;text-align:left}
-.profile-image{width:140px;height:140px}
-.beat-actions{flex-direction:column}
-.package-grid{grid-template-columns:1fr}
+
+.header{
+padding:11px 14px;
+}
+
+.search{
+order:2;
+max-width:none;
+flex-basis:100%;
+}
+
+.nav{
+order:3;
+}
+
+.account{
+position:absolute;
+right:14px;
+top:10px;
+}
+
+.logo{
+padding-right:75px;
+}
+
+main{
+width:94%;
+}
+
+.hero{
+padding:24px 17px;
+margin-bottom:25px;
+}
+
+.hero h1{
+font-size:27px;
+letter-spacing:-.6px;
+}
+
+.hero p{
+font-size:13px;
+}
+
+.hero-search{
+margin-top:19px;
+}
+
+.hero-stats{
+grid-template-columns:repeat(3,1fr);
+gap:7px;
+}
+
+.hero-stat{
+padding:11px 7px;
+text-align:center;
+}
+
+.hero-stat strong{
+font-size:17px;
+}
+
+.hero-stat span{
+font-size:9px;
+}
+
+.section-title{
+margin:24px 0 12px;
+}
+
+.section-title h2{
+font-size:17px;
+}
+
+.producer-grid,
+.beat-grid{
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:9px;
+}
+
+.producer-image-wrap,
+.beat-image-wrap{
+height:135px;
+}
+
+.producer-badge{
+font-size:8px;
+padding:5px 6px;
+left:7px;
+top:7px;
+}
+
+.beat-tag{
+font-size:7px;
+right:7px;
+top:7px;
+}
+
+.beat-play-circle{
+width:36px;
+height:36px;
+font-size:14px;
+left:8px;
+bottom:8px;
+}
+
+.producer-body,
+.beat-body{
+padding:10px;
+}
+
+.producer-name{
+font-size:14px;
+}
+
+.producer-location{
+font-size:10px;
+margin-bottom:8px;
+}
+
+.producer-description{
+font-size:10px;
+min-height:31px;
+}
+
+.producer-bottom{
+margin-top:10px;
+display:block;
+}
+
+.producer-beats{
+display:block;
+margin-bottom:8px;
+}
+
+.btn{
+width:100%;
+padding:8px 7px;
+font-size:10px;
+}
+
+.beat-title{
+font-size:13px;
+}
+
+.beat-producer{
+font-size:10px;
+}
+
+.beat-meta{
+font-size:9px;
+gap:5px;
+margin-top:7px;
+}
+
+.beat-price-row{
+margin-top:9px;
+display:block;
+}
+
+.beat-price-label{
+font-size:8px;
+}
+
+.beat-price{
+font-size:11px;
+}
+
+.player{
+margin-top:8px;
+padding:5px;
+}
+
+.player audio{
+height:29px;
+}
+
+.beat-actions{
+flex-direction:column;
+gap:5px;
+margin-top:8px;
+}
+
+.play-btn,
+.license-btn{
+padding:8px 5px;
+font-size:9px;
+}
+
+.profile-head{
+grid-template-columns:1fr;
+padding:15px;
+}
+
+.profile-image{
+width:145px;
+height:145px;
+}
+
+.profile-head h1{
+font-size:21px;
+}
+
+.profile-head p{
+font-size:12px;
+}
+
+.package-grid{
+grid-template-columns:1fr;
+}
+
 }
 </style>
+</head>
 
-</head><body><header class="header">
-<a href="/index.html" class="logo">◈ PASONG</a><div class="search">
+<body>
+
+<header class="header">
+
+<a href="/index.html" class="logo">◈ PASONG</a>
+
+<div class="search">
 <span>🔎</span>
 <input id="producerSearch" type="search" placeholder="Search producers...">
-</div><nav class="nav">
+</div>
+
+<nav class="nav">
 <a href="/store.html">Music Store</a>
 <a href="/charts.html">Charts</a>
 <a href="/artists.html">Artists</a>
-</nav><div class="account">
+</nav>
+
+<div class="account">
 <a href="/login.html">Login</a>
 </div>
-</header><main><section class="directory" id="directorySection"><div class="hero">
+
+</header>
+
+<main>
+
+<section class="directory" id="directorySection">
+
+<section class="hero">
+
 <div class="hero-label">🎛️ PASONG PRODUCER STUDIO</div>
-<h1>Discover the producers behind the sound.</h1>
-<p>Explore producers, listen to their beats in full length, and find the sound that fits your next record.</p><div class="hero-stats">
-<div class="hero-stat"><strong id="heroProducerCount">0</strong> Producers</div>
-<div class="hero-stat"><strong id="heroBeatCount">0</strong> Beats</div>
-<div class="hero-stat">🎧 Full-length previews</div>
+
+<h1>Find the producer behind your next sound.</h1>
+
+<p>
+Discover producers on PASONG, explore their sound, stream their beats in full length, and choose the right licence for your next record.
+</p>
+
+<div class="hero-search">
+<span>🔎</span>
+<input id="heroProducerSearch" type="search" placeholder="Search producers by name or location...">
 </div>
-</div><div class="section-title">
+
+<div class="hero-stats">
+
+<div class="hero-stat">
+<strong id="heroProducerCount">0</strong>
+<span>PRODUCERS</span>
+</div>
+
+<div class="hero-stat">
+<strong id="heroBeatCount">0</strong>
+<span>BEATS AVAILABLE</span>
+</div>
+
+<div class="hero-stat">
+<strong>∞</strong>
+<span>FULL-LENGTH STREAMING</span>
+</div>
+
+</div>
+
+</section>
+
+<div class="section-title">
 <h2>Featured Producers</h2>
 <span id="producerStatus"></span>
-</div><div class="producer-grid" id="producerGrid"></div><div class="section-title">
+</div>
+
+<div class="producer-grid" id="producerGrid"></div>
+
+<div class="section-title">
 <h2>Latest Beats</h2>
 <span id="beatStatus"></span>
-</div><div class="beat-grid" id="latestBeatGrid"></div></section><section class="detail" id="detailSection"><a href="/producers.html" class="back">← Back to Producers</a>
+</div>
 
-<div id="profileContainer"></div><div class="section-title">
+<div class="beat-grid" id="latestBeatGrid"></div>
+
+</section>
+
+<section class="detail" id="detailSection">
+
+<a href="/producers.html" class="back">← Back to Producers</a>
+
+<div id="profileContainer"></div>
+
+<div class="section-title">
 <h2>Beats by this Producer</h2>
 <span id="profileBeatStatus"></span>
-</div><div class="beat-grid" id="profileBeatGrid"></div></section></main><footer>© PASONG</footer><div class="modal" id="licenseModal"><div class="modal-box"><div class="modal-head">
+</div>
+
+<div class="beat-grid" id="profileBeatGrid"></div>
+
+</section>
+
+</main>
+
+<footer>© PASONG</footer>
+
+<div class="modal" id="licenseModal">
+
+<div class="modal-box">
+
+<div class="modal-head">
 <h2 id="licenseTitle">Beat Licence</h2>
 <button class="close" id="closeModal" type="button">×</button>
-</div><div class="modal-sub" id="licenseSub"></div><div class="package-grid" id="packageGrid"></div><div class="modal-footer">
+</div>
+
+<div class="modal-sub" id="licenseSub"></div>
+
+<div class="package-grid" id="packageGrid"></div>
+
+<div class="modal-footer">
 Paid licences provide the downloadable files and usage rights attached to the selected package.
-</div></div>
-</div><script>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
@@ -183,533 +1191,733 @@ let allBeats=[];
 let currentAudio=null;
 
 function getName(p){
-  if(!p) return "KV BEATS";
 
-  let n=(p.stage_name||p.display_name||p.performing_name||p.name||"KV BEATS").toString().trim();
+if(!p) return "KV BEATS";
 
-  if(n.toLowerCase().includes("kv beats kv beats")) return "KV BEATS";
+let n=(p.stage_name||p.display_name||p.performing_name||p.name||"KV BEATS").toString().trim();
 
-  n=n.replace(/KV BEATS.*KV BEATS/ig,"KV BEATS").trim();
+if(n.toLowerCase().includes("kv beats kv beats")) return "KV BEATS";
 
-  if(p.id===KV_ID) return "KV BEATS";
+n=n.replace(/KV BEATS.*KV BEATS/ig,"KV BEATS").trim();
 
-  return n.split("\n")[0].trim();
+if(p.id===KV_ID) return "KV BEATS";
+
+return n.split("\n")[0].trim();
+
 }
 
 function getImg(p){
-  let u=p.profile_image_url||p.profile_photo_url||p.photo_url||p.avatar_url||p.image_url||p.profile_picture_url||"";
 
-  u=String(u||"").trim().replace("v1789730166","v1");
+let u=p.profile_image_url||p.profile_photo_url||p.photo_url||p.avatar_url||p.image_url||p.profile_picture_url||"";
 
-  if(!u||u.toLowerCase()==="null") return "";
+u=String(u||"").trim().replace("v1789730166","v1");
 
-  if(u.toUpperCase().includes("PASONG")&&!u.toLowerCase().includes("cloudinary")) return "";
+if(!u||u.toLowerCase()==="null") return "";
 
-  if(u.startsWith("http")) return u;
+if(u.toUpperCase().includes("PASONG")&&!u.toLowerCase().includes("cloudinary")) return "";
 
-  if(u) return SUPABASE_URL+"/storage/v1/object/public/"+u.replace(/^\//,"");
+if(u.startsWith("http")) return u;
 
-  return "";
+if(u) return SUPABASE_URL+"/storage/v1/object/public/"+u.replace(/^\//,"");
+
+return "";
+
 }
 
 function avatar(name){
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name||"KV BEATS")}&background=8b5cf6&color=fff&bold=true&size=500`;
+
+return `https://ui-avatars.com/api/?name=${encodeURIComponent(name||"KV BEATS")}&background=8b5cf6&color=fff&bold=true&size=500`;
+
 }
 
 function escapeHtml(value){
-  return String(value??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+
+return String(value??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
 }
 
 function getBeatTitle(b){
-  let t=(b.title||b.beat_title||"Untitled Beat").toString().trim();
 
-  if(t.toLowerCase().includes("nyange nyange")){
-    t="Nyange";
-  }
+let t=(b.title||b.beat_title||"Untitled Beat").toString().trim();
 
-  return t.split("\n")[0].trim();
+if(t.toLowerCase().includes("nyange nyange")){
+t="Nyange";
+}
+
+return t.split("\n")[0].trim();
+
 }
 
 function getBeatImage(b){
-  return b.cover_url||b.cover_image_url||b.image_url||"";
+
+return b.cover_url||b.cover_image_url||b.image_url||"";
+
 }
 
 function getAudioUrl(b){
-  const keys=[
-    "audio_url",
-    "audio_file_url",
-    "beat_audio_url",
-    "file_url",
-    "audio",
-    "mp3_url",
-    "stream_url",
-    "streaming_url",
-    "preview_url"
-  ];
 
-  for(const key of keys){
-    if(b[key]&&String(b[key]).trim()){
-      return String(b[key]).trim();
-    }
-  }
+const keys=[
+"audio_url",
+"audio_file_url",
+"beat_audio_url",
+"file_url",
+"audio",
+"mp3_url",
+"stream_url",
+"streaming_url",
+"preview_url"
+];
 
-  return "";
+for(const key of keys){
+
+if(b[key]&&String(b[key]).trim()){
+return String(b[key]).trim();
+}
+
+}
+
+return "";
+
 }
 
 function getProducerForBeat(b){
-  const producer=producerProfiles.find(p=>p.id===b.producer_id);
 
-  if(producer){
-    return producer;
-  }
+const producer=producerProfiles.find(p=>p.id===b.producer_id);
 
-  if(b.producer){
-    return b.producer;
-  }
+if(producer){
+return producer;
+}
 
-  return null;
+if(b.producer){
+return b.producer;
+}
+
+return null;
+
 }
 
 function getPrice(b,key,fallback){
-  const value=b[key];
 
-  if(value!==undefined&&value!==null&&value!==""&&!isNaN(Number(value))){
-    return Number(value);
-  }
+const value=b[key];
 
-  return fallback;
+if(value!==undefined&&value!==null&&value!==""&&!isNaN(Number(value))){
+return Number(value);
+}
+
+return fallback;
+
 }
 
 function card(p){
-  const name=getName(p);
-  const img=getImg(p);
-  const src=img||avatar(name);
 
-  return `<div class="card">
-    <img class="producer-image" src="${src}" alt="${escapeHtml(name)}" onerror="this.onerror=null;this.src='${avatar(name)}'">
-    <div class="card-body">
-      <h3>${escapeHtml(name)}</h3>
-      <div class="muted">📍 ${escapeHtml(p.location||p.city||"Kampala")}</div>
-      <div class="muted">🎹 Music Producer</div>
-      <a class="btn" href="/producers.html?id=${encodeURIComponent(p.id)}">View Producer</a>
-    </div>
-  </div>`;
+const name=getName(p);
+const img=getImg(p);
+const src=img||avatar(name);
+
+const beatCount=allBeats.filter(b=>b.producer_id===p.id).length;
+
+return `
+<div class="producer-card">
+
+<div class="producer-image-wrap">
+
+<img
+class="producer-image"
+src="${src}"
+alt="${escapeHtml(name)}"
+onerror="this.onerror=null;this.src='${avatar(name)}'"
+>
+
+<div class="producer-overlay"></div>
+
+<div class="producer-badge">🎛️ PRODUCER</div>
+
+</div>
+
+<div class="producer-body">
+
+<div class="producer-name">${escapeHtml(name)}</div>
+
+<div class="producer-location">
+📍 ${escapeHtml(p.location||p.city||"Kampala")}
+</div>
+
+<div class="producer-description">
+${escapeHtml(p.bio||"Music producer on PASONG creating beats for artists and creators.")}
+</div>
+
+<div class="producer-bottom">
+
+<div class="producer-beats">
+🎧 ${beatCount} ${beatCount===1?"Beat":"Beats"}
+</div>
+
+<a class="btn" href="/producers.html?id=${encodeURIComponent(p.id)}">
+View Producer
+</a>
+
+</div>
+
+</div>
+
+</div>
+`;
+
 }
 
 function beatCard(b){
-  const t=getBeatTitle(b);
-  const img=getBeatImage(b);
-  const src=img||avatar(t);
-  const audio=getAudioUrl(b);
-  const producer=getProducerForBeat(b);
-  const producerName=producer?getName(producer):"PASONG Producer";
 
-  const exclusive=getPrice(b,"exclusive_price",500000);
+const t=getBeatTitle(b);
+const img=getBeatImage(b);
+const src=img||avatar(t);
+const audio=getAudioUrl(b);
+const producer=getProducerForBeat(b);
+const producerName=producer?getName(producer):"PASONG Producer";
 
-  const mp3=b.mp3_price??b.lease_mp3_price??b.basic_price??b.mp3_license_price;
-  const wav=b.wav_price??b.lease_wav_price??b.wav_license_price;
-  const stems=b.stems_price??b.stem_price??b.stems_license_price;
+const exclusive=getPrice(b,"exclusive_price",500000);
 
-  const safeAudio=escapeHtml(audio);
+const mp3=b.mp3_price??b.lease_mp3_price??b.basic_price??b.mp3_license_price;
+const wav=b.wav_price??b.lease_wav_price??b.wav_license_price;
+const stems=b.stems_price??b.stem_price??b.stems_license_price;
 
-  return `<div class="card beat-card">
+const safeAudio=escapeHtml(audio);
 
-    <img class="beat-image" src="${src}" alt="${escapeHtml(t)}" onerror="this.onerror=null;this.src='${avatar(t)}'">
+return `
+<div class="beat-card">
 
-    <div class="card-body">
+<div class="beat-image-wrap">
 
-      <div class="beat-tag">FULL-LENGTH STREAM</div>
+<img
+class="beat-image"
+src="${src}"
+alt="${escapeHtml(t)}"
+onerror="this.onerror=null;this.src='${avatar(t)}'"
+>
 
-      <h3>${escapeHtml(t)}</h3>
+<div class="beat-cover-gradient"></div>
 
-      ${producer ? `<a class="beat-producer" href="/producers.html?id=${encodeURIComponent(producer.id)}">🎛️ ${escapeHtml(producerName)}</a>` : `<div class="beat-producer">🎛️ ${escapeHtml(producerName)}</div>`}
+<div class="beat-tag">FULL-LENGTH STREAM</div>
 
-      <div class="beat-meta">
-        <span>${escapeHtml(b.genre||"Afrobeat")}</span>
-        <span>•</span>
-        <span>${escapeHtml(b.bpm||90)} BPM</span>
-        ${b.key ? `<span>•</span><span>${escapeHtml(b.key)}</span>` : ""}
-      </div>
+${audio ? `
+<button class="beat-play-circle" type="button" onclick="toggleBeat(this)">
+▶
+</button>
+` : ""}
 
-      <div class="beat-price">Exclusive UGX ${exclusive.toLocaleString()}</div>
+</div>
 
-      ${audio ? `
-      <div class="player">
-        <audio class="beat-audio" controls preload="none" src="${safeAudio}"></audio>
-      </div>
-      ` : `
-      <div class="muted" style="margin-top:10px">Audio stream unavailable</div>
-      `}
+<div class="beat-body">
 
-      <div class="beat-actions">
-        ${audio ? `<button class="play-btn" type="button" onclick="toggleBeat(this)">▶ Play</button>` : `<button class="play-btn" type="button" disabled style="opacity:.5;cursor:not-allowed">▶ Play</button>`}
-        <button class="license-btn" type="button" onclick='openLicense(${JSON.stringify(b).replace(/'/g,"&#039;")})'>💿 Licence</button>
-      </div>
+<div class="beat-title">${escapeHtml(t)}</div>
 
-    </div>
-  </div>`;
+${producer
+? `<a class="beat-producer" href="/producers.html?id=${encodeURIComponent(producer.id)}">🎛️ ${escapeHtml(producerName)}</a>`
+: `<div class="beat-producer">🎛️ ${escapeHtml(producerName)}</div>`
+}
+
+<div class="beat-meta">
+<span>${escapeHtml(b.genre||"Afrobeat")}</span>
+<span>•</span>
+<span>${escapeHtml(b.bpm||90)} BPM</span>
+${b.key ? `<span>•</span><span>${escapeHtml(b.key)}</span>` : ""}
+</div>
+
+<div class="beat-price-row">
+
+<div class="beat-price-label">
+EXCLUSIVE
+</div>
+
+<div class="beat-price">
+<small>BUY EXCLUSIVE</small>
+UGX ${exclusive.toLocaleString()}
+</div>
+
+</div>
+
+${audio ? `
+<div class="player">
+<audio class="beat-audio" controls preload="none" src="${safeAudio}"></audio>
+</div>
+` : `
+<div class="muted" style="margin-top:10px">Audio stream unavailable</div>
+`}
+
+<div class="beat-actions">
+
+${audio
+? `<button class="play-btn" type="button" onclick="toggleBeat(this)">▶ Play</button>`
+: `<button class="play-btn" type="button" disabled style="opacity:.5;cursor:not-allowed">▶ Play</button>`
+}
+
+<button class="license-btn" type="button" onclick='openLicense(${JSON.stringify(b).replace(/'/g,"&#039;")})'>
+💿 Licence
+</button>
+
+</div>
+
+</div>
+
+</div>
+`;
+
 }
 
 function toggleBeat(button){
-  const card=button.closest(".beat-card");
-  const audio=card?card.querySelector("audio"):null;
 
-  if(!audio) return;
+const card=button.closest(".beat-card");
+const audio=card?card.querySelector("audio"):null;
 
-  if(currentAudio&&currentAudio!==audio){
-    currentAudio.pause();
+if(!audio) return;
 
-    const oldCard=currentAudio.closest(".beat-card");
+if(currentAudio&&currentAudio!==audio){
 
-    if(oldCard){
-      const oldButton=oldCard.querySelector(".play-btn");
+currentAudio.pause();
 
-      if(oldButton){
-        oldButton.textContent="▶ Play";
-        oldButton.classList.remove("playing");
-      }
-    }
-  }
+const oldCard=currentAudio.closest(".beat-card");
 
-  if(audio.paused){
-    audio.play().catch(()=>{});
-    button.textContent="⏸ Pause";
-    button.classList.add("playing");
-    currentAudio=audio;
-  }else{
-    audio.pause();
-    button.textContent="▶ Play";
-    button.classList.remove("playing");
-  }
+if(oldCard){
 
-  audio.onended=()=>{
-    button.textContent="▶ Play";
-    button.classList.remove("playing");
-  };
+const oldButton=oldCard.querySelector(".play-btn");
+const oldCircle=oldCard.querySelector(".beat-play-circle");
+
+if(oldButton){
+oldButton.textContent="▶ Play";
+oldButton.classList.remove("playing");
+}
+
+if(oldCircle){
+oldCircle.textContent="▶";
+}
+
+}
+
+}
+
+if(audio.paused){
+
+audio.play().catch(()=>{});
+
+button.textContent="⏸ Pause";
+button.classList.add("playing");
+
+const circle=card.querySelector(".beat-play-circle");
+
+if(circle){
+circle.textContent="⏸";
+}
+
+currentAudio=audio;
+
+}else{
+
+audio.pause();
+
+button.textContent="▶ Play";
+button.classList.remove("playing");
+
+const circle=card.querySelector(".beat-play-circle");
+
+if(circle){
+circle.textContent="▶";
+}
+
+}
+
+audio.onended=()=>{
+
+button.textContent="▶ Play";
+button.classList.remove("playing");
+
+const circle=card.querySelector(".beat-play-circle");
+
+if(circle){
+circle.textContent="▶";
+}
+
+};
+
 }
 
 function openLicense(b){
 
-  const title=getBeatTitle(b);
+const title=getBeatTitle(b);
 
-  document.getElementById("licenseTitle").textContent=title+" Licence";
+document.getElementById("licenseTitle").textContent=title+" Licence";
 
-  document.getElementById("licenseSub").textContent=
-    "Choose a licence package for this beat. Package prices shown below use the values stored with the beat.";
+document.getElementById("licenseSub").textContent=
+"Choose a licence package for this beat. Package prices shown below use the values stored with the beat.";
 
-  const grid=document.getElementById("packageGrid");
+const grid=document.getElementById("packageGrid");
 
-  const packages=[];
+const packages=[];
 
-  const mp3=b.mp3_price??b.lease_mp3_price??b.basic_price??b.mp3_license_price;
-  const wav=b.wav_price??b.lease_wav_price??b.wav_license_price;
-  const stems=b.stems_price??b.stem_price??b.stems_license_price;
-  const exclusive=b.exclusive_price;
+const mp3=b.mp3_price??b.lease_mp3_price??b.basic_price??b.mp3_license_price;
+const wav=b.wav_price??b.lease_wav_price??b.wav_license_price;
+const stems=b.stems_price??b.stem_price??b.stems_license_price;
+const exclusive=b.exclusive_price;
 
-  if(mp3!==undefined&&mp3!==null&&mp3!==""){
-    packages.push({
-      name:"MP3 Licence",
-      price:Number(mp3),
-      note:"MP3 downloadable licence"
-    });
-  }
+if(mp3!==undefined&&mp3!==null&&mp3!==""){
 
-  if(wav!==undefined&&wav!==null&&wav!==""){
-    packages.push({
-      name:"WAV Licence",
-      price:Number(wav),
-      note:"WAV downloadable licence"
-    });
-  }
+packages.push({
+name:"MP3 Licence",
+price:Number(mp3),
+note:"MP3 downloadable licence"
+});
 
-  if(stems!==undefined&&stems!==null&&stems!==""){
-    packages.push({
-      name:"Stems Licence",
-      price:Number(stems),
-      note:"Stems downloadable licence"
-    });
-  }
+}
 
-  if(exclusive!==undefined&&exclusive!==null&&exclusive!==""){
-    packages.push({
-      name:"Exclusive",
-      price:Number(exclusive),
-      note:"Exclusive rights package"
-    });
-  }
+if(wav!==undefined&&wav!==null&&wav!==""){
 
-  if(!packages.length){
-    packages.push({
-      name:"Licence",
-      price:0,
-      note:"Package pricing is not currently available on this beat."
-    });
-  }
+packages.push({
+name:"WAV Licence",
+price:Number(wav),
+note:"WAV downloadable licence"
+});
 
-  grid.innerHTML=packages.map(p=>{
+}
 
-    const titleArg=escapeHtml(JSON.stringify(title));
-    const packageArg=escapeHtml(JSON.stringify(p.name));
+if(stems!==undefined&&stems!==null&&stems!==""){
 
-    return `
-      <div class="package">
-        <h3>${escapeHtml(p.name)}</h3>
-        <div class="package-price">
-          ${p.price>0 ? "UGX "+p.price.toLocaleString() : "Contact producer"}
-        </div>
-        <div class="package-note">${escapeHtml(p.note)}</div>
+packages.push({
+name:"Stems Licence",
+price:Number(stems),
+note:"Stems downloadable licence"
+});
 
-        ${p.price>0 ? `
-          <button
-            class="package-buy"
-            type="button"
-            onclick="selectLicense(${titleArg},${packageArg},${p.price})">
-            Buy Licence
-          </button>
-        ` : ""}
-      </div>
-    `;
-  }).join("");
+}
 
-  document.getElementById("licenseModal").classList.add("active");
+if(exclusive!==undefined&&exclusive!==null&&exclusive!==""){
+
+packages.push({
+name:"Exclusive",
+price:Number(exclusive),
+note:"Exclusive rights package"
+});
+
+}
+
+if(!packages.length){
+
+packages.push({
+name:"Licence",
+price:0,
+note:"Package pricing is not currently available on this beat."
+});
+
+}
+
+grid.innerHTML=packages.map(p=>{
+
+const titleArg=escapeHtml(JSON.stringify(title));
+const packageArg=escapeHtml(JSON.stringify(p.name));
+
+return `
+<div class="package">
+
+<h3>${escapeHtml(p.name)}</h3>
+
+<div class="package-price">
+${p.price>0 ? "UGX "+p.price.toLocaleString() : "Contact producer"}
+</div>
+
+<div class="package-note">
+${escapeHtml(p.note)}
+</div>
+
+${p.price>0 ? `
+<button
+class="package-buy"
+type="button"
+onclick="selectLicense(${titleArg},${packageArg},${p.price})">
+Buy Licence
+</button>
+` : ""}
+
+</div>
+`;
+
+}).join("");
+
+document.getElementById("licenseModal").classList.add("active");
+
 }
 
 function selectLicense(beatTitle,packageName,price){
 
-  const selected={
-    beat_title:beatTitle,
-    package:packageName,
-    price:Number(price),
-    selected_at:new Date().toISOString()
-  };
+const selected={
+beat_title:beatTitle,
+package:packageName,
+price:Number(price),
+selected_at:new Date().toISOString()
+};
 
-  localStorage.setItem(
-    "pasong_selected_license",
-    JSON.stringify(selected)
-  );
+localStorage.setItem(
+"pasong_selected_license",
+JSON.stringify(selected)
+);
 
-  window.location.href=
-    "/login.html?return=license&beat="+
-    encodeURIComponent(beatTitle)+
-    "&package="+
-    encodeURIComponent(packageName);
+window.location.href=
+"/login.html?return=license&beat="+
+encodeURIComponent(beatTitle)+
+"&package="+
+encodeURIComponent(packageName);
+
 }
 
 function closeLicense(){
-  document.getElementById("licenseModal").classList.remove("active");
+
+document.getElementById("licenseModal").classList.remove("active");
+
 }
 
 async function load(){
 
-  const grid=document.getElementById("producerGrid");
+const grid=document.getElementById("producerGrid");
 
-  grid.innerHTML=`<div class="empty">Loading producers...</div>`;
+grid.innerHTML=`<div class="empty">Loading producers...</div>`;
 
-  try{
+try{
 
-    const result=await supabaseClient
-      .from("artist_profiles")
-      .select("*");
+const result=await supabaseClient
+.from("artist_profiles")
+.select("*");
 
-    producerProfiles=result.data||[];
+producerProfiles=result.data||[];
 
-    producerProfiles=producerProfiles.map(p=>{
+producerProfiles=producerProfiles.map(p=>{
 
-      if(p.id===KV_ID){
-        p.performing_name="KV BEATS";
-        p.stage_name="KV BEATS";
-      }
+if(p.id===KV_ID){
 
-      return p;
-    });
+p.performing_name="KV BEATS";
+p.stage_name="KV BEATS";
 
-    if(!producerProfiles.length){
-      producerProfiles=[{
-        id:KV_ID,
-        stage_name:"KV BEATS",
-        performing_name:"KV BEATS",
-        location:"Kampala"
-      }];
-    }
+}
 
-  }catch(e){
+return p;
 
-    producerProfiles=[{
-      id:KV_ID,
-      stage_name:"KV BEATS",
-      performing_name:"KV BEATS",
-      location:"Kampala"
-    }];
+});
 
-  }
+if(!producerProfiles.length){
 
-  document.getElementById("producerStatus").textContent=
-    producerProfiles.length+" producers";
+producerProfiles=[{
+id:KV_ID,
+stage_name:"KV BEATS",
+performing_name:"KV BEATS",
+location:"Kampala"
+}];
 
-  document.getElementById("heroProducerCount").textContent=
-    producerProfiles.length;
+}
 
-  grid.innerHTML=producerProfiles.map(card).join("");
+}catch(e){
 
-  try{
+producerProfiles=[{
+id:KV_ID,
+stage_name:"KV BEATS",
+performing_name:"KV BEATS",
+location:"Kampala"
+}];
 
-    const result=await supabaseClient
-      .from("beats")
-      .select("*")
-      .order("created_at",{ascending:false})
-      .limit(20);
+}
 
-    allBeats=result.data||[];
+try{
 
-    document.getElementById("beatStatus").textContent=
-      allBeats.length+" beats";
+const result=await supabaseClient
+.from("beats")
+.select("*")
+.order("created_at",{ascending:false})
+.limit(20);
 
-    document.getElementById("heroBeatCount").textContent=
-      allBeats.length;
+allBeats=result.data||[];
 
-    document.getElementById("latestBeatGrid").innerHTML=
-      allBeats.map(beatCard).join("")||
-      `<div class="empty">No beats</div>`;
+}catch(e){
 
-  }catch(e){
+allBeats=[];
 
-    allBeats=[];
+}
 
-    document.getElementById("beatStatus").textContent="0 beats";
-    document.getElementById("heroBeatCount").textContent="0";
+document.getElementById("producerStatus").textContent=
+producerProfiles.length+" producers";
 
-    document.getElementById("latestBeatGrid").innerHTML=
-      `<div class="empty">No beats available</div>`;
-  }
+document.getElementById("heroProducerCount").textContent=
+producerProfiles.length;
+
+grid.innerHTML=
+producerProfiles.map(card).join("")||
+`<div class="empty">No producers found</div>`;
+
+document.getElementById("beatStatus").textContent=
+allBeats.length+" beats";
+
+document.getElementById("heroBeatCount").textContent=
+allBeats.length;
+
+document.getElementById("latestBeatGrid").innerHTML=
+allBeats.map(beatCard).join("")||
+`<div class="empty">No beats available</div>`;
+
 }
 
 async function loadProducer(id){
 
-  document.getElementById("profileContainer").innerHTML=
-    `<div class="empty">Loading producer...</div>`;
+document.getElementById("profileContainer").innerHTML=
+`<div class="empty">Loading producer...</div>`;
 
-  try{
+try{
 
-    const result=await supabaseClient
-      .from("artist_profiles")
-      .select("*")
-      .eq("id",id)
-      .single();
+const result=await supabaseClient
+.from("artist_profiles")
+.select("*")
+.eq("id",id)
+.single();
 
-    const p=result.data||{
-      id:id,
-      stage_name:"KV BEATS",
-      performing_name:"KV BEATS",
-      location:"Kampala"
-    };
+const p=result.data||{
+id:id,
+stage_name:"KV BEATS",
+performing_name:"KV BEATS",
+location:"Kampala"
+};
 
-    const name=getName(p);
-    const img=getImg(p);
-    const src=img||avatar(name);
+const name=getName(p);
+const img=getImg(p);
+const src=img||avatar(name);
 
-    document.getElementById("profileContainer").innerHTML=`
+const beatResult=await supabaseClient
+.from("beats")
+.select("*")
+.eq("producer_id",id)
+.order("created_at",{ascending:false});
 
-      <div class="profile-head">
+const beats=beatResult.data||[];
 
-        <img
-          class="profile-image"
-          src="${src}"
-          alt="${escapeHtml(name)}"
-          onerror="this.onerror=null;this.src='${avatar(name)}'"
-        >
+document.getElementById("profileContainer").innerHTML=`
 
-        <div>
+<div class="profile-head">
 
-          <h1>🎛️ ${escapeHtml(name)}</h1>
+<img
+class="profile-image"
+src="${src}"
+alt="${escapeHtml(name)}"
+onerror="this.onerror=null;this.src='${avatar(name)}'"
+>
 
-          <p class="profile-location">
-            📍 ${escapeHtml(p.location||p.city||"Kampala")}
-          </p>
+<div>
 
-          <p style="margin-top:10px;color:#aaaabd">
-            ${escapeHtml(p.bio||"Producer on PASONG")}
-          </p>
+<h1>🎛️ ${escapeHtml(name)}</h1>
 
-          <div class="profile-info">
-            <div class="profile-pill">🎹 Music Producer</div>
-            <div class="profile-pill">🎧 Full-length beat streaming</div>
-            <div class="profile-pill">💿 Beat licences</div>
-          </div>
+<p class="profile-location">
+📍 ${escapeHtml(p.location||p.city||"Kampala")}
+</p>
 
-        </div>
+<p style="margin-top:10px;color:#aaaabd">
+${escapeHtml(p.bio||"Producer on PASONG")}
+</p>
 
-      </div>
-    `;
+<div class="profile-info">
 
-    const beatResult=await supabaseClient
-      .from("beats")
-      .select("*")
-      .eq("producer_id",id)
-      .order("created_at",{ascending:false});
+<div class="profile-pill">🎹 Music Producer</div>
 
-    const beats=beatResult.data||[];
+<div class="profile-pill">🎧 ${beats.length} Beats</div>
 
-    document.getElementById("profileBeatStatus").textContent=
-      beats.length+" beats";
+<div class="profile-pill">🎧 Full-length beat streaming</div>
 
-    document.getElementById("profileBeatGrid").innerHTML=
-      beats.map(beatCard).join("")||
-      `<div class="empty">No beats yet</div>`;
+<div class="profile-pill">💿 Beat licences</div>
 
-  }catch(e){
+</div>
 
-    document.getElementById("profileContainer").innerHTML=
-      `<div class="empty">Producer profile could not be loaded.</div>`;
+</div>
 
-    document.getElementById("profileBeatGrid").innerHTML=
-      `<div class="empty">No beats available</div>`;
-  }
+</div>
+`;
+
+document.getElementById("profileBeatStatus").textContent=
+beats.length+" beats";
+
+document.getElementById("profileBeatGrid").innerHTML=
+beats.map(beatCard).join("")||
+`<div class="empty">No beats yet</div>`;
+
+}catch(e){
+
+document.getElementById("profileContainer").innerHTML=
+`<div class="empty">Producer profile could not be loaded.</div>`;
+
+document.getElementById("profileBeatGrid").innerHTML=
+`<div class="empty">No beats available</div>`;
+
+}
+
+}
+
+function filterProducers(q){
+
+q=q.toLowerCase().trim();
+
+const filtered=producerProfiles.filter(p=>
+getName(p).toLowerCase().includes(q)||
+String(p.location||"").toLowerCase().includes(q)||
+String(p.city||"").toLowerCase().includes(q)
+);
+
+document.getElementById("producerGrid").innerHTML=
+filtered.map(card).join("")||
+`<div class="empty">No producers found</div>`;
+
 }
 
 function init(){
 
-  const id=new URLSearchParams(location.search).get("id");
+const id=new URLSearchParams(location.search).get("id");
 
-  if(id){
+if(id){
 
-    document.getElementById("directorySection").classList.add("hidden");
-    document.getElementById("detailSection").classList.add("active");
+document.getElementById("directorySection").classList.add("hidden");
+document.getElementById("detailSection").classList.add("active");
 
-    loadProducer(id);
+loadProducer(id);
 
-  }else{
+}else{
 
-    load();
+load();
 
-  }
+}
+
 }
 
 document.getElementById("producerSearch").addEventListener("input",function(){
 
-  const q=this.value.toLowerCase().trim();
+filterProducers(this.value);
 
-  const filtered=producerProfiles.filter(p=>
-    getName(p).toLowerCase().includes(q)||
-    String(p.location||"").toLowerCase().includes(q)||
-    String(p.city||"").toLowerCase().includes(q)
-  );
+});
 
-  document.getElementById("producerGrid").innerHTML=
-    filtered.map(card).join("")||
-    `<div class="empty">No producers found</div>`;
+document.getElementById("heroProducerSearch").addEventListener("input",function(){
+
+const value=this.value;
+
+document.getElementById("producerSearch").value=value;
+
+filterProducers(value);
+
 });
 
 document.getElementById("closeModal").addEventListener("click",closeLicense);
 
 document.getElementById("licenseModal").addEventListener("click",function(e){
-  if(e.target===this) closeLicense();
+
+if(e.target===this){
+closeLicense();
+}
+
 });
 
 init();
-</script></body>
+
+</script>
+
+</body>
 </html>
