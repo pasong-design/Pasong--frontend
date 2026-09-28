@@ -3,617 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#8b5cf6">
 <title>PASONG — Sign Up</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-
-body{
-font-family:Arial,sans-serif;
-background:
-radial-gradient(circle at 15% 20%,rgba(139,92,246,.14),transparent 30%),
-radial-gradient(circle at 85% 80%,rgba(236,72,153,.09),transparent 28%),
-#09090f;
-color:#fff;
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px;
-overflow:auto
-}
-
-.bg{
-position:fixed;
-inset:0;
-pointer-events:none;
-overflow:hidden
-}
-
-.orb{
-position:absolute;
-border-radius:50%;
-filter:blur(70px);
-opacity:.18
-}
-
-.orb.one{
-width:220px;
-height:220px;
-background:#8b5cf6;
-top:-80px;
-left:-70px
-}
-
-.orb.two{
-width:190px;
-height:190px;
-background:#ec4899;
-right:-70px;
-bottom:-70px
-}
-
-.lines{
-position:absolute;
-inset:0;
-opacity:.035;
-background-image:
-linear-gradient(90deg,#fff 1px,transparent 1px),
-linear-gradient(#fff 1px,transparent 1px);
-background-size:55px 55px
-}
-
-.box{
-position:relative;
-z-index:2;
-width:100%;
-max-width:410px;
-background:rgba(18,18,27,.94);
-border:1px solid #292938;
-border-radius:20px;
-padding:30px;
-box-shadow:
-0 25px 80px rgba(0,0,0,.5),
-0 0 45px rgba(139,92,246,.08);
-backdrop-filter:blur(14px)
-}
-
-.brand{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:9px;
-margin-bottom:20px
-}
-
-.brand-mark{
-width:38px;
-height:38px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:11px;
-background:linear-gradient(135deg,#8b5cf6,#c084fc);
-font-size:19px;
-font-weight:900;
-box-shadow:0 8px 25px rgba(139,92,246,.28)
-}
-
-.brand-name{
-font-size:22px;
-font-weight:900;
-letter-spacing:.5px
-}
-
-.music-bar{
-display:flex;
-align-items:flex-end;
-justify-content:center;
-gap:4px;
-height:32px;
-margin-bottom:20px
-}
-
-.music-bar span{
-width:4px;
-border-radius:4px;
-background:linear-gradient(#c084fc,#8b5cf6);
-animation:pulse 1.1s ease-in-out infinite
-}
-
-.music-bar span:nth-child(1){height:12px;animation-delay:.1s}
-.music-bar span:nth-child(2){height:23px;animation-delay:.25s}
-.music-bar span:nth-child(3){height:31px;animation-delay:.4s}
-.music-bar span:nth-child(4){height:18px;animation-delay:.55s}
-.music-bar span:nth-child(5){height:27px;animation-delay:.7s}
-.music-bar span:nth-child(6){height:14px;animation-delay:.85s}
-.music-bar span:nth-child(7){height:22px;animation-delay:.95s}
-
-@keyframes pulse{
-0%,100%{transform:scaleY(.65);opacity:.55}
-50%{transform:scaleY(1);opacity:1}
-}
-
-.welcome{
-text-align:center;
-margin-bottom:24px
-}
-
-.welcome h1{
-font-size:27px;
-margin-bottom:8px
-}
-
-.welcome p{
-color:#9999aa;
-font-size:13px;
-line-height:1.5
-}
-
-.field{
-margin-bottom:16px
-}
-
-label{
-display:block;
-font-size:12px;
-font-weight:700;
-color:#d8d8e4;
-margin-bottom:7px
-}
-
-.input-wrap{
-position:relative
-}
-
-.input-icon{
-position:absolute;
-left:14px;
-top:50%;
-transform:translateY(-50%);
-font-size:15px;
-opacity:.65;
-pointer-events:none
-}
-
-input{
-width:100%;
-height:48px;
-padding:12px 52px 12px 42px;
-border-radius:11px;
-border:1px solid #303040;
-background:#171720;
-color:#fff;
-outline:none;
-font-size:15px;
-transition:.2s
-}
-
-input:focus{
-border-color:#8b5cf6;
-background:#191922;
-box-shadow:0 0 0 3px rgba(139,92,246,.11)
-}
-
-input::placeholder{
-color:#6f6f80
-}
-
-.toggle{
-position:absolute;
-right:5px;
-top:5px;
-width:38px;
-height:38px;
-padding:0;
-border:0;
-background:transparent;
-color:#9999aa;
-cursor:pointer;
-font-size:16px
-}
-
-.toggle:hover{
-background:transparent;
-color:#c084fc
-}
-
-.signup-btn{
-width:100%;
-height:48px;
-margin-top:3px;
-border:0;
-border-radius:11px;
-background:linear-gradient(135deg,#8b5cf6,#7c4ee8);
-color:#fff;
-font-size:15px;
-font-weight:800;
-cursor:pointer;
-box-shadow:0 8px 25px rgba(139,92,246,.2);
-transition:.2s
-}
-
-.signup-btn:hover{
-transform:translateY(-1px);
-box-shadow:0 10px 30px rgba(139,92,246,.3)
-}
-
-.signup-btn:disabled{
-opacity:.6;
-cursor:not-allowed;
-transform:none
-}
-
-.error,
-.success{
-display:none;
-padding:10px 12px;
-border-radius:9px;
-font-size:13px;
-line-height:1.45;
-margin-bottom:14px
-}
-
-.error{
-color:#ff9a9a;
-background:#1b1218;
-border:1px solid #493344
-}
-
-.success{
-color:#d7b7ff;
-background:#17121f;
-border:1px solid #49366b
-}
-
-.links{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-margin-top:16px;
-font-size:13px
-}
-
-a{
-color:#c084fc;
-text-decoration:none;
-transition:.2s
-}
-
-a:hover{
-color:#ec4899
-}
-
-.login-link{
-text-align:center;
-margin-top:20px;
-padding-top:18px;
-border-top:1px solid #252533;
-font-size:13px;
-color:#9999aa
-}
-
-.login-link a{
-font-weight:700
-}
-
-.status{
-min-height:18px;
-margin-top:11px;
-text-align:center;
-font-size:12px;
-color:#9999aa
-}
-
-.footer{
-text-align:center;
-margin-top:20px;
-color:#666678;
-font-size:11px;
-line-height:1.5
-}
-
-@media(max-width:430px){
-body{
-padding:14px
-}
-
-.box{
-padding:25px 20px;
-border-radius:18px
-}
-
-.welcome h1{
-font-size:24px
-}
-}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.box{width:min(440px,92%);background:#12121b;border:1px solid #282836;border-radius:16px;padding:28px}
+h1{font-size:26px;margin-bottom:6px}.sub{color:#9999aa;font-size:14px;margin-bottom:20px}
+label{font-size:13px;color:#aaaabd;display:block;margin:14px 0 6px}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #303040;background:#171720;color:#fff;outline:none}
+input:focus{border-color:#8b5cf6}
+.btn{width:100%;margin-top:20px;padding:12px;border:none;border-radius:10px;background:#8b5cf6;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+.btn:disabled{opacity:.6}
+.muted{margin-top:14px;text-align:center;color:#9999aa;font-size:13px}
+.muted a{color:#c084fc;text-decoration:none}
+.msg{margin-top:12px;padding:10px;border-radius:8px;font-size:13px;display:none}
+.msg.err{display:block;background:#2a1212;color:#ff8a8a;border:1px solid #5a2222}
+.msg.ok{display:block;background:#122a18;color:#8aff9a;border:1px solid #224a2e}
 </style>
 </head>
-
 <body>
-
-<div class="bg">
-<div class="orb one"></div>
-<div class="orb two"></div>
-<div class="lines"></div>
-</div>
-
 <div class="box">
+<h1>◈ Create Account</h1>
+<p class="sub">Join PASONG as Producer — sell beats</p>
 
-<div class="brand">
-<div class="brand-mark">◈</div>
-<div class="brand-name">PASONG</div>
-</div>
+<label>Stage Name</label>
+<input id="stageName" placeholder="e.g. KV BEATS">
 
-<div class="music-bar">
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-</div>
+<label>Email</label>
+<input id="email" type="email" placeholder="you@email.com">
 
-<div class="welcome">
-<h1>Create your account</h1>
-<p>Join PASONG and start building your music journey.</p>
-</div>
+<label>Password</label>
+<input id="password" type="password" placeholder="Min 6 characters">
 
-<div id="err" class="error"></div>
-<div id="success" class="success"></div>
-
-<form id="signupForm">
-
-<div class="field">
-<label for="stageName">Stage Name</label>
-<div class="input-wrap">
-<span class="input-icon">★</span>
-<input
-id="stageName"
-type="text"
-placeholder="e.g. KV BEATS"
-autocomplete="nickname"
-required
->
-</div>
-</div>
-
-<div class="field">
-<label for="email">Email</label>
-<div class="input-wrap">
-<span class="input-icon">✉</span>
-<input
-id="email"
-type="email"
-placeholder="you@email.com"
-autocomplete="email"
-required
->
-</div>
-</div>
-
-<div class="field">
-<label for="password">Password</label>
-<div class="input-wrap">
-<span class="input-icon">🔒</span>
-<input
-id="password"
-type="password"
-placeholder="Minimum 6 characters"
-autocomplete="new-password"
-required
->
-<button
-type="button"
-class="toggle"
-id="togglePassword"
-aria-label="Show password"
->👁</button>
-</div>
-</div>
-
-<button
-type="submit"
-class="signup-btn"
-id="signupBtn"
->
-Create PASONG Account
-</button>
-
-</form>
-
-<div class="links">
-<a href="/login.html">← Login</a>
-<a href="/index.html">Home</a>
-</div>
-
-<div class="status" id="status"></div>
-
-<div class="login-link">
-Already have a PASONG account?
-<br>
-<a href="/login.html">Login to your account</a>
-</div>
-
-<div class="footer">
-PASONG © 2026 • Music • Artists • Opportunity
-</div>
-
+<button id="signupBtn" class="btn">Sign Up</button>
+<div id="msg" class="msg"></div>
+<p class="muted">Already have account? <a href="/login.html">Login</a></p>
 </div>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const supa=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-const supa=supabase.createClient(
-SUPABASE_URL,
-SUPABASE_ANON_KEY
-);
-
-const form=document.getElementById("signupForm");
-const stageName=document.getElementById("stageName");
-const email=document.getElementById("email");
-const password=document.getElementById("password");
-const signupBtn=document.getElementById("signupBtn");
-const togglePassword=document.getElementById("togglePassword");
-const err=document.getElementById("err");
-const success=document.getElementById("success");
-const status=document.getElementById("status");
-
-function clearMessages(){
-err.style.display="none";
-success.style.display="none";
-err.textContent="";
-success.textContent="";
-status.textContent="";
+function show(t,ok=false){
+  const m=document.getElementById("msg");
+  m.textContent=t; m.className= ok ? "msg ok" : "msg err";
 }
 
-function showError(message){
-success.style.display="none";
-err.textContent=message;
-err.style.display="block";
-}
+document.getElementById("signupBtn").onclick=async()=>{
+  const stage=document.getElementById("stageName").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+  const btn=document.getElementById("signupBtn");
 
-function showSuccess(message){
-err.style.display="none";
-success.textContent=message;
-success.style.display="block";
-}
+  if(!stage||!email||!password){ show("Fill all fields"); return; }
+  if(password.length<6){ show("Password min 6 chars"); return; }
 
-function friendlyError(message){
-const m=String(message||"").toLowerCase();
+  btn.disabled=true; btn.textContent="Creating...";
 
-if(m.includes("user already registered")){
-return"This email is already registered. Please login instead.";
-}
+  // 1. Sign up auth
+  const {data,error}=await supa.auth.signUp({email,password});
+  if(error){ show(error.message); btn.disabled=false; btn.textContent="Sign Up"; return; }
 
-if(m.includes("password should be at least")){
-return"Your password must contain at least 6 characters.";
-}
+  const user=data.user || (await supa.auth.getUser()).data.user;
+  if(!user){ show("Check email to confirm",true); btn.disabled=false; btn.textContent="Sign Up"; return; }
 
-if(m.includes("invalid email")){
-return"Please enter a valid email address.";
-}
+  // 2. Create artist_profiles
+  const {error:profErr}=await supa.from("artist_profiles").insert({
+    id:user.id,
+    stage_name:stage,
+    performing_name:stage,
+    location:"Kampala",
+    bio:"Producer on PASONG"
+  });
 
-if(m.includes("too many requests")){
-return"Too many attempts. Please wait a moment and try again.";
-}
+  if(profErr){ console.log(profErr); /* ignore if exists */ }
 
-return message||"Sign up failed. Please try again.";
-}
-
-togglePassword.addEventListener("click",function(){
-if(password.type==="password"){
-password.type="text";
-togglePassword.textContent="🙈";
-togglePassword.setAttribute("aria-label","Hide password");
-}else{
-password.type="password";
-togglePassword.textContent="👁";
-togglePassword.setAttribute("aria-label","Show password");
-}
-});
-
-form.addEventListener("submit",async function(e){
-e.preventDefault();
-
-clearMessages();
-
-const stage=stageName.value.trim();
-const emailValue=email.value.trim();
-const passwordValue=password.value;
-
-if(!stage){
-showError("Please enter your Stage Name.");
-stageName.focus();
-return;
-}
-
-if(!emailValue){
-showError("Please enter your email.");
-email.focus();
-return;
-}
-
-if(!emailValue.includes("@")){
-showError("Please enter a valid email address.");
-email.focus();
-return;
-}
-
-if(!passwordValue){
-showError("Please enter your password.");
-password.focus();
-return;
-}
-
-if(passwordValue.length<6){
-showError("Password must contain at least 6 characters.");
-password.focus();
-return;
-}
-
-signupBtn.disabled=true;
-signupBtn.textContent="Creating account...";
-status.textContent="Connecting to PASONG...";
-
-const {data,error}=await supa.auth.signUp({
-email:emailValue,
-password:passwordValue
-});
-
-if(error){
-showError(friendlyError(error.message));
-status.textContent="";
-signupBtn.disabled=false;
-signupBtn.textContent="Create PASONG Account";
-return;
-}
-
-const user=data&&data.user;
-
-if(!user){
-showSuccess("Account created. Please check your email to confirm your account.");
-status.textContent="";
-signupBtn.disabled=false;
-signupBtn.textContent="Create PASONG Account";
-return;
-}
-
-const {error:profErr}=await supa
-.from("artist_profiles")
-.insert({
-id:user.id,
-stage_name:stage,
-performing_name:stage,
-location:"Kampala",
-bio:"Producer on PASONG"
-});
-
-if(profErr){
-console.log("Profile creation:",profErr.message);
-}
-
-if(data.session){
-showSuccess("Account created! Opening your Producer Dashboard...");
-status.textContent="Welcome to PASONG.";
-
-setTimeout(function(){
-window.location.href="/producer-dashboard.html";
-},900);
-}else{
-showSuccess("Account created! Please check your email to confirm your account.");
-status.textContent="After confirmation, return to Login.";
-signupBtn.disabled=false;
-signupBtn.textContent="Create PASONG Account";
-}
-});
+  show("Account created! Redirecting...",true);
+  setTimeout(()=>location.href="/producer-dashboard.html",1200);
+};
 </script>
-
 </body>
 </html>
