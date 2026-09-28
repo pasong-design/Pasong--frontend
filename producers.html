@@ -57,6 +57,9 @@ main{width:min(1200px,94%);margin:0 auto;padding:28px 0 50px}
 .panel p{color:#b5b5c5;line-height:1.65}
 .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .contact-box{padding:14px;background:#181821;border:1px solid #2b2b39;border-radius:10px}
+.debug{margin-top:30px;background:#0e0e16;border:1px solid #3a3a50;border-radius:14px;padding:20px}
+.debug h2{margin-bottom:12px;color:#c084fc}
+.debug pre{white-space:pre-wrap;word-break:break-word;color:#ddd;font-size:12px;line-height:1.5;background:#08080d;padding:15px;border-radius:10px;overflow:auto}
 .empty{padding:25px;text-align:center;color:#9999aa;border:1px dashed #343444;border-radius:12px}
 footer{border-top:1px solid #252533;padding:25px 20px;text-align:center;color:#777788;font-size:13px;margin-top:30px}
 @media(max-width:700px){
@@ -92,7 +95,10 @@ footer{border-top:1px solid #252533;padding:25px 20px;text-align:center;color:#7
 </div><div class="producer-grid" id="producerGrid"></div><div class="section-title">
 <h2>Latest Beats</h2>
 <span class="status" id="beatStatus">Loading beats...</span>
-</div><div class="beat-grid" id="latestBeatGrid"></div></section><section class="detail" id="detailSection"><a href="/producers.html" class="back">← Back to Producers</a>
+</div><div class="beat-grid" id="latestBeatGrid"></div><div class="debug">
+<h2>Image Debug</h2>
+<pre id="imageDebug">Loading image data...</pre>
+</div></section><section class="detail" id="detailSection"><a href="/producers.html" class="back">← Back to Producers</a>
 
 <div id="profileContainer"></div><div class="section-title">
 <h2>🎵 Beats by this Producer</h2>
@@ -116,12 +122,7 @@ footer{border-top:1px solid #252533;padding:25px 20px;text-align:center;color:#7
 </div><div class="contact-box">
 <strong>💼 Availability</strong>
 <p class="muted" id="contactAvailability">—</p>
-</div></div></div><div class="panel">
-<h2>Reviews</h2>
-<p>4.9 ⭐ · 23 reviews</p>
-</div><div class="panel">
-<h2>Similar Producers</h2>
-<p>More producers will appear here.</p>
+</div></div>
 </div></section></main><footer>
 © PASONG — Music Marketplace
 </footer><script>
@@ -153,9 +154,7 @@ return String(value??"")
 }
 
 function getCanonicalProducerId(p){
-
 return p?.id||null;
-
 }
 
 function getProducerName(p){
@@ -168,193 +167,35 @@ p?.name||
 
 }
 
-function extractImage(value){
-
-if(!value) return null;
-
-if(typeof value==="string"){
-
-const v=value.trim();
-
-if(v) return v;
-
-return null;
-
-}
-
-if(typeof value==="object"){
-
-return value.url||
-value.secure_url||
-value.public_url||
-value.href||
-value.path||
-null;
-
-}
-
-return null;
-
-}
-
 function getProducerImage(p){
 
-return extractImage(
-p?.profile_image_url
-)||
-extractImage(
-p?.profile_image
-)||
-extractImage(
-p?.avatar_url
-)||
-extractImage(
-p?.image_url
-)||
-extractImage(
-p?.photo_url
-)||
-extractImage(
-p?.profile_photo_url
-)||
-extractImage(
-p?.image
-)||
+return p?.profile_image_url||
+p?.profile_image||
+p?.avatar_url||
+p?.image_url||
+p?.photo_url||
+p?.profile_photo_url||
+p?.image||
 null;
 
 }
 
 function getBeatImage(beat){
 
-return extractImage(
-beat?.cover_url
-)||
-extractImage(
-beat?.cover_image_url
-)||
-extractImage(
-beat?.cover_image
-)||
-extractImage(
-beat?.cover
-)||
-extractImage(
-beat?.cover_photo_url
-)||
-extractImage(
-beat?.cover_art_url
-)||
-extractImage(
-beat?.artwork_url
-)||
-extractImage(
-beat?.artwork
-)||
-extractImage(
-beat?.thumbnail_url
-)||
-extractImage(
-beat?.thumbnail
-)||
-extractImage(
-beat?.image_url
-)||
-extractImage(
-beat?.image
-)||
-extractImage(
-beat?.cover_path
-)||
+return beat?.cover_url||
+beat?.cover_image_url||
+beat?.cover_image||
+beat?.cover||
+beat?.cover_photo_url||
+beat?.cover_art_url||
+beat?.artwork_url||
+beat?.artwork||
+beat?.thumbnail_url||
+beat?.thumbnail||
+beat?.image_url||
+beat?.image||
+beat?.cover_path||
 null;
-
-}
-
-function producerFallbackImage(){
-
-return "data:image/svg+xml;charset=UTF-8,"+
-encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg"
-width="600"
-height="600"
-viewBox="0 0 600 600">
-
-<rect width="600" height="600" fill="#171720"/>
-
-<circle
-cx="300"
-cy="230"
-r="95"
-fill="#8b5cf6"/>
-
-<circle
-cx="300"
-cy="210"
-r="48"
-fill="#ffffff"/>
-
-<path
-d="M175 430c20-95 75-140 125-140s105 45 125 140"
-fill="#ffffff"/>
-
-<text
-x="300"
-y="525"
-text-anchor="middle"
-fill="#c084fc"
-font-family="Arial"
-font-size="38"
-font-weight="700">
-PASONG
-</text>
-
-</svg>
-`);
-
-}
-
-function beatFallbackImage(){
-
-return "data:image/svg+xml;charset=UTF-8,"+
-encodeURIComponent(`
-<svg xmlns="http://www.w3.org/2000/svg"
-width="800"
-height="500"
-viewBox="0 0 800 500">
-
-<rect width="800" height="500" fill="#171720"/>
-
-<circle
-cx="400"
-cy="245"
-r="115"
-fill="#8b5cf6"
-opacity=".9"/>
-
-<circle
-cx="400"
-cy="245"
-r="48"
-fill="#09090f"/>
-
-<path
-d="M400 130v115l115-55"
-fill="none"
-stroke="#c084fc"
-stroke-width="12"/>
-
-<text
-x="400"
-y="430"
-text-anchor="middle"
-fill="#ffffff"
-font-family="Arial"
-font-size="42"
-font-weight="700">
-PASONG
-</text>
-
-</svg>
-`);
 
 }
 
@@ -366,6 +207,21 @@ p?.city||
 
 }
 
+function fallbackImage(){
+
+return "data:image/svg+xml;charset=UTF-8,"+
+encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+<rect width="100%" height="100%" fill="#171720"/>
+<circle cx="300" cy="250" r="100" fill="#8b5cf6"/>
+<text x="300" y="430" text-anchor="middle"
+fill="#ffffff" font-family="Arial" font-size="42"
+font-weight="700">PASONG</text>
+</svg>
+`);
+
+}
+
 function producerCard(p){
 
 const id=getCanonicalProducerId(p);
@@ -374,7 +230,7 @@ const name=getProducerName(p);
 
 const image=
 getProducerImage(p)||
-producerFallbackImage();
+fallbackImage();
 
 return `
 
@@ -384,7 +240,7 @@ return `
 class="producer-image"
 src="${escapeHtml(image)}"
 alt="${escapeHtml(name)}"
-onerror="this.onerror=null;this.src=producerFallbackImage()"
+onerror="this.onerror=null;this.src=fallbackImage()"
 >
 
 <div class="card-body">
@@ -427,10 +283,7 @@ if(data?.session){
 nav.innerHTML=`
 
 <span>🔔 0</span>
-
-<a href="/account.html">
-Account
-</a>
+<a href="/account.html">Account</a>
 
 `;
 
@@ -459,11 +312,7 @@ if(error){
 status.textContent="Unable to load producers.";
 
 grid.innerHTML=`
-
-<div class="empty">
-Could not load producers.
-</div>
-
+<div class="empty">Could not load producers.</div>
 `;
 
 return;
@@ -471,17 +320,11 @@ return;
 }
 
 const producerIds=[
-
 ...new Set(
-
 (beats||[])
-
 .map(b=>String(b.producer_id))
-
 .filter(Boolean)
-
 )
-
 ];
 
 if(!producerIds.length){
@@ -491,11 +334,7 @@ producerProfiles=[];
 status.textContent="0 producers";
 
 grid.innerHTML=`
-
-<div class="empty">
-No producers found.
-</div>
-
+<div class="empty">No producers found.</div>
 `;
 
 return;
@@ -507,41 +346,25 @@ producerProfiles=producerIds.map(id=>{
 if(id===KV_BEATS_PROFILE_ID){
 
 return {
-
 id:KV_BEATS_PROFILE_ID,
-
 performing_name:"KV BEATS",
-
 stage_name:"KV BEATS",
-
 display_name:"KV BEATS",
-
 name:"KV BEATS",
-
 location:"Kampala",
-
 city:"Kampala"
-
 };
 
 }
 
 return {
-
 id:id,
-
 performing_name:"PASONG PRODUCER",
-
 stage_name:"PASONG PRODUCER",
-
 display_name:"PASONG PRODUCER",
-
 name:"PASONG PRODUCER",
-
 location:"Kampala",
-
 city:"Kampala"
-
 };
 
 });
@@ -563,63 +386,20 @@ beat?.title||
 beat?.beat_title||
 "Untitled Beat";
 
-const genre=
-beat?.genre||
-"Beat";
-
-const bpm=
-beat?.bpm||
-"—";
-
-const key=
-beat?.key||
-"—";
-
 const image=
 getBeatImage(beat)||
-beatFallbackImage();
+fallbackImage();
 
-const mp3=
-beat?.mp3_price??
-beat?.price_mp3??
-null;
+const genre=beat?.genre||"Beat";
 
-const wav=
-beat?.wav_price??
-beat?.price_wav??
-null;
+const bpm=beat?.bpm||"—";
 
-const stems=
-beat?.stems_price??
-beat?.price_stems??
-null;
+const key=beat?.key||"—";
 
 const exclusive=
 beat?.exclusive_price??
 beat?.price_exclusive??
 null;
-
-let prices=[];
-
-if(mp3!==null)
-prices.push(
-`MP3 UGX ${Number(mp3).toLocaleString()}`
-);
-
-if(wav!==null)
-prices.push(
-`WAV UGX ${Number(wav).toLocaleString()}`
-);
-
-if(stems!==null)
-prices.push(
-`Stems UGX ${Number(stems).toLocaleString()}`
-);
-
-if(exclusive!==null)
-prices.push(
-`Exclusive UGX ${Number(exclusive).toLocaleString()}`
-);
 
 return `
 
@@ -629,14 +409,12 @@ return `
 class="beat-image"
 src="${escapeHtml(image)}"
 alt="${escapeHtml(title)}"
-onerror="this.onerror=null;this.src=beatFallbackImage()"
+onerror="this.onerror=null;this.src=fallbackImage()"
 >
 
 <div class="beat-card-body">
 
-<h3>
-${escapeHtml(title)}
-</h3>
+<h3>${escapeHtml(title)}</h3>
 
 <div class="muted">
 ${escapeHtml(genre)}
@@ -647,13 +425,17 @@ ${escapeHtml(genre)}
 <span>${escapeHtml(key)}</span>
 </div>
 
+<div class="price">
+
 ${
-prices.length
+exclusive!==null
 ?
-`<div class="price">${prices.join(" · ")}</div>`
+`Exclusive UGX ${Number(exclusive).toLocaleString()}`
 :
-`<div class="price">Licence available</div>`
+"Licence available"
 }
+
+</div>
 
 </div>
 
@@ -696,16 +478,19 @@ await supabaseClient
 
 if(error){
 
-status.textContent=
-"Unable to load beats.";
+status.textContent="Unable to load beats.";
 
 grid.innerHTML=`
-
 <div class="empty">
 Could not load latest beats.
 </div>
-
 `;
+
+document.getElementById(
+"imageDebug"
+).textContent=
+"BEATS QUERY ERROR:\n\n"+
+JSON.stringify(error,null,2);
 
 return;
 
@@ -718,12 +503,15 @@ if(!latestBeats.length){
 status.textContent="0 beats";
 
 grid.innerHTML=`
-
 <div class="empty">
 No beats uploaded yet.
 </div>
-
 `;
+
+document.getElementById(
+"imageDebug"
+).textContent=
+"No beats were returned.";
 
 return;
 
@@ -745,7 +533,7 @@ beat?.beat_title||
 
 const image=
 getBeatImage(beat)||
-beatFallbackImage();
+fallbackImage();
 
 return `
 
@@ -755,7 +543,7 @@ return `
 class="beat-image"
 src="${escapeHtml(image)}"
 alt="${escapeHtml(title)}"
-onerror="this.onerror=null;this.src=beatFallbackImage()"
+onerror="this.onerror=null;this.src=fallbackImage()"
 >
 
 <div class="beat-card-body">
@@ -777,41 +565,29 @@ ${escapeHtml(beat?.key||"—")}
 
 ${
 beat?.exclusive_price!=null
-
 ?
-
 `Exclusive UGX ${Number(
 beat.exclusive_price
 ).toLocaleString()}`
-
 :
-
 "Licence available"
-
 }
 
 </div>
 
 ${
 producerRef
-
 ?
-
 `
-
 <a
 class="btn"
 href="/producers.html?id=${encodeURIComponent(producerRef)}"
 >
 View Producer
 </a>
-
 `
-
 :
-
 ""
-
 }
 
 </div>
@@ -821,6 +597,15 @@ View Producer
 `;
 
 }).join("");
+
+document.getElementById(
+"imageDebug"
+).textContent=
+JSON.stringify(
+latestBeats,
+null,
+2
+);
 
 }
 
@@ -859,11 +644,9 @@ beat?.genre||
 if(!filtered.length){
 
 grid.innerHTML=`
-
 <div class="empty">
 No matching beats found.
 </div>
-
 `;
 
 return;
@@ -871,94 +654,7 @@ return;
 }
 
 grid.innerHTML=
-filtered.map(beat=>{
-
-const producerRef=
-getBeatProducerId(beat);
-
-const title=
-beat?.title||
-beat?.beat_title||
-"Untitled Beat";
-
-const image=
-getBeatImage(beat)||
-beatFallbackImage();
-
-return `
-
-<div class="card beat-card">
-
-<img
-class="beat-image"
-src="${escapeHtml(image)}"
-alt="${escapeHtml(title)}"
-onerror="this.onerror=null;this.src=beatFallbackImage()"
->
-
-<div class="beat-card-body">
-
-<h3>
-${escapeHtml(title)}
-</h3>
-
-<div class="muted">
-${escapeHtml(beat?.genre||"Beat")}
-·
-${escapeHtml(beat?.bpm||"—")}
-BPM
-·
-${escapeHtml(beat?.key||"—")}
-</div>
-
-<div class="price">
-
-${
-beat?.exclusive_price!=null
-
-?
-
-`Exclusive UGX ${Number(
-beat.exclusive_price
-).toLocaleString()}`
-
-:
-
-"Licence available"
-
-}
-
-</div>
-
-${
-producerRef
-
-?
-
-`
-
-<a
-class="btn"
-href="/producers.html?id=${encodeURIComponent(producerRef)}"
->
-View Producer
-</a>
-
-`
-
-:
-
-""
-
-}
-
-</div>
-
-</div>
-
-`;
-
-}).join("");
+filtered.map(beatCard).join("");
 
 }
 
@@ -970,9 +666,7 @@ window.location.search
 ).get("id");
 
 if(!requestedId){
-
 return null;
-
 }
 
 const {data,error}=
@@ -986,20 +680,23 @@ await supabaseClient
 
 .limit(1);
 
-if(
-!error&&
-data&&
-data.length
-){
+if(!error&&data&&data.length){
+
+document.getElementById(
+"imageDebug"
+).textContent+=
+"\n\nARTIST PROFILE:\n\n"+
+JSON.stringify(
+data[0],
+null,
+2
+);
 
 return data[0];
 
 }
 
-if(
-requestedId===
-KV_BEATS_PROFILE_ID
-){
+if(requestedId===KV_BEATS_PROFILE_ID){
 
 return {
 
@@ -1015,10 +712,7 @@ name:"KV BEATS",
 
 location:"Kampala",
 
-city:"Kampala",
-
-bio:
-"KV BEATS is a music producer on PASONG."
+city:"Kampala"
 
 };
 
@@ -1038,7 +732,7 @@ getLocation(profile);
 
 const image=
 getProducerImage(profile)||
-producerFallbackImage();
+fallbackImage();
 
 const bio=
 profile?.bio||
@@ -1065,7 +759,7 @@ document.getElementById(
 class="profile-image"
 src="${escapeHtml(image)}"
 alt="${escapeHtml(name)}"
-onerror="this.onerror=null;this.src=producerFallbackImage()"
+onerror="this.onerror=null;this.src=fallbackImage()"
 >
 
 <div class="profile-info">
@@ -1133,7 +827,6 @@ document.getElementById(
 document.getElementById(
 "contactWhatsapp"
 ).textContent=
-
 profile?.whatsapp||
 profile?.whatsapp_number||
 profile?.mobile||
@@ -1142,7 +835,6 @@ profile?.mobile||
 document.getElementById(
 "contactAvailability"
 ).textContent=
-
 profile?.availability||
 "Available for bookings";
 
@@ -1158,17 +850,14 @@ if(!profile){
 document.getElementById(
 "profileContainer"
 ).innerHTML=`
-
 <div class="empty">
 Producer profile not found.
 </div>
-
 `;
 
 document.getElementById(
 "profileBeatStatus"
-).textContent=
-"0 beats";
+).textContent="0 beats";
 
 return;
 
@@ -1214,11 +903,9 @@ status.textContent=
 "Unable to load beats.";
 
 grid.innerHTML=`
-
 <div class="empty">
 Could not load this producer's beats.
 </div>
-
 `;
 
 return;
@@ -1233,11 +920,9 @@ status.textContent=
 if(!beats.length){
 
 grid.innerHTML=`
-
 <div class="empty">
 This producer has no beats uploaded yet.
 </div>
-
 `;
 
 return;
@@ -1347,21 +1032,13 @@ document.getElementById(
 ).innerHTML=
 
 filtered.length
-
 ?
-
-filtered
-.map(producerCard)
-.join("")
-
+filtered.map(producerCard).join("")
 :
-
 `
-
 <div class="empty">
 No producers found.
 </div>
-
 `;
 
 }
