@@ -112,8 +112,6 @@ margin:0 auto;
 padding:30px 0 50px;
 }
 
-/* HERO */
-
 .hero{
 position:relative;
 overflow:hidden;
@@ -220,8 +218,6 @@ color:#9292a4;
 font-size:11px;
 }
 
-/* SECTION */
-
 .section-title{
 display:flex;
 justify-content:space-between;
@@ -238,8 +234,6 @@ letter-spacing:-.3px;
 color:#858596;
 font-size:12px;
 }
-
-/* PRODUCERS */
 
 .producer-grid{
 display:grid;
@@ -354,8 +348,6 @@ cursor:pointer;
 .btn:hover{
 background:#7c4ee8;
 }
-
-/* BEATS */
 
 .beat-grid{
 display:grid;
@@ -542,8 +534,6 @@ border-color:#8b5cf6;
 background:#7c4ee8;
 }
 
-/* DETAIL */
-
 .detail{
 display:none;
 }
@@ -632,8 +622,6 @@ border-radius:14px;
 grid-column:1/-1;
 background:#0e0e16;
 }
-
-/* MODAL */
 
 .modal{
 position:fixed;
@@ -764,8 +752,6 @@ font-size:12px;
 margin-top:25px;
 }
 
-/* TABLET */
-
 @media(max-width:800px){
 
 .header{
@@ -842,8 +828,6 @@ font-size:22px;
 }
 
 }
-
-/* MOBILE */
 
 @media(max-width:480px){
 
@@ -1287,7 +1271,7 @@ return "";
 
 function getProducerForBeat(b){
 
-const producer=producerProfiles.find(p=>p.id===b.producer_id);
+const producer=producerProfiles.find(p=>String(p.id)===String(b.producer_id));
 
 if(producer){
 return producer;
@@ -1319,7 +1303,7 @@ const name=getName(p);
 const img=getImg(p);
 const src=img||avatar(name);
 
-const beatCount=allBeats.filter(b=>b.producer_id===p.id).length;
+const beatCount=allBeats.filter(b=>String(b.producer_id)===String(p.id)).length;
 
 return `
 <div class="producer-card">
@@ -1614,6 +1598,7 @@ note:"Package pricing is not currently available on this beat."
 
 grid.innerHTML=packages.map(p=>{
 
+const beatId=escapeHtml(String(b.id||""));
 const titleArg=escapeHtml(JSON.stringify(title));
 const packageArg=escapeHtml(JSON.stringify(p.name));
 
@@ -1634,7 +1619,7 @@ ${p.price>0 ? `
 <button
 class="package-buy"
 type="button"
-onclick="selectLicense(${titleArg},${packageArg},${p.price})">
+onclick="selectLicense('${beatId}',${titleArg},${packageArg},${p.price})">
 Buy Licence
 </button>
 ` : ""}
@@ -1648,9 +1633,10 @@ document.getElementById("licenseModal").classList.add("active");
 
 }
 
-function selectLicense(beatTitle,packageName,price){
+function selectLicense(beatId,beatTitle,packageName,price){
 
 const selected={
+beat_id:beatId,
 beat_title:beatTitle,
 package:packageName,
 price:Number(price),
@@ -1664,7 +1650,7 @@ JSON.stringify(selected)
 
 window.location.href=
 "/login.html?return=license&beat="+
-encodeURIComponent(beatTitle)+
+encodeURIComponent(beatId)+
 "&package="+
 encodeURIComponent(packageName);
 
@@ -1782,6 +1768,8 @@ stage_name:"KV BEATS",
 performing_name:"KV BEATS",
 location:"Kampala"
 };
+
+producerProfiles=[p];
 
 const name=getName(p);
 const img=getImg(p);
