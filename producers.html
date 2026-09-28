@@ -204,6 +204,8 @@ SUPABASE_URL,
 SUPABASE_ANON_KEY
 );
 
+const KV_BEATS_PROFILE_ID="119e7b2d-4115-44e9-ba0f-e47d4a3fa332";
+
 let producerProfiles=[];
 let latestBeats=[];
 let selectedProducer=null;
@@ -268,6 +270,7 @@ View Producer
 </a>
 
 </div>
+
 </div>
 `;
 
@@ -297,15 +300,14 @@ nav.innerHTML=`
 async function loadProducerDirectory(){
 
 const grid=document.getElementById("producerGrid");
-
 const status=document.getElementById("producerStatus");
 
-const {data:beats,error:beatsError}=await supabaseClient
+const {data:beats,error}=await supabaseClient
 .from("beats")
 .select("producer_id")
 .not("producer_id","is",null);
 
-if(beatsError){
+if(error){
 
 status.textContent="Unable to load producers.";
 
@@ -322,7 +324,7 @@ return;
 const producerIds=[
 ...new Set(
 (beats||[])
-.map(b=>b.producer_id)
+.map(b=>String(b.producer_id))
 .filter(Boolean)
 )
 ];
@@ -343,40 +345,34 @@ return;
 
 }
 
-const {data:profiles,error:profilesError}=await supabaseClient
-.from("artist_profiles")
-.select("*")
-.in("id",producerIds);
+producerProfiles=producerIds.map(id=>{
 
-if(profilesError){
+if(id===KV_BEATS_PROFILE_ID){
 
-status.textContent="Unable to load producers.";
-
-grid.innerHTML=`
-<div class="empty">
-Could not load producer profiles.
-</div>
-`;
-
-return;
+return {
+id:KV_BEATS_PROFILE_ID,
+performing_name:"KV BEATS",
+stage_name:"KV BEATS",
+display_name:"KV BEATS",
+name:"KV BEATS",
+location:"Kampala",
+city:"Kampala",
+profile_image_url:"https://via.placeholder.com/500x500?text=KV+BEATS"
+};
 
 }
 
-producerProfiles=profiles||[];
+return {
+id:id,
+performing_name:"PASONG PRODUCER",
+stage_name:"PASONG PRODUCER",
+display_name:"PASONG PRODUCER",
+name:"PASONG PRODUCER",
+location:"Kampala",
+city:"Kampala"
+};
 
-if(!producerProfiles.length){
-
-status.textContent="0 producers";
-
-grid.innerHTML=`
-<div class="empty">
-No producers found.
-</div>
-`;
-
-return;
-
-}
+});
 
 status.textContent=
 `${producerProfiles.length} producers`;
@@ -480,7 +476,6 @@ null;
 async function loadLatestBeats(){
 
 const grid=document.getElementById("latestBeatGrid");
-
 const status=document.getElementById("beatStatus");
 
 const {data,error}=await supabaseClient
@@ -681,34 +676,34 @@ window.location.search
 ).get("id");
 
 if(!requestedId){
-
 return null;
-
-}
-
-const local=
-producerProfiles.find(
-p=>
-String(
-getCanonicalProducerId(p)
-)===String(requestedId)
-);
-
-if(local){
-
-return local;
-
 }
 
 const {data,error}=await supabaseClient
 .from("artist_profiles")
 .select("*")
 .eq("id",requestedId)
-.maybeSingle();
+.limit(1);
 
-if(!error&&data){
+if(!error&&data&&data.length){
 
-return data;
+return data[0];
+
+}
+
+if(requestedId===KV_BEATS_PROFILE_ID){
+
+return {
+id:KV_BEATS_PROFILE_ID,
+performing_name:"KV BEATS",
+stage_name:"KV BEATS",
+display_name:"KV BEATS",
+name:"KV BEATS",
+location:"Kampala",
+city:"Kampala",
+profile_image_url:"https://via.placeholder.com/500x500?text=KV+BEATS",
+bio:"KV BEATS is a music producer on PASONG."
+};
 
 }
 
@@ -719,7 +714,6 @@ return null;
 function renderProfile(profile){
 
 const name=getProducerName(profile);
-
 const location=getLocation(profile);
 
 const bio=
@@ -789,6 +783,7 @@ Producer
 </div>
 
 </div>
+
 </div>
 `;
 
