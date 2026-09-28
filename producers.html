@@ -47,4 +47,57 @@ main{width:min(1200px,94%);margin:0 auto;padding:28px 0 50px}
 .detail.active{display:block}
 .directory.hidden{display:none}
 .back{display:inline-block;margin-bottom:18px;color:#c084fc;font-size:14px}
-.profile-head{display:grid;grid-template-columns:220px 1fr;gap:25px;padding:22px;background:#12121b;border:1px solid #292938;border-radius
+.profile-head{display:grid;grid-template-columns:220px 1fr;gap:25px;padding:22px;background:#12121b;border:1px solid #292938;border-radius:16px;margin-bottom:24px}
+.profile-image{width:220px;height:220px;object-fit:cover;border-radius:14px;background:#1b1b27;display:block}
+.profile-info h1{font-size:32px;margin-bottom:8px}
+.profile-info .location{color:#aaaabd;margin-bottom:16px}
+.stats{display:flex;gap:25px;flex-wrap:wrap;margin-top:18px}
+.stat strong{display:block;font-size:20px;margin-bottom:3px}
+.stat span{color:#9999aa;font-size:12px}
+.panel{background:#12121b;border:1px solid #292938;border-radius:14px;padding:20px;margin-top:20px}
+.panel h2{font-size:19px;margin-bottom:12px}
+.panel p{color:#b5b5c5;line-height:1.65}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.contact-box{padding:14px;background:#181821;border:1px solid #2b2b39;border-radius:10px}
+.empty{padding:25px;text-align:center;color:#9999aa;border:1px dashed #343444;border-radius:12px}
+footer{border-top:1px solid #252533;padding:25px 20px;text-align:center;color:#777788;font-size:13px;margin-top:30px}
+@media(max-width:700px){.header{padding:12px}.nav{width:100%;overflow-x:auto;white-space:nowrap}.account{margin-left:0}.profile-head{grid-template-columns:1fr}.profile-image{width:160px;height:160px}.profile-info h1{font-size:26px}}
+</style>
+</head>
+<body>
+<header class="header">
+<a href="/index.html" class="logo">◈ PASONG</a>
+<div class="search"><span>🔎</span><input id="producerSearch" type="search" placeholder="Search producers..."></div>
+<nav class="nav"><a href="/store.html">Music Store</a><a href="/charts.html">Charts</a><a href="/artists.html">Artists</a><a href="/playlists.html">Playlists</a><a href="/promotion.html">Promotion</a><a href="/upload.html">Upload Music</a></nav>
+<div class="account" id="accountNav"><span>🔔 0</span><a href="/login.html">Login</a><a href="/signup.html">Sign Up</a></div>
+</header>
+<main>
+<section class="directory" id="directorySection">
+<div class="hero"><h1>🎛️ Discover Producers</h1><p>Choose a producer to view their profile and beats.</p></div>
+<div class="section-title"><h2>Producers</h2><span class="status" id="producerStatus">Loading producers...</span></div>
+<div class="producer-grid" id="producerGrid"></div>
+<div class="section-title"><h2>Latest Beats</h2><span class="status" id="beatStatus">Loading beats...</span></div>
+<div class="beat-grid" id="latestBeatGrid"></div>
+</section>
+<section class="detail" id="detailSection">
+<a href="/producers.html" class="back">← Back to Producers</a>
+<div id="profileContainer"></div>
+<div class="section-title"><h2>🎵 Beats by this Producer</h2><span class="status" id="profileBeatStatus">Loading beats...</span></div>
+<div class="beat-grid" id="profileBeatGrid"></div>
+<div class="panel"><h2>About</h2><p id="aboutText">Producer profile information.</p></div>
+<div class="panel"><h2>Studio Setup</h2><p id="studioText">Studio setup information coming soon.</p></div>
+<div class="panel"><h2>Services</h2><p id="servicesText">Producer services and booking information coming soon.</p></div>
+<div class="panel"><h2>Contact & Booking</h2><div class="contact-grid"><div class="contact-box"><strong>📍 Location</strong><p class="muted" id="contactLocation">—</p></div><div class="contact-box"><strong>📱 WhatsApp</strong><p class="muted" id="contactWhatsapp">—</p></div><div class="contact-box"><strong>💼 Availability</strong><p class="muted" id="contactAvailability">—</p></div></div></div>
+</section>
+</main>
+<footer>© PASONG — Music Marketplace</footer>
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const KV_BEATS_PROFILE_ID="119e7b2d-4115-44e9-ba0f-e47d4a3fa332";
+let producerProfiles=[];
+
+function escapeHtml(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function getProducerName(p){return p?.performing_name||p?.stage_name||p?.display_name||p?.name||"Producer";}
+function getLocation(p){return p?.location||p?.city||"K
