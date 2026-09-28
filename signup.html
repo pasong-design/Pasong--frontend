@@ -3,85 +3,739 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#8b5cf6">
 <title>PASONG — Sign Up</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.box{width:min(440px,92%);background:#12121b;border:1px solid #282836;border-radius:16px;padding:28px}
-h1{font-size:26px;margin-bottom:6px}.sub{color:#9999aa;font-size:14px;margin-bottom:20px}
-label{font-size:13px;color:#aaaabd;display:block;margin:14px 0 6px}
-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #303040;background:#171720;color:#fff;outline:none}
-input:focus{border-color:#8b5cf6}
-.btn{width:100%;margin-top:20px;padding:12px;border:none;border-radius:10px;background:#8b5cf6;color:#fff;font-weight:800;font-size:15px;cursor:pointer}
-.btn:disabled{opacity:.6}
-.muted{margin-top:14px;text-align:center;color:#9999aa;font-size:13px}
-.muted a{color:#c084fc;text-decoration:none}
-.msg{margin-top:12px;padding:10px;border-radius:8px;font-size:13px;display:none}
-.msg.err{display:block;background:#2a1212;color:#ff8a8a;border:1px solid #5a2222}
-.msg.ok{display:block;background:#122a18;color:#8aff9a;border:1px solid #224a2e}
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+font-family:Arial,sans-serif;
+background:#08080e;
+color:#fff;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+overflow:auto
+}
+
+.bg{
+position:fixed;
+inset:0;
+overflow:hidden;
+pointer-events:none
+}
+
+.grid{
+position:absolute;
+inset:0;
+background-image:
+linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+background-size:48px 48px
+}
+
+.glow{
+position:absolute;
+border-radius:50%;
+filter:blur(80px);
+opacity:.2
+}
+
+.glow.one{
+width:260px;
+height:260px;
+background:#8b5cf6;
+top:-100px;
+left:-100px
+}
+
+.glow.two{
+width:240px;
+height:240px;
+background:#ec4899;
+right:-100px;
+bottom:-100px
+}
+
+.glow.three{
+width:160px;
+height:160px;
+background:#c084fc;
+top:45%;
+left:50%;
+transform:translate(-50%,-50%);
+opacity:.06
+}
+
+.box{
+position:relative;
+z-index:2;
+width:100%;
+max-width:430px;
+background:rgba(15,15,24,.94);
+border:1px solid #2b2b3b;
+border-radius:24px;
+padding:30px;
+box-shadow:
+0 30px 90px rgba(0,0,0,.6),
+0 0 60px rgba(139,92,246,.08);
+backdrop-filter:blur(18px)
+}
+
+.top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:25px
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:9px
+}
+
+.brand-mark{
+width:38px;
+height:38px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:12px;
+background:linear-gradient(135deg,#8b5cf6,#c084fc);
+font-size:19px;
+font-weight:900;
+box-shadow:0 8px 25px rgba(139,92,246,.3)
+}
+
+.brand-name{
+font-size:21px;
+font-weight:900;
+letter-spacing:.5px
+}
+
+.login-top{
+font-size:12px;
+color:#9999aa;
+text-decoration:none
+}
+
+.login-top span{
+color:#c084fc;
+font-weight:700
+}
+
+.hero{
+margin-bottom:24px
+}
+
+.hero-tag{
+display:inline-flex;
+align-items:center;
+gap:7px;
+padding:6px 10px;
+border:1px solid #342b4d;
+background:#171321;
+border-radius:999px;
+color:#c084fc;
+font-size:11px;
+font-weight:700;
+margin-bottom:13px
+}
+
+.dot{
+width:6px;
+height:6px;
+border-radius:50%;
+background:#c084fc;
+box-shadow:0 0 10px #c084fc
+}
+
+.hero h1{
+font-size:30px;
+line-height:1.1;
+margin-bottom:9px;
+letter-spacing:-.5px
+}
+
+.hero p{
+color:#9999aa;
+font-size:13px;
+line-height:1.55
+}
+
+.visual{
+height:62px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:5px;
+margin:0 0 22px;
+padding:10px 0
+}
+
+.visual span{
+width:5px;
+border-radius:8px;
+background:linear-gradient(180deg,#c084fc,#8b5cf6);
+animation:wave 1.2s ease-in-out infinite
+}
+
+.visual span:nth-child(1){height:18px;animation-delay:.05s}
+.visual span:nth-child(2){height:31px;animation-delay:.12s}
+.visual span:nth-child(3){height:44px;animation-delay:.19s}
+.visual span:nth-child(4){height:26px;animation-delay:.26s}
+.visual span:nth-child(5){height:50px;animation-delay:.33s}
+.visual span:nth-child(6){height:34px;animation-delay:.40s}
+.visual span:nth-child(7){height:46px;animation-delay:.47s}
+.visual span:nth-child(8){height:24px;animation-delay:.54s}
+.visual span:nth-child(9){height:39px;animation-delay:.61s}
+.visual span:nth-child(10){height:18px;animation-delay:.68s}
+.visual span:nth-child(11){height:29px;animation-delay:.75s}
+
+@keyframes wave{
+0%,100%{transform:scaleY(.55);opacity:.45}
+50%{transform:scaleY(1);opacity:1}
+}
+
+.form-card{
+background:#11111a;
+border:1px solid #252535;
+border-radius:17px;
+padding:18px
+}
+
+.field{
+margin-bottom:15px
+}
+
+label{
+display:block;
+font-size:12px;
+font-weight:700;
+color:#d8d8e4;
+margin-bottom:7px
+}
+
+.input-wrap{
+position:relative
+}
+
+.input-icon{
+position:absolute;
+left:14px;
+top:50%;
+transform:translateY(-50%);
+font-size:14px;
+opacity:.6;
+pointer-events:none
+}
+
+input{
+width:100%;
+height:48px;
+padding:12px 50px 12px 41px;
+border-radius:11px;
+border:1px solid #303040;
+background:#181821;
+color:#fff;
+outline:none;
+font-size:14px;
+transition:.2s
+}
+
+input:focus{
+border-color:#8b5cf6;
+box-shadow:0 0 0 3px rgba(139,92,246,.1);
+background:#1a1a24
+}
+
+input::placeholder{
+color:#686878
+}
+
+.toggle{
+position:absolute;
+right:5px;
+top:5px;
+width:38px;
+height:38px;
+border:0;
+border-radius:9px;
+background:transparent;
+color:#9999aa;
+cursor:pointer;
+font-size:16px
+}
+
+.toggle:hover{
+color:#c084fc;
+background:#22212d
+}
+
+.signup-btn{
+width:100%;
+height:49px;
+margin-top:5px;
+border:0;
+border-radius:11px;
+background:linear-gradient(135deg,#8b5cf6,#7c4ee8);
+color:#fff;
+font-size:14px;
+font-weight:800;
+cursor:pointer;
+box-shadow:0 10px 28px rgba(139,92,246,.2);
+transition:.2s
+}
+
+.signup-btn:hover{
+transform:translateY(-1px);
+box-shadow:0 13px 32px rgba(139,92,246,.3)
+}
+
+.signup-btn:disabled{
+opacity:.6;
+cursor:not-allowed;
+transform:none
+}
+
+.error,
+.success{
+display:none;
+padding:10px 12px;
+border-radius:10px;
+font-size:12px;
+line-height:1.45;
+margin-bottom:13px
+}
+
+.error{
+color:#ff9a9a;
+background:#1c1218;
+border:1px solid #4b303d
+}
+
+.success{
+color:#d7b7ff;
+background:#17121f;
+border:1px solid #49366b
+}
+
+.status{
+min-height:17px;
+margin-top:10px;
+text-align:center;
+font-size:11px;
+color:#9999aa
+}
+
+.links{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:16px;
+font-size:12px
+}
+
+.links a{
+color:#aaaabd;
+text-decoration:none
+}
+
+.links a:hover{
+color:#c084fc
+}
+
+.login-box{
+margin-top:20px;
+padding-top:18px;
+border-top:1px solid #252533;
+text-align:center;
+font-size:12px;
+color:#777789
+}
+
+.login-box a{
+color:#c084fc;
+font-weight:700;
+text-decoration:none
+}
+
+.footer{
+text-align:center;
+margin-top:20px;
+font-size:10px;
+color:#5f5f70
+}
+
+@media(max-width:450px){
+body{
+padding:12px
+}
+
+.box{
+padding:23px 17px;
+border-radius:20px
+}
+
+.hero h1{
+font-size:26px
+}
+
+.form-card{
+padding:15px
+}
+
+.top{
+margin-bottom:21px
+}
+}
 </style>
 </head>
+
 <body>
+
+<div class="bg">
+<div class="grid"></div>
+<div class="glow one"></div>
+<div class="glow two"></div>
+<div class="glow three"></div>
+</div>
+
 <div class="box">
-<h1>◈ Create Account</h1>
-<p class="sub">Join PASONG as Producer — sell beats</p>
 
-<label>Stage Name</label>
-<input id="stageName" placeholder="e.g. KV BEATS">
+<div class="top">
 
-<label>Email</label>
-<input id="email" type="email" placeholder="you@email.com">
+<div class="brand">
+<div class="brand-mark">◈</div>
+<div class="brand-name">PASONG</div>
+</div>
 
-<label>Password</label>
-<input id="password" type="password" placeholder="Min 6 characters">
+<a class="login-top" href="/login.html">
+Already a member? <span>Login</span>
+</a>
 
-<button id="signupBtn" class="btn">Sign Up</button>
-<div id="msg" class="msg"></div>
-<p class="muted">Already have account? <a href="/login.html">Login</a></p>
+</div>
+
+<div class="hero">
+
+<div class="hero-tag">
+<span class="dot"></span>
+PASONG CREATOR
+</div>
+
+<h1>Your sound starts here.</h1>
+
+<p>
+Create your PASONG account and step into a platform built for music, creators and opportunity.
+</p>
+
+</div>
+
+<div class="visual">
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+</div>
+
+<div class="form-card">
+
+<div id="err" class="error"></div>
+<div id="success" class="success"></div>
+
+<form id="signupForm">
+
+<div class="field">
+<label for="stageName">Stage Name</label>
+
+<div class="input-wrap">
+<span class="input-icon">★</span>
+
+<input
+id="stageName"
+type="text"
+placeholder="e.g. KV BEATS"
+autocomplete="nickname"
+required
+>
+</div>
+</div>
+
+<div class="field">
+<label for="email">Email Address</label>
+
+<div class="input-wrap">
+<span class="input-icon">✉</span>
+
+<input
+id="email"
+type="email"
+placeholder="you@email.com"
+autocomplete="email"
+required
+>
+</div>
+</div>
+
+<div class="field">
+<label for="password">Password</label>
+
+<div class="input-wrap">
+<span class="input-icon">🔒</span>
+
+<input
+id="password"
+type="password"
+placeholder="Minimum 6 characters"
+autocomplete="new-password"
+required
+>
+
+<button
+type="button"
+class="toggle"
+id="togglePassword"
+aria-label="Show password"
+>👁</button>
+
+</div>
+</div>
+
+<button
+type="submit"
+class="signup-btn"
+id="signupBtn"
+>
+Create My PASONG Account
+</button>
+
+</form>
+
+<div class="status" id="status"></div>
+
+</div>
+
+<div class="links">
+<a href="/login.html">← Back to Login</a>
+<a href="/index.html">Home</a>
+</div>
+
+<div class="login-box">
+Already have a PASONG account?
+<br>
+<a href="/login.html">Sign in to your account</a>
+</div>
+
+<div class="footer">
+PASONG © 2026 • Music • Artists • Opportunity
+</div>
+
 </div>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const supa=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-function show(t,ok=false){
-  const m=document.getElementById("msg");
-  m.textContent=t; m.className= ok ? "msg ok" : "msg err";
+const supa=supabase.createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+);
+
+const form=document.getElementById("signupForm");
+const stageName=document.getElementById("stageName");
+const email=document.getElementById("email");
+const password=document.getElementById("password");
+const signupBtn=document.getElementById("signupBtn");
+const togglePassword=document.getElementById("togglePassword");
+const err=document.getElementById("err");
+const success=document.getElementById("success");
+const status=document.getElementById("status");
+
+function clearMessages(){
+err.style.display="none";
+success.style.display="none";
+err.textContent="";
+success.textContent="";
+status.textContent="";
 }
 
-document.getElementById("signupBtn").onclick=async()=>{
-  const stage=document.getElementById("stageName").value.trim();
-  const email=document.getElementById("email").value.trim();
-  const password=document.getElementById("password").value;
-  const btn=document.getElementById("signupBtn");
+function showError(message){
+success.style.display="none";
+err.textContent=message;
+err.style.display="block";
+}
 
-  if(!stage||!email||!password){ show("Fill all fields"); return; }
-  if(password.length<6){ show("Password min 6 chars"); return; }
+function showSuccess(message){
+err.style.display="none";
+success.textContent=message;
+success.style.display="block";
+}
 
-  btn.disabled=true; btn.textContent="Creating...";
+function friendlyError(message){
+const m=String(message||"").toLowerCase();
 
-  // 1. Sign up auth
-  const {data,error}=await supa.auth.signUp({email,password});
-  if(error){ show(error.message); btn.disabled=false; btn.textContent="Sign Up"; return; }
+if(m.includes("user already registered")){
+return"This email is already registered. Please login instead.";
+}
 
-  const user=data.user || (await supa.auth.getUser()).data.user;
-  if(!user){ show("Check email to confirm",true); btn.disabled=false; btn.textContent="Sign Up"; return; }
+if(m.includes("password should be at least")){
+return"Your password must contain at least 6 characters.";
+}
 
-  // 2. Create artist_profiles
-  const {error:profErr}=await supa.from("artist_profiles").insert({
-    id:user.id,
-    stage_name:stage,
-    performing_name:stage,
-    location:"Kampala",
-    bio:"Producer on PASONG"
-  });
+if(m.includes("invalid email")){
+return"Please enter a valid email address.";
+}
 
-  if(profErr){ console.log(profErr); /* ignore if exists */ }
+if(m.includes("too many requests")){
+return"Too many attempts. Please wait a moment and try again.";
+}
 
-  show("Account created! Redirecting...",true);
-  setTimeout(()=>location.href="/producer-dashboard.html",1200);
-};
+return message||"Sign up failed. Please try again.";
+}
+
+togglePassword.addEventListener("click",function(){
+
+if(password.type==="password"){
+password.type="text";
+togglePassword.textContent="🙈";
+togglePassword.setAttribute("aria-label","Hide password");
+}else{
+password.type="password";
+togglePassword.textContent="👁";
+togglePassword.setAttribute("aria-label","Show password");
+}
+
+});
+
+form.addEventListener("submit",async function(e){
+
+e.preventDefault();
+
+clearMessages();
+
+const stage=stageName.value.trim();
+const emailValue=email.value.trim();
+const passwordValue=password.value;
+
+if(!stage){
+showError("Please enter your Stage Name.");
+stageName.focus();
+return;
+}
+
+if(!emailValue){
+showError("Please enter your email.");
+email.focus();
+return;
+}
+
+if(!emailValue.includes("@")){
+showError("Please enter a valid email address.");
+email.focus();
+return;
+}
+
+if(!passwordValue){
+showError("Please enter your password.");
+password.focus();
+return;
+}
+
+if(passwordValue.length<6){
+showError("Password must contain at least 6 characters.");
+password.focus();
+return;
+}
+
+signupBtn.disabled=true;
+signupBtn.textContent="Creating your account...";
+status.textContent="Connecting to PASONG...";
+
+const {data,error}=await supa.auth.signUp({
+email:emailValue,
+password:passwordValue
+});
+
+if(error){
+
+showError(friendlyError(error.message));
+
+status.textContent="";
+signupBtn.disabled=false;
+signupBtn.textContent="Create My PASONG Account";
+
+return;
+}
+
+const user=data&&data.user;
+
+if(!user){
+
+showSuccess(
+"Account created. Please check your email to confirm your account."
+);
+
+status.textContent="";
+signupBtn.disabled=false;
+signupBtn.textContent="Create My PASONG Account";
+
+return;
+}
+
+const {error:profErr}=await supa
+.from("artist_profiles")
+.insert({
+id:user.id,
+stage_name:stage,
+performing_name:stage,
+location:"Kampala",
+bio:"Producer on PASONG"
+});
+
+if(profErr){
+console.log("Profile creation:",profErr.message);
+}
+
+if(data.session){
+
+showSuccess(
+"Account created! Opening your Producer Dashboard..."
+);
+
+status.textContent="Welcome to PASONG.";
+
+setTimeout(function(){
+window.location.href="/producer-dashboard.html";
+},900);
+
+}else{
+
+showSuccess(
+"Account created! Please check your email to confirm your account."
+);
+
+status.textContent="After confirmation, return to Login.";
+
+signupBtn.disabled=false;
+signupBtn.textContent="Create My PASONG Account";
+
+}
+
+});
 </script>
+
 </body>
 </html>
