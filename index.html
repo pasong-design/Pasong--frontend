@@ -194,11 +194,15 @@ main{
   margin-bottom:18px
 }
 
-.slide-content h1 img{
-  height:42px;
-  width:auto;
-  vertical-align:middle;
-  margin:0 3px
+.hero-wave{
+  display:inline-block;
+  color:#c084fc;
+  font-size:.62em;
+  line-height:1;
+  margin:0 5px;
+  transform:translateY(-4px);
+  letter-spacing:-4px;
+  font-weight:900
 }
 
 .slide-content h2{
@@ -542,6 +546,21 @@ main{
   color:#9999a8;
   line-height:1.6;
   max-width:700px
+}
+
+.btn-yellow{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:#8b5cf6;
+  color:#fff;
+  padding:12px 18px;
+  border-radius:9px;
+  font-weight:800
+}
+
+.btn-yellow:hover{
+  background:#7c3aed
 }
 
 footer{
@@ -896,12 +915,13 @@ footer{
       id="heroSlide"
       style="background-image:url('assets/hero-king-saha.jpg')"
     >
+
       <div class="slide-overlay"></div>
 
       <div class="slide-content">
 
         <h1>
-          PAS<img src="icons/soundwave.png" alt="">NG
+          PAS<span class="hero-wave">〰</span>NG
         </h1>
 
         <h2>
@@ -1555,6 +1575,8 @@ let currentSongs = [];
 
 let currentPlayingSong = null;
 
+let artistMap = {};
+
 let audioPlayer =
   document.getElementById(
     "audioPlayer"
@@ -1585,7 +1607,54 @@ function escapeHtml(value){
     .replace(/'/g,"&#039;");
 }
 
+async function loadArtistMap(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("artist_profiles")
+      .select(
+        "id,user_id,performing_name,stage_name,profile_image_url"
+      );
+
+  if(error){
+
+    console.error(
+      "Artist map loading error:",
+      error
+    );
+
+    artistMap = {};
+
+    return;
+  }
+
+  artistMap = {};
+
+  (data || []).forEach(
+    artist => {
+
+      artistMap[artist.id] =
+        artist;
+
+      if(artist.user_id){
+        artistMap[artist.user_id] =
+          artist;
+      }
+
+    }
+  );
+}
+
 function getSongArtist(song){
+
+  const profile =
+    artistMap[song.artist_id] ||
+    artistMap[song.artist_profile_id] ||
+    artistMap[song.artist_user_id] ||
+    null;
 
   return (
     song.performing_name ||
@@ -1593,6 +1662,8 @@ function getSongArtist(song){
     song.artist_name ||
     song.artist_profiles?.performing_name ||
     song.artist_profiles?.stage_name ||
+    profile?.performing_name ||
+    profile?.stage_name ||
     "Unknown Artist"
   );
 }
@@ -1865,10 +1936,12 @@ function updateHero(){
       function(item,index){
 
         return `
+
           <span
             class="${index === heroIndex ? "active" : ""}"
             data-index="${index}"
           ></span>
+
         `;
 
       }
@@ -2600,11 +2673,13 @@ async function loadAccount(){
     accountBox.innerHTML = `
 
       <span class="account-letter">
+
         ${escapeHtml(
           name
             .charAt(0)
             .toUpperCase()
         )}
+
       </span>
 
     `;
@@ -2617,6 +2692,8 @@ async function init(){
   setupSearch();
 
   await loadAccount();
+
+  await loadArtistMap();
 
   await loadPasongSongs();
 
