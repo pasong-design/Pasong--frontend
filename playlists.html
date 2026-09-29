@@ -1,16 +1,9 @@
 <!doctype html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>PASONG — Playlists</title>
-
-<link rel="stylesheet" href="assets/style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>PASONG — Playlists</title><link rel="stylesheet" href="assets/style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 *{
   box-sizing:border-box;
 }
@@ -170,14 +163,9 @@ main{
   border-radius:14px;
   overflow:hidden;
   background:
-    radial-gradient(circle at 30% 30%,rgba(168,85,247,.5),transparent 40%),
+    radial-gradient(circle at 25% 25%,rgba(168,85,247,.55),transparent 35%),
+    radial-gradient(circle at 75% 70%,rgba(236,72,153,.45),transparent 38%),
     linear-gradient(135deg,#151522,#28132d);
-}
-
-.cover img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
 }
 
 .placeholder{
@@ -186,7 +174,27 @@ main{
   display:flex;
   align-items:center;
   justify-content:center;
+  flex-direction:column;
+  gap:7px;
   font-size:48px;
+}
+
+.placeholder span{
+  font-size:11px;
+  color:#aaa;
+  letter-spacing:1px;
+}
+
+.visibility{
+  position:absolute;
+  top:9px;
+  right:9px;
+  padding:5px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,.6);
+  border:1px solid rgba(255,255,255,.1);
+  font-size:10px;
+  color:#ddd;
 }
 
 .playlist-card h3{
@@ -201,6 +209,17 @@ main{
   color:#888;
   font-size:13px;
   margin:0;
+  line-height:1.45;
+  min-height:38px;
+}
+
+.playlist-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:10px;
+  color:#666;
+  font-size:11px;
 }
 
 .card-actions{
@@ -292,6 +311,12 @@ main{
 
 .song-buttons button:first-child{
   background:linear-gradient(135deg,#7c3aed,#db2777);
+}
+
+.song-stats{
+  color:#666;
+  font-size:11px;
+  margin-top:8px;
 }
 
 .empty{
@@ -387,6 +412,38 @@ main{
   border:1px solid rgba(255,255,255,.1) !important;
 }
 
+.song-select{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px;
+  margin-bottom:8px;
+  border-radius:11px;
+  background:#191925;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.song-select-info{
+  flex:1;
+  min-width:0;
+}
+
+.song-select-title{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.song-select-artist{
+  color:#888;
+  font-size:11px;
+  margin-top:3px;
+}
+
+.song-select button{
+  flex-shrink:0;
+}
+
 footer{
   border-top:1px solid rgba(255,255,255,.07);
   padding:25px 20px;
@@ -447,14 +504,7 @@ footer{
     align-items:flex-start;
   }
 }
-</style>
-</head>
-
-<body>
-
-<header>
-
-  <a class="logo" href="index.html">◈ PASONG</a>
+</style></head><body><header><a class="logo" href="index.html">◈ PASONG</a>
 
   <nav>
     <a href="index.html">Home</a>
@@ -464,322 +514,217 @@ footer{
     <a href="playlists.html" class="active">Playlists</a>
     <a href="promotion.html">Promotion</a>
     <a href="account.html">Account</a>
-  </nav>
+  </nav></header><main>  <section class="hero"><h1>🎧 PASONG Playlists</h1>
 
-</header>
+<p>
+  Discover music, create your own playlists and organize
+  the songs you love on PASONG.
+</p>
 
+<div class="status" id="loginStatus">
+  ● Checking account...
+</div>
 
-<main>
+<div class="hero-actions">
 
-  <section class="hero">
+  <button class="btn" onclick="openCreatePlaylist()">
+    ＋ Create Playlist
+  </button>
 
-    <h1>🎧 PASONG Playlists</h1>
+  <button class="btn secondary" onclick="scrollToMyPlaylists()">
+    🎵 My Playlists
+  </button>
 
-    <p>
-      Discover music, create your own playlists and organize
-      the songs you love on PASONG.
-    </p>
+</div>
 
-    <div class="status" id="loginStatus">
-      ● Checking account...
-    </div>
+  </section>  <section class="section" id="myPlaylistsSection"><div class="section-head">
 
-    <div class="hero-actions">
+  <div>
+    <h2>💜 My Playlists</h2>
+    <p>Your personal PASONG playlists.</p>
+  </div>
 
-      <button class="btn" onclick="openCreatePlaylist()">
-        ＋ Create Playlist
-      </button>
+  <button
+    class="btn secondary"
+    onclick="loadMyPlaylists()">
+    ↻ Refresh
+  </button>
 
-      <button class="btn secondary" onclick="scrollToMyPlaylists()">
-        🎵 My Playlists
-      </button>
+</div>
 
-    </div>
+<div id="myPlaylists" class="playlist-grid">
 
-  </section>
+  <div class="loading">
+    Checking your playlists...
+  </div>
 
+</div>
 
-  <!-- MY PLAYLISTS -->
+  </section>  <section class="section"><div class="section-head">
 
-  <section class="section" id="myPlaylistsSection">
+  <div>
+    <h2>🔥 Trending Music</h2>
+    <p>Popular songs on PASONG.</p>
+  </div>
 
-    <div class="section-head">
+</div>
 
-      <div>
-        <h2>💜 My Playlists</h2>
-        <p>Your personal PASONG playlists.</p>
-      </div>
+<div id="trendingSongs" class="song-grid">
 
-      <button
-        class="btn secondary"
-        onclick="loadMyPlaylists()">
-        ↻ Refresh
-      </button>
+  <div class="loading">
+    Loading trending music...
+  </div>
 
-    </div>
+</div>
 
-    <div id="myPlaylists" class="playlist-grid">
+  </section>  <section class="section"><div class="section-head">
 
-      <div class="loading">
-        Checking your playlists...
-      </div>
+  <div>
+    <h2>🆕 Latest Releases</h2>
+    <p>Recently uploaded music.</p>
+  </div>
 
-    </div>
+</div>
 
-  </section>
+<div id="latestSongs" class="song-grid">
 
+  <div class="loading">
+    Loading latest music...
+  </div>
 
-  <!-- TRENDING -->
+</div>
 
-  <section class="section">
+  </section>  <section class="section"><div class="section-head">
+  <div>
+    <h2>🎵 Afrobeats</h2>
+    <p>Fresh African sounds.</p>
+  </div>
+</div>
 
-    <div class="section-head">
+<div id="afrobeatsSongs" class="song-grid"></div>
 
-      <div>
-        <h2>🔥 Trending Music</h2>
-        <p>Popular songs on PASONG.</p>
-      </div>
+  </section>  <section class="section"><div class="section-head">
+  <div>
+    <h2>🔥 Amapiano</h2>
+    <p>Dance-ready sounds.</p>
+  </div>
+</div>
 
-    </div>
+<div id="amapianoSongs" class="song-grid"></div>
 
-    <div id="trendingSongs" class="song-grid">
-
-      <div class="loading">
-        Loading trending music...
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- LATEST -->
-
-  <section class="section">
-
-    <div class="section-head">
-
-      <div>
-        <h2>🆕 Latest Releases</h2>
-        <p>Recently uploaded music.</p>
-      </div>
-
-    </div>
-
-    <div id="latestSongs" class="song-grid">
-
-      <div class="loading">
-        Loading latest music...
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- GENRES -->
-
-  <section class="section">
-
-    <div class="section-head">
-      <div>
-        <h2>🎵 Afrobeats</h2>
-        <p>Fresh African sounds.</p>
-      </div>
-    </div>
-
-    <div id="afrobeatsSongs" class="song-grid"></div>
-
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-head">
-      <div>
-        <h2>🔥 Amapiano</h2>
-        <p>Dance-ready sounds.</p>
-      </div>
-    </div>
-
-    <div id="amapianoSongs" class="song-grid"></div>
-
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-head">
-      <div>
-        <h2>🎤 Gengetone</h2>
-        <p>East African sounds.</p>
-      </div>
-    </div>
-
-    <div id="gengetoneSongs" class="song-grid"></div>
-
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-head">
-      <div>
-        <h2>🌍 Bongo</h2>
-        <p>Discover Bongo music.</p>
-      </div>
-    </div>
-
-    <div id="bongoSongs" class="song-grid"></div>
-
-  </section>
-
-</main>
-
-
-<footer>
+  </section>  <section class="section"><div class="section-head">
+  <div>
+    <h2>🎤 Gengetone</h2>
+    <p>East African sounds.</p>
+  </div>
+</div>
+
+<div id="gengetoneSongs" class="song-grid"></div>
+
+  </section>  <section class="section"><div class="section-head">
+  <div>
+    <h2>🌍 Bongo</h2>
+    <p>Discover Bongo music.</p>
+  </div>
+</div>
+
+<div id="bongoSongs" class="song-grid"></div>
+
+  </section></main><footer>
   PASONG © 2026 • Music • Artists • Opportunity
-</footer>
+</footer><div class="modal" id="createPlaylistModal">  <div class="modal-box"><h2>＋ Create Playlist</h2>
 
+<div class="form-group">
 
-<!-- CREATE PLAYLIST MODAL -->
+  <label for="playlistName">
+    Playlist Name
+  </label>
 
-<div class="modal" id="createPlaylistModal">
-
-  <div class="modal-box">
-
-    <h2>＋ Create Playlist</h2>
-
-    <div class="form-group">
-
-      <label for="playlistName">
-        Playlist Name
-      </label>
-
-      <input
-        id="playlistName"
-        type="text"
-        placeholder="e.g. My Uganda Hits"
-        maxlength="100"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="playlistDescription">
-        Description
-      </label>
-
-      <textarea
-        id="playlistDescription"
-        placeholder="Tell people about this playlist..."
-        maxlength="500"
-      ></textarea>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="playlistCover">
-        Playlist Cover Image
-      </label>
-
-      <input
-        id="playlistCover"
-        type="url"
-        placeholder="Optional cover image URL"
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label for="playlistVisibility">
-        Visibility
-      </label>
-
-      <select id="playlistVisibility">
-
-        <option value="public">
-          Public
-        </option>
-
-        <option value="private">
-          Private
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <div
-      id="createMessage"
-      class="message">
-    </div>
-
-
-    <div class="modal-actions">
-
-      <button
-        class="btn close-btn"
-        onclick="closeCreatePlaylist()">
-        Cancel
-      </button>
-
-      <button
-        class="btn"
-        id="createPlaylistButton"
-        onclick="createPlaylist()">
-        Create Playlist
-      </button>
-
-    </div>
-
-  </div>
+  <input
+    id="playlistName"
+    type="text"
+    placeholder="e.g. My Uganda Hits"
+    maxlength="100"
+  >
 
 </div>
 
+<div class="form-group">
 
-<!-- ADD SONG MODAL -->
+  <label for="playlistDescription">
+    Description
+  </label>
 
-<div class="modal" id="addSongModal">
-
-  <div class="modal-box">
-
-    <h2>🎵 Add Song</h2>
-
-    <p
-      id="addSongPlaylistName"
-      style="color:#999;margin-bottom:18px;">
-    </p>
-
-    <div id="songSelectionList"></div>
-
-    <div class="modal-actions">
-
-      <button
-        class="btn close-btn"
-        onclick="closeAddSongModal()">
-        Close
-      </button>
-
-    </div>
-
-  </div>
+  <textarea
+    id="playlistDescription"
+    placeholder="Tell people about this playlist..."
+    maxlength="500"
+  ></textarea>
 
 </div>
 
+<div class="form-group">
 
-<script>
+  <label for="playlistVisibility">
+    Visibility
+  </label>
 
-/* =========================================
-   PASONG CONFIG
-========================================= */
+  <select id="playlistVisibility">
+
+    <option value="public">
+      Public
+    </option>
+
+    <option value="private">
+      Private
+    </option>
+
+  </select>
+
+</div>
+
+<div
+  id="createMessage"
+  class="message">
+</div>
+
+<div class="modal-actions">
+
+  <button
+    class="btn close-btn"
+    onclick="closeCreatePlaylist()">
+    Cancel
+  </button>
+
+  <button
+    class="btn"
+    id="createPlaylistButton"
+    onclick="createPlaylist()">
+    Create Playlist
+  </button>
+
+</div>
+
+  </div></div><div class="modal" id="addSongModal">  <div class="modal-box"><h2>🎵 Playlist</h2>
+
+<p
+  id="addSongPlaylistName"
+  style="color:#999;margin-bottom:18px;">
+</p>
+
+<div id="songSelectionList"></div>
+
+<div class="modal-actions">
+
+  <button
+    class="btn close-btn"
+    onclick="closeAddSongModal()">
+    Close
+  </button>
+
+</div>
+
+  </div></div><script>
 
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
@@ -790,22 +735,15 @@ const SUPABASE_ANON_KEY =
 const API_BASE =
   "https://pasong-api.onrender.com";
 
-
 const supabaseClient =
   window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
   );
 
-
 let currentUser = null;
 let allSongs = [];
 let currentPlaylist = null;
-
-
-/* =========================================
-   HELPERS
-========================================= */
 
 function escapeHTML(value){
 
@@ -817,7 +755,6 @@ function escapeHTML(value){
     .replace(/'/g,"&#039;");
 
 }
-
 
 function getSongsFromResponse(data){
 
@@ -837,7 +774,6 @@ function getSongsFromResponse(data){
 
 }
 
-
 function getSongTitle(song){
 
   return song.title ||
@@ -845,7 +781,6 @@ function getSongTitle(song){
          "Untitled Song";
 
 }
-
 
 function getArtist(song){
 
@@ -879,7 +814,6 @@ function getArtist(song){
 
 }
 
-
 function getGenre(song){
 
   return String(
@@ -891,7 +825,6 @@ function getGenre(song){
 
 }
 
-
 function getCover(song){
 
   return song.cover_url ||
@@ -900,7 +833,6 @@ function getCover(song){
          "";
 
 }
-
 
 function getPlays(song){
 
@@ -913,7 +845,6 @@ function getPlays(song){
 
 }
 
-
 function getDownloads(song){
 
   return Number(
@@ -925,7 +856,6 @@ function getDownloads(song){
 
 }
 
-
 function getSongDate(song){
 
   return song.created_at ||
@@ -935,7 +865,6 @@ function getSongDate(song){
 
 }
 
-
 function getSongId(song){
 
   return song.id ||
@@ -944,11 +873,6 @@ function getSongId(song){
          "";
 
 }
-
-
-/* =========================================
-   ACCOUNT
-========================================= */
 
 async function checkUser(){
 
@@ -995,11 +919,6 @@ async function checkUser(){
 
 }
 
-
-/* =========================================
-   CREATE PLAYLIST
-========================================= */
-
 function openCreatePlaylist(){
 
   if(!currentUser){
@@ -1019,15 +938,16 @@ function openCreatePlaylist(){
 
 }
 
-
 function closeCreatePlaylist(){
 
   document
     .getElementById("createPlaylistModal")
     .classList.remove("show");
 
-}
+  document.getElementById("createMessage")
+    .textContent = "";
 
+}
 
 async function createPlaylist(){
 
@@ -1037,7 +957,6 @@ async function createPlaylist(){
 
     return;
   }
-
 
   const name =
     document
@@ -1051,12 +970,6 @@ async function createPlaylist(){
       .value
       .trim();
 
-  const coverUrl =
-    document
-      .getElementById("playlistCover")
-      .value
-      .trim();
-
   const visibility =
     document
       .getElementById("playlistVisibility")
@@ -1064,7 +977,6 @@ async function createPlaylist(){
 
   const message =
     document.getElementById("createMessage");
-
 
   if(!name){
 
@@ -1074,7 +986,6 @@ async function createPlaylist(){
     return;
   }
 
-
   const button =
     document.getElementById(
       "createPlaylistButton"
@@ -1082,7 +993,6 @@ async function createPlaylist(){
 
   button.disabled = true;
   button.textContent = "Creating...";
-
 
   try{
 
@@ -1100,9 +1010,6 @@ async function createPlaylist(){
         description:
           description || null,
 
-        cover_url:
-          coverUrl || null,
-
         visibility:visibility,
 
         is_public:
@@ -1112,11 +1019,9 @@ async function createPlaylist(){
       .select()
       .single();
 
-
     if(error){
       throw error;
     }
-
 
     document.getElementById("playlistName")
       .value = "";
@@ -1124,20 +1029,15 @@ async function createPlaylist(){
     document.getElementById("playlistDescription")
       .value = "";
 
-    document.getElementById("playlistCover")
-      .value = "";
-
     message.textContent =
       "✓ Playlist created successfully.";
 
     await loadMyPlaylists();
 
-
     setTimeout(
       closeCreatePlaylist,
       700
     );
-
 
   }catch(error){
 
@@ -1157,16 +1057,31 @@ async function createPlaylist(){
 
 }
 
+async function getPlaylistSongCount(playlistId){
 
-/* =========================================
-   MY PLAYLISTS
-========================================= */
+  const {
+    count,
+    error
+  } = await supabaseClient
+    .from("playlist_songs")
+    .select("*",{
+      count:"exact",
+      head:true
+    })
+    .eq("playlist_id",playlistId);
+
+  if(error){
+    return 0;
+  }
+
+  return count || 0;
+
+}
 
 async function loadMyPlaylists(){
 
   const container =
     document.getElementById("myPlaylists");
-
 
   if(!currentUser){
 
@@ -1184,14 +1099,13 @@ async function loadMyPlaylists(){
     `;
 
     return;
-  }
 
+  }
 
   container.innerHTML =
     `<div class="loading">
       Loading your playlists...
     </div>`;
-
 
   try{
 
@@ -1206,17 +1120,17 @@ async function loadMyPlaylists(){
         ascending:false
       });
 
-
     if(error){
       throw error;
     }
-
 
     if(!data || !data.length){
 
       container.innerHTML = `
         <div class="empty">
-          You haven't created a playlist yet.
+          🎵 Your playlist library is waiting.
+          <br>
+          Create a playlist and start building your collection.
           <br><br>
           <button
             class="btn"
@@ -1227,14 +1141,23 @@ async function loadMyPlaylists(){
       `;
 
       return;
+
     }
 
+    const cards = await Promise.all(
+      data.map(async playlist=>{
+        const count =
+          await getPlaylistSongCount(playlist.id);
+
+        return playlistCard(
+          playlist,
+          count
+        );
+      })
+    );
 
     container.innerHTML =
-      data.map(
-        playlistCard
-      ).join("");
-
+      cards.join("");
 
   }catch(error){
 
@@ -1252,12 +1175,10 @@ async function loadMyPlaylists(){
 
 }
 
-
-/* =========================================
-   PLAYLIST CARD
-========================================= */
-
-function playlistCard(playlist){
+function playlistCard(
+  playlist,
+  songCount
+){
 
   const id =
     playlist.id;
@@ -1268,22 +1189,16 @@ function playlistCard(playlist){
 
   const description =
     playlist.description ||
-    "PASONG Playlist";
+    "A PASONG playlist.";
 
-  const cover =
-    playlist.cover_url ||
-    "";
+  const visibility =
+    playlist.visibility ||
+    (playlist.is_public ? "public" : "private");
 
-
-  const coverHTML =
-    cover
-      ? `<img src="${escapeHTML(cover)}"
-           alt="${escapeHTML(name)}"
-           loading="lazy">`
-      : `<div class="placeholder">
-           🎧
-         </div>`;
-
+  const visibilityIcon =
+    visibility === "public"
+      ? "🌍 Public"
+      : "🔒 Private";
 
   return `
 
@@ -1291,7 +1206,19 @@ function playlistCard(playlist){
 
       <div class="cover">
 
-        ${coverHTML}
+        <div class="placeholder">
+
+          🎧
+
+          <span>
+            PASONG PLAYLIST
+          </span>
+
+        </div>
+
+        <div class="visibility">
+          ${visibilityIcon}
+        </div>
 
       </div>
 
@@ -1303,12 +1230,24 @@ function playlistCard(playlist){
         ${escapeHTML(description)}
       </p>
 
+      <div class="playlist-meta">
+
+        <span>
+          🎵 ${songCount} song${songCount === 1 ? "" : "s"}
+        </span>
+
+        <span>
+          ${visibility === "public" ? "Discoverable" : "Only you"}
+        </span>
+
+      </div>
+
       <div class="card-actions">
 
         <button
           class="primary"
           onclick="openPlaylist('${escapeHTML(id)}')">
-          Open
+          ▶ Open
         </button>
 
         <button
@@ -1324,11 +1263,6 @@ function playlistCard(playlist){
 
 }
 
-
-/* =========================================
-   OPEN PLAYLIST
-========================================= */
-
 async function openPlaylist(id){
 
   try{
@@ -1342,14 +1276,11 @@ async function openPlaylist(id){
       .eq("id",id)
       .single();
 
-
     if(error){
       throw error;
     }
 
-
     currentPlaylist = playlist;
-
 
     const {
       data:playlistSongs,
@@ -1362,16 +1293,13 @@ async function openPlaylist(id){
         ascending:true
       });
 
-
     if(songError){
       throw songError;
     }
 
-
     const ids =
       (playlistSongs || [])
         .map(item=>item.song_id);
-
 
     const selectedSongs =
       allSongs.filter(
@@ -1379,12 +1307,10 @@ async function openPlaylist(id){
           ids.includes(getSongId(song))
       );
 
-
     showPlaylistModal(
       playlist,
       selectedSongs
     );
-
 
   }catch(error){
 
@@ -1398,11 +1324,6 @@ async function openPlaylist(id){
   }
 
 }
-
-
-/* =========================================
-   PLAYLIST DETAIL MODAL
-========================================= */
 
 function showPlaylistModal(
   playlist,
@@ -1426,17 +1347,15 @@ function showPlaylistModal(
     <br>
 
     <span>
-      ${songs.length} song(s)
+      ${songs.length} song${songs.length === 1 ? "" : "s"}
     </span>
 
   `;
-
 
   const list =
     document.getElementById(
       "songSelectionList"
     );
-
 
   if(!songs.length){
 
@@ -1444,7 +1363,11 @@ function showPlaylistModal(
 
       <div class="empty">
 
-        This playlist has no songs yet.
+        🎵 This playlist is empty.
+
+        <br><br>
+
+        Add your favorite PASONG songs to get started.
 
         <br><br>
 
@@ -1473,32 +1396,25 @@ function showPlaylistModal(
           (song,index)=>`
 
             <div
-              style="
-                display:flex;
-                align-items:center;
-                gap:10px;
-                padding:10px;
-                border-radius:10px;
-                background:#191925;
-              ">
+              class="song-select">
 
               <strong>
-                ${index+1}.
+                ${index+1}
               </strong>
 
-              <div style="flex:1">
+              <div class="song-select-info">
 
-                <div>
+                <div class="song-select-title">
                   ${escapeHTML(
                     getSongTitle(song)
                   )}
                 </div>
 
-                <small style="color:#888">
+                <div class="song-select-artist">
                   ${escapeHTML(
                     getArtist(song)
                   )}
-                </small>
+                </div>
 
               </div>
 
@@ -1532,18 +1448,15 @@ function showPlaylistModal(
 
   }
 
-
   modal.classList.add("show");
 
 }
-
 
 function showAvailableSongs(){
 
   if(!currentPlaylist){
     return;
   }
-
 
   document.getElementById(
     "addSongPlaylistName"
@@ -1559,12 +1472,10 @@ function showAvailableSongs(){
 
   `;
 
-
   const list =
     document.getElementById(
       "songSelectionList"
     );
-
 
   if(!allSongs.length){
 
@@ -1575,39 +1486,33 @@ function showAvailableSongs(){
     `;
 
     return;
-  }
 
+  }
 
   list.innerHTML =
     allSongs.map(
       song=>`
 
         <div
-          style="
-            display:flex;
-            align-items:center;
-            gap:10px;
-            padding:10px;
-            margin-bottom:8px;
-            border-radius:10px;
-            background:#191925;
-          ">
+          class="song-select">
 
-          <div style="flex:1">
+          <div class="song-select-info">
 
-            <strong>
+            <div class="song-select-title">
+
               ${escapeHTML(
                 getSongTitle(song)
               )}
-            </strong>
 
-            <br>
+            </div>
 
-            <small style="color:#888">
+            <div class="song-select-artist">
+
               ${escapeHTML(
                 getArtist(song)
               )}
-            </small>
+
+            </div>
 
           </div>
 
@@ -1630,7 +1535,6 @@ function showAvailableSongs(){
 
 }
 
-
 function closeAddSongModal(){
 
   document
@@ -1640,11 +1544,6 @@ function closeAddSongModal(){
   currentPlaylist = null;
 
 }
-
-
-/* =========================================
-   ADD SONG
-========================================= */
 
 async function openAddSong(
   playlistId,
@@ -1658,7 +1557,6 @@ async function openAddSong(
     return;
   }
 
-
   const {
     data:playlist,
     error
@@ -1668,7 +1566,6 @@ async function openAddSong(
     .eq("id",playlistId)
     .single();
 
-
   if(error){
 
     alert(error.message);
@@ -1676,9 +1573,7 @@ async function openAddSong(
     return;
   }
 
-
   currentPlaylist = playlist;
-
 
   document.getElementById(
     "addSongPlaylistName"
@@ -1692,16 +1587,13 @@ async function openAddSong(
 
   `;
 
-
   document.getElementById(
     "addSongModal"
   ).classList.add("show");
 
-
   showAvailableSongs();
 
 }
-
 
 async function addSongToPlaylist(songId){
 
@@ -1709,14 +1601,12 @@ async function addSongToPlaylist(songId){
     return;
   }
 
-
   if(!songId){
 
     alert("Song ID is missing.");
 
     return;
   }
-
 
   try{
 
@@ -1736,11 +1626,9 @@ async function addSongToPlaylist(songId){
       )
       .maybeSingle();
 
-
     if(checkError){
       throw checkError;
     }
-
 
     if(existing){
 
@@ -1750,7 +1638,6 @@ async function addSongToPlaylist(songId){
 
       return;
     }
-
 
     const {
       count,
@@ -1766,11 +1653,9 @@ async function addSongToPlaylist(songId){
         currentPlaylist.id
       );
 
-
     if(countError){
       throw countError;
     }
-
 
     const {
       error
@@ -1789,16 +1674,15 @@ async function addSongToPlaylist(songId){
 
       });
 
-
     if(error){
       throw error;
     }
 
-
     alert("✓ Song added to playlist.");
 
-    showAvailableSongs();
+    await loadMyPlaylists();
 
+    showAvailableSongs();
 
   }catch(error){
 
@@ -1813,11 +1697,6 @@ async function addSongToPlaylist(songId){
 
 }
 
-
-/* =========================================
-   REMOVE SONG
-========================================= */
-
 async function removeSongFromPlaylist(
   playlistId,
   songId
@@ -1828,7 +1707,6 @@ async function removeSongFromPlaylist(
   )){
     return;
   }
-
 
   try{
 
@@ -1846,16 +1724,13 @@ async function removeSongFromPlaylist(
         songId
       );
 
-
     if(error){
       throw error;
     }
 
-
     alert("✓ Song removed.");
 
     openPlaylist(playlistId);
-
 
   }catch(error){
 
@@ -1869,11 +1744,6 @@ async function removeSongFromPlaylist(
   }
 
 }
-
-
-/* =========================================
-   SONG CARDS
-========================================= */
 
 function createSongCard(song){
 
@@ -1895,7 +1765,6 @@ function createSongCard(song){
   const downloads =
     getDownloads(song);
 
-
   const coverHTML =
     cover
       ? `<img
@@ -1903,11 +1772,9 @@ function createSongCard(song){
           alt="${escapeHTML(title)}"
           loading="lazy">
         `
-      : `<div
-          class="placeholder">
+      : `<div class="placeholder">
           🎵
         </div>`;
-
 
   return `
 
@@ -1951,12 +1818,7 @@ function createSongCard(song){
 
       </div>
 
-      <div
-        style="
-          color:#666;
-          font-size:11px;
-          margin-top:8px;
-        ">
+      <div class="song-stats">
 
         ▶ ${plays}
         &nbsp; • &nbsp;
@@ -1969,11 +1831,6 @@ function createSongCard(song){
   `;
 
 }
-
-
-/* =========================================
-   QUICK ADD
-========================================= */
 
 async function quickAddSong(songId){
 
@@ -1989,7 +1846,6 @@ async function quickAddSong(songId){
     return;
   }
 
-
   const {
     data,
     error
@@ -2001,14 +1857,12 @@ async function quickAddSong(songId){
       ascending:false
     });
 
-
   if(error){
 
     alert(error.message);
 
     return;
   }
-
 
   if(!data || !data.length){
 
@@ -2023,7 +1877,6 @@ async function quickAddSong(songId){
     return;
   }
 
-
   const playlistName =
     prompt(
       "Enter the number of the playlist:\n\n" +
@@ -2033,10 +1886,8 @@ async function quickAddSong(songId){
       ).join("\n")
     );
 
-
   const number =
     Number(playlistName);
-
 
   if(
     !Number.isInteger(number) ||
@@ -2047,25 +1898,17 @@ async function quickAddSong(songId){
     return;
   }
 
-
   const playlist =
     data[number-1];
 
-
   currentPlaylist =
     playlist;
-
 
   await addSongToPlaylist(
     songId
   );
 
 }
-
-
-/* =========================================
-   LOAD SONGS
-========================================= */
 
 async function loadSongs(){
 
@@ -2078,14 +1921,12 @@ async function loadSongs(){
     "bongoSongs"
   ];
 
-
   try{
 
     const response =
       await fetch(
         `${API_BASE}/api/songs`
       );
-
 
     if(!response.ok){
 
@@ -2095,14 +1936,11 @@ async function loadSongs(){
 
     }
 
-
     const data =
       await response.json();
 
-
     allSongs =
       getSongsFromResponse(data);
-
 
     const trending =
       [...allSongs]
@@ -2120,7 +1958,6 @@ async function loadSongs(){
 
         })
         .slice(0,8);
-
 
     const latest =
       [...allSongs]
@@ -2145,13 +1982,11 @@ async function loadSongs(){
         })
         .slice(0,8);
 
-
     renderSongList(
       "trendingSongs",
       trending,
       "No trending songs yet."
     );
-
 
     renderSongList(
       "latestSongs",
@@ -2159,35 +1994,29 @@ async function loadSongs(){
       "No songs uploaded yet."
     );
 
-
     renderGenre(
       "afrobeatsSongs",
       "Afrobeats"
     );
-
 
     renderGenre(
       "amapianoSongs",
       "Amapiano"
     );
 
-
     renderGenre(
       "gengetoneSongs",
       "Gengetone"
     );
-
 
     renderGenre(
       "bongoSongs",
       "Bongo"
     );
 
-
   }catch(error){
 
     console.error(error);
-
 
     containers.forEach(id=>{
 
@@ -2210,11 +2039,6 @@ async function loadSongs(){
 
 }
 
-
-/* =========================================
-   RENDER SONG LIST
-========================================= */
-
 function renderSongList(
   elementId,
   songs,
@@ -2223,7 +2047,6 @@ function renderSongList(
 
   const container =
     document.getElementById(elementId);
-
 
   if(!songs.length){
 
@@ -2236,14 +2059,12 @@ function renderSongList(
     return;
   }
 
-
   container.innerHTML =
     songs.map(
       createSongCard
     ).join("");
 
 }
-
 
 function renderGenre(
   elementId,
@@ -2272,7 +2093,6 @@ function renderGenre(
       })
       .slice(0,8);
 
-
   renderSongList(
     elementId,
     songs,
@@ -2280,11 +2100,6 @@ function renderGenre(
   );
 
 }
-
-
-/* =========================================
-   OPEN SONG PAGE
-========================================= */
 
 function openSong(id){
 
@@ -2296,16 +2111,10 @@ function openSong(id){
     return;
   }
 
-
   window.location.href =
     `song.html?id=${encodeURIComponent(id)}`;
 
 }
-
-
-/* =========================================
-   SCROLL
-========================================= */
 
 function scrollToMyPlaylists(){
 
@@ -2319,11 +2128,6 @@ function scrollToMyPlaylists(){
 
 }
 
-
-/* =========================================
-   START
-========================================= */
-
 async function init(){
 
   await checkUser();
@@ -2334,16 +2138,10 @@ async function init(){
 
 }
 
-
 document.addEventListener(
   "DOMContentLoaded",
   init
 );
-
-
-/* =========================================
-   AUTH CHANGES
-========================================= */
 
 supabaseClient.auth.onAuthStateChange(
   async (event,session)=>{
@@ -2377,7 +2175,5 @@ supabaseClient.auth.onAuthStateChange(
   }
 );
 
-</script>
-
-</body>
+</script></body>
 </html>
