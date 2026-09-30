@@ -354,6 +354,20 @@ h1{
   font-weight:800;
 }
 
+.play-count{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin:0 0 25px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);
+  color:#a9a9b7;
+  font-size:13px;
+  font-weight:700;
+}
+
 .status{
   text-align:center;
   margin-top:30px;
@@ -468,6 +482,13 @@ footer{
 
       <div id="songGenreText" class="genre-text">
         Music
+      </div>
+
+      <div
+        id="playCount"
+        class="play-count"
+      >
+        ▶ 0 plays
       </div>
 
       <p id="songDescription" class="description">
@@ -686,11 +707,18 @@ const progress =
 const currentTime =
   document.getElementById("currentTime");
 
+const playCount =
+  document.getElementById("playCount");
+
 let isDjMix = false;
 let currentDjMix = null;
 let currentSongId = "";
 let isFavorite = false;
 let favoriteBusy = false;
+
+let playRecorded = false;
+let playTimer = null;
+let playSeconds = 0;
 
 function getSongId(){
 
@@ -810,7 +838,7 @@ async function loadFavoriteStatus(){
       },
       error:userError
     } =
-      await supabaseClient.auth.getUser();
+    await supabaseClient.auth.getUser();
 
     if(userError || !user){
 
@@ -826,12 +854,12 @@ async function loadFavoriteStatus(){
       data,
       error
     } =
-      await supabaseClient
-        .from("favorites")
-        .select("id")
-        .eq("user_id",user.id)
-        .eq("song_id",currentSongId)
-        .maybeSingle();
+    await supabaseClient
+      .from("favorites")
+      .select("id")
+      .eq("user_id",user.id)
+      .eq("song_id",currentSongId)
+      .maybeSingle();
 
     if(error){
 
@@ -883,7 +911,7 @@ async function toggleFavorite(){
       },
       error:userError
     } =
-      await supabaseClient.auth.getUser();
+    await supabaseClient.auth.getUser();
 
     if(userError || !user){
 
@@ -989,6 +1017,212 @@ if(favoriteButton){
   );
 
 }
+
+async function recordPlay(){
+
+  if(
+    playRecorded ||
+    !currentSongId
+  ){
+    return;
+  }
+
+  playRecorded = true;
+
+  try{
+
+    const {
+      data:{
+        user
+      }
+    } =
+    await supabaseClient.auth.getUser();
+
+    const {
+      error
+    } =
+    await supabaseClient
+      .from("song_plays")
+      .insert({
+        song_id:currentSongId,
+        user_id:user?.id || null
+      });
+
+    if(error){
+
+      playRecorded = false;
+
+      console.error(
+        "PASONG play recording error:",
+        error
+      );
+
+      return;
+
+    }
+
+    await loadPlayCount();
+
+  }catch(error){
+
+    playRecorded = false;
+
+    console.error(
+      "PASONG play recording error:",
+      error
+    );
+
+  }
+
+}
+
+async function loadPlayCount(){
+
+  if(
+    !currentSongId ||
+    !playCount
+  ){
+    return;
+  }
+
+  try{
+
+    const {
+      count,
+      error
+    } =
+    await supabaseClient
+      .from("song_plays")
+      .select(
+        "id",
+        {
+          count:"exact",
+          head:true
+        }
+      )
+      .eq(
+        "song_id",
+        currentSongId
+      );
+
+    if(error){
+
+      console.error(
+        "PASONG play count error:",
+        error
+      );
+
+      return;
+
+    }
+
+    const total =
+      Number(count || 0);
+
+    playCount.textContent =
+      "▶ " +
+      total.toLocaleString() +
+      (
+        total === 1
+        ? " play"
+        : " plays"
+      );
+
+  }catch(error){
+
+    console.error(
+      "PASONG play count error:",
+      error
+    );
+
+  }
+
+}
+
+function resetPlayTracking(){
+
+  playRecorded = false;
+  playSeconds = 0;
+
+  if(playTimer){
+
+    clearInterval(
+      playTimer
+    );
+
+    playTimer = null;
+
+  }
+
+}
+
+function startPlayTracking(){
+
+  if(
+    playRecorded ||
+    playTimer
+  ){
+    return;
+  }
+
+  playTimer =
+    setInterval(
+      () => {
+
+        if(
+          audio.paused ||
+          audio.ended
+        ){
+          return;
+        }
+
+        playSeconds++;
+
+        if(
+          playSeconds >= 10
+        ){
+
+          clearInterval(
+            playTimer
+          );
+
+          playTimer = null;
+
+          recordPlay();
+
+        }
+
+      },
+      1000
+    );
+
+}
+
+audio.addEventListener(
+  "play",
+  function(){
+
+    startPlayTracking();
+
+  }
+);
+
+audio.addEventListener(
+  "pause",
+  function(){
+
+    if(playTimer){
+
+      clearInterval(
+        playTimer
+      );
+
+      playTimer = null;
+
+    }
+
+  }
+);
 
 async function detectCountry(){
 
@@ -1149,6 +1383,8 @@ function setupNormalSong(data){
     data.previewUrl ||
     "";
 
+  resetPlayTracking();
+
   if(audioUrl){
 
     audio.src =
@@ -1261,6 +1497,8 @@ async function setupDjMix(data){
     data.previewUrl ||
     "";
 
+  resetPlayTracking();
+
   if(mixAudioUrl){
 
     audio.src =
@@ -1321,6 +1559,8 @@ async function loadSong(){
 
   currentSongId =
     songId;
+
+  resetPlayTracking();
 
   console.log(
     "PASONG Song ID:",
@@ -1548,6 +1788,8 @@ async function loadSong(){
 
     }
 
+    await loadPlayCount();
+
     await loadFavoriteStatus();
 
     if(loading){
@@ -1693,7 +1935,7 @@ audio.addEventListener(
       if(endTime){
 
         endTime.textContent =
-          formatTime(duration);
+          formatTime(audio.duration);
 
       }
 
@@ -1710,6 +1952,16 @@ audio.addEventListener(
 
       previewButton.textContent =
         "▶";
+
+    }
+
+    if(playTimer){
+
+      clearInterval(
+        playTimer
+      );
+
+      playTimer = null;
 
     }
 
@@ -1815,6 +2067,23 @@ if(tipButton){
   );
 
 }
+
+window.addEventListener(
+  "beforeunload",
+  function(){
+
+    if(playTimer){
+
+      clearInterval(
+        playTimer
+      );
+
+      playTimer = null;
+
+    }
+
+  }
+);
 
 loadSong();
 </script>
