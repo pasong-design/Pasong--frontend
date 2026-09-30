@@ -1564,21 +1564,23 @@ function getGenre(song){
 function getPlays(song){
 
   return Number(
-    song.plays ||
-    song.play_count ||
-    song.streams ||
+    song.plays ??
+    song.play_count ??
+    song.streams ??
+    song.stream_count ??
     0
-  );
+  ) || 0;
 
 }
 
 function getDownloads(song){
 
   return Number(
-    song.downloads ||
-    song.download_count ||
+    song.downloads ??
+    song.download_count ??
+    song.total_downloads ??
     0
-  );
+  ) || 0;
 
 }
 
@@ -1587,6 +1589,8 @@ function getDate(song){
   return (
     song.created_at ||
     song.release_date ||
+    song.released_at ||
+    song.published_at ||
     song.date ||
     ""
   );
@@ -1598,6 +1602,7 @@ function getId(song){
   return (
     song.id ||
     song.song_id ||
+    song.songId ||
     ""
   );
 
@@ -1663,8 +1668,6 @@ function getChartSongs(){
 
   let list = [...songs];
 
-  list = list.filter(isInPeriod);
-
   if(currentGenre !== "all"){
 
     list = list.filter(
@@ -1675,12 +1678,73 @@ function getChartSongs(){
 
   }
 
+  if(!list.length){
+    return [];
+  }
+
+  const periodList =
+    list.filter(isInPeriod);
+
+  if(periodList.length){
+
+    list = periodList;
+
+  }
+
   if(currentChart === "latest"){
 
     list.sort(
       (a,b) =>
         (parseDate(getDate(b))?.getTime() || 0) -
         (parseDate(getDate(a))?.getTime() || 0)
+    );
+
+  }else if(currentChart === "trending"){
+
+    list.sort(
+      (a,b) => {
+
+        const scoreA =
+          getPlays(a) +
+          getDownloads(a) * 5;
+
+        const scoreB =
+          getPlays(b) +
+          getDownloads(b) * 5;
+
+        const dateA =
+          parseDate(getDate(a))?.getTime() || 0;
+
+        const dateB =
+          parseDate(getDate(b))?.getTime() || 0;
+
+        const recentA =
+          dateA
+            ? Math.max(
+                0,
+                (Date.now() - dateA) / 86400000
+              )
+            : 99999;
+
+        const recentB =
+          dateB
+            ? Math.max(
+                0,
+                (Date.now() - dateB) / 86400000
+              )
+            : 99999;
+
+        const trendA =
+          scoreA +
+          Math.max(0,100 - recentA) * 0.5;
+
+        const trendB =
+          scoreB +
+          Math.max(0,100 - recentB) * 0.5;
+
+        return trendB - trendA;
+
+      }
     );
 
   }else{
@@ -1890,7 +1954,22 @@ function populateGenres(){
     }
   );
 
-  select.value = currentGenre;
+  if(
+    [...select.options]
+      .some(
+        option =>
+          option.value === currentGenre
+      )
+  ){
+
+    select.value = currentGenre;
+
+  }else{
+
+    currentGenre = "all";
+    select.value = "all";
+
+  }
 
 }
 
@@ -1909,31 +1988,86 @@ async function loadCharts(){
 
     const response =
       await fetch(
-        `${API_BASE}/api/songs`
+        `${API_BASE}/api/songs`,
+        {
+          method:"GET",
+          headers:{
+            "Accept":"application/json"
+          },
+          cache:"no-store"
+        }
       );
 
     if(!response.ok){
-      throw new Error("Unable to load songs");
+      throw new Error(
+        `Unable to load songs: ${response.status}`
+      );
     }
 
     const data =
       await response.json();
 
+    let loadedSongs = [];
+
     if(Array.isArray(data)){
 
-      songs = data;
+      loadedSongs = data;
 
-    }else if(Array.isArray(data.songs)){
+    }else if(
+      data &&
+      Array.isArray(data.songs)
+    ){
 
-      songs = data.songs;
+      loadedSongs = data.songs;
 
-    }else if(Array.isArray(data.data)){
+    }else if(
+      data &&
+      Array.isArray(data.data)
+    ){
 
-      songs = data.data;
+      loadedSongs = data.data;
 
-    }else{
+    }else if(
+      data &&
+      data.data &&
+      Array.isArray(data.data.songs)
+    ){
 
-      songs = [];
+      loadedSongs = data.data.songs;
+
+    }else if(
+      data &&
+      Array.isArray(data.results)
+    ){
+
+      loadedSongs = data.results;
+
+    }
+
+    songs =
+      loadedSongs.filter(
+        song =>
+          song &&
+          typeof song === "object"
+      );
+
+    console.log(
+      "PASONG charts loaded songs:",
+      songs.length
+    );
+
+    if(!songs.length){
+
+      songList.innerHTML = `
+        <div class="empty-state">
+          No songs are available on PASONG yet.
+        </div>
+      `;
+
+      populateGenres();
+      updateChartHeading();
+
+      return;
 
     }
 
