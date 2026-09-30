@@ -1,21 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0">
+name="theme-color"
+content="#8b5cf6">
 
-<meta
-  name="theme-color"
-  content="#8b5cf6">
-
-<title>PASONG Artists</title>
-
-<style>
+<title>PASONG Artists</title><style>
 
 *{
   margin:0;
@@ -214,102 +205,60 @@ footer{
 
 }
 
-</style>
+</style></head><body><nav><a
+class="logo"
+href="index.html">
+◈ <span>PASONG</span>
+</a>
 
-</head>
+  <div class="nav-links"><a href="index.html">
+  Home
+</a>
 
-<body>
+<a href="store.html">
+  Music Store
+</a>
 
+<a href="charts.html">
+  Charts
+</a>
 
-<nav>
+<a
+  class="active"
+  href="artists.html">
+  Artists
+</a>
 
-  <a
-    class="logo"
-    href="index.html">
-    ◈ <span>PASONG</span>
-  </a>
+<a href="playlists.html">
+  Playlists
+</a>
 
+<a href="promotion.html">
+  Promotion
+</a>
 
-  <div class="nav-links">
+<a href="account.html">
+  Account
+</a>
 
-    <a href="index.html">
-      Home
-    </a>
+  </div></nav><main class="container">  <section class="hero"><h1>
+  PASONG <span>Artists</span>
+</h1>
 
-    <a href="store.html">
-      Music Store
-    </a>
+<p>
+  Discover artists and explore their music on PASONG.
+</p>
 
-    <a href="charts.html">
-      Charts
-    </a>
-
-    <a
-      class="active"
-      href="artists.html">
-      Artists
-    </a>
-
-    <a href="playlists.html">
-      Playlists
-    </a>
-
-    <a href="promotion.html">
-      Promotion
-    </a>
-
-    <a href="account.html">
-      Account
-    </a>
-
-  </div>
-
-</nav>
-
-
-<main class="container">
-
-
-  <section class="hero">
-
-    <h1>
-      PASONG <span>Artists</span>
-    </h1>
-
-    <p>
-      Discover artists and explore their music on PASONG.
-    </p>
-
-  </section>
-
-
-  <div
+  </section>  <div
     id="status"
-    class="status">
+    class="status">Loading artists...
 
-    Loading artists...
-
-  </div>
-
-
-  <div
+  </div>  <div
     id="artists"
     class="artist-grid">
-  </div>
+  </div></main><footer>PASONG © 2026 • Music • Artists • Opportunity
 
-
-</main>
-
-
-<footer>
-
-  PASONG © 2026 • Music • Artists • Opportunity
-
-</footer>
-
-
-<script>
-
+</footer><script>
 
 const API_BASE =
 "https://pasong-api.onrender.com";
@@ -327,10 +276,11 @@ function firstValue(){
     if(
       value !== undefined &&
       value !== null &&
+      typeof value !== "object" &&
       String(value).trim() !== ""
     ){
 
-      return value;
+      return String(value).trim();
 
     }
 
@@ -343,48 +293,31 @@ function firstValue(){
 
 function getArtistObject(song){
 
-  if(
-    song.artist &&
-    typeof song.artist === "object"
+  const candidates = [
+
+    song.artist,
+    song.artist_profile,
+    song.artistProfile,
+    song.artist_data,
+    song.artistData,
+    song.artist_info,
+    song.artistInfo
+
+  ];
+
+  for(
+    const candidate of candidates
   ){
 
-    return song.artist;
+    if(
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate)
+    ){
 
-  }
+      return candidate;
 
-  if(
-    song.artist_profile &&
-    typeof song.artist_profile === "object"
-  ){
-
-    return song.artist_profile;
-
-  }
-
-  if(
-    song.artistProfile &&
-    typeof song.artistProfile === "object"
-  ){
-
-    return song.artistProfile;
-
-  }
-
-  if(
-    song.artist_data &&
-    typeof song.artist_data === "object"
-  ){
-
-    return song.artist_data;
-
-  }
-
-  if(
-    song.artistData &&
-    typeof song.artistData === "object"
-  ){
-
-    return song.artistData;
+    }
 
   }
 
@@ -398,22 +331,40 @@ function getArtistProfile(song){
   const artist =
     getArtistObject(song);
 
-  const profile =
-    song.artist_profile ||
-    song.artistProfile ||
-    song.artist_data ||
-    song.artistData ||
-    artist.profile ||
-    artist.profile_data ||
-    artist.profileData ||
-    {};
+  const candidates = [
 
-  return (
-    profile &&
-    typeof profile === "object"
-  )
-    ? profile
-    : {};
+    song.artist_profile,
+    song.artistProfile,
+    song.artist_data,
+    song.artistData,
+    song.artist_info,
+    song.artistInfo,
+
+    artist.profile,
+    artist.profile_data,
+    artist.profileData,
+    artist.artist_profile,
+    artist.artistProfile
+
+  ];
+
+  for(
+    const candidate of candidates
+  ){
+
+    if(
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate)
+    ){
+
+      return candidate;
+
+    }
+
+  }
+
+  return artist;
 
 }
 
@@ -429,25 +380,17 @@ function getArtistId(song){
   return firstValue(
 
     song.artist_id,
-
     song.artistId,
-
     song.artistID,
-
     song.artist_uuid,
-
     song.artistUuid,
 
     profile.id,
-
     profile.artist_id,
-
     profile.artistId,
 
     artist.id,
-
     artist.artist_id,
-
     artist.artistId
 
   );
@@ -464,69 +407,101 @@ function getArtistName(song){
     getArtistProfile(song);
 
 
-  return firstValue(
+  const directName =
+    firstValue(
 
-    song.artist_name,
+      song.artist_name,
+      song.artistName,
+      song.artist_performing_name,
+      song.artistPerformingName,
+      song.artist_stage_name,
+      song.artistStageName,
 
-    song.artistName,
+      song.performing_name,
+      song.performingName,
+      song.stage_name,
+      song.stageName,
 
-    song.artist_performing_name,
+      song.performer_name,
+      song.performerName
 
-    song.artistPerformingName,
+    );
 
-    song.artist_stage_name,
 
-    song.artistStageName,
+  if(directName){
 
-    song.performing_name,
+    return directName;
 
-    song.performingName,
+  }
 
-    song.stage_name,
 
-    song.stageName,
+  const profileName =
+    firstValue(
 
-    song.performer_name,
+      profile.performing_name,
+      profile.performingName,
+      profile.stage_name,
+      profile.stageName,
 
-    song.performerName,
+      profile.performer_name,
+      profile.performerName,
 
-    profile.performing_name,
+      profile.performing_stage_name,
+      profile.performingStageName,
 
-    profile.performingName,
+      profile.public_name,
+      profile.publicName,
 
-    profile.stage_name,
+      profile.display_name,
+      profile.displayName,
 
-    profile.stageName,
+      profile.artist_name,
+      profile.artistName
 
-    profile.performer_name,
+    );
 
-    profile.performerName,
 
-    artist.performing_name,
+  if(profileName){
 
-    artist.performingName,
+    return profileName;
 
-    artist.stage_name,
+  }
 
-    artist.stageName,
 
-    artist.performer_name,
+  const artistName =
+    firstValue(
 
-    artist.performerName,
+      artist.performing_name,
+      artist.performingName,
+      artist.stage_name,
+      artist.stageName,
 
-    artist.name,
+      artist.performer_name,
+      artist.performerName,
 
-    artist.display_name,
+      artist.public_name,
+      artist.publicName,
 
-    artist.displayName,
+      artist.display_name,
+      artist.displayName,
 
-    artist.username,
+      artist.artist_name,
+      artist.artistName,
 
-    artist.full_name,
+      artist.name,
+      artist.username
 
-    song.artist
+    );
 
-  );
+
+  if(artistName){
+
+    return artistName;
+
+  }
+
+
+  return "";
 
 }
 
@@ -543,59 +518,42 @@ function getArtistImage(song){
   return firstValue(
 
     song.artist_avatar,
-
     song.artistAvatar,
-
     song.artist_avatar_url,
-
     song.artistAvatarUrl,
 
     song.artist_image,
-
     song.artistImage,
-
     song.artist_image_url,
-
     song.artistImageUrl,
 
     song.artist_profile_image,
-
     song.artistProfileImage,
-
     song.artist_profile_image_url,
-
     song.artistProfileImageUrl,
 
     song.profile_image_url,
-
     song.profileImageUrl,
 
     song.avatar_url,
-
     song.avatarUrl,
 
     profile.profile_image_url,
-
     profile.profileImageUrl,
 
     profile.avatar_url,
-
     profile.avatarUrl,
 
     profile.image_url,
-
     profile.imageUrl,
 
     artist.profile_image_url,
-
     artist.profileImageUrl,
 
     artist.avatar_url,
-
     artist.avatarUrl,
 
     artist.image_url,
-
     artist.imageUrl
 
   );
@@ -615,15 +573,12 @@ function getArtistBio(song){
   return firstValue(
 
     song.artist_bio,
-
     song.artistBio,
 
     profile.bio,
-
     profile.description,
 
     artist.bio,
-
     artist.description
 
   );
@@ -722,7 +677,6 @@ async function loadArtists(){
 
   try{
 
-
     const response =
     await fetch(
       API_BASE +
@@ -814,8 +768,7 @@ async function loadArtists(){
 
 
         const artistName =
-          getArtistName(song) ||
-          "Unknown Artist";
+          getArtistName(song);
 
 
         const artistCover =
@@ -834,7 +787,8 @@ async function loadArtists(){
               artistId,
 
             name:
-              artistName,
+              artistName ||
+              "Unknown Artist",
 
             cover:
               artistCover,
@@ -852,19 +806,12 @@ async function loadArtists(){
 
         else{
 
-
           if(
 
-            (
-              artistMap[artistId].name ===
-              "Unknown Artist"
+            artistMap[artistId].name ===
+            "Unknown Artist" &&
 
-            ) &&
-
-            (
-              artistName !==
-              "Unknown Artist"
-            )
+            artistName
 
           ){
 
@@ -909,9 +856,9 @@ async function loadArtists(){
 
 
     const artists =
-      Object.values(
-        artistMap
-      );
+    Object.values(
+      artistMap
+    );
 
 
     status.style.display =
@@ -1070,7 +1017,6 @@ async function loadArtists(){
 
   }catch(error){
 
-
     console.error(
       "PASONG Artists Error:",
       error
@@ -1160,9 +1106,4 @@ function escapeHtml(value){
 
 loadArtists();
 
-</script>
-
-
-</body>
-
-</html>
+</script></body></html>
