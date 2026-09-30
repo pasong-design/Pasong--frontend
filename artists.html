@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Artists</title>
-
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
+<title>PASONG Artists</title><style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
 body{
   background:#080810;
@@ -197,20 +198,9 @@ footer{
     white-space:nowrap;
   }
 }
-</style>
-</head>
-
-<body>
-
-<nav>
-
-<a class="logo" href="index.html">
+</style></head><body><nav><a class="logo" href="index.html">
   ◈ <span>PASONG</span>
-</a>
-
-<div class="nav-links">
-
-<a href="index.html">Home</a>
+</a><div class="nav-links"><a href="index.html">Home</a>
 
 <a href="store.html">Music Store</a>
 
@@ -224,42 +214,15 @@ footer{
 
 <a href="account.html">Account</a>
 
-</div>
-
-</nav>
-
-
-<main class="container">
-
-<section class="hero">
-
-<h1>
+</div></nav><main class="container"><section class="hero"><h1>
 PASONG <span>Artists</span>
-</h1>
-
-<p>
+</h1><p>
 Discover artists and explore their music on PASONG.
-</p>
-
-</section>
-
-
-<div id="status" class="status">
+</p></section><div id="status" class="status">
 Loading artists...
-</div>
-
-
-<div id="artists" class="artist-grid"></div>
-
-</main>
-
-
-<footer>
+</div><div id="artists" class="artist-grid"></div></main><footer>
 PASONG © 2026 • Music • Artists • Opportunity
-</footer>
-
-
-<script>
+</footer><script>
 
 const API_BASE =
 "https://pasong-api.onrender.com";
@@ -273,14 +236,12 @@ document.getElementById("status");
 const container =
 document.getElementById("artists");
 
-
 try{
 
 const response =
 await fetch(
 API_BASE + "/api/songs"
 );
-
 
 if(!response.ok){
 
@@ -290,10 +251,8 @@ throw new Error(
 
 }
 
-
 const data =
 await response.json();
-
 
 const songs =
 Array.isArray(data)
@@ -330,18 +289,21 @@ const artistMap = {};
 
 songs.forEach(song=>{
 
+const artist =
+song.artist || {};
+
+const profile =
+song.artist_profile ||
+song.artistProfile ||
+artist.profile ||
+{};
+
+
 const artistId =
 song.artist_id ||
 song.artistId ||
-song.artist?.id;
-
-
-const artistName =
-song.artist_name ||
-song.artistName ||
-song.artist?.name ||
-song.artist ||
-"Unknown Artist";
+artist.id ||
+profile.id;
 
 
 if(!artistId){
@@ -349,6 +311,41 @@ if(!artistId){
 return;
 
 }
+
+
+const artistName =
+song.artist_name ||
+song.artistName ||
+song.performing_name ||
+song.performingName ||
+song.stage_name ||
+song.stageName ||
+profile.performing_name ||
+profile.performingName ||
+profile.stage_name ||
+profile.stageName ||
+artist.performing_name ||
+artist.performingName ||
+artist.stage_name ||
+artist.stageName ||
+artist.name ||
+"Unknown Artist";
+
+
+const artistCover =
+song.artist_avatar ||
+song.artist_image ||
+song.artistImage ||
+song.artist_profile_image ||
+song.artistProfileImage ||
+song.profile_image_url ||
+profile.profile_image_url ||
+profile.avatar_url ||
+profile.image_url ||
+artist.profile_image_url ||
+artist.avatar_url ||
+artist.image_url ||
+"";
 
 
 if(!artistMap[artistId]){
@@ -359,12 +356,7 @@ id:artistId,
 
 name:artistName,
 
-cover:
-song.artist_avatar ||
-song.artist_image ||
-song.artist?.avatar_url ||
-song.artist?.image_url ||
-"",
+cover:artistCover,
 
 songs:0
 
@@ -372,6 +364,29 @@ songs:0
 
 }
 
+else{
+
+if(
+artistMap[artistId].name === "Unknown Artist" &&
+artistName !== "Unknown Artist"
+){
+
+artistMap[artistId].name =
+artistName;
+
+}
+
+if(
+!artistMap[artistId].cover &&
+artistCover
+){
+
+artistMap[artistId].cover =
+artistCover;
+
+}
+
+}
 
 artistMap[artistId].songs++;
 
@@ -406,8 +421,11 @@ return;
 container.innerHTML =
 artists.map(artist=>{
 
+const name =
+artist.name || "Unknown Artist";
+
 const initial =
-(artist.name || "A")
+name
 .charAt(0)
 .toUpperCase();
 
@@ -419,26 +437,26 @@ artist.cover
 <img
 class="artist-image"
 src="${escapeHtml(artist.cover)}"
-alt="${escapeHtml(artist.name)}"
-onerror="this.style.display='none'"
+alt="${escapeHtml(name)}"
+onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
 >
+
+<div
+class="artist-placeholder"
+style="display:none"
+>
+${escapeHtml(initial)}
+</div>
 
 `
 : `
 
 <div class="artist-placeholder">
-${initial}
+${escapeHtml(initial)}
 </div>
 
 `;
 
-
-/*
- IMPORTANT:
- The artist ID is placed into the URL.
- Example:
- artist.html?id=119e7b2d-4115-44e9-ba0f-e47d4a3fa332
-*/
 
 const profileLink =
 "artist.html?id=" +
@@ -452,7 +470,7 @@ return `
 ${image}
 
 <div class="artist-name">
-${escapeHtml(artist.name)}
+${escapeHtml(name)}
 </div>
 
 <div class="artist-info">
@@ -478,7 +496,10 @@ View Artist
 
 }catch(error){
 
-console.error(error);
+console.error(
+"PASONG Artists Error:",
+error
+);
 
 status.style.display="none";
 
@@ -537,7 +558,5 @@ return String(value ?? "")
 
 loadArtists();
 
-</script>
-
-</body>
+</script></body>
 </html>
