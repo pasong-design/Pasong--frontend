@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG — Favorites</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#08080d;
+  color:#fff;
+  min-height:100vh;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+header{
+  height:70px;
+  display:flex;
+  align-items:center;
+  gap:22px;
+  padding:0 28px;
+  background:#0d0d14;
+  border-bottom:1px solid #242431;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.logo::first-letter{
+  color:#c084fc;
+}
+
+.search-wrap{
+  flex:1;
+  max-width:520px;
+  position:relative;
+}
+
+.search-wrap input{
+  width:100%;
+  height:42px;
+  border:1px solid #292936;
+  border-radius:22px;
+  background:#15151e;
+  color:#fff;
+  padding:0 18px;
+  outline:none;
+}
+
+.search-wrap input:focus{
+  border-color:#8b5cf6;
+}
+
+.account{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#181821;
+  border:1px solid #30303c;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:19px;
+}
+
+main{
+  width:min(1180px,94%);
+  margin:0 auto;
+  padding:38px 0 120px;
+}
+
+.back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#aaaabd;
+  font-size:14px;
+  margin-bottom:25px;
+}
+
+.back:hover{
+  color:#fff;
+}
+
+.hero{
+  background:
+    radial-gradient(circle at 15% 20%,rgba(139,92,246,.25),transparent 35%),
+    radial-gradient(circle at 85% 80%,rgba(236,72,153,.12),transparent 30%),
+    #11111a;
+  border:1px solid #282837;
+  border-radius:24px;
+  padding:32px;
+  margin-bottom:28px;
+}
+
+.eyebrow{
+  color:#c084fc;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:2px;
+  margin-bottom:10px;
+}
+
+h1{
+  font-size:38px;
+  line-height:1.1;
+  margin-bottom:10px;
+}
+
+.hero p{
+  color:#a7a7b8;
+  max-width:650px;
+  line-height:1.6;
+}
+
+.stats{
+  display:flex;
+  gap:12px;
+  margin-top:24px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  min-width:120px;
+  padding:14px 17px;
+  border-radius:14px;
+  background:#171721;
+  border:1px solid #292936;
+}
+
+.stat strong{
+  display:block;
+  font-size:21px;
+  margin-bottom:4px;
+}
+
+.stat span{
+  color:#8f8fa1;
+  font-size:12px;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.section-head h2{
+  font-size:23px;
+}
+
+.clear-btn{
+  border:1px solid #393946;
+  background:#15151e;
+  color:#c8c8d5;
+  padding:10px 15px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.clear-btn:hover{
+  border-color:#8b5cf6;
+  color:#fff;
+}
+
+.songs{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+}
+
+.song{
+  background:#111119;
+  border:1px solid #282833;
+  border-radius:18px;
+  padding:13px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+  transition:.2s;
+}
+
+.song:hover{
+  transform:translateY(-2px);
+  border-color:#4b3b65;
+  background:#15151f;
+}
+
+.cover{
+  width:78px;
+  height:78px;
+  flex:0 0 78px;
+  border-radius:12px;
+  object-fit:cover;
+  background:#1b1b26;
+}
+
+.cover-placeholder{
+  width:78px;
+  height:78px;
+  flex:0 0 78px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#24183b,#171721);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:27px;
+}
+
+.info{
+  flex:1;
+  min-width:0;
+}
+
+.title{
+  font-size:16px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-bottom:6px;
+}
+
+.artist{
+  color:#a9a9ba;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.meta{
+  color:#777789;
+  font-size:11px;
+  margin-top:7px;
+}
+
+.actions{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.action{
+  border:1px solid #343441;
+  background:#181820;
+  color:#fff;
+  border-radius:9px;
+  min-width:74px;
+  padding:8px 9px;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.action:hover{
+  border-color:#8b5cf6;
+}
+
+.play{
+  background:#8b5cf6;
+  border-color:#8b5cf6;
+}
+
+.play:hover{
+  background:#9d70f7;
+}
+
+.remove:hover{
+  border-color:#ec4899;
+  color:#ec4899;
+}
+
+.state{
+  text-align:center;
+  padding:65px 20px;
+  background:#111119;
+  border:1px dashed #30303d;
+  border-radius:20px;
+  color:#9999aa;
+}
+
+.state-icon{
+  font-size:40px;
+  margin-bottom:15px;
+}
+
+.state h3{
+  color:#fff;
+  margin-bottom:8px;
+}
+
+.state p{
+  line-height:1.6;
+  margin-bottom:20px;
+}
+
+.primary{
+  display:inline-block;
+  background:#8b5cf6;
+  padding:11px 18px;
+  border-radius:10px;
+  font-weight:700;
+}
+
+footer{
+  border-top:1px solid #242431;
+  background:#0d0d14;
+  padding:28px 20px;
+  text-align:center;
+  color:#777789;
+  font-size:12px;
+}
+
+.player{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:200;
+  background:rgba(13,13,20,.97);
+  border-top:1px solid #292936;
+  padding:10px 18px;
+  display:none;
+  align-items:center;
+  gap:15px;
+}
+
+.player-info{
+  min-width:150px;
+  max-width:300px;
+  flex:1;
+}
+
+.player-title{
+  font-weight:700;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.player-artist{
+  color:#858595;
+  font-size:11px;
+  margin-top:3px;
+}
+
+audio{
+  flex:2;
+  min-width:180px;
+  height:38px;
+}
+
+@media(max-width:760px){
+  header{
+    height:62px;
+    padding:0 15px;
+    gap:10px;
+  }
+
+  .logo{
+    font-size:18px;
+  }
+
+  .search-wrap{
+    display:none;
+  }
+
+  main{
+    width:92%;
+    padding-top:25px;
+  }
+
+  .hero{
+    padding:25px 20px;
+    border-radius:20px;
+  }
+
+  h1{
+    font-size:30px;
+  }
+
+  .songs{
+    grid-template-columns:1fr;
+  }
+
+  .section-head{
+    align-items:flex-start;
+  }
+
+  .clear-btn{
+    font-size:11px;
+    padding:8px 10px;
+  }
+
+  .song{
+    padding:10px;
+  }
+
+  .cover,
+  .cover-placeholder{
+    width:65px;
+    height:65px;
+    flex-basis:65px;
+  }
+
+  .actions{
+    flex-direction:row;
+  }
+
+  .action{
+    min-width:auto;
+    padding:8px;
+  }
+
+  .player{
+    flex-wrap:wrap;
+    padding:8px 12px;
+  }
+
+  .player-info{
+    width:100%;
+    max-width:none;
+    flex:none;
+  }
+
+  audio{
+    width:100%;
+    flex:none;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="logo">◈ PASONG</a>
+
+  <div class="search-wrap">
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Search music..."
+      autocomplete="off"
+    >
+  </div>
+
+  <a href="login.html" class="account" id="accountLink">◉</a>
+</header>
+
+<main>
+
+  <a href="index.html" class="back">← Back to Home</a>
+
+  <section class="hero">
+    <div class="eyebrow">YOUR MUSIC</div>
+    <h1>Favorites</h1>
+    <p>
+      Keep the songs you love in one place and quickly return to them whenever you want.
+    </p>
+
+    <div class="stats">
+      <div class="stat">
+        <strong id="favoriteCount">0</strong>
+        <span>Favorite Songs</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <h2>Your Favorites</h2>
+    <button class="clear-btn" id="clearBtn" style="display:none">
+      Clear All
+    </button>
+  </div>
+
+  <section id="content">
+    <div class="state">
+      <div class="state-icon">♡</div>
+      <h3>Loading favorites...</h3>
+      <p>Please wait.</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="player" id="player">
+  <div class="player-info">
+    <div class="player-title" id="playerTitle">Nothing playing</div>
+    <div class="player-artist" id="playerArtist"></div>
+  </div>
+  <audio id="audio" controls></audio>
+</div>
+
+<footer>
+  © 2026 PASONG — Music marketplace
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+const API_BASE =
+  "https://pasong-api.onrender.com";
+
+const content =
+  document.getElementById("content");
+
+const favoriteCount =
+  document.getElementById("favoriteCount");
+
+const clearBtn =
+  document.getElementById("clearBtn");
+
+const audio =
+  document.getElementById("audio");
+
+const player =
+  document.getElementById("player");
+
+const playerTitle =
+  document.getElementById("playerTitle");
+
+const playerArtist =
+  document.getElementById("playerArtist");
+
+let currentUser = null;
+let favoriteRows = [];
+let favoriteSongs = [];
+
+function firstValue(...values){
+  for(const value of values){
+    if(
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    ){
+      return value;
+    }
+  }
+
+  return "";
+}
+
+function escapeHtml(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function getArtistName(song){
+  return firstValue(
+    song.performing_name,
+    song.stage_name,
+    song.artist_name,
+    song.artist?.performing_name,
+    song.artist?.stage_name,
+    song.artist?.name,
+    song.artist_profile?.performing_name,
+    song.artist_profile?.stage_name,
+    song.artist_profile?.name,
+    song.artist_profiles?.performing_name,
+    song.artist_profiles?.stage_name,
+    "Unknown Artist"
+  );
+}
+
+function getCover(song){
+  return firstValue(
+    song.cover_url,
+    song.cover_image_url,
+    song.cover,
+    song.cover_image,
+    song.image_url,
+    song.artwork_url,
+    song.thumbnail_url,
+    song.artist?.profile_image_url
+  );
+}
+
+function getAudio(song){
+  return firstValue(
+    song.preview_url,
+    song.audio_url,
+    song.stream_url
+  );
+}
+
+function getSongId(song){
+  return firstValue(
+    song.id,
+    song.song_id
+  );
+}
+
+function showMessage(
+  icon,
+  title,
+  message,
+  buttonText = "",
+  buttonHref = ""
+){
+  content.innerHTML = `
+    <div class="state">
+      <div class="state-icon">${icon}</div>
+      <h3>${escapeHtml(title)}</h3>
+      <p>${escapeHtml(message)}</p>
+      ${
+        buttonText
+        ?
+        `<a class="primary" href="${buttonHref}">
+          ${escapeHtml(buttonText)}
+        </a>`
+        :
+        ""
+      }
+    </div>
+  `;
+}
+
+async function loadAccount(){
+  const {
+    data:{
+      user
+    }
+  } = await supabaseClient.auth.getUser();
+
+  const accountLink =
+    document.getElementById("accountLink");
+
+  if(user){
+    accountLink.href = "account.html";
+  }else{
+    accountLink.href = "login.html";
+  }
+}
+
+async function loadFavorites(){
+
+  const {
+    data:{
+      user
+    },
+    error:userError
+  } = await supabaseClient.auth.getUser();
+
+  if(userError){
+    console.error(userError);
+  }
+
+  currentUser = user;
+
+  if(!user){
+    favoriteCount.textContent = "0";
+    clearBtn.style.display = "none";
+
+    showMessage(
+      "♡",
+      "Login required",
+      "Please log in to see and manage your favorite songs.",
+      "Login",
+      "login.html"
+    );
+
+    return;
+  }
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("favorites")
+    .select("id,song_id,created_at")
+    .eq("user_id",user.id)
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+
+    showMessage(
+      "!",
+      "Could not load favorites",
+      error.message
+    );
+
+    return;
+  }
+
+  favoriteRows = data || [];
+
+  favoriteCount.textContent =
+    favoriteRows.length;
+
+  clearBtn.style.display =
+    favoriteRows.length
+    ? "block"
+    : "none";
+
+  if(!favoriteRows.length){
+    showMessage(
+      "♡",
+      "No favorites yet",
+      "Songs you favorite will appear here.",
+      "Explore Music",
+      "store.html"
+    );
+
+    return;
+  }
+
+  await loadFavoriteSongs();
+}
+
+async function loadFavoriteSongs(){
+
+  const songIds =
+    favoriteRows
+      .map(row => row.song_id)
+      .filter(Boolean);
+
+  if(!songIds.length){
+    showMessage(
+      "♡",
+      "No favorites yet",
+      "Your favorite list is empty."
+    );
+
+    return;
+  }
+
+  let songs = [];
+
+  try{
+    const response =
+      await fetch(
+        API_BASE + "/api/songs"
+      );
+
+    if(response.ok){
+      const payload =
+        await response.json();
+
+      if(Array.isArray(payload)){
+        songs = payload;
+      }else if(Array.isArray(payload.songs)){
+        songs = payload.songs;
+      }else if(Array.isArray(payload.data)){
+        songs = payload.data;
+      }
+    }
+  }catch(error){
+    console.error(error);
+  }
+
+  if(!songs.length){
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("songs")
+      .select("*")
+      .in("id",songIds);
+
+    if(error){
+      console.error(error);
+
+      showMessage(
+        "!",
+        "Could not load songs",
+        error.message
+      );
+
+      return;
+    }
+
+    songs = data || [];
+  }
+
+  favoriteSongs =
+    songIds
+      .map(id =>
+        songs.find(
+          song =>
+            String(getSongId(song)) === String(id)
+        )
+      )
+      .filter(Boolean);
+
+  renderFavorites();
+}
+
+function renderFavorites(){
+
+  if(!favoriteSongs.length){
+    showMessage(
+      "♡",
+      "No favorite songs found",
+      "The saved favorites could not be matched with available songs.",
+      "Explore Music",
+      "store.html"
+    );
+
+    return;
+  }
+
+  content.innerHTML =
+    `<div class="songs">
+      ${
+        favoriteSongs
+          .map(song => createSong(song))
+          .join("")
+      }
+    </div>`;
+}
+
+function createSong(song){
+
+  const songId =
+    getSongId(song);
+
+  const title =
+    firstValue(
+      song.title,
+      song.name,
+      "Untitled Song"
+    );
+
+  const artist =
+    getArtistName(song);
+
+  const cover =
+    getCover(song);
+
+  return `
+    <article class="song">
+
+      ${
+        cover
+        ?
+        `<img
+          class="cover"
+          src="${escapeHtml(cover)}"
+          alt="${escapeHtml(title)}"
+          loading="lazy"
+          onerror="this.outerHTML='<div class=&quot;cover-placeholder&quot;>♫</div>'"
+        >`
+        :
+        `<div class="cover-placeholder">♫</div>`
+      }
+
+      <div class="info">
+        <div class="title">
+          ${escapeHtml(title)}
+        </div>
+
+        <div class="artist">
+          ${escapeHtml(artist)}
+        </div>
+
+        <div class="meta">
+          Added to favorites
+        </div>
+      </div>
+
+      <div class="actions">
+
+        ${
+          getAudio(song)
+          ?
+          `<button
+            class="action play"
+            onclick="playSong(${JSON.stringify(song).replace(/"/g,"&quot;")})"
+          >
+            ▶ Play
+          </button>`
+          :
+          ""
+        }
+
+        <a
+          class="action"
+          href="song.html?id=${encodeURIComponent(songId)}"
+        >
+          View
+        </a>
+
+        <button
+          class="action remove"
+          onclick="removeFavorite('${escapeHtml(songId)}')"
+        >
+          ♥ Remove
+        </button>
+
+      </div>
+
+    </article>
+  `;
+}
+
+async function removeFavorite(songId){
+
+  if(!currentUser){
+    location.href = "login.html";
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("favorites")
+    .delete()
+    .eq("user_id",currentUser.id)
+    .eq("song_id",songId);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  await loadFavorites();
+}
+
+async function clearFavorites(){
+
+  if(!currentUser){
+    location.href = "login.html";
+    return;
+  }
+
+  if(!confirm(
+    "Remove all your favorite songs?"
+  )){
+    return;
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("favorites")
+    .delete()
+    .eq("user_id",currentUser.id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  await loadFavorites();
+}
+
+function playSong(song){
+
+  const source =
+    getAudio(song);
+
+  if(!source){
+    alert(
+      "This song does not have a playable preview."
+    );
+    return;
+  }
+
+  const title =
+    firstValue(
+      song.title,
+      song.name,
+      "Untitled Song"
+    );
+
+  const artist =
+    getArtistName(song);
+
+  playerTitle.textContent =
+    title;
+
+  playerArtist.textContent =
+    artist;
+
+  audio.src =
+    source;
+
+  player.style.display =
+    "flex";
+
+  audio.play().catch(
+    error =>
+      console.error(error)
+  );
+}
+
+clearBtn.addEventListener(
+  "click",
+  clearFavorites
+);
+
+document
+  .getElementById("searchInput")
+  .addEventListener(
+    "keydown",
+    event => {
+      if(event.key === "Enter"){
+        const value =
+          event.target.value.trim();
+
+        if(value){
+          window.location.href =
+            "store.html?search=" +
+            encodeURIComponent(value);
+        }
+      }
+    }
+  );
+
+supabaseClient.auth.onAuthStateChange(
+  () => {
+    loadFavorites();
+    loadAccount();
+  }
+);
+
+async function init(){
+
+  await loadAccount();
+  await loadFavorites();
+
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker
+      .register("/sw.js")
+      .catch(
+        error =>
+          console.error(error)
+      );
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
