@@ -1,3151 +1,1684 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1">
-
-<meta
-  name="theme-color"
-  content="#8b5cf6">
-
-<link
-  rel="manifest"
-  href="manifest.json">
-
-<title>PASONG — Charts</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#8b5cf6">
+<link rel="manifest" href="manifest.json">
+<title>PASONG — Music Charts</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 body{
-  margin:0;
-  background:#08080d;
+  font-family:Arial,sans-serif;
+  background:#09090f;
   color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
 }
+button,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
 
-a{
-  color:inherit;
-  text-decoration:none;
-}
-
-button,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-.topbar{
+header{
   position:sticky;
   top:0;
   z-index:100;
+  background:rgba(9,9,15,.94);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.header-inner{
+  max-width:1200px;
+  margin:auto;
+  min-height:68px;
   display:flex;
   align-items:center;
   gap:18px;
-  padding:14px 20px;
-  background:rgba(8,8,13,.96);
-  border-bottom:1px solid #20202b;
-  backdrop-filter:blur(14px);
+  padding:10px 18px;
 }
-
 .logo{
-  font-size:20px;
+  font-size:22px;
   font-weight:900;
-  white-space:nowrap;
+  letter-spacing:.5px;
   color:#fff;
+  white-space:nowrap;
 }
-
+.logo span{color:#a78bfa}
 .nav{
   display:flex;
   align-items:center;
-  gap:16px;
+  gap:7px;
+  flex:1;
   overflow-x:auto;
   scrollbar-width:none;
-  flex:1;
 }
-
-.nav::-webkit-scrollbar{
-  display:none;
-}
-
+.nav::-webkit-scrollbar{display:none}
 .nav a{
+  padding:9px 11px;
+  border-radius:9px;
   color:#aaa;
-  font-size:14px;
+  font-size:13px;
   white-space:nowrap;
 }
-
-.nav a:hover,
-.nav a.active{
+.nav a:hover,.nav a.active{
   color:#fff;
+  background:rgba(139,92,246,.14);
+}
+.account{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.1);
+  background:#15151f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:17px;
+  flex-shrink:0;
 }
 
-.account-link{
-  padding:8px 12px;
-  border:1px solid #292936;
-  border-radius:10px;
-  color:#ddd !important;
-}
-
-.page{
-  width:min(1180px,calc(100% - 28px));
-  margin:0 auto;
-  padding:32px 0 70px;
+main{
+  max-width:1200px;
+  margin:auto;
+  padding:22px 18px 70px;
 }
 
 .hero{
   position:relative;
-  min-height:285px;
-  margin-bottom:28px;
-  padding:34px;
-  border:1px solid #2b2940;
-  border-radius:26px;
   overflow:hidden;
+  min-height:285px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:22px;
+  padding:30px;
   background:
-    radial-gradient(
-      circle at 88% 15%,
-      rgba(192,132,252,.25),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 12% 90%,
-      rgba(236,72,153,.16),
-      transparent 32%
-    ),
-    linear-gradient(
-      135deg,
-      #15131f 0%,
-      #0e0d16 48%,
-      #0a0a10 100%
-    );
-  box-shadow:
-    0 25px 70px rgba(0,0,0,.35);
+    radial-gradient(circle at 80% 20%,rgba(139,92,246,.22),transparent 32%),
+    radial-gradient(circle at 15% 90%,rgba(236,72,153,.13),transparent 30%),
+    linear-gradient(135deg,#11111a,#0c0c13);
+  margin-bottom:22px;
 }
-
-.hero::before{
-  content:"";
-  position:absolute;
-  width:300px;
-  height:300px;
-  right:-90px;
-  top:-150px;
-  border-radius:50%;
-  border:1px solid rgba(192,132,252,.2);
-  box-shadow:
-    0 0 0 35px rgba(139,92,246,.035),
-    0 0 0 70px rgba(139,92,246,.025),
-    0 0 0 105px rgba(139,92,246,.018);
-}
-
-.hero::after{
-  content:"";
-  position:absolute;
-  left:-10%;
-  right:-10%;
-  bottom:-90px;
-  height:150px;
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      rgba(139,92,246,.1),
-      transparent
-    );
-  transform:rotate(-3deg);
-}
-
 .hero-content{
   position:relative;
-  z-index:3;
-  max-width:680px;
+  z-index:2;
+  max-width:720px;
 }
-
-.hero-kicker{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  margin-bottom:17px;
-  padding:7px 11px;
-  border:1px solid rgba(192,132,252,.25);
-  border-radius:999px;
-  background:rgba(139,92,246,.08);
-  color:#c084fc;
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:1.2px;
-  text-transform:uppercase;
+.eyebrow{
+  color:#a78bfa;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  margin-bottom:10px;
 }
-
-.hero-live-dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:#ec4899;
-  box-shadow:0 0 12px rgba(236,72,153,.8);
-  animation:heroPulse 1.8s infinite;
-}
-
-@keyframes heroPulse{
-
-  0%,
-  100%{
-    opacity:1;
-    transform:scale(1);
-  }
-
-  50%{
-    opacity:.45;
-    transform:scale(.72);
-  }
-
-}
-
 .hero h1{
-  margin:0 0 12px;
-  font-size:clamp(38px,6vw,64px);
-  line-height:.98;
-  letter-spacing:-2px;
+  font-size:clamp(30px,6vw,56px);
+  line-height:1;
+  margin-bottom:12px;
 }
-
-.hero h1 span{
-  background:linear-gradient(
-    90deg,
-    #fff,
-    #c084fc,
-    #ec4899
-  );
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-
 .hero p{
-  margin:0;
-  max-width:590px;
-  color:#a1a0ad;
-  font-size:15px;
+  color:#aaa;
+  max-width:650px;
   line-height:1.6;
+  font-size:14px;
 }
-
 .hero-stats{
-  position:absolute;
-  z-index:3;
-  right:30px;
-  bottom:28px;
   display:flex;
-  gap:9px;
+  gap:10px;
+  margin-top:24px;
+  flex-wrap:wrap;
 }
-
 .hero-stat{
-  min-width:105px;
+  min-width:115px;
   padding:12px 14px;
   border:1px solid rgba(255,255,255,.09);
   border-radius:13px;
   background:rgba(10,10,16,.65);
   backdrop-filter:blur(10px);
+  transition:.2s;
+  cursor:pointer;
+  text-align:left;
+  color:#fff;
 }
-
+.hero-stat:hover{
+  transform:translateY(-3px);
+  border-color:#8b5cf6;
+  background:rgba(139,92,246,.12);
+}
+.hero-stat.active{
+  border-color:#8b5cf6;
+  background:rgba(139,92,246,.16);
+  box-shadow:0 0 25px rgba(139,92,246,.12);
+}
 .hero-stat strong{
   display:block;
-  margin-bottom:4px;
-  font-size:17px;
+  font-size:20px;
+  margin-bottom:5px;
 }
-
 .hero-stat span{
-  color:#777783;
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
+  display:block;
+  font-size:12px;
+  color:#aaa;
+  font-weight:700;
 }
-
-.hero-equalizer{
+.equalizer{
   position:absolute;
-  z-index:2;
-  right:36px;
-  top:48px;
+  right:35px;
+  bottom:25px;
   display:flex;
-  align-items:flex-end;
-  gap:5px;
-  height:85px;
+  align-items:end;
+  gap:6px;
+  height:150px;
   opacity:.55;
 }
-
-.hero-bar{
-  width:5px;
-  border-radius:999px;
-  background:linear-gradient(
-    to top,
-    #8b5cf6,
-    #ec4899
-  );
-  animation:equalizer 1.3s ease-in-out infinite alternate;
+.equalizer i{
+  display:block;
+  width:7px;
+  border-radius:8px;
+  background:linear-gradient(#a78bfa,#ec4899);
+  animation:eq 1.2s ease-in-out infinite alternate;
 }
+.equalizer i:nth-child(1){height:35px;animation-delay:.1s}
+.equalizer i:nth-child(2){height:85px;animation-delay:.3s}
+.equalizer i:nth-child(3){height:55px;animation-delay:.2s}
+.equalizer i:nth-child(4){height:125px;animation-delay:.4s}
+.equalizer i:nth-child(5){height:75px;animation-delay:.1s}
+.equalizer i:nth-child(6){height:145px;animation-delay:.5s}
+.equalizer i:nth-child(7){height:90px;animation-delay:.2s}
+.equalizer i:nth-child(8){height:120px;animation-delay:.4s}
+.equalizer i:nth-child(9){height:60px;animation-delay:.1s}
+@keyframes eq{to{transform:scaleY(.45)}}
 
-.hero-bar:nth-child(1){
-  height:30%;
-  animation-delay:.1s;
+.section{
+  margin-top:22px;
 }
-
-.hero-bar:nth-child(2){
-  height:70%;
-  animation-delay:.25s;
-}
-
-.hero-bar:nth-child(3){
-  height:45%;
-  animation-delay:.4s;
-}
-
-.hero-bar:nth-child(4){
-  height:90%;
-  animation-delay:.15s;
-}
-
-.hero-bar:nth-child(5){
-  height:55%;
-  animation-delay:.35s;
-}
-
-.hero-bar:nth-child(6){
-  height:76%;
-  animation-delay:.2s;
-}
-
-.hero-bar:nth-child(7){
-  height:38%;
-  animation-delay:.5s;
-}
-
-@keyframes equalizer{
-
-  from{
-    transform:scaleY(.55);
-  }
-
-  to{
-    transform:scaleY(1);
-  }
-
-}
-
-.chart-controls{
+.section-head{
   display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:18px;
+  justify-content:space-between;
+  align-items:end;
+  gap:15px;
+  margin-bottom:12px;
 }
-
-.chart-btn,
-.period-btn,
-.filter-btn{
-  border:1px solid #292936;
-  background:#111119;
-  color:#aaa;
-  border-radius:10px;
-  padding:9px 13px;
-  transition:.2s;
+.section-head h2{
+  font-size:20px;
 }
-
-.chart-btn:hover,
-.period-btn:hover,
-.filter-btn:hover{
-  border-color:#555566;
-  color:#fff;
-}
-
-.chart-btn.active,
-.period-btn.active,
-.filter-btn.active{
-  background:#8b5cf6;
-  border-color:#8b5cf6;
-  color:#fff;
-}
-
-.filter-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:9px;
-  align-items:center;
-  margin-bottom:22px;
-}
-
-.genre-select{
-  background:#111119;
-  border:1px solid #292936;
-  color:#ddd;
-  border-radius:10px;
-  padding:10px 13px;
-  min-width:170px;
-  outline:none;
+.section-head p{
+  color:#777;
+  font-size:12px;
+  margin-top:5px;
 }
 
 .chart-card{
-  background:linear-gradient(145deg,#111119,#0c0c12);
-  border:1px solid #242430;
+  background:#101018;
+  border:1px solid rgba(255,255,255,.08);
   border-radius:18px;
   overflow:hidden;
-  margin-bottom:26px;
 }
-
-.chart-head{
+.chart-toolbar{
+  padding:14px;
+  border-bottom:1px solid rgba(255,255,255,.07);
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:15px;
-  padding:18px;
-  border-bottom:1px solid #22222c;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
 }
-
-.chart-title{
-  margin:0 0 5px;
-  font-size:21px;
+.chart-tabs{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+}
+.chart-btn,.period-btn{
+  border:1px solid rgba(255,255,255,.08);
+  background:#171720;
+  color:#aaa;
+  border-radius:9px;
+  padding:8px 12px;
+  font-size:12px;
+  white-space:nowrap;
+}
+.chart-btn:hover,.period-btn:hover{
+  color:#fff;
+  border-color:#8b5cf6;
+}
+.chart-btn.active,.period-btn.active{
+  color:#fff;
+  background:#8b5cf6;
+  border-color:#8b5cf6;
+}
+.filters{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.genre-select{
+  background:#171720;
+  color:#ddd;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:9px;
+  padding:8px 11px;
+  outline:none;
+}
+.periods{
+  display:flex;
+  gap:7px;
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  overflow-x:auto;
 }
 
 .chart-description{
-  margin:0;
-  color:#888894;
-  font-size:13px;
-}
-
-.refresh-btn{
-  border:1px solid #343443;
-  background:#181821;
-  color:#ddd;
-  border-radius:9px;
-  padding:8px 12px;
-  white-space:nowrap;
-}
-
-.refresh-btn:hover{
-  background:#22222d;
-}
-
-.song-list{
-  display:flex;
-  flex-direction:column;
+  padding:13px 14px;
+  color:#888;
+  font-size:12px;
+  line-height:1.5;
 }
 
 .song-row{
   display:grid;
-  grid-template-columns:58px 1fr auto;
-  gap:14px;
+  grid-template-columns:52px minmax(0,1fr) auto;
+  gap:13px;
   align-items:center;
-  padding:14px 18px;
-  border-bottom:1px solid #1c1c25;
+  padding:12px 14px;
+  border-top:1px solid rgba(255,255,255,.055);
+  transition:.2s;
 }
-
-.song-row:last-child{
-  border-bottom:0;
+.song-row:hover{
+  background:rgba(139,92,246,.055);
 }
-
-.song-cover{
-  width:58px;
-  height:58px;
-  border-radius:12px;
-  object-fit:cover;
-  display:block;
+.song-number{
+  width:48px;
+  height:48px;
+  border-radius:10px;
   background:#191923;
-  border:1px solid #292936;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  color:#888;
+  font-size:13px;
+  font-weight:800;
 }
-
-.song-cover-placeholder{
-  width:58px;
-  height:58px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  background:
-    radial-gradient(
-      circle at 30% 20%,
-      rgba(192,132,252,.35),
-      transparent 45%
-    ),
-    linear-gradient(145deg,#191923,#0d0d14);
-  color:#c084fc;
-  font-size:19px;
-  font-weight:900;
-  border:1px solid #292936;
+.song-number span{
+  position:relative;
+  z-index:1;
 }
-
+.song-number img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:2;
+}
 .song-main{
   min-width:0;
 }
-
 .song-title{
+  display:block;
+  color:#fff;
+  font-size:14px;
   font-weight:800;
-  font-size:15px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
-
 .song-artist{
-  margin-top:4px;
-  color:#a3a3ad;
-  font-size:13px;
+  color:#999;
+  font-size:12px;
+  margin-top:5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-
 .song-meta{
   display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:7px;
-  color:#73737e;
-  font-size:11px;
+  gap:9px;
+  margin-top:5px;
+  color:#666;
+  font-size:10px;
 }
-
 .song-actions{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
-
-.song-stats{
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-  text-align:right;
-  color:#73737e;
+.song-stat{
+  color:#999;
+  font-size:11px;
+  white-space:nowrap;
+}
+.listen-btn{
+  border:1px solid rgba(139,92,246,.35);
+  background:rgba(139,92,246,.1);
+  color:#c4b5fd;
+  padding:8px 11px;
+  border-radius:8px;
   font-size:11px;
 }
-
-.open-song{
-  padding:8px 11px;
-  border-radius:9px;
+.listen-btn:hover{
   background:#8b5cf6;
   color:#fff;
-  font-size:12px;
-  font-weight:700;
 }
-
-.open-song:hover{
-  background:#9b6af8;
-}
-
-.empty-state{
-  padding:35px 20px;
+.empty{
+  padding:35px 15px;
   text-align:center;
-  color:#777782;
+  color:#777;
+  font-size:13px;
+}
+.loading{
+  padding:35px 15px;
+  text-align:center;
+  color:#888;
+  font-size:13px;
 }
 
-.discover-row{
+.discover-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:14px;
-  margin:26px 0 34px;
+  gap:15px;
 }
-
 .discover-card{
   position:relative;
-  min-height:150px;
-  padding:22px;
-  border:1px solid #282832;
-  border-radius:18px;
   overflow:hidden;
+  min-height:230px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#101018;
+}
+.discover-card.beats{
+  cursor:pointer;
+}
+.beat-feature-image{
+  position:absolute;
+  inset:0;
+  background:#161620;
+}
+.beat-feature-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:opacity .45s,transform .6s;
+}
+.beat-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.9));
+}
+.beat-info{
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:17px;
+  z-index:2;
+}
+.beat-label{
+  display:inline-block;
+  background:#8b5cf6;
+  color:#fff;
+  padding:5px 8px;
+  border-radius:7px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.5px;
+  margin-bottom:8px;
+}
+.beat-info h3{
+  font-size:21px;
+  margin-bottom:5px;
+}
+.beat-info p{
+  color:#bbb;
+  font-size:12px;
+}
+.beat-dots{
+  position:absolute;
+  right:18px;
+  top:18px;
+  display:flex;
+  gap:5px;
+  z-index:3;
+}
+.beat-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:rgba(255,255,255,.3);
+}
+.beat-dot.active{background:#fff}
+.dj-card{
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
   background:
-    radial-gradient(
-      circle at 100% 0%,
-      rgba(139,92,246,.28),
-      transparent 40%
-    ),
-    linear-gradient(145deg,#14141e,#0c0c12);
-  transition:.2s;
+    radial-gradient(circle at 90% 15%,rgba(236,72,153,.18),transparent 35%),
+    #101018;
 }
-
-.discover-card:hover{
-  transform:translateY(-2px);
-  border-color:#555566;
+.dj-card .small{
+  color:#a78bfa;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1px;
 }
-
-.discover-icon{
-  font-size:28px;
-  margin-bottom:12px;
+.dj-card h3{
+  font-size:24px;
+  margin:8px 0;
 }
-
-.discover-card h3{
-  margin:0 0 6px;
-  font-size:20px;
-}
-
-.discover-card p{
-  margin:0;
-  color:#9999a4;
+.dj-card p{
+  color:#999;
   font-size:13px;
-  max-width:320px;
   line-height:1.5;
 }
-
-.discover-arrow{
-  position:absolute;
-  right:20px;
-  bottom:18px;
-  color:#c084fc;
-  font-size:20px;
+.discover-link{
+  display:inline-block;
+  margin-top:16px;
+  width:max-content;
+  padding:9px 13px;
+  border-radius:9px;
+  background:#8b5cf6;
+  font-size:12px;
+  font-weight:800;
 }
 
 .news-section{
-  margin-top:12px;
+  margin-top:25px;
 }
-
-.news-section-head{
+.news-controls{
   display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:15px;
-  margin-bottom:16px;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-bottom:13px;
 }
-
-.news-section-head h2{
-  margin:0 0 6px;
-  font-size:23px;
+.news-btn{
+  border:1px solid rgba(255,255,255,.08);
+  background:#15151e;
+  color:#999;
+  padding:8px 11px;
+  border-radius:9px;
+  font-size:11px;
 }
-
-.news-section-head p{
-  margin:0;
-  color:#888894;
-  font-size:13px;
-  line-height:1.5;
+.news-btn.active{
+  color:#fff;
+  background:#8b5cf6;
+  border-color:#8b5cf6;
 }
-
-.news-filters{
+.news-featured{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  min-height:240px;
+  background:#101018;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  overflow:hidden;
+  margin-bottom:14px;
+}
+.news-featured-image{
+  min-height:240px;
+  background:#171720;
+}
+.news-featured-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.news-featured-text{
+  padding:22px;
   display:flex;
   flex-direction:column;
-  gap:9px;
-  margin-bottom:18px;
+  justify-content:center;
 }
-
-.news-filter-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
+.news-source{
+  color:#a78bfa;
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.8px;
 }
-
+.news-featured-text h3{
+  font-size:22px;
+  line-height:1.25;
+  margin:9px 0;
+}
+.news-featured-text p{
+  color:#999;
+  font-size:12px;
+  line-height:1.5;
+}
 .news-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px;
+  gap:12px;
 }
-
-.news-featured{
-  position:relative;
-  min-height:390px;
-  border:1px solid #292936;
-  border-radius:20px;
-  overflow:hidden;
-  margin-bottom:16px;
-  background:
-    radial-gradient(
-      circle at 80% 10%,
-      rgba(139,92,246,.35),
-      transparent 35%
-    ),
-    linear-gradient(145deg,#171720,#09090d);
-}
-
-.news-featured-image{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  background:#12121a;
-}
-
-.news-featured::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(
-      to top,
-      rgba(0,0,0,.94) 0%,
-      rgba(0,0,0,.65) 42%,
-      rgba(0,0,0,.08) 100%
-    );
-  pointer-events:none;
-}
-
-.news-featured.featured-no-image{
-  background:
-    radial-gradient(
-      circle at 80% 10%,
-      rgba(139,92,246,.4),
-      transparent 35%
-    ),
-    radial-gradient(
-      circle at 10% 80%,
-      rgba(236,72,153,.2),
-      transparent 35%
-    ),
-    linear-gradient(145deg,#191923,#09090d);
-}
-
-.featured-placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#c084fc;
-  font-size:42px;
-  font-weight:900;
-  letter-spacing:2px;
-  opacity:.22;
-}
-
-.news-featured-content{
-  position:absolute;
-  z-index:2;
-  left:0;
-  right:0;
-  bottom:0;
-  padding:25px;
-}
-
-.news-label{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 9px;
-  margin-bottom:10px;
-  border-radius:7px;
-  background:rgba(139,92,246,.9);
-  color:#fff;
-  font-size:10px;
-  font-weight:900;
-  letter-spacing:.6px;
-}
-
-.news-featured-meta{
-  color:#d0d0d7;
-  font-size:11px;
-  margin-bottom:8px;
-}
-
-.news-featured h3{
-  margin:0 0 9px;
-  max-width:850px;
-  font-size:clamp(23px,4vw,37px);
-  line-height:1.12;
-}
-
-.news-featured p{
-  margin:0 0 15px;
-  max-width:780px;
-  color:#c3c3ca;
-  font-size:13px;
-  line-height:1.55;
-}
-
-.news-read{
-  display:inline-flex;
-  padding:9px 13px;
-  border-radius:9px;
-  background:#fff;
-  color:#08080d;
-  font-size:12px;
-  font-weight:800;
-}
-
-.news-rotation{
-  position:absolute;
-  z-index:5;
-  left:0;
-  bottom:0;
-  width:100%;
-  height:3px;
-  background:rgba(255,255,255,.1);
-}
-
-.news-rotation span{
-  display:block;
-  width:0;
-  height:100%;
-  background:linear-gradient(90deg,#8b5cf6,#ec4899);
-  animation:newsProgress 10s linear forwards;
-}
-
-@keyframes newsProgress{
-
-  from{
-    width:0;
-  }
-
-  to{
-    width:100%;
-  }
-
-}
-
 .news-card{
-  min-width:0;
-  background:#101017;
-  border:1px solid #252530;
-  border-radius:16px;
-  overflow:hidden;
-  transition:.2s;
-}
-
-.news-card:hover{
-  transform:translateY(-2px);
-  border-color:#444452;
-}
-
-.news-image-wrap{
-  position:relative;
-  height:165px;
-  background:
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(139,92,246,.3),
-      transparent 35%
-    ),
-    linear-gradient(145deg,#191923,#0b0b10);
+  background:#101018;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
   overflow:hidden;
 }
-
 .news-image{
-  display:block;
+  height:145px;
+  background:#171720;
+}
+.news-image img{
   width:100%;
   height:100%;
   object-fit:cover;
 }
-
-.news-image-wrap.news-image-fallback::before{
-  content:"PASONG NEWS";
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#c084fc;
-  font-size:17px;
-  font-weight:900;
-  letter-spacing:1.5px;
-  opacity:.45;
+.news-body{
+  padding:13px;
 }
-
-.news-card-content{
-  padding:14px;
+.news-body h4{
+  font-size:13px;
+  line-height:1.4;
+  margin:5px 0 8px;
 }
-
-.news-card-meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  color:#888894;
-  font-size:10px;
-  margin-bottom:8px;
+.news-body p{
+  color:#777;
+  font-size:11px;
+  line-height:1.45;
 }
-
-.news-card h3{
-  margin:0 0 9px;
-  font-size:15px;
-  line-height:1.35;
-}
-
-.news-card p{
-  margin:0 0 11px;
-  color:#898994;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.news-card-link{
-  color:#c084fc;
-  font-size:12px;
+.news-read{
+  display:inline-block;
+  margin-top:10px;
+  color:#a78bfa;
+  font-size:11px;
   font-weight:800;
-}
-
-.news-source{
-  margin-top:5px;
-  color:#666671;
-  font-size:10px;
-}
-
-.news-loading{
-  grid-column:1/-1;
-  padding:35px;
-  text-align:center;
-  color:#777782;
-  border:1px dashed #2a2a35;
-  border-radius:15px;
 }
 
 footer{
-  padding:28px 15px;
-  border-top:1px solid #20202b;
   text-align:center;
-  color:#666672;
-  font-size:12px;
+  color:#555;
+  font-size:11px;
+  padding:25px 15px 40px;
 }
 
-@media(max-width:900px){
-
-  .hero{
-    min-height:320px;
-  }
-
-  .hero-stats{
-    position:relative;
-    right:auto;
-    bottom:auto;
-    margin-top:28px;
-  }
-
-  .hero-equalizer{
-    right:25px;
-    top:40px;
-  }
-
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translate(-50%,20px);
+  background:#171720;
+  border:1px solid rgba(255,255,255,.1);
+  color:#fff;
+  padding:11px 15px;
+  border-radius:10px;
+  font-size:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:300;
+}
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
 }
 
 @media(max-width:800px){
-
-  .topbar{
-    gap:12px;
-    padding:12px 14px;
-  }
-
-  .logo{
-    font-size:17px;
-  }
-
-  .nav{
-    gap:12px;
-  }
-
-  .nav a{
-    font-size:12px;
-  }
-
-  .page{
-    width:min(100% - 20px,1180px);
-    padding-top:26px;
-  }
-
+  .header-inner{gap:10px}
+  .nav a{padding:8px 8px;font-size:11px}
+  .hero{padding:23px;min-height:330px}
+  .equalizer{right:18px;bottom:18px;opacity:.25}
+  .discover-grid{grid-template-columns:1fr}
+  .news-featured{grid-template-columns:1fr}
+  .news-featured-image{height:210px;min-height:210px}
+  .news-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  main{padding:14px 11px 55px}
+  .header-inner{padding:8px 11px}
+  .logo{font-size:19px}
+  .nav a:nth-child(n+4){display:none}
+  .hero{border-radius:17px;padding:20px}
+  .hero h1{font-size:34px}
+  .hero-stats{display:grid;grid-template-columns:repeat(3,1fr)}
+  .hero-stat{min-width:0;padding:10px}
+  .hero-stat strong{font-size:17px}
+  .hero-stat span{font-size:10px}
   .song-row{
-    grid-template-columns:48px 1fr;
+    grid-template-columns:48px minmax(0,1fr);
+    gap:10px;
   }
-
   .song-actions{
     grid-column:2;
-    justify-content:space-between;
+    margin-top:-3px;
   }
-
-  .song-stats{
-    flex-direction:row;
-    text-align:left;
-  }
-
-  .discover-row{
-    grid-template-columns:1fr;
-  }
-
-  .news-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
+  .song-stat{font-size:10px}
+  .listen-btn{padding:7px 9px}
+  .news-grid{grid-template-columns:1fr}
+  .news-image{height:180px}
 }
-
-@media(max-width:560px){
-
-  .hero{
-    min-height:390px;
-    padding:25px 20px;
-    border-radius:21px;
-  }
-
-  .hero h1{
-    font-size:37px;
-  }
-
-  .hero p{
-    max-width:100%;
-  }
-
-  .hero-equalizer{
-    top:30px;
-    right:22px;
-    height:60px;
-    opacity:.3;
-  }
-
-  .hero-stats{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
-  }
-
-  .hero-stat{
-    min-width:0;
-  }
-
-  .chart-head{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .refresh-btn{
-    width:100%;
-  }
-
-  .news-section-head{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .news-section-head .refresh-btn{
-    width:auto;
-  }
-
-  .news-featured{
-    min-height:350px;
-  }
-
-  .news-featured-content{
-    padding:18px;
-  }
-
-  .news-featured h3{
-    font-size:23px;
-  }
-
-  .news-grid{
-    grid-template-columns:1fr;
-  }
-
-  .news-image-wrap{
-    height:190px;
-  }
-
-}
-
 </style>
-
 </head>
 
 <body>
 
-<header class="topbar">
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">◈ PASONG</a>
 
-  <a
-    href="index.html"
-    class="logo">
-    ◈ PASONG
-  </a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="store.html">Music Store</a>
+      <a class="active" href="charts.html">Charts</a>
+      <a href="artists.html">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
+      <a href="upload.html">Upload Music</a>
+    </nav>
 
-  <nav class="nav">
-
-    <a href="index.html">
-      Home
-    </a>
-
-    <a href="store.html">
-      Music Store
-    </a>
-
-    <a
-      href="charts.html"
-      class="active">
-      Charts
-    </a>
-
-    <a href="artists.html">
-      Artists
-    </a>
-
-    <a href="playlists.html">
-      Playlists
-    </a>
-
-    <a href="promotion.html">
-      Promotion
-    </a>
-
-  </nav>
-
-  <a
-    href="account.html"
-    class="account-link">
-    Account
-  </a>
-
+    <a class="account" href="account.html">◉</a>
+  </div>
 </header>
 
-<main class="page">
+<main>
 
   <section class="hero">
-
     <div class="hero-content">
-
-      <div class="hero-kicker">
-        <span class="hero-live-dot"></span>
-        PASONG MUSIC CHARTS
-      </div>
-
-      <h1>
-        What's moving<br>
-        <span>on PASONG?</span>
-      </h1>
-
-      <p>
-        Discover the songs, artists and sounds getting attention across PASONG. Explore what's rising, what's new and what listeners are playing.
-      </p>
+      <div class="eyebrow">PASONG MUSIC CHARTS</div>
+      <h1>What's moving on PASONG?</h1>
+      <p>Discover songs with real plays and downloads, fresh releases, trending music and the latest stories around African music.</p>
 
       <div class="hero-stats">
-
-        <div class="hero-stat">
+        <button type="button" class="hero-stat active" data-hero-chart="top">
           <strong>🔥</strong>
           <span>Top Songs</span>
-        </div>
+        </button>
 
-        <div class="hero-stat">
+        <button type="button" class="hero-stat" data-hero-chart="trending">
           <strong>📈</strong>
           <span>Trending</span>
-        </div>
+        </button>
 
-        <div class="hero-stat">
+        <button type="button" class="hero-stat" data-hero-chart="latest">
           <strong>🆕</strong>
           <span>Latest Music</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="equalizer" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2 id="chartHeading">Top Songs</h2>
+        <p id="chartSubheading">Songs ranked by actual plays and downloads across PASONG.</p>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-toolbar">
+        <div class="chart-tabs">
+          <button type="button" class="chart-btn active" data-chart="top">Top Songs</button>
+          <button type="button" class="chart-btn" data-chart="trending">Trending</button>
+          <button type="button" class="chart-btn" data-chart="latest">Latest</button>
         </div>
 
+        <div class="filters">
+          <select id="genreSelect" class="genre-select">
+            <option value="all">All Genres</option>
+          </select>
+        </div>
       </div>
 
+      <div class="periods">
+        <button type="button" class="period-btn active" data-period="today">Today</button>
+        <button type="button" class="period-btn" data-period="week">This Week</button>
+        <button type="button" class="period-btn" data-period="month">This Month</button>
+        <button type="button" class="period-btn" data-period="all">All Time</button>
+      </div>
+
+      <div class="chart-description" id="chartDescription">
+        Top Songs uses the real play and download counters returned by PASONG. Songs do not disappear simply because they were uploaded earlier.
+      </div>
+
+      <div id="chartsList">
+        <div class="loading">Loading PASONG charts...</div>
+      </div>
     </div>
-
-    <div class="hero-equalizer">
-
-      <span class="hero-bar"></span>
-      <span class="hero-bar"></span>
-      <span class="hero-bar"></span>
-      <span class="hero-bar"></span>
-      <span class="hero-bar"></span>
-      <span class="hero-bar"></span>
-      <span class="hero-bar"></span>
-
-    </div>
-
   </section>
 
-  <div class="chart-controls">
-
-    <button
-      class="chart-btn active"
-      data-chart="top">
-      🔥 Top Songs
-    </button>
-
-    <button
-      class="chart-btn"
-      data-chart="trending">
-      📈 Trending
-    </button>
-
-    <button
-      class="chart-btn"
-      data-chart="latest">
-      🆕 Latest
-    </button>
-
-  </div>
-
-  <div class="filter-row">
-
-    <button
-      class="period-btn active"
-      data-period="today">
-      Today
-    </button>
-
-    <button
-      class="period-btn"
-      data-period="week">
-      This Week
-    </button>
-
-    <button
-      class="period-btn"
-      data-period="month">
-      This Month
-    </button>
-
-    <button
-      class="period-btn"
-      data-period="all">
-      All Time
-    </button>
-
-    <select
-      id="genreSelect"
-      class="genre-select">
-
-      <option value="all">
-        All Genres
-      </option>
-
-    </select>
-
-  </div>
-
-  <section class="chart-card">
-
-    <div class="chart-head">
-
+  <section class="section">
+    <div class="section-head">
       <div>
-
-        <h2
-          id="chartTitle"
-          class="chart-title">
-          🔥 Top Songs
-        </h2>
-
-        <p
-          id="chartDescription"
-          class="chart-description">
-          Songs currently receiving the most activity.
-        </p>
-
+        <h2>Discover</h2>
+        <p>More music and creators on PASONG.</p>
       </div>
-
-      <button
-        id="refreshCharts"
-        class="refresh-btn">
-        ↻ Refresh
-      </button>
-
     </div>
 
-    <div
-      id="songList"
-      class="song-list">
+    <div class="discover-grid">
 
-      <div class="empty-state">
-        Loading charts...
+      <a class="discover-card beats" id="freeBeatsCard" href="producers.html">
+        <div class="beat-feature-image">
+          <img id="freeBeatCover" src="" alt="Free beat cover">
+        </div>
+
+        <div class="beat-overlay"></div>
+
+        <div class="beat-dots" id="beatDots"></div>
+
+        <div class="beat-info">
+          <span class="beat-label">FREE BEATS</span>
+          <h3 id="freeBeatTitle">Discover free beats</h3>
+          <p id="freeBeatProducer">Loading beats...</p>
+        </div>
+      </a>
+
+      <div class="discover-card dj-card">
+        <span class="small">PASONG DISCOVER</span>
+        <h3>Top DJs</h3>
+        <p>Discover DJs, mixes and creators bringing fresh sounds to the PASONG community.</p>
+        <a class="discover-link" href="djs.html">Explore DJs</a>
       </div>
 
     </div>
-
-  </section>
-
-  <section class="discover-row">
-
-    <a
-      href="producers.html"
-      class="discover-card">
-
-      <div class="discover-icon">
-        🎧
-      </div>
-
-      <h3>
-        FREE BEATS
-      </h3>
-
-      <p>
-        Find your next sound. Stream producer beats and discover your next track.
-      </p>
-
-      <div class="discover-arrow">
-        →
-      </div>
-
-    </a>
-
-    <a
-      href="artists.html"
-      class="discover-card">
-
-      <div class="discover-icon">
-        🎛️
-      </div>
-
-      <h3>
-        TOP DJs
-      </h3>
-
-      <p>
-        Discover DJs, mixes and new sounds from PASONG creators.
-      </p>
-
-      <div class="discover-arrow">
-        →
-      </div>
-
-    </a>
-
   </section>
 
   <section class="news-section">
-
-    <div class="news-section-head">
-
+    <div class="section-head">
       <div>
-
-        <h2>
-          🌍 African Music & Entertainment
-        </h2>
-
-        <p>
-          Fresh music, artists, industry and entertainment stories from Uganda and across Africa.
-        </p>
-
+        <h2>Music News</h2>
+        <p>Latest music stories and entertainment updates.</p>
       </div>
-
-      <button
-        id="refreshNews"
-        class="refresh-btn">
-        ↻ Refresh
-      </button>
-
     </div>
 
-    <div class="news-filters">
-
-      <div class="news-filter-row">
-
-        <button
-          class="filter-btn news-region active"
-          data-region="Africa">
-          🌍 Africa
-        </button>
-
-        <button
-          class="filter-btn news-region"
-          data-region="Uganda">
-          🇺🇬 Uganda
-        </button>
-
-        <button
-          class="filter-btn news-region"
-          data-region="East Africa">
-          🌍 East Africa
-        </button>
-
-        <button
-          class="filter-btn news-region"
-          data-region="West Africa">
-          🌍 West Africa
-        </button>
-
-        <button
-          class="filter-btn news-region"
-          data-region="South Africa">
-          🇿🇦 South Africa
-        </button>
-
-        <button
-          class="filter-btn news-region"
-          data-region="Worldwide">
-          🌎 Worldwide
-        </button>
-
-      </div>
-
-      <div class="news-filter-row">
-
-        <button
-          class="filter-btn news-category active"
-          data-category="All">
-          All
-        </button>
-
-        <button
-          class="filter-btn news-category"
-          data-category="Music">
-          🎵 Music
-        </button>
-
-        <button
-          class="filter-btn news-category"
-          data-category="Artists">
-          🎤 Artists
-        </button>
-
-        <button
-          class="filter-btn news-category"
-          data-category="Industry">
-          💼 Industry
-        </button>
-
-        <button
-          class="filter-btn news-category"
-          data-category="Events">
-          🎟️ Events
-        </button>
-
-      </div>
-
+    <div class="news-controls">
+      <button type="button" class="news-btn active" data-region="Africa">Africa</button>
+      <button type="button" class="news-btn" data-region="Uganda">Uganda</button>
+      <button type="button" class="news-btn" data-region="Kenya">Kenya</button>
+      <button type="button" class="news-btn" data-region="Tanzania">Tanzania</button>
+      <button type="button" class="news-btn" data-region="Nigeria">Nigeria</button>
+      <button type="button" class="news-btn" data-region="Global">Global</button>
     </div>
 
-    <div id="featuredNews"></div>
-
-    <div
-      id="newsGrid"
-      class="news-grid">
-
-      <div class="news-loading">
-        Loading African music news...
-      </div>
-
+    <div id="newsFeatured"></div>
+    <div id="newsGrid" class="news-grid">
+      <div class="loading">Loading music news...</div>
     </div>
-
   </section>
 
 </main>
 
 <footer>
-  PASONG © 2026
+  © <span id="year"></span> PASONG — Music marketplace for African creators.
 </footer>
 
+<div id="toast" class="toast"></div>
+
 <script>
+const API_BASE="https://pasong-api.onrender.com";
+const SUPABASE_URL="https://YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY";
 
-const API_BASE = "https://pasong-api.onrender.com";
-
-let songs = [];
-
-let currentChart = "top";
-let currentPeriod = "today";
-let currentGenre = "all";
-
-let newsItems = [];
-let newsRegion = "Africa";
-let newsCategory = "All";
-
-let newsRotationTimer = null;
-let newsFeaturedIndex = 0;
-
-const NEWS_ROTATION_MS = 10000;
-
-const NEWS_FALLBACK = [
-
-  {
-    title:"Uganda music and entertainment",
-    description:"Latest music, artists and entertainment stories from Uganda.",
-    link:"https://news.google.com/",
-    pubDate:"30 Sep 2026",
-    source:"Google News",
-    region:"Uganda",
-    category:"Music",
-    image:""
-  },
-
-  {
-    title:"East African music and artists",
-    description:"New releases, artists and entertainment stories from across East Africa.",
-    link:"https://news.google.com/",
-    pubDate:"30 Sep 2026",
-    source:"Google News",
-    region:"East Africa",
-    category:"Music",
-    image:""
-  },
-
-  {
-    title:"West African music and entertainment",
-    description:"Music, artists and entertainment developments from West Africa.",
-    link:"https://news.google.com/",
-    pubDate:"30 Sep 2026",
-    source:"Google News",
-    region:"West Africa",
-    category:"Music",
-    image:""
-  },
-
-  {
-    title:"South African music and entertainment",
-    description:"The latest stories from South Africa's music and entertainment scene.",
-    link:"https://news.google.com/",
-    pubDate:"30 Sep 2026",
-    source:"Google News",
-    region:"South Africa",
-    category:"Music",
-    image:""
-  },
-
-  {
-    title:"African music industry",
-    description:"Industry developments, artists and entertainment news from across Africa.",
-    link:"https://news.google.com/",
-    pubDate:"30 Sep 2026",
-    source:"Google News",
-    region:"Africa",
-    category:"Industry",
-    image:""
-  },
-
-  {
-    title:"African music events",
-    description:"Concerts, festivals and entertainment events from across Africa.",
-    link:"https://news.google.com/",
-    pubDate:"30 Sep 2026",
-    source:"Google News",
-    region:"Africa",
-    category:"Events",
-    image:""
+let supabaseClient=null;
+try{
+  if(!SUPABASE_URL.includes("YOUR_") && !SUPABASE_ANON_KEY.includes("YOUR_")){
+    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   }
+}catch(e){}
 
-];
+let songs=[];
+let beats=[];
+let currentChart="top";
+let currentPeriod="today";
+let currentGenre="all";
+let newsRegion="Africa";
+let newsItems=[];
+let beatIndex=0;
+let beatTimer=null;
 
-const NEWS_FEEDS = [
-
-  {
-    region:"Uganda",
-    url:"https://news.google.com/rss/search?q=Uganda+music+artists+entertainment+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen"
-  },
-
-  {
-    region:"East Africa",
-    url:"https://news.google.com/rss/search?q=East+Africa+music+artists+entertainment+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen"
-  },
-
-  {
-    region:"West Africa",
-    url:"https://news.google.com/rss/search?q=West+Africa+music+artists+entertainment+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen"
-  },
-
-  {
-    region:"South Africa",
-    url:"https://news.google.com/rss/search?q=South+Africa+music+artists+entertainment+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen"
-  },
-
-  {
-    region:"Africa",
-    url:"https://news.google.com/rss/search?q=Africa+music+artists+entertainment+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen"
-  },
-
-  {
-    region:"Worldwide",
-    url:"https://news.google.com/rss/search?q=African+music+artists+entertainment+when%3A14d&hl=en-US&gl=US&ceid=US%3Aen"
-  }
-
-];
+const $=id=>document.getElementById(id);
 
 function escapeHTML(value){
-
-  return String(value || "")
+  return String(value ?? "")
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;")
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#039;");
+}
 
+function parseNumber(value){
+  if(typeof value==="number" && Number.isFinite(value)) return value;
+  if(typeof value==="string"){
+    const n=Number(value.replace(/,/g,"").replace(/[^\d.-]/g,""));
+    return Number.isFinite(n)?n:0;
+  }
+  return 0;
 }
 
 function getTitle(song){
-
-  return (
-    song.title ||
-    song.name ||
-    "Untitled Song"
-  );
-
+  return song.title || song.name || "Untitled Song";
 }
 
 function getArtist(song){
-
-  return (
-    song.performing_name ||
+  return song.performing_name ||
     song.stage_name ||
     song.artist_name ||
     song.artist ||
     song.artistName ||
-    "PASONG Artist"
-  );
-
+    song.artist?.performing_name ||
+    song.artist?.stage_name ||
+    "PASONG Artist";
 }
 
 function getGenre(song){
-
-  return (
-    song.genre ||
-    song.category ||
-    "Music"
-  );
-
+  return song.genre || song.category || "Music";
 }
 
 function getPlays(song){
-
-  return Number(
+  return parseNumber(
     song.plays ??
     song.play_count ??
+    song.playCount ??
     song.streams ??
     song.stream_count ??
-    song.playCount ??
+    song.streamCount ??
     song.total_plays ??
+    song.total_streams ??
     0
-  ) || 0;
-
+  );
 }
 
 function getDownloads(song){
-
-  return Number(
+  return parseNumber(
     song.downloads ??
     song.download_count ??
-    song.total_downloads ??
     song.downloadCount ??
+    song.total_downloads ??
+    song.totalDownloads ??
     0
-  ) || 0;
-
+  );
 }
 
 function getDate(song){
-
-  return (
-    song.created_at ||
+  return song.created_at ||
     song.release_date ||
     song.released_at ||
     song.published_at ||
     song.date ||
-    ""
-  );
-
+    "";
 }
 
 function getId(song){
-
-  return (
-    song.id ||
-    song.song_id ||
-    song.songId ||
-    ""
-  );
-
+  return song.id || song.song_id || song.songId || "";
 }
 
 function getSongCover(song){
-
-  const candidates = [
-
+  const candidates=[
     song.cover_url,
     song.cover_image_url,
-    song.cover_image,
-    song.cover,
     song.coverUrl,
-    song.coverImageUrl,
-    song.coverImage,
+    song.cover,
     song.artwork_url,
-    song.artwork,
     song.artworkUrl,
-    song.thumbnail_url,
-    song.thumbnail,
+    song.artwork,
     song.image_url,
+    song.imageUrl,
     song.image,
-    song.photo_url,
-    song.profile_image_url
-
+    song.thumbnail_url,
+    song.thumbnail
   ];
 
   for(const value of candidates){
-
-    if(
-      value &&
-      typeof value === "string" &&
-      /^https?:\/\//i.test(value)
-    ){
-
-      return value;
-
-    }
-
-  }
-
-  if(
-    song.cover &&
-    typeof song.cover === "object"
-  ){
-
-    const nested = [
-      song.cover.url,
-      song.cover.secure_url,
-      song.cover.image_url
-    ];
-
-    for(const value of nested){
-
-      if(
-        value &&
-        typeof value === "string" &&
-        /^https?:\/\//i.test(value)
-      ){
-
-        return value;
-
+    if(typeof value==="string" && value.trim()){
+      if(/^https?:\/\//i.test(value.trim()) || value.startsWith("//")){
+        return value.trim();
       }
-
     }
-
   }
 
   return "";
+}
 
+function getBeatId(beat){
+  return beat.id ||
+    beat.beat_id ||
+    beat.beatId ||
+    "";
+}
+
+function getBeatTitle(beat){
+  return beat.title ||
+    beat.name ||
+    beat.beat_title ||
+    "Untitled Beat";
+}
+
+function getBeatProducer(beat){
+  return beat.producer_name ||
+    beat.performing_name ||
+    beat.stage_name ||
+    beat.producer ||
+    beat.producerName ||
+    beat.producer_profile?.performing_name ||
+    beat.producer_profile?.stage_name ||
+    "PASONG Producer";
+}
+
+function getBeatCover(beat){
+  const candidates=[
+    beat.cover_url,
+    beat.cover_image_url,
+    beat.coverUrl,
+    beat.cover,
+    beat.artwork_url,
+    beat.artworkUrl,
+    beat.artwork,
+    beat.image_url,
+    beat.imageUrl,
+    beat.image,
+    beat.thumbnail_url,
+    beat.thumbnail
+  ];
+
+  for(const value of candidates){
+    if(typeof value==="string" && value.trim()){
+      if(/^https?:\/\//i.test(value.trim()) || value.startsWith("//")){
+        return value.trim();
+      }
+    }
+  }
+
+  return "";
+}
+
+function getBeatLink(beat){
+  const producerId=
+    beat.producer_id ||
+    beat.producer_user_id ||
+    beat.user_id ||
+    beat.producerId ||
+    "";
+
+  if(producerId){
+    return "producers.html?id="+encodeURIComponent(producerId);
+  }
+
+  return "producers.html";
 }
 
 function parseDate(value){
-
-  if(!value){
-    return null;
-  }
-
-  const date = new Date(value);
-
-  if(Number.isNaN(date.getTime())){
-    return null;
-  }
-
-  return date;
-
-}
-
-function isInPeriod(song){
-
-  if(currentPeriod === "all"){
-    return true;
-  }
-
-  const date = parseDate(getDate(song));
-
-  if(!date){
-    return true;
-  }
-
-  const now = new Date();
-  const start = new Date(now);
-
-  if(currentPeriod === "today"){
-    start.setHours(0,0,0,0);
-  }
-
-  if(currentPeriod === "week"){
-    start.setDate(now.getDate() - 7);
-  }
-
-  if(currentPeriod === "month"){
-    start.setMonth(now.getMonth() - 1);
-  }
-
-  return date >= start;
-
+  if(!value) return null;
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?null:d;
 }
 
 function scoreSong(song){
+  return getPlays(song)+(getDownloads(song)*5);
+}
 
-  return (
-    getPlays(song) +
-    getDownloads(song) * 5
-  );
+function activityScore(song){
+  const plays=getPlays(song);
+  const downloads=getDownloads(song);
+  const date=parseDate(getDate(song));
+  let freshness=0;
 
+  if(date){
+    const days=Math.max(0,(Date.now()-date.getTime())/86400000);
+    freshness=Math.max(0,30-days);
+  }
+
+  return plays+(downloads*5)+(freshness*0.01);
+}
+
+function isInPeriod(song){
+  const date=parseDate(getDate(song));
+
+  if(!date) return true;
+  if(currentPeriod==="all") return true;
+
+  const now=new Date();
+  const start=new Date(now);
+
+  if(currentPeriod==="today"){
+    start.setHours(0,0,0,0);
+  }
+
+  if(currentPeriod==="week"){
+    start.setDate(now.getDate()-7);
+  }
+
+  if(currentPeriod==="month"){
+    start.setMonth(now.getMonth()-1);
+  }
+
+  return date>=start;
 }
 
 function getChartSongs(){
+  let list=[...songs];
 
-  let list = [...songs];
-
-  if(currentGenre !== "all"){
-
-    list = list.filter(
-      song =>
-        getGenre(song).toLowerCase() ===
-        currentGenre.toLowerCase()
-    );
-
+  if(currentGenre!=="all"){
+    list=list.filter(song=>{
+      return getGenre(song).toLowerCase()===currentGenre.toLowerCase();
+    });
   }
 
-  if(!list.length){
-    return [];
-  }
+  if(currentChart==="latest"){
+    list=list.filter(isInPeriod);
 
-  if(currentChart === "top"){
+    list.sort((a,b)=>{
+      const da=parseDate(getDate(a))?.getTime() || 0;
+      const db=parseDate(getDate(b))?.getTime() || 0;
+      return db-da;
+    });
 
-    list.sort(
-      (a,b) => {
-
-        const scoreA = scoreSong(a);
-        const scoreB = scoreSong(b);
-
-        if(scoreB !== scoreA){
-          return scoreB - scoreA;
-        }
-
-        const downloadsA = getDownloads(a);
-        const downloadsB = getDownloads(b);
-
-        if(downloadsB !== downloadsA){
-          return downloadsB - downloadsA;
-        }
-
-        const playsA = getPlays(a);
-        const playsB = getPlays(b);
-
-        if(playsB !== playsA){
-          return playsB - playsA;
-        }
-
-        const dateA =
-          parseDate(getDate(a))?.getTime() || 0;
-
-        const dateB =
-          parseDate(getDate(b))?.getTime() || 0;
-
-        return dateB - dateA;
-
-      }
-    );
-
-    return list;
-
-  }
-
-  const periodList =
-    list.filter(isInPeriod);
-
-  if(periodList.length){
-    list = periodList;
-  }
-
-  if(currentChart === "latest"){
-
-    list.sort(
-      (a,b) =>
-        (parseDate(getDate(b))?.getTime() || 0) -
-        (parseDate(getDate(a))?.getTime() || 0)
-    );
-
-  }else if(currentChart === "trending"){
-
-    list.sort(
-      (a,b) => {
-
-        const scoreA =
-          getPlays(a) +
-          getDownloads(a) * 5;
-
-        const scoreB =
-          getPlays(b) +
-          getDownloads(b) * 5;
-
-        const dateA =
-          parseDate(getDate(a))?.getTime() || 0;
-
-        const dateB =
-          parseDate(getDate(b))?.getTime() || 0;
-
-        const recentA =
-          dateA
-            ? Math.max(
-                0,
-                (Date.now() - dateA) / 86400000
-              )
-            : 99999;
-
-        const recentB =
-          dateB
-            ? Math.max(
-                0,
-                (Date.now() - dateB) / 86400000
-              )
-            : 99999;
-
-        const trendA =
-          scoreA +
-          Math.max(0,100 - recentA) * 0.5;
-
-        const trendB =
-          scoreB +
-          Math.max(0,100 - recentB) * 0.5;
-
-        return trendB - trendA;
-
-      }
-    );
-
-  }
-
-  return list;
-
-}
-
-function formatDate(value){
-
-  const date = parseDate(value);
-
-  if(!date){
-    return "Recently";
-  }
-
-  return date.toLocaleDateString(
-    "en-GB",
-    {
-      day:"2-digit",
-      month:"short",
-      year:"numeric"
+    if(!list.length){
+      list=[...songs].sort((a,b)=>{
+        const da=parseDate(getDate(a))?.getTime() || 0;
+        const db=parseDate(getDate(b))?.getTime() || 0;
+        return db-da;
+      });
     }
-  );
 
-}
-
-function renderCharts(){
-
-  const list = getChartSongs();
-
-  const songList =
-    document.getElementById("songList");
-
-  if(!list.length){
-
-    songList.innerHTML = `
-      <div class="empty-state">
-        No songs found for these chart filters.
-      </div>
-    `;
-
-    return;
-
+    return list.slice(0,30);
   }
 
-  songList.innerHTML =
-    list
-      .slice(0,50)
-      .map(
-        (song,index) => {
+  if(currentChart==="top"){
+    list.sort((a,b)=>{
+      const scoreDifference=scoreSong(b)-scoreSong(a);
 
-          const id = getId(song);
-          const title = escapeHTML(getTitle(song));
-          const artist = escapeHTML(getArtist(song));
-          const genre = escapeHTML(getGenre(song));
-          const date = escapeHTML(formatDate(getDate(song)));
-          const plays = getPlays(song);
-          const downloads = getDownloads(song);
-          const cover = getSongCover(song);
+      if(scoreDifference!==0) return scoreDifference;
 
-          const url =
-            id
-              ? `song.html?id=${encodeURIComponent(id)}`
-              : "#";
+      const db=parseDate(getDate(b))?.getTime() || 0;
+      const da=parseDate(getDate(a))?.getTime() || 0;
 
-          const coverMarkup =
-            cover
-              ? `
-                <img
-                  class="song-cover"
-                  src="${escapeHTML(cover)}"
-                  alt="${title}"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  onerror="
-                    this.onerror=null;
-                    this.style.display='none';
-                    this.nextElementSibling.style.display='grid';
-                  ">
-                <div
-                  class="song-cover-placeholder"
-                  style="display:none;">
-                  ♪
-                </div>
-              `
-              : `
-                <div class="song-cover-placeholder">
-                  ♪
-                </div>
-              `;
+      return db-da;
+    });
 
-          return `
+    return list.slice(0,30);
+  }
 
-            <article class="song-row">
+  list.sort((a,b)=>{
+    const scoreDifference=activityScore(b)-activityScore(a);
 
-              ${coverMarkup}
+    if(scoreDifference!==0) return scoreDifference;
 
-              <div class="song-main">
+    const db=parseDate(getDate(b))?.getTime() || 0;
+    const da=parseDate(getDate(a))?.getTime() || 0;
 
-                <div class="song-title">
-                  ${title}
-                </div>
+    return db-da;
+  });
 
-                <div class="song-artist">
-                  ${artist}
-                </div>
-
-                <div class="song-meta">
-
-                  <span>
-                    ${genre}
-                  </span>
-
-                  <span>
-                    ${date}
-                  </span>
-
-                </div>
-
-              </div>
-
-              <div class="song-actions">
-
-                <div class="song-stats">
-
-                  <span>
-                    ${plays.toLocaleString()} plays
-                  </span>
-
-                  <span>
-                    ${downloads.toLocaleString()} downloads
-                  </span>
-
-                </div>
-
-                <a
-                  class="open-song"
-                  href="${url}">
-                  Open Song
-                </a>
-
-              </div>
-
-            </article>
-
-          `;
-
-        }
-      )
-      .join("");
-
+  return list.slice(0,30);
 }
 
 function updateChartHeading(){
+  const titleMap={
+    top:"Top Songs",
+    trending:"Trending Songs",
+    latest:"Latest Music"
+  };
 
-  const title =
-    document.getElementById("chartTitle");
+  const descriptionMap={
+    top:"Songs ranked by actual plays and downloads across PASONG.",
+    trending:"Songs with the strongest recorded activity, with newer songs used as a tie-breaker.",
+    latest:"Recently added music on PASONG."
+  };
 
-  const description =
-    document.getElementById("chartDescription");
+  $("chartHeading").textContent=titleMap[currentChart];
+  $("chartSubheading").textContent=descriptionMap[currentChart];
+  $("chartDescription").textContent=descriptionMap[currentChart];
+}
 
-  if(currentChart === "top"){
+function renderCharts(){
+  const list=getChartSongs();
+  const container=$("chartsList");
 
-    title.textContent = "🔥 Top Songs";
-
-    description.textContent =
-      "Songs ranked by actual plays and downloads across PASONG.";
-
+  if(!list.length){
+    container.innerHTML='<div class="empty">No songs found for this chart.</div>';
+    return;
   }
 
-  if(currentChart === "trending"){
+  container.innerHTML=list.map((song,index)=>{
+    const title=escapeHTML(getTitle(song));
+    const artist=escapeHTML(getArtist(song));
+    const genre=escapeHTML(getGenre(song));
+    const plays=getPlays(song);
+    const downloads=getDownloads(song);
+    const id=getId(song);
+    const cover=escapeHTML(getSongCover(song));
 
-    title.textContent = "📈 Trending";
+    return `
+      <article class="song-row">
+        <div class="song-number">
+          <span>${index+1}</span>
+          ${cover ? `<img src="${cover}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+        </div>
 
-    description.textContent =
-      "Songs gaining attention from PASONG listeners.";
+        <div class="song-main">
+          <a class="song-title" href="song.html?id=${encodeURIComponent(id)}">${title}</a>
+          <div class="song-artist">${artist}</div>
+          <div class="song-meta">
+            <span>${genre}</span>
+            <span>▶ ${plays.toLocaleString()}</span>
+            <span>↓ ${downloads.toLocaleString()}</span>
+          </div>
+        </div>
 
-  }
+        <div class="song-actions">
+          <span class="song-stat">▶ ${plays.toLocaleString()}</span>
+          <button type="button" class="listen-btn" data-song-id="${escapeHTML(id)}">Listen</button>
+        </div>
+      </article>
+    `;
+  }).join("");
 
-  if(currentChart === "latest"){
-
-    title.textContent = "🆕 Latest";
-
-    description.textContent =
-      "Recently added songs on PASONG.";
-
-  }
-
+  container.querySelectorAll(".listen-btn").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const id=button.dataset.songId;
+      if(id){
+        window.location.href="song.html?id="+encodeURIComponent(id);
+      }
+    });
+  });
 }
 
 function populateGenres(){
+  const genres=new Set();
 
-  const select =
-    document.getElementById("genreSelect");
+  songs.forEach(song=>{
+    const genre=getGenre(song);
+    if(genre && genre!=="Music") genres.add(genre);
+  });
 
-  const genres =
-    [...new Set(
-      songs
-        .map(getGenre)
-        .filter(Boolean)
-    )]
-    .sort(
-      (a,b) =>
-        a.localeCompare(b)
-    );
+  const select=$("genreSelect");
 
-  select.innerHTML = `
-    <option value="all">
-      All Genres
-    </option>
-  `;
-
-  genres.forEach(
-    genre => {
-
-      const option =
-        document.createElement("option");
-
-      option.value = genre;
-      option.textContent = genre;
-
+  [...genres]
+    .sort((a,b)=>a.localeCompare(b))
+    .forEach(genre=>{
+      const option=document.createElement("option");
+      option.value=genre;
+      option.textContent=genre;
       select.appendChild(option);
-
-    }
-  );
-
-  if(
-    [...select.options]
-      .some(
-        option =>
-          option.value === currentGenre
-      )
-  ){
-
-    select.value = currentGenre;
-
-  }else{
-
-    currentGenre = "all";
-    select.value = "all";
-
-  }
-
+    });
 }
 
-async function loadCharts(){
-
-  const songList =
-    document.getElementById("songList");
-
-  songList.innerHTML = `
-    <div class="empty-state">
-      Loading charts...
-    </div>
-  `;
-
+async function loadSongs(){
   try{
-
-    const response =
-      await fetch(
-        `${API_BASE}/api/songs`,
-        {
-          method:"GET",
-          headers:{
-            "Accept":"application/json"
-          },
-          cache:"no-store"
-        }
-      );
+    const response=await fetch(`${API_BASE}/api/songs`,{
+      cache:"no-store"
+    });
 
     if(!response.ok){
-      throw new Error(
-        `Unable to load songs: ${response.status}`
-      );
+      throw new Error("Songs request failed");
     }
 
-    const data =
-      await response.json();
-
-    let loadedSongs = [];
+    const data=await response.json();
 
     if(Array.isArray(data)){
-
-      loadedSongs = data;
-
-    }else if(
-      data &&
-      Array.isArray(data.songs)
-    ){
-
-      loadedSongs = data.songs;
-
-    }else if(
-      data &&
-      Array.isArray(data.data)
-    ){
-
-      loadedSongs = data.data;
-
-    }else if(
-      data &&
-      data.data &&
-      Array.isArray(data.data.songs)
-    ){
-
-      loadedSongs = data.data.songs;
-
-    }else if(
-      data &&
-      Array.isArray(data.results)
-    ){
-
-      loadedSongs = data.results;
-
-    }
-
-    songs =
-      loadedSongs.filter(
-        song =>
-          song &&
-          typeof song === "object"
-      );
-
-    console.log(
-      "PASONG charts loaded songs:",
-      songs.length
-    );
-
-    if(!songs.length){
-
-      songList.innerHTML = `
-        <div class="empty-state">
-          No songs are available on PASONG yet.
-        </div>
-      `;
-
-      populateGenres();
-      updateChartHeading();
-
-      return;
-
+      songs=data;
+    }else if(Array.isArray(data.songs)){
+      songs=data.songs;
+    }else if(Array.isArray(data.data)){
+      songs=data.data;
+    }else{
+      songs=[];
     }
 
     populateGenres();
-    updateChartHeading();
     renderCharts();
+  }catch(error){
+    console.error(error);
+    $("chartsList").innerHTML='<div class="empty">Unable to load charts right now.</div>';
+  }
+}
+
+async function loadBeats(){
+  try{
+    const endpoints=[
+      `${API_BASE}/api/beats`,
+      `${API_BASE}/api/producer-beats`,
+      `${API_BASE}/api/beats/public`
+    ];
+
+    let loaded=[];
+
+    for(const endpoint of endpoints){
+      try{
+        const response=await fetch(endpoint,{cache:"no-store"});
+
+        if(!response.ok) continue;
+
+        const data=await response.json();
+
+        if(Array.isArray(data)){
+          loaded=data;
+        }else if(Array.isArray(data.beats)){
+          loaded=data.beats;
+        }else if(Array.isArray(data.data)){
+          loaded=data.data;
+        }
+
+        if(loaded.length) break;
+      }catch(e){}
+    }
+
+    beats=loaded.filter(beat=>{
+      return getBeatCover(beat) || getBeatTitle(beat);
+    });
+
+    if(!beats.length){
+      renderBeatFallback();
+      return;
+    }
+
+    renderBeatDots();
+    showBeat(0);
+
+    clearInterval(beatTimer);
+    beatTimer=setInterval(()=>{
+      if(beats.length>1){
+        beatIndex=(beatIndex+1)%beats.length;
+        showBeat(beatIndex);
+      }
+    },5000);
 
   }catch(error){
-
-    console.error(
-      "Charts error:",
-      error
-    );
-
-    songList.innerHTML = `
-      <div class="empty-state">
-        Unable to load charts right now.
-        Please try again.
-      </div>
-    `;
-
+    console.error(error);
+    renderBeatFallback();
   }
+}
 
+function renderBeatFallback(){
+  $("freeBeatCover").src="";
+  $("freeBeatTitle").textContent="Discover free beats";
+  $("freeBeatProducer").textContent="Explore PASONG producers and beats";
+  $("beatDots").innerHTML="";
+}
+
+function renderBeatDots(){
+  const dots=$("beatDots");
+
+  dots.innerHTML=beats.map((_,index)=>{
+    return `<span class="beat-dot ${index===0?"active":""}"></span>`;
+  }).join("");
+}
+
+function showBeat(index){
+  if(!beats.length) return;
+
+  const beat=beats[index];
+  const cover=getBeatCover(beat);
+  const title=getBeatTitle(beat);
+  const producer=getBeatProducer(beat);
+
+  const image=$("freeBeatCover");
+
+  image.style.opacity="0";
+
+  setTimeout(()=>{
+    image.src=cover || "";
+    image.alt=title+" cover";
+
+    image.onload=()=>{
+      image.style.opacity="1";
+    };
+
+    image.onerror=()=>{
+      image.style.opacity="1";
+    };
+
+    $("freeBeatTitle").textContent=title;
+    $("freeBeatProducer").textContent=producer;
+
+    document.querySelectorAll(".beat-dot").forEach((dot,i)=>{
+      dot.classList.toggle("active",i===index);
+    });
+
+    const card=$("freeBeatsCard");
+    card.href=getBeatLink(beat);
+  },180);
+}
+
+function cleanNewsSource(source){
+  let value=String(source || "Music News");
+
+  value=value.replace(/^["']+|["']+$/g,"");
+  value=value.replace(/\s*-\s*Google News.*$/i,"");
+  value=value.replace(/\s*when\s*:\s*\d+\s*d.*$/i,"");
+
+  return value.trim() || "Music News";
 }
 
 function getNewsImage(item){
-
-  const candidates = [
-
-    item?.thumbnail,
-    item?.thumbnail_url,
-    item?.thumbnailUrl,
-    item?.enclosure?.link,
-    item?.enclosure?.url,
-    item?.enclosure?.href,
-    item?.media_content?.url,
-    item?.media_content?.[0]?.url,
-    item?.media?.content?.url,
-    item?.media?.thumbnail?.url,
-    item?.["media:content"]?.url,
-    item?.["media:thumbnail"]?.url,
-    item?.image,
-    item?.image_url,
-    item?.imageUrl
-
+  const directCandidates=[
+    item.thumbnail,
+    item.thumbnail_url,
+    item.image,
+    item.image_url,
+    item.imageUrl,
+    item.media_url,
+    item.mediaUrl,
+    item.enclosure?.url,
+    item.media?.content?.url,
+    item.media?.thumbnail?.url,
+    item["media:content"]?.url,
+    item["media:thumbnail"]?.url
   ];
 
-  for(const value of candidates){
-
-    if(
-      value &&
-      typeof value === "string" &&
-      /^https?:\/\//i.test(value)
-    ){
-
+  for(const value of directCandidates){
+    if(typeof value==="string" && /^https?:\/\//i.test(value)){
       return value;
-
     }
-
   }
 
-  const text =
-    [
-      item?.content,
-      item?.description,
-      item?.contentSnippet
-    ]
-      .filter(Boolean)
-      .join(" ");
+  const arrays=[
+    item.media_content,
+    item.mediaContent,
+    item.media,
+    item["media:content"]
+  ];
 
-  const imageMatches =
-    text.match(
-      /<img[^>]+(?:src|data-src)=["']([^"']+)["']/gi
-    );
+  for(const array of arrays){
+    if(Array.isArray(array)){
+      for(const entry of array){
+        const url=typeof entry==="string"
+          ? entry
+          : entry?.url || entry?.href || "";
 
-  if(imageMatches){
-
-    for(const tag of imageMatches){
-
-      const match =
-        tag.match(
-          /(?:src|data-src)=["']([^"']+)["']/i
-        );
-
-      if(
-        match &&
-        match[1] &&
-        /^https?:\/\//i.test(match[1])
-      ){
-
-        return match[1];
-
+        if(/^https?:\/\//i.test(url)){
+          return url;
+        }
       }
-
     }
-
   }
 
-  const urlMatch =
-    text.match(
-      /https?:\/\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)(?:\?[^\s"'<>]*)?/i
-    );
+  const htmlSources=[
+    item.content,
+    item.description,
+    item.content_encoded,
+    item["content:encoded"]
+  ];
 
-  if(
-    urlMatch &&
-    urlMatch[0]
-  ){
+  for(const html of htmlSources){
+    if(typeof html!=="string") continue;
 
-    return urlMatch[0];
+    const match=html.match(/<img[^>]+src=["']([^"']+)["']/i);
 
+    if(match && /^https?:\/\//i.test(match[1])){
+      return match[1];
+    }
+
+    const mediaMatch=html.match(/<media:content[^>]+url=["']([^"']+)["']/i);
+
+    if(mediaMatch && /^https?:\/\//i.test(mediaMatch[1])){
+      return mediaMatch[1];
+    }
   }
 
   return "";
-
 }
 
-function detectNewsCategory(title,description){
-
-  const text =
-    `${title} ${description}`.toLowerCase();
-
-  if(
-    /festival|concert|tour|show|event|performance|ticket/.test(text)
-  ){
-
-    return "Events";
-
-  }
-
-  if(
-    /industry|label|streaming|deal|platform|business|award|grammy/.test(text)
-  ){
-
-    return "Industry";
-
-  }
-
-  if(
-    /singer|rapper|artist|star|band|musician|producer|dj/.test(text)
-  ){
-
-    return "Artists";
-
-  }
-
-  return "Music";
-
+function getNewsSource(item,feedTitle){
+  return cleanNewsSource(
+    item.author ||
+    item.source?.title ||
+    item.source?.name ||
+    item.source ||
+    feedTitle ||
+    "Music News"
+  );
 }
 
-function detectRegion(title,description,feedRegion){
+function getNewsText(item){
+  const html=item.description ||
+    item.content ||
+    item.content_encoded ||
+    item["content:encoded"] ||
+    "";
 
-  const text =
-    `${title} ${description}`.toLowerCase();
+  const div=document.createElement("div");
+  div.innerHTML=html;
 
-  if(
-    /uganda|kampala|ugandan/.test(text)
-  ){
+  return (div.textContent || "")
+    .replace(/\s+/g," ")
+    .trim();
+}
 
-    return "Uganda";
+function getNewsRegion(item){
+  const text=(
+    (item.title || "")+" "+
+    (item.description || "")+" "+
+    (item.content || "")
+  ).toLowerCase();
 
-  }
-
-  if(
-    /kenya|tanzania|rwanda|burundi|ethiopia|south sudan|east africa/.test(text)
-  ){
-
-    return "East Africa";
-
-  }
-
-  if(
-    /ghana|nigeria|senegal|gambia|sierra leone|liberia|ivory coast|côte d'ivoire|west africa/.test(text)
-  ){
-
-    return "West Africa";
-
-  }
-
-  if(
-    /south africa|johannesburg|cape town|durban|mzansi|south african/.test(text)
-  ){
-
-    return "South Africa";
-
-  }
-
-  if(feedRegion){
-    return feedRegion;
-  }
+  if(/uganda|kampala|ugandan/.test(text)) return "Uganda";
+  if(/kenya|nairobi|kenyan/.test(text)) return "Kenya";
+  if(/tanzania|dar es salaam|bongo/.test(text)) return "Tanzania";
+  if(/nigeria|lagos|afrobeats nigeria|nollywood/.test(text)) return "Nigeria";
 
   return "Africa";
-
 }
 
-async function fetchRSS(feed){
+function newsMatchesRegion(item){
+  if(newsRegion==="Global") return true;
+  if(newsRegion==="Africa") return true;
 
-  try{
-
-    const rssUrl =
-      encodeURIComponent(feed.url);
-
-    const apiUrl =
-      `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
-
-    const response =
-      await fetch(apiUrl);
-
-    if(!response.ok){
-      throw new Error("RSS request failed");
-    }
-
-    const data =
-      await response.json();
-
-    if(
-      !data.items ||
-      !Array.isArray(data.items)
-    ){
-
-      return [];
-
-    }
-
-    return data.items.map(
-      item => {
-
-        const title =
-          item.title ||
-          "African Music News";
-
-        const description =
-          item.description ||
-          item.contentSnippet ||
-          item.content ||
-          "";
-
-        return {
-
-          title,
-
-          description:
-            description
-              .replace(/<[^>]*>/g,"")
-              .replace(/\s+/g," ")
-              .trim(),
-
-          link:
-            item.link ||
-            "https://news.google.com/",
-
-          pubDate:
-            item.pubDate ||
-            "",
-
-          source:
-            item.author ||
-            data.feed?.title ||
-            "Google News",
-
-          region:
-            detectRegion(
-              title,
-              description,
-              feed.region
-            ),
-
-          category:
-            detectNewsCategory(
-              title,
-              description
-            ),
-
-          image:
-            getNewsImage(item)
-
-        };
-
-      }
-    );
-
-  }catch(error){
-
-    console.warn(
-      "News feed failed:",
-      feed.region,
-      error
-    );
-
-    return [];
-
-  }
-
+  return getNewsRegion(item)===newsRegion;
 }
 
-function newsKey(item){
-
-  return (
-    `${item.title}|${item.link}`
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g," ")
-      .trim()
-  );
-
-}
-
-function cleanNewsItems(items){
-
-  const seen = new Set();
-  const output = [];
-
-  items.forEach(
-    item => {
-
-      const key = newsKey(item);
-
-      if(!key){
-        return;
-      }
-
-      if(seen.has(key)){
-        return;
-      }
-
-      seen.add(key);
-      output.push(item);
-
-    }
-  );
-
-  return output;
-
-}
-
-function getFilteredNews(){
-
-  return newsItems.filter(
-    item => {
-
-      if(
-        newsRegion !== "Africa" &&
-        item.region !== newsRegion
-      ){
-
-        return false;
-
-      }
-
-      if(
-        newsCategory !== "All" &&
-        item.category !== newsCategory
-      ){
-
-        return false;
-
-      }
-
-      return true;
-
-    }
-  );
-
-}
-
-function renderFeaturedNews(item){
-
-  const container =
-    document.getElementById("featuredNews");
-
-  if(!item){
-
-    container.innerHTML = "";
-    return;
-
-  }
-
-  const image =
-    getNewsImage(item);
-
-  const safeTitle =
-    escapeHTML(item.title);
-
-  const safeDescription =
-    escapeHTML(item.description);
-
-  const safeRegion =
-    escapeHTML(item.region);
-
-  const safeDate =
-    escapeHTML(formatDate(item.pubDate));
-
-  const safeSource =
-    escapeHTML(item.source);
-
-  const imageMarkup =
-    image
-      ? `
-        <img
-          class="news-featured-image"
-          src="${escapeHTML(image)}"
-          alt=""
-          referrerpolicy="no-referrer"
-          onerror="
-            this.onerror=null;
-            this.style.display='none';
-            this.parentElement.classList.add('featured-no-image');
-          ">
-      `
-      : `
-        <div class="featured-placeholder">
-          PASONG
-        </div>
-      `;
-
-  container.innerHTML = `
-
-    <article
-      class="news-featured ${image ? "" : "featured-no-image"}">
-
-      ${imageMarkup}
-
-      <div class="news-featured-content">
-
-        <div class="news-label">
-          ✦ FEATURED STORY · AUTO
-        </div>
-
-        <div class="news-featured-meta">
-          ${safeRegion}
-          ·
-          ${safeDate}
-          ·
-          ${safeSource}
-        </div>
-
-        <h3>
-          ${safeTitle}
-        </h3>
-
-        <p>
-          ${safeDescription}
-        </p>
-
-        <a
-          class="news-read"
-          href="${escapeHTML(item.link)}"
-          target="_blank"
-          rel="noopener noreferrer">
-          Read Story →
-        </a>
-
-      </div>
-
-      <div class="news-rotation">
-        <span></span>
-      </div>
-
-    </article>
-
-  `;
-
-}
-
-function renderNewsCards(items){
-
-  const grid =
-    document.getElementById("newsGrid");
-
-  if(!items.length){
-
-    grid.innerHTML = `
-      <div class="news-loading">
-        No stories found for these filters.
-      </div>
-    `;
-
-    return;
-
-  }
-
-  grid.innerHTML =
-    items
-      .map(
-        item => {
-
-          const image =
-            getNewsImage(item);
-
-          const safeTitle =
-            escapeHTML(item.title);
-
-          const safeDescription =
-            escapeHTML(item.description);
-
-          const safeRegion =
-            escapeHTML(item.region);
-
-          const safeDate =
-            escapeHTML(formatDate(item.pubDate));
-
-          const safeCategory =
-            escapeHTML(item.category);
-
-          const safeSource =
-            escapeHTML(item.source);
-
-          const imageMarkup =
-            image
-              ? `
-                <img
-                  class="news-image"
-                  src="${escapeHTML(image)}"
-                  alt=""
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  onerror="
-                    this.onerror=null;
-                    this.style.display='none';
-                    this.parentElement.classList.add('news-image-fallback');
-                  ">
-              `
-              : "";
-
-          return `
-
-            <article class="news-card">
-
-              <div
-                class="news-image-wrap ${image ? "" : "news-image-fallback"}">
-
-                ${imageMarkup}
-
-              </div>
-
-              <div class="news-card-content">
-
-                <div class="news-card-meta">
-
-                  <span>
-                    ${safeRegion}
-                  </span>
-
-                  <span>
-                    ${safeDate}
-                  </span>
-
-                  <span>
-                    ${safeCategory}
-                  </span>
-
-                </div>
-
-                <h3>
-                  ${safeTitle}
-                </h3>
-
-                <p>
-                  ${safeDescription}
-                </p>
-
-                <a
-                  class="news-card-link"
-                  href="${escapeHTML(item.link)}"
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  Read →
-                </a>
-
-                <div class="news-source">
-                  ${safeSource}
-                </div>
-
-              </div>
-
-            </article>
-
-          `;
-
-        }
-      )
-      .join("");
-
+function formatNewsDate(value){
+  const date=parseDate(value);
+
+  if(!date) return "";
+
+  return date.toLocaleDateString(undefined,{
+    day:"numeric",
+    month:"short",
+    year:"numeric"
+  });
 }
 
 function renderNews(){
+  const filtered=newsItems.filter(newsMatchesRegion);
 
-  const items =
-    getFilteredNews();
-
-  if(!items.length){
-
-    newsFeaturedIndex = 0;
-
-    document.getElementById(
-      "featuredNews"
-    ).innerHTML = "";
-
-    renderNewsCards([]);
-
-    stopNewsRotation();
-
-    return;
-
-  }
-
-  newsFeaturedIndex =
-    newsFeaturedIndex % items.length;
-
-  const featured =
-    items[newsFeaturedIndex];
-
-  const remaining =
-    items.filter(
-      (_,index) =>
-        index !== newsFeaturedIndex
-    );
-
-  renderFeaturedNews(featured);
-
-  renderNewsCards(
-    remaining.slice(0,6)
-  );
-
-}
-
-function stopNewsRotation(){
-
-  if(newsRotationTimer){
-
-    clearInterval(newsRotationTimer);
-
-    newsRotationTimer = null;
-
-  }
-
-}
-
-function startNewsRotation(){
-
-  stopNewsRotation();
-
-  const items =
-    getFilteredNews();
-
-  if(items.length <= 1){
+  if(!filtered.length){
+    $("newsFeatured").innerHTML="";
+    $("newsGrid").innerHTML='<div class="empty">No news found for this region.</div>';
     return;
   }
 
-  newsRotationTimer =
-    setInterval(
-      () => {
+  const featured=filtered[0];
+  const rest=filtered.slice(1,10);
 
-        const currentItems =
-          getFilteredNews();
+  const featuredImage=getNewsImage(featured);
+  const featuredTitle=escapeHTML(featured.title || "Music News");
+  const featuredText=escapeHTML(getNewsText(featured).slice(0,240));
+  const featuredSource=escapeHTML(featured.source || "Music News");
+  const featuredLink=featured.link || featured.url || "#";
 
-        if(currentItems.length <= 1){
-
-          stopNewsRotation();
-          return;
-
+  $("newsFeatured").innerHTML=`
+    <a class="news-featured" href="${escapeHTML(featuredLink)}" target="_blank" rel="noopener noreferrer">
+      <div class="news-featured-image">
+        ${
+          featuredImage
+          ? `<img src="${escapeHTML(featuredImage)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
+          : ""
         }
+      </div>
 
-        newsFeaturedIndex =
-          (
-            newsFeaturedIndex + 1
-          ) %
-          currentItems.length;
+      <div class="news-featured-text">
+        <span class="news-source">${featuredSource}</span>
+        <h3>${featuredTitle}</h3>
+        <p>${featuredText || "Read the latest music story."}</p>
+        <span class="news-read">Read story →</span>
+      </div>
+    </a>
+  `;
 
-        renderNews();
+  $("newsGrid").innerHTML=rest.map(item=>{
+    const image=getNewsImage(item);
+    const title=escapeHTML(item.title || "Music News");
+    const text=escapeHTML(getNewsText(item).slice(0,130));
+    const source=escapeHTML(item.source || "Music News");
+    const link=item.link || item.url || "#";
 
-      },
-      NEWS_ROTATION_MS
-    );
+    return `
+      <article class="news-card">
+        <a href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer">
+          <div class="news-image">
+            ${
+              image
+              ? `<img src="${escapeHTML(image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
+              : ""
+            }
+          </div>
 
+          <div class="news-body">
+            <span class="news-source">${source}</span>
+            <h4>${title}</h4>
+            <p>${text}</p>
+            <span class="news-read">Read story →</span>
+          </div>
+        </a>
+      </article>
+    `;
+  }).join("");
 }
 
 async function loadNews(){
+  const feeds={
+    Africa:"https://news.google.com/rss/search?q=African+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
+    Uganda:"https://news.google.com/rss/search?q=Uganda+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
+    Kenya:"https://news.google.com/rss/search?q=Kenya+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
+    Tanzania:"https://news.google.com/rss/search?q=Tanzania+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
+    Nigeria:"https://news.google.com/rss/search?q=Nigeria+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
+    Global:"https://news.google.com/rss/search?q=music+artists+entertainment&hl=en-US&gl=US&ceid=US:en"
+  };
 
-  const grid =
-    document.getElementById("newsGrid");
-
-  grid.innerHTML = `
-    <div class="news-loading">
-      Loading African music news...
-    </div>
-  `;
-
-  stopNewsRotation();
+  $("newsGrid").innerHTML='<div class="loading">Loading music news...</div>';
 
   try{
+    const feedUrl=feeds[newsRegion] || feeds.Africa;
+    const url="https://api.rss2json.com/v1/api.json?rss_url="+encodeURIComponent(feedUrl);
 
-    const results =
-      await Promise.all(
-        NEWS_FEEDS.map(fetchRSS)
-      );
+    const response=await fetch(url,{cache:"no-store"});
+    const data=await response.json();
 
-    let remoteItems =
-      results.flat();
+    const items=Array.isArray(data.items)?data.items:[];
 
-    remoteItems =
-      cleanNewsItems(remoteItems);
-
-    const fallback =
-      cleanNewsItems(NEWS_FALLBACK);
-
-    const combined =
-      cleanNewsItems([
-        ...remoteItems,
-        ...fallback
-      ]);
-
-    newsItems = combined;
-    newsFeaturedIndex = 0;
+    newsItems=items.map(item=>({
+      title:item.title || "Music News",
+      description:item.description || "",
+      content:item.content || "",
+      content_encoded:item.content_encoded || "",
+      "content:encoded":item["content:encoded"] || "",
+      thumbnail:item.thumbnail || "",
+      thumbnail_url:item.thumbnail_url || "",
+      image:item.image || "",
+      image_url:item.image_url || "",
+      enclosure:item.enclosure || {},
+      media:item.media || {},
+      "media:content":item["media:content"] || {},
+      "media:thumbnail":item["media:thumbnail"] || {},
+      author:item.author || "",
+      source:getNewsSource(item,data.feed?.title),
+      link:item.link || "",
+      pubDate:item.pubDate || ""
+    }));
 
     renderNews();
-    startNewsRotation();
-
   }catch(error){
+    console.error(error);
+    $("newsFeatured").innerHTML="";
+    $("newsGrid").innerHTML='<div class="empty">Unable to load music news right now.</div>';
+  }
+}
 
-    console.error(
-      "News error:",
-      error
-    );
+document.querySelectorAll(".hero-stat").forEach(button=>{
+  button.addEventListener("click",()=>{
+    currentChart=button.dataset.heroChart;
 
-    newsItems =
-      cleanNewsItems(
-        NEWS_FALLBACK
-      );
+    document.querySelectorAll(".hero-stat").forEach(item=>{
+      item.classList.toggle("active",item===button);
+    });
 
-    newsFeaturedIndex = 0;
+    document.querySelectorAll(".chart-btn").forEach(item=>{
+      item.classList.toggle("active",item.dataset.chart===currentChart);
+    });
 
-    renderNews();
-    startNewsRotation();
+    updateChartHeading();
+    renderCharts();
 
+    document.querySelector(".chart-card")?.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+  });
+});
+
+document.querySelectorAll(".chart-btn").forEach(button=>{
+  button.addEventListener("click",()=>{
+    currentChart=button.dataset.chart;
+
+    document.querySelectorAll(".chart-btn").forEach(item=>{
+      item.classList.toggle("active",item===button);
+    });
+
+    document.querySelectorAll(".hero-stat").forEach(item=>{
+      item.classList.toggle("active",item.dataset.heroChart===currentChart);
+    });
+
+    updateChartHeading();
+    renderCharts();
+  });
+});
+
+document.querySelectorAll(".period-btn").forEach(button=>{
+  button.addEventListener("click",()=>{
+    currentPeriod=button.dataset.period;
+
+    document.querySelectorAll(".period-btn").forEach(item=>{
+      item.classList.toggle("active",item===button);
+    });
+
+    renderCharts();
+  });
+});
+
+$("genreSelect").addEventListener("change",event=>{
+  currentGenre=event.target.value;
+  renderCharts();
+});
+
+document.querySelectorAll(".news-btn").forEach(button=>{
+  button.addEventListener("click",()=>{
+    newsRegion=button.dataset.region;
+
+    document.querySelectorAll(".news-btn").forEach(item=>{
+      item.classList.toggle("active",item===button);
+    });
+
+    loadNews();
+  });
+});
+
+$("freeBeatsCard").addEventListener("click",event=>{
+  if(!beats.length){
+    return;
   }
 
-}
+  const beat=beats[beatIndex];
 
-function setNewsRegion(region){
-
-  newsRegion = region;
-  newsFeaturedIndex = 0;
-
-  document
-    .querySelectorAll(".news-region")
-    .forEach(
-      button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.region === region
-        );
-
-      }
-    );
-
-  renderNews();
-  startNewsRotation();
-
-}
-
-function setNewsCategory(category){
-
-  newsCategory = category;
-  newsFeaturedIndex = 0;
-
-  document
-    .querySelectorAll(".news-category")
-    .forEach(
-      button => {
-
-        button.classList.toggle(
-          "active",
-          button.dataset.category === category
-        );
-
-      }
-    );
-
-  renderNews();
-  startNewsRotation();
-
-}
-
-document
-  .querySelectorAll(".chart-btn")
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          currentChart =
-            button.dataset.chart;
-
-          document
-            .querySelectorAll(".chart-btn")
-            .forEach(
-              item =>
-                item.classList.toggle(
-                  "active",
-                  item === button
-                )
-            );
-
-          updateChartHeading();
-          renderCharts();
-
-        }
-      );
-
-    }
-  );
-
-document
-  .querySelectorAll(".period-btn")
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          currentPeriod =
-            button.dataset.period;
-
-          document
-            .querySelectorAll(".period-btn")
-            .forEach(
-              item =>
-                item.classList.toggle(
-                  "active",
-                  item === button
-                )
-            );
-
-          renderCharts();
-
-        }
-      );
-
-    }
-  );
-
-document
-  .getElementById("genreSelect")
-  .addEventListener(
-    "change",
-    event => {
-
-      currentGenre =
-        event.target.value;
-
-      renderCharts();
-
-    }
-  );
-
-document
-  .getElementById("refreshCharts")
-  .addEventListener(
-    "click",
-    loadCharts
-  );
-
-document
-  .querySelectorAll(".news-region")
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          setNewsRegion(
-            button.dataset.region
-          );
-
-        }
-      );
-
-    }
-  );
-
-document
-  .querySelectorAll(".news-category")
-  .forEach(
-    button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          setNewsCategory(
-            button.dataset.category
-          );
-
-        }
-      );
-
-    }
-  );
-
-document
-  .getElementById("refreshNews")
-  .addEventListener(
-    "click",
-    loadNews
-  );
-
-document.addEventListener(
-  "visibilitychange",
-  () => {
-
-    if(document.hidden){
-
-      stopNewsRotation();
-
-    }else{
-
-      startNewsRotation();
-
-    }
-
+  if(beat){
+    event.preventDefault();
+    window.location.href=getBeatLink(beat);
   }
-);
+});
 
-loadCharts();
+$("year").textContent=new Date().getFullYear();
+
+updateChartHeading();
+loadSongs();
+loadBeats();
 loadNews();
-
 </script>
 
 </body>
-
 </html>
