@@ -1088,22 +1088,15 @@ async function loadPlayCount(){
   try{
 
     const {
-      count,
+      data,
       error
     } =
-    await supabaseClient
-      .from("song_plays")
-      .select(
-        "id",
-        {
-          count:"exact",
-          head:true
-        }
-      )
-      .eq(
-        "song_id",
-        currentSongId
-      );
+    await supabaseClient.rpc(
+      "get_song_play_count",
+      {
+        p_song_id:currentSongId
+      }
+    );
 
     if(error){
 
@@ -1117,7 +1110,7 @@ async function loadPlayCount(){
     }
 
     const total =
-      Number(count || 0);
+      Number(data || 0);
 
     playCount.textContent =
       "▶ " +
@@ -2064,6 +2057,7 @@ if(tipButton){
       );
 
     }
+
   );
 
 }
