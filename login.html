@@ -1,565 +1,1015 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#8b5cf6">
+
 <title>PASONG — Login</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{
-font-family:Arial,sans-serif;
-background:
-radial-gradient(circle at 15% 20%,rgba(139,92,246,.14),transparent 30%),
-radial-gradient(circle at 85% 80%,rgba(236,72,153,.09),transparent 28%),
-#09090f;
-color:#fff;
-min-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px;
-overflow:hidden
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0
+}
+
+body{
+  font-family:Arial,sans-serif;
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(139,92,246,.14),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(236,72,153,.09),
+      transparent 28%
+    ),
+    #09090f;
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  overflow:hidden
 }
 
 .bg{
-position:fixed;
-inset:0;
-pointer-events:none;
-overflow:hidden
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden
 }
 
 .orb{
-position:absolute;
-border-radius:50%;
-filter:blur(70px);
-opacity:.18
+  position:absolute;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:.18
 }
 
 .orb.one{
-width:220px;
-height:220px;
-background:#8b5cf6;
-top:-80px;
-left:-70px
+  width:220px;
+  height:220px;
+  background:#8b5cf6;
+  top:-80px;
+  left:-70px
 }
 
 .orb.two{
-width:190px;
-height:190px;
-background:#ec4899;
-right:-70px;
-bottom:-70px
+  width:190px;
+  height:190px;
+  background:#ec4899;
+  right:-70px;
+  bottom:-70px
 }
 
 .lines{
-position:absolute;
-inset:0;
-opacity:.035;
-background-image:
-linear-gradient(90deg,#fff 1px,transparent 1px),
-linear-gradient(#fff 1px,transparent 1px);
-background-size:55px 55px
+  position:absolute;
+  inset:0;
+  opacity:.035;
+  background-image:
+    linear-gradient(
+      90deg,
+      #fff 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      #fff 1px,
+      transparent 1px
+    );
+  background-size:55px 55px
 }
 
 .box{
-position:relative;
-z-index:2;
-width:100%;
-max-width:410px;
-background:rgba(18,18,27,.94);
-border:1px solid #292938;
-border-radius:20px;
-padding:30px;
-box-shadow:
-0 25px 80px rgba(0,0,0,.5),
-0 0 45px rgba(139,92,246,.08);
-backdrop-filter:blur(14px)
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:410px;
+  background:rgba(18,18,27,.94);
+  border:1px solid #292938;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.5),
+    0 0 45px rgba(139,92,246,.08);
+  backdrop-filter:blur(14px)
 }
 
 .brand{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:9px;
-margin-bottom:20px
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  margin-bottom:20px
 }
 
 .brand-mark{
-width:38px;
-height:38px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:11px;
-background:linear-gradient(135deg,#8b5cf6,#c084fc);
-font-size:19px;
-font-weight:900;
-box-shadow:0 8px 25px rgba(139,92,246,.28)
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:11px;
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #c084fc
+    );
+  font-size:19px;
+  font-weight:900;
+  box-shadow:
+    0 8px 25px rgba(139,92,246,.28)
 }
 
 .brand-name{
-font-size:22px;
-font-weight:900;
-letter-spacing:.5px
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:.5px
 }
 
 .welcome{
-text-align:center;
-margin-bottom:25px
+  text-align:center;
+  margin-bottom:25px
 }
 
 .welcome h1{
-font-size:27px;
-margin-bottom:8px
+  font-size:27px;
+  margin-bottom:8px
 }
 
 .welcome p{
-color:#9999aa;
-font-size:13px;
-line-height:1.5
+  color:#9999aa;
+  font-size:13px;
+  line-height:1.5
 }
 
 .music-bar{
-display:flex;
-align-items:flex-end;
-justify-content:center;
-gap:4px;
-height:32px;
-margin-bottom:20px
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:4px;
+  height:32px;
+  margin-bottom:20px
 }
 
 .music-bar span{
-width:4px;
-border-radius:4px;
-background:linear-gradient(#c084fc,#8b5cf6);
-animation:pulse 1.1s ease-in-out infinite
+  width:4px;
+  border-radius:4px;
+  background:
+    linear-gradient(
+      #c084fc,
+      #8b5cf6
+    );
+  animation:
+    pulse 1.1s ease-in-out infinite
 }
 
-.music-bar span:nth-child(1){height:12px;animation-delay:.1s}
-.music-bar span:nth-child(2){height:23px;animation-delay:.25s}
-.music-bar span:nth-child(3){height:31px;animation-delay:.4s}
-.music-bar span:nth-child(4){height:18px;animation-delay:.55s}
-.music-bar span:nth-child(5){height:27px;animation-delay:.7s}
-.music-bar span:nth-child(6){height:14px;animation-delay:.85s}
-.music-bar span:nth-child(7){height:22px;animation-delay:.95s}
+.music-bar span:nth-child(1){
+  height:12px;
+  animation-delay:.1s
+}
+
+.music-bar span:nth-child(2){
+  height:23px;
+  animation-delay:.25s
+}
+
+.music-bar span:nth-child(3){
+  height:31px;
+  animation-delay:.4s
+}
+
+.music-bar span:nth-child(4){
+  height:18px;
+  animation-delay:.55s
+}
+
+.music-bar span:nth-child(5){
+  height:27px;
+  animation-delay:.7s
+}
+
+.music-bar span:nth-child(6){
+  height:14px;
+  animation-delay:.85s
+}
+
+.music-bar span:nth-child(7){
+  height:22px;
+  animation-delay:.95s
+}
 
 @keyframes pulse{
-0%,100%{transform:scaleY(.65);opacity:.55}
-50%{transform:scaleY(1);opacity:1}
+
+  0%,100%{
+    transform:scaleY(.65);
+    opacity:.55
+  }
+
+  50%{
+    transform:scaleY(1);
+    opacity:1
+  }
+
 }
 
 .field{
-margin-bottom:16px
+  margin-bottom:16px
 }
 
 label{
-display:block;
-font-size:12px;
-font-weight:700;
-color:#d8d8e4;
-margin-bottom:7px
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:#d8d8e4;
+  margin-bottom:7px
 }
 
 .input-wrap{
-position:relative
+  position:relative
 }
 
 .input-icon{
-position:absolute;
-left:14px;
-top:50%;
-transform:translateY(-50%);
-font-size:15px;
-opacity:.65;
-pointer-events:none
+  position:absolute;
+  left:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:15px;
+  opacity:.65;
+  pointer-events:none
 }
 
 input{
-width:100%;
-height:48px;
-padding:12px 14px 12px 42px;
-border-radius:11px;
-border:1px solid #303040;
-background:#171720;
-color:#fff;
-outline:none;
-font-size:15px;
-transition:.2s
+  width:100%;
+  height:48px;
+  padding:12px 14px 12px 42px;
+  border-radius:11px;
+  border:1px solid #303040;
+  background:#171720;
+  color:#fff;
+  outline:none;
+  font-size:15px;
+  transition:.2s
 }
 
 input:focus{
-border-color:#8b5cf6;
-background:#191922;
-box-shadow:0 0 0 3px rgba(139,92,246,.11)
+  border-color:#8b5cf6;
+  background:#191922;
+  box-shadow:
+    0 0 0 3px rgba(139,92,246,.11)
 }
 
 input::placeholder{
-color:#6f6f80
+  color:#6f6f80
 }
 
 .password-wrap input{
-padding-right:52px
+  padding-right:52px
 }
 
 .toggle{
-position:absolute;
-right:5px;
-top:5px;
-width:38px;
-height:38px;
-padding:0;
-border:0;
-background:transparent;
-color:#9999aa;
-cursor:pointer;
-font-size:16px
+  position:absolute;
+  right:5px;
+  top:5px;
+  width:38px;
+  height:38px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#9999aa;
+  cursor:pointer;
+  font-size:16px
 }
 
 .toggle:hover{
-background:transparent;
-color:#c084fc
+  background:transparent;
+  color:#c084fc
 }
 
 .login-btn{
-width:100%;
-height:48px;
-margin-top:3px;
-border:0;
-border-radius:11px;
-background:linear-gradient(135deg,#8b5cf6,#7c4ee8);
-color:#fff;
-font-size:15px;
-font-weight:800;
-cursor:pointer;
-box-shadow:0 8px 25px rgba(139,92,246,.2);
-transition:.2s
+  width:100%;
+  height:48px;
+  margin-top:3px;
+  border:0;
+  border-radius:11px;
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #7c4ee8
+    );
+  color:#fff;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:
+    0 8px 25px rgba(139,92,246,.2);
+  transition:.2s
 }
 
 .login-btn:hover{
-transform:translateY(-1px);
-box-shadow:0 10px 30px rgba(139,92,246,.3)
+  transform:translateY(-1px);
+  box-shadow:
+    0 10px 30px rgba(139,92,246,.3)
 }
 
 .login-btn:disabled{
-opacity:.6;
-cursor:not-allowed;
-transform:none
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none
 }
 
 .links{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:12px;
-margin-top:16px;
-font-size:13px
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:16px;
+  font-size:13px
 }
 
 a{
-color:#c084fc;
-text-decoration:none;
-transition:.2s
+  color:#c084fc;
+  text-decoration:none;
+  transition:.2s
 }
 
 a:hover{
-color:#ec4899
+  color:#ec4899
 }
 
 .create{
-text-align:center;
-margin-top:20px;
-padding-top:18px;
-border-top:1px solid #252533;
-font-size:13px;
-color:#9999aa
+  text-align:center;
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid #252533;
+  font-size:13px;
+  color:#9999aa
 }
 
 .create a{
-font-weight:700
+  font-weight:700
 }
 
 .error,
 .success{
-display:none;
-padding:10px 12px;
-border-radius:9px;
-font-size:13px;
-line-height:1.45;
-margin-bottom:14px
+  display:none;
+  padding:10px 12px;
+  border-radius:9px;
+  font-size:13px;
+  line-height:1.45;
+  margin-bottom:14px
 }
 
 .error{
-color:#ff9a9a;
-background:#1b1218;
-border:1px solid #493344
+  color:#ff9a9a;
+  background:#1b1218;
+  border:1px solid #493344
 }
 
 .success{
-color:#d7b7ff;
-background:#17121f;
-border:1px solid #49366b
+  color:#d7b7ff;
+  background:#17121f;
+  border:1px solid #49366b
 }
 
 .status{
-min-height:18px;
-margin-top:11px;
-text-align:center;
-font-size:12px;
-color:#9999aa
+  min-height:18px;
+  margin-top:11px;
+  text-align:center;
+  font-size:12px;
+  color:#9999aa
 }
 
 .footer{
-text-align:center;
-margin-top:20px;
-color:#666678;
-font-size:11px;
-line-height:1.5
+  text-align:center;
+  margin-top:20px;
+  color:#666678;
+  font-size:11px;
+  line-height:1.5
 }
 
 @media(max-width:430px){
-body{
-padding:14px
+
+  body{
+    padding:14px
+  }
+
+  .box{
+    padding:25px 20px;
+    border-radius:18px
+  }
+
+  .welcome h1{
+    font-size:24px
+  }
+
 }
 
-.box{
-padding:25px 20px;
-border-radius:18px
-}
-
-.welcome h1{
-font-size:24px
-}
-}
 </style>
 
-</head><body><div class="bg">
-<div class="orb one"></div>
-<div class="orb two"></div>
-<div class="lines"></div>
-</div><div class="box"><div class="brand">
-<div class="brand-mark">◈</div>
-<div class="brand-name">PASONG</div>
-</div><div class="music-bar">
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-<span></span>
-</div><div class="welcome">
-<h1>Welcome back</h1>
-<p>Sign in and continue your PASONG journey.</p>
-</div><div id="err" class="error"></div>
-<div id="success" class="success"></div><form id="loginForm"><div class="field">
-<label for="email">Email</label>
-<div class="input-wrap">
-<span class="input-icon">✉</span>
-<input
-id="email"
-type="email"
-placeholder="Your email"
-autocomplete="email"
-required
->
+</head>
+
+<body>
+
+<div class="bg">
+
+  <div class="orb one"></div>
+
+  <div class="orb two"></div>
+
+  <div class="lines"></div>
+
 </div>
-</div><div class="field">
-<label for="password">Password</label>
-<div class="input-wrap password-wrap">
-<span class="input-icon">🔒</span>
-<input
-id="password"
-type="password"
-placeholder="Your password"
-autocomplete="current-password"
-required
->
-<button
-type="button"
-class="toggle"
-id="togglePassword"
-aria-label="Show password"
->👁</button>
+
+
+<div class="box">
+
+  <div class="brand">
+
+    <div class="brand-mark">
+      ◈
+    </div>
+
+    <div class="brand-name">
+      PASONG
+    </div>
+
+  </div>
+
+
+  <div class="music-bar">
+
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+
+  </div>
+
+
+  <div class="welcome">
+
+    <h1>
+      Welcome back
+    </h1>
+
+    <p>
+      Sign in and continue your PASONG journey.
+    </p>
+
+  </div>
+
+
+  <div
+    id="err"
+    class="error">
+  </div>
+
+  <div
+    id="success"
+    class="success">
+  </div>
+
+
+  <form id="loginForm">
+
+    <div class="field">
+
+      <label for="email">
+        Email
+      </label>
+
+      <div class="input-wrap">
+
+        <span class="input-icon">
+          ✉
+        </span>
+
+        <input
+          id="email"
+          type="email"
+          placeholder="Your email"
+          autocomplete="email"
+          required
+        >
+
+      </div>
+
+    </div>
+
+
+    <div class="field">
+
+      <label for="password">
+        Password
+      </label>
+
+      <div class="input-wrap password-wrap">
+
+        <span class="input-icon">
+          🔒
+        </span>
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Your password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button
+          type="button"
+          class="toggle"
+          id="togglePassword"
+          aria-label="Show password"
+        >
+          👁
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <button
+      type="submit"
+      class="login-btn"
+      id="loginButton"
+    >
+      Login to PASONG
+    </button>
+
+  </form>
+
+
+  <div class="links">
+
+    <a
+      href="#"
+      id="forgotPassword">
+      Forgot password?
+    </a>
+
+    <a href="/index.html">
+      ← Home
+    </a>
+
+  </div>
+
+
+  <div
+    class="status"
+    id="status">
+  </div>
+
+
+  <div class="create">
+
+    Don't have a PASONG account?
+
+    <br>
+
+    <a href="/signup.html">
+      Create your account
+    </a>
+
+  </div>
+
+
+  <div class="footer">
+    PASONG © 2026 • Music • Artists • Opportunity
+  </div>
+
 </div>
-</div><button
-type="submit"
-class="login-btn"
-id="loginButton"
 
-«»
 
-Login to PASONG
-</button>
+<script>
 
-</form><div class="links">
-<a href="#" id="forgotPassword">Forgot password?</a>
-<a href="/index.html">← Home</a>
-</div><div class="status" id="status"></div><div class="create">
-Don't have a PASONG account?
-<br>
-<a href="/signup.html">Create your account</a>
-</div><div class="footer">
-PASONG © 2026 • Music • Artists • Opportunity
-</div></div><script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
 
-const supabaseClient=supabase.createClient(
-SUPABASE_URL,
-SUPABASE_ANON_KEY
-);
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
-const form=document.getElementById("loginForm");
-const email=document.getElementById("email");
-const password=document.getElementById("password");
-const loginButton=document.getElementById("loginButton");
-const togglePassword=document.getElementById("togglePassword");
-const forgotPassword=document.getElementById("forgotPassword");
-const err=document.getElementById("err");
-const success=document.getElementById("success");
-const status=document.getElementById("status");
+
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+const form =
+  document.getElementById(
+    "loginForm"
+  );
+
+const email =
+  document.getElementById(
+    "email"
+  );
+
+const password =
+  document.getElementById(
+    "password"
+  );
+
+const loginButton =
+  document.getElementById(
+    "loginButton"
+  );
+
+const togglePassword =
+  document.getElementById(
+    "togglePassword"
+  );
+
+const forgotPassword =
+  document.getElementById(
+    "forgotPassword"
+  );
+
+const err =
+  document.getElementById(
+    "err"
+  );
+
+const success =
+  document.getElementById(
+    "success"
+  );
+
+const status =
+  document.getElementById(
+    "status"
+  );
+
 
 function clearMessages(){
-err.style.display="none";
-success.style.display="none";
-err.textContent="";
-success.textContent="";
-status.textContent="";
+
+  err.style.display =
+    "none";
+
+  success.style.display =
+    "none";
+
+  err.textContent =
+    "";
+
+  success.textContent =
+    "";
+
+  status.textContent =
+    "";
+
 }
+
 
 function showError(message){
-success.style.display="none";
-err.textContent=message;
-err.style.display="block";
+
+  success.style.display =
+    "none";
+
+  err.textContent =
+    message;
+
+  err.style.display =
+    "block";
+
 }
+
 
 function showSuccess(message){
-err.style.display="none";
-success.textContent=message;
-success.style.display="block";
+
+  err.style.display =
+    "none";
+
+  success.textContent =
+    message;
+
+  success.style.display =
+    "block";
+
 }
+
 
 function friendlyError(message){
-const m=String(message||"").toLowerCase();
 
-if(m.includes("invalid login credentials")){
-return"Email or password is incorrect.";
+  const m =
+    String(message || "")
+      .toLowerCase();
+
+
+  if(
+    m.includes(
+      "invalid login credentials"
+    )
+  ){
+
+    return "Email or password is incorrect.";
+
+  }
+
+
+  if(
+    m.includes(
+      "email not confirmed"
+    )
+  ){
+
+    return "Please confirm your email address before logging in.";
+
+  }
+
+
+  if(
+    m.includes(
+      "too many requests"
+    )
+  ){
+
+    return "Too many attempts. Please wait a moment and try again.";
+
+  }
+
+
+  return (
+    message ||
+    "Login failed. Please try again."
+  );
+
 }
 
-if(m.includes("email not confirmed")){
-return"Please confirm your email address before logging in.";
-}
 
-if(m.includes("too many requests")){
-return"Too many attempts. Please wait a moment and try again.";
-}
+togglePassword.addEventListener(
+  "click",
+  function(){
 
-return message||"Login failed. Please try again.";
-}
+    if(
+      password.type ===
+      "password"
+    ){
 
-togglePassword.addEventListener("click",function(){
-if(password.type==="password"){
-password.type="text";
-togglePassword.textContent="🙈";
-togglePassword.setAttribute("aria-label","Hide password");
-}else{
-password.type="password";
-togglePassword.textContent="👁";
-togglePassword.setAttribute("aria-label","Show password");
-}
-});
+      password.type =
+        "text";
 
-form.addEventListener("submit",async function(e){
-e.preventDefault();
+      togglePassword.textContent =
+        "🙈";
 
-clearMessages();
+      togglePassword.setAttribute(
+        "aria-label",
+        "Hide password"
+      );
 
-const emailValue=email.value.trim();
-const passwordValue=password.value;
+    }else{
 
-if(!emailValue){
-showError("Please enter your email.");
-email.focus();
-return;
-}
+      password.type =
+        "password";
 
-if(!passwordValue){
-showError("Please enter your password.");
-password.focus();
-return;
-}
+      togglePassword.textContent =
+        "👁";
 
-loginButton.disabled=true;
-loginButton.textContent="Signing in...";
-status.textContent="Connecting to PASONG...";
+      togglePassword.setAttribute(
+        "aria-label",
+        "Show password"
+      );
 
-const {data,error}=await supabaseClient.auth.signInWithPassword({
-email:emailValue,
-password:passwordValue
-});
+    }
 
-if(error){
-showError(friendlyError(error.message));
-status.textContent="";
-loginButton.disabled=false;
-loginButton.textContent="Login to PASONG";
-return;
-}
-
-if(!data||!data.session){
-showError("Login was not completed. Please try again.");
-status.textContent="";
-loginButton.disabled=false;
-loginButton.textContent="Login to PASONG";
-return;
-}
-
-showSuccess("You're in. Welcome back to PASONG.");
-status.textContent="Opening your account...";
-loginButton.textContent="Welcome back!";
-
-setTimeout(function(){
-window.location.href="/account.html";
-},700);
-});
-
-forgotPassword.addEventListener("click",async function(e){
-e.preventDefault();
-
-clearMessages();
-
-const emailValue=email.value.trim();
-
-if(!emailValue){
-showError("Enter your email first, then tap Forgot password.");
-email.focus();
-return;
-}
-
-if(!emailValue.includes("@")){
-showError("Please enter a valid email address.");
-email.focus();
-return;
-}
-
-forgotPassword.textContent="Sending...";
-
-const {error}=await supabaseClient.auth.resetPasswordForEmail(
-emailValue,
-{
-redirectTo:window.location.origin+"/login.html"
-}
+  }
 );
 
-if(error){
-showError(friendlyError(error.message));
-forgotPassword.textContent="Forgot password?";
-return;
-}
 
-showSuccess("If this email is registered, a password reset link has been sent.");
-forgotPassword.textContent="Forgot password?";
-});
-</script></body>
+form.addEventListener(
+  "submit",
+  async function(e){
+
+    e.preventDefault();
+
+
+    clearMessages();
+
+
+    const emailValue =
+      email.value.trim();
+
+    const passwordValue =
+      password.value;
+
+
+    if(!emailValue){
+
+      showError(
+        "Please enter your email."
+      );
+
+      email.focus();
+
+      return;
+
+    }
+
+
+    if(!passwordValue){
+
+      showError(
+        "Please enter your password."
+      );
+
+      password.focus();
+
+      return;
+
+    }
+
+
+    loginButton.disabled =
+      true;
+
+    loginButton.textContent =
+      "Signing in...";
+
+    status.textContent =
+      "Connecting to PASONG...";
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.signInWithPassword({
+        email:emailValue,
+        password:passwordValue
+      });
+
+
+    if(error){
+
+      showError(
+        friendlyError(
+          error.message
+        )
+      );
+
+      status.textContent =
+        "";
+
+      loginButton.disabled =
+        false;
+
+      loginButton.textContent =
+        "Login to PASONG";
+
+      return;
+
+    }
+
+
+    if(
+      !data ||
+      !data.session
+    ){
+
+      showError(
+        "Login was not completed. Please try again."
+      );
+
+      status.textContent =
+        "";
+
+      loginButton.disabled =
+        false;
+
+      loginButton.textContent =
+        "Login to PASONG";
+
+      return;
+
+    }
+
+
+    showSuccess(
+      "You're in. Welcome back to PASONG."
+    );
+
+    status.textContent =
+      "Opening your account...";
+
+    loginButton.textContent =
+      "Welcome back!";
+
+
+    setTimeout(
+      function(){
+
+        window.location.href =
+          "/account.html";
+
+      },
+      700
+    );
+
+  }
+);
+
+
+forgotPassword.addEventListener(
+  "click",
+  async function(e){
+
+    e.preventDefault();
+
+
+    clearMessages();
+
+
+    const emailValue =
+      email.value.trim();
+
+
+    if(!emailValue){
+
+      showError(
+        "Enter your email first, then tap Forgot password."
+      );
+
+      email.focus();
+
+      return;
+
+    }
+
+
+    if(!emailValue.includes("@")){
+
+      showError(
+        "Please enter a valid email address."
+      );
+
+      email.focus();
+
+      return;
+
+    }
+
+
+    forgotPassword.textContent =
+      "Sending...";
+
+
+    const {error} =
+      await supabaseClient.auth.resetPasswordForEmail(
+        emailValue,
+        {
+          redirectTo:
+            window.location.origin +
+            "/login.html"
+        }
+      );
+
+
+    if(error){
+
+      showError(
+        friendlyError(
+          error.message
+        )
+      );
+
+      forgotPassword.textContent =
+        "Forgot password?";
+
+      return;
+
+    }
+
+
+    showSuccess(
+      "If this email is registered, a password reset link has been sent."
+    );
+
+    forgotPassword.textContent =
+      "Forgot password?";
+
+  }
+);
+
+</script>
+
+</body>
 </html>
