@@ -1,8 +1,22 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Artists</title><style>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="theme-color"
+  content="#8b5cf6">
+
+<title>PASONG Artists</title>
+
+<style>
+
 *{
   margin:0;
   padding:0;
@@ -197,366 +211,958 @@ footer{
   .nav-links a{
     white-space:nowrap;
   }
+
 }
-</style></head><body><nav><a class="logo" href="index.html">
-  ◈ <span>PASONG</span>
-</a><div class="nav-links"><a href="index.html">Home</a>
 
-<a href="store.html">Music Store</a>
+</style>
 
-<a href="charts.html">Charts</a>
+</head>
 
-<a class="active" href="artists.html">Artists</a>
+<body>
 
-<a href="playlists.html">Playlists</a>
 
-<a href="promotion.html">Promotion</a>
+<nav>
 
-<a href="account.html">Account</a>
+  <a
+    class="logo"
+    href="index.html">
+    ◈ <span>PASONG</span>
+  </a>
 
-</div></nav><main class="container"><section class="hero"><h1>
-PASONG <span>Artists</span>
-</h1><p>
-Discover artists and explore their music on PASONG.
-</p></section><div id="status" class="status">
-Loading artists...
-</div><div id="artists" class="artist-grid"></div></main><footer>
-PASONG © 2026 • Music • Artists • Opportunity
-</footer><script>
+
+  <div class="nav-links">
+
+    <a href="index.html">
+      Home
+    </a>
+
+    <a href="store.html">
+      Music Store
+    </a>
+
+    <a href="charts.html">
+      Charts
+    </a>
+
+    <a
+      class="active"
+      href="artists.html">
+      Artists
+    </a>
+
+    <a href="playlists.html">
+      Playlists
+    </a>
+
+    <a href="promotion.html">
+      Promotion
+    </a>
+
+    <a href="account.html">
+      Account
+    </a>
+
+  </div>
+
+</nav>
+
+
+<main class="container">
+
+
+  <section class="hero">
+
+    <h1>
+      PASONG <span>Artists</span>
+    </h1>
+
+    <p>
+      Discover artists and explore their music on PASONG.
+    </p>
+
+  </section>
+
+
+  <div
+    id="status"
+    class="status">
+
+    Loading artists...
+
+  </div>
+
+
+  <div
+    id="artists"
+    class="artist-grid">
+  </div>
+
+
+</main>
+
+
+<footer>
+
+  PASONG © 2026 • Music • Artists • Opportunity
+
+</footer>
+
+
+<script>
+
 
 const API_BASE =
 "https://pasong-api.onrender.com";
 
 
+function firstValue(){
+
+  const values =
+  Array.from(arguments);
+
+  for(
+    const value of values
+  ){
+
+    if(
+      value !== undefined &&
+      value !== null &&
+      String(value).trim() !== ""
+    ){
+
+      return value;
+
+    }
+
+  }
+
+  return "";
+
+}
+
+
+function getArtistObject(song){
+
+  if(
+    song.artist &&
+    typeof song.artist === "object"
+  ){
+
+    return song.artist;
+
+  }
+
+  if(
+    song.artist_profile &&
+    typeof song.artist_profile === "object"
+  ){
+
+    return song.artist_profile;
+
+  }
+
+  if(
+    song.artistProfile &&
+    typeof song.artistProfile === "object"
+  ){
+
+    return song.artistProfile;
+
+  }
+
+  if(
+    song.artist_data &&
+    typeof song.artist_data === "object"
+  ){
+
+    return song.artist_data;
+
+  }
+
+  if(
+    song.artistData &&
+    typeof song.artistData === "object"
+  ){
+
+    return song.artistData;
+
+  }
+
+  return {};
+
+}
+
+
+function getArtistProfile(song){
+
+  const artist =
+    getArtistObject(song);
+
+  const profile =
+    song.artist_profile ||
+    song.artistProfile ||
+    song.artist_data ||
+    song.artistData ||
+    artist.profile ||
+    artist.profile_data ||
+    artist.profileData ||
+    {};
+
+  return (
+    profile &&
+    typeof profile === "object"
+  )
+    ? profile
+    : {};
+
+}
+
+
+function getArtistId(song){
+
+  const artist =
+    getArtistObject(song);
+
+  const profile =
+    getArtistProfile(song);
+
+  return firstValue(
+
+    song.artist_id,
+
+    song.artistId,
+
+    song.artistID,
+
+    song.artist_uuid,
+
+    song.artistUuid,
+
+    profile.id,
+
+    profile.artist_id,
+
+    profile.artistId,
+
+    artist.id,
+
+    artist.artist_id,
+
+    artist.artistId
+
+  );
+
+}
+
+
+function getArtistName(song){
+
+  const artist =
+    getArtistObject(song);
+
+  const profile =
+    getArtistProfile(song);
+
+
+  return firstValue(
+
+    song.artist_name,
+
+    song.artistName,
+
+    song.artist_performing_name,
+
+    song.artistPerformingName,
+
+    song.artist_stage_name,
+
+    song.artistStageName,
+
+    song.performing_name,
+
+    song.performingName,
+
+    song.stage_name,
+
+    song.stageName,
+
+    song.performer_name,
+
+    song.performerName,
+
+    profile.performing_name,
+
+    profile.performingName,
+
+    profile.stage_name,
+
+    profile.stageName,
+
+    profile.performer_name,
+
+    profile.performerName,
+
+    artist.performing_name,
+
+    artist.performingName,
+
+    artist.stage_name,
+
+    artist.stageName,
+
+    artist.performer_name,
+
+    artist.performerName,
+
+    artist.name,
+
+    artist.display_name,
+
+    artist.displayName,
+
+    artist.username,
+
+    artist.full_name,
+
+    song.artist
+
+  );
+
+}
+
+
+function getArtistImage(song){
+
+  const artist =
+    getArtistObject(song);
+
+  const profile =
+    getArtistProfile(song);
+
+
+  return firstValue(
+
+    song.artist_avatar,
+
+    song.artistAvatar,
+
+    song.artist_avatar_url,
+
+    song.artistAvatarUrl,
+
+    song.artist_image,
+
+    song.artistImage,
+
+    song.artist_image_url,
+
+    song.artistImageUrl,
+
+    song.artist_profile_image,
+
+    song.artistProfileImage,
+
+    song.artist_profile_image_url,
+
+    song.artistProfileImageUrl,
+
+    song.profile_image_url,
+
+    song.profileImageUrl,
+
+    song.avatar_url,
+
+    song.avatarUrl,
+
+    profile.profile_image_url,
+
+    profile.profileImageUrl,
+
+    profile.avatar_url,
+
+    profile.avatarUrl,
+
+    profile.image_url,
+
+    profile.imageUrl,
+
+    artist.profile_image_url,
+
+    artist.profileImageUrl,
+
+    artist.avatar_url,
+
+    artist.avatarUrl,
+
+    artist.image_url,
+
+    artist.imageUrl
+
+  );
+
+}
+
+
+function getArtistBio(song){
+
+  const artist =
+    getArtistObject(song);
+
+  const profile =
+    getArtistProfile(song);
+
+
+  return firstValue(
+
+    song.artist_bio,
+
+    song.artistBio,
+
+    profile.bio,
+
+    profile.description,
+
+    artist.bio,
+
+    artist.description
+
+  );
+
+}
+
+
+function getSongs(data){
+
+  if(
+    Array.isArray(data)
+  ){
+
+    return data;
+
+  }
+
+
+  if(
+    Array.isArray(data.songs)
+  ){
+
+    return data.songs;
+
+  }
+
+
+  if(
+    Array.isArray(data.data)
+  ){
+
+    return data.data;
+
+  }
+
+
+  if(
+    data.data &&
+    Array.isArray(data.data.songs)
+  ){
+
+    return data.data.songs;
+
+  }
+
+
+  if(
+    data.result &&
+    Array.isArray(data.result)
+  ){
+
+    return data.result;
+
+  }
+
+
+  if(
+    data.result &&
+    Array.isArray(data.result.songs)
+  ){
+
+    return data.result.songs;
+
+  }
+
+
+  return [];
+
+}
+
+
 async function loadArtists(){
 
-const status =
-document.getElementById("status");
+  const status =
+  document.getElementById(
+    "status"
+  );
 
-const container =
-document.getElementById("artists");
+  const container =
+  document.getElementById(
+    "artists"
+  );
 
-try{
 
-const response =
-await fetch(
-API_BASE + "/api/songs"
-);
+  status.style.display =
+    "block";
 
-if(!response.ok){
 
-throw new Error(
-"API request failed"
-);
+  status.textContent =
+    "Loading artists...";
 
-}
 
-const data =
-await response.json();
+  container.innerHTML =
+    "";
 
-const songs =
-Array.isArray(data)
-? data
-: (data.songs || []);
 
+  try{
 
-if(!songs.length){
 
-status.style.display="none";
+    const response =
+    await fetch(
+      API_BASE +
+      "/api/songs",
+      {
+        method:"GET",
+        headers:{
+          "Accept":
+            "application/json"
+        },
+        cache:"no-store"
+      }
+    );
 
-container.innerHTML=`
 
-<div class="empty"
-style="grid-column:1/-1;">
+    if(!response.ok){
 
-<h3>No artists yet</h3>
+      throw new Error(
+        "API request failed: " +
+        response.status
+      );
 
-<p style="margin-top:8px;">
-Artists will appear here when music is uploaded to PASONG.
-</p>
+    }
 
-</div>
 
-`;
+    const data =
+    await response.json();
 
-return;
 
-}
+    console.log(
+      "PASONG /api/songs:",
+      data
+    );
 
 
-const artistMap = {};
+    const songs =
+    getSongs(data);
 
 
-songs.forEach(song=>{
+    if(!songs.length){
 
-const artist =
-song.artist || {};
+      status.style.display =
+        "none";
 
-const profile =
-song.artist_profile ||
-song.artistProfile ||
-artist.profile ||
-{};
 
+      container.innerHTML = `
 
-const artistId =
-song.artist_id ||
-song.artistId ||
-artist.id ||
-profile.id;
+        <div
+          class="empty"
+          style="grid-column:1/-1;">
 
+          <h3>
+            No artists yet
+          </h3>
 
-if(!artistId){
+          <p
+            style="margin-top:8px;">
 
-return;
+            Artists will appear here
+            when music is uploaded to PASONG.
 
-}
+          </p>
 
+        </div>
 
-const artistName =
-song.artist_name ||
-song.artistName ||
-song.performing_name ||
-song.performingName ||
-song.stage_name ||
-song.stageName ||
-profile.performing_name ||
-profile.performingName ||
-profile.stage_name ||
-profile.stageName ||
-artist.performing_name ||
-artist.performingName ||
-artist.stage_name ||
-artist.stageName ||
-artist.name ||
-"Unknown Artist";
+      `;
 
 
-const artistCover =
-song.artist_avatar ||
-song.artist_image ||
-song.artistImage ||
-song.artist_profile_image ||
-song.artistProfileImage ||
-song.profile_image_url ||
-profile.profile_image_url ||
-profile.avatar_url ||
-profile.image_url ||
-artist.profile_image_url ||
-artist.avatar_url ||
-artist.image_url ||
-"";
+      return;
 
+    }
 
-if(!artistMap[artistId]){
 
-artistMap[artistId]={
+    const artistMap = {};
 
-id:artistId,
 
-name:artistName,
+    songs.forEach(
+      function(song){
 
-cover:artistCover,
+        const artistId =
+          getArtistId(song);
 
-songs:0
 
-};
+        if(!artistId){
 
-}
+          return;
 
-else{
+        }
 
-if(
-artistMap[artistId].name === "Unknown Artist" &&
-artistName !== "Unknown Artist"
-){
 
-artistMap[artistId].name =
-artistName;
+        const artistName =
+          getArtistName(song) ||
+          "Unknown Artist";
 
-}
 
-if(
-!artistMap[artistId].cover &&
-artistCover
-){
+        const artistCover =
+          getArtistImage(song);
 
-artistMap[artistId].cover =
-artistCover;
 
-}
+        const artistBio =
+          getArtistBio(song);
 
-}
 
-artistMap[artistId].songs++;
+        if(!artistMap[artistId]){
 
-});
+          artistMap[artistId] = {
 
+            id:
+              artistId,
 
-const artists =
-Object.values(artistMap);
+            name:
+              artistName,
 
+            cover:
+              artistCover,
 
-status.style.display="none";
+            bio:
+              artistBio,
 
+            songs:
+              0
 
-if(!artists.length){
+          };
 
-container.innerHTML=`
+        }
 
-<div class="empty"
-style="grid-column:1/-1;">
 
-No artists found.
+        else{
 
-</div>
 
-`;
+          if(
 
-return;
+            (
+              artistMap[artistId].name ===
+              "Unknown Artist"
 
-}
+            ) &&
 
+            (
+              artistName !==
+              "Unknown Artist"
+            )
 
-container.innerHTML =
-artists.map(artist=>{
+          ){
 
-const name =
-artist.name || "Unknown Artist";
+            artistMap[artistId].name =
+              artistName;
 
-const initial =
-name
-.charAt(0)
-.toUpperCase();
+          }
 
 
-const image =
-artist.cover
-? `
+          if(
 
-<img
-class="artist-image"
-src="${escapeHtml(artist.cover)}"
-alt="${escapeHtml(name)}"
-onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
->
+            !artistMap[artistId].cover &&
+            artistCover
 
-<div
-class="artist-placeholder"
-style="display:none"
->
-${escapeHtml(initial)}
-</div>
+          ){
 
-`
-: `
+            artistMap[artistId].cover =
+              artistCover;
 
-<div class="artist-placeholder">
-${escapeHtml(initial)}
-</div>
+          }
 
-`;
 
+          if(
 
-const profileLink =
-"artist.html?id=" +
-encodeURIComponent(artist.id);
+            !artistMap[artistId].bio &&
+            artistBio
 
+          ){
 
-return `
+            artistMap[artistId].bio =
+              artistBio;
 
-<div class="artist-card">
+          }
 
-${image}
+        }
 
-<div class="artist-name">
-${escapeHtml(name)}
-</div>
 
-<div class="artist-info">
+        artistMap[artistId].songs++;
 
-${artist.songs}
-${artist.songs === 1 ? "song" : "songs"}
+      }
+    );
 
-</div>
 
-<a
-class="view-btn"
-href="${profileLink}"
->
-View Artist
-</a>
+    const artists =
+      Object.values(
+        artistMap
+      );
 
-</div>
 
-`;
+    status.style.display =
+      "none";
 
-}).join("");
 
+    if(!artists.length){
 
-}catch(error){
+      container.innerHTML = `
 
-console.error(
-"PASONG Artists Error:",
-error
-);
+        <div
+          class="empty"
+          style="grid-column:1/-1;">
 
-status.style.display="none";
+          <h3>
+            No artists found
+          </h3>
 
-container.innerHTML=`
+          <p
+            style="margin-top:8px;">
 
-<div class="empty"
-style="grid-column:1/-1;">
+            No artist profiles could be
+            identified from the uploaded music.
 
-<h3>
-Artists could not be loaded
-</h3>
+          </p>
 
-<p style="margin-top:8px;">
+        </div>
 
-PASONG could not connect to the
-music service right now.
+      `;
 
-</p>
 
-<button
-onclick="loadArtists()"
-style="
-margin-top:18px;
-border:0;
-padding:10px 18px;
-border-radius:9px;
-background:linear-gradient(90deg,#8d45d2,#d94b9d);
-color:#fff;
-cursor:pointer;
-font-weight:600;
-"
->
-Try Again
-</button>
+      return;
 
-</div>
+    }
 
-`;
 
-}
+    container.innerHTML =
+      artists.map(
+        function(artist){
+
+          const name =
+            artist.name ||
+            "Unknown Artist";
+
+
+          const initial =
+            name
+              .trim()
+              .charAt(0)
+              .toUpperCase() ||
+            "A";
+
+
+          let image;
+
+
+          if(artist.cover){
+
+            image = `
+
+              <img
+                class="artist-image"
+                src="${escapeHtml(
+                  artist.cover
+                )}"
+                alt="${escapeHtml(
+                  name
+                )}"
+                onerror="
+                  this.style.display='none';
+                  this.nextElementSibling.style.display='flex';
+                "
+              >
+
+              <div
+                class="artist-placeholder"
+                style="display:none;">
+
+                ${escapeHtml(
+                  initial
+                )}
+
+              </div>
+
+            `;
+
+          }else{
+
+            image = `
+
+              <div
+                class="artist-placeholder">
+
+                ${escapeHtml(
+                  initial
+                )}
+
+              </div>
+
+            `;
+
+          }
+
+
+          const profileLink =
+            "artist.html?id=" +
+            encodeURIComponent(
+              artist.id
+            );
+
+
+          return `
+
+            <div
+              class="artist-card">
+
+              ${image}
+
+              <div
+                class="artist-name">
+
+                ${escapeHtml(
+                  name
+                )}
+
+              </div>
+
+              <div
+                class="artist-info">
+
+                ${artist.songs}
+
+                ${
+                  artist.songs === 1
+                    ? "song"
+                    : "songs"
+                }
+
+              </div>
+
+              <a
+                class="view-btn"
+                href="${profileLink}">
+
+                View Artist
+
+              </a>
+
+            </div>
+
+          `;
+
+        }
+      ).join("");
+
+
+  }catch(error){
+
+
+    console.error(
+      "PASONG Artists Error:",
+      error
+    );
+
+
+    status.style.display =
+      "none";
+
+
+    container.innerHTML = `
+
+      <div
+        class="empty"
+        style="grid-column:1/-1;">
+
+        <h3>
+          Artists could not be loaded
+        </h3>
+
+        <p
+          style="margin-top:8px;">
+
+          PASONG could not connect to the
+          music service right now.
+
+        </p>
+
+        <button
+          onclick="loadArtists()"
+          style="
+            margin-top:18px;
+            border:0;
+            padding:10px 18px;
+            border-radius:9px;
+            background:linear-gradient(
+              90deg,
+              #8d45d2,
+              #d94b9d
+            );
+            color:#fff;
+            cursor:pointer;
+            font-weight:600;
+          ">
+
+          Try Again
+
+        </button>
+
+      </div>
+
+    `;
+
+  }
 
 }
 
 
 function escapeHtml(value){
 
-return String(value ?? "")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
+  return String(
+    value ?? ""
+  )
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+  .replace(
+    /</g,
+    "&lt;"
+  )
+  .replace(
+    />/g,
+    "&gt;"
+  )
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+  .replace(
+    /'/g,
+    "&#039;"
+  );
 
 }
 
 
 loadArtists();
 
-</script></body>
+</script>
+
+
+</body>
+
 </html>
