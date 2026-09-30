@@ -1068,6 +1068,7 @@ async function recordPlay(){
       playData?.id || null;
 
     const {
+      data:royaltyData,
       error:royaltyError
     } =
     await supabaseClient
@@ -1077,13 +1078,22 @@ async function recordPlay(){
         user_id:user?.id || null,
         play_id:playId,
         eligible:true
-      });
+      })
+      .select()
+      .single();
 
     if(royaltyError){
 
       console.error(
         "PASONG royalty stream error:",
         royaltyError
+      );
+
+    }else{
+
+      console.log(
+        "PASONG royalty stream recorded:",
+        royaltyData
       );
 
     }
