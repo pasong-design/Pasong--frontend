@@ -514,6 +514,24 @@ main{
   background:linear-gradient(90deg,transparent 60%,rgba(16,16,24,.8));
   pointer-events:none;
 }
+.news-image-fallback{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:25px;
+  text-align:center;
+  color:#777;
+  font-size:12px;
+  background:
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(139,92,246,.25),
+      transparent 35%
+    ),
+    #171720;
+}
 .news-single-text{
   padding:28px;
   display:flex;
@@ -557,7 +575,7 @@ main{
   width:0;
   height:100%;
   background:linear-gradient(90deg,#8b5cf6,#ec4899);
-  animation:newsProgress 10s linear infinite;
+  animation:newsProgress 10s linear forwards;
 }
 @keyframes newsProgress{
   from{width:0}
@@ -709,10 +727,13 @@ footer{
   <div class="section-head">
 
     <div>
+
       <h2 id="chartHeading">Top Songs</h2>
+
       <p id="chartSubheading">
         Songs ranked by actual plays and downloads across PASONG.
       </p>
+
     </div>
 
   </div>
@@ -893,6 +914,7 @@ footer{
   <div class="section-head">
 
     <div>
+
       <h2>Music News</h2>
 
       <p>
@@ -922,6 +944,12 @@ const API_BASE="https://pasong-api.onrender.com";
 
 const SUPABASE_URL="https://YOUR_SUPABASE_URL";
 const SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY";
+
+const MUSIC_AFRICA_NEWS_URL=
+  "https://musicinafrica.net/article-types/news/";
+
+const MICROLINK_BASE=
+  "https://api.microlink.io/";
 
 let supabaseClient=null;
 
@@ -1961,7 +1989,7 @@ function normalizeNewsUrl(value){
     const url=
       new URL(
         value,
-        "https://musicinafrica.net"
+        MUSIC_AFRICA_NEWS_URL
       );
 
     if(
@@ -1989,50 +2017,35 @@ function normalizeNewsImage(value){
     return "";
   }
 
-  if(
-    typeof value==="object"
-  ){
+  if(typeof value==="object"){
 
     value=
       value.url ||
       value.src ||
       value.href ||
       value["data-src"] ||
+      value.content ||
       "";
 
   }
 
-  if(
-    typeof value!=="string"
-  ){
-
+  if(typeof value!=="string"){
     return "";
-
   }
 
-  value=
-    value.trim();
+  value=value.trim();
 
   if(!value){
     return "";
   }
 
-  if(
-    value.startsWith("//")
-  ){
-
-    value=
-      "https:"+value;
-
+  if(value.startsWith("//")){
+    value="https:"+value;
   }
 
-  if(
-    value.startsWith("/")
-  ){
-
+  if(value.startsWith("/")){
     value=
       "https://musicinafrica.net"+value;
-
   }
 
   try{
@@ -2040,7 +2053,7 @@ function normalizeNewsImage(value){
     const url=
       new URL(
         value,
-        "https://musicinafrica.net"
+        MUSIC_AFRICA_NEWS_URL
       );
 
     if(
@@ -2059,6 +2072,208 @@ function normalizeNewsImage(value){
     return "";
 
   }
+
+}
+
+function extractSrcsetImage(element){
+
+  if(!element){
+    return "";
+  }
+
+  const attributes=[
+    "src",
+    "data-src",
+    "data-lazy-src",
+    "data-original",
+    "data-image",
+    "data-lazy",
+    "data-url",
+    "data-fallback-src"
+  ];
+
+  for(const attribute of attributes){
+
+    const value=
+      element.getAttribute(attribute);
+
+    const image=
+      normalizeNewsImage(value);
+
+    if(image){
+      return image;
+    }
+
+  }
+
+  const srcsetAttributes=[
+    "srcset",
+    "data-srcset",
+    "data-lazy-srcset"
+  ];
+
+  for(const attribute of srcsetAttributes){
+
+    const value=
+      element.getAttribute(attribute);
+
+    if(!value){
+      continue;
+    }
+
+    const candidates=
+      value
+        .split(",")
+        .map(item=>{
+          return item.trim().split(/\s+/)[0];
+        })
+        .filter(Boolean);
+
+    for(const candidate of candidates.reverse()){
+
+      const image=
+        normalizeNewsImage(candidate);
+
+      if(image){
+        return image;
+      }
+
+    }
+
+  }
+
+  return "";
+
+}
+
+function findNewsImage(anchor){
+
+  if(!anchor){
+    return "";
+  }
+
+  const direct=
+    anchor.querySelector("img");
+
+  let image=
+    extractSrcsetImage(direct);
+
+  if(image){
+    return image;
+  }
+
+  const picture=
+    anchor.querySelector("picture");
+
+  if(picture){
+
+    const sources=
+      [
+        ...picture.querySelectorAll("source")
+      ];
+
+    for(const source of sources){
+
+      image=
+        extractSrcsetImage(source);
+
+      if(image){
+        return image;
+      }
+
+    }
+
+  }
+
+  const wrappers=[
+    anchor.closest("article"),
+    anchor.closest(".views-row"),
+    anchor.closest(".node"),
+    anchor.closest(".card"),
+    anchor.closest(".item"),
+    anchor.parentElement,
+    anchor.parentElement?.parentElement,
+    anchor.parentElement?.parentElement?.parentElement
+  ].filter(Boolean);
+
+  for(const wrapper of wrappers){
+
+    const elements=[
+      ...wrapper.querySelectorAll(
+        "img,source"
+      )
+    ];
+
+    for(const element of elements){
+
+      image=
+        extractSrcsetImage(element);
+
+      if(image){
+        return image;
+      }
+
+    }
+
+  }
+
+  return "";
+
+}
+
+function findNewsDate(anchor){
+
+  const wrappers=[
+    anchor.closest("article"),
+    anchor.closest(".views-row"),
+    anchor.closest(".node"),
+    anchor.closest(".card"),
+    anchor.closest(".item"),
+    anchor.parentElement,
+    anchor.parentElement?.parentElement,
+    anchor.parentElement?.parentElement?.parentElement
+  ].filter(Boolean);
+
+  for(const wrapper of wrappers){
+
+    const time=
+      wrapper.querySelector("time");
+
+    if(time){
+
+      const datetime=
+        time.getAttribute("datetime");
+
+      if(datetime){
+        return datetime;
+      }
+
+      const text=
+        cleanNewsText(time.textContent);
+
+      if(text){
+        return text;
+      }
+
+    }
+
+    const wrapperText=
+      cleanNewsText(
+        wrapper.textContent
+      );
+
+    const dateMatch=
+      wrapperText.match(
+        /\b\d{1,2}\s+[A-Za-z]+\s+\d{4}\b/
+      );
+
+    if(dateMatch){
+      return dateMatch[0];
+    }
+
+  }
+
+  return "";
 
 }
 
@@ -2115,50 +2330,57 @@ function extractNewsArticlesFromHTML(html){
       continue;
     }
 
-    const anchorText=
+    let title=
       cleanNewsText(
         anchor.textContent
       );
 
+    if(!title){
+
+      const heading=
+        anchor.querySelector(
+          "h1,h2,h3,h4,h5"
+        );
+
+      if(heading){
+
+        title=
+          cleanNewsText(
+            heading.textContent
+          );
+
+      }
+
+    }
+
     if(
-      !anchorText ||
-      anchorText.length<12
+      !title ||
+      title.length<12
+    ){
+
+      const aria=
+        anchor.getAttribute(
+          "aria-label"
+        );
+
+      if(aria){
+        title=
+          cleanNewsText(aria);
+      }
+
+    }
+
+    if(
+      !title ||
+      title.length<12
     ){
 
       continue;
 
     }
 
-    const imageElement=
-      anchor.querySelector("img") ||
-      anchor.closest("article")?.querySelector("img") ||
-      anchor.parentElement?.querySelector("img") ||
-      anchor.closest(
-        ".views-row,.node,.card,.item"
-      )?.querySelector("img");
-
-    let image="";
-
-    if(imageElement){
-
-      image=
-        normalizeNewsImage(
-          imageElement.getAttribute("src")
-        ) ||
-        normalizeNewsImage(
-          imageElement.getAttribute("data-src")
-        ) ||
-        normalizeNewsImage(
-          imageElement.getAttribute("data-lazy-src")
-        ) ||
-        normalizeNewsImage(
-          imageElement.getAttribute("data-original")
-        ) ||
-        normalizeNewsImage(
-          imageElement.getAttribute("data-image")
-        );
-
-    }
+    const image=
+      findNewsImage(anchor);
 
     const wrapper=
       anchor.closest(
@@ -2170,40 +2392,35 @@ function extractNewsArticlesFromHTML(html){
         wrapper?.textContent || ""
       );
 
-    let date="";
+    const description=
+      wrapperText &&
+      wrapperText!==title
+        ?wrapperText
+        :"Latest African music news from Music In Africa.";
 
-    const timeElement=
-      wrapper?.querySelector(
-        "time"
-      );
-
-    if(timeElement){
-
-      date=
-        timeElement.getAttribute("datetime") ||
-        cleanNewsText(
-          timeElement.textContent
-        );
-
-    }
-
-    const source=
-      "Music In Africa";
+    const date=
+      findNewsDate(anchor);
 
     seen.add(href);
 
     results.push({
 
-      title:anchorText,
+      title:title,
+
       description:
-        wrapperText &&
-        wrapperText!==anchorText
-          ?wrapperText
-          :"Latest African music news from Music In Africa.",
-      source,
-      link:href,
-      image,
-      pubDate:date
+        description,
+
+      source:
+        "Music In Africa",
+
+      link:
+        href,
+
+      image:
+        image,
+
+      pubDate:
+        date
 
     });
 
@@ -2216,7 +2433,8 @@ function extractNewsArticlesFromHTML(html){
 async function getMicrolinkPageHTML(url){
 
   const endpoint=
-    "https://api.microlink.io/?url="+
+    MICROLINK_BASE+
+    "?url="+
     encodeURIComponent(url)+
     "&data.html.attr=html"+
     "&meta=false";
@@ -2240,47 +2458,128 @@ async function getMicrolinkPageHTML(url){
   const data=
     await response.json();
 
-  return data?.data?.html || "";
-
-}
-
-function getMicrolinkImageURL(articleUrl){
-
   return (
-    "https://api.microlink.io/?url="+
-    encodeURIComponent(articleUrl)+
-    "&meta=true"+
-    "&filter=image.url"+
-    "&embed=image.url"
+    data?.data?.html ||
+    data?.data?.html?.value ||
+    ""
   );
 
 }
 
-async function enrichNewsImages(items){
+function getNewsMetadataImageURL(articleUrl){
 
-  const output=[];
+  const params=
+    new URLSearchParams();
 
-  for(const item of items.slice(0,12)){
+  params.set(
+    "url",
+    articleUrl
+  );
 
-    if(item.image){
+  params.set(
+    "meta",
+    "false"
+  );
 
-      output.push(item);
-      continue;
+  params.set(
+    "data.image.selector",
+    'meta[property="og:image"]'
+  );
 
-    }
+  params.set(
+    "data.image.attr",
+    "content"
+  );
 
-    const enriched={
-      ...item,
-      image:getMicrolinkImageURL(
-        item.link
-      )
-    };
+  params.set(
+    "data.image.type",
+    "image"
+  );
 
-    output.push(enriched);
+  params.set(
+    "embed",
+    "image.url"
+  );
 
-  }
+  return (
+    MICROLINK_BASE+
+    "?"+
+    params.toString()
+  );
 
-  return output;
+}
+
+function getNewsScreenshotURL(articleUrl){
+
+  const params=
+    new URLSearchParams();
+
+  params.set(
+    "url",
+    articleUrl
+  );
+
+  params.set(
+    "screenshot",
+    "true"
+  );
+
+  params.set(
+    "meta",
+    "false"
+  );
+
+  params.set(
+    "embed",
+    "screenshot.url"
+  );
+
+  params.set(
+    "viewport.width",
+    "1200"
+  );
+
+  params.set(
+    "viewport.height",
+    "630"
+  );
+
+  return (
+    MICROLINK_BASE+
+    "?"+
+    params.toString()
+  );
+
+}
+
+function enrichNewsImages(items){
+
+  return items
+    .slice(0,12)
+    .map(item=>{
+
+      const articleUrl=
+        normalizeNewsUrl(
+          item.link
+        );
+
+      return {
+        ...item,
+        metadataImage:
+          articleUrl
+            ?getNewsMetadataImageURL(
+                articleUrl
+              )
+            :"",
+        screenshotImage:
+          articleUrl
+            ?getNewsScreenshotURL(
+                articleUrl
+              )
+            :""
+      };
+
+    });
 
 }
 
@@ -2290,7 +2589,8 @@ function formatNewsDate(value){
     return "";
   }
 
-  const parsed=parseDate(value);
+  const parsed=
+    parseDate(value);
 
   if(parsed){
 
@@ -2313,6 +2613,43 @@ function formatNewsDate(value){
   }
 
   return cleaned;
+
+}
+
+function createNewsFallbackHTML(){
+
+  return `
+
+    <div class="news-image-fallback">
+
+      <div>
+
+        <div
+          style="
+            font-size:11px;
+            color:#a78bfa;
+            font-weight:900;
+            letter-spacing:1.5px;
+            margin-bottom:8px;
+          "
+        >
+          PASONG MUSIC NEWS
+        </div>
+
+        <div
+          style="
+            color:#777;
+            font-size:12px;
+          "
+        >
+          Music In Africa
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
 
 }
 
@@ -2348,7 +2685,7 @@ function renderNewsItem(item){
   const link=
     normalizeNewsUrl(
       item.link
-    ) || "#";
+    ) || MUSIC_AFRICA_NEWS_URL;
 
   const date=
     escapeHTML(
@@ -2357,15 +2694,39 @@ function renderNewsItem(item){
       )
     );
 
-  const image=
+  const primaryImage=
     normalizeNewsImage(
       item.image
     );
 
-  const fallbackImage=
-    image ||
-    getMicrolinkImageURL(
-      link
+  const metadataImage=
+    normalizeNewsImage(
+      item.metadataImage
+    );
+
+  const screenshotImage=
+    normalizeNewsImage(
+      item.screenshotImage
+    );
+
+  const initialImage=
+    primaryImage ||
+    metadataImage ||
+    "";
+
+  const safeInitialImage=
+    escapeHTML(
+      initialImage
+    );
+
+  const safeMetadataImage=
+    escapeHTML(
+      metadataImage
+    );
+
+  const safeScreenshotImage=
+    escapeHTML(
+      screenshotImage
     );
 
   container.innerHTML=`
@@ -2380,40 +2741,20 @@ function renderNewsItem(item){
 
       <div class="news-single-image">
 
-        <img
-          src="${escapeHTML(fallbackImage)}"
-          alt="${title}"
-          loading="eager"
-          referrerpolicy="no-referrer"
-          onerror="
-            this.style.display='none';
-            this.parentElement.classList.add('news-image-failed');
-          "
-        >
-
-        <div
-          class="news-image-fallback"
-          style="
-            position:absolute;
-            inset:0;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:25px;
-            text-align:center;
-            color:#777;
-            font-size:12px;
-            background:
-              radial-gradient(
-                circle at 30% 30%,
-                rgba(139,92,246,.25),
-                transparent 35%
-              ),
-              #171720;
-          "
-        >
-          MUSIC IN AFRICA
-        </div>
+        ${
+          safeInitialImage
+          ?
+          `
+            <img
+              src="${safeInitialImage}"
+              alt="${title}"
+              loading="eager"
+              referrerpolicy="no-referrer"
+            >
+          `
+          :
+          createNewsFallbackHTML()
+        }
 
       </div>
 
@@ -2453,9 +2794,7 @@ function renderNewsItem(item){
       </div>
 
       <div class="news-progress">
-
         <div class="news-progress-bar"></div>
-
       </div>
 
     </a>
@@ -2465,31 +2804,132 @@ function renderNewsItem(item){
   const card=
     $("newsSingle");
 
+  if(!card){
+    return;
+  }
+
+  const imageContainer=
+    card.querySelector(
+      ".news-single-image"
+    );
+
   const imageElement=
-    card?.querySelector(
+    card.querySelector(
       ".news-single-image img"
     );
 
-  const fallback=
-    card?.querySelector(
-      ".news-image-fallback"
-    );
+  function showFallback(){
 
-  if(imageElement && fallback){
+    if(
+      !imageContainer ||
+      !imageElement
+    ){
+
+      if(
+        imageContainer &&
+        !imageContainer.querySelector(
+          ".news-image-fallback"
+        )
+      ){
+
+        imageContainer.insertAdjacentHTML(
+          "beforeend",
+          createNewsFallbackHTML()
+        );
+
+      }
+
+      return;
+
+    }
+
+    imageElement.style.display="none";
+
+    if(
+      !imageContainer.querySelector(
+        ".news-image-fallback"
+      )
+    ){
+
+      imageContainer.insertAdjacentHTML(
+        "beforeend",
+        createNewsFallbackHTML()
+      );
+
+    }
+
+  }
+
+  function showImage(){
+
+    const fallback=
+      imageContainer?.querySelector(
+        ".news-image-fallback"
+      );
+
+    if(fallback){
+      fallback.remove();
+    }
+
+    if(imageElement){
+      imageElement.style.display="block";
+    }
+
+  }
+
+  if(imageElement){
 
     imageElement.addEventListener(
       "load",
-      ()=>{
-        fallback.style.display="none";
+      showImage,
+      {
+        once:true
       }
     );
 
     imageElement.addEventListener(
       "error",
       ()=>{
-        fallback.style.display="flex";
+
+        if(
+          safeMetadataImage &&
+          imageElement.src!==
+          safeMetadataImage
+        ){
+
+          imageElement.src=
+            safeMetadataImage;
+
+          return;
+
+        }
+
+        if(
+          safeScreenshotImage &&
+          imageElement.src!==
+          safeScreenshotImage
+        ){
+
+          imageElement.src=
+            safeScreenshotImage;
+
+          return;
+
+        }
+
+        showFallback();
+
       }
     );
+
+    if(
+      imageElement.complete &&
+      imageElement.naturalWidth>0
+    ){
+
+      showImage();
+
+    }
 
   }
 
@@ -2534,7 +2974,9 @@ function showNextNews(){
 
 function startNewsRotation(){
 
-  clearInterval(newsTimer);
+  clearInterval(
+    newsTimer
+  );
 
   if(newsItems.length<=1){
     return;
@@ -2553,16 +2995,15 @@ async function loadNews(){
   $("newsFeatured").innerHTML=
     '<div class="loading">Loading music news...</div>';
 
-  clearInterval(newsTimer);
+  clearInterval(
+    newsTimer
+  );
 
   try{
 
-    const musicAfricaURL=
-      "https://musicinafrica.net/article-types/news/";
-
     const html=
       await getMicrolinkPageHTML(
-        musicAfricaURL
+        MUSIC_AFRICA_NEWS_URL
       );
 
     let items=
@@ -2587,7 +3028,6 @@ async function loadNews(){
       }
 
       seen.add(key);
-
       unique.push(item);
 
     }
@@ -2604,7 +3044,7 @@ async function loadNews(){
     }
 
     newsItems=
-      await enrichNewsImages(
+      enrichNewsImages(
         items
       );
 
@@ -2642,55 +3082,46 @@ async function loadNews(){
       newsTimer
     );
 
-    $("newsFeatured").innerHTML=`
+    const fallbackArticle=
+      {
+        title:
+          "Latest African music news",
 
-      <a
-        class="news-single"
-        href="https://musicinafrica.net/article-types/news/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+        description:
+          "Discover the latest music stories, artists, releases and industry updates from across Africa.",
 
-        <div class="news-single-image">
+        source:
+          "Music In Africa",
 
-          <img
-            src="${escapeHTML(
-              getMicrolinkImageURL(
-                "https://musicinafrica.net/article-types/news/"
-              )
-            )}"
-            alt="Music In Africa News"
-            loading="eager"
-            referrerpolicy="no-referrer"
-          >
+        link:
+          MUSIC_AFRICA_NEWS_URL,
 
-        </div>
+        image:
+          "",
 
-        <div class="news-single-text">
+        metadataImage:
+          getNewsMetadataImageURL(
+            MUSIC_AFRICA_NEWS_URL
+          ),
 
-          <span class="news-source">
-            MUSIC IN AFRICA
-          </span>
+        screenshotImage:
+          getNewsScreenshotURL(
+            MUSIC_AFRICA_NEWS_URL
+          ),
 
-          <h3>
-            Latest African music news
-          </h3>
+        pubDate:
+          ""
+      };
 
-          <p>
-            Discover the latest music stories,
-            artists, releases and industry updates
-            from across Africa.
-          </p>
+    newsItems=[
+      fallbackArticle
+    ];
 
-          <span class="news-read">
-            Read news →
-          </span>
+    newsIndex=0;
 
-        </div>
-
-      </a>
-
-    `;
+    renderNewsItem(
+      fallbackArticle
+    );
 
   }
 
