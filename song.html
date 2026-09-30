@@ -1039,6 +1039,7 @@ async function recordPlay(){
     await supabaseClient.auth.getUser();
 
     const {
+      data:playData,
       error
     } =
     await supabaseClient
@@ -1046,7 +1047,9 @@ async function recordPlay(){
       .insert({
         song_id:currentSongId,
         user_id:user?.id || null
-      });
+      })
+      .select("id")
+      .single();
 
     if(error){
 
@@ -1058,6 +1061,30 @@ async function recordPlay(){
       );
 
       return;
+
+    }
+
+    const playId =
+      playData?.id || null;
+
+    const {
+      error:royaltyError
+    } =
+    await supabaseClient
+      .from("royalty_streams")
+      .insert({
+        song_id:currentSongId,
+        user_id:user?.id || null,
+        play_id:playId,
+        eligible:true
+      });
+
+    if(royaltyError){
+
+      console.error(
+        "PASONG royalty stream error:",
+        royaltyError
+      );
 
     }
 
