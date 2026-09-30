@@ -6,6 +6,8 @@
 
 <title>PASONG Music Store</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{
   margin:0;
@@ -19,10 +21,6 @@ body{
   font-family:Inter,Arial,sans-serif;
   min-height:100vh;
 }
-
-/* =========================
-   NAVIGATION
-========================= */
 
 nav{
   height:70px;
@@ -85,10 +83,6 @@ nav{
   font-size:17px;
 }
 
-/* =========================
-   HERO
-========================= */
-
 .hero{
   padding:55px 6% 30px;
 }
@@ -128,10 +122,6 @@ nav{
   line-height:1.7;
   font-size:15px;
 }
-
-/* =========================
-   SEARCH
-========================= */
 
 .search-wrap{
   padding:0 6% 30px;
@@ -174,10 +164,6 @@ nav{
   font-size:12px;
 }
 
-/* =========================
-   SECTION
-========================= */
-
 .section{
   padding:10px 6% 60px;
 }
@@ -198,10 +184,6 @@ nav{
   color:#777;
   font-size:12px;
 }
-
-/* =========================
-   GENRE FILTER
-========================= */
 
 .genre-filter{
   display:none;
@@ -228,19 +210,11 @@ nav{
   color:#fff;
 }
 
-/* =========================
-   SONG GRID
-========================= */
-
 .song-grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:20px;
 }
-
-/* =========================
-   SONG CARD
-========================= */
 
 .song-card{
   background:#10101a;
@@ -356,6 +330,21 @@ nav{
   font-size:10px;
 }
 
+.song-stats{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:10px;
+  color:#777;
+  font-size:11px;
+}
+
+.song-stat{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+
 .song-bottom{
   display:flex;
   align-items:center;
@@ -397,10 +386,6 @@ nav{
   transform:scale(.97);
 }
 
-/* =========================
-   AUDIO PREVIEW
-========================= */
-
 .preview-area{
   margin-top:12px;
 }
@@ -429,10 +414,6 @@ nav{
   min-height:12px;
 }
 
-/* =========================
-   STATES
-========================= */
-
 .state{
   padding:45px 20px;
   text-align:center;
@@ -457,10 +438,6 @@ nav{
   }
 }
 
-/* =========================
-   FOOTER
-========================= */
-
 footer{
   padding:30px 6%;
   border-top:1px solid rgba(255,255,255,.07);
@@ -476,10 +453,6 @@ footer{
   color:#aaa;
   font-weight:800;
 }
-
-/* =========================
-   MOBILE
-========================= */
 
 @media(max-width:700px){
 
@@ -529,6 +502,11 @@ footer{
     font-size:9px;
   }
 
+  .song-stats{
+    gap:8px;
+    font-size:9px;
+  }
+
   .song-bottom{
     align-items:flex-end;
   }
@@ -544,9 +522,11 @@ footer{
 }
 
 @media(max-width:380px){
+
   .song-grid{
     grid-template-columns:1fr;
   }
+
 }
 </style>
 </head>
@@ -596,6 +576,7 @@ footer{
 <section class="search-wrap">
 
   <div class="search-box">
+
     <span>⌕</span>
 
     <input
@@ -604,6 +585,7 @@ footer{
       placeholder="Search songs or artists..."
       autocomplete="off"
     >
+
   </div>
 
   <div class="price-note" id="priceNote">
@@ -636,21 +618,20 @@ footer{
 
   </div>
 
-
-  <!-- GENRE FILTER INDICATOR -->
-
   <div
     id="genreFilter"
     class="genre-filter"
   ></div>
 
-
   <div
     id="songState"
     class="state"
   >
+
     <div class="spinner"></div>
+
     Loading music...
+
   </div>
 
   <div
@@ -682,35 +663,28 @@ footer{
 
 </footer>
 
-
 <script>
 
-/* =====================================================
-   PASONG API
-===================================================== */
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
 
-const API_URL = "https://pasong-api.vercel.app";
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
-/* =====================================================
-   GLOBAL STATE
-===================================================== */
+const API_URL =
+  "https://pasong-api.vercel.app";
 
 let allSongs = [];
 
 let currentPreview = null;
 
 let previewTimer = null;
-
-
-/* =====================================================
-   GENRE FILTER
-   READS:
-   store.html?genre=Afrobeats
-   store.html?genre=Amapiano
-   store.html?genre=Gengetone
-   etc.
-===================================================== */
 
 const urlParams =
   new URLSearchParams(
@@ -719,11 +693,6 @@ const urlParams =
 
 const selectedGenre =
   (urlParams.get("genre") || "").trim();
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
 
 const songGrid =
   document.getElementById("songGrid");
@@ -749,16 +718,6 @@ const sectionSub =
 const genreFilter =
   document.getElementById("genreFilter");
 
-
-/* =====================================================
-   NORMALIZE TEXT
-   Makes:
-   R&B
-   r&b
-   R&B 
-   work as the same genre.
-===================================================== */
-
 function normalizeGenre(value){
 
   return String(value ?? "")
@@ -767,11 +726,6 @@ function normalizeGenre(value){
     .replace(/\s+/g," ");
 
 }
-
-
-/* =====================================================
-   GET REAL SONG ID
-===================================================== */
 
 function getSongId(song){
 
@@ -789,11 +743,6 @@ function getSongId(song){
 
 }
 
-
-/* =====================================================
-   GET SONG TITLE
-===================================================== */
-
 function getSongTitle(song){
 
   return (
@@ -803,11 +752,6 @@ function getSongTitle(song){
   );
 
 }
-
-
-/* =====================================================
-   GET ARTIST
-===================================================== */
 
 function getArtistName(song){
 
@@ -838,11 +782,6 @@ function getArtistName(song){
 
 }
 
-
-/* =====================================================
-   GET GENRE
-===================================================== */
-
 function getGenre(song){
 
   return (
@@ -855,11 +794,6 @@ function getGenre(song){
 
 }
 
-
-/* =====================================================
-   GET COVER
-===================================================== */
-
 function getCover(song){
 
   return (
@@ -870,11 +804,6 @@ function getCover(song){
   );
 
 }
-
-
-/* =====================================================
-   GET PREVIEW
-===================================================== */
 
 function getPreview(song){
 
@@ -887,11 +816,6 @@ function getPreview(song){
   );
 
 }
-
-
-/* =====================================================
-   GET PRICE LABEL
-===================================================== */
 
 function getPriceLabel(song){
 
@@ -924,11 +848,6 @@ function getPriceLabel(song){
 
 }
 
-
-/* =====================================================
-   APPLY GENRE FILTER
-===================================================== */
-
 function getGenreFilteredSongs(songs){
 
   if(!selectedGenre){
@@ -949,11 +868,6 @@ function getGenreFilteredSongs(songs){
 
 }
 
-
-/* =====================================================
-   SET PAGE FOR SELECTED GENRE
-===================================================== */
-
 function setupGenrePage(){
 
   if(!selectedGenre){
@@ -970,7 +884,6 @@ function setupGenrePage(){
     return;
 
   }
-
 
   sectionTitle.textContent =
     "🎵 " + selectedGenre + " Music";
@@ -994,16 +907,104 @@ function setupGenrePage(){
 
 }
 
+async function getPlayCount(songId){
 
-/* =====================================================
-   LOAD SONGS
-===================================================== */
+  if(!songId){
+    return 0;
+  }
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient.rpc(
+      "get_song_play_count",
+      {
+        p_song_id:songId
+      }
+    );
+
+    if(error){
+
+      console.error(
+        "PASONG store play count error:",
+        error
+      );
+
+      return 0;
+
+    }
+
+    return Number(data || 0);
+
+  }catch(error){
+
+    console.error(
+      "PASONG store play count error:",
+      error
+    );
+
+    return 0;
+
+  }
+
+}
+
+async function loadPlayCounts(songs){
+
+  const requests =
+    songs.map(
+      async function(song){
+
+        const songId =
+          getSongId(song);
+
+        if(!songId){
+          return;
+        }
+
+        const count =
+          await getPlayCount(songId);
+
+        song._pasongPlayCount =
+          count;
+
+        const countElement =
+          document.querySelector(
+            `[data-play-count="${songId}"]`
+          );
+
+        if(countElement){
+
+          countElement.textContent =
+            "▶ " +
+            count.toLocaleString() +
+            (
+              count === 1
+              ? " play"
+              : " plays"
+            );
+
+        }
+
+      }
+    );
+
+  await Promise.all(
+    requests
+  );
+
+}
 
 async function loadSongs(){
 
-  songState.style.display = "block";
+  songState.style.display =
+    "block";
 
-  songGrid.style.display = "none";
+  songGrid.style.display =
+    "none";
 
   songState.innerHTML = `
     <div class="spinner"></div>
@@ -1012,16 +1013,17 @@ async function loadSongs(){
 
   try{
 
-    const response = await fetch(
-      API_URL + "/api/songs",
-      {
-        method:"GET",
-        headers:{
-          "Accept":"application/json"
-        },
-        cache:"no-store"
-      }
-    );
+    const response =
+      await fetch(
+        API_URL + "/api/songs",
+        {
+          method:"GET",
+          headers:{
+            "Accept":"application/json"
+          },
+          cache:"no-store"
+        }
+      );
 
     if(!response.ok){
 
@@ -1040,18 +1042,12 @@ async function loadSongs(){
       result
     );
 
-
     allSongs =
       Array.isArray(result?.songs)
         ? result.songs
         : Array.isArray(result)
           ? result
           : [];
-
-
-    /* =================================================
-       UPDATE PRICE NOTE
-    ================================================= */
 
     if(result?.pricing?.label){
 
@@ -1072,32 +1068,32 @@ async function loadSongs(){
 
     }
 
-
-    /* =================================================
-       NO SONGS
-    ================================================= */
-
     if(allSongs.length === 0){
 
-      songState.style.display = "block";
+      songState.style.display =
+        "block";
 
-      songGrid.style.display = "none";
+      songGrid.style.display =
+        "none";
 
-      songState.innerHTML = `
-        No music is available yet.
-      `;
+      songState.innerHTML =
+        "No music is available yet.";
 
       return;
 
     }
 
-
-    /* =================================================
-       RENDER
-    ================================================= */
+    const filteredSongs =
+      getGenreFilteredSongs(
+        allSongs
+      );
 
     renderSongs(
-      getGenreFilteredSongs(allSongs)
+      filteredSongs
+    );
+
+    loadPlayCounts(
+      filteredSongs
     );
 
   }catch(error){
@@ -1107,9 +1103,11 @@ async function loadSongs(){
       error
     );
 
-    songGrid.style.display = "none";
+    songGrid.style.display =
+      "none";
 
-    songState.style.display = "block";
+    songState.style.display =
+      "block";
 
     songState.innerHTML = `
       <strong style="color:#fff;">
@@ -1130,11 +1128,6 @@ async function loadSongs(){
 
 }
 
-
-/* =====================================================
-   RENDER SONGS
-===================================================== */
-
 function renderSongs(songs){
 
   songGrid.innerHTML = "";
@@ -1149,13 +1142,13 @@ function renderSongs(songs){
 
     });
 
-
   if(validSongs.length === 0){
 
-    songState.style.display = "block";
+    songState.style.display =
+      "block";
 
-    songGrid.style.display = "none";
-
+    songGrid.style.display =
+      "none";
 
     if(selectedGenre){
 
@@ -1197,7 +1190,6 @@ function renderSongs(songs){
 
   }
 
-
   validSongs.forEach(function(song){
 
     songGrid.appendChild(
@@ -1206,17 +1198,13 @@ function renderSongs(songs){
 
   });
 
+  songState.style.display =
+    "none";
 
-  songState.style.display = "none";
-
-  songGrid.style.display = "grid";
+  songGrid.style.display =
+    "grid";
 
 }
-
-
-/* =====================================================
-   CREATE SONG CARD
-===================================================== */
 
 function createSongCard(song){
 
@@ -1225,7 +1213,6 @@ function createSongCard(song){
 
   card.className =
     "song-card";
-
 
   const songId =
     getSongId(song);
@@ -1248,8 +1235,10 @@ function createSongCard(song){
   const price =
     getPriceLabel(song);
 
-
-  /* COVER */
+  const existingPlayCount =
+    Number(
+      song._pasongPlayCount || 0
+    );
 
   let coverHTML = "";
 
@@ -1283,7 +1272,6 @@ function createSongCard(song){
 
   }
 
-
   card.innerHTML = `
 
     <div
@@ -1306,7 +1294,6 @@ function createSongCard(song){
 
     </div>
 
-
     <div class="song-info">
 
       <div
@@ -1327,6 +1314,17 @@ function createSongCard(song){
         ${escapeHtml(genre)}
       </div>
 
+      <div class="song-stats">
+
+        <span
+          class="song-stat"
+          data-play-count="${escapeAttribute(songId)}"
+        >
+          ▶ ${existingPlayCount.toLocaleString()}
+          ${existingPlayCount === 1 ? "play" : "plays"}
+        </span>
+
+      </div>
 
       <div class="song-bottom">
 
@@ -1342,7 +1340,6 @@ function createSongCard(song){
 
         </div>
 
-
         <button
           class="buy-btn"
           type="button"
@@ -1352,7 +1349,6 @@ function createSongCard(song){
         </button>
 
       </div>
-
 
       <div class="preview-area">
 
@@ -1375,9 +1371,6 @@ function createSongCard(song){
 
   `;
 
-
-  /* COVER CLICK */
-
   const coverElement =
     card.querySelector(".cover-wrap");
 
@@ -1389,7 +1382,6 @@ function createSongCard(song){
 
     }
   );
-
 
   coverElement.addEventListener(
     "keydown",
@@ -1409,9 +1401,6 @@ function createSongCard(song){
     }
   );
 
-
-  /* BUY NOW */
-
   const buyButton =
     card.querySelector(".buy-btn");
 
@@ -1423,9 +1412,6 @@ function createSongCard(song){
 
     }
   );
-
-
-  /* PREVIEW */
 
   const previewButton =
     card.querySelector(".preview-btn");
@@ -1446,21 +1432,14 @@ function createSongCard(song){
     }
   );
 
-
   return card;
 
 }
-
-
-/* =====================================================
-   OPEN SONG PAGE
-===================================================== */
 
 function openSong(songId){
 
   const cleanId =
     String(songId || "").trim();
-
 
   if(!cleanId){
 
@@ -1472,19 +1451,16 @@ function openSong(songId){
 
   }
 
-
   const songPage =
     new URL(
       "song.html",
       window.location.href
     );
 
-
   songPage.searchParams.set(
     "id",
     cleanId
   );
-
 
   console.log(
     "PASONG opening song:",
@@ -1496,18 +1472,12 @@ function openSong(songId){
     songPage.href
   );
 
-
   stopPreview();
 
   window.location.href =
     songPage.href;
 
 }
-
-
-/* =====================================================
-   PLAY 20-SECOND PREVIEW
-===================================================== */
 
 function playPreview(song, button){
 
@@ -1517,7 +1487,6 @@ function playPreview(song, button){
   if(!audioUrl){
     return;
   }
-
 
   stopPreview();
 
@@ -1530,10 +1499,8 @@ function playPreview(song, button){
   previewAudio.currentTime =
     0;
 
-
   button.textContent =
     "■ Stop Preview";
-
 
   const songId =
     getSongId(song);
@@ -1543,14 +1510,12 @@ function playPreview(song, button){
       "preview-status-" + songId
     );
 
-
   if(status){
 
     status.textContent =
       "Playing preview...";
 
   }
-
 
   previewAudio.play()
     .catch(function(error){
@@ -1564,7 +1529,6 @@ function playPreview(song, button){
 
     });
 
-
   previewTimer =
     setTimeout(
       function(){
@@ -1575,7 +1539,6 @@ function playPreview(song, button){
       20000
     );
 
-
   previewAudio.onended =
     function(){
 
@@ -1584,11 +1547,6 @@ function playPreview(song, button){
     };
 
 }
-
-
-/* =====================================================
-   STOP PREVIEW
-===================================================== */
 
 function stopPreview(){
 
@@ -1602,7 +1560,6 @@ function stopPreview(){
 
   }
 
-
   previewAudio.pause();
 
   previewAudio.currentTime =
@@ -1613,7 +1570,6 @@ function stopPreview(){
   );
 
   previewAudio.load();
-
 
   if(currentPreview){
 
@@ -1636,16 +1592,9 @@ function stopPreview(){
 
   }
 
-
   currentPreview = null;
 
 }
-
-
-/* =====================================================
-   SEARCH
-   SEARCHES ONLY INSIDE CURRENT GENRE
-===================================================== */
 
 searchInput.addEventListener(
   "input",
@@ -1656,14 +1605,10 @@ searchInput.addEventListener(
         .trim()
         .toLowerCase();
 
-
-    /* Start with genre-filtered songs */
-
     const genreSongs =
       getGenreFilteredSongs(
         allSongs
       );
-
 
     if(!query){
 
@@ -1671,10 +1616,13 @@ searchInput.addEventListener(
         genreSongs
       );
 
+      loadPlayCounts(
+        genreSongs
+      );
+
       return;
 
     }
-
 
     const filtered =
       genreSongs.filter(function(song){
@@ -1691,7 +1639,6 @@ searchInput.addEventListener(
           getGenre(song)
             .toLowerCase();
 
-
         return (
           title.includes(query) ||
           artist.includes(query) ||
@@ -1700,7 +1647,6 @@ searchInput.addEventListener(
 
       });
 
-
     if(filtered.length === 0){
 
       songGrid.style.display =
@@ -1708,7 +1654,6 @@ searchInput.addEventListener(
 
       songState.style.display =
         "block";
-
 
       songState.innerHTML = `
         No songs found for
@@ -1727,18 +1672,16 @@ searchInput.addEventListener(
 
     }
 
-
     renderSongs(
+      filtered
+    );
+
+    loadPlayCounts(
       filtered
     );
 
   }
 );
-
-
-/* =====================================================
-   HTML ESCAPE
-===================================================== */
 
 function escapeHtml(value){
 
@@ -1751,21 +1694,11 @@ function escapeHtml(value){
 
 }
 
-
-/* =====================================================
-   ATTRIBUTE ESCAPE
-===================================================== */
-
 function escapeAttribute(value){
 
   return escapeHtml(value);
 
 }
-
-
-/* =====================================================
-   START
-===================================================== */
 
 setupGenrePage();
 
