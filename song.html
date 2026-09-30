@@ -396,7 +396,6 @@ id="songCover"
 class="cover"
 src=""
 alt="Song cover"
-style="display:none;"
 
 «»
 
@@ -635,7 +634,8 @@ function showError(message){
     return;
   }
 
-  loading.className = "error-box";
+  loading.className =
+    "error-box";
 
   loading.innerHTML = `
     <strong>Unable to load song</strong>
@@ -646,6 +646,24 @@ function showError(message){
       ← Back to Music Store
     </a>
   `;
+
+}
+
+function showElement(element){
+
+  if(element){
+    element.style.display =
+      "block";
+  }
+
+}
+
+function hideElement(element){
+
+  if(element){
+    element.style.display =
+      "none";
+  }
 
 }
 
@@ -679,7 +697,10 @@ function setFavoriteButton(){
 
 async function loadFavoriteStatus(){
 
-  if(!currentSongId || !favoriteButton){
+  if(
+    !currentSongId ||
+    !favoriteButton
+  ){
     return;
   }
 
@@ -772,14 +793,11 @@ async function toggleFavorite(){
         "Please log in to add songs to your Favorites."
       );
 
-      const redirect =
+      window.location.href =
         "login.html?redirect=" +
         encodeURIComponent(
           window.location.href
         );
-
-      window.location.href =
-        redirect;
 
       return;
 
@@ -790,12 +808,12 @@ async function toggleFavorite(){
       const {
         error
       } =
-        await supabaseClient
-          .from("favorites")
-          .insert({
-            user_id:user.id,
-            song_id:currentSongId
-          });
+      await supabaseClient
+        .from("favorites")
+        .insert({
+          user_id:user.id,
+          song_id:currentSongId
+        });
 
       if(error){
 
@@ -806,8 +824,6 @@ async function toggleFavorite(){
 
           isFavorite = true;
 
-          setFavoriteButton();
-
         }else{
 
           throw error;
@@ -817,8 +833,6 @@ async function toggleFavorite(){
       }else{
 
         isFavorite = true;
-
-        setFavoriteButton();
 
       }
 
@@ -834,16 +848,14 @@ async function toggleFavorite(){
         .eq("song_id",currentSongId);
 
       if(error){
-
         throw error;
-
       }
 
       isFavorite = false;
 
-      setFavoriteButton();
-
     }
+
+    setFavoriteButton();
 
   }catch(error){
 
@@ -942,6 +954,266 @@ async function getDjMixPrice(){
 
 }
 
+function setupNormalSong(data){
+
+  if(priceLabel){
+
+    priceLabel.textContent =
+      "Download price";
+
+  }
+
+  const priceLabelText =
+    "UGX 700";
+
+  if(songPrice){
+
+    songPrice.textContent =
+      priceLabelText;
+
+  }
+
+  if(buyButton){
+
+    buyButton.textContent =
+      "BUY & DOWNLOAD — " +
+      priceLabelText;
+
+    buyButton.style.display =
+      "block";
+
+  }
+
+  showElement(
+    freeStreamBadge
+  );
+
+  hideElement(
+    djFreeBadge
+  );
+
+  hideElement(
+    tipButton
+  );
+
+  if(supportTitle){
+
+    supportTitle.textContent =
+      "💿 Download & Support the Artist";
+
+  }
+
+  if(supportText){
+
+    supportText.textContent =
+      "Stream the complete song for free. Purchase the download to own the song and support the artists and creators behind it.";
+
+  }
+
+  if(previewTitle){
+
+    previewTitle.textContent =
+      "🎧 FREE FULL SONG STREAM";
+
+  }
+
+  if(previewText){
+
+    previewText.textContent =
+      "Listen to the complete song free on PASONG.";
+
+  }
+
+  if(progress){
+
+    progress.min =
+      "0";
+
+    progress.max =
+      "100";
+
+    progress.value =
+      "0";
+
+  }
+
+  if(endTime){
+
+    endTime.textContent =
+      "0:00";
+
+  }
+
+  const audioUrl =
+    data.audio_url ||
+    data.audioUrl ||
+    data.preview_url ||
+    data.previewUrl ||
+    "";
+
+  if(audioUrl){
+
+    audio.src =
+      audioUrl;
+
+    audio.load();
+
+    if(previewButton){
+
+      previewButton.disabled =
+        false;
+
+      previewButton.style.opacity =
+        "1";
+
+    }
+
+  }else{
+
+    if(previewButton){
+
+      previewButton.disabled =
+        true;
+
+      previewButton.style.opacity =
+        ".45";
+
+    }
+
+  }
+
+}
+
+async function setupDjMix(data){
+
+  if(priceLabel){
+
+    priceLabel.textContent =
+      "DJ Mix download price";
+
+  }
+
+  hideElement(
+    freeStreamBadge
+  );
+
+  showElement(
+    djFreeBadge
+  );
+
+  if(previewTitle){
+
+    previewTitle.textContent =
+      "🎧 FREE FULL DJ MIX STREAM";
+
+  }
+
+  if(previewText){
+
+    previewText.textContent =
+      "Listen to the full DJ Mix free on PASONG.";
+
+  }
+
+  if(supportTitle){
+
+    supportTitle.textContent =
+      "🎧 Stream Free • Download to Own";
+
+  }
+
+  if(supportText){
+
+    supportText.textContent =
+      "Stream the complete DJ Mix for free. Download access is available for purchase.";
+
+  }
+
+  showElement(
+    tipButton
+  );
+
+  showElement(
+    buyButton
+  );
+
+  const pricing =
+    await getDjMixPrice();
+
+  if(songPrice){
+
+    songPrice.textContent =
+      pricing.label;
+
+  }
+
+  if(buyButton){
+
+    buyButton.textContent =
+      "DOWNLOAD — " +
+      pricing.label;
+
+  }
+
+  const mixAudioUrl =
+    data.mix_audio_url ||
+    data.audio_url ||
+    data.audioUrl ||
+    "";
+
+  if(mixAudioUrl){
+
+    audio.src =
+      mixAudioUrl;
+
+    audio.load();
+
+    if(previewButton){
+
+      previewButton.disabled =
+        false;
+
+      previewButton.style.opacity =
+        "1";
+
+    }
+
+  }else{
+
+    if(previewButton){
+
+      previewButton.disabled =
+        true;
+
+      previewButton.style.opacity =
+        ".45";
+
+    }
+
+  }
+
+  if(progress){
+
+    progress.min =
+      "0";
+
+    progress.max =
+      "100";
+
+    progress.value =
+      "0";
+
+  }
+
+  if(endTime){
+
+    endTime.textContent =
+      "0:00";
+
+  }
+
+}
+
 async function loadSong(){
 
   const songId =
@@ -1020,10 +1292,14 @@ async function loadSong(){
     currentDjMix =
       data;
 
-    songTitle.textContent =
-      data.title ||
-      data.name ||
-      "Untitled Song";
+    if(songTitle){
+
+      songTitle.textContent =
+        data.title ||
+        data.name ||
+        "Untitled Song";
+
+    }
 
     let artistName =
       data.artist_name ||
@@ -1061,56 +1337,88 @@ async function loadSong(){
 
     }
 
-    songArtist.textContent =
-      artistName ||
-      "Unknown Artist";
+    if(songArtist){
+
+      songArtist.textContent =
+        artistName ||
+        "Unknown Artist";
+
+    }
 
     const genre =
       data.genre ||
       data.category_name ||
       data.category?.name ||
-      (isDjMix ? "DJ Mix" : "Music");
-
-    songGenre.textContent =
-      genre;
-
-    songGenreText.textContent =
-      genre;
-
-    songDescription.textContent =
-      data.description ||
       (
         isDjMix
-        ? "Stream this DJ Mix free on PASONG."
-        : "Stream this complete song free on PASONG."
+        ? "DJ Mix"
+        : "Music"
       );
+
+    if(songGenre){
+
+      songGenre.textContent =
+        genre;
+
+    }
+
+    if(songGenreText){
+
+      songGenreText.textContent =
+        genre;
+
+    }
+
+    if(songDescription){
+
+      songDescription.textContent =
+        data.description ||
+        (
+          isDjMix
+          ? "Stream this DJ Mix free on PASONG."
+          : "Stream this complete song free on PASONG."
+        );
+
+    }
 
     const coverUrl =
       data.cover_url ||
       data.coverUrl ||
       "";
 
-    if(coverUrl){
+    if(songCover && coverPlaceholder){
 
-      songCover.src =
-        coverUrl;
+      if(coverUrl){
 
-      songCover.style.display =
-        "block";
+        songCover.src =
+          coverUrl;
 
-      coverPlaceholder.style.display =
-        "none";
+        songCover.style.display =
+          "block";
 
-      songCover.onerror =
-        function(){
+        coverPlaceholder.style.display =
+          "none";
 
-          songCover.style.display =
-            "none";
+        songCover.onerror =
+          function(){
 
-          coverPlaceholder.style.display =
-            "flex";
+            songCover.style.display =
+              "none";
 
-        };
+            coverPlaceholder.style.display =
+              "flex";
+
+          };
+
+      }else{
+
+        songCover.style.display =
+          "none";
+
+        coverPlaceholder.style.display =
+          "flex";
+
+      }
 
     }
 
@@ -1126,11 +1434,19 @@ async function loadSong(){
 
     loadFavoriteStatus();
 
-    loading.style.display =
-      "none";
+    if(loading){
 
-    songContent.style.display =
-      "block";
+      loading.style.display =
+        "none";
+
+    }
+
+    if(songContent){
+
+      songContent.style.display =
+        "block";
+
+    }
 
   }catch(error){
 
@@ -1148,218 +1464,59 @@ async function loadSong(){
 
 }
 
-function setupNormalSong(data){
+if(previewButton){
 
-  priceLabel.textContent =
-    "Download price";
+  previewButton.addEventListener(
+    "click",
+    async function(){
 
-  const priceLabelText =
-    "UGX 700";
+      if(!audio.src){
 
-  songPrice.textContent =
-    priceLabelText;
+        alert(
+          isDjMix
+          ? "DJ Mix stream is not available."
+          : "Full song stream is not available."
+        );
 
-  buyButton.textContent =
-    "BUY & DOWNLOAD — " + priceLabelText;
-
-  buyButton.style.display =
-    "block";
-
-  freeStreamBadge.style.display =
-    "inline-flex";
-
-  djFreeBadge.style.display =
-    "none";
-
-  tipButton.style.display =
-    "none";
-
-  supportTitle.textContent =
-    "💿 Download & Support the Artist";
-
-  supportText.textContent =
-    "Stream the complete song for free. Purchase the download to own the song and support the artists and creators behind it.";
-
-  previewTitle.textContent =
-    "🎧 FREE FULL SONG STREAM";
-
-  previewText.textContent =
-    "Listen to the complete song free on PASONG.";
-
-  progress.min =
-    "0";
-
-  progress.max =
-    "100";
-
-  progress.value =
-    "0";
-
-  endTime.textContent =
-    "0:00";
-
-  const audioUrl =
-    data.audio_url ||
-    data.audioUrl ||
-    data.preview_url ||
-    data.previewUrl ||
-    "";
-
-  if(audioUrl){
-
-    audio.src =
-      audioUrl;
-
-    audio.load();
-
-    previewButton.disabled =
-      false;
-
-    previewButton.style.opacity =
-      "1";
-
-  }else{
-
-    previewButton.disabled =
-      true;
-
-    previewButton.style.opacity =
-      ".45";
-
-  }
-
-}
-
-async function setupDjMix(data){
-
-  priceLabel.textContent =
-    "DJ Mix download price";
-
-  freeStreamBadge.style.display =
-    "none";
-
-  djFreeBadge.style.display =
-    "inline-flex";
-
-  previewTitle.textContent =
-    "🎧 FREE FULL DJ MIX STREAM";
-
-  previewText.textContent =
-    "Listen to the full DJ Mix free on PASONG.";
-
-  supportTitle.textContent =
-    "🎧 Stream Free • Download to Own";
-
-  supportText.textContent =
-    "Stream the complete DJ Mix for free. Download access is available for purchase.";
-
-  tipButton.style.display =
-    "block";
-
-  buyButton.style.display =
-    "block";
-
-  const pricing =
-    await getDjMixPrice();
-
-  songPrice.textContent =
-    pricing.label;
-
-  buyButton.textContent =
-    "DOWNLOAD — " + pricing.label;
-
-  const mixAudioUrl =
-    data.mix_audio_url ||
-    data.audio_url ||
-    data.audioUrl ||
-    "";
-
-  if(mixAudioUrl){
-
-    audio.src =
-      mixAudioUrl;
-
-    audio.load();
-
-    previewButton.disabled =
-      false;
-
-    previewButton.style.opacity =
-      "1";
-
-  }else{
-
-    previewButton.disabled =
-      true;
-
-    previewButton.style.opacity =
-      ".45";
-
-  }
-
-  progress.min =
-    "0";
-
-  progress.max =
-    "100";
-
-  progress.value =
-    "0";
-
-  endTime.textContent =
-    "0:00";
-
-}
-
-previewButton.addEventListener(
-  "click",
-  async function(){
-
-    if(!audio.src){
-
-      alert(
-        isDjMix
-        ? "DJ Mix stream is not available."
-        : "Full song stream is not available."
-      );
-
-      return;
-
-    }
-
-    try{
-
-      if(audio.paused){
-
-        await audio.play();
-
-        previewButton.textContent =
-          "❚❚";
-
-      }else{
-
-        audio.pause();
-
-        previewButton.textContent =
-          "▶";
+        return;
 
       }
 
-    }catch(error){
+      try{
 
-      console.error(
-        "PASONG audio error:",
-        error
-      );
+        if(audio.paused){
 
-      alert(
-        "Unable to play the audio."
-      );
+          await audio.play();
+
+          previewButton.textContent =
+            "❚❚";
+
+        }else{
+
+          audio.pause();
+
+          previewButton.textContent =
+            "▶";
+
+        }
+
+      }catch(error){
+
+        console.error(
+          "PASONG audio error:",
+          error
+        );
+
+        alert(
+          "Unable to play the audio."
+        );
+
+      }
 
     }
+  );
 
-  }
-);
+}
 
 audio.addEventListener(
   "loadedmetadata",
@@ -1370,11 +1527,19 @@ audio.addEventListener(
       audio.duration > 0
     ){
 
-      progress.max =
-        audio.duration;
+      if(progress){
 
-      endTime.textContent =
-        formatTime(audio.duration);
+        progress.max =
+          audio.duration;
+
+      }
+
+      if(endTime){
+
+        endTime.textContent =
+          formatTime(audio.duration);
+
+      }
 
     }
 
@@ -1390,19 +1555,31 @@ audio.addEventListener(
       ? audio.duration
       : 0;
 
-    currentTime.textContent =
-      formatTime(audio.currentTime);
+    if(currentTime){
+
+      currentTime.textContent =
+        formatTime(audio.currentTime);
+
+    }
 
     if(duration > 0){
 
-      progress.max =
-        duration;
+      if(progress){
 
-      progress.value =
-        audio.currentTime;
+        progress.max =
+          duration;
 
-      endTime.textContent =
-        formatTime(duration);
+        progress.value =
+          audio.currentTime;
+
+      }
+
+      if(endTime){
+
+        endTime.textContent =
+          formatTime(duration);
+
+      }
 
     }
 
@@ -1413,104 +1590,115 @@ audio.addEventListener(
   "ended",
   function(){
 
-    previewButton.textContent =
-      "▶";
+    if(previewButton){
+
+      previewButton.textContent =
+        "▶";
+
+    }
 
   }
 );
 
-progress.addEventListener(
-  "input",
-  function(){
+if(progress){
 
-    const value =
-      Number(progress.value);
+  progress.addEventListener(
+    "input",
+    function(){
 
-    if(
-      Number.isFinite(audio.duration) &&
-      audio.duration > 0
-    ){
+      const value =
+        Number(progress.value);
 
-      audio.currentTime =
-        Math.max(
-          0,
-          Math.min(
-            value,
-            audio.duration
-          )
+      if(
+        Number.isFinite(audio.duration) &&
+        audio.duration > 0
+      ){
+
+        audio.currentTime =
+          Math.max(
+            0,
+            Math.min(
+              value,
+              audio.duration
+            )
+          );
+
+      }
+
+    }
+  );
+
+}
+
+if(buyButton){
+
+  buyButton.addEventListener(
+    "click",
+    function(){
+
+      const songId =
+        getSongId();
+
+      if(!songId){
+
+        alert(
+          "Song ID is missing."
         );
 
-    }
+        return;
 
-  }
-);
+      }
 
-buyButton.addEventListener(
-  "click",
-  function(){
-
-    const songId =
-      getSongId();
-
-    if(!songId){
-
-      alert(
-        "Song ID is missing."
-      );
-
-      return;
-
-    }
-
-    const checkoutUrl =
-      new URL(
-        CHECKOUT_PAGE,
-        window.location.href
-      );
-
-    checkoutUrl.searchParams.set(
-      "id",
-      songId
-    );
-
-    if(isDjMix){
+      const checkoutUrl =
+        new URL(
+          CHECKOUT_PAGE,
+          window.location.href
+        );
 
       checkoutUrl.searchParams.set(
-        "content_type",
-        "dj_mix"
+        "id",
+        songId
+      );
+
+      if(isDjMix){
+
+        checkoutUrl.searchParams.set(
+          "content_type",
+          "dj_mix"
+        );
+
+      }
+
+      window.location.href =
+        checkoutUrl.href;
+
+    }
+  );
+
+}
+
+if(tipButton){
+
+  tipButton.addEventListener(
+    "click",
+    function(){
+
+      const songId =
+        getSongId();
+
+      alert(
+        "Tip DJ is coming next. Your DJ Mix remains free to stream."
+      );
+
+      console.log(
+        "PASONG DJ Tip requested for:",
+        songId
       );
 
     }
+  );
 
-    console.log(
-      "PASONG Checkout URL:",
-      checkoutUrl.href
-    );
-
-    window.location.href =
-      checkoutUrl.href;
-
-  }
-);
-
-tipButton.addEventListener(
-  "click",
-  function(){
-
-    const songId =
-      getSongId();
-
-    alert(
-      "Tip DJ is coming next. Your DJ Mix remains free to stream."
-    );
-
-    console.log(
-      "PASONG DJ Tip requested for:",
-      songId
-    );
-
-  }
-);
+}
 
 loadSong();
 
