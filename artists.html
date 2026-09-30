@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Artists</title>
-
-<style>
+<title>PASONG Artists</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
 *{margin:0;padding:0;box-sizing:border-box}
 
 body{
@@ -197,20 +194,9 @@ footer{
     white-space:nowrap;
   }
 }
-</style>
-</head>
-
-<body>
-
-<nav>
-
-<a class="logo" href="index.html">
+</style></head><body><nav><a class="logo" href="index.html">
   ◈ <span>PASONG</span>
-</a>
-
-<div class="nav-links">
-
-<a href="index.html">Home</a>
+</a><div class="nav-links"><a href="index.html">Home</a>
 
 <a href="store.html">Music Store</a>
 
@@ -224,45 +210,30 @@ footer{
 
 <a href="account.html">Account</a>
 
-</div>
-
-</nav>
-
-
-<main class="container">
-
-<section class="hero">
-
-<h1>
+</div></nav><main class="container"><section class="hero"><h1>
 PASONG <span>Artists</span>
-</h1>
-
-<p>
+</h1><p>
 Discover artists and explore their music on PASONG.
-</p>
-
-</section>
-
-
-<div id="status" class="status">
+</p></section><div id="status" class="status">
 Loading artists...
-</div>
-
-
-<div id="artists" class="artist-grid"></div>
-
-</main>
-
-
-<footer>
+</div><div id="artists" class="artist-grid"></div></main><footer>
 PASONG © 2026 • Music • Artists • Opportunity
-</footer>
-
-
-<script>
+</footer><script>
 
 const API_BASE =
 "https://pasong-api.onrender.com";
+
+const SUPABASE_URL =
+"https://YOUR_SUPABASE_URL";
+
+const SUPABASE_ANON_KEY =
+"YOUR_SUPABASE_ANON_KEY";
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
 
 
 async function loadArtists(){
@@ -336,14 +307,6 @@ song.artistId ||
 song.artist?.id;
 
 
-const artistName =
-song.artist_name ||
-song.artistName ||
-song.artist?.name ||
-song.artist ||
-"Unknown Artist";
-
-
 if(!artistId){
 
 return;
@@ -357,7 +320,7 @@ artistMap[artistId]={
 
 id:artistId,
 
-name:artistName,
+name:"Unknown Artist",
 
 cover:
 song.artist_avatar ||
@@ -378,14 +341,13 @@ artistMap[artistId].songs++;
 });
 
 
-const artists =
-Object.values(artistMap);
+const artistIds =
+Object.keys(artistMap);
 
+
+if(!artistIds.length){
 
 status.style.display="none";
-
-
-if(!artists.length){
 
 container.innerHTML=`
 
@@ -403,11 +365,75 @@ return;
 }
 
 
+const {
+data:profiles,
+error:profileError
+} = await supabaseClient
+.from("artist_profiles")
+.select(`
+id,
+performing_name,
+stage_name,
+profile_image_url
+`)
+.in("id",artistIds);
+
+
+if(profileError){
+
+console.error(
+"Artist profile error:",
+profileError
+);
+
+}
+
+
+(profiles || []).forEach(profile=>{
+
+const artist =
+artistMap[profile.id];
+
+if(!artist){
+
+return;
+
+}
+
+
+artist.name =
+profile.performing_name ||
+profile.stage_name ||
+"Unknown Artist";
+
+
+if(profile.profile_image_url){
+
+artist.cover =
+profile.profile_image_url;
+
+}
+
+});
+
+
+const artists =
+Object.values(artistMap);
+
+
+status.style.display="none";
+
+
 container.innerHTML =
 artists.map(artist=>{
 
+const safeName =
+artist.name ||
+"Unknown Artist";
+
+
 const initial =
-(artist.name || "A")
+safeName
 .charAt(0)
 .toUpperCase();
 
@@ -419,26 +445,26 @@ artist.cover
 <img
 class="artist-image"
 src="${escapeHtml(artist.cover)}"
-alt="${escapeHtml(artist.name)}"
-onerror="this.style.display='none'"
+alt="${escapeHtml(safeName)}"
+onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
 >
+
+<div
+class="artist-placeholder"
+style="display:none"
+>
+${escapeHtml(initial)}
+</div>
 
 `
 : `
 
 <div class="artist-placeholder">
-${initial}
+${escapeHtml(initial)}
 </div>
 
 `;
 
-
-/*
- IMPORTANT:
- The artist ID is placed into the URL.
- Example:
- artist.html?id=119e7b2d-4115-44e9-ba0f-e47d4a3fa332
-*/
 
 const profileLink =
 "artist.html?id=" +
@@ -452,7 +478,7 @@ return `
 ${image}
 
 <div class="artist-name">
-${escapeHtml(artist.name)}
+${escapeHtml(safeName)}
 </div>
 
 <div class="artist-info">
@@ -537,7 +563,5 @@ return String(value ?? "")
 
 loadArtists();
 
-</script>
-
-</body>
+</script></body>
 </html>
