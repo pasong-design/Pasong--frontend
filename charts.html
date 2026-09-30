@@ -441,7 +441,7 @@ button{
 
 .song-row{
   display:grid;
-  grid-template-columns:48px 1fr auto;
+  grid-template-columns:58px 1fr auto;
   gap:14px;
   align-items:center;
   padding:14px 18px;
@@ -452,15 +452,33 @@ button{
   border-bottom:0;
 }
 
-.song-number{
-  width:40px;
-  height:40px;
-  border-radius:11px;
+.song-cover{
+  width:58px;
+  height:58px;
+  border-radius:12px;
+  object-fit:cover;
+  display:block;
+  background:#191923;
+  border:1px solid #292936;
+}
+
+.song-cover-placeholder{
+  width:58px;
+  height:58px;
+  border-radius:12px;
   display:grid;
   place-items:center;
-  background:#191923;
-  color:#8b5cf6;
-  font-weight:800;
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(192,132,252,.35),
+      transparent 45%
+    ),
+    linear-gradient(145deg,#191923,#0d0d14);
+  color:#c084fc;
+  font-size:19px;
+  font-weight:900;
+  border:1px solid #292936;
 }
 
 .song-main{
@@ -921,7 +939,7 @@ footer{
   }
 
   .song-row{
-    grid-template-columns:40px 1fr;
+    grid-template-columns:48px 1fr;
   }
 
   .song-actions{
@@ -1568,6 +1586,8 @@ function getPlays(song){
     song.play_count ??
     song.streams ??
     song.stream_count ??
+    song.playCount ??
+    song.total_plays ??
     0
   ) || 0;
 
@@ -1579,6 +1599,7 @@ function getDownloads(song){
     song.downloads ??
     song.download_count ??
     song.total_downloads ??
+    song.downloadCount ??
     0
   ) || 0;
 
@@ -1605,6 +1626,74 @@ function getId(song){
     song.songId ||
     ""
   );
+
+}
+
+function getSongCover(song){
+
+  const candidates = [
+
+    song.cover_url,
+    song.cover_image_url,
+    song.cover_image,
+    song.cover,
+    song.coverUrl,
+    song.coverImageUrl,
+    song.coverImage,
+    song.artwork_url,
+    song.artwork,
+    song.artworkUrl,
+    song.thumbnail_url,
+    song.thumbnail,
+    song.image_url,
+    song.image,
+    song.photo_url,
+    song.profile_image_url
+
+  ];
+
+  for(const value of candidates){
+
+    if(
+      value &&
+      typeof value === "string" &&
+      /^https?:\/\//i.test(value)
+    ){
+
+      return value;
+
+    }
+
+  }
+
+  if(
+    song.cover &&
+    typeof song.cover === "object"
+  ){
+
+    const nested = [
+      song.cover.url,
+      song.cover.secure_url,
+      song.cover.image_url
+    ];
+
+    for(const value of nested){
+
+      if(
+        value &&
+        typeof value === "string" &&
+        /^https?:\/\//i.test(value)
+      ){
+
+        return value;
+
+      }
+
+    }
+
+  }
+
+  return "";
 
 }
 
@@ -1682,13 +1771,52 @@ function getChartSongs(){
     return [];
   }
 
+  if(currentChart === "top"){
+
+    list.sort(
+      (a,b) => {
+
+        const scoreA = scoreSong(a);
+        const scoreB = scoreSong(b);
+
+        if(scoreB !== scoreA){
+          return scoreB - scoreA;
+        }
+
+        const downloadsA = getDownloads(a);
+        const downloadsB = getDownloads(b);
+
+        if(downloadsB !== downloadsA){
+          return downloadsB - downloadsA;
+        }
+
+        const playsA = getPlays(a);
+        const playsB = getPlays(b);
+
+        if(playsB !== playsA){
+          return playsB - playsA;
+        }
+
+        const dateA =
+          parseDate(getDate(a))?.getTime() || 0;
+
+        const dateB =
+          parseDate(getDate(b))?.getTime() || 0;
+
+        return dateB - dateA;
+
+      }
+    );
+
+    return list;
+
+  }
+
   const periodList =
     list.filter(isInPeriod);
 
   if(periodList.length){
-
     list = periodList;
-
   }
 
   if(currentChart === "latest"){
@@ -1745,13 +1873,6 @@ function getChartSongs(){
         return trendB - trendA;
 
       }
-    );
-
-  }else{
-
-    list.sort(
-      (a,b) =>
-        scoreSong(b) - scoreSong(a)
     );
 
   }
@@ -1811,19 +1932,44 @@ function renderCharts(){
           const date = escapeHTML(formatDate(getDate(song)));
           const plays = getPlays(song);
           const downloads = getDownloads(song);
+          const cover = getSongCover(song);
 
           const url =
             id
               ? `song.html?id=${encodeURIComponent(id)}`
               : "#";
 
+          const coverMarkup =
+            cover
+              ? `
+                <img
+                  class="song-cover"
+                  src="${escapeHTML(cover)}"
+                  alt="${title}"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  onerror="
+                    this.onerror=null;
+                    this.style.display='none';
+                    this.nextElementSibling.style.display='grid';
+                  ">
+                <div
+                  class="song-cover-placeholder"
+                  style="display:none;">
+                  ♪
+                </div>
+              `
+              : `
+                <div class="song-cover-placeholder">
+                  ♪
+                </div>
+              `;
+
           return `
 
             <article class="song-row">
 
-              <div class="song-number">
-                ${index + 1}
-              </div>
+              ${coverMarkup}
 
               <div class="song-main">
 
@@ -1894,7 +2040,7 @@ function updateChartHeading(){
     title.textContent = "🔥 Top Songs";
 
     description.textContent =
-      "Songs currently receiving the most activity.";
+      "Songs ranked by actual plays and downloads across PASONG.";
 
   }
 
@@ -2098,13 +2244,20 @@ function getNewsImage(item){
   const candidates = [
 
     item?.thumbnail,
+    item?.thumbnail_url,
+    item?.thumbnailUrl,
     item?.enclosure?.link,
     item?.enclosure?.url,
+    item?.enclosure?.href,
     item?.media_content?.url,
+    item?.media_content?.[0]?.url,
     item?.media?.content?.url,
+    item?.media?.thumbnail?.url,
     item?.["media:content"]?.url,
+    item?.["media:thumbnail"]?.url,
     item?.image,
-    item?.image_url
+    item?.image_url,
+    item?.imageUrl
 
   ];
 
@@ -2123,20 +2276,53 @@ function getNewsImage(item){
   }
 
   const text =
-    `${item?.content || ""} ${item?.description || ""}`;
+    [
+      item?.content,
+      item?.description,
+      item?.contentSnippet
+    ]
+      .filter(Boolean)
+      .join(" ");
 
-  const match =
+  const imageMatches =
     text.match(
-      /<img[^>]+src=["']([^"']+)["']/i
+      /<img[^>]+(?:src|data-src)=["']([^"']+)["']/gi
+    );
+
+  if(imageMatches){
+
+    for(const tag of imageMatches){
+
+      const match =
+        tag.match(
+          /(?:src|data-src)=["']([^"']+)["']/i
+        );
+
+      if(
+        match &&
+        match[1] &&
+        /^https?:\/\//i.test(match[1])
+      ){
+
+        return match[1];
+
+      }
+
+    }
+
+  }
+
+  const urlMatch =
+    text.match(
+      /https?:\/\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)(?:\?[^\s"'<>]*)?/i
     );
 
   if(
-    match &&
-    match[1] &&
-    /^https?:\/\//i.test(match[1])
+    urlMatch &&
+    urlMatch[0]
   ){
 
-    return match[1];
+    return urlMatch[0];
 
   }
 
@@ -2261,6 +2447,7 @@ async function fetchRSS(feed){
         const description =
           item.description ||
           item.contentSnippet ||
+          item.content ||
           "";
 
         return {
