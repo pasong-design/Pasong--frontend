@@ -282,7 +282,7 @@ h1{
 .favorite-btn{
   margin-top:12px;
   background:#171725;
-  border:1px solid rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.10);
 }
 
 .favorite-btn.active{
@@ -631,6 +631,10 @@ function formatTime(seconds){
 
 function showError(message){
 
+  if(!loading){
+    return;
+  }
+
   loading.className = "error-box";
 
   loading.innerHTML = `
@@ -646,6 +650,10 @@ function showError(message){
 }
 
 function setFavoriteButton(){
+
+  if(!favoriteButton){
+    return;
+  }
 
   if(isFavorite){
 
@@ -671,7 +679,7 @@ function setFavoriteButton(){
 
 async function loadFavoriteStatus(){
 
-  if(!currentSongId){
+  if(!currentSongId || !favoriteButton){
     return;
   }
 
@@ -735,7 +743,11 @@ async function loadFavoriteStatus(){
 
 async function toggleFavorite(){
 
-  if(favoriteBusy){
+  if(
+    favoriteBusy ||
+    !currentSongId ||
+    !favoriteButton
+  ){
     return;
   }
 
@@ -760,11 +772,14 @@ async function toggleFavorite(){
         "Please log in to add songs to your Favorites."
       );
 
-      window.location.href =
+      const redirect =
         "login.html?redirect=" +
         encodeURIComponent(
           window.location.href
         );
+
+      window.location.href =
+        redirect;
 
       return;
 
@@ -812,11 +827,11 @@ async function toggleFavorite(){
       const {
         error
       } =
-        await supabaseClient
-          .from("favorites")
-          .delete()
-          .eq("user_id",user.id)
-          .eq("song_id",currentSongId);
+      await supabaseClient
+        .from("favorites")
+        .delete()
+        .eq("user_id",user.id)
+        .eq("song_id",currentSongId);
 
       if(error){
 
@@ -845,17 +860,25 @@ async function toggleFavorite(){
 
     favoriteBusy = false;
 
-    favoriteButton.disabled =
-      false;
+    if(favoriteButton){
+
+      favoriteButton.disabled =
+        false;
+
+    }
 
   }
 
 }
 
-favoriteButton.addEventListener(
-  "click",
-  toggleFavorite
-);
+if(favoriteButton){
+
+  favoriteButton.addEventListener(
+    "click",
+    toggleFavorite
+  );
+
+}
 
 async function detectCountry(){
 
@@ -1101,7 +1124,7 @@ async function loadSong(){
 
     }
 
-    await loadFavoriteStatus();
+    loadFavoriteStatus();
 
     loading.style.display =
       "none";
