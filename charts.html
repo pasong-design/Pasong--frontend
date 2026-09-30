@@ -398,6 +398,7 @@ main{
   width:100%;
   height:100%;
   object-fit:cover;
+  opacity:1;
   transition:opacity .45s,transform .6s;
 }
 .discover-card.beats:hover .beat-feature-image img{
@@ -866,11 +867,13 @@ function escapeHTML(value){
 }
 
 function parseNumber(value){
+
   if(typeof value==="number" && Number.isFinite(value)){
     return value;
   }
 
   if(typeof value==="string"){
+
     const n=Number(
       value
         .replace(/,/g,"")
@@ -890,10 +893,14 @@ function getTitle(song){
 }
 
 function getArtist(song){
+
+  if(typeof song.artist==="string"){
+    return song.artist;
+  }
+
   return song.performing_name ||
     song.stage_name ||
     song.artist_name ||
-    song.artist ||
     song.artistName ||
     song.artist?.performing_name ||
     song.artist?.stage_name ||
@@ -907,6 +914,7 @@ function getGenre(song){
 }
 
 function getPlays(song){
+
   return parseNumber(
     song.plays ??
     song.play_count ??
@@ -921,6 +929,7 @@ function getPlays(song){
 }
 
 function getDownloads(song){
+
   return parseNumber(
     song.downloads ??
     song.download_count ??
@@ -932,6 +941,7 @@ function getDownloads(song){
 }
 
 function getDate(song){
+
   return song.created_at ||
     song.release_date ||
     song.released_at ||
@@ -941,6 +951,7 @@ function getDate(song){
 }
 
 function getId(song){
+
   return song.id ||
     song.song_id ||
     song.songId ||
@@ -948,11 +959,13 @@ function getId(song){
 }
 
 function getSongCover(song){
+
   const candidates=[
     song.cover_url,
     song.cover_image_url,
     song.coverUrl,
     song.cover,
+    song.cover_image,
     song.artwork_url,
     song.artworkUrl,
     song.artwork,
@@ -960,7 +973,9 @@ function getSongCover(song){
     song.imageUrl,
     song.image,
     song.thumbnail_url,
-    song.thumbnail
+    song.thumbnail,
+    song.cover?.url,
+    song.artwork?.url
   ];
 
   for(const value of candidates){
@@ -970,9 +985,11 @@ function getSongCover(song){
       value.trim() &&
       (
         /^https?:\/\//i.test(value.trim()) ||
-        value.trim().startsWith("//")
+        value.trim().startsWith("//") ||
+        value.trim().startsWith("/")
       )
     ){
+
       return value.trim();
     }
   }
@@ -980,7 +997,37 @@ function getSongCover(song){
   return "";
 }
 
+function normalizeList(data,keyNames=[]){
+
+  if(Array.isArray(data)){
+    return data;
+  }
+
+  for(const key of keyNames){
+
+    if(Array.isArray(data?.[key])){
+      return data[key];
+    }
+
+  }
+
+  if(Array.isArray(data?.data)){
+    return data.data;
+  }
+
+  if(Array.isArray(data?.results)){
+    return data.results;
+  }
+
+  if(Array.isArray(data?.items)){
+    return data.items;
+  }
+
+  return [];
+}
+
 function getBeatId(beat){
+
   return beat.id ||
     beat.beat_id ||
     beat.beatId ||
@@ -988,6 +1035,7 @@ function getBeatId(beat){
 }
 
 function getBeatTitle(beat){
+
   return beat.title ||
     beat.name ||
     beat.beat_title ||
@@ -995,10 +1043,14 @@ function getBeatTitle(beat){
 }
 
 function getBeatProducer(beat){
+
+  if(typeof beat.producer==="string"){
+    return beat.producer;
+  }
+
   return beat.producer_name ||
     beat.performing_name ||
     beat.stage_name ||
-    beat.producer ||
     beat.producerName ||
     beat.producer_profile?.performing_name ||
     beat.producer_profile?.stage_name ||
@@ -1012,6 +1064,7 @@ function getBeatCover(beat){
     beat.cover_image_url,
     beat.coverUrl,
     beat.cover,
+    beat.cover_image,
     beat.artwork_url,
     beat.artworkUrl,
     beat.artwork,
@@ -1019,7 +1072,9 @@ function getBeatCover(beat){
     beat.imageUrl,
     beat.image,
     beat.thumbnail_url,
-    beat.thumbnail
+    beat.thumbnail,
+    beat.cover?.url,
+    beat.artwork?.url
   ];
 
   for(const value of candidates){
@@ -1029,9 +1084,11 @@ function getBeatCover(beat){
       value.trim() &&
       (
         /^https?:\/\//i.test(value.trim()) ||
-        value.trim().startsWith("//")
+        value.trim().startsWith("//") ||
+        value.trim().startsWith("/")
       )
     ){
+
       return value.trim();
     }
   }
@@ -1046,10 +1103,13 @@ function getBeatLink(beat){
     beat.producer_user_id ||
     beat.user_id ||
     beat.producerId ||
+    beat.producer_profile?.id ||
     "";
 
   if(producerId){
-    return "producers.html?id="+encodeURIComponent(producerId);
+
+    return "producers.html?id="+
+      encodeURIComponent(producerId);
   }
 
   return "producers.html";
@@ -1068,14 +1128,14 @@ function parseDate(value){
 
 function scoreSong(song){
 
-  return getPlays(song)+(getDownloads(song)*5);
+  return getPlays(song)+
+    (getDownloads(song)*5);
 }
 
 function activityScore(song){
 
   const plays=getPlays(song);
   const downloads=getDownloads(song);
-
   const date=parseDate(getDate(song));
 
   let freshness=0;
@@ -1102,7 +1162,9 @@ function isInPeriod(song){
 
   const date=parseDate(getDate(song));
 
-  if(!date) return true;
+  if(!date){
+    return true;
+  }
 
   if(currentPeriod==="all"){
     return true;
@@ -1132,10 +1194,10 @@ function getChartSongs(){
 
   if(currentGenre!=="all"){
 
-    list=list.filter(song=>{
-      return getGenre(song).toLowerCase()===
-        currentGenre.toLowerCase();
-    });
+    list=list.filter(song=>
+      getGenre(song).toLowerCase()===
+      currentGenre.toLowerCase()
+    );
 
   }
 
@@ -1176,11 +1238,11 @@ function getChartSongs(){
 
     list.sort((a,b)=>{
 
-      const scoreDifference=
+      const difference=
         scoreSong(b)-scoreSong(a);
 
-      if(scoreDifference!==0){
-        return scoreDifference;
+      if(difference!==0){
+        return difference;
       }
 
       const db=
@@ -1197,11 +1259,11 @@ function getChartSongs(){
 
   list.sort((a,b)=>{
 
-    const scoreDifference=
+    const difference=
       activityScore(b)-activityScore(a);
 
-    if(scoreDifference!==0){
-      return scoreDifference;
+    if(difference!==0){
+      return difference;
     }
 
     const db=
@@ -1243,7 +1305,6 @@ function updateChartHeading(){
 function renderCharts(){
 
   const list=getChartSongs();
-
   const container=$("chartsList");
 
   if(!list.length){
@@ -1345,7 +1406,10 @@ function renderCharts(){
     .querySelectorAll(".listen-btn")
     .forEach(button=>{
 
-      button.addEventListener("click",()=>{
+      button.addEventListener("click",event=>{
+
+        event.preventDefault();
+        event.stopPropagation();
 
         const id=
           button.dataset.songId;
@@ -1369,20 +1433,20 @@ function populateGenres(){
 
   songs.forEach(song=>{
 
-    const genre=
-      getGenre(song);
+    const genre=getGenre(song);
 
     if(
       genre &&
       genre!=="Music"
     ){
+
       genres.add(genre);
+
     }
 
   });
 
-  const select=
-    $("genreSelect");
+  const select=$("genreSelect");
 
   select.innerHTML=
     '<option value="all">All Genres</option>';
@@ -1400,6 +1464,8 @@ function populateGenres(){
       select.appendChild(option);
 
     });
+
+  select.value=currentGenre;
 }
 
 async function loadSongs(){
@@ -1415,35 +1481,17 @@ async function loadSongs(){
       );
 
     if(!response.ok){
-      throw new Error(
-        "Songs request failed"
-      );
+      throw new Error("Songs request failed");
     }
 
     const data=
       await response.json();
 
-    if(Array.isArray(data)){
-
-      songs=data;
-
-    }else if(
-      Array.isArray(data.songs)
-    ){
-
-      songs=data.songs;
-
-    }else if(
-      Array.isArray(data.data)
-    ){
-
-      songs=data.data;
-
-    }else{
-
-      songs=[];
-
-    }
+    songs=
+      normalizeList(
+        data,
+        ["songs","results","items"]
+      );
 
     populateGenres();
     renderCharts();
@@ -1454,6 +1502,7 @@ async function loadSongs(){
 
     $("chartsList").innerHTML=
       '<div class="empty">Unable to load charts right now.</div>';
+
   }
 }
 
@@ -1486,36 +1535,17 @@ async function loadBeats(){
       const data=
         await response.json();
 
-      let result=[];
-
-      if(Array.isArray(data)){
-
-        result=data;
-
-      }else if(
-        Array.isArray(data.beats)
-      ){
-
-        result=data.beats;
-
-      }else if(
-        Array.isArray(data.data)
-      ){
-
-        result=data.data;
-
-      }else if(
-        Array.isArray(data.results)
-      ){
-
-        result=data.results;
-
-      }
+      const result=
+        normalizeList(
+          data,
+          ["beats","results","items"]
+        );
 
       if(result.length){
 
         loaded=result;
         break;
+
       }
 
     }catch(error){
@@ -1531,12 +1561,9 @@ async function loadBeats(){
   }
 
   beats=loaded.filter(beat=>{
-
     return Boolean(
-      getBeatCover(beat) ||
       getBeatTitle(beat)
     );
-
   });
 
   if(!beats.length){
@@ -1553,18 +1580,19 @@ async function loadBeats(){
 
   clearInterval(beatTimer);
 
-  beatTimer=setInterval(()=>{
+  if(beats.length>1){
 
-    if(beats.length>1){
+    beatTimer=
+      setInterval(()=>{
 
-      beatIndex=
-        (beatIndex+1)%beats.length;
+        beatIndex=
+          (beatIndex+1)%beats.length;
 
-      showBeat(beatIndex);
+        showBeat(beatIndex);
 
-    }
+      },5000);
 
-  },5000);
+  }
 }
 
 function renderBeatFallback(){
@@ -1573,7 +1601,6 @@ function renderBeatFallback(){
     $("freeBeatCover");
 
   image.removeAttribute("src");
-
   image.style.opacity="1";
 
   $("freeBeatTitle").textContent=
@@ -1587,8 +1614,7 @@ function renderBeatFallback(){
 
 function renderBeatDots(){
 
-  const dots=
-    $("beatDots");
+  const dots=$("beatDots");
 
   dots.innerHTML=
     beats.map((_,index)=>{
@@ -1624,6 +1650,7 @@ function preloadBeatImage(url){
     };
 
     image.src=url;
+
   });
 }
 
@@ -1665,6 +1692,10 @@ async function showBeat(index){
   const loaded=
     await preloadBeatImage(cover);
 
+  if(index!==beatIndex){
+    return;
+  }
+
   image.style.opacity="0";
 
   beatTransitionTimer=
@@ -1673,10 +1704,7 @@ async function showBeat(index){
       if(cover && loaded){
 
         image.src=cover;
-
-        image.alt=
-          title+" cover";
-
+        image.alt=title+" cover";
         image.style.opacity="1";
 
       }else{
