@@ -492,47 +492,41 @@ main{
 .news-section{
   margin-top:25px;
 }
-.news-controls{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  margin-bottom:13px;
-}
-.news-btn{
-  border:1px solid rgba(255,255,255,.08);
-  background:#15151e;
-  color:#999;
-  padding:8px 11px;
-  border-radius:9px;
-  font-size:11px;
-}
-.news-btn.active{
-  color:#fff;
-  background:#8b5cf6;
-  border-color:#8b5cf6;
-}
-.news-featured{
+.news-single{
+  position:relative;
   display:grid;
-  grid-template-columns:1.2fr 1fr;
-  min-height:240px;
+  grid-template-columns:1.35fr 1fr;
+  min-height:300px;
   background:#101018;
   border:1px solid rgba(255,255,255,.08);
   border-radius:18px;
   overflow:hidden;
-  margin-bottom:14px;
+  transition:opacity .35s,transform .35s;
 }
-.news-featured-image{
-  min-height:240px;
+.news-single.changing{
+  opacity:.2;
+  transform:scale(.995);
+}
+.news-single-image{
+  min-height:300px;
   background:#171720;
   overflow:hidden;
+  position:relative;
 }
-.news-featured-image img{
+.news-single-image img{
   width:100%;
   height:100%;
   object-fit:cover;
 }
-.news-featured-text{
-  padding:22px;
+.news-single-image::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg,transparent 60%,rgba(16,16,24,.8));
+  pointer-events:none;
+}
+.news-single-text{
+  padding:28px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -544,56 +538,41 @@ main{
   text-transform:uppercase;
   letter-spacing:.8px;
 }
-.news-featured-text h3{
-  font-size:22px;
-  line-height:1.25;
-  margin:9px 0;
+.news-single-text h3{
+  font-size:clamp(22px,3vw,32px);
+  line-height:1.2;
+  margin:10px 0;
 }
-.news-featured-text p{
+.news-single-text p{
   color:#999;
-  font-size:12px;
-  line-height:1.5;
-}
-.news-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;
-}
-.news-card{
-  background:#101018;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px;
-  overflow:hidden;
-}
-.news-image{
-  height:145px;
-  background:#171720;
-  overflow:hidden;
-}
-.news-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.news-body{
-  padding:13px;
-}
-.news-body h4{
   font-size:13px;
-  line-height:1.4;
-  margin:5px 0 8px;
-}
-.news-body p{
-  color:#777;
-  font-size:11px;
-  line-height:1.45;
+  line-height:1.6;
 }
 .news-read{
   display:inline-block;
-  margin-top:10px;
+  margin-top:16px;
   color:#a78bfa;
-  font-size:11px;
+  font-size:12px;
   font-weight:800;
+}
+.news-progress{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:3px;
+  background:rgba(255,255,255,.08);
+  z-index:5;
+}
+.news-progress-bar{
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,#8b5cf6,#ec4899);
+  animation:newsProgress 10s linear infinite;
+}
+@keyframes newsProgress{
+  from{width:0}
+  to{width:100%}
 }
 
 footer{
@@ -630,9 +609,11 @@ footer{
   .hero{padding:23px;min-height:330px}
   .equalizer{right:18px;bottom:18px;opacity:.25}
   .discover-grid{grid-template-columns:1fr}
-  .news-featured{grid-template-columns:1fr}
-  .news-featured-image{height:210px;min-height:210px}
-  .news-grid{grid-template-columns:1fr 1fr}
+  .news-single{grid-template-columns:1fr}
+  .news-single-image{height:230px;min-height:230px}
+  .news-single-image::after{
+    background:linear-gradient(180deg,transparent 60%,rgba(16,16,24,.7));
+  }
 }
 
 @media(max-width:560px){
@@ -656,8 +637,8 @@ footer{
   }
   .song-stat{font-size:10px}
   .listen-btn{padding:7px 9px}
-  .news-grid{grid-template-columns:1fr}
-  .news-image{height:180px}
+  .news-single-text{padding:21px}
+  .news-single-text h3{font-size:22px}
 }
 </style>
 </head>
@@ -802,20 +783,7 @@ footer{
       </div>
     </div>
 
-    <div class="news-controls">
-      <button type="button" class="news-btn active" data-region="Africa">Africa</button>
-      <button type="button" class="news-btn" data-region="Uganda">Uganda</button>
-      <button type="button" class="news-btn" data-region="Kenya">Kenya</button>
-      <button type="button" class="news-btn" data-region="Tanzania">Tanzania</button>
-      <button type="button" class="news-btn" data-region="Nigeria">Nigeria</button>
-      <button type="button" class="news-btn" data-region="Global">Global</button>
-    </div>
-
     <div id="newsFeatured"></div>
-
-    <div id="newsGrid" class="news-grid">
-      <div class="loading">Loading music news...</div>
-    </div>
 
   </section>
 
@@ -849,8 +817,9 @@ let beats=[];
 let currentChart="top";
 let currentPeriod="today";
 let currentGenre="all";
-let newsRegion="Africa";
 let newsItems=[];
+let newsIndex=0;
+let newsTimer=null;
 let beatIndex=0;
 let beatTimer=null;
 let beatTransitionTimer=null;
@@ -1957,59 +1926,6 @@ function getNewsText(item){
     .trim();
 }
 
-function getNewsRegion(item){
-
-  const text=(
-
-    (item.title || "")+
-    " "+
-    (item.description || "")+
-    " "+
-    (item.content || "")
-
-  ).toLowerCase();
-
-  if(
-    /uganda|kampala|ugandan/.test(text)
-  ){
-    return "Uganda";
-  }
-
-  if(
-    /kenya|nairobi|kenyan/.test(text)
-  ){
-    return "Kenya";
-  }
-
-  if(
-    /tanzania|dar es salaam|bongo/.test(text)
-  ){
-    return "Tanzania";
-  }
-
-  if(
-    /nigeria|lagos|afrobeats nigeria|nollywood/.test(text)
-  ){
-    return "Nigeria";
-  }
-
-  return "Africa";
-}
-
-function newsMatchesRegion(item){
-
-  if(newsRegion==="Global"){
-    return true;
-  }
-
-  if(newsRegion==="Africa"){
-    return true;
-  }
-
-  return getNewsRegion(item)===
-    newsRegion;
-}
-
 function formatNewsDate(value){
 
   const date=
@@ -2029,81 +1945,64 @@ function formatNewsDate(value){
   );
 }
 
-function renderNews(){
+function renderNewsItem(item){
 
-  const filtered=
-    newsItems.filter(
-      newsMatchesRegion
-    );
+  const container=
+    $("newsFeatured");
 
-  if(!filtered.length){
+  const image=
+    getNewsImage(item);
 
-    $("newsFeatured").innerHTML="";
-
-    $("newsGrid").innerHTML=
-      '<div class="empty">No news found for this region.</div>';
-
-    return;
-  }
-
-  const featured=
-    filtered[0];
-
-  const rest=
-    filtered.slice(1,10);
-
-  const featuredImage=
-    getNewsImage(featured);
-
-  const featuredTitle=
+  const title=
     escapeHTML(
-      featured.title ||
+      item.title ||
       "Music News"
     );
 
-  const featuredText=
+  const text=
     escapeHTML(
-      getNewsText(featured)
-        .slice(0,240)
+      getNewsText(item)
+        .slice(0,280)
     );
 
-  const featuredSource=
+  const source=
     escapeHTML(
-      featured.source ||
+      item.source ||
       "Music News"
     );
 
-  const featuredLink=
-    featured.link ||
-    featured.url ||
+  const link=
+    item.link ||
+    item.url ||
     "#";
 
-  const featuredDate=
+  const date=
     escapeHTML(
       formatNewsDate(
-        featured.pubDate
+        item.pubDate
       )
     );
 
-  $("newsFeatured").innerHTML=`
+  container.innerHTML=`
 
     <a
-      class="news-featured"
-      href="${escapeHTML(featuredLink)}"
+      class="news-single"
+      id="newsSingle"
+      href="${escapeHTML(link)}"
       target="_blank"
       rel="noopener noreferrer"
     >
 
-      <div class="news-featured-image">
+      <div class="news-single-image">
 
         ${
-          featuredImage
+          image
           ?
           `
             <img
-              src="${escapeHTML(featuredImage)}"
+              src="${escapeHTML(image)}"
               alt=""
-              loading="lazy"
+              loading="eager"
               referrerpolicy="no-referrer"
               onerror="this.style.display='none'"
             >
@@ -2114,26 +2013,29 @@ function renderNews(){
 
       </div>
 
-      <div class="news-featured-text">
+      <div class="news-single-text">
 
         <span class="news-source">
-          ${featuredSource}
+          ${source}
         </span>
 
         <h3>
-          ${featuredTitle}
+          ${title}
         </h3>
 
         <p>
-          ${featuredText || "Read the latest music story."}
+          ${text || "Read the latest music story on PASONG."}
         </p>
 
         ${
-          featuredDate
+          date
           ?
           `
-            <span class="news-source" style="margin-top:9px">
-              ${featuredDate}
+            <span
+              class="news-source"
+              style="margin-top:10px"
+            >
+              ${date}
             </span>
           `
           :
@@ -2146,149 +2048,72 @@ function renderNews(){
 
       </div>
 
+      <div class="news-progress">
+        <div class="news-progress-bar"></div>
+      </div>
+
     </a>
 
   `;
+}
 
-  $("newsGrid").innerHTML=
-    rest.map(item=>{
+function showNextNews(){
 
-      const image=
-        getNewsImage(item);
+  if(!newsItems.length){
+    return;
+  }
 
-      const title=
-        escapeHTML(
-          item.title ||
-          "Music News"
-        );
+  const current=
+    $("newsSingle");
 
-      const text=
-        escapeHTML(
-          getNewsText(item)
-            .slice(0,130)
-        );
+  if(current){
 
-      const source=
-        escapeHTML(
-          item.source ||
-          "Music News"
-        );
+    current.classList.add("changing");
 
-      const link=
-        item.link ||
-        item.url ||
-        "#";
+    setTimeout(()=>{
 
-      const date=
-        escapeHTML(
-          formatNewsDate(
-            item.pubDate
-          )
-        );
+      newsIndex=
+        (newsIndex+1)%newsItems.length;
 
-      return `
+      renderNewsItem(
+        newsItems[newsIndex]
+      );
 
-        <article class="news-card">
+    },350);
 
-          <a
-            href="${escapeHTML(link)}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+  }else{
 
-            <div class="news-image">
+    renderNewsItem(
+      newsItems[newsIndex]
+    );
 
-              ${
-                image
-                ?
-                `
-                  <img
-                    src="${escapeHTML(image)}"
-                    alt=""
-                    loading="lazy"
-                    referrerpolicy="no-referrer"
-                    onerror="this.style.display='none'"
-                  >
-                `
-                :
-                ""
-              }
+  }
+}
 
-            </div>
+function startNewsRotation(){
 
-            <div class="news-body">
+  clearInterval(newsTimer);
 
-              <span class="news-source">
-                ${source}
-              </span>
+  if(newsItems.length<=1){
+    return;
+  }
 
-              <h4>
-                ${title}
-              </h4>
-
-              <p>
-                ${text}
-              </p>
-
-              ${
-                date
-                ?
-                `
-                  <span class="news-source" style="display:block;margin-top:7px">
-                    ${date}
-                  </span>
-                `
-                :
-                ""
-              }
-
-              <span class="news-read">
-                Read story →
-              </span>
-
-            </div>
-
-          </a>
-
-        </article>
-
-      `;
-
-    }).join("");
+  newsTimer=
+    setInterval(
+      showNextNews,
+      10000
+    );
 }
 
 async function loadNews(){
 
-  const feeds={
+  const feedUrl=
+    "https://news.google.com/rss/search?q=African+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en";
 
-    Africa:
-      "https://news.google.com/rss/search?q=African+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
-
-    Uganda:
-      "https://news.google.com/rss/search?q=Uganda+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
-
-    Kenya:
-      "https://news.google.com/rss/search?q=Kenya+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
-
-    Tanzania:
-      "https://news.google.com/rss/search?q=Tanzania+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
-
-    Nigeria:
-      "https://news.google.com/rss/search?q=Nigeria+music+artists+entertainment&hl=en-US&gl=US&ceid=US:en",
-
-    Global:
-      "https://news.google.com/rss/search?q=music+artists+entertainment&hl=en-US&gl=US&ceid=US:en"
-
-  };
-
-  $("newsGrid").innerHTML=
+  $("newsFeatured").innerHTML=
     '<div class="loading">Loading music news...</div>';
 
   try{
-
-    const feedUrl=
-      feeds[newsRegion] ||
-      feeds.Africa;
 
     const url=
       "https://api.rss2json.com/v1/api.json?rss_url="+
@@ -2302,6 +2127,10 @@ async function loadNews(){
         }
       );
 
+    if(!response.ok){
+      throw new Error("News request failed");
+    }
+
     const data=
       await response.json();
 
@@ -2310,90 +2139,124 @@ async function loadNews(){
       ? data.items
       : [];
 
+    const seen=new Set();
+
     newsItems=
-      items.map(item=>({
+      items
+        .map(item=>({
 
-        title:
-          item.title ||
-          "Music News",
+          title:
+            item.title ||
+            "Music News",
 
-        description:
-          item.description ||
-          "",
+          description:
+            item.description ||
+            "",
 
-        content:
-          item.content ||
-          "",
+          content:
+            item.content ||
+            "",
 
-        content_encoded:
-          item.content_encoded ||
-          "",
+          content_encoded:
+            item.content_encoded ||
+            "",
 
-        "content:encoded":
-          item["content:encoded"] ||
-          "",
+          "content:encoded":
+            item["content:encoded"] ||
+            "",
 
-        thumbnail:
-          item.thumbnail ||
-          "",
+          thumbnail:
+            item.thumbnail ||
+            "",
 
-        thumbnail_url:
-          item.thumbnail_url ||
-          "",
+          thumbnail_url:
+            item.thumbnail_url ||
+            "",
 
-        image:
-          item.image ||
-          "",
+          image:
+            item.image ||
+            "",
 
-        image_url:
-          item.image_url ||
-          "",
+          image_url:
+            item.image_url ||
+            "",
 
-        enclosure:
-          item.enclosure ||
-          {},
+          enclosure:
+            item.enclosure ||
+            {},
 
-        media:
-          item.media ||
-          {},
+          media:
+            item.media ||
+            {},
 
-        "media:content":
-          item["media:content"] ||
-          {},
+          "media:content":
+            item["media:content"] ||
+            {},
 
-        "media:thumbnail":
-          item["media:thumbnail"] ||
-          {},
+          "media:thumbnail":
+            item["media:thumbnail"] ||
+            {},
 
-        author:
-          item.author ||
-          "",
+          author:
+            item.author ||
+            "",
 
-        source:
-          getNewsSource(
-            item,
-            data.feed?.title
-          ),
+          source:
+            getNewsSource(
+              item,
+              data.feed?.title
+            ),
 
-        link:
-          item.link ||
-          "",
+          link:
+            item.link ||
+            "",
 
-        pubDate:
-          item.pubDate ||
-          ""
+          pubDate:
+            item.pubDate ||
+            ""
 
-      }));
+        }))
+        .filter(item=>{
 
-    renderNews();
+          const key=
+            (
+              item.title+
+              "|" +
+              item.link
+            ).toLowerCase();
+
+          if(seen.has(key)){
+            return false;
+          }
+
+          seen.add(key);
+          return true;
+
+        });
+
+    newsIndex=0;
+
+    if(!newsItems.length){
+
+      $("newsFeatured").innerHTML=
+        '<div class="empty">No music news found right now.</div>';
+
+      return;
+    }
+
+    renderNewsItem(
+      newsItems[newsIndex]
+    );
+
+    startNewsRotation();
 
   }catch(error){
 
     console.error(error);
 
-    $("newsFeatured").innerHTML="";
+    clearInterval(newsTimer);
 
-    $("newsGrid").innerHTML=
+    $("newsFeatured").innerHTML=
       '<div class="empty">Unable to load music news right now.</div>';
 
   }
@@ -2528,34 +2391,6 @@ $("genreSelect")
 
     }
   );
-
-document
-  .querySelectorAll(".news-btn")
-  .forEach(button=>{
-
-    button.addEventListener(
-      "click",
-      ()=>{
-
-        newsRegion=
-          button.dataset.region;
-
-        document
-          .querySelectorAll(".news-btn")
-          .forEach(item=>{
-
-            item.classList.toggle(
-              "active",
-              item===button
-            );
-
-          });
-
-        loadNews();
-
-      });
-
-  });
 
 $("freeBeatsCard")
   .addEventListener(
