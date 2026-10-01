@@ -1,104 +1,249 @@
+/* =========================================================
+   PASONG — PREMIUM NAVIGATION
+   File: premium-nav.js
+   ========================================================= */
+
 (function () {
   "use strict";
 
-  if (window.__PASONG_PREMIUM_NAV__) return;
-  window.__PASONG_PREMIUM_NAV__ = true;
+  const PREMIUM_PAGE = "premium.html";
+  const PREMIUM_BUTTON_ID = "pasongPremiumNavButton";
 
-  const PREMIUM_URL = "premium.html";
+  function addPremiumButton() {
+    /*
+      Find the navigation action area.
+      Example:
+      <div class="nav-actions">...</div>
+    */
+    const navActions = document.querySelector(".nav-actions");
 
-  function addStyles() {
-    if (document.getElementById("pasong-premium-nav-style")) return;
+    if (!navActions) {
+      return false;
+    }
+
+    /*
+      Do not create the button twice.
+    */
+    if (document.getElementById(PREMIUM_BUTTON_ID)) {
+      return true;
+    }
+
+    /*
+      Create Premium button.
+    */
+    const premiumButton = document.createElement("a");
+
+    premiumButton.id = PREMIUM_BUTTON_ID;
+    premiumButton.href = PREMIUM_PAGE;
+    premiumButton.className = "premium-nav-btn";
+    premiumButton.title = "PASONG Premium";
+    premiumButton.setAttribute(
+      "aria-label",
+      "PASONG Premium"
+    );
+
+    premiumButton.innerHTML = `
+      <span class="premium-star">✦</span>
+      <span class="premium-text">PREMIUM</span>
+    `;
+
+    /*
+      Insert Premium at the beginning of the navigation.
+    */
+    navActions.insertBefore(
+      premiumButton,
+      navActions.firstChild
+    );
+
+    return true;
+  }
+
+
+  /* =========================================================
+     PREMIUM BUTTON STYLE
+     ========================================================= */
+
+  function addPremiumStyles() {
+    if (document.getElementById("pasongPremiumNavStyles")) {
+      return;
+    }
 
     const style = document.createElement("style");
-    style.id = "pasong-premium-nav-style";
+
+    style.id = "pasongPremiumNavStyles";
+
     style.textContent = `
-      .pasong-premium-link {
-        min-height: 40px;
-        padding: 0 13px;
-        border-radius: 12px;
-        border: 1px solid rgba(155,108,255,.30);
-        background: linear-gradient(135deg,rgba(139,92,246,.18),rgba(236,72,153,.12));
-        color: #d8b4fe !important;
-        display: inline-flex !important;
+      .premium-nav-btn {
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        font-weight: 800;
-        text-decoration: none !important;
+        gap: 7px;
+
+        min-height: 40px;
+        padding: 0 16px;
+
+        border-radius: 12px;
+
+        border: 1px solid rgba(255, 215, 92, .35);
+
+        background:
+          linear-gradient(
+            135deg,
+            rgba(155, 108, 255, .22),
+            rgba(255, 69, 159, .18)
+          );
+
+        color: #fff;
+
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 900;
+
         white-space: nowrap;
-        transition: .2s;
+
+        box-shadow:
+          0 8px 25px rgba(155, 108, 255, .12);
+
+        transition:
+          transform .2s ease,
+          border-color .2s ease,
+          box-shadow .2s ease,
+          background .2s ease;
       }
-      .pasong-premium-link:hover {
-        color: #fff !important;
-        border-color: rgba(255,255,255,.20);
-        transform: translateY(-1px);
+
+      .premium-nav-btn .premium-star {
+        color: #ffd76a;
+        font-size: 16px;
+        line-height: 1;
       }
-      @media (max-width:520px) {
-        .pasong-premium-link {
-          padding: 0 9px;
-          font-size: 12px;
+
+      .premium-nav-btn .premium-text {
+        color: #fff;
+      }
+
+      .premium-nav-btn:hover {
+        transform: translateY(-2px);
+
+        border-color:
+          rgba(255, 215, 92, .65);
+
+        box-shadow:
+          0 12px 30px
+          rgba(155, 108, 255, .22);
+
+        background:
+          linear-gradient(
+            135deg,
+            rgba(155, 108, 255, .30),
+            rgba(255, 69, 159, .24)
+          );
+      }
+
+      .premium-nav-btn:active {
+        transform: translateY(0);
+      }
+
+      .premium-nav-btn:focus-visible {
+        outline: 2px solid #ffd76a;
+        outline-offset: 3px;
+      }
+
+
+      /* =========================================
+         MOBILE
+         ========================================= */
+
+      @media (max-width: 800px) {
+
+        .premium-nav-btn {
+          min-height: 36px;
+          padding: 0 10px;
+          border-radius: 10px;
+          font-size: 11px;
         }
+
+      }
+
+
+      @media (max-width: 480px) {
+
+        .premium-nav-btn {
+          width: 38px;
+          min-height: 36px;
+          padding: 0;
+        }
+
+        .premium-nav-btn .premium-text {
+          display: none;
+        }
+
+        .premium-nav-btn .premium-star {
+          font-size: 17px;
+        }
+
       }
     `;
+
     document.head.appendChild(style);
   }
 
-  function createLink() {
-    const link = document.createElement("a");
-    link.href = PREMIUM_URL;
-    link.className = "pasong-premium-link";
-    link.textContent = "✦ Premium";
-    link.title = "PASONG Premium";
-    link.setAttribute("aria-label", "PASONG Premium");
-    return link;
-  }
 
-  function addPremiumButton() {
-    if (!document.body) return;
-    addStyles();
+  /* =========================================================
+     START
+     ========================================================= */
 
-    if (document.querySelector(".pasong-premium-link")) return;
+  function initPremiumNavigation() {
+    addPremiumStyles();
 
-    const navActions = document.querySelector(".nav-actions");
-    if (navActions) {
-      navActions.insertBefore(createLink(), navActions.firstChild);
+    /*
+      The navigation may load after this script,
+      so try immediately first.
+    */
+    if (addPremiumButton()) {
       return;
     }
 
-    const headerRight = document.querySelector(".header-right");
-    if (headerRight) {
-      headerRight.insertBefore(createLink(), headerRight.firstChild);
-      return;
-    }
-
-    const nav = document.querySelector("nav");
-    if (nav) {
-      const link = createLink();
-      link.style.marginLeft = "auto";
-      link.style.marginRight = "10px";
-      nav.appendChild(link);
-    }
-  }
-
-  function start() {
-    addPremiumButton();
-
+    /*
+      Watch the page briefly in case the navigation
+      is inserted dynamically.
+    */
     const observer = new MutationObserver(function () {
-      if (!document.querySelector(".pasong-premium-link")) {
-        addPremiumButton();
-      }
-      if (document.querySelector(".pasong-premium-link")) {
+
+      if (addPremiumButton()) {
         observer.disconnect();
       }
+
     });
 
-    observer.observe(document.body, { childList: true, subtree: true });
-    setTimeout(function () { observer.disconnect(); }, 10000);
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true
+    });
+
+    /*
+      Safety stop so the observer does not run forever.
+    */
+    setTimeout(function () {
+      observer.disconnect();
+    }, 10000);
   }
 
+
+  /*
+    Run after the document is ready.
+  */
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initPremiumNavigation
+    );
+
   } else {
-    start();
+
+    initPremiumNavigation();
+
   }
+
 })();
