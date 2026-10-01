@@ -1,78 +1,104 @@
-(function(){
+(function () {
+  "use strict";
+
   if (window.__PASONG_PREMIUM_NAV__) return;
   window.__PASONG_PREMIUM_NAV__ = true;
 
   const PREMIUM_URL = "premium.html";
 
-  function addStyles(){
-    if(document.getElementById("pasong-premium-nav-style")) return;
-    const s=document.createElement("style");
-    s.id="pasong-premium-nav-style";
-    s.textContent=`
-      .pasong-premium-link{
-        color:#d8b4fe!important;
-        text-decoration:none!important;
-        font-weight:800!important;
-        white-space:nowrap!important;
+  function addStyles() {
+    if (document.getElementById("pasong-premium-nav-style")) return;
+
+    const style = document.createElement("style");
+    style.id = "pasong-premium-nav-style";
+    style.textContent = `
+      .pasong-premium-link {
+        min-height: 40px;
+        padding: 0 13px;
+        border-radius: 12px;
+        border: 1px solid rgba(155,108,255,.30);
+        background: linear-gradient(135deg,rgba(139,92,246,.18),rgba(236,72,153,.12));
+        color: #d8b4fe !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 800;
+        text-decoration: none !important;
+        white-space: nowrap;
+        transition: .2s;
       }
-      .pasong-premium-link:hover{color:#f0abfc!important}
-      .pasong-premium-floating{
-        position:fixed;
-        right:16px;
-        bottom:16px;
-        z-index:9999;
-        display:inline-flex;
-        align-items:center;
-        gap:7px;
-        padding:10px 14px;
-        border-radius:999px;
-        background:linear-gradient(135deg,#8b5cf6,#ec4899);
-        color:#fff!important;
-        text-decoration:none!important;
-        font:800 13px Arial,sans-serif;
-        box-shadow:0 8px 24px rgba(139,92,246,.28);
+      .pasong-premium-link:hover {
+        color: #fff !important;
+        border-color: rgba(255,255,255,.20);
+        transform: translateY(-1px);
       }
-      @media(min-width:801px){
-        .pasong-premium-floating{display:none}
+      @media (max-width:520px) {
+        .pasong-premium-link {
+          padding: 0 9px;
+          font-size: 12px;
+        }
       }
     `;
-    document.head.appendChild(s);
+    document.head.appendChild(style);
   }
 
-  function addNav(){
+  function createLink() {
+    const link = document.createElement("a");
+    link.href = PREMIUM_URL;
+    link.className = "pasong-premium-link";
+    link.textContent = "✦ Premium";
+    link.title = "PASONG Premium";
+    link.setAttribute("aria-label", "PASONG Premium");
+    return link;
+  }
+
+  function addPremiumButton() {
+    if (!document.body) return;
     addStyles();
 
-    if(document.querySelector("a.pasong-premium-link")) return;
+    if (document.querySelector(".pasong-premium-link")) return;
 
-    const link=document.createElement("a");
-    link.className="pasong-premium-link";
-    link.href=PREMIUM_URL;
-    link.textContent="✦ Premium";
-    link.setAttribute("aria-label","PASONG Premium");
-
-    const headerRight=document.querySelector(".header-right");
-    if(headerRight){
-      headerRight.insertBefore(link, headerRight.firstChild);
+    const navActions = document.querySelector(".nav-actions");
+    if (navActions) {
+      navActions.insertBefore(createLink(), navActions.firstChild);
       return;
     }
 
-    const header=document.querySelector("header");
-    if(header){
-      link.style.marginLeft="auto";
-      header.appendChild(link);
+    const headerRight = document.querySelector(".header-right");
+    if (headerRight) {
+      headerRight.insertBefore(createLink(), headerRight.firstChild);
       return;
     }
 
-    const floating=document.createElement("a");
-    floating.className="pasong-premium-floating";
-    floating.href=PREMIUM_URL;
-    floating.textContent="✦ Premium";
-    document.body.appendChild(floating);
+    const nav = document.querySelector("nav");
+    if (nav) {
+      const link = createLink();
+      link.style.marginLeft = "auto";
+      link.style.marginRight = "10px";
+      nav.appendChild(link);
+    }
   }
 
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",addNav,{once:true});
-  }else{
-    addNav();
+  function start() {
+    addPremiumButton();
+
+    const observer = new MutationObserver(function () {
+      if (!document.querySelector(".pasong-premium-link")) {
+        addPremiumButton();
+      }
+      if (document.querySelector(".pasong-premium-link")) {
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(function () { observer.disconnect(); }, 10000);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
   }
 })();
