@@ -1,0 +1,78 @@
+(function(){
+  if (window.__PASONG_PREMIUM_NAV__) return;
+  window.__PASONG_PREMIUM_NAV__ = true;
+
+  const PREMIUM_URL = "premium.html";
+
+  function addStyles(){
+    if(document.getElementById("pasong-premium-nav-style")) return;
+    const s=document.createElement("style");
+    s.id="pasong-premium-nav-style";
+    s.textContent=`
+      .pasong-premium-link{
+        color:#d8b4fe!important;
+        text-decoration:none!important;
+        font-weight:800!important;
+        white-space:nowrap!important;
+      }
+      .pasong-premium-link:hover{color:#f0abfc!important}
+      .pasong-premium-floating{
+        position:fixed;
+        right:16px;
+        bottom:16px;
+        z-index:9999;
+        display:inline-flex;
+        align-items:center;
+        gap:7px;
+        padding:10px 14px;
+        border-radius:999px;
+        background:linear-gradient(135deg,#8b5cf6,#ec4899);
+        color:#fff!important;
+        text-decoration:none!important;
+        font:800 13px Arial,sans-serif;
+        box-shadow:0 8px 24px rgba(139,92,246,.28);
+      }
+      @media(min-width:801px){
+        .pasong-premium-floating{display:none}
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function addNav(){
+    addStyles();
+
+    if(document.querySelector("a.pasong-premium-link")) return;
+
+    const link=document.createElement("a");
+    link.className="pasong-premium-link";
+    link.href=PREMIUM_URL;
+    link.textContent="✦ Premium";
+    link.setAttribute("aria-label","PASONG Premium");
+
+    const headerRight=document.querySelector(".header-right");
+    if(headerRight){
+      headerRight.insertBefore(link, headerRight.firstChild);
+      return;
+    }
+
+    const header=document.querySelector("header");
+    if(header){
+      link.style.marginLeft="auto";
+      header.appendChild(link);
+      return;
+    }
+
+    const floating=document.createElement("a");
+    floating.className="pasong-premium-floating";
+    floating.href=PREMIUM_URL;
+    floating.textContent="✦ Premium";
+    document.body.appendChild(floating);
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",addNav,{once:true});
+  }else{
+    addNav();
+  }
+})();
