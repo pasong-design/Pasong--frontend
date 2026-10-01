@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG Premium</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#09050f;color:#fff;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:28px 18px 60px}.brand{font-weight:900;letter-spacing:.08em;color:#c4b5fd}.hero{text-align:center;padding:35px 0 25px}.hero h1{font-size:42px;margin:8px 0}.hero p{color:#b8afc5;max-width:620px;margin:auto;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:25px}.card{background:#140b20;border:1px solid #322044;border-radius:20px;padding:25px}.card.featured{border-color:#8b5cf6;box-shadow:0 0 30px rgba(139,92,246,.12)}.price{font-size:32px;font-weight:900;margin:12px 0}.muted{color:#9e94aa;font-size:14px}.features{list-style:none;padding:0;margin:25px 0}.features li{padding:10px 0;border-bottom:1px solid #251832;color:#ddd6e8}.features li:last-child{border-bottom:0}.btn{width:100%;padding:13px;border:0;border-radius:12px;background:#8b5cf6;color:#fff;font-weight:800;font-size:15px;cursor:pointer}.btn.secondary{background:#251632}.message{margin-top:18px;padding:14px;border-radius:12px;background:#17101e;color:#ddd}.status{margin:15px 0;padding:12px;border-radius:12px;background:#120b18;border:1px solid #2c1b3a}.badge{display:inline-block;background:#8b5cf6;color:#fff;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800}@media(max-width:700px){.grid{grid-template-columns:1fr}.hero h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">◈ PASONG</div>
+  <section class="hero">
+    <div class="badge">✦ PREMIUM</div>
+    <h1>More PASONG. Less limits.</h1>
+    <p>One global Premium experience. PASONG shows the local currency for your country while keeping fixed regional price points.</p>
+  </section>
+
+  <div id="status" class="status">Checking your Premium status…</div>
+  <div id="plans" class="grid"></div>
+  <div id="message" class="message" style="display:none"></div>
+</div>
+
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const API_URL="https://pasong-api.onrender.com";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+function show(msg){const b=document.getElementById("message");b.style.display="block";b.textContent=msg}
+
+async function token(){
+  const {data}=await supabaseClient.auth.getSession();
+  return data?.session?.access_token||"";
+}
+
+async function api(path,options={}){
+  const t=await token();
+  const headers={"Content-Type":"application/json",...(options.headers||{})};
+  if(t) headers.Authorization="Bearer "+t;
+  const r=await fetch(API_URL+path,{...options,headers});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(d.error||"Request failed");
+  return d;
+}
+
+function renderPlans(data){
+  const features=(data.features||[]).map(x=>`<li>✓ ${esc(x)}</li>`).join("");
+  const m=data.monthly,y=data.yearly;
+  document.getElementById("plans").innerHTML=`
+    <div class="card featured">
+      <div class="muted">MONTHLY</div>
+      <div class="price">${esc(m.label)}</div>
+      <div class="muted">per month · ${esc(m.country)} · ${esc(m.currency)}</div>
+      <ul class="features">${features}</ul>
+      <button class="btn" onclick="subscribe('monthly')">Get Premium</button>
+    </div>
+    <div class="card">
+      <div class="muted">YEARLY</div>
+      <div class="price">${esc(y.label)}</div>
+      <div class="muted">per year · ${esc(y.country)} · ${esc(y.currency)}</div>
+      <ul class="features">${features}</ul>
+      <button class="btn secondary" onclick="subscribe('yearly')">Choose Yearly</button>
+    </div>`;
+}
+
+async function subscribe(plan){
+  try{
+    const session=(await supabaseClient.auth.getSession()).data?.session;
+    if(!session){show("Please log in to subscribe to PASONG Premium.");return}
+    const d=await api("/api/premium/checkout",{method:"POST",body:JSON.stringify({plan})});
+    // The backend creates a pending payment. A verified payment provider must complete it.
+    show("Premium checkout created: "+d.payment.payment_reference+". Connect the payment provider to complete the payment and activate Premium.");
+  }catch(e){show(e.message)}
+}
+
+async function load(){
+  try{
+    const [pricing,status]=await Promise.all([
+      fetch(API_URL+"/api/premium/pricing").then(r=>r.json()),
+      api("/api/premium/status").catch(()=>({premium:false,status:"free"}))
+    ]);
+    renderPlans(pricing);
+    const box=document.getElementById("status");
+    if(status.premium){box.innerHTML="You are <span class='badge'>✦ PREMIUM</span> until "+esc(status.subscription?.expires_at||"");}
+    else box.textContent="You are currently on the Free plan.";
+  }catch(e){show(e.message)}
+}
+load();
+</script>
+</body>
+</html>
