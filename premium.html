@@ -2,95 +2,1295 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#8b5cf6">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>PASONG Premium</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#09050f;color:#fff;min-height:100vh}.wrap{max-width:900px;margin:auto;padding:28px 18px 60px}.brand{font-weight:900;letter-spacing:.08em;color:#c4b5fd}.hero{text-align:center;padding:35px 0 25px}.hero h1{font-size:42px;margin:8px 0}.hero p{color:#b8afc5;max-width:620px;margin:auto;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:25px}.card{background:#140b20;border:1px solid #322044;border-radius:20px;padding:25px}.card.featured{border-color:#8b5cf6;box-shadow:0 0 30px rgba(139,92,246,.12)}.price{font-size:32px;font-weight:900;margin:12px 0}.muted{color:#9e94aa;font-size:14px}.features{list-style:none;padding:0;margin:25px 0}.features li{padding:10px 0;border-bottom:1px solid #251832;color:#ddd6e8}.features li:last-child{border-bottom:0}.btn{width:100%;padding:13px;border:0;border-radius:12px;background:#8b5cf6;color:#fff;font-weight:800;font-size:15px;cursor:pointer}.btn.secondary{background:#251632}.message{margin-top:18px;padding:14px;border-radius:12px;background:#17101e;color:#ddd}.status{margin:15px 0;padding:12px;border-radius:12px;background:#120b18;border:1px solid #2c1b3a}.badge{display:inline-block;background:#8b5cf6;color:#fff;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800}@media(max-width:700px){.grid{grid-template-columns:1fr}.hero h1{font-size:34px}}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#07060d;
+  --card:#11101c;
+  --card2:#151322;
+  --purple:#8b5cf6;
+  --pink:#ff459f;
+  --gold:#ffd76a;
+  --muted:#9996a8;
+  --border:rgba(255,255,255,.09);
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(139,92,246,.28),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 90% 25%,
+      rgba(255,69,159,.12),
+      transparent 28%
+    ),
+    var(--bg);
+  color:#fff;
+  font-family:Inter,Arial,sans-serif;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(
+      circle at 20% 40%,
+      rgba(139,92,246,.07),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(255,69,159,.06),
+      transparent 25%
+    );
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+nav{
+  height:70px;
+  padding:0 6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(7,6,13,.82);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.logo{
+  color:#fff;
+  text-decoration:none;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.4px;
+}
+
+.logo span{
+  background:
+    linear-gradient(
+      90deg,
+      #9b6cff,
+      #ff4fa3
+    );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.nav-btn{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#11101a;
+  color:#fff;
+  text-decoration:none;
+  font-size:16px;
+  transition:.2s;
+}
+
+.nav-btn:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,255,255,.2);
+}
+
+.nav-premium{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:0 14px;
+  height:40px;
+  border-radius:12px;
+  color:#fff;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:900;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139,92,246,.35),
+      rgba(255,69,159,.25)
+    );
+  border:1px solid rgba(255,215,106,.35);
+  transition:.2s;
+}
+
+.nav-premium:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,215,106,.65);
+}
+
+.nav-premium span:first-child{
+  color:var(--gold);
+}
+
+.nav-premium-text{
+  color:#fff;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero{
+  width:min(900px,92%);
+  margin:0 auto;
+  padding:75px 0 35px;
+  text-align:center;
+}
+
+.premium-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 16px;
+  border-radius:999px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139,92,246,.18),
+      rgba(255,69,159,.12)
+    );
+  border:1px solid rgba(255,215,106,.35);
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:
+    0 0 35px rgba(139,92,246,.18);
+  margin-bottom:20px;
+}
+
+.premium-badge .star{
+  color:var(--gold);
+  font-size:17px;
+}
+
+.hero h1{
+  font-size:clamp(42px,7vw,76px);
+  line-height:1;
+  letter-spacing:-3px;
+  margin-bottom:20px;
+  background:
+    linear-gradient(
+      90deg,
+      #fff 15%,
+      #cdbbff 48%,
+      #ff8ac5 90%
+    );
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.hero h1 span{
+  display:block;
+}
+
+.hero-text{
+  max-width:650px;
+  margin:0 auto;
+  color:#aaa7b8;
+  font-size:16px;
+  line-height:1.7;
+}
+
+/* =========================================================
+   QUICK BENEFITS
+   ========================================================= */
+
+.mini-benefits{
+  width:min(900px,92%);
+  margin:25px auto 50px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.mini-benefit{
+  padding:15px 10px;
+  text-align:center;
+  border-radius:15px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.065);
+  transition:.2s;
+}
+
+.mini-benefit:hover{
+  transform:translateY(-3px);
+  border-color:rgba(139,92,246,.3);
+}
+
+.mini-icon{
+  font-size:20px;
+  margin-bottom:7px;
+}
+
+.mini-benefit strong{
+  display:block;
+  font-size:12px;
+}
+
+.mini-benefit small{
+  color:#777486;
+  font-size:10px;
+}
+
+/* =========================================================
+   PLANS
+   ========================================================= */
+
+.plans{
+  width:min(900px,92%);
+  margin:0 auto 60px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.plan{
+  position:relative;
+  padding:28px;
+  border-radius:24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.045),
+      rgba(255,255,255,.018)
+    );
+  border:1px solid var(--border);
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.25);
+  transition:
+    transform .25s,
+    border-color .25s,
+    box-shadow .25s;
+}
+
+.plan:hover{
+  transform:translateY(-6px);
+  border-color:rgba(139,92,246,.45);
+  box-shadow:
+    0 30px 90px rgba(139,92,246,.12);
+}
+
+.plan.popular{
+  border:1px solid rgba(139,92,246,.7);
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(139,92,246,.16),
+      transparent 45%
+    ),
+    #11101c;
+}
+
+.popular-label{
+  position:absolute;
+  top:-13px;
+  left:25px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:
+    linear-gradient(
+      90deg,
+      #8b5cf6,
+      #ff459f
+    );
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+.plan-header{
+  color:#8f8b9c;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.8px;
+  margin-bottom:10px;
+}
+
+.plan h2{
+  font-size:34px;
+  margin-bottom:4px;
+  letter-spacing:-1px;
+}
+
+.plan-price{
+  color:#9995a6;
+  font-size:12px;
+  margin-bottom:24px;
+}
+
+.plan-price strong{
+  color:#fff;
+}
+
+.plan ul{
+  list-style:none;
+  margin-bottom:25px;
+}
+
+.plan li{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,.055);
+  color:#d0cdd9;
+  font-size:13px;
+}
+
+.plan li:last-child{
+  border-bottom:0;
+}
+
+.check{
+  width:20px;
+  height:20px;
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:rgba(139,92,246,.15);
+  color:#b99aff;
+  font-size:11px;
+  font-weight:900;
+}
+
+.plan-button{
+  width:100%;
+  height:50px;
+  border:0;
+  border-radius:14px;
+  cursor:pointer;
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+  background:#21182d;
+  transition:.2s;
+}
+
+.plan-button:hover{
+  transform:translateY(-2px);
+  background:#2b1d3a;
+}
+
+.plan.popular .plan-button{
+  background:
+    linear-gradient(
+      90deg,
+      #8b5cf6,
+      #ff459f
+    );
+  box-shadow:
+    0 12px 30px rgba(139,92,246,.25);
+}
+
+.plan-button:active{
+  transform:scale(.98);
+}
+
+.plan-button.loading{
+  opacity:.7;
+  cursor:wait;
+}
+
+/* =========================================================
+   YEARLY SAVING
+   ========================================================= */
+
+.saving{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-top:-35px;
+  margin-bottom:55px;
+  color:#9f9baa;
+  font-size:12px;
+  text-align:center;
+}
+
+.saving strong{
+  color:#86efac;
+}
+
+/* =========================================================
+   EXPERIENCE
+   ========================================================= */
+
+.experience{
+  width:min(900px,92%);
+  margin:0 auto 60px;
+}
+
+.section-title{
+  text-align:center;
+  font-size:28px;
+  margin-bottom:25px;
+  letter-spacing:-1px;
+}
+
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.feature{
+  padding:22px;
+  border-radius:18px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.07);
+  transition:.2s;
+}
+
+.feature:hover{
+  transform:translateY(-3px);
+  border-color:rgba(139,92,246,.3);
+}
+
+.feature-icon{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:13px;
+  background:rgba(139,92,246,.12);
+  font-size:20px;
+  margin-bottom:15px;
+}
+
+.feature h3{
+  font-size:15px;
+  margin-bottom:7px;
+}
+
+.feature p{
+  color:#858291;
+  font-size:12px;
+  line-height:1.6;
+}
+
+/* =========================================================
+   CTA
+   ========================================================= */
+
+.cta{
+  width:min(900px,92%);
+  margin:0 auto 70px;
+  padding:38px 25px;
+  text-align:center;
+  border-radius:25px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(139,92,246,.22),
+      transparent 55%
+    ),
+    rgba(255,255,255,.025);
+  border:1px solid rgba(139,92,246,.2);
+}
+
+.cta h2{
+  font-size:27px;
+  margin-bottom:10px;
+}
+
+.cta p{
+  color:#8f8b9c;
+  font-size:13px;
+  margin-bottom:20px;
+}
+
+.cta-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:210px;
+  height:50px;
+  padding:0 25px;
+  border-radius:14px;
+  background:
+    linear-gradient(
+      90deg,
+      #8b5cf6,
+      #ff459f
+    );
+  color:#fff;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:
+    0 15px 35px rgba(139,92,246,.22);
+  transition:.2s;
+}
+
+.cta-button:hover{
+  transform:translateY(-2px);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer{
+  padding:25px;
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,.06);
+  color:#5f5c69;
+  font-size:11px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:700px){
+
+  nav{
+    padding:0 4%;
+  }
+
+  .logo{
+    font-size:17px;
+  }
+
+  .nav-premium{
+    width:38px;
+    padding:0;
+    justify-content:center;
+  }
+
+  .nav-premium .nav-premium-text{
+    display:none;
+  }
+
+  .hero{
+    padding-top:55px;
+  }
+
+  .hero h1{
+    font-size:46px;
+    letter-spacing:-2px;
+  }
+
+  .hero-text{
+    font-size:14px;
+  }
+
+  .mini-benefits{
+    grid-template-columns:repeat(2,1fr);
+    margin-bottom:40px;
+  }
+
+  .plans{
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+
+  .plan{
+    padding:24px;
+  }
+
+  .plan.popular{
+    order:-1;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr;
+  }
+
+  .section-title{
+    font-size:24px;
+  }
+
+  .saving{
+    flex-wrap:wrap;
+    padding:0 15px;
+  }
+}
+
+@media(max-width:420px){
+
+  .hero h1{
+    font-size:40px;
+  }
+
+  .premium-badge{
+    font-size:11px;
+  }
+
+  .mini-benefit{
+    padding:13px 7px;
+  }
+
+  .plan h2{
+    font-size:30px;
+  }
+
+}
 </style>
 </head>
-<body>
-<div class="wrap">
-  <div class="brand">◈ PASONG</div>
-  <section class="hero">
-    <div class="badge">✦ PREMIUM</div>
-    <h1>More PASONG. Less limits.</h1>
-    <p>One global Premium experience. PASONG shows the local currency for your country while keeping fixed regional price points.</p>
-  </section>
 
-  <div id="status" class="status">Checking your Premium status…</div>
-  <div id="plans" class="grid"></div>
-  <div id="message" class="message" style="display:none"></div>
+<body>
+
+<!-- =======================================================
+     NAVIGATION
+     ======================================================= -->
+
+<nav>
+
+  <a href="index.html" class="logo">
+    ◈ <span>PASONG</span>
+  </a>
+
+  <div class="nav-actions">
+
+    <a
+      href="premium.html"
+      class="nav-premium"
+      title="PASONG Premium"
+    >
+      <span>✦</span>
+      <span class="nav-premium-text">
+        PREMIUM
+      </span>
+    </a>
+
+    <a
+      href="store.html"
+      class="nav-btn"
+      title="Music Store"
+    >
+      ⌕
+    </a>
+
+    <a
+      href="account.html"
+      class="nav-btn"
+      title="Account"
+    >
+      ◉
+    </a>
+
+  </div>
+
+</nav>
+
+
+<!-- =======================================================
+     HERO
+     ======================================================= -->
+
+<section class="hero">
+
+  <div class="premium-badge">
+    <span class="star">✦</span>
+    PASONG PREMIUM
+  </div>
+
+  <h1>
+    More PASONG.
+    <span>Less limits.</span>
+  </h1>
+
+  <p class="hero-text">
+    Unlock the full PASONG experience.
+    Listen without ads, enjoy higher-quality
+    audio, discover Premium releases and take
+    your music with you.
+  </p>
+
+</section>
+
+
+<!-- =======================================================
+     QUICK BENEFITS
+     ======================================================= -->
+
+<section class="mini-benefits">
+
+  <div class="mini-benefit">
+    <div class="mini-icon">🚫</div>
+    <strong>Ad-free</strong>
+    <small>Keep listening</small>
+  </div>
+
+  <div class="mini-benefit">
+    <div class="mini-icon">🎧</div>
+    <strong>Better Audio</strong>
+    <small>Higher quality</small>
+  </div>
+
+  <div class="mini-benefit">
+    <div class="mini-icon">⬇️</div>
+    <strong>Offline</strong>
+    <small>Listen anywhere</small>
+  </div>
+
+  <div class="mini-benefit">
+    <div class="mini-icon">✦</div>
+    <strong>Exclusive</strong>
+    <small>More PASONG</small>
+  </div>
+
+</section>
+
+
+<!-- =======================================================
+     PLANS
+     ======================================================= -->
+
+<section class="plans">
+
+  <!-- MONTHLY -->
+
+  <div class="plan popular">
+
+    <div class="popular-label">
+      MOST FLEXIBLE
+    </div>
+
+    <div class="plan-header">
+      MONTHLY
+    </div>
+
+    <h2>
+      UGX 10,000
+    </h2>
+
+    <div class="plan-price">
+      <strong>per month</strong>
+      · Uganda · UGX
+    </div>
+
+    <ul>
+
+      <li>
+        <span class="check">✓</span>
+        Premium badge
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Ad-free listening
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Higher-quality audio
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Offline listening for eligible content
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Premium-exclusive releases
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Early access to selected releases
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Premium-only playlists
+      </li>
+
+    </ul>
+
+    <button
+      class="plan-button"
+      id="monthlyButton"
+      type="button"
+    >
+      GET PREMIUM
+    </button>
+
+  </div>
+
+
+  <!-- YEARLY -->
+
+  <div class="plan">
+
+    <div class="plan-header">
+      YEARLY
+    </div>
+
+    <h2>
+      UGX 100,000
+    </h2>
+
+    <div class="plan-price">
+      <strong>per year</strong>
+      · Uganda · UGX
+    </div>
+
+    <ul>
+
+      <li>
+        <span class="check">✓</span>
+        Premium badge
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Ad-free listening
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Higher-quality audio
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Offline listening for eligible content
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Premium-exclusive releases
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Early access to selected releases
+      </li>
+
+      <li>
+        <span class="check">✓</span>
+        Premium-only playlists
+      </li>
+
+    </ul>
+
+    <button
+      class="plan-button"
+      id="yearlyButton"
+      type="button"
+    >
+      CHOOSE YEARLY
+    </button>
+
+  </div>
+
+</section>
+
+
+<div class="saving">
+
+  💜 Choose yearly and pay
+
+  <strong>
+    UGX 100,000/year
+  </strong>
+
+  instead of UGX 120,000 monthly.
+
 </div>
 
-<script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_URL="https://pasong-api.onrender.com";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
-function show(msg){const b=document.getElementById("message");b.style.display="block";b.textContent=msg}
+<!-- =======================================================
+     PREMIUM EXPERIENCE
+     ======================================================= -->
 
-async function token(){
-  const {data}=await supabaseClient.auth.getSession();
-  return data?.session?.access_token||"";
-}
+<section class="experience">
 
-async function api(path,options={}){
-  const t=await token();
-  const headers={"Content-Type":"application/json",...(options.headers||{})};
-  if(t) headers.Authorization="Bearer "+t;
-  const r=await fetch(API_URL+path,{...options,headers});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(d.error||"Request failed");
-  return d;
-}
+  <h2 class="section-title">
+    Your Premium experience
+  </h2>
 
-function renderPlans(data){
-  const features=(data.features||[]).map(x=>`<li>✓ ${esc(x)}</li>`).join("");
-  const m=data.monthly,y=data.yearly;
-  document.getElementById("plans").innerHTML=`
-    <div class="card featured">
-      <div class="muted">MONTHLY</div>
-      <div class="price">${esc(m.label)}</div>
-      <div class="muted">per month · ${esc(m.country)} · ${esc(m.currency)}</div>
-      <ul class="features">${features}</ul>
-      <button class="btn" onclick="subscribe('monthly')">Get Premium</button>
+  <div class="feature-grid">
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        🚫
+      </div>
+
+      <h3>
+        Music without interruptions
+      </h3>
+
+      <p>
+        Enjoy your listening experience
+        without advertising interruptions.
+      </p>
+
     </div>
-    <div class="card">
-      <div class="muted">YEARLY</div>
-      <div class="price">${esc(y.label)}</div>
-      <div class="muted">per year · ${esc(y.country)} · ${esc(y.currency)}</div>
-      <ul class="features">${features}</ul>
-      <button class="btn secondary" onclick="subscribe('yearly')">Choose Yearly</button>
-    </div>`;
+
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        🎵
+      </div>
+
+      <h3>
+        Hear more detail
+      </h3>
+
+      <p>
+        Enjoy higher-quality audio on
+        eligible PASONG content.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        ✦
+      </div>
+
+      <h3>
+        Discover before everyone
+      </h3>
+
+      <p>
+        Get access to selected releases
+        and early-access experiences.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        📥
+      </div>
+
+      <h3>
+        Take music with you
+      </h3>
+
+      <p>
+        Offline listening is available
+        for eligible Premium content.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        💎
+      </div>
+
+      <h3>
+        Stand out
+      </h3>
+
+      <p>
+        Your Premium badge shows that
+        you're part of the PASONG Premium
+        community.
+      </p>
+
+    </div>
+
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        🎶
+      </div>
+
+      <h3>
+        Premium playlists
+      </h3>
+
+      <p>
+        Explore playlists and selections
+        reserved for Premium members.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =======================================================
+     CTA
+     ======================================================= -->
+
+<section class="cta">
+
+  <h2>
+    Ready for more PASONG?
+  </h2>
+
+  <p>
+    Choose your plan and unlock the Premium experience.
+  </p>
+
+  <a
+    href="#monthlyButton"
+    class="cta-button"
+    id="ctaPremiumButton"
+  >
+    ✦ GET PASONG PREMIUM
+  </a>
+
+</section>
+
+
+<footer>
+  PASONG © 2026 • Music • Artists • Opportunity
+</footer>
+
+
+<!-- =======================================================
+     PREMIUM PAGE SCRIPT
+     ======================================================= -->
+
+<script>
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+const monthlyButton =
+  document.getElementById(
+    "monthlyButton"
+  );
+
+const yearlyButton =
+  document.getElementById(
+    "yearlyButton"
+  );
+
+const ctaPremiumButton =
+  document.getElementById(
+    "ctaPremiumButton"
+  );
+
+
+/*
+=========================================================
+   PREMIUM CHECKOUT
+=========================================================
+
+   These buttons currently prepare the selected
+   Premium plan.
+
+   The actual payment endpoint will be connected
+   here once the PASONG Premium payment backend
+   is ready.
+*/
+
+function startPremiumCheckout(plan){
+
+  let amount = 0;
+  let period = "";
+
+  if(plan === "monthly"){
+
+    amount = 10000;
+    period = "month";
+
+  }
+
+  if(plan === "yearly"){
+
+    amount = 100000;
+    period = "year";
+
+  }
+
+  if(!amount){
+
+    alert(
+      "Please select a valid Premium plan."
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    "PASONG Premium selected:",
+    {
+      plan:plan,
+      amount:amount,
+      currency:"UGX",
+      period:period
+    }
+  );
+
+
+  /*
+     TEMPORARY MESSAGE
+
+     We do NOT mark the user as Premium here.
+
+     Premium should only become active after
+     the payment backend confirms the payment.
+  */
+
+  alert(
+    "PASONG Premium " +
+    (plan === "monthly"
+      ? "Monthly"
+      : "Yearly") +
+    " selected.\n\n" +
+
+    "Amount: UGX " +
+    amount.toLocaleString() +
+    "\n\n" +
+
+    "Payment connection is ready to be connected."
+  );
+
 }
 
-async function subscribe(plan){
-  try{
-    const session=(await supabaseClient.auth.getSession()).data?.session;
-    if(!session){show("Please log in to subscribe to PASONG Premium.");return}
-    const d=await api("/api/premium/checkout",{method:"POST",body:JSON.stringify({plan})});
-    // The backend creates a pending payment. A verified payment provider must complete it.
-    show("Premium checkout created: "+d.payment.payment_reference+". Connect the payment provider to complete the payment and activate Premium.");
-  }catch(e){show(e.message)}
+
+/* =========================================================
+   MONTHLY BUTTON
+   ========================================================= */
+
+if(monthlyButton){
+
+  monthlyButton.addEventListener(
+    "click",
+    function(){
+
+      startPremiumCheckout(
+        "monthly"
+      );
+
+    }
+  );
+
 }
 
-async function load(){
-  try{
-    const [pricing,status]=await Promise.all([
-      fetch(API_URL+"/api/premium/pricing").then(r=>r.json()),
-      api("/api/premium/status").catch(()=>({premium:false,status:"free"}))
-    ]);
-    renderPlans(pricing);
-    const box=document.getElementById("status");
-    if(status.premium){box.innerHTML="You are <span class='badge'>✦ PREMIUM</span> until "+esc(status.subscription?.expires_at||"");}
-    else box.textContent="You are currently on the Free plan.";
-  }catch(e){show(e.message)}
+
+/* =========================================================
+   YEARLY BUTTON
+   ========================================================= */
+
+if(yearlyButton){
+
+  yearlyButton.addEventListener(
+    "click",
+    function(){
+
+      startPremiumCheckout(
+        "yearly"
+      );
+
+    }
+  );
+
 }
-load();
+
+
+/* =========================================================
+   CTA BUTTON
+   ========================================================= */
+
+if(ctaPremiumButton){
+
+  ctaPremiumButton.addEventListener(
+    "click",
+    function(event){
+
+      event.preventDefault();
+
+      if(monthlyButton){
+
+        monthlyButton.scrollIntoView({
+          behavior:"smooth",
+          block:"center"
+        });
+
+        setTimeout(
+          function(){
+
+            monthlyButton.click();
+
+          },
+          450
+        );
+
+      }
+
+    }
+  );
+
+}
+
 </script>
+
+
+<!-- =======================================================
+     SHARED PASONG PREMIUM NAVIGATION
+     ======================================================= -->
+
+<script src="premium-nav.js"></script>
+
+
 </body>
 </html>
