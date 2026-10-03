@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#8b5cf6">
 <title>PASONG — Producers</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -104,6 +105,17 @@ border-radius:9px;
 
 .account a:hover{
 border-color:#8b5cf6;
+}
+
+.account-user{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+.account-user small{
+color:#aaaabd;
+font-size:11px;
 }
 
 main{
@@ -852,7 +864,7 @@ top:10px;
 }
 
 .logo{
-padding-right:75px;
+padding-right:100px;
 }
 
 main{
@@ -1061,7 +1073,7 @@ grid-template-columns:1fr;
 <a href="/artists.html">Artists</a>
 </nav>
 
-<div class="account">
+<div class="account" id="accountArea">
 <a href="/login.html">Login</a>
 </div>
 
@@ -1090,12 +1102,12 @@ Discover producers on PASONG, explore their sound, stream their beats in full le
 
 <div class="hero-stat">
 <strong id="heroProducerCount">0</strong>
-<span>PRODUCERS</span>
+<span id="heroProducerLabel">PRODUCERS</span>
 </div>
 
 <div class="hero-stat">
 <strong id="heroBeatCount">0</strong>
-<span>BEATS AVAILABLE</span>
+<span id="heroBeatLabel">BEATS AVAILABLE</span>
 </div>
 
 <div class="hero-stat">
@@ -1166,53 +1178,232 @@ Paid licences provide the downloadable files and usage rights attached to the se
 <script>
 
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+const supabaseClient=
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_ANON_KEY
+);
+
 const KV_ID="119e7b2d-4115-44e9-ba0f-e47d4a3fa332";
 
 let producerProfiles=[];
 let allBeats=[];
 let currentAudio=null;
 
+
+/* ================================
+   AUTH / ACCOUNT UI
+================================ */
+
+async function updateAccountUI(){
+
+const accountArea=
+document.getElementById("accountArea");
+
+if(!accountArea) return;
+
+try{
+
+const {
+data,
+error
+}=
+await supabaseClient.auth.getSession();
+
+if(error){
+
+console.error(
+"Session error:",
+error
+);
+
+accountArea.innerHTML=
+`<a href="/login.html">Login</a>`;
+
+return;
+
+}
+
+const session=
+data?.session;
+
+if(
+session &&
+session.user
+){
+
+const user=
+session.user;
+
+const metadata=
+user.user_metadata||{};
+
+let name=
+metadata.stage_name||
+metadata.display_name||
+metadata.performing_name||
+metadata.full_name||
+metadata.name||
+"Account";
+
+name=String(name).trim();
+
+if(
+!name ||
+name.toLowerCase()==="null"
+){
+
+name=
+user.email?.split("@")[0]||
+"Account";
+
+}
+
+accountArea.innerHTML=`
+
+<a
+href="/account.html"
+title="${escapeHtml(user.email||"Account")}"
+>
+👤 ${escapeHtml(name)}
+</a>
+
+`;
+
+}else{
+
+accountArea.innerHTML=`
+<a href="/login.html">Login</a>
+`;
+
+}
+
+}catch(error){
+
+console.error(
+"Account UI error:",
+error
+);
+
+accountArea.innerHTML=
+`<a href="/login.html">Login</a>`;
+
+}
+
+}
+
+
+supabaseClient.auth.onAuthStateChange(
+function(){
+
+setTimeout(
+function(){
+updateAccountUI();
+},
+0
+);
+
+});
+
+
+/* ================================
+   HELPERS
+================================ */
+
 function getName(p){
 
 if(!p) return "KV BEATS";
 
-let n=(p.stage_name||p.display_name||p.performing_name||p.name||"KV BEATS").toString().trim();
+let n=
+(
+p.stage_name||
+p.display_name||
+p.performing_name||
+p.name||
+"KV BEATS"
+)
+.toString()
+.trim();
 
-if(n.toLowerCase().includes("kv beats kv beats")) return "KV BEATS";
+if(
+n.toLowerCase().includes(
+"kv beats kv beats"
+)
+){
 
-n=n.replace(/KV BEATS.*KV BEATS/ig,"KV BEATS").trim();
-
-if(p.id===KV_ID) return "KV BEATS";
-
-return n.split("\n")[0].trim();
+return "KV BEATS";
 
 }
 
+n=
+n.replace(
+/KV BEATS.*KV BEATS/ig,
+"KV BEATS"
+).trim();
+
+if(p.id===KV_ID)
+return "KV BEATS";
+
+return n
+.split("\n")[0]
+.trim();
+
+}
+
+
 function getImg(p){
 
-let u=p.profile_image_url||p.profile_photo_url||p.photo_url||p.avatar_url||p.image_url||p.profile_picture_url||"";
+let u=
+p.profile_image_url||
+p.profile_photo_url||
+p.photo_url||
+p.avatar_url||
+p.image_url||
+p.profile_picture_url||
+"";
 
-u=String(u||"").trim().replace("v1789730166","v1");
+u=
+String(u||"")
+.trim()
+.replace(
+"v1789730166",
+"v1"
+);
 
-if(!u||u.toLowerCase()==="null") return "";
+if(
+!u||
+u.toLowerCase()==="null"
+)
+return "";
 
-if(u.toUpperCase().includes("PASONG")&&!u.toLowerCase().includes("cloudinary")) return "";
+if(
+u.toUpperCase().includes("PASONG")&&
+!u.toLowerCase().includes("cloudinary")
+)
+return "";
 
-if(u.startsWith("http")) return u;
+if(u.startsWith("http"))
+return u;
 
-if(u) return SUPABASE_URL+"/storage/v1/object/public/"+u.replace(/^\//,"");
+if(u)
+return SUPABASE_URL+
+"/storage/v1/object/public/"+
+u.replace(/^\//,"");
 
 return "";
 
 }
+
 
 function avatar(name){
 
 return `https://ui-avatars.com/api/?name=${encodeURIComponent(name||"KV BEATS")}&background=8b5cf6&color=fff&bold=true&size=500`;
 
 }
+
 
 function escapeHtml(value){
 
@@ -1225,23 +1416,42 @@ return String(value??"")
 
 }
 
+
 function getBeatTitle(b){
 
-let t=(b.title||b.beat_title||"Untitled Beat").toString().trim();
+let t=
+(
+b.title||
+b.beat_title||
+"Untitled Beat"
+)
+.toString()
+.trim();
 
-if(t.toLowerCase().includes("nyange nyange")){
+if(
+t.toLowerCase().includes("nyange nyange")
+){
+
 t="Nyange";
-}
-
-return t.split("\n")[0].trim();
 
 }
+
+return t
+.split("\n")[0]
+.trim();
+
+}
+
 
 function getBeatImage(b){
 
-return b.cover_url||b.cover_image_url||b.image_url||"";
+return b.cover_url||
+b.cover_image_url||
+b.image_url||
+"";
 
 }
+
 
 function getAudioUrl(b){
 
@@ -1257,10 +1467,17 @@ const keys=[
 "preview_url"
 ];
 
-for(const key of keys){
+for(
+const key of keys
+){
 
-if(b[key]&&String(b[key]).trim()){
+if(
+b[key]&&
+String(b[key]).trim()
+){
+
 return String(b[key]).trim();
+
 }
 
 }
@@ -1269,33 +1486,54 @@ return "";
 
 }
 
+
 function getProducerForBeat(b){
 
-const producer=producerProfiles.find(p=>String(p.id)===String(b.producer_id));
+const producer=
+producerProfiles.find(
+p=>
+String(p.id)===
+String(b.producer_id)
+);
 
-if(producer){
+if(producer)
 return producer;
-}
 
-if(b.producer){
+if(b.producer)
 return b.producer;
-}
 
 return null;
 
 }
 
-function getPrice(b,key,fallback){
+
+function getPrice(
+b,
+key,
+fallback
+){
 
 const value=b[key];
 
-if(value!==undefined&&value!==null&&value!==""&&!isNaN(Number(value))){
+if(
+value!==undefined&&
+value!==null&&
+value!==""&&
+!isNaN(Number(value))
+){
+
 return Number(value);
+
 }
 
 return fallback;
 
 }
+
+
+/* ================================
+   PRODUCER CARD
+================================ */
 
 function card(p){
 
@@ -1303,9 +1541,15 @@ const name=getName(p);
 const img=getImg(p);
 const src=img||avatar(name);
 
-const beatCount=allBeats.filter(b=>String(b.producer_id)===String(p.id)).length;
+const beatCount=
+allBeats.filter(
+b=>
+String(b.producer_id)===
+String(p.id)
+).length;
 
 return `
+
 <div class="producer-card">
 
 <div class="producer-image-wrap">
@@ -1319,29 +1563,44 @@ onerror="this.onerror=null;this.src='${avatar(name)}'"
 
 <div class="producer-overlay"></div>
 
-<div class="producer-badge">🎛️ PRODUCER</div>
+<div class="producer-badge">
+🎛️ PRODUCER
+</div>
 
 </div>
 
 <div class="producer-body">
 
-<div class="producer-name">${escapeHtml(name)}</div>
+<div class="producer-name">
+${escapeHtml(name)}
+</div>
 
 <div class="producer-location">
-📍 ${escapeHtml(p.location||p.city||"Kampala")}
+📍 ${escapeHtml(
+p.location||
+p.city||
+"Kampala"
+)}
 </div>
 
 <div class="producer-description">
-${escapeHtml(p.bio||"Music producer on PASONG creating beats for artists and creators.")}
+${escapeHtml(
+p.bio||
+"Music producer on PASONG creating beats for artists and creators."
+)}
 </div>
 
 <div class="producer-bottom">
 
 <div class="producer-beats">
-🎧 ${beatCount} ${beatCount===1?"Beat":"Beats"}
+🎧 ${beatCount}
+${beatCount===1?"Beat":"Beats"}
 </div>
 
-<a class="btn" href="/producers.html?id=${encodeURIComponent(p.id)}">
+<a
+class="btn"
+href="/producers.html?id=${encodeURIComponent(p.id)}"
+>
 View Producer
 </a>
 
@@ -1350,28 +1609,49 @@ View Producer
 </div>
 
 </div>
+
 `;
 
 }
 
+
+/* ================================
+   BEAT CARD
+================================ */
+
 function beatCard(b){
 
 const t=getBeatTitle(b);
+
 const img=getBeatImage(b);
-const src=img||avatar(t);
-const audio=getAudioUrl(b);
-const producer=getProducerForBeat(b);
-const producerName=producer?getName(producer):"PASONG Producer";
 
-const exclusive=getPrice(b,"exclusive_price",500000);
+const src=
+img||
+avatar(t);
 
-const mp3=b.mp3_price??b.lease_mp3_price??b.basic_price??b.mp3_license_price;
-const wav=b.wav_price??b.lease_wav_price??b.wav_license_price;
-const stems=b.stems_price??b.stem_price??b.stems_license_price;
+const audio=
+getAudioUrl(b);
 
-const safeAudio=escapeHtml(audio);
+const producer=
+getProducerForBeat(b);
+
+const producerName=
+producer?
+getName(producer):
+"PASONG Producer";
+
+const exclusive=
+getPrice(
+b,
+"exclusive_price",
+500000
+);
+
+const safeAudio=
+escapeHtml(audio);
 
 return `
+
 <div class="beat-card">
 
 <div class="beat-image-wrap">
@@ -1385,30 +1665,66 @@ onerror="this.onerror=null;this.src='${avatar(t)}'"
 
 <div class="beat-cover-gradient"></div>
 
-<div class="beat-tag">FULL-LENGTH STREAM</div>
+<div class="beat-tag">
+FULL-LENGTH STREAM
+</div>
 
-${audio ? `
-<button class="beat-play-circle" type="button" onclick="toggleBeat(this)">
+${audio?`
+
+<button
+class="beat-play-circle"
+type="button"
+onclick="toggleBeat(this)"
+>
 ▶
 </button>
-` : ""}
+
+`:""}
 
 </div>
 
 <div class="beat-body">
 
-<div class="beat-title">${escapeHtml(t)}</div>
+<div class="beat-title">
+${escapeHtml(t)}
+</div>
 
-${producer
-? `<a class="beat-producer" href="/producers.html?id=${encodeURIComponent(producer.id)}">🎛️ ${escapeHtml(producerName)}</a>`
-: `<div class="beat-producer">🎛️ ${escapeHtml(producerName)}</div>`
+${
+producer
+?
+`
+<a
+class="beat-producer"
+href="/producers.html?id=${encodeURIComponent(producer.id)}"
+>
+🎛️ ${escapeHtml(producerName)}
+</a>
+`
+:
+`
+<div class="beat-producer">
+🎛️ ${escapeHtml(producerName)}
+</div>
+`
 }
 
 <div class="beat-meta">
-<span>${escapeHtml(b.genre||"Afrobeat")}</span>
+
+<span>
+${escapeHtml(b.genre||"Afrobeat")}
+</span>
+
 <span>•</span>
-<span>${escapeHtml(b.bpm||90)} BPM</span>
-${b.key ? `<span>•</span><span>${escapeHtml(b.key)}</span>` : ""}
+
+<span>
+${escapeHtml(b.bpm||90)} BPM
+</span>
+
+${b.key?`
+<span>•</span>
+<span>${escapeHtml(b.key)}</span>
+`:""}
+
 </div>
 
 <div class="beat-price-row">
@@ -1418,28 +1734,75 @@ EXCLUSIVE
 </div>
 
 <div class="beat-price">
-<small>BUY EXCLUSIVE</small>
+
+<small>
+BUY EXCLUSIVE
+</small>
+
 UGX ${exclusive.toLocaleString()}
-</div>
 
 </div>
 
-${audio ? `
+</div>
+
+${
+audio
+?
+`
 <div class="player">
-<audio class="beat-audio" controls preload="none" src="${safeAudio}"></audio>
+
+<audio
+class="beat-audio"
+controls
+preload="none"
+src="${safeAudio}"
+></audio>
+
 </div>
-` : `
-<div class="muted" style="margin-top:10px">Audio stream unavailable</div>
-`}
+`
+:
+`
+<div
+class="muted"
+style="margin-top:10px"
+>
+Audio stream unavailable
+</div>
+`
+}
 
 <div class="beat-actions">
 
-${audio
-? `<button class="play-btn" type="button" onclick="toggleBeat(this)">▶ Play</button>`
-: `<button class="play-btn" type="button" disabled style="opacity:.5;cursor:not-allowed">▶ Play</button>`
+${
+audio
+?
+`
+<button
+class="play-btn"
+type="button"
+onclick="toggleBeat(this)"
+>
+▶ Play
+</button>
+`
+:
+`
+<button
+class="play-btn"
+type="button"
+disabled
+style="opacity:.5;cursor:not-allowed"
+>
+▶ Play
+</button>
+`
 }
 
-<button class="license-btn" type="button" onclick='openLicense(${JSON.stringify(b).replace(/'/g,"&#039;")})'>
+<button
+class="license-btn"
+type="button"
+onclick='openLicense(${JSON.stringify(b).replace(/'/g,"&#039;")})'
+>
 💿 Licence
 </button>
 
@@ -1448,53 +1811,107 @@ ${audio
 </div>
 
 </div>
+
 `;
 
 }
 
-function toggleBeat(button){
 
-const card=button.closest(".beat-card");
-const audio=card?card.querySelector("audio"):null;
+/* ================================
+   AUDIO PLAYER
+================================ */
 
-if(!audio) return;
+function resetAudioCard(audio){
 
-if(currentAudio&&currentAudio!==audio){
+if(!audio)
+return;
 
-currentAudio.pause();
+const oldCard=
+audio.closest(".beat-card");
 
-const oldCard=currentAudio.closest(".beat-card");
+if(!oldCard)
+return;
 
-if(oldCard){
+const oldButton=
+oldCard.querySelector(".play-btn");
 
-const oldButton=oldCard.querySelector(".play-btn");
-const oldCircle=oldCard.querySelector(".beat-play-circle");
+const oldCircle=
+oldCard.querySelector(".beat-play-circle");
 
 if(oldButton){
-oldButton.textContent="▶ Play";
-oldButton.classList.remove("playing");
+
+oldButton.textContent=
+"▶ Play";
+
+oldButton.classList.remove(
+"playing"
+);
+
 }
 
 if(oldCircle){
+
 oldCircle.textContent="▶";
-}
 
 }
 
 }
+
+
+function toggleBeat(button){
+
+const card=
+button.closest(".beat-card");
+
+const audio=
+card?
+card.querySelector("audio"):
+null;
+
+if(!audio)
+return;
+
+
+if(
+currentAudio&&
+currentAudio!==audio
+){
+
+currentAudio.pause();
+
+resetAudioCard(
+currentAudio
+);
+
+}
+
 
 if(audio.paused){
 
-audio.play().catch(()=>{});
+audio.play().catch(
+function(error){
 
-button.textContent="⏸ Pause";
-button.classList.add("playing");
+console.error(
+"Audio play error:",
+error
+);
 
-const circle=card.querySelector(".beat-play-circle");
+});
 
-if(circle){
+button.textContent=
+"⏸ Pause";
+
+button.classList.add(
+"playing"
+);
+
+const circle=
+card.querySelector(
+".beat-play-circle"
+);
+
+if(circle)
 circle.textContent="⏸";
-}
 
 currentAudio=audio;
 
@@ -1502,51 +1919,100 @@ currentAudio=audio;
 
 audio.pause();
 
-button.textContent="▶ Play";
-button.classList.remove("playing");
+button.textContent=
+"▶ Play";
 
-const circle=card.querySelector(".beat-play-circle");
+button.classList.remove(
+"playing"
+);
 
-if(circle){
+const circle=
+card.querySelector(
+".beat-play-circle"
+);
+
+if(circle)
 circle.textContent="▶";
-}
 
 }
 
-audio.onended=()=>{
+audio.onended=
+function(){
 
-button.textContent="▶ Play";
-button.classList.remove("playing");
+button.textContent=
+"▶ Play";
 
-const circle=card.querySelector(".beat-play-circle");
+button.classList.remove(
+"playing"
+);
 
-if(circle){
+const circle=
+card.querySelector(
+".beat-play-circle"
+);
+
+if(circle)
 circle.textContent="▶";
-}
+
+if(currentAudio===audio)
+currentAudio=null;
 
 };
 
 }
 
+
+/* ================================
+   LICENCE
+================================ */
+
 function openLicense(b){
 
-const title=getBeatTitle(b);
+const title=
+getBeatTitle(b);
 
-document.getElementById("licenseTitle").textContent=title+" Licence";
+document.getElementById(
+"licenseTitle"
+).textContent=
+title+" Licence";
 
-document.getElementById("licenseSub").textContent=
+document.getElementById(
+"licenseSub"
+).textContent=
 "Choose a licence package for this beat. Package prices shown below use the values stored with the beat.";
 
-const grid=document.getElementById("packageGrid");
+const grid=
+document.getElementById(
+"packageGrid"
+);
 
 const packages=[];
 
-const mp3=b.mp3_price??b.lease_mp3_price??b.basic_price??b.mp3_license_price;
-const wav=b.wav_price??b.lease_wav_price??b.wav_license_price;
-const stems=b.stems_price??b.stem_price??b.stems_license_price;
-const exclusive=b.exclusive_price;
+const mp3=
+b.mp3_price??
+b.lease_mp3_price??
+b.basic_price??
+b.mp3_license_price;
 
-if(mp3!==undefined&&mp3!==null&&mp3!==""){
+const wav=
+b.wav_price??
+b.lease_wav_price??
+b.wav_license_price;
+
+const stems=
+b.stems_price??
+b.stem_price??
+b.stems_license_price;
+
+const exclusive=
+b.exclusive_price;
+
+
+if(
+mp3!==undefined&&
+mp3!==null&&
+mp3!==""
+){
 
 packages.push({
 name:"MP3 Licence",
@@ -1556,7 +2022,12 @@ note:"MP3 downloadable licence"
 
 }
 
-if(wav!==undefined&&wav!==null&&wav!==""){
+
+if(
+wav!==undefined&&
+wav!==null&&
+wav!==""
+){
 
 packages.push({
 name:"WAV Licence",
@@ -1566,7 +2037,12 @@ note:"WAV downloadable licence"
 
 }
 
-if(stems!==undefined&&stems!==null&&stems!==""){
+
+if(
+stems!==undefined&&
+stems!==null&&
+stems!==""
+){
 
 packages.push({
 name:"Stems Licence",
@@ -1576,7 +2052,12 @@ note:"Stems downloadable licence"
 
 }
 
-if(exclusive!==undefined&&exclusive!==null&&exclusive!==""){
+
+if(
+exclusive!==undefined&&
+exclusive!==null&&
+exclusive!==""
+){
 
 packages.push({
 name:"Exclusive",
@@ -1585,6 +2066,7 @@ note:"Exclusive rights package"
 });
 
 }
+
 
 if(!packages.length){
 
@@ -1596,57 +2078,156 @@ note:"Package pricing is not currently available on this beat."
 
 }
 
-grid.innerHTML=packages.map(p=>{
 
-const beatId=escapeHtml(String(b.id||""));
-const titleArg=escapeHtml(JSON.stringify(title));
-const packageArg=escapeHtml(JSON.stringify(p.name));
+grid.innerHTML=
+packages.map(
+p=>{
+
+const beatId=
+escapeHtml(
+String(b.id||"")
+);
+
+const titleArg=
+escapeHtml(
+JSON.stringify(title)
+);
+
+const packageArg=
+escapeHtml(
+JSON.stringify(p.name)
+);
 
 return `
+
 <div class="package">
 
-<h3>${escapeHtml(p.name)}</h3>
+<h3>
+${escapeHtml(p.name)}
+</h3>
 
 <div class="package-price">
-${p.price>0 ? "UGX "+p.price.toLocaleString() : "Contact producer"}
+
+${
+p.price>0
+?
+"UGX "+
+p.price.toLocaleString()
+:
+"Contact producer"
+}
+
 </div>
 
 <div class="package-note">
 ${escapeHtml(p.note)}
 </div>
 
-${p.price>0 ? `
+${
+p.price>0
+?
+`
 <button
 class="package-buy"
 type="button"
-onclick="selectLicense('${beatId}',${titleArg},${packageArg},${p.price})">
+onclick="selectLicense('${beatId}',${titleArg},${packageArg},${p.price})"
+>
 Buy Licence
 </button>
-` : ""}
+`
+:
+""
+}
 
 </div>
+
 `;
 
-}).join("");
+}
+).join("");
 
-document.getElementById("licenseModal").classList.add("active");
+document.getElementById(
+"licenseModal"
+).classList.add("active");
 
 }
 
-function selectLicense(beatId,beatTitle,packageName,price){
+
+/* ================================
+   LICENCE SELECTION
+================================ */
+
+async function selectLicense(
+beatId,
+beatTitle,
+packageName,
+price
+){
 
 const selected={
+
 beat_id:beatId,
+
 beat_title:beatTitle,
+
 package:packageName,
+
 price:Number(price),
-selected_at:new Date().toISOString()
+
+selected_at:
+new Date().toISOString()
+
 };
+
 
 localStorage.setItem(
 "pasong_selected_license",
 JSON.stringify(selected)
 );
+
+
+/*
+   Check the current Supabase session.
+*/
+
+const {
+data,
+error
+}=
+await supabaseClient.auth.getSession();
+
+
+if(
+!error &&
+data &&
+data.session &&
+data.session.user
+){
+
+/*
+   User is already logged in.
+
+   Do NOT send them back to login.html.
+   Send them to the account area with the
+   selected licence information preserved.
+*/
+
+window.location.href=
+"/account.html?return=license&beat="+
+encodeURIComponent(beatId)+
+"&package="+
+encodeURIComponent(packageName);
+
+return;
+
+}
+
+
+/*
+   User is not logged in.
+   Send them to login and preserve the
+   licence selection.
+*/
 
 window.location.href=
 "/login.html?return=license&beat="+
@@ -1656,134 +2237,284 @@ encodeURIComponent(packageName);
 
 }
 
+
+/* ================================
+   CLOSE LICENCE
+================================ */
+
 function closeLicense(){
 
-document.getElementById("licenseModal").classList.remove("active");
+document.getElementById(
+"licenseModal"
+).classList.remove("active");
 
 }
 
+
+/* ================================
+   LOAD DATA
+================================ */
+
 async function load(){
 
-const grid=document.getElementById("producerGrid");
+const grid=
+document.getElementById(
+"producerGrid"
+);
 
-grid.innerHTML=`<div class="empty">Loading producers...</div>`;
+grid.innerHTML=
+`<div class="empty">Loading producers...</div>`;
+
 
 try{
 
-const result=await supabaseClient
+const result=
+await supabaseClient
 .from("artist_profiles")
 .select("*");
 
-producerProfiles=result.data||[];
+producerProfiles=
+result.data||[];
 
-producerProfiles=producerProfiles.map(p=>{
+producerProfiles=
+producerProfiles.map(
+p=>{
 
 if(p.id===KV_ID){
 
-p.performing_name="KV BEATS";
-p.stage_name="KV BEATS";
+p.performing_name=
+"KV BEATS";
+
+p.stage_name=
+"KV BEATS";
 
 }
 
 return p;
 
-});
+}
+);
+
 
 if(!producerProfiles.length){
 
 producerProfiles=[{
+
 id:KV_ID,
+
 stage_name:"KV BEATS",
+
 performing_name:"KV BEATS",
+
 location:"Kampala"
+
 }];
 
 }
 
 }catch(e){
 
+console.error(
+"Producer loading error:",
+e
+);
+
 producerProfiles=[{
+
 id:KV_ID,
+
 stage_name:"KV BEATS",
+
 performing_name:"KV BEATS",
+
 location:"Kampala"
+
 }];
 
 }
+
 
 try{
 
-const result=await supabaseClient
+const result=
+await supabaseClient
 .from("beats")
 .select("*")
-.order("created_at",{ascending:false})
+.order(
+"created_at",
+{ascending:false}
+)
 .limit(20);
 
-allBeats=result.data||[];
+allBeats=
+result.data||[];
 
 }catch(e){
+
+console.error(
+"Beat loading error:",
+e
+);
 
 allBeats=[];
 
 }
 
-document.getElementById("producerStatus").textContent=
-producerProfiles.length+" producers";
 
-document.getElementById("heroProducerCount").textContent=
+document.getElementById(
+"producerStatus"
+).textContent=
+producerProfiles.length+
+(
+producerProfiles.length===1
+?
+" producer"
+:
+" producers"
+);
+
+
+document.getElementById(
+"heroProducerCount"
+).textContent=
 producerProfiles.length;
 
+
+document.getElementById(
+"heroProducerLabel"
+).textContent=
+producerProfiles.length===1
+?
+"PRODUCER"
+:
+"PRODUCERS";
+
+
 grid.innerHTML=
-producerProfiles.map(card).join("")||
+producerProfiles
+.map(card)
+.join("")||
 `<div class="empty">No producers found</div>`;
 
-document.getElementById("beatStatus").textContent=
-allBeats.length+" beats";
 
-document.getElementById("heroBeatCount").textContent=
+document.getElementById(
+"beatStatus"
+).textContent=
+allBeats.length+
+(
+allBeats.length===1
+?
+" beat"
+:
+" beats"
+);
+
+
+document.getElementById(
+"heroBeatCount"
+).textContent=
 allBeats.length;
 
-document.getElementById("latestBeatGrid").innerHTML=
-allBeats.map(beatCard).join("")||
+
+document.getElementById(
+"heroBeatLabel"
+).textContent=
+allBeats.length===1
+?
+"BEAT AVAILABLE"
+:
+"BEATS AVAILABLE";
+
+
+document.getElementById(
+"latestBeatGrid"
+).innerHTML=
+allBeats
+.map(beatCard)
+.join("")||
 `<div class="empty">No beats available</div>`;
 
 }
 
+
+/* ================================
+   LOAD PRODUCER
+================================ */
+
 async function loadProducer(id){
 
-document.getElementById("profileContainer").innerHTML=
+document.getElementById(
+"profileContainer"
+).innerHTML=
 `<div class="empty">Loading producer...</div>`;
+
 
 try{
 
-const result=await supabaseClient
+const result=
+await supabaseClient
 .from("artist_profiles")
 .select("*")
 .eq("id",id)
 .single();
 
-const p=result.data||{
+
+const p=
+result.data||{
+
 id:id,
+
 stage_name:"KV BEATS",
+
 performing_name:"KV BEATS",
+
 location:"Kampala"
+
 };
+
+
+if(p.id===KV_ID){
+
+p.stage_name=
+"KV BEATS";
+
+p.performing_name=
+"KV BEATS";
+
+}
+
 
 producerProfiles=[p];
 
-const name=getName(p);
-const img=getImg(p);
-const src=img||avatar(name);
 
-const beatResult=await supabaseClient
+const name=
+getName(p);
+
+const img=
+getImg(p);
+
+const src=
+img||avatar(name);
+
+
+const beatResult=
+await supabaseClient
 .from("beats")
 .select("*")
 .eq("producer_id",id)
-.order("created_at",{ascending:false});
+.order(
+"created_at",
+{ascending:false}
+);
 
-const beats=beatResult.data||[];
 
-document.getElementById("profileContainer").innerHTML=`
+const beats=
+beatResult.data||[];
+
+
+document.getElementById(
+"profileContainer"
+).innerHTML=`
 
 <div class="profile-head">
 
@@ -1796,25 +2527,44 @@ onerror="this.onerror=null;this.src='${avatar(name)}'"
 
 <div>
 
-<h1>🎛️ ${escapeHtml(name)}</h1>
+<h1>
+🎛️ ${escapeHtml(name)}
+</h1>
 
 <p class="profile-location">
-📍 ${escapeHtml(p.location||p.city||"Kampala")}
+📍 ${escapeHtml(
+p.location||
+p.city||
+"Kampala"
+)}
 </p>
 
-<p style="margin-top:10px;color:#aaaabd">
-${escapeHtml(p.bio||"Producer on PASONG")}
+<p
+style="margin-top:10px;color:#aaaabd"
+>
+${escapeHtml(
+p.bio||
+"Producer on PASONG"
+)}
 </p>
 
 <div class="profile-info">
 
-<div class="profile-pill">🎹 Music Producer</div>
+<div class="profile-pill">
+🎹 Music Producer
+</div>
 
-<div class="profile-pill">🎧 ${beats.length} Beats</div>
+<div class="profile-pill">
+🎧 ${beats.length} Beats
+</div>
 
-<div class="profile-pill">🎧 Full-length beat streaming</div>
+<div class="profile-pill">
+🎧 Full-length beat streaming
+</div>
 
-<div class="profile-pill">💿 Beat licences</div>
+<div class="profile-pill">
+💿 Beat licences
+</div>
 
 </div>
 
@@ -1823,85 +2573,203 @@ ${escapeHtml(p.bio||"Producer on PASONG")}
 </div>
 `;
 
-document.getElementById("profileBeatStatus").textContent=
-beats.length+" beats";
 
-document.getElementById("profileBeatGrid").innerHTML=
-beats.map(beatCard).join("")||
+document.getElementById(
+"profileBeatStatus"
+).textContent=
+beats.length+
+(
+beats.length===1
+?
+" beat"
+:
+" beats"
+);
+
+
+document.getElementById(
+"profileBeatGrid"
+).innerHTML=
+beats
+.map(beatCard)
+.join("")||
 `<div class="empty">No beats yet</div>`;
 
 }catch(e){
 
-document.getElementById("profileContainer").innerHTML=
+console.error(
+"Producer profile error:",
+e
+);
+
+document.getElementById(
+"profileContainer"
+).innerHTML=
 `<div class="empty">Producer profile could not be loaded.</div>`;
 
-document.getElementById("profileBeatGrid").innerHTML=
+document.getElementById(
+"profileBeatGrid"
+).innerHTML=
 `<div class="empty">No beats available</div>`;
 
 }
 
 }
 
+
+/* ================================
+   FILTER
+================================ */
+
 function filterProducers(q){
 
-q=q.toLowerCase().trim();
+q=
+q.toLowerCase().trim();
 
-const filtered=producerProfiles.filter(p=>
-getName(p).toLowerCase().includes(q)||
-String(p.location||"").toLowerCase().includes(q)||
-String(p.city||"").toLowerCase().includes(q)
+
+const filtered=
+producerProfiles.filter(
+p=>
+
+getName(p)
+.toLowerCase()
+.includes(q)||
+
+String(
+p.location||""
+)
+.toLowerCase()
+.includes(q)||
+
+String(
+p.city||""
+)
+.toLowerCase()
+.includes(q)
 );
 
-document.getElementById("producerGrid").innerHTML=
-filtered.map(card).join("")||
+
+document.getElementById(
+"producerGrid"
+).innerHTML=
+filtered
+.map(card)
+.join("")||
 `<div class="empty">No producers found</div>`;
 
 }
 
-function init(){
 
-const id=new URLSearchParams(location.search).get("id");
+/* ================================
+   INIT
+================================ */
+
+async function init(){
+
+await updateAccountUI();
+
+
+const params=
+new URLSearchParams(
+location.search
+);
+
+const id=
+params.get("id");
+
 
 if(id){
 
-document.getElementById("directorySection").classList.add("hidden");
-document.getElementById("detailSection").classList.add("active");
+document.getElementById(
+"directorySection"
+).classList.add("hidden");
 
-loadProducer(id);
+document.getElementById(
+"detailSection"
+).classList.add("active");
+
+await loadProducer(id);
 
 }else{
 
-load();
+await load();
 
 }
 
 }
 
-document.getElementById("producerSearch").addEventListener("input",function(){
 
-filterProducers(this.value);
+/* ================================
+   SEARCH EVENTS
+================================ */
 
-});
+document.getElementById(
+"producerSearch"
+).addEventListener(
+"input",
+function(){
 
-document.getElementById("heroProducerSearch").addEventListener("input",function(){
+filterProducers(
+this.value
+);
 
-const value=this.value;
+}
+);
 
-document.getElementById("producerSearch").value=value;
 
-filterProducers(value);
+document.getElementById(
+"heroProducerSearch"
+).addEventListener(
+"input",
+function(){
 
-});
+const value=
+this.value;
 
-document.getElementById("closeModal").addEventListener("click",closeLicense);
+document.getElementById(
+"producerSearch"
+).value=
+value;
 
-document.getElementById("licenseModal").addEventListener("click",function(e){
+filterProducers(
+value
+);
+
+}
+);
+
+
+/* ================================
+   MODAL EVENTS
+================================ */
+
+document.getElementById(
+"closeModal"
+).addEventListener(
+"click",
+closeLicense
+);
+
+
+document.getElementById(
+"licenseModal"
+).addEventListener(
+"click",
+function(e){
 
 if(e.target===this){
+
 closeLicense();
+
 }
 
-});
+}
+);
+
+
+/* ================================
+   START
+================================ */
 
 init();
 
