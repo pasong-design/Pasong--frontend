@@ -189,6 +189,11 @@ button:hover{
   opacity:.9;
 }
 
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
 button.primary{
   background:#8b5cf6;
   border-color:#8b5cf6;
@@ -356,6 +361,16 @@ textarea{
   outline:none;
 }
 
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#8b5cf6;
+}
+
+input[type="file"]{
+  padding:8px;
+}
+
 textarea{
   min-height:90px;
   resize:vertical;
@@ -370,11 +385,36 @@ textarea{
 }
 
 .ad-preview img{
-  max-width:100%;
-  max-height:220px;
+  width:100%;
+  max-width:700px;
+  max-height:300px;
+  object-fit:contain;
   border-radius:8px;
   display:block;
-  margin-bottom:8px;
+  margin:10px 0;
+  background:#111;
+}
+
+.auth-details{
+  margin-top:12px;
+  padding:12px;
+  background:#0b0b15;
+  border:1px solid #29293d;
+  border-radius:9px;
+  font-size:12px;
+  line-height:1.7;
+  word-break:break-word;
+}
+
+.upload-box{
+  padding:12px;
+  border:1px dashed #393951;
+  border-radius:10px;
+  background:#0b0b15;
+}
+
+.featured{
+  color:#ffd166;
 }
 
 @media(max-width:800px){
@@ -394,6 +434,30 @@ textarea{
   .grid2,
   .grid3{
     grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:520px){
+
+  .container{
+    padding:10px;
+  }
+
+  .stats{
+    gap:7px;
+  }
+
+  .stat{
+    padding:12px;
+  }
+
+  .stat-number{
+    font-size:20px;
+  }
+
+  .hero h1{
+    font-size:21px;
   }
 
 }
@@ -439,6 +503,11 @@ textarea{
     <div
       id="authMessage"
       class="message"
+    ></div>
+
+    <div
+      id="authDetails"
+      class="auth-details hidden"
     ></div>
 
     <div
@@ -591,6 +660,12 @@ textarea{
       </button>
 
       <button
+        data-section="dj"
+      >
+        🎧 DJ Mix Control
+      </button>
+
+      <button
         data-section="orders"
       >
         📦 Sales & Orders
@@ -652,25 +727,30 @@ textarea{
           <div class="notice">
 
             <strong>
-              Content auto-approval is enabled.
+              Automatic content approval is enabled.
             </strong>
 
             <br><br>
 
-            Songs and beats created through the current
-            PASONG backend are automatically saved as
-            <b>approved</b>.
+            <b>Songs</b>,
+            <b>beats</b>
+            and
+            <b>DJ mixes</b>
+            are intended to go live automatically.
 
             <br><br>
 
-            The admin dashboard therefore does
-            <strong>not</strong>
-            contain a manual song/beat approval queue.
+            There is therefore no manual
+            Approve/Reject queue for those content types.
 
             <br><br>
 
-            Admin control remains available for editing,
-            hiding, suspending, featuring and deleting content.
+            Admin can still manage,
+            edit,
+            hide,
+            suspend,
+            feature
+            or delete content.
 
           </div>
 
@@ -692,13 +772,18 @@ textarea{
 
             Logged in administrator:
 
-            <br>
+            <br><br>
 
             <strong id="overviewAdminEmail">
               Loading…
             </strong>
 
           </div>
+
+          <div
+            id="adminRoleInfo"
+            class="small muted"
+          ></div>
 
         </div>
 
@@ -724,9 +809,9 @@ textarea{
 
             Songs are automatically approved.
 
-            <br>
+            <br><br>
 
-            There is no Approve/Reject queue here.
+            There is no Approve/Reject queue.
 
           </div>
 
@@ -749,29 +834,17 @@ textarea{
 
                 <tr>
 
-                  <th>
-                    Song
-                  </th>
+                  <th>Song</th>
 
-                  <th>
-                    Artist
-                  </th>
+                  <th>Artist</th>
 
-                  <th>
-                    Price
-                  </th>
+                  <th>Price</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Date
-                  </th>
+                  <th>Date</th>
 
-                  <th>
-                    Actions
-                  </th>
+                  <th>Actions</th>
 
                 </tr>
 
@@ -780,12 +853,15 @@ textarea{
               <tbody id="songsBody">
 
                 <tr>
+
                   <td
                     colspan="6"
                     class="empty"
                   >
                     Loading…
+
                   </td>
+
                 </tr>
 
               </tbody>
@@ -821,7 +897,8 @@ textarea{
             <br><br>
 
             Admin can still edit prices,
-            hide/suspend content, feature content,
+            hide/suspend content,
+            feature content,
             or delete a beat.
 
           </div>
@@ -845,29 +922,17 @@ textarea{
 
                 <tr>
 
-                  <th>
-                    Beat
-                  </th>
+                  <th>Beat</th>
 
-                  <th>
-                    Producer
-                  </th>
+                  <th>Producer</th>
 
-                  <th>
-                    Prices
-                  </th>
+                  <th>Prices</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Date
-                  </th>
+                  <th>Date</th>
 
-                  <th>
-                    Actions
-                  </th>
+                  <th>Actions</th>
 
                 </tr>
 
@@ -879,6 +944,94 @@ textarea{
 
                   <td
                     colspan="6"
+                    class="empty"
+                  >
+                    Loading…
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           DJ MIXES
+      ==================================================== -->
+
+      <div
+        id="section-dj"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            🎧 DJ Mix Control
+          </h2>
+
+          <div class="notice">
+
+            DJ mixes are intended to be automatically
+            approved when uploaded.
+
+            <br><br>
+
+            There is no manual approval queue.
+
+            <br><br>
+
+            Admin can manage or delete DJ mixes here.
+
+          </div>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadDjMixes()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>Mix</th>
+
+                  <th>DJ</th>
+
+                  <th>Status</th>
+
+                  <th>Date</th>
+
+                  <th>Actions</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="djBody">
+
+                <tr>
+
+                  <td
+                    colspan="5"
                     class="empty"
                   >
                     Loading…
@@ -932,25 +1085,15 @@ textarea{
 
                 <tr>
 
-                  <th>
-                    Order
-                  </th>
+                  <th>Order</th>
 
-                  <th>
-                    Buyer
-                  </th>
+                  <th>Buyer</th>
 
-                  <th>
-                    Amount
-                  </th>
+                  <th>Amount</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Date
-                  </th>
+                  <th>Date</th>
 
                 </tr>
 
@@ -1015,29 +1158,17 @@ textarea{
 
                 <tr>
 
-                  <th>
-                    Reference
-                  </th>
+                  <th>Reference</th>
 
-                  <th>
-                    User
-                  </th>
+                  <th>User</th>
 
-                  <th>
-                    Amount
-                  </th>
+                  <th>Amount</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Date
-                  </th>
+                  <th>Date</th>
 
-                  <th>
-                    Actions
-                  </th>
+                  <th>Actions</th>
 
                 </tr>
 
@@ -1077,7 +1208,6 @@ textarea{
         class="section hidden"
       >
 
-
         <div class="card">
 
           <h2>
@@ -1086,21 +1216,19 @@ textarea{
 
           <div class="notice">
 
-            Admin can create, activate, pause,
-            edit and delete advertisements.
+            Admin can post advertisements directly from
+            this dashboard.
 
             <br><br>
 
-            The ad can contain:
+            Choose the original advertisement image
+            from your phone or computer.
 
-            title,
-            description,
-            image,
-            target link,
-            placement,
-            start date,
-            end date
-            and status.
+            <br><br>
+
+            PASONG uploads the image to Cloudinary
+            automatically. You do <strong>not</strong>
+            need to paste an image URL.
 
           </div>
 
@@ -1115,7 +1243,6 @@ textarea{
 
             <div class="grid2">
 
-
               <div class="field">
 
                 <label>
@@ -1126,6 +1253,7 @@ textarea{
                   id="adTitle"
                   maxlength="200"
                   required
+                  placeholder="Example: New PASONG Release"
                 >
 
               </div>
@@ -1175,48 +1303,65 @@ textarea{
               <textarea
                 id="adDescription"
                 maxlength="2000"
+                placeholder="Advertisement description..."
               ></textarea>
 
             </div>
 
 
-            <div class="grid2">
+            <!-- ORIGINAL IMAGE UPLOAD -->
 
+            <div class="field">
 
-              <div class="field">
+              <label>
+                Advertisement Image
+              </label>
 
-                <label>
-                  Advertisement Image URL
-                </label>
+              <div class="upload-box">
 
                 <input
-                  id="adImageUrl"
-                  type="url"
-                  placeholder="https://..."
+                  id="adImageFile"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
                 >
+
+                <div
+                  id="adUploadStatus"
+                  class="muted small"
+                  style="margin-top:8px"
+                >
+                  Choose the original advertisement image
+                  from your device.
+                </div>
 
               </div>
 
+              <!-- Cloudinary URL is stored here automatically -->
 
-              <div class="field">
+              <input
+                id="adImageUrl"
+                type="hidden"
+              >
 
-                <label>
-                  Target URL
-                </label>
+            </div>
 
-                <input
-                  id="adTargetUrl"
-                  type="url"
-                  placeholder="https://..."
-                >
 
-              </div>
+            <div class="field">
+
+              <label>
+                Target URL
+              </label>
+
+              <input
+                id="adTargetUrl"
+                type="url"
+                placeholder="https://..."
+              >
 
             </div>
 
 
             <div class="grid3">
-
 
               <div class="field">
 
@@ -1273,26 +1418,32 @@ textarea{
             </div>
 
 
+            <!-- PREVIEW -->
+
             <div
               id="adPreview"
               class="ad-preview hidden"
             >
 
               <strong>
-                Preview
+                Advertisement Preview
               </strong>
 
               <img
                 id="adPreviewImage"
                 src=""
-                alt=""
+                alt="Advertisement preview"
               >
 
-              <div id="adPreviewTitle"></div>
+              <div
+                id="adPreviewTitle"
+                style="font-weight:800;margin-top:5px"
+              ></div>
 
               <div
                 id="adPreviewDescription"
                 class="muted small"
+                style="margin-top:5px"
               ></div>
 
             </div>
@@ -1331,6 +1482,8 @@ textarea{
         </div>
 
 
+        <!-- CURRENT ADS -->
+
         <div class="card">
 
           <h3>
@@ -1356,29 +1509,17 @@ textarea{
 
                 <tr>
 
-                  <th>
-                    Advertisement
-                  </th>
+                  <th>Advertisement</th>
 
-                  <th>
-                    Placement
-                  </th>
+                  <th>Placement</th>
 
-                  <th>
-                    Schedule
-                  </th>
+                  <th>Schedule</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Clicks
-                  </th>
+                  <th>Clicks</th>
 
-                  <th>
-                    Actions
-                  </th>
+                  <th>Actions</th>
 
                 </tr>
 
@@ -1443,25 +1584,15 @@ textarea{
 
                 <tr>
 
-                  <th>
-                    Title
-                  </th>
+                  <th>Title</th>
 
-                  <th>
-                    User
-                  </th>
+                  <th>User</th>
 
-                  <th>
-                    Style
-                  </th>
+                  <th>Style</th>
 
-                  <th>
-                    Status
-                  </th>
+                  <th>Status</th>
 
-                  <th>
-                    Date
-                  </th>
+                  <th>Date</th>
 
                 </tr>
 
@@ -1589,7 +1720,14 @@ const API_BASE =
 const supabaseClient =
   supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_KEY
+    SUPABASE_KEY,
+    {
+      auth:{
+        persistSession:true,
+        autoRefreshToken:true,
+        detectSessionInUrl:true
+      }
+    }
   );
 
 
@@ -1599,6 +1737,7 @@ const supabaseClient =
 
 let currentSession = null;
 let currentUser = null;
+let bootingAdmin = false;
 
 
 /* ============================================================
@@ -1638,6 +1777,31 @@ function escapeHtml(value){
 }
 
 
+function escapeJs(value){
+
+  return String(
+    value ?? ""
+  )
+  .replace(
+    /\\/g,
+    "\\\\"
+  )
+  .replace(
+    /'/g,
+    "\\'"
+  )
+  .replace(
+    /\r/g,
+    "\\r"
+  )
+  .replace(
+    /\n/g,
+    "\\n"
+  );
+
+}
+
+
 function formatDate(value){
 
   if(!value){
@@ -1667,12 +1831,13 @@ function money(
   currency="UGX"
 ){
 
+  const number =
+    Number(amount || 0);
+
   return (
     String(currency || "UGX") +
     " " +
-    Number(
-      amount || 0
-    ).toLocaleString()
+    number.toLocaleString()
   );
 
 }
@@ -1707,8 +1872,10 @@ function hideMessage(id){
     $(id);
 
   if(element){
+
     element.className =
       "message";
+
   }
 
 }
@@ -1716,7 +1883,6 @@ function hideMessage(id){
 
 /* ============================================================
    TIMEOUT
-   Prevents the page from hanging forever.
 ============================================================ */
 
 function withTimeout(
@@ -1725,24 +1891,66 @@ function withTimeout(
   message
 ){
 
-  return Promise.race([
+  return new Promise(
+    (resolve,reject)=>{
 
-    promise,
+      let finished =
+        false;
 
-    new Promise(
-      (_,reject)=>{
 
+      const timer =
         setTimeout(
-          ()=>reject(
-            new Error(message)
-          ),
+          ()=>{
+
+            if(finished){
+              return;
+            }
+
+            finished = true;
+
+            reject(
+              new Error(message)
+            );
+
+          },
           milliseconds
         );
 
-      }
-    )
 
-  ]);
+      Promise.resolve(promise)
+        .then(
+          value=>{
+
+            if(finished){
+              return;
+            }
+
+            finished = true;
+
+            clearTimeout(timer);
+
+            resolve(value);
+
+          }
+        )
+        .catch(
+          error=>{
+
+            if(finished){
+              return;
+            }
+
+            finished = true;
+
+            clearTimeout(timer);
+
+            reject(error);
+
+          }
+        );
+
+    }
+  );
 
 }
 
@@ -1753,15 +1961,28 @@ function withTimeout(
 
 function getRole(user){
 
+  const appRole =
+    user?.app_metadata?.role;
+
+  const userRole =
+    user?.user_metadata?.role;
+
+  const appUserRole =
+    user?.app_metadata?.user_role;
+
+  const userUserRole =
+    user?.user_metadata?.user_role;
+
+
   return String(
 
-    user?.app_metadata?.role ||
+    appRole ||
 
-    user?.user_metadata?.role ||
+    userRole ||
 
-    user?.app_metadata?.user_role ||
+    appUserRole ||
 
-    user?.user_metadata?.user_role ||
+    userUserRole ||
 
     ""
 
@@ -1773,35 +1994,45 @@ function getRole(user){
 
 
 /* ============================================================
-   ADMIN SESSION CHECK
+   GET ADMIN SESSION
 ============================================================ */
 
 async function getAdminSession(){
 
-  let sessionResult;
+  let session = null;
+
+
+  /*
+     FIRST:
+     Get the current persisted session.
+  */
 
   try{
 
-    sessionResult =
+    const sessionResult =
       await withTimeout(
 
         supabaseClient.auth.getSession(),
 
-        8000,
+        10000,
 
-        "Supabase session check timed out after 8 seconds."
+        "Supabase session check timed out after 10 seconds."
 
       );
+
+
+    session =
+      sessionResult?.data?.session || null;
 
   }catch(error){
 
     throw new Error(
 
-      "Unable to read the Supabase login session. " +
+      "Unable to read your PASONG login session. " +
 
       (
         error?.message ||
-        "Unknown session error."
+        "Unknown Supabase session error."
       )
 
     );
@@ -1809,15 +2040,10 @@ async function getAdminSession(){
   }
 
 
-  let session =
-    sessionResult
-      ?.data
-      ?.session || null;
-
-
   /*
-     Fallback to getUser()
-     if there is no session object.
+     SECOND:
+     If there is no session, ask Supabase
+     directly for the authenticated user.
   */
 
   if(!session){
@@ -1829,23 +2055,25 @@ async function getAdminSession(){
 
           supabaseClient.auth.getUser(),
 
-          8000,
+          10000,
 
-          "Supabase user check timed out after 8 seconds."
+          "Supabase user verification timed out after 10 seconds."
 
         );
 
 
       if(
-        userResult
-          ?.data
-          ?.user
+        userResult?.data?.user
       ){
+
+        const verifiedUser =
+          userResult.data.user;
+
 
         session = {
 
           user:
-            userResult.data.user,
+            verifiedUser,
 
           access_token:
             null
@@ -1873,7 +2101,7 @@ async function getAdminSession(){
 
 
   /*
-     No logged-in account.
+     NO LOGIN
   */
 
   if(!session?.user){
@@ -1893,27 +2121,27 @@ async function getAdminSession(){
     session.user;
 
 
+  /*
+     ROLE
+  */
+
   const role =
     getRole(user);
 
 
   /*
-     ADMIN ROLE MISSING
+     NOT ADMIN
   */
 
   if(role !== "admin"){
 
     const appRole =
-      user
-        ?.app_metadata
-        ?.role ||
+      user?.app_metadata?.role ??
       "(missing)";
 
 
     const userRole =
-      user
-        ?.user_metadata
-        ?.role ||
+      user?.user_metadata?.role ??
       "(missing)";
 
 
@@ -1940,9 +2168,9 @@ async function getAdminSession(){
 
       ". " +
 
-      'Set app_metadata.role to "admin" for this account, ' +
+      'This account must have app_metadata.role set to "admin". ' +
 
-      "then log in again."
+      "After changing the role, sign out and sign in again."
 
     );
 
@@ -1952,7 +2180,8 @@ async function getAdminSession(){
   return {
 
     session,
-    user
+    user,
+    role
 
   };
 
@@ -1960,23 +2189,41 @@ async function getAdminSession(){
 
 
 /* ============================================================
-   START ADMIN
+   ADMIN BOOT
 ============================================================ */
 
 async function bootAdmin(){
 
+  if(bootingAdmin){
+    return;
+  }
+
+
+  bootingAdmin =
+    true;
+
+
   $("authTitle").textContent =
     "Checking administrator access…";
 
+
   $("authText").textContent =
     "Verifying your PASONG Supabase session and administrator role.";
+
 
   hideMessage(
     "authMessage"
   );
 
+
+  $("authDetails")
+    .classList
+    .add("hidden");
+
+
   $("retryAuth").style.display =
     "none";
+
 
   $("loginButton").style.display =
     "none";
@@ -1995,6 +2242,33 @@ async function bootAdmin(){
       result.user;
 
 
+    /*
+       If the fallback getUser() was used,
+       get a fresh session if possible.
+    */
+
+    try{
+
+      const freshSession =
+        await supabaseClient.auth.getSession();
+
+
+      if(
+        freshSession?.data?.session
+      ){
+
+        currentSession =
+          freshSession.data.session;
+
+      }
+
+    }catch{
+      /*
+         Existing verified user is still valid.
+      */
+    }
+
+
     $("adminIdentity").textContent =
       "Administrator: " +
       (
@@ -2008,6 +2282,13 @@ async function bootAdmin(){
       currentUser.id;
 
 
+    $("adminRoleInfo").textContent =
+      "Role: " +
+      getRole(currentUser) +
+      " • User ID: " +
+      currentUser.id;
+
+
     $("authScreen")
       .classList
       .add("hidden");
@@ -2018,15 +2299,37 @@ async function bootAdmin(){
       .remove("hidden");
 
 
+    /*
+       Load data separately.
+       One broken table must not hide the dashboard.
+    */
+
     await loadAll();
 
 
   }catch(error){
 
     console.error(
-      "Admin authentication error:",
+      "PASONG Admin authentication error:",
       error
     );
+
+
+    currentSession =
+      null;
+
+    currentUser =
+      null;
+
+
+    $("adminApp")
+      .classList
+      .add("hidden");
+
+
+    $("authScreen")
+      .classList
+      .remove("hidden");
 
 
     $("authTitle").textContent =
@@ -2034,7 +2337,7 @@ async function bootAdmin(){
 
 
     $("authText").textContent =
-      "The dashboard stopped here because the account/session could not be verified.";
+      "PASONG could not verify administrator access.";
 
 
     showMessage(
@@ -2050,12 +2353,34 @@ async function bootAdmin(){
     );
 
 
+    $("authDetails")
+      .classList
+      .remove("hidden");
+
+
+    $("authDetails").innerHTML =
+
+      "<strong>What to check:</strong><br>" +
+
+      "1. Make sure you are logged into PASONG.<br>" +
+
+      "2. Make sure this account has administrator role.<br>" +
+
+      '3. The required role is <b>admin</b>.<br>' +
+
+      "4. After changing the role, sign out and sign in again.";
+
     $("retryAuth").style.display =
       "inline-block";
 
 
     $("loginButton").style.display =
       "inline-block";
+
+  }finally{
+
+    bootingAdmin =
+      false;
 
   }
 
@@ -2069,6 +2394,12 @@ async function bootAdmin(){
 supabaseClient.auth.onAuthStateChange(
 
   (event,session)=>{
+
+    console.log(
+      "PASONG auth event:",
+      event
+    );
+
 
     if(event === "SIGNED_OUT"){
 
@@ -2131,7 +2462,18 @@ $("loginButton").onclick =
 $("logoutButton").onclick =
   async()=>{
 
-    await supabaseClient.auth.signOut();
+    try{
+
+      await supabaseClient.auth.signOut();
+
+    }catch(error){
+
+      console.error(
+        "Logout error:",
+        error
+      );
+
+    }
 
     location.reload();
 
@@ -2227,10 +2569,7 @@ async function loadSongs(){
   $("songsBody").innerHTML =
     `
       <tr>
-        <td
-          colspan="6"
-          class="empty"
-        >
+        <td colspan="6" class="empty">
           Loading…
         </td>
       </tr>
@@ -2254,10 +2593,7 @@ async function loadSongs(){
     $("songsBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="6"
-            class="error"
-          >
+          <td colspan="6" class="error">
             ${escapeHtml(
               result.error.message
             )}
@@ -2279,10 +2615,7 @@ async function loadSongs(){
     $("songsBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="6"
-            class="empty"
-          >
+          <td colspan="6" class="empty">
             No songs found.
           </td>
         </tr>
@@ -2296,35 +2629,46 @@ async function loadSongs(){
   $("songsBody").innerHTML =
     songs.map(song=>{
 
+      const status =
+        song.status ||
+        "approved";
+
+
       return `
 
         <tr>
 
           <td>
+
             <strong>
               ${escapeHtml(
                 song.title ||
                 "Untitled"
               )}
             </strong>
+
           </td>
 
 
           <td>
+
             ${escapeHtml(
               song.artist_name ||
               song.artist_user_id ||
               song.artist_id ||
               "—"
             )}
+
           </td>
 
 
           <td>
+
             ${money(
               song.price,
               song.currency
             )}
+
           </td>
 
 
@@ -2333,8 +2677,7 @@ async function loadSongs(){
             <span class="pill">
 
               ${escapeHtml(
-                song.status ||
-                "approved"
+                status
               )}
 
             </span>
@@ -2343,9 +2686,11 @@ async function loadSongs(){
 
 
           <td>
+
             ${formatDate(
               song.created_at
             )}
+
           </td>
 
 
@@ -2355,13 +2700,9 @@ async function loadSongs(){
 
               <button
                 onclick="editSong(
-                  '${song.id}',
-                  ${JSON.stringify(
-                    song.title || ""
-                  )},
-                  ${Number(
-                    song.price || 0
-                  )}
+                  '${escapeJs(song.id)}',
+                  '${escapeJs(song.title || "")}',
+                  ${Number(song.price || 0)}
                 )"
               >
                 Edit
@@ -2371,7 +2712,7 @@ async function loadSongs(){
               <button
                 class="danger"
                 onclick="deleteSong(
-                  '${song.id}'
+                  '${escapeJs(song.id)}'
                 )"
               >
                 Delete
@@ -2451,7 +2792,6 @@ async function editSong(
 
 
   await loadSongs();
-
   await loadCounts();
 
 }
@@ -2493,7 +2833,6 @@ async function deleteSong(id){
 
 
   await loadSongs();
-
   await loadCounts();
 
 }
@@ -2508,10 +2847,7 @@ async function loadBeats(){
   $("beatsBody").innerHTML =
     `
       <tr>
-        <td
-          colspan="6"
-          class="empty"
-        >
+        <td colspan="6" class="empty">
           Loading…
         </td>
       </tr>
@@ -2535,10 +2871,7 @@ async function loadBeats(){
     $("beatsBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="6"
-            class="error"
-          >
+          <td colspan="6" class="error">
             ${escapeHtml(
               result.error.message
             )}
@@ -2560,10 +2893,7 @@ async function loadBeats(){
     $("beatsBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="6"
-            class="empty"
-          >
+          <td colspan="6" class="empty">
             No beats found.
           </td>
         </tr>
@@ -2593,9 +2923,11 @@ async function loadBeats(){
             <br>
 
             <span class="muted">
+
               ${escapeHtml(
                 beat.genre || ""
               )}
+
             </span>
 
           </td>
@@ -2658,9 +2990,11 @@ async function loadBeats(){
 
 
           <td>
+
             ${formatDate(
               beat.created_at
             )}
+
           </td>
 
 
@@ -2670,22 +3004,12 @@ async function loadBeats(){
 
               <button
                 onclick="editBeat(
-                  '${beat.id}',
-                  ${JSON.stringify(
-                    beat.title || ""
-                  )},
-                  ${Number(
-                    beat.lease_mp3_price || 0
-                  )},
-                  ${Number(
-                    beat.lease_wav_price || 0
-                  )},
-                  ${Number(
-                    beat.stems_price || 0
-                  )},
-                  ${Number(
-                    beat.exclusive_price || 0
-                  )}
+                  '${escapeJs(beat.id)}',
+                  '${escapeJs(beat.title || "")}',
+                  ${Number(beat.lease_mp3_price || 0)},
+                  ${Number(beat.lease_wav_price || 0)},
+                  ${Number(beat.stems_price || 0)},
+                  ${Number(beat.exclusive_price || 0)}
                 )"
               >
                 Edit
@@ -2695,7 +3019,7 @@ async function loadBeats(){
               <button
                 class="danger"
                 onclick="deleteBeat(
-                  '${beat.id}'
+                  '${escapeJs(beat.id)}'
                 )"
               >
                 Delete
@@ -2823,7 +3147,6 @@ async function editBeat(
 
 
   await loadBeats();
-
   await loadCounts();
 
 }
@@ -2865,8 +3188,212 @@ async function deleteBeat(id){
 
 
   await loadBeats();
-
   await loadCounts();
+
+}
+
+
+/* ============================================================
+   DJ MIXES
+============================================================ */
+
+async function loadDjMixes(){
+
+  $("djBody").innerHTML =
+    `
+      <tr>
+        <td colspan="5" class="empty">
+          Loading…
+        </td>
+      </tr>
+    `;
+
+
+  const result =
+    await supabaseClient
+      .from("dj_mixes")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(result.error){
+
+    $("djBody").innerHTML =
+      `
+        <tr>
+
+          <td
+            colspan="5"
+            class="error"
+          >
+
+            DJ mixes could not be loaded:
+
+            ${escapeHtml(
+              result.error.message
+            )}
+
+          </td>
+
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  const mixes =
+    result.data || [];
+
+
+  if(!mixes.length){
+
+    $("djBody").innerHTML =
+      `
+        <tr>
+
+          <td
+            colspan="5"
+            class="empty"
+          >
+            No DJ mixes found.
+
+          </td>
+
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  $("djBody").innerHTML =
+    mixes.map(mix=>{
+
+      const title =
+        mix.title ||
+        mix.name ||
+        "Untitled Mix";
+
+
+      const dj =
+        mix.dj_name ||
+        mix.dj_user_id ||
+        mix.user_id ||
+        mix.dj_id ||
+        "—";
+
+
+      const status =
+        mix.status ||
+        "approved";
+
+
+      return `
+
+        <tr>
+
+          <td>
+
+            <strong>
+              ${escapeHtml(title)}
+            </strong>
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(dj)}
+
+          </td>
+
+
+          <td>
+
+            <span class="pill">
+
+              ${escapeHtml(status)}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            ${formatDate(
+              mix.created_at
+            )}
+
+          </td>
+
+
+          <td>
+
+            <button
+              class="danger"
+              onclick="deleteDjMix(
+                '${escapeJs(mix.id)}'
+              )"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+}
+
+
+async function deleteDjMix(id){
+
+  if(
+    !confirm(
+      "Delete this DJ mix? This cannot be undone."
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const result =
+    await supabaseClient
+      .from("dj_mixes")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error){
+
+    alert(
+      "DJ mix deletion failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadDjMixes();
 
 }
 
@@ -2880,10 +3407,7 @@ async function loadOrders(){
   $("ordersBody").innerHTML =
     `
       <tr>
-        <td
-          colspan="5"
-          class="empty"
-        >
+        <td colspan="5" class="empty">
           Loading…
         </td>
       </tr>
@@ -2908,10 +3432,7 @@ async function loadOrders(){
     $("ordersBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="5"
-            class="error"
-          >
+          <td colspan="5" class="error">
             ${escapeHtml(
               result.error.message
             )}
@@ -2933,10 +3454,7 @@ async function loadOrders(){
     $("ordersBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="5"
-            class="empty"
-          >
+          <td colspan="5" class="empty">
             No orders found.
           </td>
         </tr>
@@ -2955,27 +3473,36 @@ async function loadOrders(){
         <tr>
 
           <td>
+
             ${escapeHtml(
               order.order_number ||
               order.id
             )}
+
           </td>
 
+
           <td>
+
             ${escapeHtml(
               order.buyer_email ||
               order.buyer_id ||
               "—"
             )}
+
           </td>
 
+
           <td>
+
             ${money(
               order.price ||
               order.total_amount,
               order.currency
             )}
+
           </td>
+
 
           <td>
 
@@ -2990,10 +3517,13 @@ async function loadOrders(){
 
           </td>
 
+
           <td>
+
             ${formatDate(
               order.created_at
             )}
+
           </td>
 
         </tr>
@@ -3014,10 +3544,7 @@ async function loadPayments(){
   $("paymentsBody").innerHTML =
     `
       <tr>
-        <td
-          colspan="6"
-          class="empty"
-        >
+        <td colspan="6" class="empty">
           Loading…
         </td>
       </tr>
@@ -3044,10 +3571,7 @@ async function loadPayments(){
     $("paymentsBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="6"
-            class="error"
-          >
+          <td colspan="6" class="error">
             ${escapeHtml(
               result.error.message
             )}
@@ -3069,10 +3593,7 @@ async function loadPayments(){
     $("paymentsBody").innerHTML =
       `
         <tr>
-          <td
-            colspan="6"
-            class="empty"
-          >
+          <td colspan="6" class="empty">
             No payment verifications found.
           </td>
         </tr>
@@ -3167,7 +3688,7 @@ async function loadPayments(){
                   <button
                     class="good"
                     onclick="setPayment(
-                      '${payment.id}',
+                      '${escapeJs(payment.id)}',
                       'approved'
                     )"
                   >
@@ -3177,7 +3698,7 @@ async function loadPayments(){
                   <button
                     class="danger"
                     onclick="setPayment(
-                      '${payment.id}',
+                      '${escapeJs(payment.id)}',
                       'rejected'
                     )"
                   >
@@ -3247,12 +3768,16 @@ async function setPayment(
 function updateAdPreview(){
 
   const title =
-    $("adTitle").value.trim();
+    $("adTitle")
+      .value
+      .trim();
+
 
   const description =
     $("adDescription")
       .value
       .trim();
+
 
   const image =
     $("adImageUrl")
@@ -3328,10 +3853,439 @@ $("adDescription")
   );
 
 
-$("adImageUrl")
+/* ============================================================
+   AD IMAGE UPLOAD
+============================================================ */
+
+async function uploadAdvertisementImage(file){
+
+  if(!file){
+
+    throw new Error(
+      "Please choose an advertisement image."
+    );
+
+  }
+
+
+  /*
+     Make sure we have a fresh access token.
+  */
+
+  let session =
+    currentSession;
+
+
+  try{
+
+    const result =
+      await supabaseClient.auth.getSession();
+
+
+    if(
+      result?.data?.session
+    ){
+
+      session =
+        result.data.session;
+
+      currentSession =
+        session;
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Could not refresh admin session:",
+      error
+    );
+
+  }
+
+
+  if(
+    !session?.access_token
+  ){
+
+    throw new Error(
+
+      "Your administrator session has expired. " +
+
+      "Please log in again."
+
+    );
+
+  }
+
+
+  const allowedTypes = [
+
+    "image/jpeg",
+
+    "image/jpg",
+
+    "image/png",
+
+    "image/webp"
+
+  ];
+
+
+  if(
+    !allowedTypes.includes(
+      file.type
+    )
+  ){
+
+    throw new Error(
+
+      "Only JPG, JPEG, PNG and WEBP images are allowed."
+
+    );
+
+  }
+
+
+  if(
+    file.size >
+    10 * 1024 * 1024
+  ){
+
+    throw new Error(
+
+      "Advertisement image must be 10MB or smaller."
+
+    );
+
+  }
+
+
+  $("adUploadStatus").textContent =
+    "Requesting secure upload permission…";
+
+
+  $("adUploadStatus").className =
+    "warning small";
+
+
+  /*
+     Get signed Cloudinary upload data
+     from PASONG backend.
+  */
+
+  const signatureResponse =
+    await withTimeout(
+
+      fetch(
+
+        API_BASE +
+        "/api/cloudinary/signature",
+
+        {
+
+          method:"POST",
+
+          headers:{
+
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              session.access_token
+
+          },
+
+          body:JSON.stringify({
+
+            folder:
+              "pasong/ads"
+
+          })
+
+        }
+
+      ),
+
+      15000,
+
+      "Cloudinary signature request timed out."
+
+    );
+
+
+  let signatureData;
+
+
+  try{
+
+    signatureData =
+      await signatureResponse.json();
+
+  }catch{
+
+    throw new Error(
+      "PASONG returned an invalid Cloudinary response."
+    );
+
+  }
+
+
+  if(!signatureResponse.ok){
+
+    throw new Error(
+
+      signatureData?.error ||
+
+      "Advertisement image upload authorization failed."
+
+    );
+
+  }
+
+
+  if(
+    !signatureData.cloud_name ||
+    !signatureData.api_key ||
+    !signatureData.timestamp ||
+    !signatureData.signature ||
+    !signatureData.folder
+  ){
+
+    throw new Error(
+      "PASONG returned incomplete Cloudinary upload information."
+    );
+
+  }
+
+
+  $("adUploadStatus").textContent =
+    "Uploading original advertisement image…";
+
+
+  /*
+     Upload original file directly to Cloudinary.
+  */
+
+  const formData =
+    new FormData();
+
+
+  formData.append(
+    "file",
+    file
+  );
+
+
+  formData.append(
+    "api_key",
+    signatureData.api_key
+  );
+
+
+  formData.append(
+    "timestamp",
+    signatureData.timestamp
+  );
+
+
+  formData.append(
+    "signature",
+    signatureData.signature
+  );
+
+
+  formData.append(
+    "folder",
+    signatureData.folder
+  );
+
+
+  const cloudinaryResponse =
+    await withTimeout(
+
+      fetch(
+
+        "https://api.cloudinary.com/v1_1/" +
+
+        encodeURIComponent(
+          signatureData.cloud_name
+        ) +
+
+        "/image/upload",
+
+        {
+
+          method:"POST",
+
+          body:formData
+
+        }
+
+      ),
+
+      60000,
+
+      "Cloudinary image upload timed out."
+
+    );
+
+
+  let uploaded;
+
+
+  try{
+
+    uploaded =
+      await cloudinaryResponse.json();
+
+  }catch{
+
+    throw new Error(
+      "Cloudinary returned an invalid upload response."
+    );
+
+  }
+
+
+  if(!cloudinaryResponse.ok){
+
+    throw new Error(
+
+      uploaded?.error?.message ||
+
+      "Advertisement image upload failed."
+
+    );
+
+  }
+
+
+  if(
+    !uploaded.secure_url
+  ){
+
+    throw new Error(
+      "Cloudinary did not return the advertisement image URL."
+    );
+
+  }
+
+
+  /*
+     Store returned URL automatically.
+  */
+
+  $("adImageUrl").value =
+    uploaded.secure_url;
+
+
+  /*
+     Preview uploaded image.
+  */
+
+  $("adPreviewImage").src =
+    uploaded.secure_url;
+
+
+  $("adPreviewImage").style.display =
+    "block";
+
+
+  $("adPreview")
+    .classList
+    .remove("hidden");
+
+
+  $("adUploadStatus").textContent =
+    "✓ Original advertisement image uploaded successfully.";
+
+
+  $("adUploadStatus").className =
+    "success small";
+
+
+  updateAdPreview();
+
+
+  return uploaded.secure_url;
+
+}
+
+
+/* ============================================================
+   AD FILE SELECT
+============================================================ */
+
+$("adImageFile")
   .addEventListener(
-    "input",
-    updateAdPreview
+    "change",
+    async function(){
+
+      const file =
+        this.files?.[0];
+
+
+      if(!file){
+        return;
+      }
+
+
+      hideMessage(
+        "adMessage"
+      );
+
+
+      try{
+
+        await uploadAdvertisementImage(
+          file
+        );
+
+
+      }catch(error){
+
+        console.error(
+          "Advertisement image upload error:",
+          error
+        );
+
+
+        showMessage(
+
+          "adMessage",
+
+          "error",
+
+          error?.message ||
+
+          "Advertisement image upload failed."
+
+        );
+
+
+        this.value =
+          "";
+
+
+        $("adImageUrl").value =
+          "";
+
+
+        $("adUploadStatus").textContent =
+          "Image upload failed. Choose another image.";
+
+
+        $("adUploadStatus").className =
+          "error small";
+
+
+        updateAdPreview();
+
+      }
+
+    }
   );
 
 
@@ -3344,10 +4298,7 @@ async function loadAds(){
   $("adsBody").innerHTML =
     `
       <tr>
-        <td
-          colspan="6"
-          class="empty"
-        >
+        <td colspan="6" class="empty">
           Loading…
         </td>
       </tr>
@@ -3388,8 +4339,8 @@ async function loadAds(){
 
               <br><br>
 
-              Run the SQL supplied below
-              this admin.html, then refresh.
+              Create the advertisements table
+              before posting advertisements.
 
             </div>
 
@@ -3398,9 +4349,11 @@ async function loadAds(){
         </tr>
       `;
 
+
     $("reportAds")
       .textContent =
       "0";
+
 
     return;
 
@@ -3426,7 +4379,9 @@ async function loadAds(){
             colspan="6"
             class="empty"
           >
+
             No advertisements yet.
+
           </td>
 
         </tr>
@@ -3461,9 +4416,28 @@ async function loadAds(){
 
             <strong>
               ${escapeHtml(
-                ad.title
+                ad.title ||
+                "Advertisement"
               )}
             </strong>
+
+            <br>
+
+            ${
+              ad.image_url
+              ?
+              `
+                <span class="success small">
+                  ✓ Image
+                </span>
+              `
+              :
+              `
+                <span class="muted small">
+                  No image
+                </span>
+              `
+            }
 
             <br>
 
@@ -3537,7 +4511,7 @@ async function loadAds(){
 
               <button
                 onclick="editAd(
-                  '${ad.id}'
+                  '${escapeJs(ad.id)}'
                 )"
               >
                 Edit
@@ -3546,8 +4520,8 @@ async function loadAds(){
 
               <button
                 onclick="toggleAd(
-                  '${ad.id}',
-                  '${status}'
+                  '${escapeJs(ad.id)}',
+                  '${escapeJs(status)}'
                 )"
               >
                 ${actionText}
@@ -3557,7 +4531,7 @@ async function loadAds(){
               <button
                 class="danger"
                 onclick="deleteAd(
-                  '${ad.id}'
+                  '${escapeJs(ad.id)}'
                 )"
               >
                 Delete
@@ -3584,19 +4558,40 @@ function resetAdForm(){
 
   $("adForm").reset();
 
+
   $("adId").value =
     "";
 
+
   $("adStatus").value =
     "draft";
+
+
+  $("adImageUrl").value =
+    "";
+
+
+  $("adImageFile").value =
+    "";
+
 
   $("adSaveButton")
     .textContent =
     "Post Advertisement";
 
+
   $("adPreview")
     .classList
     .add("hidden");
+
+
+  $("adUploadStatus").textContent =
+    "Choose the original advertisement image from your device.";
+
+
+  $("adUploadStatus").className =
+    "muted small";
+
 
   hideMessage(
     "adMessage"
@@ -3630,12 +4625,14 @@ async function editAd(id){
   ){
 
     alert(
+
       "Could not load advertisement: " +
 
       (
         result.error?.message ||
         "Advertisement not found."
       )
+
     );
 
     return;
@@ -3681,32 +4678,82 @@ async function editAd(id){
     "draft";
 
 
+  $("adImageFile").value =
+    "";
+
+
+  if(ad.image_url){
+
+    $("adUploadStatus").textContent =
+      "Existing advertisement image is being used. Choose another file to replace it.";
+
+
+    $("adUploadStatus").className =
+      "muted small";
+
+  }
+
+
   if(ad.start_at){
 
-    $("adStartAt").value =
+    const startDate =
       new Date(
         ad.start_at
-      )
-      .toISOString()
-      .slice(
-        0,
-        16
       );
+
+
+    if(
+      !Number.isNaN(
+        startDate.getTime()
+      )
+    ){
+
+      $("adStartAt").value =
+        startDate
+          .toISOString()
+          .slice(
+            0,
+            16
+          );
+
+    }
+
+  }else{
+
+    $("adStartAt").value =
+      "";
 
   }
 
 
   if(ad.end_at){
 
-    $("adEndAt").value =
+    const endDate =
       new Date(
         ad.end_at
-      )
-      .toISOString()
-      .slice(
-        0,
-        16
       );
+
+
+    if(
+      !Number.isNaN(
+        endDate.getTime()
+      )
+    ){
+
+      $("adEndAt").value =
+        endDate
+          .toISOString()
+          .slice(
+            0,
+            16
+          );
+
+    }
+
+  }else{
+
+    $("adEndAt").value =
+      "";
 
   }
 
@@ -3720,8 +4767,11 @@ async function editAd(id){
 
 
   window.scrollTo({
+
     top:0,
+
     behavior:"smooth"
+
   });
 
 }
@@ -3766,8 +4816,11 @@ async function toggleAd(
   if(result.error){
 
     alert(
+
       "Advertisement update failed: " +
+
       result.error.message
+
     );
 
     return;
@@ -3812,8 +4865,11 @@ async function deleteAd(id){
   if(result.error){
 
     alert(
+
       "Advertisement deletion failed: " +
+
       result.error.message
+
     );
 
     return;
@@ -3865,6 +4921,118 @@ $("adForm")
         }
 
 
+        /*
+           If a file has been selected but
+           has not finished uploading, stop.
+        */
+
+        const selectedFile =
+          $("adImageFile")
+            .files?.[0];
+
+
+        if(
+          selectedFile &&
+          !$("adImageUrl").value.trim()
+        ){
+
+          throw new Error(
+
+            "Please wait for the advertisement image upload to finish."
+
+          );
+
+        }
+
+
+        const startValue =
+          $("adStartAt")
+            .value;
+
+
+        const endValue =
+          $("adEndAt")
+            .value;
+
+
+        let startAt =
+          null;
+
+
+        let endAt =
+          null;
+
+
+        if(startValue){
+
+          const date =
+            new Date(
+              startValue
+            );
+
+
+          if(
+            Number.isNaN(
+              date.getTime()
+            )
+          ){
+
+            throw new Error(
+              "Invalid advertisement start date."
+            );
+
+          }
+
+
+          startAt =
+            date.toISOString();
+
+        }
+
+
+        if(endValue){
+
+          const date =
+            new Date(
+              endValue
+            );
+
+
+          if(
+            Number.isNaN(
+              date.getTime()
+            )
+          ){
+
+            throw new Error(
+              "Invalid advertisement end date."
+            );
+
+          }
+
+
+          endAt =
+            date.toISOString();
+
+        }
+
+
+        if(
+          startAt &&
+          endAt &&
+          new Date(startAt) >=
+          new Date(endAt)
+        ){
+
+          throw new Error(
+
+            "Advertisement end time must be after the start time."
+
+          );
+
+        }
+
+
         const payload = {
 
           title:title,
@@ -3892,35 +5060,14 @@ $("adForm")
               .value,
 
           start_at:
-            $("adStartAt")
-              .value
-              ?
-              new Date(
-                $("adStartAt")
-                  .value
-              )
-              .toISOString()
-              :
-              null,
+            startAt,
 
           end_at:
-            $("adEndAt")
-              .value
-              ?
-              new Date(
-                $("adEndAt")
-                  .value
-              )
-              .toISOString()
-              :
-              null,
+            endAt,
 
           status:
             $("adStatus")
               .value,
-
-          created_by:
-            currentUser.id,
 
           updated_at:
             new Date()
@@ -3932,22 +5079,32 @@ $("adForm")
         let result;
 
 
-        if(
-          $("adId").value
-        ){
+        const existingId =
+          $("adId")
+            .value
+            .trim();
+
+
+        if(existingId){
 
           result =
             await supabaseClient
               .from(
                 "advertisements"
               )
-              .update(payload)
+              .update(
+                payload
+              )
               .eq(
                 "id",
-                $("adId").value
+                existingId
               );
 
         }else{
+
+          payload.created_by =
+            currentUser.id;
+
 
           result =
             await supabaseClient
@@ -3970,13 +5127,8 @@ $("adForm")
         }
 
 
-        showMessage(
-
-          "adMessage",
-
-          "success",
-
-          $("adId").value
+        const message =
+          existingId
 
           ?
 
@@ -3984,12 +5136,21 @@ $("adForm")
 
           :
 
-          "Advertisement posted successfully."
-
-        );
+          "Advertisement posted successfully.";
 
 
         resetAdForm();
+
+
+        showMessage(
+
+          "adMessage",
+
+          "success",
+
+          message
+
+        );
 
 
         await loadAds();
@@ -4036,15 +5197,9 @@ async function loadCovers(){
   $("coversBody").innerHTML =
     `
       <tr>
-
-        <td
-          colspan="5"
-          class="empty"
-        >
+        <td colspan="5" class="empty">
           Loading…
-
         </td>
-
       </tr>
     `;
 
@@ -4104,6 +5259,7 @@ async function loadCovers(){
             class="empty"
           >
             No cover requests.
+
           </td>
 
         </tr>
@@ -4188,90 +5344,76 @@ async function loadCovers(){
    LOAD EVERYTHING
 ============================================================ */
 
+async function safeLoad(
+  name,
+  functionToRun
+){
+
+  try{
+
+    await functionToRun();
+
+  }catch(error){
+
+    console.error(
+      name +
+      " loading error:",
+      error
+    );
+
+  }
+
+}
+
+
 async function loadAll(){
 
-  try{
-
-    await loadCounts();
-
-  }catch(error){
-
-    console.error(
-      "Counts error:",
-      error
-    );
-
-    showMessage(
-
-      "overviewMessage",
-
-      "error",
-
-      error.message
-
-    );
-
-  }
+  await safeLoad(
+    "Counts",
+    loadCounts
+  );
 
 
-  try{
-    await loadSongs();
-  }catch(error){
-    console.error(
-      "Songs loading error:",
-      error
-    );
-  }
+  await safeLoad(
+    "Songs",
+    loadSongs
+  );
 
 
-  try{
-    await loadBeats();
-  }catch(error){
-    console.error(
-      "Beats loading error:",
-      error
-    );
-  }
+  await safeLoad(
+    "Beats",
+    loadBeats
+  );
 
 
-  try{
-    await loadOrders();
-  }catch(error){
-    console.error(
-      "Orders loading error:",
-      error
-    );
-  }
+  await safeLoad(
+    "DJ mixes",
+    loadDjMixes
+  );
 
 
-  try{
-    await loadPayments();
-  }catch(error){
-    console.error(
-      "Payments loading error:",
-      error
-    );
-  }
+  await safeLoad(
+    "Orders",
+    loadOrders
+  );
 
 
-  try{
-    await loadAds();
-  }catch(error){
-    console.error(
-      "Ads loading error:",
-      error
-    );
-  }
+  await safeLoad(
+    "Payments",
+    loadPayments
+  );
 
 
-  try{
-    await loadCovers();
-  }catch(error){
-    console.error(
-      "Covers loading error:",
-      error
-    );
-  }
+  await safeLoad(
+    "Advertisements",
+    loadAds
+  );
+
+
+  await safeLoad(
+    "Covers",
+    loadCovers
+  );
 
 }
 
@@ -4292,7 +5434,7 @@ document
 
         document
           .querySelectorAll(
-            ".sidebar button"
+            ".sidebar button[data-section]"
           )
           .forEach(
             item=>
