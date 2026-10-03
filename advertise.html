@@ -1,2020 +1,335 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Advertise With PASONG</title>
-
-<link rel="stylesheet" href="assets/style.css">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG — Advertise</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:#080810;
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-header{
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:rgba(8,8,16,.96);
-  border-bottom:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(14px);
-}
-
-.header-inner{
-  max-width:1200px;
-  margin:auto;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:18px;
-}
-
-.logo{
-  font-size:23px;
-  font-weight:900;
-  background:linear-gradient(90deg,#b86cff,#ff4fa3);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  white-space:nowrap;
-}
-
-nav{
-  display:flex;
-  gap:5px;
-  overflow-x:auto;
-}
-
-nav a{
-  color:#aaaabc;
-  text-decoration:none;
-  padding:9px 11px;
-  border-radius:10px;
-  font-size:14px;
-  white-space:nowrap;
-}
-
-nav a:hover,
-nav a.active{
-  background:rgba(181,87,255,.14);
-  color:#fff;
-}
-
-main{
-  width:min(1180px,calc(100% - 24px));
-  margin:auto;
-  padding:28px 0 60px;
-}
-
-.hero{
-  padding:30px 24px;
-  border-radius:24px;
-  background:
-    radial-gradient(circle at 10% 20%,rgba(181,91,255,.22),transparent 35%),
-    radial-gradient(circle at 90% 10%,rgba(255,70,160,.18),transparent 35%),
-    linear-gradient(135deg,#11111d,#0c0c15);
-  border:1px solid rgba(255,255,255,.08);
-  margin-bottom:20px;
-}
-
-.hero h1{
-  margin:0 0 10px;
-  font-size:clamp(30px,6vw,50px);
-}
-
-.hero p{
-  margin:0;
-  max-width:760px;
-  color:#aaaabd;
-  line-height:1.7;
-}
-
-.badge{
-  display:inline-block;
-  margin-bottom:14px;
-  padding:7px 12px;
-  border-radius:999px;
-  background:rgba(184,100,255,.12);
-  border:1px solid rgba(184,100,255,.22);
-  color:#d7adff;
-  font-size:13px;
-  font-weight:800;
-}
-
-.pricing{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-  margin-bottom:20px;
-}
-
-.price-card{
-  position:relative;
-  padding:23px;
-  border-radius:20px;
-  background:linear-gradient(145deg,#11111c,#0c0c14);
-  border:1px solid rgba(255,255,255,.08);
-}
-
-.price-card.featured{
-  border-color:rgba(197,105,255,.4);
-  box-shadow:0 15px 45px rgba(151,65,255,.12);
-}
-
-.price-card h2{
-  margin:0 0 8px;
-}
-
-.price{
-  font-size:30px;
-  font-weight:900;
-  color:#d49aff;
-}
-
-.price small{
-  font-size:13px;
-  color:#88889b;
-  font-weight:normal;
-}
-
-.price-card p{
-  color:#9999ab;
-  margin-bottom:0;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:20px;
-}
-
-.card{
-  background:linear-gradient(145deg,#11111c,#0c0c14);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:20px;
-  padding:21px;
-  margin-bottom:20px;
-}
-
-.card h2{
-  margin:0 0 8px;
-}
-
-.subtitle{
-  color:#9696aa;
-  font-size:14px;
-  line-height:1.6;
-  margin:0 0 18px;
-}
-
-.field{
-  margin-bottom:15px;
-}
-
-label{
-  display:block;
-  margin-bottom:7px;
-  color:#b5b5c5;
-  font-size:13px;
-  font-weight:700;
-}
-
-input,
-textarea,
-select{
-  width:100%;
-  padding:13px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.1);
-  background:#080810;
-  color:#fff;
-  outline:none;
-  font-size:14px;
-}
-
-textarea{
-  min-height:105px;
-  resize:vertical;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
-  border-color:#b45cff;
-  box-shadow:0 0 0 3px rgba(180,92,255,.1);
-}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.file-box{
-  padding:17px;
-  border:1px dashed rgba(190,105,255,.3);
-  border-radius:15px;
-  background:rgba(180,90,255,.04);
-}
-
-.file-note{
-  color:#858598;
-  font-size:12px;
-  line-height:1.5;
-  margin-top:8px;
-}
-
-.checkbox{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-  margin:14px 0;
-  color:#a4a4b4;
-  font-size:13px;
-  line-height:1.5;
-}
-
-.checkbox input{
-  width:auto;
-  margin-top:3px;
-}
-
-.btn{
-  border:0;
-  cursor:pointer;
-  border-radius:12px;
-  padding:13px 18px;
-  font-weight:800;
-  color:#fff;
-  background:linear-gradient(135deg,#9b55ff,#ff4d9d);
-  box-shadow:0 9px 25px rgba(170,70,255,.2);
-}
-
-.btn:hover{
-  filter:brightness(1.08);
-  transform:translateY(-1px);
-}
-
-.btn.secondary{
-  background:#171722;
-  border:1px solid rgba(255,255,255,.1);
-  box-shadow:none;
-}
-
-.full{
-  width:100%;
-}
-
-.status{
-  padding:15px;
-  border-radius:14px;
-  background:rgba(255,255,255,.035);
-  border:1px solid rgba(255,255,255,.07);
-  color:#aaaabc;
-  line-height:1.6;
-  font-size:13px;
-  margin-top:14px;
-}
-
-.status strong{
-  color:#fff;
-}
-
-.preview{
-  min-height:330px;
-  border-radius:18px;
-  overflow:hidden;
-  background:#090911;
-  border:1px solid rgba(255,255,255,.08);
-}
-
-.preview-media{
-  height:190px;
-  background:
-    radial-gradient(circle at 30% 30%,rgba(184,91,255,.35),transparent 35%),
-    radial-gradient(circle at 80% 30%,rgba(255,70,160,.25),transparent 35%),
-    #10101b;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-.preview-media img,
-.preview-media video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.preview-placeholder{
-  text-align:center;
-  color:#77778a;
-  padding:20px;
-}
-
-.preview-body{
-  padding:17px;
-}
-
-.preview-title{
-  font-size:20px;
-  font-weight:900;
-  margin-bottom:6px;
-}
-
-.preview-business{
-  color:#b5b5c6;
-  font-size:13px;
-  margin-bottom:10px;
-}
-
-.preview-description{
-  color:#9191a4;
-  font-size:13px;
-  line-height:1.5;
-}
-
-.preview-buttons{
-  display:flex;
-  gap:8px;
-  margin-top:15px;
-}
-
-.preview-buttons span{
-  flex:1;
-  text-align:center;
-  padding:10px;
-  border-radius:10px;
-  background:#191923;
-  color:#bbb;
-  font-size:12px;
-}
-
-.status-flow{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
-  margin-top:15px;
-}
-
-.flow{
-  text-align:center;
-  padding:12px 7px;
-  border-radius:12px;
-  background:#10101a;
-  border:1px solid rgba(255,255,255,.06);
-  color:#777789;
-  font-size:11px;
-}
-
-.flow.active{
-  color:#d3a0ff;
-  border-color:rgba(189,100,255,.35);
-  background:rgba(180,90,255,.08);
-}
-
-.analytics{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-
-.metric{
-  padding:15px;
-  border-radius:14px;
-  background:#10101a;
-  border:1px solid rgba(255,255,255,.06);
-}
-
-.metric-label{
-  color:#888899;
-  font-size:12px;
-}
-
-.metric-value{
-  margin-top:7px;
-  font-size:23px;
-  font-weight:900;
-}
-
-.history{
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:650px;
-}
-
-th,
-td{
-  text-align:left;
-  padding:12px 9px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  font-size:13px;
-}
-
-th{
-  color:#8d8d9e;
-}
-
-td{
-  color:#d3d3df;
-}
-
-.pill{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:800;
-}
-
-.pending{
-  background:rgba(255,255,255,.07);
-  color:#bbb;
-}
-
-.paid{
-  background:rgba(110,230,170,.1);
-  color:#7de0a9;
-}
-
-.live{
-  background:rgba(115,200,255,.1);
-  color:#83cfff;
-}
-
-.expired{
-  background:rgba(255,255,255,.06);
-  color:#888899;
-}
-
-.empty{
-  text-align:center;
-  padding:25px;
-  color:#777789;
-}
-
-.info{
-  padding:14px;
-  border-radius:14px;
-  background:rgba(180,90,255,.06);
-  border:1px solid rgba(180,90,255,.12);
-  color:#9999aa;
-  line-height:1.6;
-  font-size:13px;
-}
-
-.info strong{
-  color:#fff;
-}
-
-.hidden{
-  display:none!important;
-}
-
-footer{
-  border-top:1px solid rgba(255,255,255,.07);
-  padding:25px;
-  text-align:center;
-  color:#777789;
-  font-size:13px;
-}
-
-@media(max-width:850px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .pricing{
-    grid-template-columns:1fr 1fr;
-  }
-}
-
-@media(max-width:600px){
-  .header-inner{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  nav{
-    width:100%;
-  }
-
-  main{
-    width:calc(100% - 16px);
-    padding-top:15px;
-  }
-
-  .pricing{
-    grid-template-columns:1fr;
-  }
-
-  .row{
-    grid-template-columns:1fr;
-  }
-
-  .analytics{
-    grid-template-columns:1fr 1fr 1fr;
-  }
-
-  .status-flow{
-    grid-template-columns:1fr;
-  }
-
-  .flow{
-    text-align:left;
-  }
-}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:#09090f;color:#fff;min-height:100vh}
+a{color:inherit;text-decoration:none}
+header{height:64px;border-bottom:1px solid #20202c;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0d0d14;position:sticky;top:0;z-index:20}
+.logo{font-size:20px;font-weight:900;color:#fff}.logo span{color:#8b5cf6}
+.nav{display:flex;gap:16px;align-items:center;font-size:13px;color:#aaa}.nav a:hover{color:#fff}
+.container{max-width:1000px;margin:auto;padding:28px 16px 60px}
+.hero{background:linear-gradient(135deg,#171226,#101018);border:1px solid #2a2140;border-radius:22px;padding:30px;margin-bottom:20px}
+.hero h1{font-size:32px}.hero p{color:#aaa;margin-top:10px;line-height:1.6;max-width:720px}
+.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}
+.card{background:#101017;border:1px solid #242432;border-radius:18px;padding:20px}
+.card h2{font-size:18px;margin-bottom:15px}
+.field{margin-bottom:14px}.field label{display:block;font-size:12px;color:#aaa;margin-bottom:7px;font-weight:700}
+input,textarea,select{width:100%;background:#0a0a10;color:#fff;border:1px solid #2b2b3a;border-radius:11px;padding:12px;font:inherit;outline:none}
+input:focus,textarea:focus,select:focus{border-color:#8b5cf6}
+textarea{min-height:95px;resize:vertical}
+.packages{display:grid;grid-template-columns:1fr;gap:10px}
+.package{border:1px solid #2b2b3a;border-radius:14px;padding:14px;cursor:pointer;background:#0c0c13}
+.package:hover,.package.selected{border-color:#8b5cf6;background:#13101d}
+.package strong{display:block;font-size:15px}.package small{display:block;color:#999;line-height:1.5;margin-top:5px}
+.package .price{margin-top:9px;color:#c4a7ff;font-weight:900}
+.upload{border:1px dashed #3b3b4c;border-radius:14px;padding:16px}
+.preview{margin-top:12px;display:none}.preview img,.preview video{width:100%;max-height:260px;object-fit:cover;border-radius:12px;background:#000}
+button{border:0;border-radius:12px;padding:13px 16px;font-weight:900;cursor:pointer}
+.primary{width:100%;background:#8b5cf6;color:#fff}.primary:hover{filter:brightness(1.08)}
+.secondary{background:#20202b;color:#fff}
+.notice{font-size:12px;color:#999;line-height:1.6;background:#0b0b11;border:1px solid #242432;border-radius:12px;padding:12px;margin-top:12px}
+.status{display:none;margin-top:12px;border-radius:12px;padding:12px;font-size:13px;line-height:1.5}
+.success{display:block;background:#0d2117;border:1px solid #1d5d39;color:#a9efc8}
+.error{display:block;background:#281114;border:1px solid #71303a;color:#ffb7bd}
+.info{display:block;background:#171426;border:1px solid #3b2e59;color:#d7c7ff}
+.summary-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #20202c;font-size:13px}.summary-row:last-child{border-bottom:0}
+.muted{color:#999}
+.hidden{display:none!important}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.hero h1{font-size:26px}.nav a{display:none}}
 </style>
 </head>
-
 <body>
-
 <header>
-  <div class="header-inner">
-
-    <a class="logo" href="index.html">◈ PASONG</a>
-
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="store.html">Music Store</a>
-      <a href="charts.html">Charts</a>
-      <a href="artists.html">Artists</a>
-      <a href="playlists.html">Playlists</a>
-      <a class="active" href="promotion.html">Promotion</a>
-      <a href="points.html">Points</a>
-      <a href="account.html">Account</a>
-    </nav>
-
-  </div>
+  <a class="logo" href="index.html">◈ <span>PASONG</span></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="promotion.html">Promote</a>
+    <a href="account.html">Account</a>
+  </nav>
 </header>
 
-
-<main>
-
-  <!-- HERO -->
-
-  <section class="hero">
-
-    <div class="badge">📢 PASONG ADVERTISING</div>
-
-    <h1>Advertise With PASONG</h1>
-
-    <p>
-      Put your business, brand, event, product or service in front
-      of PASONG users. Submit your campaign, complete payment,
-      and your advertisement will go through verification before
-      it becomes live.
-    </p>
-
-  </section>
-
-
-  <!-- PRICING -->
-
-  <section class="pricing">
-
-    <div class="price-card">
-
-      <h2>Weekly</h2>
-
-      <div class="price">
-        UGX 10,000
-      </div>
-
-      <p>
-        7 days of advertising on PASONG.
-      </p>
-
-      <button
-        class="btn full"
-        onclick="selectPackage('weekly')"
-        style="margin-top:15px"
-      >
-        Choose Weekly
-      </button>
-
-    </div>
-
-
-    <div class="price-card featured">
-
-      <h2>Monthly</h2>
-
-      <div class="price">
-        UGX 50,000
-      </div>
-
-      <p>
-        30 days of advertising on PASONG.
-      </p>
-
-      <button
-        class="btn full"
-        onclick="selectPackage('monthly')"
-        style="margin-top:15px"
-      >
-        Choose Monthly
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <div class="grid">
-
-    <!-- LEFT -->
-
-    <div>
-
-      <section class="card">
-
-        <h2>📢 Create Your Campaign</h2>
-
-        <p class="subtitle">
-          Enter your advertisement information below.
-        </p>
-
-
-        <div class="row">
-
-          <div class="field">
-
-            <label>Advertiser Name *</label>
-
-            <input
-              id="advertiserName"
-              type="text"
-              placeholder="Your name"
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label>Business / Company Name *</label>
-
-            <input
-              id="businessName"
-              type="text"
-              placeholder="Business or company"
-            >
-
-          </div>
-
-        </div>
-
-
-        <div class="row">
-
-          <div class="field">
-
-            <label>Email *</label>
-
-            <input
-              id="advertiserEmail"
-              type="email"
-              placeholder="you@example.com"
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label>Phone / WhatsApp *</label>
-
-            <input
-              id="advertiserPhone"
-              type="tel"
-              placeholder="07XXXXXXXX"
-            >
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Campaign Name *</label>
-
-          <input
-            id="campaignName"
-            type="text"
-            placeholder="Example: September Business Promotion"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Ad Title *</label>
-
-          <input
-            id="adTitle"
-            type="text"
-            placeholder="Your advertisement headline"
-            maxlength="100"
-          >
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Ad Description *</label>
-
-          <textarea
-            id="adDescription"
-            placeholder="Tell PASONG users about your product, service, event or offer..."
-          ></textarea>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Website / Landing Page</label>
-
-          <input
-            id="websiteUrl"
-            type="url"
-            placeholder="https://example.com"
-          >
-
-        </div>
-
-
-        <div class="row">
-
-          <div class="field">
-
-            <label>Ad Placement *</label>
-
-            <select id="placement">
-
-              <option value="">Choose placement</option>
-
-              <option value="home">
-                Home Page
-              </option>
-
-              <option value="store">
-                Music Store
-              </option>
-
-              <option value="search">
-                Search
-              </option>
-
-              <option value="charts">
-                Charts
-              </option>
-
-              <option value="artists">
-                Artist Pages
-              </option>
-
-              <option value="songs">
-                Song Pages
-              </option>
-
-              <option value="all">
-                PASONG Network
-              </option>
-
-            </select>
-
-          </div>
-
-
-          <div class="field">
-
-            <label>Target Country</label>
-
-            <select id="targetCountry">
-
-              <option value="Uganda">
-                Uganda
-              </option>
-
-              <option value="Kenya">
-                Kenya
-              </option>
-
-              <option value="Tanzania">
-                Tanzania
-              </option>
-
-              <option value="Nigeria">
-                Nigeria
-              </option>
-
-              <option value="Other">
-                Other
-              </option>
-
-              <option value="All">
-                All Available Markets
-              </option>
-
-            </select>
-
-          </div>
-
-        </div>
-
-
-        <div class="row">
-
-          <div class="field">
-
-            <label>Start Date *</label>
-
-            <input
-              id="startDate"
-              type="date"
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label>End Date</label>
-
-            <input
-              id="endDate"
-              type="date"
-              readonly
-            >
-
-          </div>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Choose Package *</label>
-
-          <select
-            id="package"
-            onchange="updatePackage()"
-          >
-
-            <option value="weekly">
-              UGX 10,000 — Weekly / 7 Days
-            </option>
-
-            <option value="monthly">
-              UGX 50,000 — Monthly / 30 Days
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div class="field">
-
-          <label>Advertisement Image / Video *</label>
-
-          <div class="file-box">
-
-            <input
-              id="adFile"
-              type="file"
-              accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
-              onchange="previewAdFile(event)"
-            >
-
-            <div class="file-note">
-              Recommended: clear promotional artwork.
-              Supported: JPG, PNG, WEBP, MP4 and WEBM.
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="checkbox">
-
-          <input
-            id="rightsCheck"
-            type="checkbox"
-          >
-
-          <span>
-            I confirm that I have permission to use the submitted
-            advertisement, images, video, logos and other materials.
-          </span>
-
-        </div>
-
-
-        <div class="checkbox">
-
-          <input
-            id="termsCheck"
-            type="checkbox"
-          >
-
-          <span>
-            I agree that my advertisement will only become live
-            after payment verification and PASONG approval.
-          </span>
-
-        </div>
-
-
-        <button
-          class="btn full"
-          onclick="submitCampaign()"
-          id="submitButton"
-        >
-          Continue to Payment
-        </button>
-
-
-        <div
-          id="adStatus"
-          class="status"
-        >
-          Campaign status will appear here.
-        </div>
-
-      </section>
-
-
-      <!-- PAYMENT -->
-
-      <section class="card">
-
-        <h2>💳 Payment</h2>
-
-        <p class="subtitle">
-          Your selected package is shown below. Payment integration
-          can be connected to PASONG's live payment providers.
-        </p>
-
-
-        <div class="analytics">
-
-          <div class="metric">
-
-            <div class="metric-label">
-              Package
-            </div>
-
-            <div
-              class="metric-value"
-              id="paymentPackage"
-            >
-              Weekly
-            </div>
-
-          </div>
-
-
-          <div class="metric">
-
-            <div class="metric-label">
-              Price
-            </div>
-
-            <div
-              class="metric-value"
-              id="paymentAmount"
-            >
-              UGX 10,000
-            </div>
-
-          </div>
-
-
-          <div class="metric">
-
-            <div class="metric-label">
-              Duration
-            </div>
-
-            <div
-              class="metric-value"
-              id="paymentDuration"
-            >
-              7 days
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="status"
-          style="margin-top:15px"
-        >
-
-          <strong>Payment methods ready for connection:</strong><br><br>
-
-          🟡 MTN Mobile Money<br>
-          🔴 Airtel Money<br>
-          💳 Card / online payment
-
-          <br><br>
-
-          The campaign remains
-          <strong>Pending Payment</strong>
-          until PASONG receives and verifies the payment.
-
-        </div>
-
-      </section>
-
-    </div>
-
-
-    <!-- RIGHT -->
-
-    <div>
-
-      <!-- PREVIEW -->
-
-      <section class="card">
-
-        <h2>👁️ Ad Preview</h2>
-
-        <p class="subtitle">
-          This is approximately how your advertisement can appear.
-        </p>
-
-
-        <div class="preview">
-
-          <div
-            class="preview-media"
-            id="previewMedia"
-          >
-
-            <div class="preview-placeholder">
-              🖼️<br><br>
-              Your advertisement preview
-            </div>
-
-          </div>
-
-
-          <div class="preview-body">
-
-            <div
-              class="preview-title"
-              id="previewTitle"
-            >
-              Your Ad Title
-            </div>
-
-            <div
-              class="preview-business"
-              id="previewBusiness"
-            >
-              Your Business
-            </div>
-
-            <div
-              class="preview-description"
-              id="previewDescription"
-            >
-              Your advertisement description will appear here.
-            </div>
-
-
-            <div class="preview-buttons">
-
-              <span>
-                📱 WhatsApp
-              </span>
-
-              <span>
-                🔗 Visit
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- WORKFLOW -->
-
-      <section class="card">
-
-        <h2>🔄 Campaign Workflow</h2>
-
-        <div class="status-flow">
-
-          <div class="flow active">
-            1<br>
-            Submitted
-          </div>
-
-          <div class="flow">
-            2<br>
-            Payment
-          </div>
-
-          <div class="flow">
-            3<br>
-            Verified
-          </div>
-
-          <div class="flow">
-            4<br>
-            Admin Approval
-          </div>
-
-          <div class="flow">
-            5<br>
-            Live
-          </div>
-
-        </div>
-
-        <div class="info" style="margin-top:15px">
-
-          Your advertisement does <strong>not</strong> automatically
-          become live after submitting the form.
-
-          <br><br>
-
-          PASONG verifies the payment and reviews the advertisement
-          before activation.
-
-        </div>
-
-      </section>
-
-
-      <!-- ANALYTICS -->
-
-      <section class="card">
-
-        <h2>📊 Campaign Analytics</h2>
-
-        <p class="subtitle">
-          Once your advertisement is live, these statistics can
-          display its performance.
-        </p>
-
-        <div class="analytics">
-
-          <div class="metric">
-            <div class="metric-label">
-              Impressions
-            </div>
-            <div class="metric-value">
-              0
-            </div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-label">
-              Clicks
-            </div>
-            <div class="metric-value">
-              0
-            </div>
-          </div>
-
-          <div class="metric">
-            <div class="metric-label">
-              CTR
-            </div>
-            <div class="metric-value">
-              0%
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-    </div>
-
+<main class="container">
+<section class="hero">
+  <h1>Advertise on PASONG</h1>
+  <p>Put your brand, event, product or service in front of PASONG listeners. Submit your campaign, upload your advert, choose where it should appear and complete payment securely. Your campaign remains pending until PASONG approves it.</p>
+</section>
+
+<div class="grid">
+<section class="card">
+  <h2>1. Campaign details</h2>
+
+  <div class="field">
+    <label>Advertiser / Brand name</label>
+    <input id="brand" placeholder="e.g. My Brand">
   </div>
 
+  <div class="field">
+    <label>Contact email</label>
+    <input id="email" type="email" placeholder="you@example.com">
+  </div>
 
-  <!-- CAMPAIGN HISTORY -->
+  <div class="field">
+    <label>Contact phone</label>
+    <input id="phone" placeholder="+256...">
+  </div>
 
-  <section class="card">
+  <div class="field">
+    <label>Advert title</label>
+    <input id="title" maxlength="120" placeholder="Your advert headline">
+  </div>
 
-    <h2>📋 My Campaigns</h2>
+  <div class="field">
+    <label>Description</label>
+    <textarea id="description" maxlength="500" placeholder="Short description shown with the advert"></textarea>
+  </div>
 
-    <p class="subtitle">
-      Your submitted campaigns will appear here after the
-      advertiser database is connected.
-    </p>
+  <div class="field">
+    <label>Destination URL</label>
+    <input id="targetUrl" type="url" placeholder="https://example.com">
+  </div>
 
-    <div class="history">
+  <div class="field">
+    <label>Placement</label>
+    <select id="placement">
+      <option value="home">PASONG Home — Sponsored</option>
+      <option value="all">All PASONG</option>
+      <option value="music">Music</option>
+      <option value="beats">Beats</option>
+      <option value="dj">DJ</option>
+    </select>
+  </div>
 
-      <table>
+  <h2 style="margin-top:20px">2. Choose a campaign package</h2>
+  <div class="packages" id="packages"></div>
 
-        <thead>
-
-          <tr>
-            <th>Campaign</th>
-            <th>Package</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Duration</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="campaignHistory">
-
-          <tr>
-
-            <td colspan="5">
-
-              <div class="empty">
-                No campaigns submitted yet.
-              </div>
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
+  <h2 style="margin-top:20px">3. Upload advert</h2>
+  <div class="upload">
+    <div class="field" style="margin-bottom:0">
+      <label>Image or video</label>
+      <input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/ogg">
     </div>
+    <div class="notice">Images and short videos are supported. The file is uploaded to Cloudinary after you start checkout. Keep videos reasonably small for fast loading.</div>
+    <div class="preview" id="preview"></div>
+  </div>
 
-  </section>
+  <button class="primary" id="payButton" style="margin-top:16px">Continue to secure payment</button>
+  <div id="status" class="status"></div>
+</section>
 
-
-  <!-- RULES -->
-
-  <section class="card">
-
-    <h2>📌 Advertising Information</h2>
-
-    <div class="info">
-
-      <strong>Weekly:</strong> UGX 10,000 for 7 days.<br>
-
-      <strong>Monthly:</strong> UGX 50,000 for 30 days.<br><br>
-
-      Advertisements are subject to payment verification and
-      PASONG approval.
-
-      <br><br>
-
-      PASONG may reject advertisements that contain misleading,
-      unlawful, fraudulent, copyrighted or otherwise prohibited
-      material.
-
-      <br><br>
-
-      Approved campaigns automatically expire when their paid
-      advertising period ends.
-
-    </div>
-
-  </section>
-
+<aside class="card">
+  <h2>Campaign summary</h2>
+  <div class="summary-row"><span class="muted">Package</span><strong id="sumPackage">Choose a package</strong></div>
+  <div class="summary-row"><span class="muted">Price</span><strong id="sumPrice">—</strong></div>
+  <div class="summary-row"><span class="muted">Placement</span><strong id="sumPlacement">Home</strong></div>
+  <div class="summary-row"><span class="muted">Media</span><strong id="sumMedia">Not selected</strong></div>
+  <div class="notice">
+    <strong>How it works</strong><br><br>
+    1. Submit campaign details.<br>
+    2. Pay through PASONG's secure checkout.<br>
+    3. Payment is verified server-side.<br>
+    4. Your campaign becomes <b>Pending approval</b>.<br>
+    5. PASONG admin approves and schedules it.<br>
+    6. Approved campaigns appear in the selected placement.
+  </div>
+</aside>
+</div>
 </main>
 
-
-<footer>
-  PASONG © 2026 • Music • Artists • Opportunity • Advertising
-</footer>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="assets/app.js"></script>
-
 <script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const API_BASE="https://pasong-api.onrender.com";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* =========================================
-   PASONG ADVERTISING
-========================================= */
+/*
+  PACKAGE PRICES:
+  Set these to the prices PASONG wants to charge.
+  They are intentionally easy to edit until PASONG's final advertising
+  price list is decided.
+*/
+const PACKAGES=[
+  {key:"home_image",name:"Homepage Image",description:"Sponsored image placement on the PASONG Home page.",days:7,amount:0,currency:"UGX"},
+  {key:"home_video",name:"Homepage Video",description:"Sponsored video placement on the PASONG Home page.",days:7,amount:0,currency:"UGX"},
+  {key:"sitewide",name:"PASONG Sitewide",description:"Sponsored placement across PASONG placements.",days:7,amount:0,currency:"UGX"}
+];
 
-const SUPABASE_URL =
-  "https://mtufczmjlkvycarxylgh.supabase.co";
+let selectedPackage=null;
 
-const SUPABASE_ANON_KEY =
-  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-let currentUser = null;
-let selectedPackage = "weekly";
-
-
-/* =========================================
-   PACKAGE
-========================================= */
-
-function selectPackage(type){
-
-  selectedPackage =
-    type === "monthly"
-      ? "monthly"
-      : "weekly";
-
-  document.getElementById("package").value =
-    selectedPackage;
-
-  updatePackage();
-
-  document
-    .getElementById("campaignName")
-    .scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
-
+function money(p){
+  if(!p) return "—";
+  return new Intl.NumberFormat("en-US",{style:"currency",currency:p.currency,maximumFractionDigits:2}).format(p.amount);
 }
-
-
-function updatePackage(){
-
-  selectedPackage =
-    document.getElementById("package").value;
-
-  const monthly =
-    selectedPackage === "monthly";
-
-  document.getElementById(
-    "paymentPackage"
-  ).textContent =
-    monthly
-      ? "Monthly"
-      : "Weekly";
-
-  document.getElementById(
-    "paymentAmount"
-  ).textContent =
-    monthly
-      ? "UGX 50,000"
-      : "UGX 10,000";
-
-  document.getElementById(
-    "paymentDuration"
-  ).textContent =
-    monthly
-      ? "30 days"
-      : "7 days";
-
-  updateEndDate();
-
+function setStatus(message,type="info"){
+  const el=document.getElementById("status");
+  el.textContent=message;
+  el.className="status "+type;
 }
-
-
-/* =========================================
-   DATE
-========================================= */
-
-function updateEndDate(){
-
-  const start =
-    document.getElementById(
-      "startDate"
-    ).value;
-
-  if(!start){
-    document.getElementById(
-      "endDate"
-    ).value = "";
-    return;
-  }
-
-  const date =
-    new Date(start + "T00:00:00");
-
-  const days =
-    selectedPackage === "monthly"
-      ? 30
-      : 7;
-
-  date.setDate(
-    date.getDate() + days
-  );
-
-  document.getElementById(
-    "endDate"
-  ).value =
-    date.toISOString()
-      .split("T")[0];
-
+function renderPackages(){
+  const box=document.getElementById("packages");
+  box.innerHTML="";
+  PACKAGES.forEach(p=>{
+    const el=document.createElement("div");
+    el.className="package";
+    el.innerHTML=`<strong>${p.name}</strong><small>${p.description}<br>Duration: ${p.days} days</small><div class="price">${money(p)}</div>`;
+    el.onclick=()=>{
+      selectedPackage=p;
+      document.querySelectorAll(".package").forEach(x=>x.classList.remove("selected"));
+      el.classList.add("selected");
+      document.getElementById("sumPackage").textContent=p.name;
+      document.getElementById("sumPrice").textContent=money(p);
+    };
+    box.appendChild(el);
+  });
 }
-
-
-document
-  .getElementById("startDate")
-  .addEventListener(
-    "change",
-    updateEndDate
-  );
-
-
-/* =========================================
-   LIVE PREVIEW
-========================================= */
-
-document
-  .getElementById("adTitle")
-  .addEventListener(
-    "input",
-    function(){
-
-      document.getElementById(
-        "previewTitle"
-      ).textContent =
-        this.value ||
-        "Your Ad Title";
-
-    }
-  );
-
-
-document
-  .getElementById("businessName")
-  .addEventListener(
-    "input",
-    function(){
-
-      document.getElementById(
-        "previewBusiness"
-      ).textContent =
-        this.value ||
-        "Your Business";
-
-    }
-  );
-
-
-document
-  .getElementById("adDescription")
-  .addEventListener(
-    "input",
-    function(){
-
-      document.getElementById(
-        "previewDescription"
-      ).textContent =
-        this.value ||
-        "Your advertisement description will appear here.";
-
-    }
-  );
-
-
-/* =========================================
-   FILE PREVIEW
-========================================= */
-
-function previewAdFile(event){
-
-  const file =
-    event.target.files[0];
-
-  if(!file){
-    return;
-  }
-
-  const container =
-    document.getElementById(
-      "previewMedia"
-    );
-
-  const url =
-    URL.createObjectURL(file);
-
-  if(file.type.startsWith("video/")){
-
-    container.innerHTML = `
-      <video
-        src="${url}"
-        controls
-        muted
-        playsinline
-      ></video>
-    `;
-
+function updateMediaSummary(){
+  const f=document.getElementById("media").files[0];
+  document.getElementById("sumMedia").textContent=f?f.name:"Not selected";
+  const preview=document.getElementById("preview");
+  preview.innerHTML="";
+  preview.style.display="none";
+  if(!f)return;
+  const url=URL.createObjectURL(f);
+  if(f.type.startsWith("video/")){
+    const v=document.createElement("video");
+    v.src=url;v.controls=true;v.muted=true;v.playsInline=true;
+    preview.appendChild(v);
   }else{
-
-    container.innerHTML = `
-      <img
-        src="${url}"
-        alt="Advertisement preview"
-      >
-    `;
-
+    const img=document.createElement("img");
+    img.src=url;preview.appendChild(img);
   }
+  preview.style.display="block";
+}
+document.getElementById("media").addEventListener("change",updateMediaSummary);
+document.getElementById("placement").addEventListener("change",e=>document.getElementById("sumPlacement").textContent=e.target.options[e.target.selectedIndex].text);
 
+async function getSession(){
+  const {data}=await supabaseClient.auth.getSession();
+  return data.session;
 }
 
+async function uploadMedia(file,session){
+  const signatureResponse=await fetch(API_BASE+"/api/cloudinary/signature",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer "+session.access_token
+    },
+    body:JSON.stringify({folder:"pasong/ads"})
+  });
+  const signatureText=await signatureResponse.text();
+  let signatureData={};
+  try{signatureData=signatureText?JSON.parse(signatureText):{}}catch{}
+  if(!signatureResponse.ok||!signatureData.signature){
+    throw new Error(signatureData.error||"Could not prepare media upload.");
+  }
 
-/* =========================================
-   ACCOUNT
-========================================= */
+  const fd=new FormData();
+  fd.append("file",file);
+  fd.append("api_key",signatureData.api_key);
+  fd.append("timestamp",signatureData.timestamp);
+  fd.append("signature",signatureData.signature);
+  fd.append("folder",signatureData.folder||"pasong/ads");
 
-async function loadUser(){
+  const upload=await fetch("https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload",{method:"POST",body:fd});
+  const data=await upload.json();
+  if(!upload.ok||!data.secure_url)throw new Error(data.error?.message||"Media upload failed.");
+  return data.secure_url;
+}
 
+async function startCheckout(){
   try{
-
-    const {
-      data:{
-        session
-      }
-    } =
-      await supabaseClient.auth.getSession();
-
-    if(session){
-
-      currentUser =
-        session.user;
-
-      const email =
-        document.getElementById(
-          "advertiserEmail"
-        );
-
-      if(
-        email &&
-        !email.value
-      ){
-
-        email.value =
-          currentUser.email || "";
-
-      }
-
+    setStatus("Checking your PASONG account…","info");
+    const session=await getSession();
+    if(!session){
+      setStatus("Please log in to PASONG before advertising.","error");
+      return;
+    }
+    if(!selectedPackage){
+      setStatus("Choose an advertising package first.","error");
+      return;
+    }
+    if(!selectedPackage.amount||selectedPackage.amount<=0){
+      setStatus("Advertising package prices have not been configured yet. Set the package amounts in advertise.html before enabling checkout.","error");
+      return;
     }
 
-  }catch(error){
+    const file=document.getElementById("media").files[0];
+    if(!file){setStatus("Please upload your advert image or video.","error");return;}
 
-    console.log(
-      "User session not available."
-    );
+    const brand=document.getElementById("brand").value.trim();
+    const email=document.getElementById("email").value.trim();
+    const phone=document.getElementById("phone").value.trim();
+    const title=document.getElementById("title").value.trim();
+    const description=document.getElementById("description").value.trim();
+    const targetUrl=document.getElementById("targetUrl").value.trim();
+    const placement=document.getElementById("placement").value;
 
-  }
-
-}
-
-
-/* =========================================
-   VALIDATION
-========================================= */
-
-function validateCampaign(){
-
-  const required = [
-
-    ["advertiserName","Advertiser name"],
-
-    ["businessName","Business/company name"],
-
-    ["advertiserEmail","Email"],
-
-    ["advertiserPhone","Phone/WhatsApp"],
-
-    ["campaignName","Campaign name"],
-
-    ["adTitle","Ad title"],
-
-    ["adDescription","Ad description"],
-
-    ["placement","Ad placement"],
-
-    ["startDate","Start date"]
-
-  ];
-
-
-  for(
-    const [id,label]
-    of required
-  ){
-
-    const element =
-      document.getElementById(id);
-
-    if(!element.value.trim()){
-
-      alert(
-        "Please enter " +
-        label + "."
-      );
-
-      element.focus();
-
-      return false;
-
+    if(!brand||!email||!phone||!title){
+      setStatus("Please complete the advertiser name, email, phone and advert title.","error");
+      return;
     }
 
-  }
-
-
-  const file =
-    document.getElementById(
-      "adFile"
-    ).files[0];
-
-  if(!file){
-
-    alert(
-      "Please upload your advertisement image or video."
-    );
-
-    return false;
-
-  }
-
-
-  if(
-    !document.getElementById(
-      "rightsCheck"
-    ).checked
-  ){
-
-    alert(
-      "Please confirm that you have the rights to use the advertisement."
-    );
-
-    return false;
-
-  }
-
-
-  if(
-    !document.getElementById(
-      "termsCheck"
-    ).checked
-  ){
-
-    alert(
-      "Please agree to the PASONG advertising terms."
-    );
-
-    return false;
-
-  }
-
-
-  return true;
-
-}
-
-
-/* =========================================
-   SUBMIT CAMPAIGN
-========================================= */
-
-async function submitCampaign(){
-
-  if(!validateCampaign()){
-    return;
-  }
-
-
-  const button =
-    document.getElementById(
-      "submitButton"
-    );
-
-  const status =
-    document.getElementById(
-      "adStatus"
-    );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "Preparing campaign...";
-
-
-  const campaign = {
-
-    advertiser_name:
-      document.getElementById(
-        "advertiserName"
-      ).value.trim(),
-
-    business_name:
-      document.getElementById(
-        "businessName"
-      ).value.trim(),
-
-    email:
-      document.getElementById(
-        "advertiserEmail"
-      ).value.trim(),
-
-    phone:
-      document.getElementById(
-        "advertiserPhone"
-      ).value.trim(),
-
-    campaign_name:
-      document.getElementById(
-        "campaignName"
-      ).value.trim(),
-
-    ad_title:
-      document.getElementById(
-        "adTitle"
-      ).value.trim(),
-
-    ad_description:
-      document.getElementById(
-        "adDescription"
-      ).value.trim(),
-
-    website_url:
-      document.getElementById(
-        "websiteUrl"
-      ).value.trim() || null,
-
-    placement:
-      document.getElementById(
-        "placement"
-      ).value,
-
-    target_country:
-      document.getElementById(
-        "targetCountry"
-      ).value,
-
-    package:
-      selectedPackage,
-
-    amount:
-      selectedPackage === "monthly"
-        ? 50000
-        : 10000,
-
-    currency:
-      "UGX",
-
-    start_date:
-      document.getElementById(
-        "startDate"
-      ).value,
-
-    end_date:
-      document.getElementById(
-        "endDate"
-      ).value,
-
-    payment_status:
-      "pending",
-
-    approval_status:
-      "pending",
-
-    campaign_status:
-      "pending_payment"
-
-  };
-
-
-  /*
-    IMPORTANT:
-
-    The advertising database/payment backend
-    can be connected here.
-
-    We first try the existing PASONG
-    promotions table.
-
-    If the table uses a different schema,
-    the campaign is still shown as ready
-    for backend connection rather than being
-    falsely marked as paid/live.
-  */
-
-
-  try{
-
-    if(currentUser){
-
-      const result =
-        await supabaseClient
-          .from("promotions")
-          .insert({
-
-            user_id:
-              currentUser.id,
-
-            title:
-              campaign.ad_title,
-
-            description:
-              campaign.ad_description,
-
-            amount:
-              campaign.amount,
-
-            currency:
-              campaign.currency,
-
-            start_date:
-              campaign.start_date,
-
-            end_date:
-              campaign.end_date,
-
-            status:
-              "pending"
-
-          })
-          .select()
-          .maybeSingle();
-
-
-      if(result.error){
-
-        console.log(
-          "Promotions insert:",
-          result.error.message
-        );
-
-      }else{
-
-        renderLocalCampaign(
-          campaign,
-          result.data
-        );
-
-      }
-
+    if(targetUrl&&!/^https?:\/\//i.test(targetUrl)){
+      setStatus("Destination URL must start with http:// or https://.","error");
+      return;
     }
 
+    document.getElementById("payButton").disabled=true;
+    document.getElementById("payButton").textContent="Uploading advert…";
 
-    status.innerHTML =
-      "<strong>✓ Campaign submitted.</strong><br><br>" +
+    const mediaUrl=await uploadMedia(file,session);
+    const mediaType=file.type.startsWith("video/")?"video":"image";
 
-      "Status: Pending Payment / Review.<br>" +
+    document.getElementById("payButton").textContent="Creating secure checkout…";
 
-      "Package: " +
-      escapeHtml(
-        selectedPackage === "monthly"
-          ? "Monthly"
-          : "Weekly"
-      ) +
-      "<br>" +
-
-      "Amount: UGX " +
-      Number(
-        campaign.amount
-      ).toLocaleString() +
-
-      "<br><br>" +
-
-      "The advertisement will NOT go live until payment is verified and the campaign is approved.";
-
-
-    status.scrollIntoView({
-      behavior:"smooth",
-      block:"center"
+    const response=await fetch(API_BASE+"/api/advertising/checkout",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer "+session.access_token
+      },
+      body:JSON.stringify({
+        package_key:selectedPackage.key,
+        amount:selectedPackage.amount,
+        currency:selectedPackage.currency,
+        duration_days:selectedPackage.days,
+        advertiser_name:brand,
+        advertiser_email:email,
+        advertiser_phone:phone,
+        title,
+        description,
+        target_url:targetUrl||null,
+        placement,
+        media_url:mediaUrl,
+        media_type:mediaType
+      })
     });
 
+    const text=await response.text();
+    let data={};
+    try{data=text?JSON.parse(text):{}}catch{}
+    if(!response.ok||!data.checkout_url){
+      throw new Error(data.error||"Unable to create payment checkout.");
+    }
 
-  }catch(error){
-
-    console.error(error);
-
-    status.innerHTML =
-      "<strong>Campaign prepared.</strong><br><br>" +
-
-      "The payment/backend connection still needs to be completed. Your advertisement has not been marked as paid or live.";
-
+    setStatus("Checkout created. Opening secure payment…","success");
+    window.location.href=data.checkout_url;
+  }catch(err){
+    console.error(err);
+    setStatus(err.message||"Something went wrong.","error");
+    document.getElementById("payButton").disabled=false;
+    document.getElementById("payButton").textContent="Continue to secure payment";
   }
-
-
-  button.disabled = false;
-
-  button.textContent =
-    "Continue to Payment";
-
 }
 
-
-/* =========================================
-   LOCAL CAMPAIGN DISPLAY
-========================================= */
-
-function renderLocalCampaign(
-  campaign,
-  databaseRow
-){
-
-  const body =
-    document.getElementById(
-      "campaignHistory"
-    );
-
-
-  body.innerHTML = `
-
-    <tr>
-
-      <td>
-        ${escapeHtml(
-          campaign.campaign_name
-        )}
-      </td>
-
-      <td>
-        ${campaign.package === "monthly"
-          ? "Monthly"
-          : "Weekly"}
-      </td>
-
-      <td>
-        UGX ${Number(
-          campaign.amount
-        ).toLocaleString()}
-      </td>
-
-      <td>
-        <span class="pill pending">
-          Pending
-        </span>
-      </td>
-
-      <td>
-        ${escapeHtml(
-          campaign.start_date
-        )}
-        →
-        ${escapeHtml(
-          campaign.end_date
-        )}
-      </td>
-
-    </tr>
-
-  `;
-
-}
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =========================================
-   START
-========================================= */
-
-loadUser();
-
-updatePackage();
-
+document.getElementById("payButton").addEventListener("click",startCheckout);
+renderPackages();
 </script>
-
 </body>
 </html>
