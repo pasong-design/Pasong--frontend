@@ -1,10 +1,19 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-«»
+<meta charset="UTF-8">
 
-<title>PASONG Admin Dashboard</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>PASONG Admin Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
 
 *{
   margin:0;
@@ -359,6 +368,56 @@ button.info-btn:hover{
   border-color:#d946ef;
 }
 
+.ad-builder{
+  background:#0b0b14;
+  border:1px solid #29293d;
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:20px;
+}
+
+.ad-builder h3{
+  margin-bottom:6px;
+}
+
+.ad-preview{
+  margin-top:18px;
+  background:#11111d;
+  border:1px solid #29293d;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.ad-preview img{
+  width:100%;
+  max-height:300px;
+  object-fit:cover;
+  display:block;
+}
+
+.ad-preview-content{
+  padding:15px;
+}
+
+.ad-preview-title{
+  color:#fff;
+  font-size:18px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.ad-preview-description{
+  color:#aaaabb;
+  line-height:1.5;
+}
+
+.ad-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+
 .cover-details{
   margin-top:18px;
   background:#0b0b14;
@@ -474,461 +533,954 @@ button.info-btn:hover{
 
 }
 
-</style></head><body><nav>  <div class="logo">
+</style>
+
+</head>
+
+<body>
+
+<nav>
+
+  <div class="logo">
     ◈ PASONG
-  </div>  <div class="admin-label">
-    ADMIN PANEL
-  </div></nav><main><div id="loading">
-  Checking administrator access...
-</div><div id="error"></div><div id="dashboard"><h1>
-  PASONG Admin Dashboard
-</h1><p class="subtitle">
-  Manage PASONG music, artists, orders and platform activity.
-</p><div class="cards">  <div class="card">
-    <h3>Administrator</h3>
-    <div class="number">✓</div>
-  </div>  <div class="card">
-    <h3>Music</h3>
-    <div class="number" id="musicCount">0</div>
-  </div>  <div class="card">
-    <h3>Artist Profiles</h3>
-    <div class="number" id="userCount">0</div>
-  </div>  <div class="card">
-    <h3>Orders</h3>
-    <div class="number" id="orderCount">0</div>
-  </div></div><div class="menu">  <button onclick="showSection('sales')">
-    🛒 Sales & Orders
-  </button>  <button onclick="showSection('royalties')">
-    💰 Royalty Ledger
-  </button>  <button onclick="showSection('advertisements')">
-    📢 Advertisement Campaigns
-  </button>  <button onclick="showSection('referrals')">
-    🎁 Referral Points
-  </button>  <button onclick="showSection('payments'); loadPaymentVerifications()">
-    💳 Payments & Verification
-  </button>  <button onclick="showSection('cover-requests'); loadCoverRequests()">
-    🎨 Cover Requests
-  </button>  <button onclick="showSection('reports')">
-    📊 Reports
-  </button></div><div class="section">  <h2>
-    🛒 Sales & Orders
-  </h2>  <div id="sales" class="section-content"><p>
-  View customer purchases, songs, prices and order status.
-</p>
-
-<div class="refresh-row">
-
-  <button class="small-btn" onclick="loadOrders()">
-    ↻ Refresh Orders
-  </button>
-
-</div>
-
-<div class="table-wrap">
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>Order ID</th>
-        <th>Song</th>
-        <th>Buyer</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Status</th>
-        <th>Created</th>
-        <th>Action</th>
-
-      </tr>
-
-    </thead>
-
-    <tbody id="ordersTable">
-
-      <tr>
-
-        <td colspan="8">
-          Loading orders...
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
-
-</div>
-
-  </div></div><div class="section">  <h2>
-    💰 Royalty Ledger
-  </h2>  <div id="royalties" class="section-content"><p>
-  Track PASONG music revenue distribution.
-</p>
-
-<div class="notice">
-
-  <strong>
-    Current Uganda Song Price: UGX 700
-  </strong>
-
-  <br><br>
-
-  PASONG royalty records are generated from completed music sales.
-
-  <br><br>
-
-  Royalty transactions will appear here as the payment system
-  records completed sales.
-
-</div>
-
-  </div></div><div class="section">  <h2>
-    📢 Advertisement Campaigns
-  </h2>  <div id="advertisements" class="section-content"><p>
-  Monitor PASONG advertising campaigns.
-</p>
-
-<div class="notice">
-
-  Advertiser campaigns will be managed from the PASONG advertising system.
-
-  <br><br>
-
-  Weekly promotion idea: UGX 10,000<br>
-  Monthly promotion idea: UGX 50,000
-
-</div>
-
-  </div></div><div class="section">  <h2>
-    🎁 Referral Points
-  </h2>  <div id="referrals" class="section-content"><p>
-  Monitor PASONG referral activity.
-</p>
-
-<div class="notice">
-
-  1,000 PASONG Points = UGX 1,000
-
-  <br><br>
-
-  Successful referral = 50 PASONG Points
-
-  <br><br>
-
-  Referral qualifies when the referred user completes
-  their first qualifying song purchase.
-
-</div>
-
-  </div></div><div class="section">  <h2>
-    💳 Payments & Verification
-  </h2>  <div id="payments" class="section-content"><p>
-  Review and approve creator payment methods.
-</p>
-
-<div class="refresh-row">
-
-  <button class="small-btn" onclick="loadPaymentVerifications()">
-    ↻ Refresh Verifications
-  </button>
-
-</div>
-
-<div class="notice" style="margin-bottom:18px;">
-
-  <strong>
-    Verification Rules
-  </strong>
-
-  <br><br>
-
-  🇺🇬 Uganda creators:
-  <strong>
-    MTN Mobile Money / Airtel Money
-  </strong>
-
-  <br>
-
-  🌍 Creators outside Uganda:
-  <strong>
-    Card / Online Payment
-  </strong>
-
-  <br><br>
-
-  <span class="status-pending">
-    ● New verification requests require Admin approval
-  </span>
-
-</div>
-
-<div class="table-wrap">
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>Creator</th>
-        <th>Country</th>
-        <th>Method</th>
-        <th>Provider</th>
-        <th>Account Name</th>
-        <th>Account / Reference</th>
-        <th>Status</th>
-        <th>Submitted</th>
-        <th>Action</th>
-
-      </tr>
-
-    </thead>
-
-    <tbody id="paymentVerificationsTable">
-
-      <tr>
-
-        <td colspan="9">
-          Open Payments & Verification to load requests.
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
-
-</div>
-
-  </div></div><div class="section">  <h2>
-    🎨 PASONG Cover Requests
-  </h2>  <div id="cover-requests" class="section-content"><p>
-  Manage cover-design requests from artists, DJs,
-  producers and other PASONG creators.
-</p>
-
-<div class="refresh-row">
-
-  <button class="small-btn" onclick="loadCoverRequests()">
-    ↻ Refresh Cover Requests
-  </button>
-
-</div>
-
-<div class="table-wrap">
-
-  <table>
-
-    <thead>
-
-      <tr>
-
-        <th>Creator</th>
-        <th>Cover / Mix</th>
-        <th>Price</th>
-        <th>Payment</th>
-        <th>Design</th>
-        <th>Submitted</th>
-        <th>Action</th>
-
-      </tr>
-
-    </thead>
-
-    <tbody id="coverRequestsTable">
-
-      <tr>
-
-        <td colspan="7">
-          Open Cover Requests to load requests.
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
-
-</div>
-
-<div
-  id="coverRequestDetails"
-  class="cover-details"
-  style="display:none;"
->
-
-  <div
-    style="
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:15px;
-      flex-wrap:wrap;
-    "
-  >
-
-    <div>
-      <h3>
-        🎨 Cover Request Details
-      </h3>
-    </div>
-
-    <button
-      class="small-btn"
-      onclick="closeCoverRequest()"
-    >
-      Close
-    </button>
-
   </div>
 
-  <div
-    id="coverRequestDetailsContent"
-    style="margin-top:15px;"
-  ></div>
+  <div class="admin-label">
+    ADMIN PANEL
+  </div>
 
+</nav>
+
+<main>
+
+<div id="loading">
+  Checking administrator access...
 </div>
 
-  </div></div><div class="section">  <h2>
-    📊 Reports
-  </h2>  <div id="reports" class="section-content"><p>
-  View PASONG platform statistics.
+<div id="error"></div>
+
+<div id="dashboard">
+
+<h1>
+  PASONG Admin Dashboard
+</h1>
+
+<p class="subtitle">
+  Full control of PASONG platform activity.
 </p>
 
 <div class="cards">
 
   <div class="card">
-
-    <h3>
-      Total Music
-    </h3>
-
-    <div
-      class="number"
-      id="reportSongs"
-    >
-      0
-    </div>
-
+    <h3>Administrator</h3>
+    <div class="number">✓</div>
   </div>
 
   <div class="card">
-
-    <h3>
-      Total Artists
-    </h3>
-
-    <div
-      class="number"
-      id="reportArtists"
-    >
-      0
-    </div>
-
+    <h3>Music</h3>
+    <div class="number" id="musicCount">0</div>
   </div>
 
   <div class="card">
+    <h3>Artist Profiles</h3>
+    <div class="number" id="userCount">0</div>
+  </div>
 
-    <h3>
-      Total Orders
-    </h3>
+  <div class="card">
+    <h3>Orders</h3>
+    <div class="number" id="orderCount">0</div>
+  </div>
 
-    <div
-      class="number"
-      id="reportOrders"
-    >
-      0
-    </div>
-
+  <div class="card">
+    <h3>Advertisements</h3>
+    <div class="number" id="adCount">0</div>
   </div>
 
 </div>
 
-  </div></div><div class="section">  <h2>
-    🎵 Music Control
-  </h2>  <div class="section-content active"><p>
-  Music currently stored in PASONG.
+<div class="menu">
+
+  <button onclick="showSection('sales')">
+    🛒 Sales & Orders
+  </button>
+
+  <button onclick="showSection('royalties')">
+    💰 Royalty Ledger
+  </button>
+
+  <button onclick="showSection('advertisements');loadAdvertisements()">
+    📢 Advertisements
+  </button>
+
+  <button onclick="showSection('referrals')">
+    🎁 Referral Points
+  </button>
+
+  <button onclick="showSection('payments');loadPaymentVerifications()">
+    💳 Payments & Verification
+  </button>
+
+  <button onclick="showSection('cover-requests');loadCoverRequests()">
+    🎨 Cover Requests
+  </button>
+
+  <button onclick="showSection('reports')">
+    📊 Reports
+  </button>
+
+</div>
+
+
+<!-- SALES -->
+
+<div class="section">
+
+<h2>
+  🛒 Sales & Orders
+</h2>
+
+<div id="sales" class="section-content">
+
+<p>
+  View customer purchases, songs, prices and order status.
 </p>
 
 <div class="refresh-row">
 
-  <button
-    class="small-btn"
-    onclick="loadSongs()"
-  >
-    ↻ Refresh Music
-  </button>
+<button
+  class="small-btn"
+  onclick="loadOrders()"
+>
+  ↻ Refresh Orders
+</button>
 
 </div>
 
 <div class="table-wrap">
 
-  <table>
+<table>
 
-    <thead>
+<thead>
 
-      <tr>
+<tr>
+<th>Order ID</th>
+<th>Song</th>
+<th>Buyer</th>
+<th>Price</th>
+<th>Currency</th>
+<th>Status</th>
+<th>Created</th>
+<th>Action</th>
+</tr>
 
-        <th>Title</th>
-        <th>Artist</th>
-        <th>Price</th>
-        <th>Currency</th>
-        <th>Status</th>
-        <th>Song ID</th>
-        <th>Action</th>
+</thead>
 
-      </tr>
+<tbody id="ordersTable">
 
-    </thead>
+<tr>
+<td colspan="8">
+Loading orders...
+</td>
+</tr>
 
-    <tbody id="songsTable">
+</tbody>
 
-      <tr>
-
-        <td colspan="7">
-          Loading music...
-        </td>
-
-      </tr>
-
-    </tbody>
-
-  </table>
+</table>
 
 </div>
 
-  </div></div><div class="section">  <h2>
-    ⚙️ Platform Status
-  </h2>  <div class="notice">Authentication:
+</div>
+
+</div>
+
+
+<!-- ROYALTIES -->
+
+<div class="section">
+
+<h2>
+  💰 Royalty Ledger
+</h2>
+
+<div id="royalties" class="section-content">
+
+<p>
+  Track PASONG music revenue distribution.
+</p>
+
+<div class="notice">
+
+<strong>
+Royalty System
+</strong>
+
+<br><br>
+
+Completed sales generate creator royalty records.
+
+<br><br>
+
+Producer beat sales currently use the PASONG producer royalty system.
+
+<br><br>
+
+More detailed ledger controls can be connected to the royalty tables in the next admin phase.
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ADVERTISEMENTS -->
+
+<div class="section">
+
+<h2>
+  📢 Advertisement Control
+</h2>
+
+<div id="advertisements" class="section-content">
+
+<p>
+  Admin can create and publish advertisements directly on PASONG.
+</p>
+
+
+<div class="notice" style="margin-bottom:18px;">
+
+<strong>
+ADMIN DIRECT PUBLISHING
+</strong>
+
+<br><br>
+
+Ads created here are immediately marked
+<strong>ACTIVE</strong>.
+
+<br>
+
+No second approval is required.
+
+<br><br>
+
+Use the placement field to control where the advertisement belongs.
+
+</div>
+
+
+<div class="ad-builder">
+
+<h3>
+  ➕ Create Advertisement
+</h3>
+
+<p>
+Create a PASONG advertisement and publish it directly.
+</p>
+
+<div class="edit-grid">
+
+<div class="form-group">
+
+<label>
+Ad Title
+</label>
+
+<input
+  id="adTitle"
+  type="text"
+  placeholder="Example: PASONG Premium"
+/>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Destination URL
+</label>
+
+<input
+  id="adTargetUrl"
+  type="url"
+  placeholder="https://..."
+/>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Placement
+</label>
+
+<select id="adPlacement">
+
+<option value="home">
+Home
+</option>
+
+<option value="music">
+Music
+</option>
+
+<option value="beats">
+Beats
+</option>
+
+<option value="dj">
+DJ Mixes
+</option>
+
+<option value="producers">
+Producers
+</option>
+
+<option value="artists">
+Artists
+</option>
+
+<option value="all">
+All PASONG
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Start Date
+</label>
+
+<input
+  id="adStart"
+  type="datetime-local"
+/>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+End Date
+</label>
+
+<input
+  id="adEnd"
+  type="datetime-local"
+/>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Ad Image
+</label>
+
+<input
+  id="adImage"
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+/>
+
+</div>
+
+</div>
+
+
+<div class="form-group" style="margin-top:14px;">
+
+<label>
+Description
+</label>
+
+<textarea
+  id="adDescription"
+  placeholder="Advertisement description..."
+></textarea>
+
+</div>
+
+
+<div class="ad-preview" id="adPreview">
+
+<div class="ad-preview-content">
+
+<div class="ad-preview-title">
+Advertisement Preview
+</div>
+
+<div class="ad-preview-description">
+Your advertisement preview will appear here.
+</div>
+
+</div>
+
+</div>
+
+
+<div class="ad-actions">
+
+<button
+  class="action"
+  onclick="createAdvertisement()"
+>
+  📢 Publish Advertisement
+</button>
+
+<button
+  class="small-btn"
+  onclick="clearAdForm()"
+>
+  Clear
+</button>
+
+</div>
+
+</div>
+
+
+<h3 style="margin-bottom:12px;">
+  Current Advertisements
+</h3>
+
+<div class="refresh-row">
+
+<button
+  class="small-btn"
+  onclick="loadAdvertisements()"
+>
+  ↻ Refresh Advertisements
+</button>
+
+</div>
+
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Advertisement</th>
+<th>Placement</th>
+<th>Period</th>
+<th>Status</th>
+<th>Impressions</th>
+<th>Clicks</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="advertisementsTable">
+
+<tr>
+
+<td colspan="7">
+Open Advertisement Control to load ads.
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- REFERRALS -->
+
+<div class="section">
+
+<h2>
+  🎁 Referral Points
+</h2>
+
+<div id="referrals" class="section-content">
+
+<p>
+  Monitor PASONG referral activity.
+</p>
+
+<div class="notice">
+
+1,000 PASONG Points = UGX 1,000
+
+<br><br>
+
+Successful referral = 50 PASONG Points
+
+<br><br>
+
+Referral qualifies when the referred user completes
+their first qualifying song purchase.
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- PAYMENTS -->
+
+<div class="section">
+
+<h2>
+  💳 Payments & Verification
+</h2>
+
+<div id="payments" class="section-content">
+
+<p>
+  Review and approve creator payment methods.
+</p>
+
+<div class="refresh-row">
+
+<button
+  class="small-btn"
+  onclick="loadPaymentVerifications()"
+>
+↻ Refresh Verifications
+</button>
+
+</div>
+
+<div class="notice" style="margin-bottom:18px;">
+
+<strong>
+Verification Rules
+</strong>
+
+<br><br>
+
+🇺🇬 Uganda creators:
+<strong>
+MTN Mobile Money / Airtel Money
+</strong>
+
+<br>
+
+🌍 Creators outside Uganda:
+<strong>
+Card / Online Payment
+</strong>
+
+<br><br>
+
+<span class="status-pending">
+● New verification requests require Admin approval
+</span>
+
+</div>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Creator</th>
+<th>Country</th>
+<th>Method</th>
+<th>Provider</th>
+<th>Account Name</th>
+<th>Account / Reference</th>
+<th>Status</th>
+<th>Submitted</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="paymentVerificationsTable">
+
+<tr>
+
+<td colspan="9">
+Open Payments & Verification to load requests.
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- COVER -->
+
+<div class="section">
+
+<h2>
+  🎨 PASONG Cover Requests
+</h2>
+
+<div id="cover-requests" class="section-content">
+
+<p>
+Manage cover-design requests from artists, DJs,
+producers and other PASONG creators.
+</p>
+
+<div class="refresh-row">
+
+<button
+  class="small-btn"
+  onclick="loadCoverRequests()"
+>
+↻ Refresh Cover Requests
+</button>
+
+</div>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Creator</th>
+<th>Cover / Mix</th>
+<th>Price</th>
+<th>Payment</th>
+<th>Design</th>
+<th>Submitted</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="coverRequestsTable">
+
+<tr>
+
+<td colspan="7">
+Open Cover Requests to load requests.
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<div
+id="coverRequestDetails"
+class="cover-details"
+style="display:none;"
+>
+
+<div
+style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+"
+>
+
+<h3>
+🎨 Cover Request Details
+</h3>
+
+<button
+class="small-btn"
+onclick="closeCoverRequest()"
+>
+Close
+</button>
+
+</div>
+
+<div
+id="coverRequestDetailsContent"
+style="margin-top:15px;"
+></div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- REPORTS -->
+
+<div class="section">
+
+<h2>
+  📊 Reports
+</h2>
+
+<div id="reports" class="section-content">
+
+<p>
+View PASONG platform statistics.
+</p>
+
+<div class="cards">
+
+<div class="card">
+
+<h3>
+Total Music
+</h3>
+
+<div
+class="number"
+id="reportSongs"
+>
+0
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+Total Artists
+</h3>
+
+<div
+class="number"
+id="reportArtists"
+>
+0
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+Total Orders
+</h3>
+
+<div
+class="number"
+id="reportOrders"
+>
+0
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+Total Advertisements
+</h3>
+
+<div
+class="number"
+id="reportAds"
+>
+0
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MUSIC -->
+
+<div class="section">
+
+<h2>
+  🎵 Music Control
+</h2>
+
+<div class="section-content active">
+
+<p>
+Songs uploaded to PASONG are automatically approved.
+DJ mixes and beats are also intended to publish automatically.
+Admin retains the right to edit, hide or delete content.
+</p>
+
+<div class="notice" style="margin-bottom:18px;">
+
+<strong>
+AUTO APPROVAL
+</strong>
+
+<br><br>
+
+🎵 Songs — automatically approved
+
+<br>
+
+🎧 DJ Mixes — automatically approved
+
+<br>
+
+🎹 Beats — automatically approved
+
+<br><br>
+
+The Admin Dashboard does not require a manual approval step
+for these content types.
+
+</div>
+
+<div class="refresh-row">
+
+<button
+class="small-btn"
+onclick="loadSongs()"
+>
+↻ Refresh Music
+</button>
+
+</div>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Title</th>
+<th>Artist</th>
+<th>Price</th>
+<th>Currency</th>
+<th>Status</th>
+<th>Song ID</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="songsTable">
+
+<tr>
+
+<td colspan="7">
+Loading music...
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- PLATFORM STATUS -->
+
+<div class="section">
+
+<h2>
+  ⚙️ Platform Status
+</h2>
+
+<div class="notice">
+
+Authentication:
 <span class="status">
-  ● Connected
+● Connected
 </span>
 
 <br>
 
 Supabase:
 <span class="status">
-  ● Connected
+● Connected
 </span>
 
 <br>
 
 Admin Role:
 <span class="status">
-  ● Verified
+● Verified
 </span>
 
-  </div>  <br><button
+<br>
+
+Advertisements:
+<span
+id="adsSystemStatus"
+class="status-pending"
+>
+● Checking
+</span>
+
+<br>
+
+Content Approval:
+<span class="status">
+● Songs / DJ Mixes / Beats Auto
+</span>
+
+</div>
+
+<br>
+
+<button
 class="action logout"
 onclick="logout()"
-
-«»
-
+>
 Logout
+</button>
 
-  </button></div></div></main><script>
+</div>
+
+</div>
+
+</main>
+
+
+<script>
 
 const SUPABASE_URL =
 "https://mtufczmjlkvycarxylgh.supabase.co";
@@ -941,3101 +1493,2078 @@ const API_BASE =
 
 const supabaseClient =
 window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
-let ordersData = [];
-let songsData = [];
-let artistsData = [];
-let orderItemsData = [];
-let coverRequestsData = [];
-let currentCoverRequest = null;
+
+let ordersData=[];
+let songsData=[];
+let artistsData=[];
+let orderItemsData=[];
+let coverRequestsData=[];
+let advertisementsData=[];
+let currentCoverRequest=null;
+
 
 function showError(message){
 
-  document.getElementById("loading")
-    .style.display="none";
+document.getElementById("loading")
+.style.display="none";
 
-  const error =
-    document.getElementById("error");
+const error=
+document.getElementById("error");
 
-  error.textContent=message;
+error.textContent=message;
 
-  error.style.display="block";
+error.style.display="block";
 
 }
+
 
 async function checkAdmin(){
 
-  try{
+try{
 
-    const {
-      data:{session},
-      error
-    } =
-    await supabaseClient.auth.getSession();
+const {
+data:{session},
+error
+}=
+await supabaseClient.auth.getSession();
 
-    if(error) throw error;
+if(error) throw error;
 
-    if(!session){
+if(!session){
 
-      window.location.href="account.html";
+window.location.href="account.html";
 
-      return;
-
-    }
-
-    const user=session.user;
-
-    const role =
-      user.app_metadata &&
-      user.app_metadata.role;
-
-    if(role !== "admin"){
-
-      showError(
-        "Access denied. This account is not an administrator."
-      );
-
-      return;
-
-    }
-
-    document.getElementById("loading")
-      .style.display="none";
-
-    document.getElementById("dashboard")
-      .style.display="block";
-
-    await loadAllData();
-
-  }catch(error){
-
-    console.error(error);
-
-    showError(
-      "Unable to verify administrator access: "
-      + error.message
-    );
-
-  }
+return;
 
 }
+
+const user=session.user;
+
+const role=
+user.app_metadata &&
+user.app_metadata.role;
+
+if(role!=="admin"){
+
+showError(
+"Access denied. This account is not an administrator."
+);
+
+return;
+
+}
+
+document.getElementById("loading")
+.style.display="none";
+
+document.getElementById("dashboard")
+.style.display="block";
+
+await loadAllData();
+
+}catch(error){
+
+console.error(error);
+
+showError(
+"Unable to verify administrator access: "+
+error.message
+);
+
+}
+
+}
+
 
 async function loadAllData(){
 
-  await Promise.all([
-    loadUsers(),
-    loadSongs(),
-    loadOrders()
-  ]);
+await Promise.all([
+loadUsers(),
+loadSongs(),
+loadOrders(),
+loadAdvertisements()
+]);
 
 }
+
 
 async function loadUsers(){
 
-  try{
+try{
 
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("artist_profiles")
-      .select("*");
+const {
+data,
+error
+}=
+await supabaseClient
+.from("artist_profiles")
+.select("*");
 
-    if(error) throw error;
+if(error) throw error;
 
-    artistsData=data || [];
+artistsData=data||[];
 
-    const count =
-      artistsData.length;
+const count=
+artistsData.length;
 
-    document.getElementById("userCount")
-      .textContent=count;
+document.getElementById("userCount")
+.textContent=count;
 
-    document.getElementById("reportArtists")
-      .textContent=count;
+document.getElementById("reportArtists")
+.textContent=count;
 
-  }catch(error){
+}catch(error){
 
-    console.error(
-      "Artist profiles error:",
-      error
-    );
-
-  }
+console.error(
+"Artist profiles error:",
+error
+);
 
 }
+
+}
+
 
 function findArtistName(artistId){
 
-  if(!artistId){
+if(!artistId){
 
-    return "Unknown Artist";
-
-  }
-
-  const artist =
-    artistsData.find(
-      profile =>
-        String(profile.id) === String(artistId)
-    );
-
-  if(!artist){
-
-    return "Unknown Artist";
-
-  }
-
-  return (
-    artist.stage_name ||
-    artist.artist_name ||
-    artist.performing_name ||
-    "Unnamed Artist"
-  );
+return "Unknown Artist";
 
 }
+
+const artist=
+artistsData.find(
+profile=>
+String(profile.id)===String(artistId)
+);
+
+if(!artist){
+
+return "Unknown Artist";
+
+}
+
+return(
+artist.stage_name||
+artist.artist_name||
+artist.performing_name||
+"Unnamed Artist"
+);
+
+}
+
+
+/* =========================================================
+   SONGS
+   ========================================================= */
 
 async function loadSongs(){
 
-  try{
-
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("songs")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-    if(error) throw error;
-
-    songsData=data || [];
-
-    document.getElementById("musicCount")
-      .textContent=songsData.length;
-
-    document.getElementById("reportSongs")
-      .textContent=songsData.length;
-
-    const table =
-      document.getElementById("songsTable");
-
-    if(!songsData.length){
-
-      table.innerHTML=
-      `<tr>
-        <td colspan="7" class="empty">
-          No songs uploaded yet.
-        </td>
-      </tr>`;
-
-      return;
-
-    }
-
-    table.innerHTML =
-      songsData.map(song => {
-
-        const title =
-          song.title || "-";
-
-        const price =
-          song.price !== null &&
-          song.price !== undefined
-          ? song.price
-          : 700;
-
-        const currency =
-          song.currency || "UGX";
-
-        const status =
-          song.status || "active";
-
-        const artistName =
-          findArtistName(song.artist_id);
-
-        const songId =
-          song.id || "-";
-
-        const safeId =
-          escapeHtml(
-            String(songId)
-          );
-
-        const normalizedStatus =
-          String(status).toLowerCase();
-
-        let buttons = `
-
-          <button
-            class="info-btn"
-            onclick="editSong('${safeId}')"
-          >
-            Edit
-          </button>
-
-        `;
-
-        if(
-          normalizedStatus !== "approved" &&
-          normalizedStatus !== "active"
-        ){
-
-          buttons += `
-
-            <button
-              class="success-btn"
-              onclick="updateSongStatus('${safeId}','approved')"
-            >
-              ✓ Approve
-            </button>
-
-          `;
-
-        }
-
-        if(
-          normalizedStatus !== "rejected"
-        ){
-
-          buttons += `
-
-            <button
-              class="danger-btn"
-              onclick="updateSongStatus('${safeId}','rejected')"
-            >
-              ✕ Reject
-            </button>
-
-          `;
-
-        }
-
-        buttons += `
-
-          <button
-            class="danger-btn"
-            onclick="deleteSong('${safeId}')"
-          >
-            Delete
-          </button>
-
-        `;
-
-        return `
-
-        <tr>
-
-          <td>
-
-            <div class="song-title">
-
-              ${escapeHtml(
-                String(title)
-              )}
-
-            </div>
-
-          </td>
-
-          <td>
-
-            <div class="artist-name">
-
-              ${escapeHtml(
-                String(artistName)
-              )}
-
-            </div>
-
-          </td>
-
-          <td>
-
-            ${escapeHtml(
-              String(price)
-            )}
-
-          </td>
-
-          <td>
-
-            ${escapeHtml(
-              String(currency)
-            )}
-
-          </td>
-
-          <td>
-
-            ${formatStatus(status)}
-
-          </td>
-
-          <td>
-
-            <div class="id-text">
-
-              ${escapeHtml(
-                String(songId)
-              )}
-
-            </div>
-
-          </td>
-
-          <td>
-
-            <div class="admin-actions">
-
-              ${buttons}
-
-            </div>
-
-          </td>
-
-        </tr>
-
-        `;
-
-      }).join("");
-
-  }catch(error){
-
-    console.error(
-      "Songs error:",
-      error
-    );
-
-    document.getElementById("songsTable")
-      .innerHTML=
-      `<tr>
-        <td colspan="7">
-          Unable to load music.
-          <br><br>
-          ${escapeHtml(
-            error.message ||
-            "Unknown error"
-          )}
-        </td>
-      </tr>`;
-
-  }
+try{
+
+const {
+data,
+error
+}=
+await supabaseClient
+.from("songs")
+.select("*")
+.order(
+"created_at",
+{
+ascending:false
+}
+);
+
+if(error) throw error;
+
+songsData=data||[];
+
+document.getElementById("musicCount")
+.textContent=songsData.length;
+
+document.getElementById("reportSongs")
+.textContent=songsData.length;
+
+const table=
+document.getElementById("songsTable");
+
+if(!songsData.length){
+
+table.innerHTML=
+`
+<tr>
+<td colspan="7" class="empty">
+No songs uploaded yet.
+</td>
+</tr>
+`;
+
+return;
 
 }
 
-async function updateSongStatus(
-  songId,
-  newStatus
-){
+table.innerHTML=
+songsData.map(song=>{
 
-  if(!songId){
+const title=
+song.title||"-";
 
-    return;
+const price=
+song.price!==null &&
+song.price!==undefined
+? song.price
+:700;
 
-  }
+const currency=
+song.currency||"UGX";
 
-  const confirmed =
-    confirm(
-      newStatus === "approved"
-      ? "Approve this song for PASONG?"
-      : "Reject this song?"
-    );
+const status=
+song.status||"approved";
 
-  if(!confirmed){
+const artistName=
+findArtistName(song.artist_id);
 
-    return;
+const songId=
+song.id||"-";
 
-  }
+const safeId=
+escapeHtml(
+String(songId)
+);
 
-  try{
+return`
 
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("songs")
-      .update({
-        status:newStatus,
-        updated_at:
-          new Date().toISOString()
-      })
-      .eq(
-        "id",
-        songId
-      );
+<tr>
 
-    if(error) throw error;
+<td>
 
-    alert(
-      newStatus === "approved"
-      ? "Song approved successfully."
-      : "Song rejected."
-    );
+<div class="song-title">
+${escapeHtml(String(title))}
+</div>
 
-    await loadSongs();
+</td>
 
-  }catch(error){
+<td>
 
-    console.error(
-      "Song status update error:",
-      error
-    );
+<div class="artist-name">
+${escapeHtml(String(artistName))}
+</div>
 
-    alert(
-      "Unable to update song status: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
+</td>
 
-  }
+<td>
+${escapeHtml(String(price))}
+</td>
+
+<td>
+${escapeHtml(String(currency))}
+</td>
+
+<td>
+
+${formatStatus(
+status==="pending"
+?"approved"
+:status
+)}
+
+</td>
+
+<td>
+
+<div class="id-text">
+${escapeHtml(String(songId))}
+</div>
+
+</td>
+
+<td>
+
+<div class="admin-actions">
+
+<button
+class="info-btn"
+onclick="editSong('${safeId}')"
+>
+Edit
+</button>
+
+<button
+class="danger-btn"
+onclick="deleteSong('${safeId}')"
+>
+Delete
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`;
+
+}).join("");
+
+}catch(error){
+
+console.error(
+"Songs error:",
+error
+);
+
+document.getElementById("songsTable")
+.innerHTML=
+`
+<tr>
+<td colspan="7">
+
+Unable to load music.
+
+<br><br>
+
+${escapeHtml(
+error.message||
+"Unknown error"
+)}
+
+</td>
+</tr>
+`;
 
 }
+
+}
+
 
 async function editSong(songId){
 
-  const song =
-    songsData.find(
-      item =>
-        String(item.id) ===
-        String(songId)
-    );
+const song=
+songsData.find(
+item=>
+String(item.id)===String(songId)
+);
 
-  if(!song){
+if(!song){
 
-    alert("Song was not found.");
+alert("Song was not found.");
 
-    return;
-
-  }
-
-  const newTitle =
-    prompt(
-      "Song title:",
-      song.title || ""
-    );
-
-  if(newTitle === null){
-
-    return;
-
-  }
-
-  const newPrice =
-    prompt(
-      "Song price:",
-      song.price !== null &&
-      song.price !== undefined
-      ? song.price
-      : 700
-    );
-
-  if(newPrice === null){
-
-    return;
-
-  }
-
-  const newCurrency =
-    prompt(
-      "Currency:",
-      song.currency || "UGX"
-    );
-
-  if(newCurrency === null){
-
-    return;
-
-  }
-
-  const numericPrice =
-    Number(newPrice);
-
-  if(
-    !Number.isFinite(numericPrice) ||
-    numericPrice < 0
-  ){
-
-    alert("Please enter a valid price.");
-
-    return;
-
-  }
-
-  try{
-
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("songs")
-      .update({
-
-        title:newTitle.trim(),
-
-        price:numericPrice,
-
-        currency:
-          newCurrency.trim().toUpperCase(),
-
-        updated_at:
-          new Date().toISOString()
-
-      })
-      .eq(
-        "id",
-        songId
-      );
-
-    if(error) throw error;
-
-    alert("Song updated successfully.");
-
-    await loadSongs();
-
-  }catch(error){
-
-    console.error(
-      "Song edit error:",
-      error
-    );
-
-    alert(
-      "Unable to edit song: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
+return;
 
 }
+
+const newTitle=
+prompt(
+"Song title:",
+song.title||""
+);
+
+if(newTitle===null)return;
+
+const newPrice=
+prompt(
+"Song price:",
+song.price!==null &&
+song.price!==undefined
+?song.price
+:700
+);
+
+if(newPrice===null)return;
+
+const newCurrency=
+prompt(
+"Currency:",
+song.currency||"UGX"
+);
+
+if(newCurrency===null)return;
+
+const numericPrice=
+Number(newPrice);
+
+if(
+!Number.isFinite(numericPrice)||
+numericPrice<0
+){
+
+alert("Please enter a valid price.");
+
+return;
+
+}
+
+try{
+
+const {
+error
+}=
+await supabaseClient
+.from("songs")
+.update({
+
+title:newTitle.trim(),
+
+price:numericPrice,
+
+currency:
+newCurrency.trim().toUpperCase(),
+
+status:"approved",
+
+updated_at:
+new Date().toISOString()
+
+})
+.eq(
+"id",
+songId
+);
+
+if(error)throw error;
+
+alert(
+"Song updated successfully."
+);
+
+await loadSongs();
+
+}catch(error){
+
+console.error(
+"Song edit error:",
+error
+);
+
+alert(
+"Unable to edit song: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+}
+
+}
+
 
 async function deleteSong(songId){
 
-  if(!songId){
+if(!songId)return;
 
-    return;
+const confirmed=
+confirm(
+"Delete this song from PASONG? This action cannot be undone."
+);
 
-  }
+if(!confirmed)return;
 
-  const confirmed =
-    confirm(
-      "Delete this song from PASONG? This action cannot be undone."
-    );
+try{
 
-  if(!confirmed){
+const {
+error
+}=
+await supabaseClient
+.from("songs")
+.delete()
+.eq(
+"id",
+songId
+);
 
-    return;
+if(error)throw error;
 
-  }
+alert(
+"Song deleted successfully."
+);
 
-  try{
+await loadSongs();
 
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("songs")
-      .delete()
-      .eq(
-        "id",
-        songId
-      );
+}catch(error){
 
-    if(error) throw error;
+console.error(
+"Song delete error:",
+error
+);
 
-    alert("Song deleted successfully.");
-
-    await loadSongs();
-
-  }catch(error){
-
-    console.error(
-      "Song delete error:",
-      error
-    );
-
-    alert(
-      "Unable to delete song: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
+alert(
+"Unable to delete song: "+
+(
+error.message||
+"Unknown error"
+)
+);
 
 }
+
+}
+
+
+/* =========================================================
+   ORDERS
+   ========================================================= */
 
 async function loadOrders(){
 
-  try{
-
-    const {
-      data:orders,
-      error:ordersError
-    } =
-    await supabaseClient
-      .from("orders")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-    if(ordersError) throw ordersError;
-
-    ordersData=orders || [];
-
-    const {
-      data:items,
-      error:itemsError
-    } =
-    await supabaseClient
-      .from("order_items")
-      .select("*");
-
-    if(itemsError) throw itemsError;
-
-    orderItemsData=items || [];
-
-    document.getElementById("orderCount")
-      .textContent=ordersData.length;
-
-    document.getElementById("reportOrders")
-      .textContent=ordersData.length;
-
-    const table =
-      document.getElementById("ordersTable");
-
-    if(!ordersData.length){
-
-      table.innerHTML=
-      `<tr>
-        <td colspan="8" class="empty">
-          No orders yet.
-        </td>
-      </tr>`;
-
-      return;
-
-    }
-
-    table.innerHTML =
-      ordersData.map(order => {
-
-        const id =
-          order.id || "-";
-
-        const buyer =
-          order.buyer_id || "-";
-
-        const status =
-          order.status || "pending";
-
-        const created =
-          order.created_at
-          ? new Date(
-              order.created_at
-            ).toLocaleString()
-          : "-";
-
-        const itemsForOrder =
-          orderItemsData.filter(
-            item =>
-              String(item.order_id)
-              ===
-              String(order.id)
-          );
-
-        let songHtml="";
-
-        if(!itemsForOrder.length){
-
-          songHtml =
-          `<span class="id-text">
-            No song item found
-          </span>`;
-
-        }else{
-
-          songHtml =
-            itemsForOrder.map(item => {
-
-              const song =
-                songsData.find(
-                  s =>
-                    String(s.id)
-                    ===
-                    String(item.song_id)
-                );
-
-              if(!song){
-
-                return `
-                <div>
-                  <div class="song-title">
-                    Unknown Song
-                  </div>
-                  <div class="id-text">
-                    Song ID:
-                    ${escapeHtml(
-                      String(
-                        item.song_id ||
-                        "-"
-                      )
-                    )}
-                  </div>
-                </div>
-                `;
-
-              }
-
-              const artistName =
-                findArtistName(
-                  song.artist_id
-                );
-
-              return `
-              <div style="margin-bottom:8px;">
-
-                <div class="song-title">
-                  ${escapeHtml(
-                    String(
-                      song.title ||
-                      "-"
-                    )
-                  )}
-                </div>
-
-                <div class="artist-name">
-                  ${escapeHtml(
-                    String(
-                      artistName
-                    )
-                  )}
-                </div>
-
-              </div>
-              `;
-
-            }).join("");
-
-        }
-
-        let priceHtml="";
-
-        if(itemsForOrder.length){
-
-          priceHtml =
-            itemsForOrder.map(item => {
-
-              const price =
-                item.price !== null &&
-                item.price !== undefined
-                ? item.price
-                : 0;
-
-              return `
-              <div>
-                ${escapeHtml(
-                  String(price)
-                )}
-              </div>
-              `;
-
-            }).join("");
-
-        }else{
-
-          const amount =
-            order.total_amount ||
-            order.amount ||
-            order.total ||
-            0;
-
-          priceHtml =
-            escapeHtml(
-              String(amount)
-            );
-
-        }
-
-        let currency="UGX";
-
-        if(itemsForOrder.length){
-
-          currency =
-            itemsForOrder[0].currency ||
-            order.currency ||
-            "UGX";
-
-        }else{
-
-          currency =
-            order.currency ||
-            "UGX";
-
-        }
-
-        const safeOrderId =
-          escapeHtml(
-            String(id)
-          );
-
-        return `
-
-        <tr>
-
-          <td>
-
-            <div class="id-text">
-              ${safeOrderId}
-            </div>
-
-          </td>
-
-          <td>
-            ${songHtml}
-          </td>
-
-          <td>
-
-            <div class="id-text">
-              ${escapeHtml(
-                String(buyer)
-              )}
-            </div>
-
-          </td>
-
-          <td>
-            ${priceHtml}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(currency)
-            )}
-          </td>
-
-          <td>
-            ${formatStatus(status)}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(created)
-            )}
-          </td>
-
-          <td>
-
-            <div class="admin-actions">
-
-              <button
-                class="info-btn"
-                onclick="viewOrder('${safeOrderId}')"
-              >
-                View
-              </button>
-
-              <button
-                class="action"
-                onclick="editOrderStatus('${safeOrderId}')"
-              >
-                Update
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-        `;
-
-      }).join("");
-
-  }catch(error){
-
-    console.error(
-      "Orders error:",
-      error
-    );
-
-    document.getElementById("ordersTable")
-      .innerHTML=
-      `<tr>
-        <td colspan="8">
-          Unable to load orders.
-          <br><br>
-          ${escapeHtml(
-            error.message ||
-            "Unknown error"
-          )}
-        </td>
-      </tr>`;
-
-  }
+try{
+
+const {
+data:orders,
+error:ordersError
+}=
+await supabaseClient
+.from("orders")
+.select("*")
+.order(
+"created_at",
+{
+ascending:false
+}
+);
+
+if(ordersError)throw ordersError;
+
+ordersData=orders||[];
+
+const {
+data:items,
+error:itemsError
+}=
+await supabaseClient
+.from("order_items")
+.select("*");
+
+if(itemsError)throw itemsError;
+
+orderItemsData=items||[];
+
+document.getElementById("orderCount")
+.textContent=ordersData.length;
+
+document.getElementById("reportOrders")
+.textContent=ordersData.length;
+
+const table=
+document.getElementById("ordersTable");
+
+if(!ordersData.length){
+
+table.innerHTML=
+`
+<tr>
+<td colspan="8" class="empty">
+No orders yet.
+</td>
+</tr>
+`;
+
+return;
 
 }
+
+table.innerHTML=
+ordersData.map(order=>{
+
+const id=
+order.id||"-";
+
+const buyer=
+order.buyer_id||"-";
+
+const status=
+order.status||"pending";
+
+const created=
+order.created_at
+?new Date(
+order.created_at
+).toLocaleString()
+:"-";
+
+const itemsForOrder=
+orderItemsData.filter(
+item=>
+String(item.order_id)===
+String(order.id)
+);
+
+let songHtml="";
+
+if(!itemsForOrder.length){
+
+songHtml=
+`
+<span class="id-text">
+No song item found
+</span>
+`;
+
+}else{
+
+songHtml=
+itemsForOrder.map(item=>{
+
+const song=
+songsData.find(
+s=>
+String(s.id)===
+String(item.song_id)
+);
+
+if(!song){
+
+return`
+<div>
+
+<div class="song-title">
+Unknown Song
+</div>
+
+<div class="id-text">
+Song ID:
+${escapeHtml(
+String(
+item.song_id||"-"
+)
+)}
+</div>
+
+</div>
+`;
+
+}
+
+return`
+<div style="margin-bottom:8px;">
+
+<div class="song-title">
+${escapeHtml(
+String(
+song.title||"-"
+)
+)}
+</div>
+
+<div class="artist-name">
+${escapeHtml(
+String(
+findArtistName(
+song.artist_id
+)
+)
+)}
+</div>
+
+</div>
+`;
+
+}).join("");
+
+}
+
+let priceHtml="";
+
+if(itemsForOrder.length){
+
+priceHtml=
+itemsForOrder.map(item=>{
+
+const price=
+item.price!==null &&
+item.price!==undefined
+?item.price
+:0;
+
+return`
+<div>
+${escapeHtml(
+String(price)
+)}
+</div>
+`;
+
+}).join("");
+
+}else{
+
+const amount=
+order.total_amount||
+order.amount||
+order.total||
+0;
+
+priceHtml=
+escapeHtml(
+String(amount)
+);
+
+}
+
+const currency=
+itemsForOrder.length
+?(itemsForOrder[0].currency||
+order.currency||
+"UGX")
+:(order.currency||"UGX");
+
+const safeOrderId=
+escapeHtml(
+String(id)
+);
+
+return`
+
+<tr>
+
+<td>
+
+<div class="id-text">
+${safeOrderId}
+</div>
+
+</td>
+
+<td>
+${songHtml}
+</td>
+
+<td>
+
+<div class="id-text">
+${escapeHtml(
+String(buyer)
+)}
+</div>
+
+</td>
+
+<td>
+${priceHtml}
+</td>
+
+<td>
+${escapeHtml(
+String(currency)
+)}
+</td>
+
+<td>
+${formatStatus(status)}
+</td>
+
+<td>
+${escapeHtml(
+String(created)
+)}
+</td>
+
+<td>
+
+<div class="admin-actions">
+
+<button
+class="info-btn"
+onclick="viewOrder('${safeOrderId}')"
+>
+View
+</button>
+
+<button
+class="action"
+onclick="editOrderStatus('${safeOrderId}')"
+>
+Update
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`;
+
+}).join("");
+
+}catch(error){
+
+console.error(
+"Orders error:",
+error
+);
+
+document.getElementById("ordersTable")
+.innerHTML=
+`
+<tr>
+<td colspan="8">
+
+Unable to load orders.
+
+<br><br>
+
+${escapeHtml(
+error.message||
+"Unknown error"
+)}
+
+</td>
+</tr>
+`;
+
+}
+
+}
+
 
 function viewOrder(orderId){
 
-  const order =
-    ordersData.find(
-      item =>
-        String(item.id) ===
-        String(orderId)
-    );
+const order=
+ordersData.find(
+item=>
+String(item.id)===
+String(orderId)
+);
 
-  if(!order){
+if(!order){
 
-    alert("Order was not found.");
+alert("Order was not found.");
 
-    return;
-
-  }
-
-  const items =
-    orderItemsData.filter(
-      item =>
-        String(item.order_id) ===
-        String(order.id)
-    );
-
-  const details =
-    items.map(
-      item =>
-        "Song ID: "
-        + String(
-          item.song_id ||
-          "-"
-        )
-        + "\nPrice: "
-        + String(
-          item.price ||
-          0
-        )
-    ).join("\n\n");
-
-  alert(
-    "Order ID:\n"
-    + String(order.id || "-")
-    + "\n\nBuyer:\n"
-    + String(order.buyer_id || "-")
-    + "\n\nStatus:\n"
-    + String(order.status || "pending")
-    + "\n\nCurrency:\n"
-    + String(order.currency || "UGX")
-    + "\n\nItems:\n"
-    + (
-      details ||
-      "No order items found."
-    )
-  );
+return;
 
 }
+
+const items=
+orderItemsData.filter(
+item=>
+String(item.order_id)===
+String(order.id)
+);
+
+const details=
+items.map(
+item=>
+"Song ID: "+
+String(
+item.song_id||"-"
+)+
+"\nPrice: "+
+String(
+item.price||0
+)
+).join("\n\n");
+
+alert(
+"Order ID:\n"+
+String(order.id||"-")+
+"\n\nBuyer:\n"+
+String(order.buyer_id||"-")+
+"\n\nStatus:\n"+
+String(order.status||"pending")+
+"\n\nCurrency:\n"+
+String(order.currency||"UGX")+
+"\n\nItems:\n"+
+(
+details||
+"No order items found."
+)
+);
+
+}
+
 
 async function editOrderStatus(orderId){
 
-  const order =
-    ordersData.find(
-      item =>
-        String(item.id) ===
-        String(orderId)
-    );
+const order=
+ordersData.find(
+item=>
+String(item.id)===
+String(orderId)
+);
 
-  if(!order){
+if(!order){
 
-    alert("Order was not found.");
+alert("Order was not found.");
 
-    return;
-
-  }
-
-  const current =
-    order.status || "pending";
-
-  const newStatus =
-    prompt(
-      "Enter order status:\npending, paid, completed, failed, cancelled, rejected",
-      current
-    );
-
-  if(newStatus === null){
-
-    return;
-
-  }
-
-  const cleanStatus =
-    newStatus.trim().toLowerCase();
-
-  if(!cleanStatus){
-
-    alert("Status cannot be empty.");
-
-    return;
-
-  }
-
-  try{
-
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("orders")
-      .update({
-        status:cleanStatus
-      })
-      .eq(
-        "id",
-        orderId
-      );
-
-    if(error) throw error;
-
-    alert("Order status updated.");
-
-    await loadOrders();
-
-  }catch(error){
-
-    console.error(
-      "Order status error:",
-      error
-    );
-
-    alert(
-      "Unable to update order: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
+return;
 
 }
+
+const current=
+order.status||"pending";
+
+const newStatus=
+prompt(
+"Enter order status:\npending, paid, completed, failed, cancelled, rejected",
+current
+);
+
+if(newStatus===null)return;
+
+const cleanStatus=
+newStatus.trim().toLowerCase();
+
+if(!cleanStatus){
+
+alert("Status cannot be empty.");
+
+return;
+
+}
+
+try{
+
+const {
+error
+}=
+await supabaseClient
+.from("orders")
+.update({
+status:cleanStatus
+})
+.eq(
+"id",
+orderId
+);
+
+if(error)throw error;
+
+alert(
+"Order status updated."
+);
+
+await loadOrders();
+
+}catch(error){
+
+console.error(
+"Order status error:",
+error
+);
+
+alert(
+"Unable to update order: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+}
+
+}
+
+
+/* =========================================================
+   ADVERTISEMENTS
+   ========================================================= */
+
+async function loadAdvertisements(){
+
+const table=
+document.getElementById(
+"advertisementsTable"
+);
+
+if(!table)return;
+
+table.innerHTML=
+`
+<tr>
+<td colspan="7">
+Loading advertisements...
+</td>
+</tr>
+`;
+
+try{
+
+const {
+data,
+error
+}=
+await supabaseClient
+.from("advertisements")
+.select("*")
+.order(
+"created_at",
+{
+ascending:false
+}
+);
+
+if(error)throw error;
+
+advertisementsData=
+data||[];
+
+document.getElementById("adCount")
+.textContent=
+advertisementsData.length;
+
+document.getElementById("reportAds")
+.textContent=
+advertisementsData.length;
+
+const statusElement=
+document.getElementById(
+"adsSystemStatus"
+);
+
+if(statusElement){
+
+statusElement.className="status";
+
+statusElement.textContent=
+"● Connected";
+
+}
+
+if(!advertisementsData.length){
+
+table.innerHTML=
+`
+<tr>
+<td colspan="7" class="empty">
+No advertisements created yet.
+</td>
+</tr>
+`;
+
+return;
+
+}
+
+table.innerHTML=
+advertisementsData.map(ad=>{
+
+const title=
+ad.title||"Untitled Advertisement";
+
+const placement=
+ad.placement||"home";
+
+const start=
+ad.start_at
+?new Date(
+ad.start_at
+).toLocaleString()
+:"Immediately";
+
+const end=
+ad.end_at
+?new Date(
+ad.end_at
+).toLocaleString()
+:"No expiry";
+
+const status=
+ad.status||"active";
+
+const safeId=
+escapeHtml(
+String(ad.id)
+);
+
+return`
+
+<tr>
+
+<td>
+
+<div class="song-title">
+${escapeHtml(
+String(title)
+)}
+</div>
+
+<div class="artist-name">
+${escapeHtml(
+String(
+ad.description||""
+)
+)}
+</div>
+
+</td>
+
+<td>
+${escapeHtml(
+String(placement)
+)}
+</td>
+
+<td>
+
+<div>
+${escapeHtml(start)}
+</div>
+
+<div class="id-text">
+${escapeHtml(end)}
+</div>
+
+</td>
+
+<td>
+${formatStatus(status)}
+</td>
+
+<td>
+${Number(
+ad.impressions||0
+).toLocaleString()}
+</td>
+
+<td>
+${Number(
+ad.clicks||0
+).toLocaleString()}
+</td>
+
+<td>
+
+<div class="admin-actions">
+
+<button
+class="info-btn"
+onclick="editAdvertisement('${safeId}')"
+>
+Edit
+</button>
+
+${
+String(status).toLowerCase()==="active"
+?
+`
+<button
+class="small-btn"
+onclick="setAdvertisementStatus('${safeId}','paused')"
+>
+Pause
+</button>
+`
+:
+`
+<button
+class="success-btn"
+onclick="setAdvertisementStatus('${safeId}','active')"
+>
+Activate
+</button>
+`
+}
+
+<button
+class="danger-btn"
+onclick="deleteAdvertisement('${safeId}')"
+>
+Delete
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`;
+
+}).join("");
+
+}catch(error){
+
+console.error(
+"Advertisement loading error:",
+error
+);
+
+const statusElement=
+document.getElementById(
+"adsSystemStatus"
+);
+
+if(statusElement){
+
+statusElement.className=
+"status-failed";
+
+statusElement.textContent=
+"● Database not ready";
+
+}
+
+table.innerHTML=
+`
+<tr>
+<td colspan="7">
+
+Unable to load advertisements.
+
+<br><br>
+
+${escapeHtml(
+error.message||
+"Unknown error"
+)}
+
+<br><br>
+
+Make sure the advertisements SQL table was created.
+
+</td>
+</tr>
+`;
+
+}
+
+}
+
+
+async function createAdvertisement(){
+
+const title=
+document.getElementById(
+"adTitle"
+).value.trim();
+
+const description=
+document.getElementById(
+"adDescription"
+).value.trim();
+
+const targetUrl=
+document.getElementById(
+"adTargetUrl"
+).value.trim();
+
+const placement=
+document.getElementById(
+"adPlacement"
+).value;
+
+const startInput=
+document.getElementById(
+"adStart"
+).value;
+
+const endInput=
+document.getElementById(
+"adEnd"
+).value;
+
+const fileInput=
+document.getElementById(
+"adImage"
+);
+
+if(!title){
+
+alert(
+"Please enter an advertisement title."
+);
+
+return;
+
+}
+
+if(!targetUrl){
+
+alert(
+"Please enter the destination URL."
+);
+
+return;
+
+}
+
+try{
+
+new URL(targetUrl);
+
+}catch{
+
+alert(
+"Please enter a valid destination URL."
+);
+
+return;
+
+}
+
+if(
+startInput &&
+endInput &&
+new Date(startInput)>=new Date(endInput)
+){
+
+alert(
+"End date must be after start date."
+);
+
+return;
+
+}
+
+let imageUrl=null;
+
+try{
+
+if(
+fileInput &&
+fileInput.files &&
+fileInput.files[0]
+){
+
+const file=
+fileInput.files[0];
+
+if(
+![
+"image/jpeg",
+"image/png",
+"image/webp"
+].includes(file.type)
+){
+
+alert(
+"Advertisement image must be JPG, PNG or WEBP."
+);
+
+return;
+
+}
+
+if(
+file.size>5*1024*1024
+){
+
+alert(
+"Advertisement image must be 5MB or smaller."
+);
+
+return;
+
+}
+
+imageUrl=
+await uploadAdImage(file);
+
+}
+
+}catch(error){
+
+alert(
+"Advertisement image upload failed: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+return;
+
+}
+
+try{
+
+const {
+data:{
+user
+}
+}=
+await supabaseClient.auth.getUser();
+
+if(!user){
+
+alert(
+"Your administrator session has expired."
+);
+
+window.location.href="account.html";
+
+return;
+
+}
+
+const {
+error
+}=
+await supabaseClient
+.from("advertisements")
+.insert({
+
+title:title,
+
+description:
+description||null,
+
+image_url:
+imageUrl,
+
+target_url:
+targetUrl,
+
+placement:
+placement,
+
+start_at:
+startInput
+?new Date(
+startInput
+).toISOString()
+:null,
+
+end_at:
+endInput
+?new Date(
+endInput
+).toISOString()
+:null,
+
+status:"active",
+
+created_by:
+user.id,
+
+created_at:
+new Date().toISOString(),
+
+updated_at:
+new Date().toISOString()
+
+});
+
+if(error)throw error;
+
+alert(
+"Advertisement published successfully."
+);
+
+clearAdForm();
+
+await loadAdvertisements();
+
+}catch(error){
+
+console.error(
+"Advertisement creation error:",
+error
+);
+
+alert(
+"Unable to publish advertisement: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+}
+
+}
+
+
+async function uploadAdImage(file){
+
+const sessionResult=
+await supabaseClient.auth.getSession();
+
+const session=
+sessionResult?.data?.session;
+
+if(!session){
+
+throw new Error(
+"Administrator session expired."
+);
+
+}
+
+const signatureResponse=
+await fetch(
+API_BASE+
+"/api/cloudinary/signature",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json",
+
+"Authorization":
+"Bearer "+
+session.access_token
+},
+
+body:JSON.stringify({
+folder:"pasong/ads"
+})
+
+}
+);
+
+const signatureData=
+await signatureResponse.json();
+
+if(
+!signatureResponse.ok
+){
+
+throw new Error(
+signatureData.error||
+"Cloudinary signing failed."
+);
+
+}
+
+const signature=
+signatureData.signature;
+
+const timestamp=
+signatureData.timestamp;
+
+const cloudName=
+signatureData.cloud_name||
+signatureData.cloudName;
+
+const apiKey=
+signatureData.api_key||
+signatureData.apiKey;
+
+if(
+!signature||
+!timestamp||
+!cloudName||
+!apiKey
+){
+
+throw new Error(
+"Cloudinary signing response is incomplete."
+);
+
+}
+
+const formData=
+new FormData();
+
+formData.append(
+"file",
+file
+);
+
+formData.append(
+"api_key",
+apiKey
+);
+
+formData.append(
+"timestamp",
+timestamp
+);
+
+formData.append(
+"signature",
+signature
+);
+
+formData.append(
+"folder",
+signatureData.folder||
+"pasong/ads"
+);
+
+const uploadResponse=
+await fetch(
+"https://api.cloudinary.com/v1_1/"+
+encodeURIComponent(
+cloudName
+)+
+"/image/upload",
+{
+
+method:"POST",
+
+body:formData
+
+}
+);
+
+const uploadData=
+await uploadResponse.json();
+
+if(
+!uploadResponse.ok
+){
+
+throw new Error(
+uploadData?.error?.message||
+"Cloudinary upload failed."
+);
+
+}
+
+return(
+uploadData.secure_url||
+uploadData.url||
+null
+);
+
+}
+
+
+async function editAdvertisement(id){
+
+const ad=
+advertisementsData.find(
+item=>
+String(item.id)===
+String(id)
+);
+
+if(!ad){
+
+alert(
+"Advertisement was not found."
+);
+
+return;
+
+}
+
+const title=
+prompt(
+"Advertisement title:",
+ad.title||""
+);
+
+if(title===null)return;
+
+const description=
+prompt(
+"Advertisement description:",
+ad.description||""
+);
+
+if(description===null)return;
+
+const targetUrl=
+prompt(
+"Destination URL:",
+ad.target_url||""
+);
+
+if(targetUrl===null)return;
+
+const placement=
+prompt(
+"Placement:\nhome, music, beats, dj, producers, artists, all",
+ad.placement||"home"
+);
+
+if(placement===null)return;
+
+try{
+
+new URL(
+targetUrl.trim()
+);
+
+}catch{
+
+alert(
+"Please enter a valid destination URL."
+);
+
+return;
+
+}
+
+try{
+
+const {
+error
+}=
+await supabaseClient
+.from("advertisements")
+.update({
+
+title:
+title.trim(),
+
+description:
+description.trim()||null,
+
+target_url:
+targetUrl.trim(),
+
+placement:
+placement.trim().toLowerCase(),
+
+updated_at:
+new Date().toISOString()
+
+})
+.eq(
+"id",
+id
+);
+
+if(error)throw error;
+
+alert(
+"Advertisement updated."
+);
+
+await loadAdvertisements();
+
+}catch(error){
+
+console.error(
+"Advertisement edit error:",
+error
+);
+
+alert(
+"Unable to update advertisement: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+}
+
+}
+
+
+async function setAdvertisementStatus(
+id,
+newStatus
+){
+
+const confirmed=
+confirm(
+newStatus==="active"
+?
+"Activate this advertisement?"
+:
+"Pause this advertisement?"
+);
+
+if(!confirmed)return;
+
+try{
+
+const {
+error
+}=
+await supabaseClient
+.from("advertisements")
+.update({
+
+status:newStatus,
+
+updated_at:
+new Date().toISOString()
+
+})
+.eq(
+"id",
+id
+);
+
+if(error)throw error;
+
+alert(
+newStatus==="active"
+?
+"Advertisement activated."
+:
+"Advertisement paused."
+);
+
+await loadAdvertisements();
+
+}catch(error){
+
+console.error(
+"Advertisement status error:",
+error
+);
+
+alert(
+"Unable to change advertisement status: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+}
+
+}
+
+
+async function deleteAdvertisement(id){
+
+const confirmed=
+confirm(
+"Delete this advertisement? This action cannot be undone."
+);
+
+if(!confirmed)return;
+
+try{
+
+const {
+error
+}=
+await supabaseClient
+.from("advertisements")
+.delete()
+.eq(
+"id",
+id
+);
+
+if(error)throw error;
+
+alert(
+"Advertisement deleted."
+);
+
+await loadAdvertisements();
+
+}catch(error){
+
+console.error(
+"Advertisement delete error:",
+error
+);
+
+alert(
+"Unable to delete advertisement: "+
+(
+error.message||
+"Unknown error"
+)
+);
+
+}
+
+}
+
+
+function clearAdForm(){
+
+document.getElementById(
+"adTitle"
+).value="";
+
+document.getElementById(
+"adDescription"
+).value="";
+
+document.getElementById(
+"adTargetUrl"
+).value="";
+
+document.getElementById(
+"adPlacement"
+).value="home";
+
+document.getElementById(
+"adStart"
+).value="";
+
+document.getElementById(
+"adEnd"
+).value="";
+
+document.getElementById(
+"adImage"
+).value="";
+
+document.getElementById(
+"adPreview"
+).innerHTML=
+`
+<div class="ad-preview-content">
+
+<div class="ad-preview-title">
+Advertisement Preview
+</div>
+
+<div class="ad-preview-description">
+Your advertisement preview will appear here.
+</div>
+
+</div>
+`;
+
+}
+
+
+function updateAdPreview(){
+
+const title=
+document.getElementById(
+"adTitle"
+).value.trim();
+
+const description=
+document.getElementById(
+"adDescription"
+).value.trim();
+
+const file=
+document.getElementById(
+"adImage"
+).files?.[0];
+
+const preview=
+document.getElementById(
+"adPreview"
+);
+
+let imageHtml="";
+
+if(file){
+
+const url=
+URL.createObjectURL(file);
+
+imageHtml=
+`
+<img
+src="${url}"
+alt="Advertisement preview"
+>
+`;
+
+}
+
+preview.innerHTML=
+`
+${imageHtml}
+
+<div class="ad-preview-content">
+
+<div class="ad-preview-title">
+${escapeHtml(
+title||
+"Advertisement Preview"
+)}
+</div>
+
+<div class="ad-preview-description">
+${escapeHtml(
+description||
+"Your advertisement preview will appear here."
+)}
+</div>
+
+</div>
+`;
+
+}
+
+
+document.getElementById(
+"adTitle"
+).addEventListener(
+"input",
+updateAdPreview
+);
+
+document.getElementById(
+"adDescription"
+).addEventListener(
+"input",
+updateAdPreview
+);
+
+document.getElementById(
+"adImage"
+).addEventListener(
+"change",
+updateAdPreview
+);
+
+
+/* =========================================================
+   PAYMENT VERIFICATION
+   ========================================================= */
 
 async function loadPaymentVerifications(){
 
-  const table =
-    document.getElementById(
-      "paymentVerificationsTable"
-    );
+const table=
+document.getElementById(
+"paymentVerificationsTable"
+);
 
-  if(!table) return;
+if(!table)return;
 
-  table.innerHTML = `
-    <tr>
-      <td colspan="9">
-        Loading payment verifications...
-      </td>
-    </tr>
-  `;
+table.innerHTML=
+`
+<tr>
+<td colspan="9">
+Loading payment verifications...
+</td>
+</tr>
+`;
 
-  try{
+try{
 
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("payment_verifications")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
+const {
+data,
+error
+}=
+await supabaseClient
+.from("payment_verifications")
+.select("*")
+.order(
+"created_at",
+{
+ascending:false
+}
+);
 
-    if(error) throw error;
+if(error)throw error;
 
-    if(!data || !data.length){
+if(!data||!data.length){
 
-      table.innerHTML = `
-        <tr>
-          <td colspan="9" class="empty">
-            💳 No payment verification requests yet.
-          </td>
-        </tr>
-      `;
+table.innerHTML=
+`
+<tr>
+<td colspan="9" class="empty">
+💳 No payment verification requests yet.
+</td>
+</tr>
+`;
 
-      return;
-
-    }
-
-    table.innerHTML =
-      data.map(function(item){
-
-        const country =
-          item.country ||
-          "-";
-
-        const method =
-          item.verification_type === "mobile_money"
-          ? "📱 Mobile Money"
-          : "💳 Card / Online";
-
-        const provider =
-          item.provider ||
-          "-";
-
-        const accountName =
-          item.account_name ||
-          "-";
-
-        const accountNumber =
-          item.account_number ||
-          "-";
-
-        const status =
-          item.status ||
-          "pending";
-
-        const submitted =
-          item.created_at
-          ? new Date(
-              item.created_at
-            ).toLocaleString()
-          : "-";
-
-        const safeId =
-          escapeHtml(
-            String(
-              item.id ||
-              ""
-            )
-          );
-
-        return `
-
-        <tr>
-
-          <td>
-
-            <div class="song-title">
-              Creator
-            </div>
-
-            <div class="id-text">
-              ${escapeHtml(
-                String(
-                  item.user_id ||
-                  "-"
-                )
-              )}
-            </div>
-
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(country)
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(method)
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(provider)
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(accountName)
-            )}
-          </td>
-
-          <td>
-
-            <div class="id-text">
-              ${escapeHtml(
-                String(accountNumber)
-              )}
-            </div>
-
-          </td>
-
-          <td>
-            ${formatStatus(status)}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(submitted)
-            )}
-          </td>
-
-          <td>
-
-            <div class="admin-actions">
-
-              <button
-                class="info-btn"
-                onclick="viewPaymentVerification('${safeId}')"
-              >
-                View
-              </button>
-
-              ${
-                String(status).toLowerCase()
-                === "pending"
-
-                ?
-
-                `
-
-                <button
-                  class="success-btn"
-                  onclick="updatePaymentVerification('${safeId}','approved')"
-                >
-                  ✓ Approve
-                </button>
-
-                <button
-                  class="danger-btn"
-                  onclick="updatePaymentVerification('${safeId}','rejected')"
-                >
-                  ✕ Reject
-                </button>
-
-                `
-
-                :
-
-                `<span class="id-text">
-                  Reviewed
-                </span>`
-
-              }
-
-            </div>
-
-          </td>
-
-        </tr>
-
-        `;
-
-      }).join("");
-
-  }catch(error){
-
-    console.error(
-      "Payment verification error:",
-      error
-    );
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="9">
-          Unable to load payment verifications.
-          <br><br>
-          ${escapeHtml(
-            error.message ||
-            "Unknown error"
-          )}
-        </td>
-      </tr>
-    `;
-
-  }
+return;
 
 }
 
-function viewPaymentVerification(id){
+table.innerHTML=
+data.map(item=>{
 
-  alert(
-    "Payment verification ID:\n"
-    + String(id)
-    + "\n\nUse Approve or Reject to review this request."
-  );
+const country=
+item.country||"-";
 
-}
+const method=
+item.verification_type==="mobile_money"
+?"📱 Mobile Money"
+:"💳 Card / Online";
 
-async function updatePaymentVerification(
-  verificationId,
-  newStatus
-){
-
-  if(
-    !verificationId ||
-    !newStatus
-  ){
-
-    return;
-
-  }
-
-  const actionText =
-    newStatus === "approved"
-    ? "approve"
-    : "reject";
-
-  const confirmed =
-    confirm(
-      "Are you sure you want to "
-      + actionText
-      + " this payment method?"
-    );
-
-  if(!confirmed){
-
-    return;
-
-  }
-
-  try{
-
-    const {
-      data:{
-        user
-      }
-    } =
-    await supabaseClient.auth.getUser();
-
-    if(!user){
-
-      alert(
-        "Your administrator session has expired."
-      );
-
-      window.location.href="account.html";
-
-      return;
-
-    }
-
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("payment_verifications")
-      .update({
-
-        status:newStatus,
-
-        reviewed_at:
-          new Date().toISOString(),
-
-        reviewed_by:
-          user.id,
-
-        updated_at:
-          new Date().toISOString()
-
-      })
-      .eq(
-        "id",
-        verificationId
-      );
-
-    if(error) throw error;
-
-    alert(
-      newStatus === "approved"
-      ? "Payment method approved successfully."
-      : "Payment method rejected."
-    );
-
-    await loadPaymentVerifications();
-
-  }catch(error){
-
-    console.error(
-      "Payment verification update error:",
-      error
-    );
-
-    alert(
-      "Unable to update verification: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
-
-}
-
-async function loadCoverRequests(){
-
-  const table =
-    document.getElementById(
-      "coverRequestsTable"
-    );
-
-  if(!table) return;
-
-  table.innerHTML = `
-    <tr>
-      <td colspan="7">
-        Loading cover requests...
-      </td>
-    </tr>
-  `;
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .select(`
-        id,
-        user_id,
-        dj_name,
-        mix_title,
-        subtitle,
-        featured_artists,
-        genre,
-        edition_year,
-        preferred_style,
-        preferred_colours,
-        location,
-        main_photo_url,
-        reference_photo_url,
-        logo_url,
-        extra_details,
-        contact_email,
-        contact_phone,
-        country,
-        currency,
-        price,
-        payment_status,
-        request_status,
-        finished_cover_url,
-        admin_notes,
-        created_at,
-        updated_at
-      `)
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-    if(error){
-
-      console.error(
-        "Cover requests error:",
-        error
-      );
-
-      table.innerHTML = `
-        <tr>
-          <td colspan="7">
-            Unable to load cover requests.
-            <br><br>
-            ${escapeHtml(
-              error.message ||
-              "Unknown Supabase error"
-            )}
-          </td>
-        </tr>
-      `;
-
-      return;
-
-    }
-
-    coverRequestsData =
-      data || [];
-
-    if(!coverRequestsData.length){
-
-      table.innerHTML = `
-        <tr>
-          <td colspan="7" class="empty">
-            🎨 No cover requests yet.
-          </td>
-        </tr>
-      `;
-
-      return;
-
-    }
-
-    table.innerHTML =
-      coverRequestsData.map(function(request){
-
-        const creator =
-          request.dj_name ||
-          "Unknown Creator";
-
-        const title =
-          request.mix_title ||
-          "Untitled";
-
-        const price =
-          Number(
-            request.price || 0
-          ).toLocaleString();
-
-        const currency =
-          request.currency ||
-          "UGX";
-
-        const payment =
-          request.payment_status ||
-          "pending";
-
-        const design =
-          request.request_status ||
-          "pending";
-
-        const created =
-          request.created_at
-          ? new Date(
-              request.created_at
-            ).toLocaleString()
-          : "-";
-
-        const safeId =
-          escapeHtml(
-            String(request.id)
-          );
-
-        return `
-
-        <tr>
-
-          <td>
-
-            <div class="song-title">
-              ${escapeHtml(
-                String(creator)
-              )}
-            </div>
-
-            <div class="artist-name">
-              ${escapeHtml(
-                String(
-                  request.contact_email ||
-                  ""
-                )
-              )}
-            </div>
-
-          </td>
-
-          <td>
-
-            <div class="song-title">
-              ${escapeHtml(
-                String(title)
-              )}
-            </div>
-
-            <div class="id-text">
-              ${escapeHtml(
-                String(
-                  request.genre ||
-                  ""
-                )
-              )}
-            </div>
-
-          </td>
-
-          <td>
-
-            ${escapeHtml(
-              String(currency)
-            )}
-            ${escapeHtml(
-              String(price)
-            )}
-
-          </td>
-
-          <td>
-            ${formatStatus(payment)}
-          </td>
-
-          <td>
-            ${formatStatus(design)}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              String(created)
-            )}
-          </td>
-
-          <td>
-
-            <div class="admin-actions">
-
-              <button
-                class="info-btn"
-                onclick="viewCoverRequest('${safeId}')"
-              >
-                View
-              </button>
-
-              <button
-                class="action"
-                onclick="editCoverRequest('${safeId}')"
-              >
-                Edit
-              </button>
-
-              <button
-                class="success-btn"
-                onclick="completeCoverRequest('${safeId}')"
-              >
-                ✓ Complete
-              </button>
-
-              <button
-                class="danger-btn"
-                onclick="rejectCoverRequest('${safeId}')"
-              >
-                ✕ Reject
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-        `;
-
-      }).join("");
-
-  }catch(error){
-
-    console.error(
-      "Cover requests failed:",
-      error
-    );
-
-    table.innerHTML = `
-      <tr>
-        <td colspan="7">
-          Failed to fetch cover requests.
-          <br><br>
-          ${escapeHtml(
-            error.message ||
-            "Unknown error"
-          )}
-        </td>
-      </tr>
-    `;
-
-  }
-
-}
-
-async function viewCoverRequest(
-  requestId
-){
-
-  const details =
-    document.getElementById(
-      "coverRequestDetails"
-    );
-
-  const content =
-    document.getElementById(
-      "coverRequestDetailsContent"
-    );
-
-  if(!details || !content){
-
-    return;
-
-  }
-
-  details.style.display="block";
-
-  content.innerHTML = `
-    <div class="notice">
-      Loading cover request...
-    </div>
-  `;
-
-  details.scrollIntoView({
-    behavior:"smooth",
-    block:"start"
-  });
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .select("*")
-      .eq(
-        "id",
-        requestId
-      )
-      .single();
-
-    if(error) throw error;
-
-    if(!data){
-
-      content.innerHTML = `
-        <div class="notice">
-          Cover request was not found.
-        </div>
-      `;
-
-      return;
-
-    }
-
-    currentCoverRequest=data;
-
-    renderCoverRequestDetails(data);
-
-  }catch(error){
-
-    console.error(
-      "View cover request error:",
-      error
-    );
-
-    content.innerHTML = `
-      <div class="notice">
-        Unable to open cover request.
-        <br><br>
-        ${escapeHtml(
-          error.message ||
-          "Unknown error"
-        )}
-      </div>
-    `;
-
-  }
-
-}
-
-function renderCoverRequestDetails(data){
-
-  const content =
-    document.getElementById(
-      "coverRequestDetailsContent"
-    );
-
-  if(!content){
-
-    return;
-
-  }
-
-  const price =
-    Number(
-      data.price || 0
-    ).toLocaleString();
-
-  const currency =
-    data.currency ||
-    "UGX";
-
-  const requestStatus =
-    data.request_status ||
-    "pending";
-
-  const paymentStatus =
-    data.payment_status ||
-    "pending";
-
-  let mainPhoto = "";
-
-  if(
-    data.main_photo_url &&
-    /^https?:\/\//i.test(
-      data.main_photo_url
-    )
-  ){
-
-    mainPhoto = `
-      <div class="cover-image-box">
-
-        <div class="cover-detail-label">
-          Main Photo
-        </div>
-
-        <img
-          src="${escapeHtml(
-            data.main_photo_url
-          )}"
-          alt="Main creator photo"
-        >
-
-        <br>
-
-        <a
-          class="cover-link"
-          href="${escapeHtml(
-            data.main_photo_url
-          )}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open Photo
-        </a>
-
-      </div>
-    `;
-
-  }
-
-  let referencePhoto = "";
-
-  if(
-    data.reference_photo_url &&
-    /^https?:\/\//i.test(
-      data.reference_photo_url
-    )
-  ){
-
-    referencePhoto = `
-      <div class="cover-image-box">
-
-        <div class="cover-detail-label">
-          Reference Photo
-        </div>
-
-        <img
-          src="${escapeHtml(
-            data.reference_photo_url
-          )}"
-          alt="Reference photo"
-        >
-
-        <br>
-
-        <a
-          class="cover-link"
-          href="${escapeHtml(
-            data.reference_photo_url
-          )}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open Photo
-        </a>
-
-      </div>
-    `;
-
-  }
-
-  let logo = "";
-
-  if(
-    data.logo_url &&
-    /^https?:\/\//i.test(
-      data.logo_url
-    )
-  ){
-
-    logo = `
-      <div class="cover-image-box">
-
-        <div class="cover-detail-label">
-          Logo
-        </div>
-
-        <img
-          src="${escapeHtml(
-            data.logo_url
-          )}"
-          alt="Creator logo"
-        >
-
-        <br>
-
-        <a
-          class="cover-link"
-          href="${escapeHtml(
-            data.logo_url
-          )}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open Logo
-        </a>
-
-      </div>
-    `;
-
-  }
-
-  let finishedCover = "";
-
-  if(
-    data.finished_cover_url &&
-    /^https?:\/\//i.test(
-      data.finished_cover_url
-    )
-  ){
-
-    finishedCover = `
-      <div class="cover-image-box">
-
-        <div class="cover-detail-label">
-          Finished Cover
-        </div>
-
-        <img
-          src="${escapeHtml(
-            data.finished_cover_url
-          )}"
-          alt="Finished PASONG cover"
-        >
-
-        <br>
-
-        <a
-          class="cover-link"
-          href="${escapeHtml(
-            data.finished_cover_url
-          )}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open Finished Cover
-        </a>
-
-      </div>
-    `;
-
-  }
-
-  content.innerHTML = `
-
-    <div class="cover-details-grid">
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Request ID
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.id || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Creator
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.dj_name || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Cover / Mix Title
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.mix_title || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Subtitle
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.subtitle || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Featured Artists
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(
-              data.featured_artists ||
-              "-"
-            )
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Genre
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.genre || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Edition / Year
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(
-              data.edition_year ||
-              "-"
-            )
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Preferred Style
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(
-              data.preferred_style ||
-              "-"
-            )
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Preferred Colours
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(
-              data.preferred_colours ||
-              "-"
-            )
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Location
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.location || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Country
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(data.country || "-")
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Contact Email
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(
-              data.contact_email ||
-              "-"
-            )
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Contact Phone
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(
-              data.contact_phone ||
-              "-"
-            )
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Cover Price
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            String(currency)
-          )}
-          ${escapeHtml(
-            String(price)
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Payment Status
-        </div>
-
-        <div class="cover-detail-value">
-          ${formatStatus(
-            paymentStatus
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Design Status
-        </div>
-
-        <div class="cover-detail-value">
-          ${formatStatus(
-            requestStatus
-          )}
-        </div>
-
-      </div>
-
-      <div class="cover-detail-box">
-
-        <div class="cover-detail-label">
-          Submitted
-        </div>
-
-        <div class="cover-detail-value">
-          ${escapeHtml(
-            data.created_at
-            ? new Date(
-                data.created_at
-              ).toLocaleString()
-            : "-"
-          )}
-        </div>
-
-      </div>
-
-    </div>
-
-    <div
-      class="cover-detail-box"
-      style="margin-top:15px;"
-    >
-
-      <div class="cover-detail-label">
-        Extra Details / Instructions
-      </div>
-
-      <div class="cover-detail-value">
-        ${escapeHtml(
-          String(
-            data.extra_details ||
-            "-"
-          )
-        )}
-      </div>
-
-    </div>
-
-    <div
-      class="cover-detail-box"
-      style="margin-top:15px;"
-    >
-
-      <div class="cover-detail-label">
-        Admin Notes
-      </div>
-
-      <div class="cover-detail-value">
-        ${escapeHtml(
-          String(
-            data.admin_notes ||
-            "-"
-          )
-        )}
-      </div>
-
-    </div>
-
-    <div class="cover-images">
-
-      ${mainPhoto}
-
-      ${referencePhoto}
-
-      ${logo}
-
-      ${finishedCover}
-
-    </div>
-
-    <div class="upload-box">
-
-      <strong>
-        🎨 Upload Finished Cover
-      </strong>
-
-      <input
-        id="finishedCoverFile"
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-      >
-
-      <div class="cover-actions">
-
-        <button
-          class="action"
-          onclick="uploadFinishedCover('${escapeHtml(String(data.id))}')"
-        >
-          Upload Cover
-        </button>
-
-        <button
-          class="success-btn"
-          onclick="completeCoverRequest('${escapeHtml(String(data.id))}')"
-        >
-          ✓ Mark Complete
-        </button>
-
-        <button
-          class="danger-btn"
-          onclick="rejectCoverRequest('${escapeHtml(String(data.id))}')"
-        >
-          ✕ Reject Request
-        </button>
-
-      </div>
-
-    </div>
-
-    <div
-      class="cover-detail-box"
-      style="margin-top:15px;"
-    >
-
-      <div class="cover-detail-label">
-        User ID
-      </div>
-
-      <div class="cover-detail-value">
-        ${escapeHtml(
-          String(
-            data.user_id ||
-            "-"
-          )
-        )}
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-async function editCoverRequest(requestId){
-
-  try{
-
-    const {
-      data,
-      error
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .select("*")
-      .eq(
-        "id",
-        requestId
-      )
-      .single();
-
-    if(error) throw error;
-
-    const title =
-      prompt(
-        "Cover / Mix Title:",
-        data.mix_title || ""
-      );
-
-    if(title === null) return;
-
-    const subtitle =
-      prompt(
-        "Subtitle:",
-        data.subtitle || ""
-      );
-
-    if(subtitle === null) return;
-
-    const style =
-      prompt(
-        "Preferred Style:",
-        data.preferred_style || ""
-      );
-
-    if(style === null) return;
-
-    const colours =
-      prompt(
-        "Preferred Colours:",
-        data.preferred_colours || ""
-      );
-
-    if(colours === null) return;
-
-    const notes =
-      prompt(
-        "Admin Notes:",
-        data.admin_notes || ""
-      );
-
-    if(notes === null) return;
-
-    const {
-      error:updateError
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .update({
-
-        mix_title:title.trim(),
-
-        subtitle:subtitle.trim(),
-
-        preferred_style:
-          style.trim(),
-
-        preferred_colours:
-          colours.trim(),
-
-        admin_notes:
-          notes.trim(),
-
-        updated_at:
-          new Date().toISOString()
-
-      })
-      .eq(
-        "id",
-        requestId
-      );
-
-    if(updateError) throw updateError;
-
-    alert(
-      "Cover request updated successfully."
-    );
-
-    await loadCoverRequests();
-
-    await viewCoverRequest(
-      requestId
-    );
-
-  }catch(error){
-
-    console.error(
-      "Cover edit error:",
-      error
-    );
-
-    alert(
-      "Unable to edit cover request: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
-
-}
-
-async function completeCoverRequest(requestId){
-
-  if(!requestId){
-
-    return;
-
-  }
-
-  const confirmed =
-    confirm(
-      "Mark this cover request as completed?"
-    );
-
-  if(!confirmed){
-
-    return;
-
-  }
-
-  try{
-
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .update({
-
-        request_status:
-          "completed",
-
-        updated_at:
-          new Date().toISOString()
-
-      })
-      .eq(
-        "id",
-        requestId
-      );
-
-    if(error) throw error;
-
-    alert(
-      "Cover request marked as completed."
-    );
-
-    await loadCoverRequests();
-
-    await viewCoverRequest(
-      requestId
-    );
-
-  }catch(error){
-
-    console.error(
-      "Complete cover request error:",
-      error
-    );
-
-    alert(
-      "Unable to complete cover request: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
-
-}
-
-async function rejectCoverRequest(requestId){
-
-  if(!requestId){
-
-    return;
-
-  }
-
-  const confirmed =
-    confirm(
-      "Reject this cover request?"
-    );
-
-  if(!confirmed){
-
-    return;
-
-  }
-
-  try{
-
-    const {
-      error
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .update({
-
-        request_status:
-          "rejected",
-
-        updated_at:
-          new Date().toISOString()
-
-      })
-      .eq(
-        "id",
-        requestId
-      );
-
-    if(error) throw error;
-
-    alert(
-      "Cover request rejected."
-    );
-
-    await loadCoverRequests();
-
-    await viewCoverRequest(
-      requestId
-    );
-
-  }catch(error){
-
-    console.error(
-      "Reject cover request error:",
-      error
-    );
-
-    alert(
-      "Unable to reject cover request: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
-
-}
-
-async function uploadFinishedCover(
-  requestId
-){
-
-  const input =
-    document.getElementById(
-      "finishedCoverFile"
-    );
-
-  if(!input || !input.files || !input.files[0]){
-
-    alert(
-      "Please select the finished cover image first."
-    );
-
-    return;
-
-  }
-
-  const file =
-    input.files[0];
-
-  if(
-    ![
-      "image/jpeg",
-      "image/png",
-      "image/webp"
-    ].includes(file.type)
-  ){
-
-    alert(
-      "Please upload JPG, PNG or WEBP."
-    );
-
-    return;
-
-  }
-
-  if(file.size > 5 * 1024 * 1024){
-
-    alert(
-      "Cover image must be 5MB or smaller."
-    );
-
-    return;
-
-  }
-
-  try{
-
-    const sessionResult =
-      await supabaseClient.auth.getSession();
-
-    const session =
-      sessionResult &&
-      sessionResult.data &&
-      sessionResult.data.session;
-
-    if(!session){
-
-      alert(
-        "Your administrator session has expired."
-      );
-
-      window.location.href="account.html";
-
-      return;
-
-    }
-
-    const button =
-      document.querySelector(
-        `button[onclick*="uploadFinishedCover"]`
-      );
-
-    if(button){
-
-      button.disabled=true;
-
-      button.textContent=
-        "Uploading...";
-
-    }
-
-    const signatureResponse =
-      await fetch(
-        API_BASE +
-        "/api/cloudinary/signature",
-        {
-          method:"POST",
-          headers:{
-            "Content-Type":
-              "application/json",
-            "Authorization":
-              "Bearer " +
-              session.access_token
-          },
-          body:JSON.stringify({
-            folder:
-              "pasong/covers"
-          })
-        }
-      );
-
-    let signatureData=null;
-
-    try{
-
-      signatureData =
-        await signatureResponse.json();
-
-    }catch(error){
-
-      signatureData=null;
-
-    }
-
-    if(
-      !signatureResponse.ok ||
-      !signatureData
-    ){
-
-      throw new Error(
-        "Cloudinary signing failed."
-      );
-
-    }
-
-    const signature =
-      signatureData.signature;
-
-    const timestamp =
-      signatureData.timestamp;
-
-    const cloudName =
-      signatureData.cloud_name ||
-      signatureData.cloudName;
-
-    const apiKey =
-      signatureData.api_key ||
-      signatureData.apiKey;
-
-    if(
-      !signature ||
-      !timestamp ||
-      !cloudName ||
-      !apiKey
-    ){
-
-      throw new Error(
-        "Cloudinary signing response is incomplete."
-      );
-
-    }
-
-    const formData =
-      new FormData();
-
-    formData.append(
-      "file",
-      file
-    );
-
-    formData.append(
-      "api_key",
-      apiKey
-    );
-
-    formData.append(
-      "timestamp",
-      timestamp
-    );
-
-    formData.append(
-      "signature",
-      signature
-    );
-
-    if(signatureData.folder){
-
-      formData.append(
-        "folder",
-        signatureData.folder
-      );
-
-    }else{
-
-      formData.append(
-        "folder",
-        "pasong/covers"
-      );
-
-    }
-
-    const uploadResponse =
-      await fetch(
-        "https://api.cloudinary.com/v1_1/"
-        + encodeURIComponent(
-          cloudName
-        )
-        + "/image/upload",
-        {
-          method:"POST",
-          body:formData
-        }
-      );
-
-    const uploadData =
-      await uploadResponse.json();
-
-    if(!uploadResponse.ok){
-
-      throw new Error(
-        uploadData.error &&
-        uploadData.error.message
-        ? uploadData.error.message
-        : "Cloudinary upload failed."
-      );
-
-    }
-
-    const coverUrl =
-      uploadData.secure_url ||
-      uploadData.url;
-
-    if(!coverUrl){
-
-      throw new Error(
-        "Cloudinary did not return a cover URL."
-      );
-
-    }
-
-    const {
-      error:updateError
-    } =
-    await supabaseClient
-      .from("cover_requests")
-      .update({
-
-        finished_cover_url:
-          coverUrl,
-
-        request_status:
-          "completed",
-
-        updated_at:
-          new Date().toISOString()
-
-      })
-      .eq(
-        "id",
-        requestId
-      );
-
-    if(updateError) throw updateError;
-
-    alert(
-      "Finished cover uploaded successfully."
-    );
-
-    await loadCoverRequests();
-
-    await viewCoverRequest(
-      requestId
-    );
-
-  }catch(error){
-
-    console.error(
-      "Finished cover upload error:",
-      error
-    );
-
-    alert(
-      "Unable to upload finished cover: "
-      + (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }finally{
-
-    const button =
-      document.querySelector(
-        `button[onclick*="uploadFinishedCover"]`
-      );
-
-    if(button){
-
-      button.disabled=false;
-
-      button.textContent=
-        "Upload Cover";
-
-    }
-
-  }
-
-}
-
-function closeCoverRequest(){
-
-  const details =
-    document.getElementById(
-      "coverRequestDetails"
-    );
-
-  const content =
-    document.getElementById(
-      "coverRequestDetailsContent"
-    );
-
-  if(details){
-
-    details.style.display="none";
-
-  }
-
-  if(content){
-
-    content.innerHTML="";
-
-  }
-
-  currentCoverRequest=null;
-
-}
-
-function formatStatus(status){
-
-  const value =
-    String(
-      status ||
-      "pending"
-    ).toLowerCase();
-
-  if(
-
-    value === "completed" ||
-    value === "paid" ||
-    value === "success" ||
-    value === "approved" ||
-    value === "active"
-
-  ){
-
-    return `
-      <span class="status">
-        ● ${escapeHtml(value)}
-      </span>
-    `;
-
-  }
-
-  if(
-
-    value === "failed" ||
-    value === "cancelled" ||
-    value === "rejected"
-
-  ){
-
-    return `
-      <span class="status-failed">
-        ● ${escapeHtml(value)}
-      </span>
-    `;
-
-  }
-
-  return `
-    <span class="status-pending">
-      ● ${escapeHtml(value)}
-    </span>
-  `;
-
-}
-
-function showSection(id){
-
-  document.querySelectorAll(
-    ".section-content"
-  ).forEach(section => {
-
-    section.classList.remove(
-      "active"
-    );
-
-  });
-
-  const selected =
-    document.getElementById(id);
-
-  if(selected){
-
-    selected.classList.add(
-      "active"
-    );
-
-    selected.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-
-  }
-
-}
-
-function escapeHtml(value){
-
-  return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
-
-async function logout(){
-
-  await supabaseClient.auth.signOut();
-
-  window.location.href="account.html";
-
-}
-
-checkAdmin();
-
-</script></body></html>
+const provider=
