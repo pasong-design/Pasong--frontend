@@ -299,6 +299,126 @@ main{
   right:18px
 }
 
+
+/* =========================
+   PASONG ADVERTISEMENTS
+   ========================= */
+
+.ads-section{
+  margin-top:18px;
+  display:none
+}
+
+.ads-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px
+}
+
+.ads-label{
+  font-size:11px;
+  font-weight:800;
+  color:#8d8d9b;
+  letter-spacing:1.5px;
+  text-transform:uppercase
+}
+
+.ads-list{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px
+}
+
+.ads-card{
+  display:block;
+  width:100%;
+  min-height:130px;
+  border:1px solid #292936;
+  border-radius:15px;
+  overflow:hidden;
+  background:#11111a;
+  position:relative;
+  transition:.2s;
+  cursor:pointer
+}
+
+.ads-card:hover{
+  border-color:#8b5cf6;
+  transform:translateY(-1px)
+}
+
+.ads-card-media{
+  width:100%;
+  display:block;
+  background:#09090f;
+  position:relative
+}
+
+.ads-card-media img{
+  display:block;
+  width:100%;
+  max-height:300px;
+  object-fit:cover
+}
+
+.ads-card-media video{
+  display:block;
+  width:100%;
+  max-height:420px;
+  object-fit:cover;
+  background:#000
+}
+
+.ads-card-content{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:55px 18px 16px;
+  background:linear-gradient(
+    transparent,
+    rgba(0,0,0,.92)
+  );
+  pointer-events:none
+}
+
+.ads-card-title{
+  font-size:17px;
+  font-weight:900;
+  line-height:1.2
+}
+
+.ads-card-description{
+  margin-top:5px;
+  color:#d0d0d8;
+  font-size:12px;
+  line-height:1.4
+}
+
+.ads-video-badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:3;
+  background:rgba(0,0,0,.65);
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:7px;
+  padding:5px 8px;
+  font-size:10px;
+  font-weight:800;
+  color:#fff
+}
+
+.ads-empty{
+  display:none
+}
+
+
+/* =========================
+   QUICK NAV
+   ========================= */
+
 .quick-nav{
   display:flex;
   gap:9px;
@@ -812,6 +932,20 @@ footer{
     right:10px
   }
 
+  .ads-card-media img{
+    min-height:140px;
+    max-height:220px
+  }
+
+  .ads-card-media video{
+    min-height:180px;
+    max-height:240px
+  }
+
+  .ads-card-title{
+    font-size:15px
+  }
+
 }
 
 @media(max-width:520px){
@@ -1010,6 +1144,32 @@ footer{
     </button>
 
   </section>
+
+
+  <!-- =========================
+       PASONG SPONSORED ADS
+       ========================= -->
+
+  <section
+    class="ads-section"
+    id="pasongAdsSection"
+  >
+
+    <div class="ads-header">
+
+      <span class="ads-label">
+        Sponsored
+      </span>
+
+    </div>
+
+    <div
+      class="ads-list"
+      id="pasongAds"
+    ></div>
+
+  </section>
+
 
   <div class="quick-nav">
 
@@ -1697,6 +1857,11 @@ function escapeHtml(value){
     .replace(/'/g,"&#039;");
 }
 
+
+/* =========================
+   LOAD ARTIST MAP
+   ========================= */
+
 async function loadArtistMap(){
 
   const {
@@ -1797,6 +1962,11 @@ function getGenre(song){
 
   );
 }
+
+
+/* =========================
+   SONG CARDS
+   ========================= */
 
 function createSongCard(song){
 
@@ -1960,6 +2130,406 @@ function renderSongs(
     }
   );
 }
+
+
+/* =========================
+   PASONG ADVERTISEMENTS
+   IMAGE + VIDEO
+   ========================= */
+
+async function loadPasongAds(){
+
+  const section =
+    document.getElementById(
+      "pasongAdsSection"
+    );
+
+  const container =
+    document.getElementById(
+      "pasongAds"
+    );
+
+  if(
+    !section ||
+    !container
+  ){
+    return;
+  }
+
+  section.style.display =
+    "none";
+
+  container.innerHTML =
+    "";
+
+  const now =
+    new Date().toISOString();
+
+  /*
+    We select * so the public page can work with
+    image_url, video_url, media_url or media_type
+    without breaking if your advertisements table
+    has different media columns.
+  */
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("advertisements")
+      .select("*")
+      .eq(
+        "status",
+        "active"
+      )
+      .eq(
+        "placement",
+        "home"
+      )
+      .or(
+        `start_at.is.null,start_at.lte.${now}`
+      )
+      .or(
+        `end_at.is.null,end_at.gte.${now}`
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(5);
+
+  if(error){
+
+    console.error(
+      "PASONG ads loading error:",
+      error
+    );
+
+    return;
+  }
+
+  const ads =
+    (data || []).filter(
+      function(ad){
+
+        return (
+
+          ad.image_url ||
+          ad.video_url ||
+          ad.media_url
+
+        );
+
+      }
+    );
+
+  if(!ads.length){
+
+    return;
+  }
+
+  section.style.display =
+    "block";
+
+  ads.forEach(
+    function(ad){
+
+      const card =
+        document.createElement(
+          "a"
+        );
+
+      card.className =
+        "ads-card";
+
+      let target =
+        ad.target_url ||
+        "";
+
+      target =
+        String(target).trim();
+
+      /*
+        If there is no destination,
+        the advertisement still displays
+        but does not navigate.
+      */
+
+      if(target){
+
+        card.href =
+          target;
+
+        /*
+          External advertisement links open
+          safely in a new tab.
+        */
+
+        if(
+          /^https?:\/\//i.test(target)
+        ){
+
+          card.target =
+            "_blank";
+
+          card.rel =
+            "noopener noreferrer";
+
+        }
+
+      }else{
+
+        card.href =
+          "javascript:void(0)";
+
+        card.addEventListener(
+          "click",
+          function(event){
+
+            event.preventDefault();
+
+          }
+        );
+
+      }
+
+
+      /*
+        Determine whether this is a video.
+      */
+
+      const mediaType =
+        String(
+          ad.media_type ||
+          ad.type ||
+          ""
+        )
+          .toLowerCase()
+          .trim();
+
+      const videoUrl =
+        ad.video_url ||
+        ad.media_url ||
+        (
+          mediaType === "video"
+            ? ad.image_url
+            : ""
+        );
+
+      const imageUrl =
+        ad.image_url ||
+        (
+          mediaType !== "video"
+            ? ad.media_url
+            : ""
+        );
+
+      const looksLikeVideo =
+        mediaType === "video" ||
+        !!ad.video_url ||
+        (
+          !!ad.media_url &&
+          /\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(
+            String(ad.media_url)
+          )
+        ) ||
+        (
+          !!ad.image_url &&
+          mediaType === "video"
+        );
+
+      const media =
+        document.createElement(
+          "div"
+        );
+
+      media.className =
+        "ads-card-media";
+
+
+      if(
+        looksLikeVideo &&
+        videoUrl
+      ){
+
+        const video =
+          document.createElement(
+            "video"
+          );
+
+        video.src =
+          videoUrl;
+
+        video.autoplay =
+          true;
+
+        video.muted =
+          true;
+
+        video.loop =
+          true;
+
+        video.playsInline =
+          true;
+
+        video.controls =
+          false;
+
+        video.preload =
+          "metadata";
+
+        video.setAttribute(
+          "aria-label",
+          ad.title ||
+          "PASONG Advertisement"
+        );
+
+        const badge =
+          document.createElement(
+            "div"
+          );
+
+        badge.className =
+          "ads-video-badge";
+
+        badge.textContent =
+          "▶ VIDEO AD";
+
+        media.appendChild(
+          video
+        );
+
+        media.appendChild(
+          badge
+        );
+
+        /*
+          Some browsers block autoplay until
+          muted playback is explicitly requested.
+        */
+
+        video.play()
+          .catch(
+            function(){
+
+              /*
+                If autoplay is blocked,
+                the video remains available.
+              */
+
+            }
+          );
+
+      }else if(imageUrl){
+
+        const image =
+          document.createElement(
+            "img"
+          );
+
+        image.src =
+          imageUrl;
+
+        image.alt =
+          ad.title ||
+          "PASONG Advertisement";
+
+        image.loading =
+          "lazy";
+
+        media.appendChild(
+          image
+        );
+
+      }else{
+
+        return;
+
+      }
+
+
+      card.appendChild(
+        media
+      );
+
+
+      /*
+        Advertisement text overlay.
+      */
+
+      if(
+        ad.title ||
+        ad.description
+      ){
+
+        const content =
+          document.createElement(
+            "div"
+          );
+
+        content.className =
+          "ads-card-content";
+
+        if(ad.title){
+
+          const title =
+            document.createElement(
+              "div"
+            );
+
+          title.className =
+            "ads-card-title";
+
+          title.textContent =
+            ad.title;
+
+          content.appendChild(
+            title
+          );
+
+        }
+
+        if(ad.description){
+
+          const description =
+            document.createElement(
+              "div"
+            );
+
+          description.className =
+            "ads-card-description";
+
+          description.textContent =
+            ad.description;
+
+          content.appendChild(
+            description
+          );
+
+        }
+
+        card.appendChild(
+          content
+        );
+
+      }
+
+      container.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================
+   HERO
+   ========================= */
 
 function updateHero(){
 
@@ -2129,6 +2699,11 @@ document
     }
   );
 
+
+/* =========================
+   AUDIO PLAYER
+   ========================= */
+
 function playSong(song){
 
   const preview =
@@ -2295,6 +2870,11 @@ document
     }
   );
 
+
+/* =========================
+   SONGS
+   ========================= */
+
 async function loadPasongSongs(){
 
   const {
@@ -2377,6 +2957,11 @@ async function loadPasongSongs(){
     )
   );
 }
+
+
+/* =========================
+   POPULAR ARTISTS
+   ========================= */
 
 async function loadPopularArtists(){
 
@@ -2486,6 +3071,11 @@ async function loadPopularArtists(){
     }
   );
 }
+
+
+/* =========================
+   DJ MIXES
+   ========================= */
 
 function isDjMix(song){
 
@@ -2638,6 +3228,11 @@ async function loadPasongDjMixes(){
   );
 }
 
+
+/* =========================
+   SEARCH
+   ========================= */
+
 function setupSearch(){
 
   const search =
@@ -2672,6 +3267,11 @@ function setupSearch(){
     }
   );
 }
+
+
+/* =========================
+   ACCOUNT
+   ========================= */
 
 async function loadAccount(){
 
@@ -2777,6 +3377,11 @@ async function loadAccount(){
   }
 }
 
+
+/* =========================
+   INIT
+   ========================= */
+
 async function init(){
 
   setupSearch();
@@ -2784,6 +3389,13 @@ async function init(){
   await loadAccount();
 
   await loadArtistMap();
+
+  /*
+    Load advertisements directly after
+    the hero so they appear near the top.
+  */
+
+  await loadPasongAds();
 
   await loadPasongSongs();
 
@@ -2794,6 +3406,11 @@ async function init(){
 }
 
 init();
+
+
+/* =========================
+   SERVICE WORKER
+   ========================= */
 
 if(
   "serviceWorker" in navigator
