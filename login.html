@@ -614,6 +614,10 @@ const supabaseClient =
   );
 
 
+/* ================================
+   ELEMENTS
+================================ */
+
 const form =
   document.getElementById(
     "loginForm"
@@ -659,6 +663,85 @@ const status =
     "status"
   );
 
+
+/* ================================
+   URL PARAMETERS
+================================ */
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const returnPage =
+  params.get("return");
+
+const returnBeat =
+  params.get("beat");
+
+const returnPackage =
+  params.get("package");
+
+
+/* ================================
+   RETURN URL
+================================ */
+
+function getReturnUrl(){
+
+  /*
+    Licence request.
+
+    The selected licence is already stored
+    in localStorage, so after login we return
+    to the Producer page instead of creating
+    a login loop.
+  */
+
+  if(
+    returnPage === "license" &&
+    returnBeat
+  ){
+
+    return (
+      "/producers.html?license=1" +
+      "&beat=" +
+      encodeURIComponent(returnBeat) +
+      "&package=" +
+      encodeURIComponent(
+        returnPackage || ""
+      )
+    );
+
+  }
+
+
+  /*
+    Other internal return paths.
+  */
+
+  if(
+    returnPage &&
+    returnPage.startsWith("/")
+  ){
+
+    return returnPage;
+
+  }
+
+
+  /*
+    Normal login.
+  */
+
+  return "/account.html";
+
+}
+
+
+/* ================================
+   MESSAGES
+================================ */
 
 function clearMessages(){
 
@@ -708,6 +791,10 @@ function showSuccess(message){
 }
 
 
+/* ================================
+   FRIENDLY ERRORS
+================================ */
+
 function friendlyError(message){
 
   const m =
@@ -756,6 +843,10 @@ function friendlyError(message){
 }
 
 
+/* ================================
+   PASSWORD TOGGLE
+================================ */
+
 togglePassword.addEventListener(
   "click",
   function(){
@@ -794,6 +885,90 @@ togglePassword.addEventListener(
   }
 );
 
+
+/* ================================
+   EXISTING SESSION
+================================ */
+
+async function checkExistingSession(){
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if(error){
+
+      console.error(
+        "Session check error:",
+        error
+      );
+
+      return;
+
+    }
+
+
+    if(
+      data &&
+      data.session &&
+      data.session.user
+    ){
+
+      /*
+        The user is already logged in.
+
+        This prevents:
+        Producer page
+        → Login
+        → Login again
+        → account
+
+        Instead we continue to the
+        requested destination.
+      */
+
+      status.textContent =
+        "You're already logged in.";
+
+      loginButton.disabled =
+        true;
+
+      loginButton.textContent =
+        "Already logged in";
+
+
+      setTimeout(
+        function(){
+
+          window.location.href =
+            getReturnUrl();
+
+        },
+        500
+      );
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Existing session error:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ================================
+   LOGIN
+================================ */
 
 form.addEventListener(
   "submit",
@@ -848,22 +1023,133 @@ form.addEventListener(
       "Connecting to PASONG...";
 
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.auth.signInWithPassword({
-        email:emailValue,
-        password:passwordValue
-      });
+    try{
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.signInWithPassword({
+
+          email:emailValue,
+
+          password:passwordValue
+
+        });
 
 
-    if(error){
+      if(error){
+
+        showError(
+          friendlyError(
+            error.message
+          )
+        );
+
+        status.textContent =
+          "";
+
+        loginButton.disabled =
+          false;
+
+        loginButton.textContent =
+          "Login to PASONG";
+
+        return;
+
+      }
+
+
+      if(
+        !data ||
+        !data.session
+      ){
+
+        showError(
+          "Login was not completed. Please try again."
+        );
+
+        status.textContent =
+          "";
+
+        loginButton.disabled =
+          false;
+
+        loginButton.textContent =
+          "Login to PASONG";
+
+        return;
+
+      }
+
+
+      /*
+        Make sure the selected licence remains
+        available after navigation.
+      */
+
+      if(
+        returnPage === "license" &&
+        returnBeat
+      ){
+
+        const selected=
+          localStorage.getItem(
+            "pasong_selected_license"
+          );
+
+        if(!selected){
+
+          localStorage.setItem(
+            "pasong_selected_license",
+            JSON.stringify({
+
+              beat_id:returnBeat,
+
+              package:returnPackage||"",
+
+              selected_at:
+                new Date().toISOString()
+
+            })
+          );
+
+        }
+
+      }
+
+
+      showSuccess(
+        "You're in. Welcome back to PASONG."
+      );
+
+      status.textContent =
+        "Opening your account...";
+
+      loginButton.textContent =
+        "Welcome back!";
+
+
+      setTimeout(
+        function(){
+
+          window.location.href =
+            getReturnUrl();
+
+        },
+        500
+      );
+
+
+    }catch(error){
+
+      console.error(
+        "Login error:",
+        error
+      );
 
       showError(
-        friendlyError(
-          error.message
-        )
+        "Something went wrong while signing in. Please try again."
       );
 
       status.textContent =
@@ -875,58 +1161,15 @@ form.addEventListener(
       loginButton.textContent =
         "Login to PASONG";
 
-      return;
-
     }
-
-
-    if(
-      !data ||
-      !data.session
-    ){
-
-      showError(
-        "Login was not completed. Please try again."
-      );
-
-      status.textContent =
-        "";
-
-      loginButton.disabled =
-        false;
-
-      loginButton.textContent =
-        "Login to PASONG";
-
-      return;
-
-    }
-
-
-    showSuccess(
-      "You're in. Welcome back to PASONG."
-    );
-
-    status.textContent =
-      "Opening your account...";
-
-    loginButton.textContent =
-      "Welcome back!";
-
-
-    setTimeout(
-      function(){
-
-        window.location.href =
-          "/account.html";
-
-      },
-      700
-    );
 
   }
 );
 
+
+/* ================================
+   FORGOT PASSWORD
+================================ */
 
 forgotPassword.addEventListener(
   "click",
@@ -972,42 +1215,85 @@ forgotPassword.addEventListener(
       "Sending...";
 
 
-    const {error} =
-      await supabaseClient.auth.resetPasswordForEmail(
-        emailValue,
-        {
-          redirectTo:
-            window.location.origin +
-            "/login.html"
-        }
+    try{
+
+      const {error} =
+        await supabaseClient.auth.resetPasswordForEmail(
+
+          emailValue,
+
+          {
+            redirectTo:
+              window.location.origin +
+              "/login.html"
+          }
+
+        );
+
+
+      if(error){
+
+        showError(
+          friendlyError(
+            error.message
+          )
+        );
+
+        forgotPassword.textContent =
+          "Forgot password?";
+
+        return;
+
+      }
+
+
+      showSuccess(
+        "If this email is registered, a password reset link has been sent."
       );
 
 
-    if(error){
+    }catch(error){
+
+      console.error(
+        "Password reset error:",
+        error
+      );
 
       showError(
-        friendlyError(
-          error.message
-        )
+        "Unable to send the password reset email. Please try again."
       );
-
-      forgotPassword.textContent =
-        "Forgot password?";
-
-      return;
 
     }
 
-
-    showSuccess(
-      "If this email is registered, a password reset link has been sent."
-    );
 
     forgotPassword.textContent =
       "Forgot password?";
 
   }
 );
+
+
+/* ================================
+   AUTH STATE
+================================ */
+
+supabaseClient.auth.onAuthStateChange(
+  function(event,session){
+
+    console.log(
+      "PASONG auth event:",
+      event
+    );
+
+  }
+);
+
+
+/* ================================
+   START
+================================ */
+
+checkExistingSession();
 
 </script>
 
