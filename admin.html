@@ -6,528 +6,393 @@
 
 <meta
   name="viewport"
-  content="width=device-width, initial-scale=1.0"
+  content="width=device-width,initial-scale=1.0"
 >
 
-<title>PASONG Admin Dashboard</title>
+<meta
+  name="theme-color"
+  content="#8b5cf6"
+>
+
+<title>PASONG — Admin Panel</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
 *{
+  box-sizing:border-box;
   margin:0;
   padding:0;
-  box-sizing:border-box;
 }
 
 body{
-  background:#080810;
-  color:#fff;
-  font-family:Inter,Arial,sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#080812;
+  color:#eee;
   min-height:100vh;
 }
 
-nav{
-  background:#10101b;
-  border-bottom:1px solid #25253a;
-  padding:18px 22px;
+header{
+  height:62px;
+  background:#10101c;
+  border-bottom:1px solid #29293d;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
   position:sticky;
   top:0;
-  z-index:100;
+  z-index:50;
 }
 
 .logo{
-  font-size:24px;
+  font-weight:800;
+  letter-spacing:.4px;
+}
+
+.admin-badge{
+  font-size:11px;
+  color:#c084fc;
   font-weight:800;
 }
 
-.admin-label{
-  color:#d946ef;
-  font-size:13px;
-  font-weight:700;
-}
-
-main{
+.container{
   max-width:1250px;
   margin:auto;
-  padding:25px 18px 50px;
+  padding:18px;
 }
 
-h1{
-  font-size:30px;
-  margin-bottom:6px;
+.hidden{
+  display:none!important;
 }
 
-.subtitle{
-  color:#9999aa;
-  margin-bottom:25px;
+.hero{
+  padding:20px 0;
 }
 
-#loading{
-  text-align:center;
-  padding:50px 10px;
-  color:#bbb;
+.hero h1{
+  font-size:25px;
+  margin-bottom:7px;
 }
 
-#error{
-  display:none;
-  background:#351522;
-  border:1px solid #8b2948;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:20px;
+.hero p{
+  color:#a9a9b8;
+  font-size:13px;
 }
 
-#dashboard{
-  display:none;
-}
-
-.cards{
+.stats{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-  margin-bottom:25px;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#11111d;
+  border:1px solid #29293d;
+  border-radius:14px;
+  padding:16px;
+}
+
+.stat-label{
+  color:#999;
+  font-size:12px;
+}
+
+.stat-number{
+  font-size:25px;
+  font-weight:800;
+  margin-top:8px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:210px 1fr;
+  gap:16px;
+}
+
+.sidebar{
+  background:#11111d;
+  border:1px solid #29293d;
+  border-radius:14px;
+  padding:10px;
+  height:max-content;
+  position:sticky;
+  top:78px;
+}
+
+.sidebar button{
+  width:100%;
+  text-align:left;
+  border:0;
+  background:transparent;
+  color:#aaa;
+  padding:11px 10px;
+  border-radius:9px;
+  cursor:pointer;
+  margin-bottom:3px;
+}
+
+.sidebar button:hover,
+.sidebar button.active{
+  background:#1d1830;
+  color:#fff;
 }
 
 .card{
   background:#11111d;
-  border:1px solid #28283d;
+  border:1px solid #29293d;
   border-radius:14px;
-  padding:20px;
+  padding:18px;
+  margin-bottom:16px;
+}
+
+.card h2{
+  font-size:18px;
+  margin-bottom:12px;
 }
 
 .card h3{
-  color:#aaaabb;
-  font-size:14px;
+  font-size:15px;
   margin-bottom:10px;
 }
 
-.number{
-  font-size:28px;
-  font-weight:800;
-  color:#e879f9;
+.notice{
+  padding:12px;
+  border:1px solid #3a3852;
+  border-radius:9px;
+  background:#151525;
+  color:#bbb;
+  margin-bottom:14px;
+  line-height:1.5;
+  font-size:13px;
 }
 
-.menu{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:12px;
-  margin-bottom:28px;
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
 }
 
-.menu button{
-  background:#151522;
+button{
+  border:1px solid #393951;
+  background:#1b1b2a;
   color:#fff;
-  border:1px solid #303047;
-  padding:17px;
-  border-radius:12px;
+  padding:9px 12px;
+  border-radius:8px;
   cursor:pointer;
-  text-align:left;
-  font-size:15px;
-  font-weight:700;
-  transition:.2s;
 }
 
-.menu button:hover{
-  border-color:#d946ef;
-  background:#1b1724;
-  transform:translateY(-1px);
+button:hover{
+  opacity:.9;
 }
 
-.section{
-  background:#10101b;
-  border:1px solid #28283d;
-  border-radius:14px;
-  padding:20px;
-  margin-bottom:20px;
+button.primary{
+  background:#8b5cf6;
+  border-color:#8b5cf6;
 }
 
-.section h2{
-  font-size:20px;
-  margin-bottom:8px;
+button.good{
+  background:#12351f;
+  border-color:#27663a;
+  color:#9df2b5;
 }
 
-.section p{
-  color:#9999aa;
-  margin-bottom:15px;
+button.danger{
+  background:#3a1519;
+  border-color:#6d252d;
+  color:#ffb0b0;
 }
 
-.section-content{
-  display:none;
-}
-
-.section-content.active{
-  display:block;
+.actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
 }
 
 .table-wrap{
-  overflow-x:auto;
+  width:100%;
+  overflow:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:850px;
+  font-size:12px;
 }
 
 th,
 td{
-  padding:12px 10px;
-  border-bottom:1px solid #29293b;
+  padding:10px;
+  border-bottom:1px solid #27273a;
   text-align:left;
-  font-size:14px;
   vertical-align:top;
 }
 
 th{
-  color:#d8d8e5;
-  background:#13131f;
+  color:#aaa;
+  white-space:nowrap;
 }
 
-td{
-  color:#aaaabb;
-}
-
-.song-title{
-  color:#fff;
-  font-weight:700;
-}
-
-.artist-name{
-  color:#d946ef;
-  font-size:13px;
-  margin-top:4px;
-}
-
-.id-text{
+.pill{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#24243a;
   font-size:11px;
-  color:#686879;
-  word-break:break-all;
-  max-width:180px;
 }
 
-.status{
-  color:#4ade80;
-  font-weight:700;
+.muted{
+  color:#999;
 }
 
-.status-pending{
-  color:#facc15;
-  font-weight:700;
-}
-
-.status-failed{
-  color:#fb7185;
-  font-weight:700;
-}
-
-button.action{
-  background:#d946ef;
-  color:#fff;
-  border:0;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-button.action:hover{
-  opacity:.85;
-}
-
-button.success-btn{
-  background:#16a34a;
-  color:#fff;
-  border:0;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-button.success-btn:hover{
-  opacity:.85;
-}
-
-button.danger-btn{
-  background:#be123c;
-  color:#fff;
-  border:0;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-button.danger-btn:hover{
-  opacity:.85;
-}
-
-button.info-btn{
-  background:#2563eb;
-  color:#fff;
-  border:0;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:700;
-}
-
-button.info-btn:hover{
-  opacity:.85;
-}
-
-.logout{
-  background:#21121e !important;
-  border-color:#57263f !important;
-}
-
-.notice{
-  background:#151522;
-  border:1px solid #29293d;
-  padding:15px;
-  border-radius:10px;
-  color:#aaaabb;
-  line-height:1.6;
+.small{
+  font-size:12px;
 }
 
 .empty{
   text-align:center;
+  color:#888;
   padding:25px;
-  color:#777789;
 }
 
-.refresh-row{
-  display:flex;
-  justify-content:flex-end;
-  margin-bottom:12px;
+.error{
+  color:#ff8b8b;
 }
 
-.small-btn{
-  background:#181827;
-  color:#fff;
-  border:1px solid #34344b;
-  padding:9px 14px;
-  border-radius:8px;
-  cursor:pointer;
+.success{
+  color:#7ee787;
 }
 
-.small-btn:hover{
-  border-color:#d946ef;
+.warning{
+  color:#ffd166;
 }
 
-.admin-actions{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  min-width:190px;
-}
-
-.edit-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:14px;
-  margin-top:15px;
-}
-
-.form-group{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.form-group label{
-  color:#aaaabb;
-  font-size:13px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select{
-  width:100%;
-  background:#080810;
-  color:#fff;
-  border:1px solid #34344b;
-  border-radius:8px;
+.message{
+  display:none;
   padding:11px;
-  outline:none;
+  border-radius:8px;
+  margin-top:10px;
+  font-size:12px;
+  line-height:1.5;
 }
 
-.form-group textarea{
-  min-height:100px;
-  resize:vertical;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus{
-  border-color:#d946ef;
-}
-
-.ad-builder{
-  background:#0b0b14;
-  border:1px solid #29293d;
-  border-radius:12px;
-  padding:18px;
-  margin-bottom:20px;
-}
-
-.ad-builder h3{
-  margin-bottom:6px;
-}
-
-.ad-preview{
-  margin-top:18px;
-  background:#11111d;
-  border:1px solid #29293d;
-  border-radius:12px;
-  overflow:hidden;
-}
-
-.ad-preview img{
-  width:100%;
-  max-height:300px;
-  object-fit:cover;
+.message.show{
   display:block;
 }
 
-.ad-preview-content{
-  padding:15px;
+.message.error{
+  background:#35171b;
+  border:1px solid #6b2830;
+  color:#ffb0b0;
 }
 
-.ad-preview-title{
-  color:#fff;
-  font-size:18px;
-  font-weight:800;
-  margin-bottom:6px;
+.message.success{
+  background:#12351f;
+  border:1px solid #27663a;
+  color:#9df2b5;
 }
 
-.ad-preview-description{
-  color:#aaaabb;
-  line-height:1.5;
+.message.info{
+  background:#171d35;
+  border:1px solid #34467a;
+  color:#b8c7ff;
 }
 
-.ad-actions{
+.auth-screen{
+  min-height:calc(100vh - 62px);
   display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:15px;
+  align-items:center;
+  justify-content:center;
+  padding:25px;
 }
 
-.cover-details{
-  margin-top:18px;
-  background:#0b0b14;
-  border:1px solid #29293d;
-  border-radius:12px;
-  padding:18px;
-}
-
-.cover-details-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:14px;
-}
-
-.cover-detail-box{
+.auth-box{
+  width:min(600px,100%);
   background:#11111d;
-  border:1px solid #25253a;
-  border-radius:10px;
-  padding:12px;
+  border:1px solid #29293d;
+  border-radius:16px;
+  padding:25px;
 }
 
-.cover-detail-label{
-  color:#777789;
+.auth-box h2{
+  margin-bottom:10px;
+}
+
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.field{
+  margin-bottom:12px;
+}
+
+label{
+  display:block;
   font-size:12px;
+  color:#aaa;
   margin-bottom:5px;
 }
 
-.cover-detail-value{
-  color:#fff;
-  word-break:break-word;
-  line-height:1.5;
-}
-
-.cover-images{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-  margin-top:18px;
-}
-
-.cover-image-box{
-  background:#11111d;
-  border:1px solid #25253a;
-  border-radius:12px;
-  padding:12px;
-}
-
-.cover-image-box img{
+input,
+select,
+textarea{
   width:100%;
-  max-height:260px;
-  object-fit:contain;
+  background:#0b0b15;
+  border:1px solid #333348;
+  color:#fff;
+  padding:10px;
   border-radius:8px;
-  background:#080810;
-  margin-top:8px;
+  outline:none;
 }
 
-.cover-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
+textarea{
+  min-height:90px;
+  resize:vertical;
 }
 
-.cover-link{
-  color:#e879f9;
-  text-decoration:none;
-  word-break:break-all;
-}
-
-.cover-link:hover{
-  text-decoration:underline;
-}
-
-.upload-box{
-  background:#151522;
-  border:1px dashed #45455d;
+.ad-preview{
+  background:#0b0b15;
+  border:1px dashed #393951;
   border-radius:10px;
-  padding:15px;
-  margin-top:15px;
+  padding:12px;
+  margin-top:12px;
 }
 
-.upload-box input{
-  width:100%;
-  color:#fff;
-  margin-top:10px;
+.ad-preview img{
+  max-width:100%;
+  max-height:220px;
+  border-radius:8px;
+  display:block;
+  margin-bottom:8px;
 }
 
-@media(max-width:600px){
+@media(max-width:800px){
 
-  h1{
-    font-size:25px;
+  .stats{
+    grid-template-columns:1fr 1fr;
   }
 
-  .menu{
+  .layout{
     grid-template-columns:1fr;
   }
 
-  .section{
-    padding:15px;
+  .sidebar{
+    position:static;
   }
 
-  nav{
-    padding:15px;
-  }
-
-  .logo{
-    font-size:21px;
-  }
-
-  .cover-images{
+  .grid2,
+  .grid3{
     grid-template-columns:1fr;
   }
 
@@ -539,3032 +404,3947 @@ button.info-btn:hover{
 
 <body>
 
-<nav>
+<header>
 
   <div class="logo">
     ◈ PASONG
   </div>
 
-  <div class="admin-label">
+  <div class="admin-badge">
     ADMIN PANEL
   </div>
 
-</nav>
+</header>
 
-<main>
 
-<div id="loading">
-  Checking administrator access...
-</div>
+<!-- =========================================================
+     AUTH SCREEN
+========================================================= -->
 
-<div id="error"></div>
+<div id="authScreen" class="auth-screen">
 
-<div id="dashboard">
+  <div class="auth-box">
 
-<h1>
-  PASONG Admin Dashboard
-</h1>
+    <h2 id="authTitle">
+      Checking administrator access…
+    </h2>
 
-<p class="subtitle">
-  Full control of PASONG platform activity.
-</p>
+    <p
+      id="authText"
+      class="muted small"
+    >
+      Verifying your PASONG account.
+    </p>
 
-<div class="cards">
+    <div
+      id="authMessage"
+      class="message"
+    ></div>
 
-  <div class="card">
-    <h3>Administrator</h3>
-    <div class="number">✓</div>
+    <div
+      class="actions"
+      style="margin-top:12px"
+    >
+
+      <button
+        id="retryAuth"
+        class="primary"
+        style="display:none"
+      >
+        Retry
+      </button>
+
+      <button
+        id="loginButton"
+        style="display:none"
+      >
+        Go to Login
+      </button>
+
+    </div>
+
   </div>
 
-  <div class="card">
-    <h3>Music</h3>
-    <div class="number" id="musicCount">0</div>
+</div>
+
+
+<!-- =========================================================
+     ADMIN APPLICATION
+========================================================= -->
+
+<main
+  id="adminApp"
+  class="container hidden"
+>
+
+  <section class="hero">
+
+    <h1>
+      🛡️ PASONG Admin Control Center
+    </h1>
+
+    <p id="adminIdentity">
+      Administrator
+    </p>
+
+  </section>
+
+
+  <!-- =======================================================
+       STATS
+  ======================================================== -->
+
+  <div class="stats">
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Music
+      </div>
+
+      <div
+        class="stat-number"
+        id="countSongs"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Beats
+      </div>
+
+      <div
+        class="stat-number"
+        id="countBeats"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Artist Profiles
+      </div>
+
+      <div
+        class="stat-number"
+        id="countArtists"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-label">
+        Orders
+      </div>
+
+      <div
+        class="stat-number"
+        id="countOrders"
+      >
+        0
+      </div>
+
+    </div>
+
   </div>
 
-  <div class="card">
-    <h3>Artist Profiles</h3>
-    <div class="number" id="userCount">0</div>
+
+  <div class="layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+      <button
+        class="active"
+        data-section="overview"
+      >
+        📊 Overview
+      </button>
+
+      <button
+        data-section="music"
+      >
+        🎵 Music Control
+      </button>
+
+      <button
+        data-section="beats"
+      >
+        🎛️ Beat Control
+      </button>
+
+      <button
+        data-section="orders"
+      >
+        📦 Sales & Orders
+      </button>
+
+      <button
+        data-section="payments"
+      >
+        💳 Payments
+      </button>
+
+      <button
+        data-section="ads"
+      >
+        📢 Advertisements
+      </button>
+
+      <button
+        data-section="covers"
+      >
+        🎨 Cover Requests
+      </button>
+
+      <button
+        data-section="reports"
+      >
+        📈 Reports
+      </button>
+
+      <button id="logoutButton">
+        🚪 Logout
+      </button>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CONTENT
+    ====================================================== -->
+
+    <section>
+
+
+      <!-- ===================================================
+           OVERVIEW
+      ==================================================== -->
+
+      <div
+        id="section-overview"
+        class="section"
+      >
+
+        <div class="card">
+
+          <h2>
+            PASONG Platform Control
+          </h2>
+
+          <div class="notice">
+
+            <strong>
+              Content auto-approval is enabled.
+            </strong>
+
+            <br><br>
+
+            Songs and beats created through the current
+            PASONG backend are automatically saved as
+            <b>approved</b>.
+
+            <br><br>
+
+            The admin dashboard therefore does
+            <strong>not</strong>
+            contain a manual song/beat approval queue.
+
+            <br><br>
+
+            Admin control remains available for editing,
+            hiding, suspending, featuring and deleting content.
+
+          </div>
+
+          <div
+            id="overviewMessage"
+            class="message"
+          ></div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h2>
+            🔐 Administrator
+          </h2>
+
+          <div class="notice">
+
+            Logged in administrator:
+
+            <br>
+
+            <strong id="overviewAdminEmail">
+              Loading…
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           MUSIC
+      ==================================================== -->
+
+      <div
+        id="section-music"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            🎵 Music Control
+          </h2>
+
+          <div class="notice">
+
+            Songs are automatically approved.
+
+            <br>
+
+            There is no Approve/Reject queue here.
+
+          </div>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadSongs()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Song
+                  </th>
+
+                  <th>
+                    Artist
+                  </th>
+
+                  <th>
+                    Price
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                  <th>
+                    Actions
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="songsBody">
+
+                <tr>
+                  <td
+                    colspan="6"
+                    class="empty"
+                  >
+                    Loading…
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           BEATS
+      ==================================================== -->
+
+      <div
+        id="section-beats"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            🎛️ Beat Control
+          </h2>
+
+          <div class="notice">
+
+            Beats are automatically approved when uploaded.
+
+            <br><br>
+
+            Admin can still edit prices,
+            hide/suspend content, feature content,
+            or delete a beat.
+
+          </div>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadBeats()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Beat
+                  </th>
+
+                  <th>
+                    Producer
+                  </th>
+
+                  <th>
+                    Prices
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                  <th>
+                    Actions
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="beatsBody">
+
+                <tr>
+
+                  <td
+                    colspan="6"
+                    class="empty"
+                  >
+                    Loading…
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           ORDERS
+      ==================================================== -->
+
+      <div
+        id="section-orders"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            📦 Sales & Orders
+          </h2>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadOrders()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Order
+                  </th>
+
+                  <th>
+                    Buyer
+                  </th>
+
+                  <th>
+                    Amount
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="ordersBody">
+
+                <tr>
+
+                  <td
+                    colspan="5"
+                    class="empty"
+                  >
+                    Loading…
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           PAYMENTS
+      ==================================================== -->
+
+      <div
+        id="section-payments"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            💳 Payments & Verification
+          </h2>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadPayments()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Reference
+                  </th>
+
+                  <th>
+                    User
+                  </th>
+
+                  <th>
+                    Amount
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                  <th>
+                    Actions
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="paymentsBody">
+
+                <tr>
+
+                  <td
+                    colspan="6"
+                    class="empty"
+                  >
+                    Loading…
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           ADVERTISEMENTS
+      ==================================================== -->
+
+      <div
+        id="section-ads"
+        class="section hidden"
+      >
+
+
+        <div class="card">
+
+          <h2>
+            📢 Advertisement Manager
+          </h2>
+
+          <div class="notice">
+
+            Admin can create, activate, pause,
+            edit and delete advertisements.
+
+            <br><br>
+
+            The ad can contain:
+
+            title,
+            description,
+            image,
+            target link,
+            placement,
+            start date,
+            end date
+            and status.
+
+          </div>
+
+
+          <form id="adForm">
+
+            <input
+              type="hidden"
+              id="adId"
+            >
+
+
+            <div class="grid2">
+
+
+              <div class="field">
+
+                <label>
+                  Advertisement Title *
+                </label>
+
+                <input
+                  id="adTitle"
+                  maxlength="200"
+                  required
+                >
+
+              </div>
+
+
+              <div class="field">
+
+                <label>
+                  Placement
+                </label>
+
+                <select id="adPlacement">
+
+                  <option value="home">
+                    Home
+                  </option>
+
+                  <option value="music">
+                    Music
+                  </option>
+
+                  <option value="beats">
+                    Beats
+                  </option>
+
+                  <option value="dj">
+                    DJ
+                  </option>
+
+                  <option value="all">
+                    All PASONG
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Description
+              </label>
+
+              <textarea
+                id="adDescription"
+                maxlength="2000"
+              ></textarea>
+
+            </div>
+
+
+            <div class="grid2">
+
+
+              <div class="field">
+
+                <label>
+                  Advertisement Image URL
+                </label>
+
+                <input
+                  id="adImageUrl"
+                  type="url"
+                  placeholder="https://..."
+                >
+
+              </div>
+
+
+              <div class="field">
+
+                <label>
+                  Target URL
+                </label>
+
+                <input
+                  id="adTargetUrl"
+                  type="url"
+                  placeholder="https://..."
+                >
+
+              </div>
+
+            </div>
+
+
+            <div class="grid3">
+
+
+              <div class="field">
+
+                <label>
+                  Start Date / Time
+                </label>
+
+                <input
+                  id="adStartAt"
+                  type="datetime-local"
+                >
+
+              </div>
+
+
+              <div class="field">
+
+                <label>
+                  End Date / Time
+                </label>
+
+                <input
+                  id="adEndAt"
+                  type="datetime-local"
+                >
+
+              </div>
+
+
+              <div class="field">
+
+                <label>
+                  Status
+                </label>
+
+                <select id="adStatus">
+
+                  <option value="draft">
+                    Draft
+                  </option>
+
+                  <option value="active">
+                    Active
+                  </option>
+
+                  <option value="paused">
+                    Paused
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <div
+              id="adPreview"
+              class="ad-preview hidden"
+            >
+
+              <strong>
+                Preview
+              </strong>
+
+              <img
+                id="adPreviewImage"
+                src=""
+                alt=""
+              >
+
+              <div id="adPreviewTitle"></div>
+
+              <div
+                id="adPreviewDescription"
+                class="muted small"
+              ></div>
+
+            </div>
+
+
+            <div
+              class="actions"
+              style="margin-top:12px"
+            >
+
+              <button
+                type="submit"
+                class="primary"
+                id="adSaveButton"
+              >
+                Post Advertisement
+              </button>
+
+              <button
+                type="button"
+                onclick="resetAdForm()"
+              >
+                Clear
+              </button>
+
+            </div>
+
+
+            <div
+              id="adMessage"
+              class="message"
+            ></div>
+
+          </form>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            Current Advertisements
+          </h3>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadAds()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Advertisement
+                  </th>
+
+                  <th>
+                    Placement
+                  </th>
+
+                  <th>
+                    Schedule
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Clicks
+                  </th>
+
+                  <th>
+                    Actions
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="adsBody">
+
+                <tr>
+
+                  <td
+                    colspan="6"
+                    class="empty"
+                  >
+                    Loading…
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           COVERS
+      ==================================================== -->
+
+      <div
+        id="section-covers"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            🎨 Cover Requests
+          </h2>
+
+          <div class="toolbar">
+
+            <button
+              class="primary"
+              onclick="loadCovers()"
+            >
+              Refresh
+            </button>
+
+          </div>
+
+          <div class="table-wrap">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Title
+                  </th>
+
+                  <th>
+                    User
+                  </th>
+
+                  <th>
+                    Style
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="coversBody">
+
+                <tr>
+
+                  <td
+                    colspan="5"
+                    class="empty"
+                  >
+                    Loading…
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           REPORTS
+      ==================================================== -->
+
+      <div
+        id="section-reports"
+        class="section hidden"
+      >
+
+        <div class="card">
+
+          <h2>
+            📈 Reports
+          </h2>
+
+          <div class="grid3">
+
+            <div class="stat">
+
+              <div class="stat-label">
+                Songs
+              </div>
+
+              <div
+                class="stat-number"
+                id="reportSongs"
+              >
+                0
+              </div>
+
+            </div>
+
+
+            <div class="stat">
+
+              <div class="stat-label">
+                Beats
+              </div>
+
+              <div
+                class="stat-number"
+                id="reportBeats"
+              >
+                0
+              </div>
+
+            </div>
+
+
+            <div class="stat">
+
+              <div class="stat-label">
+                Advertisements
+              </div>
+
+              <div
+                class="stat-number"
+                id="reportAds"
+              >
+                0
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+    </section>
+
   </div>
-
-  <div class="card">
-    <h3>Orders</h3>
-    <div class="number" id="orderCount">0</div>
-  </div>
-
-  <div class="card">
-    <h3>Advertisements</h3>
-    <div class="number" id="adCount">0</div>
-  </div>
-
-</div>
-
-<div class="menu">
-
-  <button onclick="showSection('sales')">
-    🛒 Sales & Orders
-  </button>
-
-  <button onclick="showSection('royalties')">
-    💰 Royalty Ledger
-  </button>
-
-  <button onclick="showSection('advertisements');loadAdvertisements()">
-    📢 Advertisements
-  </button>
-
-  <button onclick="showSection('referrals')">
-    🎁 Referral Points
-  </button>
-
-  <button onclick="showSection('payments');loadPaymentVerifications()">
-    💳 Payments & Verification
-  </button>
-
-  <button onclick="showSection('cover-requests');loadCoverRequests()">
-    🎨 Cover Requests
-  </button>
-
-  <button onclick="showSection('reports')">
-    📊 Reports
-  </button>
-
-</div>
-
-
-<!-- SALES -->
-
-<div class="section">
-
-<h2>
-  🛒 Sales & Orders
-</h2>
-
-<div id="sales" class="section-content">
-
-<p>
-  View customer purchases, songs, prices and order status.
-</p>
-
-<div class="refresh-row">
-
-<button
-  class="small-btn"
-  onclick="loadOrders()"
->
-  ↻ Refresh Orders
-</button>
-
-</div>
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-<th>Order ID</th>
-<th>Song</th>
-<th>Buyer</th>
-<th>Price</th>
-<th>Currency</th>
-<th>Status</th>
-<th>Created</th>
-<th>Action</th>
-</tr>
-
-</thead>
-
-<tbody id="ordersTable">
-
-<tr>
-<td colspan="8">
-Loading orders...
-</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ROYALTIES -->
-
-<div class="section">
-
-<h2>
-  💰 Royalty Ledger
-</h2>
-
-<div id="royalties" class="section-content">
-
-<p>
-  Track PASONG music revenue distribution.
-</p>
-
-<div class="notice">
-
-<strong>
-Royalty System
-</strong>
-
-<br><br>
-
-Completed sales generate creator royalty records.
-
-<br><br>
-
-Producer beat sales currently use the PASONG producer royalty system.
-
-<br><br>
-
-More detailed ledger controls can be connected to the royalty tables in the next admin phase.
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- ADVERTISEMENTS -->
-
-<div class="section">
-
-<h2>
-  📢 Advertisement Control
-</h2>
-
-<div id="advertisements" class="section-content">
-
-<p>
-  Admin can create and publish advertisements directly on PASONG.
-</p>
-
-
-<div class="notice" style="margin-bottom:18px;">
-
-<strong>
-ADMIN DIRECT PUBLISHING
-</strong>
-
-<br><br>
-
-Ads created here are immediately marked
-<strong>ACTIVE</strong>.
-
-<br>
-
-No second approval is required.
-
-<br><br>
-
-Use the placement field to control where the advertisement belongs.
-
-</div>
-
-
-<div class="ad-builder">
-
-<h3>
-  ➕ Create Advertisement
-</h3>
-
-<p>
-Create a PASONG advertisement and publish it directly.
-</p>
-
-<div class="edit-grid">
-
-<div class="form-group">
-
-<label>
-Ad Title
-</label>
-
-<input
-  id="adTitle"
-  type="text"
-  placeholder="Example: PASONG Premium"
-/>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Destination URL
-</label>
-
-<input
-  id="adTargetUrl"
-  type="url"
-  placeholder="https://..."
-/>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Placement
-</label>
-
-<select id="adPlacement">
-
-<option value="home">
-Home
-</option>
-
-<option value="music">
-Music
-</option>
-
-<option value="beats">
-Beats
-</option>
-
-<option value="dj">
-DJ Mixes
-</option>
-
-<option value="producers">
-Producers
-</option>
-
-<option value="artists">
-Artists
-</option>
-
-<option value="all">
-All PASONG
-</option>
-
-</select>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Start Date
-</label>
-
-<input
-  id="adStart"
-  type="datetime-local"
-/>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-End Date
-</label>
-
-<input
-  id="adEnd"
-  type="datetime-local"
-/>
-
-</div>
-
-
-<div class="form-group">
-
-<label>
-Ad Image
-</label>
-
-<input
-  id="adImage"
-  type="file"
-  accept="image/jpeg,image/png,image/webp"
-/>
-
-</div>
-
-</div>
-
-
-<div class="form-group" style="margin-top:14px;">
-
-<label>
-Description
-</label>
-
-<textarea
-  id="adDescription"
-  placeholder="Advertisement description..."
-></textarea>
-
-</div>
-
-
-<div class="ad-preview" id="adPreview">
-
-<div class="ad-preview-content">
-
-<div class="ad-preview-title">
-Advertisement Preview
-</div>
-
-<div class="ad-preview-description">
-Your advertisement preview will appear here.
-</div>
-
-</div>
-
-</div>
-
-
-<div class="ad-actions">
-
-<button
-  class="action"
-  onclick="createAdvertisement()"
->
-  📢 Publish Advertisement
-</button>
-
-<button
-  class="small-btn"
-  onclick="clearAdForm()"
->
-  Clear
-</button>
-
-</div>
-
-</div>
-
-
-<h3 style="margin-bottom:12px;">
-  Current Advertisements
-</h3>
-
-<div class="refresh-row">
-
-<button
-  class="small-btn"
-  onclick="loadAdvertisements()"
->
-  ↻ Refresh Advertisements
-</button>
-
-</div>
-
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Advertisement</th>
-<th>Placement</th>
-<th>Period</th>
-<th>Status</th>
-<th>Impressions</th>
-<th>Clicks</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="advertisementsTable">
-
-<tr>
-
-<td colspan="7">
-Open Advertisement Control to load ads.
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- REFERRALS -->
-
-<div class="section">
-
-<h2>
-  🎁 Referral Points
-</h2>
-
-<div id="referrals" class="section-content">
-
-<p>
-  Monitor PASONG referral activity.
-</p>
-
-<div class="notice">
-
-1,000 PASONG Points = UGX 1,000
-
-<br><br>
-
-Successful referral = 50 PASONG Points
-
-<br><br>
-
-Referral qualifies when the referred user completes
-their first qualifying song purchase.
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- PAYMENTS -->
-
-<div class="section">
-
-<h2>
-  💳 Payments & Verification
-</h2>
-
-<div id="payments" class="section-content">
-
-<p>
-  Review and approve creator payment methods.
-</p>
-
-<div class="refresh-row">
-
-<button
-  class="small-btn"
-  onclick="loadPaymentVerifications()"
->
-↻ Refresh Verifications
-</button>
-
-</div>
-
-<div class="notice" style="margin-bottom:18px;">
-
-<strong>
-Verification Rules
-</strong>
-
-<br><br>
-
-🇺🇬 Uganda creators:
-<strong>
-MTN Mobile Money / Airtel Money
-</strong>
-
-<br>
-
-🌍 Creators outside Uganda:
-<strong>
-Card / Online Payment
-</strong>
-
-<br><br>
-
-<span class="status-pending">
-● New verification requests require Admin approval
-</span>
-
-</div>
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Creator</th>
-<th>Country</th>
-<th>Method</th>
-<th>Provider</th>
-<th>Account Name</th>
-<th>Account / Reference</th>
-<th>Status</th>
-<th>Submitted</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="paymentVerificationsTable">
-
-<tr>
-
-<td colspan="9">
-Open Payments & Verification to load requests.
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- COVER -->
-
-<div class="section">
-
-<h2>
-  🎨 PASONG Cover Requests
-</h2>
-
-<div id="cover-requests" class="section-content">
-
-<p>
-Manage cover-design requests from artists, DJs,
-producers and other PASONG creators.
-</p>
-
-<div class="refresh-row">
-
-<button
-  class="small-btn"
-  onclick="loadCoverRequests()"
->
-↻ Refresh Cover Requests
-</button>
-
-</div>
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Creator</th>
-<th>Cover / Mix</th>
-<th>Price</th>
-<th>Payment</th>
-<th>Design</th>
-<th>Submitted</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="coverRequestsTable">
-
-<tr>
-
-<td colspan="7">
-Open Cover Requests to load requests.
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-<div
-id="coverRequestDetails"
-class="cover-details"
-style="display:none;"
->
-
-<div
-style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:15px;
-flex-wrap:wrap;
-"
->
-
-<h3>
-🎨 Cover Request Details
-</h3>
-
-<button
-class="small-btn"
-onclick="closeCoverRequest()"
->
-Close
-</button>
-
-</div>
-
-<div
-id="coverRequestDetailsContent"
-style="margin-top:15px;"
-></div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- REPORTS -->
-
-<div class="section">
-
-<h2>
-  📊 Reports
-</h2>
-
-<div id="reports" class="section-content">
-
-<p>
-View PASONG platform statistics.
-</p>
-
-<div class="cards">
-
-<div class="card">
-
-<h3>
-Total Music
-</h3>
-
-<div
-class="number"
-id="reportSongs"
->
-0
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-Total Artists
-</h3>
-
-<div
-class="number"
-id="reportArtists"
->
-0
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-Total Orders
-</h3>
-
-<div
-class="number"
-id="reportOrders"
->
-0
-</div>
-
-</div>
-
-<div class="card">
-
-<h3>
-Total Advertisements
-</h3>
-
-<div
-class="number"
-id="reportAds"
->
-0
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- MUSIC -->
-
-<div class="section">
-
-<h2>
-  🎵 Music Control
-</h2>
-
-<div class="section-content active">
-
-<p>
-Songs uploaded to PASONG are automatically approved.
-DJ mixes and beats are also intended to publish automatically.
-Admin retains the right to edit, hide or delete content.
-</p>
-
-<div class="notice" style="margin-bottom:18px;">
-
-<strong>
-AUTO APPROVAL
-</strong>
-
-<br><br>
-
-🎵 Songs — automatically approved
-
-<br>
-
-🎧 DJ Mixes — automatically approved
-
-<br>
-
-🎹 Beats — automatically approved
-
-<br><br>
-
-The Admin Dashboard does not require a manual approval step
-for these content types.
-
-</div>
-
-<div class="refresh-row">
-
-<button
-class="small-btn"
-onclick="loadSongs()"
->
-↻ Refresh Music
-</button>
-
-</div>
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Title</th>
-<th>Artist</th>
-<th>Price</th>
-<th>Currency</th>
-<th>Status</th>
-<th>Song ID</th>
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="songsTable">
-
-<tr>
-
-<td colspan="7">
-Loading music...
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- PLATFORM STATUS -->
-
-<div class="section">
-
-<h2>
-  ⚙️ Platform Status
-</h2>
-
-<div class="notice">
-
-Authentication:
-<span class="status">
-● Connected
-</span>
-
-<br>
-
-Supabase:
-<span class="status">
-● Connected
-</span>
-
-<br>
-
-Admin Role:
-<span class="status">
-● Verified
-</span>
-
-<br>
-
-Advertisements:
-<span
-id="adsSystemStatus"
-class="status-pending"
->
-● Checking
-</span>
-
-<br>
-
-Content Approval:
-<span class="status">
-● Songs / DJ Mixes / Beats Auto
-</span>
-
-</div>
-
-<br>
-
-<button
-class="action logout"
-onclick="logout()"
->
-Logout
-</button>
-
-</div>
-
-</div>
 
 </main>
 
 
 <script>
 
+/* ============================================================
+   PASONG CONFIG
+============================================================ */
+
 const SUPABASE_URL =
-"https://mtufczmjlkvycarxylgh.supabase.co";
+  "https://mtufczmjlkvycarxylgh.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
 const API_BASE =
-"https://pasong-api.onrender.com";
+  "https://pasong-api.onrender.com";
+
 
 const supabaseClient =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+
+let currentSession = null;
+let currentUser = null;
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  ).replace(
+    /[&<>"']/g,
+    character => {
+
+      const map = {
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+
+      };
+
+      return map[character];
+
+    }
+  );
+
+}
+
+
+function formatDate(value){
+
+  if(!value){
+    return "—";
+  }
+
+  const date =
+    new Date(value);
+
+  if(
+    Number.isNaN(
+      date.getTime()
+    )
+  ){
+
+    return "—";
+
+  }
+
+  return date.toLocaleString();
+
+}
+
+
+function money(
+  amount,
+  currency="UGX"
+){
+
+  return (
+    String(currency || "UGX") +
+    " " +
+    Number(
+      amount || 0
+    ).toLocaleString()
+  );
+
+}
+
+
+function showMessage(
+  id,
+  type,
+  text
+){
+
+  const element =
+    $(id);
+
+  if(!element){
+    return;
+  }
+
+  element.className =
+    "message show " +
+    type;
+
+  element.textContent =
+    text;
+
+}
+
+
+function hideMessage(id){
+
+  const element =
+    $(id);
+
+  if(element){
+    element.className =
+      "message";
+  }
+
+}
+
+
+/* ============================================================
+   TIMEOUT
+   Prevents the page from hanging forever.
+============================================================ */
+
+function withTimeout(
+  promise,
+  milliseconds,
+  message
+){
+
+  return Promise.race([
+
+    promise,
+
+    new Promise(
+      (_,reject)=>{
+
+        setTimeout(
+          ()=>reject(
+            new Error(message)
+          ),
+          milliseconds
+        );
+
+      }
+    )
+
+  ]);
+
+}
+
+
+/* ============================================================
+   ADMIN ROLE
+============================================================ */
+
+function getRole(user){
+
+  return String(
+
+    user?.app_metadata?.role ||
+
+    user?.user_metadata?.role ||
+
+    user?.app_metadata?.user_role ||
+
+    user?.user_metadata?.user_role ||
+
+    ""
+
+  )
+  .trim()
+  .toLowerCase();
+
+}
+
+
+/* ============================================================
+   ADMIN SESSION CHECK
+============================================================ */
+
+async function getAdminSession(){
+
+  let sessionResult;
+
+  try{
+
+    sessionResult =
+      await withTimeout(
+
+        supabaseClient.auth.getSession(),
+
+        8000,
+
+        "Supabase session check timed out after 8 seconds."
+
+      );
+
+  }catch(error){
+
+    throw new Error(
+
+      "Unable to read the Supabase login session. " +
+
+      (
+        error?.message ||
+        "Unknown session error."
+      )
+
+    );
+
+  }
+
+
+  let session =
+    sessionResult
+      ?.data
+      ?.session || null;
+
+
+  /*
+     Fallback to getUser()
+     if there is no session object.
+  */
+
+  if(!session){
+
+    try{
+
+      const userResult =
+        await withTimeout(
+
+          supabaseClient.auth.getUser(),
+
+          8000,
+
+          "Supabase user check timed out after 8 seconds."
+
+        );
+
+
+      if(
+        userResult
+          ?.data
+          ?.user
+      ){
+
+        session = {
+
+          user:
+            userResult.data.user,
+
+          access_token:
+            null
+
+        };
+
+      }
+
+    }catch(error){
+
+      throw new Error(
+
+        "Supabase could not verify the logged-in account. " +
+
+        (
+          error?.message ||
+          "Unknown Supabase error."
+        )
+
+      );
+
+    }
+
+  }
+
+
+  /*
+     No logged-in account.
+  */
+
+  if(!session?.user){
+
+    throw new Error(
+
+      "No active PASONG login session was found. " +
+
+      "Log in first, then open the Admin Panel."
+
+    );
+
+  }
+
+
+  const user =
+    session.user;
+
+
+  const role =
+    getRole(user);
+
+
+  /*
+     ADMIN ROLE MISSING
+  */
+
+  if(role !== "admin"){
+
+    const appRole =
+      user
+        ?.app_metadata
+        ?.role ||
+      "(missing)";
+
+
+    const userRole =
+      user
+        ?.user_metadata
+        ?.role ||
+      "(missing)";
+
+
+    throw new Error(
+
+      "Administrator role missing. " +
+
+      "Logged in as " +
+
+      (
+        user.email ||
+        user.id
+      ) +
+
+      ". " +
+
+      "app_metadata.role=" +
+
+      appRole +
+
+      "; user_metadata.role=" +
+
+      userRole +
+
+      ". " +
+
+      'Set app_metadata.role to "admin" for this account, ' +
+
+      "then log in again."
+
+    );
+
+  }
+
+
+  return {
+
+    session,
+    user
+
+  };
+
+}
+
+
+/* ============================================================
+   START ADMIN
+============================================================ */
+
+async function bootAdmin(){
+
+  $("authTitle").textContent =
+    "Checking administrator access…";
+
+  $("authText").textContent =
+    "Verifying your PASONG Supabase session and administrator role.";
+
+  hideMessage(
+    "authMessage"
+  );
+
+  $("retryAuth").style.display =
+    "none";
+
+  $("loginButton").style.display =
+    "none";
+
+
+  try{
+
+    const result =
+      await getAdminSession();
+
+
+    currentSession =
+      result.session;
+
+    currentUser =
+      result.user;
+
+
+    $("adminIdentity").textContent =
+      "Administrator: " +
+      (
+        currentUser.email ||
+        currentUser.id
+      );
+
+
+    $("overviewAdminEmail").textContent =
+      currentUser.email ||
+      currentUser.id;
+
+
+    $("authScreen")
+      .classList
+      .add("hidden");
+
+
+    $("adminApp")
+      .classList
+      .remove("hidden");
+
+
+    await loadAll();
+
+
+  }catch(error){
+
+    console.error(
+      "Admin authentication error:",
+      error
+    );
+
+
+    $("authTitle").textContent =
+      "Administrator access failed";
+
+
+    $("authText").textContent =
+      "The dashboard stopped here because the account/session could not be verified.";
+
+
+    showMessage(
+
+      "authMessage",
+
+      "error",
+
+      error?.message ||
+
+      "Unknown administrator authentication error."
+
+    );
+
+
+    $("retryAuth").style.display =
+      "inline-block";
+
+
+    $("loginButton").style.display =
+      "inline-block";
+
+  }
+
+}
+
+
+/* ============================================================
+   AUTH EVENTS
+============================================================ */
+
+supabaseClient.auth.onAuthStateChange(
+
+  (event,session)=>{
+
+    if(event === "SIGNED_OUT"){
+
+      currentSession =
+        null;
+
+      currentUser =
+        null;
+
+
+      $("adminApp")
+        .classList
+        .add("hidden");
+
+
+      $("authScreen")
+        .classList
+        .remove("hidden");
+
+
+      $("authTitle").textContent =
+        "Signed out";
+
+
+      $("authText").textContent =
+        "Please log in again as an administrator.";
+
+
+      $("retryAuth").style.display =
+        "inline-block";
+
+
+      $("loginButton").style.display =
+        "inline-block";
+
+    }
+
+  }
+
 );
 
 
-let ordersData=[];
-let songsData=[];
-let artistsData=[];
-let orderItemsData=[];
-let coverRequestsData=[];
-let advertisementsData=[];
-let currentCoverRequest=null;
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+$("retryAuth").onclick =
+  ()=>bootAdmin();
 
 
-function showError(message){
+$("loginButton").onclick =
+  ()=>{
 
-document.getElementById("loading")
-.style.display="none";
+    location.href =
+      "index.html";
 
-const error=
-document.getElementById("error");
-
-error.textContent=message;
-
-error.style.display="block";
-
-}
+  };
 
 
-async function checkAdmin(){
+$("logoutButton").onclick =
+  async()=>{
 
-try{
+    await supabaseClient.auth.signOut();
 
-const {
-data:{session},
-error
-}=
-await supabaseClient.auth.getSession();
+    location.reload();
 
-if(error) throw error;
+  };
 
-if(!session){
 
-window.location.href="account.html";
+/* ============================================================
+   COUNTS
+============================================================ */
 
-return;
+async function countTable(
+  table
+){
 
-}
+  const result =
+    await supabaseClient
+      .from(table)
+      .select(
+        "id",
+        {
+          count:"exact",
+          head:true
+        }
+      );
 
-const user=session.user;
 
-const role=
-user.app_metadata &&
-user.app_metadata.role;
+  if(result.error){
 
-if(role!=="admin"){
+    throw new Error(
 
-showError(
-"Access denied. This account is not an administrator."
-);
+      table +
+      ": " +
+      result.error.message
 
-return;
+    );
 
-}
+  }
 
-document.getElementById("loading")
-.style.display="none";
 
-document.getElementById("dashboard")
-.style.display="block";
-
-await loadAllData();
-
-}catch(error){
-
-console.error(error);
-
-showError(
-"Unable to verify administrator access: "+
-error.message
-);
-
-}
+  return result.count || 0;
 
 }
 
 
-async function loadAllData(){
+async function loadCounts(){
 
-await Promise.all([
-loadUsers(),
-loadSongs(),
-loadOrders(),
-loadAdvertisements()
-]);
+  const results =
+    await Promise.all([
 
-}
+      countTable("songs"),
+
+      countTable("beats"),
+
+      countTable("artist_profiles"),
+
+      countTable("orders")
+
+    ]);
 
 
-async function loadUsers(){
+  $("countSongs").textContent =
+    results[0];
 
-try{
 
-const {
-data,
-error
-}=
-await supabaseClient
-.from("artist_profiles")
-.select("*");
+  $("countBeats").textContent =
+    results[1];
 
-if(error) throw error;
 
-artistsData=data||[];
+  $("countArtists").textContent =
+    results[2];
 
-const count=
-artistsData.length;
 
-document.getElementById("userCount")
-.textContent=count;
+  $("countOrders").textContent =
+    results[3];
 
-document.getElementById("reportArtists")
-.textContent=count;
 
-}catch(error){
+  $("reportSongs").textContent =
+    results[0];
 
-console.error(
-"Artist profiles error:",
-error
-);
 
-}
+  $("reportBeats").textContent =
+    results[1];
 
 }
 
 
-function findArtistName(artistId){
-
-if(!artistId){
-
-return "Unknown Artist";
-
-}
-
-const artist=
-artistsData.find(
-profile=>
-String(profile.id)===String(artistId)
-);
-
-if(!artist){
-
-return "Unknown Artist";
-
-}
-
-return(
-artist.stage_name||
-artist.artist_name||
-artist.performing_name||
-"Unnamed Artist"
-);
-
-}
-
-
-/* =========================================================
+/* ============================================================
    SONGS
-   ========================================================= */
+============================================================ */
 
 async function loadSongs(){
 
-try{
+  $("songsBody").innerHTML =
+    `
+      <tr>
+        <td
+          colspan="6"
+          class="empty"
+        >
+          Loading…
+        </td>
+      </tr>
+    `;
 
-const {
-data,
-error
-}=
-await supabaseClient
-.from("songs")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
 
-if(error) throw error;
+  const result =
+    await supabaseClient
+      .from("songs")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
 
-songsData=data||[];
 
-document.getElementById("musicCount")
-.textContent=songsData.length;
+  if(result.error){
 
-document.getElementById("reportSongs")
-.textContent=songsData.length;
+    $("songsBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="6"
+            class="error"
+          >
+            ${escapeHtml(
+              result.error.message
+            )}
+          </td>
+        </tr>
+      `;
 
-const table=
-document.getElementById("songsTable");
+    return;
 
-if(!songsData.length){
+  }
 
-table.innerHTML=
-`
-<tr>
-<td colspan="7" class="empty">
-No songs uploaded yet.
-</td>
-</tr>
-`;
 
-return;
+  const songs =
+    result.data || [];
 
-}
 
-table.innerHTML=
-songsData.map(song=>{
+  if(!songs.length){
 
-const title=
-song.title||"-";
+    $("songsBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="6"
+            class="empty"
+          >
+            No songs found.
+          </td>
+        </tr>
+      `;
 
-const price=
-song.price!==null &&
-song.price!==undefined
-? song.price
-:700;
+    return;
 
-const currency=
-song.currency||"UGX";
+  }
 
-const status=
-song.status||"approved";
 
-const artistName=
-findArtistName(song.artist_id);
+  $("songsBody").innerHTML =
+    songs.map(song=>{
 
-const songId=
-song.id||"-";
+      return `
 
-const safeId=
-escapeHtml(
-String(songId)
-);
+        <tr>
 
-return`
+          <td>
+            <strong>
+              ${escapeHtml(
+                song.title ||
+                "Untitled"
+              )}
+            </strong>
+          </td>
 
-<tr>
 
-<td>
+          <td>
+            ${escapeHtml(
+              song.artist_name ||
+              song.artist_user_id ||
+              song.artist_id ||
+              "—"
+            )}
+          </td>
 
-<div class="song-title">
-${escapeHtml(String(title))}
-</div>
 
-</td>
+          <td>
+            ${money(
+              song.price,
+              song.currency
+            )}
+          </td>
 
-<td>
 
-<div class="artist-name">
-${escapeHtml(String(artistName))}
-</div>
+          <td>
 
-</td>
+            <span class="pill">
 
-<td>
-${escapeHtml(String(price))}
-</td>
+              ${escapeHtml(
+                song.status ||
+                "approved"
+              )}
 
-<td>
-${escapeHtml(String(currency))}
-</td>
+            </span>
 
-<td>
+          </td>
 
-${formatStatus(
-status==="pending"
-?"approved"
-:status
-)}
 
-</td>
+          <td>
+            ${formatDate(
+              song.created_at
+            )}
+          </td>
 
-<td>
 
-<div class="id-text">
-${escapeHtml(String(songId))}
-</div>
+          <td>
 
-</td>
+            <div class="actions">
 
-<td>
+              <button
+                onclick="editSong(
+                  '${song.id}',
+                  ${JSON.stringify(
+                    song.title || ""
+                  )},
+                  ${Number(
+                    song.price || 0
+                  )}
+                )"
+              >
+                Edit
+              </button>
 
-<div class="admin-actions">
 
-<button
-class="info-btn"
-onclick="editSong('${safeId}')"
->
-Edit
-</button>
+              <button
+                class="danger"
+                onclick="deleteSong(
+                  '${song.id}'
+                )"
+              >
+                Delete
+              </button>
 
-<button
-class="danger-btn"
-onclick="deleteSong('${safeId}')"
->
-Delete
-</button>
+            </div>
 
-</div>
+          </td>
 
-</td>
+        </tr>
 
-</tr>
+      `;
 
-`;
-
-}).join("");
-
-}catch(error){
-
-console.error(
-"Songs error:",
-error
-);
-
-document.getElementById("songsTable")
-.innerHTML=
-`
-<tr>
-<td colspan="7">
-
-Unable to load music.
-
-<br><br>
-
-${escapeHtml(
-error.message||
-"Unknown error"
-)}
-
-</td>
-</tr>
-`;
-
-}
+    }).join("");
 
 }
 
 
-async function editSong(songId){
-
-const song=
-songsData.find(
-item=>
-String(item.id)===String(songId)
-);
-
-if(!song){
-
-alert("Song was not found.");
-
-return;
-
-}
-
-const newTitle=
-prompt(
-"Song title:",
-song.title||""
-);
-
-if(newTitle===null)return;
-
-const newPrice=
-prompt(
-"Song price:",
-song.price!==null &&
-song.price!==undefined
-?song.price
-:700
-);
-
-if(newPrice===null)return;
-
-const newCurrency=
-prompt(
-"Currency:",
-song.currency||"UGX"
-);
-
-if(newCurrency===null)return;
-
-const numericPrice=
-Number(newPrice);
-
-if(
-!Number.isFinite(numericPrice)||
-numericPrice<0
+async function editSong(
+  id,
+  title,
+  price
 ){
 
-alert("Please enter a valid price.");
-
-return;
-
-}
-
-try{
-
-const {
-error
-}=
-await supabaseClient
-.from("songs")
-.update({
-
-title:newTitle.trim(),
-
-price:numericPrice,
-
-currency:
-newCurrency.trim().toUpperCase(),
-
-status:"approved",
-
-updated_at:
-new Date().toISOString()
-
-})
-.eq(
-"id",
-songId
-);
-
-if(error)throw error;
-
-alert(
-"Song updated successfully."
-);
-
-await loadSongs();
-
-}catch(error){
-
-console.error(
-"Song edit error:",
-error
-);
-
-alert(
-"Unable to edit song: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-}
-
-}
+  const newTitle =
+    prompt(
+      "Song title:",
+      title
+    );
 
 
-async function deleteSong(songId){
+  if(newTitle === null){
+    return;
+  }
 
-if(!songId)return;
 
-const confirmed=
-confirm(
-"Delete this song from PASONG? This action cannot be undone."
-);
+  const newPrice =
+    prompt(
+      "Song price:",
+      price
+    );
 
-if(!confirmed)return;
 
-try{
+  if(newPrice === null){
+    return;
+  }
 
-const {
-error
-}=
-await supabaseClient
-.from("songs")
-.delete()
-.eq(
-"id",
-songId
-);
 
-if(error)throw error;
+  const result =
+    await supabaseClient
+      .from("songs")
+      .update({
 
-alert(
-"Song deleted successfully."
-);
+        title:
+          newTitle.trim(),
 
-await loadSongs();
+        price:
+          Number(newPrice)
 
-}catch(error){
+      })
+      .eq(
+        "id",
+        id
+      );
 
-console.error(
-"Song delete error:",
-error
-);
 
-alert(
-"Unable to delete song: "+
-(
-error.message||
-"Unknown error"
-)
-);
+  if(result.error){
 
-}
+    alert(
+      "Song update failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadSongs();
+
+  await loadCounts();
 
 }
 
 
-/* =========================================================
+async function deleteSong(id){
+
+  if(
+    !confirm(
+      "Delete this song? This cannot be undone."
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const result =
+    await supabaseClient
+      .from("songs")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error){
+
+    alert(
+      "Song deletion failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadSongs();
+
+  await loadCounts();
+
+}
+
+
+/* ============================================================
+   BEATS
+============================================================ */
+
+async function loadBeats(){
+
+  $("beatsBody").innerHTML =
+    `
+      <tr>
+        <td
+          colspan="6"
+          class="empty"
+        >
+          Loading…
+        </td>
+      </tr>
+    `;
+
+
+  const result =
+    await supabaseClient
+      .from("beats")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(result.error){
+
+    $("beatsBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="6"
+            class="error"
+          >
+            ${escapeHtml(
+              result.error.message
+            )}
+          </td>
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  const beats =
+    result.data || [];
+
+
+  if(!beats.length){
+
+    $("beatsBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="6"
+            class="empty"
+          >
+            No beats found.
+          </td>
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  $("beatsBody").innerHTML =
+    beats.map(beat=>{
+
+      return `
+
+        <tr>
+
+          <td>
+
+            <strong>
+              ${escapeHtml(
+                beat.title ||
+                "Untitled Beat"
+              )}
+            </strong>
+
+            <br>
+
+            <span class="muted">
+              ${escapeHtml(
+                beat.genre || ""
+              )}
+            </span>
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              beat.producer_name ||
+              beat.producer_id ||
+              "—"
+            )}
+
+          </td>
+
+
+          <td>
+
+            MP3:
+            ${money(
+              beat.lease_mp3_price
+            )}
+
+            <br>
+
+            WAV:
+            ${money(
+              beat.lease_wav_price
+            )}
+
+            <br>
+
+            Stems:
+            ${money(
+              beat.stems_price
+            )}
+
+            <br>
+
+            Exclusive:
+            ${money(
+              beat.exclusive_price
+            )}
+
+          </td>
+
+
+          <td>
+
+            <span class="pill">
+
+              ${escapeHtml(
+                beat.status ||
+                "approved"
+              )}
+
+            </span>
+
+          </td>
+
+
+          <td>
+            ${formatDate(
+              beat.created_at
+            )}
+          </td>
+
+
+          <td>
+
+            <div class="actions">
+
+              <button
+                onclick="editBeat(
+                  '${beat.id}',
+                  ${JSON.stringify(
+                    beat.title || ""
+                  )},
+                  ${Number(
+                    beat.lease_mp3_price || 0
+                  )},
+                  ${Number(
+                    beat.lease_wav_price || 0
+                  )},
+                  ${Number(
+                    beat.stems_price || 0
+                  )},
+                  ${Number(
+                    beat.exclusive_price || 0
+                  )}
+                )"
+              >
+                Edit
+              </button>
+
+
+              <button
+                class="danger"
+                onclick="deleteBeat(
+                  '${beat.id}'
+                )"
+              >
+                Delete
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+}
+
+
+async function editBeat(
+  id,
+  title,
+  mp3,
+  wav,
+  stems,
+  exclusive
+){
+
+  const newTitle =
+    prompt(
+      "Beat title:",
+      title
+    );
+
+
+  if(newTitle === null){
+    return;
+  }
+
+
+  const newMp3 =
+    prompt(
+      "MP3 price:",
+      mp3
+    );
+
+
+  if(newMp3 === null){
+    return;
+  }
+
+
+  const newWav =
+    prompt(
+      "WAV price:",
+      wav
+    );
+
+
+  if(newWav === null){
+    return;
+  }
+
+
+  const newStems =
+    prompt(
+      "Stems price:",
+      stems
+    );
+
+
+  if(newStems === null){
+    return;
+  }
+
+
+  const newExclusive =
+    prompt(
+      "Exclusive price:",
+      exclusive
+    );
+
+
+  if(newExclusive === null){
+    return;
+  }
+
+
+  const result =
+    await supabaseClient
+      .from("beats")
+      .update({
+
+        title:
+          newTitle.trim(),
+
+        lease_mp3_price:
+          Number(newMp3),
+
+        lease_wav_price:
+          Number(newWav),
+
+        stems_price:
+          Number(newStems),
+
+        exclusive_price:
+          Number(newExclusive)
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error){
+
+    alert(
+      "Beat update failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadBeats();
+
+  await loadCounts();
+
+}
+
+
+async function deleteBeat(id){
+
+  if(
+    !confirm(
+      "Delete this beat? This cannot be undone."
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const result =
+    await supabaseClient
+      .from("beats")
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error){
+
+    alert(
+      "Beat deletion failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadBeats();
+
+  await loadCounts();
+
+}
+
+
+/* ============================================================
    ORDERS
-   ========================================================= */
+============================================================ */
 
 async function loadOrders(){
 
-try{
+  $("ordersBody").innerHTML =
+    `
+      <tr>
+        <td
+          colspan="5"
+          class="empty"
+        >
+          Loading…
+        </td>
+      </tr>
+    `;
 
-const {
-data:orders,
-error:ordersError
-}=
-await supabaseClient
-.from("orders")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
 
-if(ordersError)throw ordersError;
+  const result =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(200);
 
-ordersData=orders||[];
 
-const {
-data:items,
-error:itemsError
-}=
-await supabaseClient
-.from("order_items")
-.select("*");
+  if(result.error){
 
-if(itemsError)throw itemsError;
+    $("ordersBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="5"
+            class="error"
+          >
+            ${escapeHtml(
+              result.error.message
+            )}
+          </td>
+        </tr>
+      `;
 
-orderItemsData=items||[];
+    return;
 
-document.getElementById("orderCount")
-.textContent=ordersData.length;
+  }
 
-document.getElementById("reportOrders")
-.textContent=ordersData.length;
 
-const table=
-document.getElementById("ordersTable");
+  const orders =
+    result.data || [];
 
-if(!ordersData.length){
 
-table.innerHTML=
-`
-<tr>
-<td colspan="8" class="empty">
-No orders yet.
-</td>
-</tr>
-`;
+  if(!orders.length){
 
-return;
+    $("ordersBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="5"
+            class="empty"
+          >
+            No orders found.
+          </td>
+        </tr>
+      `;
 
-}
+    return;
 
-table.innerHTML=
-ordersData.map(order=>{
+  }
 
-const id=
-order.id||"-";
 
-const buyer=
-order.buyer_id||"-";
+  $("ordersBody").innerHTML =
+    orders.map(order=>{
 
-const status=
-order.status||"pending";
+      return `
 
-const created=
-order.created_at
-?new Date(
-order.created_at
-).toLocaleString()
-:"-";
+        <tr>
 
-const itemsForOrder=
-orderItemsData.filter(
-item=>
-String(item.order_id)===
-String(order.id)
-);
+          <td>
+            ${escapeHtml(
+              order.order_number ||
+              order.id
+            )}
+          </td>
 
-let songHtml="";
+          <td>
+            ${escapeHtml(
+              order.buyer_email ||
+              order.buyer_id ||
+              "—"
+            )}
+          </td>
 
-if(!itemsForOrder.length){
+          <td>
+            ${money(
+              order.price ||
+              order.total_amount,
+              order.currency
+            )}
+          </td>
 
-songHtml=
-`
-<span class="id-text">
-No song item found
-</span>
-`;
+          <td>
 
-}else{
+            <span class="pill">
 
-songHtml=
-itemsForOrder.map(item=>{
+              ${escapeHtml(
+                order.status ||
+                "—"
+              )}
 
-const song=
-songsData.find(
-s=>
-String(s.id)===
-String(item.song_id)
-);
+            </span>
 
-if(!song){
+          </td>
 
-return`
-<div>
+          <td>
+            ${formatDate(
+              order.created_at
+            )}
+          </td>
 
-<div class="song-title">
-Unknown Song
-</div>
+        </tr>
 
-<div class="id-text">
-Song ID:
-${escapeHtml(
-String(
-item.song_id||"-"
-)
-)}
-</div>
+      `;
 
-</div>
-`;
-
-}
-
-return`
-<div style="margin-bottom:8px;">
-
-<div class="song-title">
-${escapeHtml(
-String(
-song.title||"-"
-)
-)}
-</div>
-
-<div class="artist-name">
-${escapeHtml(
-String(
-findArtistName(
-song.artist_id
-)
-)
-)}
-</div>
-
-</div>
-`;
-
-}).join("");
+    }).join("");
 
 }
 
-let priceHtml="";
 
-if(itemsForOrder.length){
+/* ============================================================
+   PAYMENTS
+============================================================ */
 
-priceHtml=
-itemsForOrder.map(item=>{
+async function loadPayments(){
 
-const price=
-item.price!==null &&
-item.price!==undefined
-?item.price
-:0;
-
-return`
-<div>
-${escapeHtml(
-String(price)
-)}
-</div>
-`;
-
-}).join("");
-
-}else{
-
-const amount=
-order.total_amount||
-order.amount||
-order.total||
-0;
-
-priceHtml=
-escapeHtml(
-String(amount)
-);
-
-}
-
-const currency=
-itemsForOrder.length
-?(itemsForOrder[0].currency||
-order.currency||
-"UGX")
-:(order.currency||"UGX");
-
-const safeOrderId=
-escapeHtml(
-String(id)
-);
-
-return`
-
-<tr>
-
-<td>
-
-<div class="id-text">
-${safeOrderId}
-</div>
-
-</td>
-
-<td>
-${songHtml}
-</td>
-
-<td>
-
-<div class="id-text">
-${escapeHtml(
-String(buyer)
-)}
-</div>
-
-</td>
-
-<td>
-${priceHtml}
-</td>
-
-<td>
-${escapeHtml(
-String(currency)
-)}
-</td>
-
-<td>
-${formatStatus(status)}
-</td>
-
-<td>
-${escapeHtml(
-String(created)
-)}
-</td>
-
-<td>
-
-<div class="admin-actions">
-
-<button
-class="info-btn"
-onclick="viewOrder('${safeOrderId}')"
->
-View
-</button>
-
-<button
-class="action"
-onclick="editOrderStatus('${safeOrderId}')"
->
-Update
-</button>
-
-</div>
-
-</td>
-
-</tr>
-
-`;
-
-}).join("");
-
-}catch(error){
-
-console.error(
-"Orders error:",
-error
-);
-
-document.getElementById("ordersTable")
-.innerHTML=
-`
-<tr>
-<td colspan="8">
-
-Unable to load orders.
-
-<br><br>
-
-${escapeHtml(
-error.message||
-"Unknown error"
-)}
-
-</td>
-</tr>
-`;
-
-}
-
-}
+  $("paymentsBody").innerHTML =
+    `
+      <tr>
+        <td
+          colspan="6"
+          class="empty"
+        >
+          Loading…
+        </td>
+      </tr>
+    `;
 
 
-function viewOrder(orderId){
+  const result =
+    await supabaseClient
+      .from(
+        "payment_verifications"
+      )
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(200);
 
-const order=
-ordersData.find(
-item=>
-String(item.id)===
-String(orderId)
-);
 
-if(!order){
+  if(result.error){
 
-alert("Order was not found.");
+    $("paymentsBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="6"
+            class="error"
+          >
+            ${escapeHtml(
+              result.error.message
+            )}
+          </td>
+        </tr>
+      `;
 
-return;
+    return;
 
-}
+  }
 
-const items=
-orderItemsData.filter(
-item=>
-String(item.order_id)===
-String(order.id)
-);
 
-const details=
-items.map(
-item=>
-"Song ID: "+
-String(
-item.song_id||"-"
-)+
-"\nPrice: "+
-String(
-item.price||0
-)
-).join("\n\n");
+  const payments =
+    result.data || [];
 
-alert(
-"Order ID:\n"+
-String(order.id||"-")+
-"\n\nBuyer:\n"+
-String(order.buyer_id||"-")+
-"\n\nStatus:\n"+
-String(order.status||"pending")+
-"\n\nCurrency:\n"+
-String(order.currency||"UGX")+
-"\n\nItems:\n"+
-(
-details||
-"No order items found."
-)
-);
+
+  if(!payments.length){
+
+    $("paymentsBody").innerHTML =
+      `
+        <tr>
+          <td
+            colspan="6"
+            class="empty"
+          >
+            No payment verifications found.
+          </td>
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  $("paymentsBody").innerHTML =
+    payments.map(payment=>{
+
+      const pending =
+        String(
+          payment.status ||
+          "pending"
+        ).toLowerCase() ===
+        "pending";
+
+
+      return `
+
+        <tr>
+
+          <td>
+
+            ${escapeHtml(
+              payment.reference ||
+              payment.payment_reference ||
+              payment.transaction_id ||
+              "—"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              payment.user_email ||
+              payment.user_id ||
+              "—"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${money(
+              payment.amount,
+              payment.currency
+            )}
+
+          </td>
+
+
+          <td>
+
+            <span class="pill">
+
+              ${escapeHtml(
+                payment.status ||
+                "pending"
+              )}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            ${formatDate(
+              payment.created_at
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${
+              pending
+
+              ?
+
+              `
+                <div class="actions">
+
+                  <button
+                    class="good"
+                    onclick="setPayment(
+                      '${payment.id}',
+                      'approved'
+                    )"
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    class="danger"
+                    onclick="setPayment(
+                      '${payment.id}',
+                      'rejected'
+                    )"
+                  >
+                    Reject
+                  </button>
+
+                </div>
+              `
+
+              :
+
+              "—"
+
+            }
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
 
 }
 
 
-async function editOrderStatus(orderId){
-
-const order=
-ordersData.find(
-item=>
-String(item.id)===
-String(orderId)
-);
-
-if(!order){
-
-alert("Order was not found.");
-
-return;
-
-}
-
-const current=
-order.status||"pending";
-
-const newStatus=
-prompt(
-"Enter order status:\npending, paid, completed, failed, cancelled, rejected",
-current
-);
-
-if(newStatus===null)return;
-
-const cleanStatus=
-newStatus.trim().toLowerCase();
-
-if(!cleanStatus){
-
-alert("Status cannot be empty.");
-
-return;
-
-}
-
-try{
-
-const {
-error
-}=
-await supabaseClient
-.from("orders")
-.update({
-status:cleanStatus
-})
-.eq(
-"id",
-orderId
-);
-
-if(error)throw error;
-
-alert(
-"Order status updated."
-);
-
-await loadOrders();
-
-}catch(error){
-
-console.error(
-"Order status error:",
-error
-);
-
-alert(
-"Unable to update order: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-}
-
-}
-
-
-/* =========================================================
-   ADVERTISEMENTS
-   ========================================================= */
-
-async function loadAdvertisements(){
-
-const table=
-document.getElementById(
-"advertisementsTable"
-);
-
-if(!table)return;
-
-table.innerHTML=
-`
-<tr>
-<td colspan="7">
-Loading advertisements...
-</td>
-</tr>
-`;
-
-try{
-
-const {
-data,
-error
-}=
-await supabaseClient
-.from("advertisements")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
-
-if(error)throw error;
-
-advertisementsData=
-data||[];
-
-document.getElementById("adCount")
-.textContent=
-advertisementsData.length;
-
-document.getElementById("reportAds")
-.textContent=
-advertisementsData.length;
-
-const statusElement=
-document.getElementById(
-"adsSystemStatus"
-);
-
-if(statusElement){
-
-statusElement.className="status";
-
-statusElement.textContent=
-"● Connected";
-
-}
-
-if(!advertisementsData.length){
-
-table.innerHTML=
-`
-<tr>
-<td colspan="7" class="empty">
-No advertisements created yet.
-</td>
-</tr>
-`;
-
-return;
-
-}
-
-table.innerHTML=
-advertisementsData.map(ad=>{
-
-const title=
-ad.title||"Untitled Advertisement";
-
-const placement=
-ad.placement||"home";
-
-const start=
-ad.start_at
-?new Date(
-ad.start_at
-).toLocaleString()
-:"Immediately";
-
-const end=
-ad.end_at
-?new Date(
-ad.end_at
-).toLocaleString()
-:"No expiry";
-
-const status=
-ad.status||"active";
-
-const safeId=
-escapeHtml(
-String(ad.id)
-);
-
-return`
-
-<tr>
-
-<td>
-
-<div class="song-title">
-${escapeHtml(
-String(title)
-)}
-</div>
-
-<div class="artist-name">
-${escapeHtml(
-String(
-ad.description||""
-)
-)}
-</div>
-
-</td>
-
-<td>
-${escapeHtml(
-String(placement)
-)}
-</td>
-
-<td>
-
-<div>
-${escapeHtml(start)}
-</div>
-
-<div class="id-text">
-${escapeHtml(end)}
-</div>
-
-</td>
-
-<td>
-${formatStatus(status)}
-</td>
-
-<td>
-${Number(
-ad.impressions||0
-).toLocaleString()}
-</td>
-
-<td>
-${Number(
-ad.clicks||0
-).toLocaleString()}
-</td>
-
-<td>
-
-<div class="admin-actions">
-
-<button
-class="info-btn"
-onclick="editAdvertisement('${safeId}')"
->
-Edit
-</button>
-
-${
-String(status).toLowerCase()==="active"
-?
-`
-<button
-class="small-btn"
-onclick="setAdvertisementStatus('${safeId}','paused')"
->
-Pause
-</button>
-`
-:
-`
-<button
-class="success-btn"
-onclick="setAdvertisementStatus('${safeId}','active')"
->
-Activate
-</button>
-`
-}
-
-<button
-class="danger-btn"
-onclick="deleteAdvertisement('${safeId}')"
->
-Delete
-</button>
-
-</div>
-
-</td>
-
-</tr>
-
-`;
-
-}).join("");
-
-}catch(error){
-
-console.error(
-"Advertisement loading error:",
-error
-);
-
-const statusElement=
-document.getElementById(
-"adsSystemStatus"
-);
-
-if(statusElement){
-
-statusElement.className=
-"status-failed";
-
-statusElement.textContent=
-"● Database not ready";
-
-}
-
-table.innerHTML=
-`
-<tr>
-<td colspan="7">
-
-Unable to load advertisements.
-
-<br><br>
-
-${escapeHtml(
-error.message||
-"Unknown error"
-)}
-
-<br><br>
-
-Make sure the advertisements SQL table was created.
-
-</td>
-</tr>
-`;
-
-}
-
-}
-
-
-async function createAdvertisement(){
-
-const title=
-document.getElementById(
-"adTitle"
-).value.trim();
-
-const description=
-document.getElementById(
-"adDescription"
-).value.trim();
-
-const targetUrl=
-document.getElementById(
-"adTargetUrl"
-).value.trim();
-
-const placement=
-document.getElementById(
-"adPlacement"
-).value;
-
-const startInput=
-document.getElementById(
-"adStart"
-).value;
-
-const endInput=
-document.getElementById(
-"adEnd"
-).value;
-
-const fileInput=
-document.getElementById(
-"adImage"
-);
-
-if(!title){
-
-alert(
-"Please enter an advertisement title."
-);
-
-return;
-
-}
-
-if(!targetUrl){
-
-alert(
-"Please enter the destination URL."
-);
-
-return;
-
-}
-
-try{
-
-new URL(targetUrl);
-
-}catch{
-
-alert(
-"Please enter a valid destination URL."
-);
-
-return;
-
-}
-
-if(
-startInput &&
-endInput &&
-new Date(startInput)>=new Date(endInput)
+async function setPayment(
+  id,
+  status
 ){
 
-alert(
-"End date must be after start date."
-);
+  const result =
+    await supabaseClient
+      .from(
+        "payment_verifications"
+      )
+      .update({
+        status:status
+      })
+      .eq(
+        "id",
+        id
+      );
 
-return;
 
-}
+  if(result.error){
 
-let imageUrl=null;
+    alert(
+      "Payment update failed: " +
+      result.error.message
+    );
 
-try{
+    return;
 
-if(
-fileInput &&
-fileInput.files &&
-fileInput.files[0]
-){
+  }
 
-const file=
-fileInput.files[0];
 
-if(
-![
-"image/jpeg",
-"image/png",
-"image/webp"
-].includes(file.type)
-){
-
-alert(
-"Advertisement image must be JPG, PNG or WEBP."
-);
-
-return;
-
-}
-
-if(
-file.size>5*1024*1024
-){
-
-alert(
-"Advertisement image must be 5MB or smaller."
-);
-
-return;
-
-}
-
-imageUrl=
-await uploadAdImage(file);
-
-}
-
-}catch(error){
-
-alert(
-"Advertisement image upload failed: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-return;
-
-}
-
-try{
-
-const {
-data:{
-user
-}
-}=
-await supabaseClient.auth.getUser();
-
-if(!user){
-
-alert(
-"Your administrator session has expired."
-);
-
-window.location.href="account.html";
-
-return;
-
-}
-
-const {
-error
-}=
-await supabaseClient
-.from("advertisements")
-.insert({
-
-title:title,
-
-description:
-description||null,
-
-image_url:
-imageUrl,
-
-target_url:
-targetUrl,
-
-placement:
-placement,
-
-start_at:
-startInput
-?new Date(
-startInput
-).toISOString()
-:null,
-
-end_at:
-endInput
-?new Date(
-endInput
-).toISOString()
-:null,
-
-status:"active",
-
-created_by:
-user.id,
-
-created_at:
-new Date().toISOString(),
-
-updated_at:
-new Date().toISOString()
-
-});
-
-if(error)throw error;
-
-alert(
-"Advertisement published successfully."
-);
-
-clearAdForm();
-
-await loadAdvertisements();
-
-}catch(error){
-
-console.error(
-"Advertisement creation error:",
-error
-);
-
-alert(
-"Unable to publish advertisement: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-}
+  await loadPayments();
 
 }
 
 
-async function uploadAdImage(file){
-
-const sessionResult=
-await supabaseClient.auth.getSession();
-
-const session=
-sessionResult?.data?.session;
-
-if(!session){
-
-throw new Error(
-"Administrator session expired."
-);
-
-}
-
-const signatureResponse=
-await fetch(
-API_BASE+
-"/api/cloudinary/signature",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json",
-
-"Authorization":
-"Bearer "+
-session.access_token
-},
-
-body:JSON.stringify({
-folder:"pasong/ads"
-})
-
-}
-);
-
-const signatureData=
-await signatureResponse.json();
-
-if(
-!signatureResponse.ok
-){
-
-throw new Error(
-signatureData.error||
-"Cloudinary signing failed."
-);
-
-}
-
-const signature=
-signatureData.signature;
-
-const timestamp=
-signatureData.timestamp;
-
-const cloudName=
-signatureData.cloud_name||
-signatureData.cloudName;
-
-const apiKey=
-signatureData.api_key||
-signatureData.apiKey;
-
-if(
-!signature||
-!timestamp||
-!cloudName||
-!apiKey
-){
-
-throw new Error(
-"Cloudinary signing response is incomplete."
-);
-
-}
-
-const formData=
-new FormData();
-
-formData.append(
-"file",
-file
-);
-
-formData.append(
-"api_key",
-apiKey
-);
-
-formData.append(
-"timestamp",
-timestamp
-);
-
-formData.append(
-"signature",
-signature
-);
-
-formData.append(
-"folder",
-signatureData.folder||
-"pasong/ads"
-);
-
-const uploadResponse=
-await fetch(
-"https://api.cloudinary.com/v1_1/"+
-encodeURIComponent(
-cloudName
-)+
-"/image/upload",
-{
-
-method:"POST",
-
-body:formData
-
-}
-);
-
-const uploadData=
-await uploadResponse.json();
-
-if(
-!uploadResponse.ok
-){
-
-throw new Error(
-uploadData?.error?.message||
-"Cloudinary upload failed."
-);
-
-}
-
-return(
-uploadData.secure_url||
-uploadData.url||
-null
-);
-
-}
-
-
-async function editAdvertisement(id){
-
-const ad=
-advertisementsData.find(
-item=>
-String(item.id)===
-String(id)
-);
-
-if(!ad){
-
-alert(
-"Advertisement was not found."
-);
-
-return;
-
-}
-
-const title=
-prompt(
-"Advertisement title:",
-ad.title||""
-);
-
-if(title===null)return;
-
-const description=
-prompt(
-"Advertisement description:",
-ad.description||""
-);
-
-if(description===null)return;
-
-const targetUrl=
-prompt(
-"Destination URL:",
-ad.target_url||""
-);
-
-if(targetUrl===null)return;
-
-const placement=
-prompt(
-"Placement:\nhome, music, beats, dj, producers, artists, all",
-ad.placement||"home"
-);
-
-if(placement===null)return;
-
-try{
-
-new URL(
-targetUrl.trim()
-);
-
-}catch{
-
-alert(
-"Please enter a valid destination URL."
-);
-
-return;
-
-}
-
-try{
-
-const {
-error
-}=
-await supabaseClient
-.from("advertisements")
-.update({
-
-title:
-title.trim(),
-
-description:
-description.trim()||null,
-
-target_url:
-targetUrl.trim(),
-
-placement:
-placement.trim().toLowerCase(),
-
-updated_at:
-new Date().toISOString()
-
-})
-.eq(
-"id",
-id
-);
-
-if(error)throw error;
-
-alert(
-"Advertisement updated."
-);
-
-await loadAdvertisements();
-
-}catch(error){
-
-console.error(
-"Advertisement edit error:",
-error
-);
-
-alert(
-"Unable to update advertisement: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-}
-
-}
-
-
-async function setAdvertisementStatus(
-id,
-newStatus
-){
-
-const confirmed=
-confirm(
-newStatus==="active"
-?
-"Activate this advertisement?"
-:
-"Pause this advertisement?"
-);
-
-if(!confirmed)return;
-
-try{
-
-const {
-error
-}=
-await supabaseClient
-.from("advertisements")
-.update({
-
-status:newStatus,
-
-updated_at:
-new Date().toISOString()
-
-})
-.eq(
-"id",
-id
-);
-
-if(error)throw error;
-
-alert(
-newStatus==="active"
-?
-"Advertisement activated."
-:
-"Advertisement paused."
-);
-
-await loadAdvertisements();
-
-}catch(error){
-
-console.error(
-"Advertisement status error:",
-error
-);
-
-alert(
-"Unable to change advertisement status: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-}
-
-}
-
-
-async function deleteAdvertisement(id){
-
-const confirmed=
-confirm(
-"Delete this advertisement? This action cannot be undone."
-);
-
-if(!confirmed)return;
-
-try{
-
-const {
-error
-}=
-await supabaseClient
-.from("advertisements")
-.delete()
-.eq(
-"id",
-id
-);
-
-if(error)throw error;
-
-alert(
-"Advertisement deleted."
-);
-
-await loadAdvertisements();
-
-}catch(error){
-
-console.error(
-"Advertisement delete error:",
-error
-);
-
-alert(
-"Unable to delete advertisement: "+
-(
-error.message||
-"Unknown error"
-)
-);
-
-}
-
-}
-
-
-function clearAdForm(){
-
-document.getElementById(
-"adTitle"
-).value="";
-
-document.getElementById(
-"adDescription"
-).value="";
-
-document.getElementById(
-"adTargetUrl"
-).value="";
-
-document.getElementById(
-"adPlacement"
-).value="home";
-
-document.getElementById(
-"adStart"
-).value="";
-
-document.getElementById(
-"adEnd"
-).value="";
-
-document.getElementById(
-"adImage"
-).value="";
-
-document.getElementById(
-"adPreview"
-).innerHTML=
-`
-<div class="ad-preview-content">
-
-<div class="ad-preview-title">
-Advertisement Preview
-</div>
-
-<div class="ad-preview-description">
-Your advertisement preview will appear here.
-</div>
-
-</div>
-`;
-
-}
-
+/* ============================================================
+   AD PREVIEW
+============================================================ */
 
 function updateAdPreview(){
 
-const title=
-document.getElementById(
-"adTitle"
-).value.trim();
+  const title =
+    $("adTitle").value.trim();
 
-const description=
-document.getElementById(
-"adDescription"
-).value.trim();
+  const description =
+    $("adDescription")
+      .value
+      .trim();
 
-const file=
-document.getElementById(
-"adImage"
-).files?.[0];
-
-const preview=
-document.getElementById(
-"adPreview"
-);
-
-let imageHtml="";
-
-if(file){
-
-const url=
-URL.createObjectURL(file);
-
-imageHtml=
-`
-<img
-src="${url}"
-alt="Advertisement preview"
->
-`;
-
-}
-
-preview.innerHTML=
-`
-${imageHtml}
-
-<div class="ad-preview-content">
-
-<div class="ad-preview-title">
-${escapeHtml(
-title||
-"Advertisement Preview"
-)}
-</div>
-
-<div class="ad-preview-description">
-${escapeHtml(
-description||
-"Your advertisement preview will appear here."
-)}
-</div>
-
-</div>
-`;
-
-}
+  const image =
+    $("adImageUrl")
+      .value
+      .trim();
 
 
-document.getElementById(
-"adTitle"
-).addEventListener(
-"input",
-updateAdPreview
-);
+  if(
+    !title &&
+    !description &&
+    !image
+  ){
 
-document.getElementById(
-"adDescription"
-).addEventListener(
-"input",
-updateAdPreview
-);
+    $("adPreview")
+      .classList
+      .add("hidden");
 
-document.getElementById(
-"adImage"
-).addEventListener(
-"change",
-updateAdPreview
-);
+    return;
+
+  }
 
 
-/* =========================================================
-   PAYMENT VERIFICATION
-   ========================================================= */
+  $("adPreview")
+    .classList
+    .remove("hidden");
 
-async function loadPaymentVerifications(){
 
-const table=
-document.getElementById(
-"paymentVerificationsTable"
-);
+  $("adPreviewTitle")
+    .textContent =
+    title ||
+    "Advertisement";
 
-if(!table)return;
 
-table.innerHTML=
-`
-<tr>
-<td colspan="9">
-Loading payment verifications...
-</td>
-</tr>
-`;
+  $("adPreviewDescription")
+    .textContent =
+    description;
 
-try{
 
-const {
-data,
-error
-}=
-await supabaseClient
-.from("payment_verifications")
-.select("*")
-.order(
-"created_at",
-{
-ascending:false
-}
-);
+  if(image){
 
-if(error)throw error;
+    $("adPreviewImage")
+      .src =
+      image;
 
-if(!data||!data.length){
+    $("adPreviewImage")
+      .style
+      .display =
+      "block";
 
-table.innerHTML=
-`
-<tr>
-<td colspan="9" class="empty">
-💳 No payment verification requests yet.
-</td>
-</tr>
-`;
+  }else{
 
-return;
+    $("adPreviewImage")
+      .style
+      .display =
+      "none";
+
+  }
 
 }
 
-table.innerHTML=
-data.map(item=>{
 
-const country=
-item.country||"-";
+$("adTitle")
+  .addEventListener(
+    "input",
+    updateAdPreview
+  );
 
-const method=
-item.verification_type==="mobile_money"
-?"📱 Mobile Money"
-:"💳 Card / Online";
 
-const provider=
+$("adDescription")
+  .addEventListener(
+    "input",
+    updateAdPreview
+  );
+
+
+$("adImageUrl")
+  .addEventListener(
+    "input",
+    updateAdPreview
+  );
+
+
+/* ============================================================
+   ADVERTISEMENTS
+============================================================ */
+
+async function loadAds(){
+
+  $("adsBody").innerHTML =
+    `
+      <tr>
+        <td
+          colspan="6"
+          class="empty"
+        >
+          Loading…
+        </td>
+      </tr>
+    `;
+
+
+  const result =
+    await supabaseClient
+      .from(
+        "advertisements"
+      )
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(result.error){
+
+    $("adsBody").innerHTML =
+      `
+        <tr>
+
+          <td colspan="6">
+
+            <div class="notice error">
+
+              Advertisement table is not ready.
+
+              <br><br>
+
+              ${escapeHtml(
+                result.error.message
+              )}
+
+              <br><br>
+
+              Run the SQL supplied below
+              this admin.html, then refresh.
+
+            </div>
+
+          </td>
+
+        </tr>
+      `;
+
+    $("reportAds")
+      .textContent =
+      "0";
+
+    return;
+
+  }
+
+
+  const ads =
+    result.data || [];
+
+
+  $("reportAds")
+    .textContent =
+    ads.length;
+
+
+  if(!ads.length){
+
+    $("adsBody").innerHTML =
+      `
+        <tr>
+
+          <td
+            colspan="6"
+            class="empty"
+          >
+            No advertisements yet.
+          </td>
+
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  $("adsBody").innerHTML =
+    ads.map(ad=>{
+
+      const status =
+        String(
+          ad.status ||
+          "draft"
+        );
+
+
+      const actionText =
+        status === "active"
+        ? "Pause"
+        : "Activate";
+
+
+      return `
+
+        <tr>
+
+          <td>
+
+            <strong>
+              ${escapeHtml(
+                ad.title
+              )}
+            </strong>
+
+            <br>
+
+            <span class="muted">
+
+              ${escapeHtml(
+                ad.description ||
+                ""
+              )}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              ad.placement ||
+              "home"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${formatDate(
+              ad.start_at
+            )}
+
+            <br>
+
+            →
+
+            <br>
+
+            ${formatDate(
+              ad.end_at
+            )}
+
+          </td>
+
+
+          <td>
+
+            <span class="pill">
+
+              ${escapeHtml(
+                status
+              )}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            ${Number(
+              ad.clicks ||
+              0
+            ).toLocaleString()}
+
+          </td>
+
+
+          <td>
+
+            <div class="actions">
+
+              <button
+                onclick="editAd(
+                  '${ad.id}'
+                )"
+              >
+                Edit
+              </button>
+
+
+              <button
+                onclick="toggleAd(
+                  '${ad.id}',
+                  '${status}'
+                )"
+              >
+                ${actionText}
+              </button>
+
+
+              <button
+                class="danger"
+                onclick="deleteAd(
+                  '${ad.id}'
+                )"
+              >
+                Delete
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* ============================================================
+   RESET AD FORM
+============================================================ */
+
+function resetAdForm(){
+
+  $("adForm").reset();
+
+  $("adId").value =
+    "";
+
+  $("adStatus").value =
+    "draft";
+
+  $("adSaveButton")
+    .textContent =
+    "Post Advertisement";
+
+  $("adPreview")
+    .classList
+    .add("hidden");
+
+  hideMessage(
+    "adMessage"
+  );
+
+}
+
+
+/* ============================================================
+   EDIT AD
+============================================================ */
+
+async function editAd(id){
+
+  const result =
+    await supabaseClient
+      .from(
+        "advertisements"
+      )
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .maybeSingle();
+
+
+  if(
+    result.error ||
+    !result.data
+  ){
+
+    alert(
+      "Could not load advertisement: " +
+
+      (
+        result.error?.message ||
+        "Advertisement not found."
+      )
+    );
+
+    return;
+
+  }
+
+
+  const ad =
+    result.data;
+
+
+  $("adId").value =
+    ad.id;
+
+
+  $("adTitle").value =
+    ad.title ||
+    "";
+
+
+  $("adDescription").value =
+    ad.description ||
+    "";
+
+
+  $("adImageUrl").value =
+    ad.image_url ||
+    "";
+
+
+  $("adTargetUrl").value =
+    ad.target_url ||
+    "";
+
+
+  $("adPlacement").value =
+    ad.placement ||
+    "home";
+
+
+  $("adStatus").value =
+    ad.status ||
+    "draft";
+
+
+  if(ad.start_at){
+
+    $("adStartAt").value =
+      new Date(
+        ad.start_at
+      )
+      .toISOString()
+      .slice(
+        0,
+        16
+      );
+
+  }
+
+
+  if(ad.end_at){
+
+    $("adEndAt").value =
+      new Date(
+        ad.end_at
+      )
+      .toISOString()
+      .slice(
+        0,
+        16
+      );
+
+  }
+
+
+  $("adSaveButton")
+    .textContent =
+    "Update Advertisement";
+
+
+  updateAdPreview();
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* ============================================================
+   TOGGLE AD
+============================================================ */
+
+async function toggleAd(
+  id,
+  currentStatus
+){
+
+  const nextStatus =
+    currentStatus === "active"
+    ? "paused"
+    : "active";
+
+
+  const result =
+    await supabaseClient
+      .from(
+        "advertisements"
+      )
+      .update({
+
+        status:
+          nextStatus,
+
+        updated_at:
+          new Date()
+            .toISOString()
+
+      })
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error){
+
+    alert(
+      "Advertisement update failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadAds();
+
+}
+
+
+/* ============================================================
+   DELETE AD
+============================================================ */
+
+async function deleteAd(id){
+
+  if(
+    !confirm(
+      "Delete this advertisement?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const result =
+    await supabaseClient
+      .from(
+        "advertisements"
+      )
+      .delete()
+      .eq(
+        "id",
+        id
+      );
+
+
+  if(result.error){
+
+    alert(
+      "Advertisement deletion failed: " +
+      result.error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadAds();
+
+}
+
+
+/* ============================================================
+   CREATE / UPDATE AD
+============================================================ */
+
+$("adForm")
+  .addEventListener(
+    "submit",
+    async event=>{
+
+      event.preventDefault();
+
+
+      hideMessage(
+        "adMessage"
+      );
+
+
+      $("adSaveButton")
+        .disabled =
+        true;
+
+
+      try{
+
+        const title =
+          $("adTitle")
+            .value
+            .trim();
+
+
+        if(!title){
+
+          throw new Error(
+            "Advertisement title is required."
+          );
+
+        }
+
+
+        const payload = {
+
+          title:title,
+
+          description:
+            $("adDescription")
+              .value
+              .trim() ||
+            null,
+
+          image_url:
+            $("adImageUrl")
+              .value
+              .trim() ||
+            null,
+
+          target_url:
+            $("adTargetUrl")
+              .value
+              .trim() ||
+            null,
+
+          placement:
+            $("adPlacement")
+              .value,
+
+          start_at:
+            $("adStartAt")
+              .value
+              ?
+              new Date(
+                $("adStartAt")
+                  .value
+              )
+              .toISOString()
+              :
+              null,
+
+          end_at:
+            $("adEndAt")
+              .value
+              ?
+              new Date(
+                $("adEndAt")
+                  .value
+              )
+              .toISOString()
+              :
+              null,
+
+          status:
+            $("adStatus")
+              .value,
+
+          created_by:
+            currentUser.id,
+
+          updated_at:
+            new Date()
+              .toISOString()
+
+        };
+
+
+        let result;
+
+
+        if(
+          $("adId").value
+        ){
+
+          result =
+            await supabaseClient
+              .from(
+                "advertisements"
+              )
+              .update(payload)
+              .eq(
+                "id",
+                $("adId").value
+              );
+
+        }else{
+
+          result =
+            await supabaseClient
+              .from(
+                "advertisements"
+              )
+              .insert(
+                payload
+              );
+
+        }
+
+
+        if(result.error){
+
+          throw new Error(
+            result.error.message
+          );
+
+        }
+
+
+        showMessage(
+
+          "adMessage",
+
+          "success",
+
+          $("adId").value
+
+          ?
+
+          "Advertisement updated successfully."
+
+          :
+
+          "Advertisement posted successfully."
+
+        );
+
+
+        resetAdForm();
+
+
+        await loadAds();
+
+
+      }catch(error){
+
+        console.error(
+          "Advertisement error:",
+          error
+        );
+
+
+        showMessage(
+
+          "adMessage",
+
+          "error",
+
+          error?.message ||
+
+          "Advertisement save failed."
+
+        );
+
+      }finally{
+
+        $("adSaveButton")
+          .disabled =
+          false;
+
+      }
+
+    }
+  );
+
+
+/* ============================================================
+   COVERS
+============================================================ */
+
+async function loadCovers(){
+
+  $("coversBody").innerHTML =
+    `
+      <tr>
+
+        <td
+          colspan="5"
+          class="empty"
+        >
+          Loading…
+
+        </td>
+
+      </tr>
+    `;
+
+
+  const result =
+    await supabaseClient
+      .from(
+        "cover_requests"
+      )
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(200);
+
+
+  if(result.error){
+
+    $("coversBody").innerHTML =
+      `
+        <tr>
+
+          <td
+            colspan="5"
+            class="error"
+          >
+
+            ${escapeHtml(
+              result.error.message
+            )}
+
+          </td>
+
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  const covers =
+    result.data || [];
+
+
+  if(!covers.length){
+
+    $("coversBody").innerHTML =
+      `
+        <tr>
+
+          <td
+            colspan="5"
+            class="empty"
+          >
+            No cover requests.
+          </td>
+
+        </tr>
+      `;
+
+    return;
+
+  }
+
+
+  $("coversBody").innerHTML =
+    covers.map(cover=>{
+
+      return `
+
+        <tr>
+
+          <td>
+
+            ${escapeHtml(
+              cover.title ||
+              cover.song_title ||
+              "—"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              cover.user_email ||
+              cover.user_id ||
+              "—"
+            )}
+
+          </td>
+
+
+          <td>
+
+            ${escapeHtml(
+              cover.style ||
+              "—"
+            )}
+
+          </td>
+
+
+          <td>
+
+            <span class="pill">
+
+              ${escapeHtml(
+                cover.status ||
+                "pending"
+              )}
+
+            </span>
+
+          </td>
+
+
+          <td>
+
+            ${formatDate(
+              cover.created_at
+            )}
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* ============================================================
+   LOAD EVERYTHING
+============================================================ */
+
+async function loadAll(){
+
+  try{
+
+    await loadCounts();
+
+  }catch(error){
+
+    console.error(
+      "Counts error:",
+      error
+    );
+
+    showMessage(
+
+      "overviewMessage",
+
+      "error",
+
+      error.message
+
+    );
+
+  }
+
+
+  try{
+    await loadSongs();
+  }catch(error){
+    console.error(
+      "Songs loading error:",
+      error
+    );
+  }
+
+
+  try{
+    await loadBeats();
+  }catch(error){
+    console.error(
+      "Beats loading error:",
+      error
+    );
+  }
+
+
+  try{
+    await loadOrders();
+  }catch(error){
+    console.error(
+      "Orders loading error:",
+      error
+    );
+  }
+
+
+  try{
+    await loadPayments();
+  }catch(error){
+    console.error(
+      "Payments loading error:",
+      error
+    );
+  }
+
+
+  try{
+    await loadAds();
+  }catch(error){
+    console.error(
+      "Ads loading error:",
+      error
+    );
+  }
+
+
+  try{
+    await loadCovers();
+  }catch(error){
+    console.error(
+      "Covers loading error:",
+      error
+    );
+  }
+
+}
+
+
+/* ============================================================
+   SECTION NAVIGATION
+============================================================ */
+
+document
+  .querySelectorAll(
+    ".sidebar button[data-section]"
+  )
+  .forEach(button=>{
+
+    button.addEventListener(
+      "click",
+      ()=>{
+
+        document
+          .querySelectorAll(
+            ".sidebar button"
+          )
+          .forEach(
+            item=>
+              item.classList
+                .remove("active")
+          );
+
+
+        button
+          .classList
+          .add("active");
+
+
+        document
+          .querySelectorAll(
+            ".section"
+          )
+          .forEach(
+            section=>
+              section.classList
+                .add("hidden")
+          );
+
+
+        const section =
+          $(
+            "section-" +
+            button.dataset.section
+          );
+
+
+        if(section){
+
+          section
+            .classList
+            .remove("hidden");
+
+        }
+
+      }
+    );
+
+  });
+
+
+/* ============================================================
+   START
+============================================================ */
+
+bootAdmin();
+
+</script>
+
+</body>
+</html>
