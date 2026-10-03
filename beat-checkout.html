@@ -36,10 +36,7 @@ body{
     ),
     #09090f;
   color:#fff;
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
 a{
@@ -527,7 +524,6 @@ header{
 
 </header>
 
-
 <main class="page">
 
   <div class="page-title">
@@ -540,7 +536,6 @@ header{
 
   </div>
 
-
   <div
     id="loadingBox"
     class="card loading"
@@ -548,12 +543,10 @@ header{
     Loading checkout...
   </div>
 
-
   <div
     id="checkoutGrid"
     class="checkout-grid hidden"
   >
-
 
     <!-- BEAT DETAILS -->
 
@@ -579,7 +572,6 @@ header{
           Producer
         </div>
 
-
         <div class="info-row">
 
           <span class="info-label">
@@ -595,7 +587,6 @@ header{
 
         </div>
 
-
         <div class="info-row">
 
           <span class="info-label">
@@ -608,7 +599,6 @@ header{
 
         </div>
 
-
         <div class="info-row">
 
           <span class="info-label">
@@ -619,7 +609,7 @@ header{
             id="paymentMethodSummary"
             class="info-value"
           >
-            Mobile Money
+            MTN Mobile Money
           </span>
 
         </div>
@@ -627,7 +617,6 @@ header{
       </div>
 
     </section>
-
 
     <!-- PAYMENT -->
 
@@ -640,7 +629,6 @@ header{
       <div class="subtitle">
         Choose how you want to pay.
       </div>
-
 
       <div class="account-box">
 
@@ -657,14 +645,11 @@ header{
 
       </div>
 
-
       <div class="section-label">
         Payment Method
       </div>
 
-
       <div class="providers">
-
 
         <button
           type="button"
@@ -683,7 +668,6 @@ header{
 
         </button>
 
-
         <button
           type="button"
           class="provider"
@@ -700,7 +684,6 @@ header{
           </span>
 
         </button>
-
 
         <button
           type="button"
@@ -719,9 +702,7 @@ header{
 
         </button>
 
-
       </div>
-
 
       <!-- MOBILE MONEY -->
 
@@ -751,7 +732,6 @@ header{
 
       </div>
 
-
       <!-- CARD -->
 
       <div
@@ -772,7 +752,6 @@ header{
 
         </div>
 
-
         <div class="card-icons">
 
           <span class="card-icon">
@@ -791,11 +770,9 @@ header{
 
       </div>
 
-
       <!-- ORDER -->
 
       <div class="order-box">
-
 
         <div class="order-row">
 
@@ -809,7 +786,6 @@ header{
 
         </div>
 
-
         <div class="order-row">
 
           <span>
@@ -821,7 +797,6 @@ header{
           </strong>
 
         </div>
-
 
         <div class="total">
 
@@ -838,9 +813,7 @@ header{
 
         </div>
 
-
       </div>
-
 
       <button
         id="payButton"
@@ -851,12 +824,10 @@ header{
         Pay Now
       </button>
 
-
       <div
         id="message"
         class="message"
       ></div>
-
 
       <div class="security">
 
@@ -867,11 +838,9 @@ header{
 
     </section>
 
-
   </div>
 
 </main>
-
 
 <script>
 
@@ -908,10 +877,15 @@ const supabaseClient =
 ========================================================= */
 
 let currentSession = null;
+
 let currentBeat = null;
+
 let currentProvider = "MTN";
+
 let currentPackage = "";
+
 let currentPrice = 0;
+
 let currentBeatId = null;
 
 
@@ -940,10 +914,7 @@ function formatUGX(value){
 }
 
 
-function showMessage(
-  type,
-  message
-){
+function showMessage(type,message){
 
   const box =
     document.getElementById("message");
@@ -995,13 +966,124 @@ function getBeatId(){
 }
 
 
+/*
+=========================================================
+IMPORTANT PACKAGE NORMALIZER
+=========================================================
+
+This is the fix for the "Invalid package" error.
+
+The backend expects EXACTLY:
+
+mp3
+wav
+stems
+exclusive
+
+The page may receive:
+
+exclusive
+Exclusive Licence
+exclusive licence
+wav
+WAV Lease
+stems
+Stems / Trackout
+mp3
+MP3 Lease
+
+Everything is converted to the exact backend value.
+=========================================================
+*/
+
+function normalizePackage(value){
+
+  const packageValue =
+    String(value || "")
+      .toLowerCase()
+      .trim();
+
+
+  if(
+    packageValue === "exclusive" ||
+    packageValue.includes("exclusive")
+  ){
+
+    return "exclusive";
+
+  }
+
+
+  if(
+    packageValue === "stems" ||
+    packageValue.includes("stems") ||
+    packageValue.includes("trackout")
+  ){
+
+    return "stems";
+
+  }
+
+
+  if(
+    packageValue === "wav" ||
+    packageValue.includes("wav")
+  ){
+
+    return "wav";
+
+  }
+
+
+  if(
+    packageValue === "mp3" ||
+    packageValue.includes("mp3")
+  ){
+
+    return "mp3";
+
+  }
+
+
+  return "";
+
+}
+
+
 function getPackage(){
 
-  return (
+  const rawPackage =
     getQueryParam("package") ||
     getQueryParam("package_type") ||
-    ""
-  ).trim();
+    "";
+
+  return normalizePackage(
+    rawPackage
+  );
+
+}
+
+
+function getPackageDisplayName(packageType){
+
+  switch(packageType){
+
+    case "exclusive":
+      return "Exclusive Licence";
+
+    case "stems":
+      return "Stems / Trackout";
+
+    case "wav":
+      return "WAV Lease";
+
+    case "mp3":
+      return "MP3 Lease";
+
+    default:
+      return "Licence";
+
+  }
 
 }
 
@@ -1089,6 +1171,15 @@ async function loadBeat(){
 
     throw new Error(
       "No beat was selected."
+    );
+
+  }
+
+
+  if(!currentPackage){
+
+    throw new Error(
+      "Invalid beat licence package."
     );
 
   }
@@ -1196,27 +1287,14 @@ async function loadBeat(){
     beatTitle;
 
 
-  /*
-    Determine the selected package price
-    from the actual beat record.
+  let serverPrice = 0;
 
-    This prevents the browser URL price from
-    being trusted as the final purchase price.
+
+  /*
+    Use the normalized package value here.
   */
 
-  const packageLower =
-    currentPackage
-      .toLowerCase()
-      .trim();
-
-
-  let serverPrice = 0;
-  let displayPackage = currentPackage;
-
-
-  if(
-    packageLower.includes("exclusive")
-  ){
+  if(currentPackage === "exclusive"){
 
     serverPrice =
       Number(
@@ -1225,13 +1303,7 @@ async function loadBeat(){
         0
       );
 
-    displayPackage =
-      "Exclusive Licence";
-
-  }else if(
-    packageLower.includes("stems") ||
-    packageLower.includes("trackout")
-  ){
+  }else if(currentPackage === "stems"){
 
     serverPrice =
       Number(
@@ -1240,12 +1312,7 @@ async function loadBeat(){
         0
       );
 
-    displayPackage =
-      "Stems / Trackout";
-
-  }else if(
-    packageLower.includes("wav")
-  ){
+  }else if(currentPackage === "wav"){
 
     serverPrice =
       Number(
@@ -1255,10 +1322,7 @@ async function loadBeat(){
         0
       );
 
-    displayPackage =
-      "WAV Lease";
-
-  }else{
+  }else if(currentPackage === "mp3"){
 
     serverPrice =
       Number(
@@ -1268,20 +1332,8 @@ async function loadBeat(){
         0
       );
 
-    displayPackage =
-      "MP3 Lease";
-
   }
 
-
-  /*
-    If backend did not expose the price under
-    one of the expected names, retain the URL
-    price only for display.
-
-    The actual server payment endpoint must
-    still validate the order price.
-  */
 
   if(
     !Number.isFinite(serverPrice) ||
@@ -1296,6 +1348,12 @@ async function loadBeat(){
 
   currentPrice =
     Number(serverPrice || 0);
+
+
+  const displayPackage =
+    getPackageDisplayName(
+      currentPackage
+    );
 
 
   document.getElementById(
@@ -1318,15 +1376,13 @@ async function loadBeat(){
 
   /*
     Detect own beat.
-
-    We compare the currently logged-in user
-    against the producer/user fields returned
-    by the API.
   */
 
   const loggedUserId =
-    currentSession?.user?.id ||
-    "";
+    String(
+      currentSession?.user?.id ||
+      ""
+    );
 
 
   const producerUserId =
@@ -1516,11 +1572,38 @@ async function createBeatOrder(){
   }
 
 
+  /*
+    ALWAYS use the normalized package.
+
+    This is the main fix.
+
+    For Exclusive Licence:
+      currentPackage = "exclusive"
+
+    NOT:
+      "Exclusive Licence"
+  */
+
   const packageType =
-    currentPackage ||
-    document.getElementById(
-      "orderPackage"
-    ).textContent;
+    normalizePackage(
+      currentPackage
+    );
+
+
+  if(
+    ![
+      "mp3",
+      "wav",
+      "stems",
+      "exclusive"
+    ].includes(packageType)
+  ){
+
+    throw new Error(
+      "Invalid beat licence package."
+    );
+
+  }
 
 
   const response =
@@ -1603,22 +1686,26 @@ async function createBeatOrder(){
    MOBILE MONEY PAYMENT
 ========================================================= */
 
-async function startMobileMoneyPayment(
-  order
-){
+async function startMobileMoneyPayment(order){
 
   const mobileNumber =
     getMobileNumber();
 
 
-  /*
-    This keeps the same PASONG Mobile Money
-    service used by the existing payment system.
+  const packageType =
+    normalizePackage(
+      currentPackage
+    );
 
-    The secure server-side payment completion
-    must verify the provider transaction before
-    marking the beat order as paid.
-  */
+
+  if(!packageType){
+
+    throw new Error(
+      "Invalid beat licence package."
+    );
+
+  }
+
 
   const payload = {
 
@@ -1635,7 +1722,7 @@ async function startMobileMoneyPayment(
       order?.id || null,
 
     package_type:
-      currentPackage,
+      packageType,
 
     amount:
       currentPrice,
@@ -1729,11 +1816,6 @@ async function startMobileMoneyPayment(
   }
 
 
-  /*
-    The existing PASONG payment service may return
-    a reference under different field names.
-  */
-
   const reference =
     data.reference ||
     data.transaction_reference ||
@@ -1745,16 +1827,6 @@ async function startMobileMoneyPayment(
 
 
   if(!reference){
-
-    /*
-      Some payment services return the whole
-      payment object while the transaction is
-      being processed.
-
-      If no reference exists, display the provider
-      response instead of pretending the payment
-      succeeded.
-    */
 
     console.error(
       "Payment service response:",
@@ -1947,30 +2019,32 @@ async function pollMobileMoneyPayment(
    CARD PAYMENT
 ========================================================= */
 
-async function startCardPayment(
-  order
-){
+async function startCardPayment(order){
 
   /*
     IMPORTANT:
 
-    The Flutterwave secret key must NEVER be
-    placed in this HTML file.
+    Flutterwave secret credentials remain on
+    the Render backend.
 
-    The next backend update will provide a secure
-    endpoint that:
-
-      1. receives the PASONG order
-      2. creates the Flutterwave Standard payment
-      3. returns the Flutterwave hosted link
-      4. redirects the buyer there
-      5. verifies the transaction after return
-      6. completes the PASONG beat order
-      7. unlocks delivery
-
-    The frontend is already prepared for that
-    secure flow.
+    This browser only requests a secure hosted
+    checkout URL.
   */
+
+
+  const packageType =
+    normalizePackage(
+      currentPackage
+    );
+
+
+  if(!packageType){
+
+    throw new Error(
+      "Invalid beat licence package."
+    );
+
+  }
 
 
   const response =
@@ -1999,7 +2073,7 @@ async function startCardPayment(
             order?.id || null,
 
           package_type:
-            currentPackage
+            packageType
 
         })
 
@@ -2034,7 +2108,7 @@ async function startCardPayment(
     throw new Error(
       data.error ||
       data.message ||
-      "Card checkout is not available yet."
+      "Card checkout is not available."
     );
 
   }
@@ -2074,22 +2148,6 @@ async function finalizeBeatOrder(
   paymentData
 ){
 
-  /*
-    The current beat-payment backend already has
-    a protected payment-completion route.
-
-    We do NOT expose the payment secret in this
-    frontend.
-
-    Therefore the actual secure completion for
-    Mobile Money/Card is handled by the backend
-    payment service.
-
-    If the payment service already completed the
-    order, simply continue to delivery.
-  */
-
-
   const transactionId =
     paymentData.transaction_id ||
     paymentData.transactionId ||
@@ -2098,10 +2156,6 @@ async function finalizeBeatOrder(
     paymentData.reference ||
     "";
 
-
-  /*
-    Ask the backend to deliver the purchased files.
-  */
 
   const deliveryResponse =
     await fetch(
@@ -2159,22 +2213,17 @@ async function finalizeBeatOrder(
 
   if(!deliveryResponse.ok){
 
-    /*
-      Payment may already have succeeded even if
-      delivery needs another backend step.
-
-      Do not tell the user that money was lost.
-    */
-
     console.error(
       "Delivery response:",
       deliveryData
     );
 
+
     showMessage(
       "success",
       "Payment was confirmed. Your beat licence is being prepared. Check your PASONG account/orders for the download."
     );
+
 
     document.getElementById(
       "payButton"
@@ -2202,16 +2251,12 @@ async function finalizeBeatOrder(
     "Purchase Complete";
 
 
-  /*
-    If delivery contains download links,
-    store them locally for the next page/use.
-  */
-
   try{
 
     localStorage.setItem(
       "pasong_last_beat_purchase",
       JSON.stringify({
+
         order:
           order || null,
 
@@ -2222,10 +2267,13 @@ async function finalizeBeatOrder(
           currentBeatId,
 
         package:
-          currentPackage,
+          normalizePackage(
+            currentPackage
+          ),
 
         purchased_at:
           new Date().toISOString()
+
       })
     );
 
@@ -2280,9 +2328,23 @@ async function startPayment(){
   }
 
 
-  /*
-    Card payments are sent to the secure backend.
-  */
+  const packageType =
+    normalizePackage(
+      currentPackage
+    );
+
+
+  if(!packageType){
+
+    showMessage(
+      "error",
+      "Invalid beat licence package."
+    );
+
+    return;
+
+  }
+
 
   button.disabled = true;
 
@@ -2313,10 +2375,6 @@ async function startPayment(){
     }
 
 
-    /*
-      CARD
-    */
-
     if(
       currentProvider ===
       "FLUTTERWAVE"
@@ -2335,10 +2393,6 @@ async function startPayment(){
 
     }
 
-
-    /*
-      MOBILE MONEY
-    */
 
     button.textContent =
       "Starting Payment...";
@@ -2375,11 +2429,6 @@ async function startPayment(){
 
   }
 
-
-  /*
-    Card payment redirects away, so normally
-    execution does not reach here for cards.
-  */
 
   button.disabled =
     false;
@@ -2426,11 +2475,6 @@ async function initializeCheckout(){
     );
 
 
-    /*
-      If this is an own beat, loadBeat()
-      has already disabled the button.
-    */
-
   }catch(error){
 
     console.error(
@@ -2465,7 +2509,7 @@ async function initializeCheckout(){
 ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
-  (event, session)=>{
+  (event,session)=>{
 
     if(
       event === "SIGNED_OUT"
