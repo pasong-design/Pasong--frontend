@@ -692,7 +692,13 @@ font-weight:700;
 cursor:pointer;
 }
 
-.package-buy:hover{background:#7c4ee8}
+.package-buy:hover{
+background:#7c4ee8;
+}
+
+.package-buy:active{
+transform:scale(.98);
+}
 
 .modal-footer{
 margin-top:16px;
@@ -945,7 +951,9 @@ height:145px;
 .profile-head h1{font-size:21px}
 .profile-head p{font-size:12px}
 
-.package-grid{grid-template-columns:1fr}
+.package-grid{
+grid-template-columns:1fr;
+}
 
 }
 </style>
@@ -1055,7 +1063,15 @@ Discover producers on PASONG, explore their sound, stream their beats in full le
 
 <div class="modal-head">
 <h2 id="licenseTitle">Beat Licence</h2>
-<button class="close" id="closeModal" type="button">×</button>
+
+<button
+class="close"
+id="closeModal"
+type="button"
+>
+×
+</button>
+
 </div>
 
 <div class="modal-sub" id="licenseSub"></div>
@@ -1829,6 +1845,8 @@ currentAudio=null;
 
 function openLicense(b){
 
+try{
+
 const title=getBeatTitle(b);
 
 document.getElementById(
@@ -1940,6 +1958,9 @@ p=>{
 const beatId=
 String(b.id||"");
 
+const safeBeatId=
+escapeHtml(beatId);
+
 return`
 
 <div class="package">
@@ -1971,12 +1992,10 @@ p.price>0
 <button
 class="package-buy"
 type="button"
-onclick="selectLicense(
-'${escapeHtml(beatId)}',
-${JSON.stringify(title)},
-${JSON.stringify(p.name)},
-${Number(p.price)}
-)"
+data-beat-id="${safeBeatId}"
+data-beat-title="${escapeHtml(title)}"
+data-package="${escapeHtml(p.name)}"
+data-price="${Number(p.price)}"
 >
 Buy Licence
 </button>
@@ -1996,29 +2015,116 @@ document.getElementById(
 "licenseModal"
 ).classList.add("active");
 
+
+/*
+   IMPORTANT:
+   Attach the Buy Licence action after
+   the buttons have been created.
+*/
+
+grid
+.querySelectorAll(".package-buy")
+.forEach(function(button){
+
+button.addEventListener(
+"click",
+function(){
+
+const beatId=
+button.dataset.beatId||"";
+
+const beatTitle=
+button.dataset.beatTitle||title;
+
+const packageName=
+button.dataset.package||"Licence";
+
+const price=
+Number(button.dataset.price||0);
+
+window.selectLicense(
+beatId,
+beatTitle,
+packageName,
+price
+);
+
+}
+);
+
+});
+
+}catch(error){
+
+console.error(
+"Open licence error:",
+error
+);
+
+alert(
+"Unable to open the licence options. Please refresh the page and try again."
+);
+
+}
+
 }
 
 
 /* ================================
    LICENCE SELECTION
+   FIXED
 ================================ */
 
-async function selectLicense(
+window.selectLicense = async function(
 beatId,
 beatTitle,
 packageName,
 price
 ){
 
+try{
+
+beatId=String(beatId||"").trim();
+
+beatTitle=String(
+beatTitle||"Untitled Beat"
+).trim();
+
+packageName=String(
+packageName||"Licence"
+).trim();
+
+price=Number(price||0);
+
+
+/*
+   Make sure a beat ID exists.
+*/
+
+if(!beatId){
+
+alert(
+"This beat does not have a valid ID yet."
+);
+
+return;
+
+}
+
+
+/*
+   Save the selected licence.
+*/
+
 const selected={
 
-beat_id:String(beatId),
+beat_id:beatId,
 
-beat_title:String(beatTitle),
+beat_title:beatTitle,
 
-package:String(packageName),
+package:packageName,
 
-price:Number(price||0),
+price:price,
 
 selected_at:
 new Date().toISOString()
@@ -2032,8 +2138,40 @@ JSON.stringify(selected)
 
 
 /*
-   Check whether the buyer is already
-   authenticated with Supabase.
+   Build the dedicated PASONG
+   producer beat checkout URL.
+*/
+
+const checkoutUrl=
+"/beat-checkout.html"+
+"?id="+
+encodeURIComponent(beatId)+
+"&package="+
+encodeURIComponent(packageName)+
+"&price="+
+encodeURIComponent(price);
+
+
+/*
+   Close the licence modal.
+*/
+
+const modal=
+document.getElementById(
+"licenseModal"
+);
+
+if(modal){
+
+modal.classList.remove(
+"active"
+);
+
+}
+
+
+/*
+   Check Supabase login.
 */
 
 let session=null;
@@ -2043,46 +2181,43 @@ try{
 const result=
 await supabaseClient.auth.getSession();
 
-if(!result.error){
+if(
+!result.error&&
+result.data
+){
 
 session=
-result.data?.session||null;
+result.data.session||null;
 
 }
 
-}catch(error){
+}catch(sessionError){
 
 console.error(
-"Licence session check failed:",
-error
+"Session check error:",
+sessionError
 );
 
 }
 
 
 /*
-   Build the dedicated beat checkout URL.
+   USER IS ALREADY LOGGED IN
+   -------------------------
+   Go DIRECTLY to beat checkout.
 */
 
-const checkoutUrl=
-"/beat-checkout.html?id="+
-encodeURIComponent(beatId)+
-"&package="+
-encodeURIComponent(packageName)+
-"&price="+
-encodeURIComponent(
-Number(price||0)
+if(
+session&&
+session.user
+){
+
+console.log(
+"Logged in. Opening beat checkout:",
+checkoutUrl
 );
 
-
-/*
-   Already logged in:
-   GO DIRECTLY TO BEAT CHECKOUT.
-*/
-
-if(session){
-
-window.location.replace(
+window.location.assign(
 checkoutUrl
 );
 
@@ -2092,20 +2227,41 @@ return;
 
 
 /*
-   Not logged in:
-   GO TO LOGIN, then login.html
-   must return to this checkout URL.
+   USER IS NOT LOGGED IN
+   ---------------------
+   Send them to Login and tell
+   login.html where to return.
 */
 
 const loginUrl=
 "/login.html?return_url="+
-encodeURIComponent(checkoutUrl);
+encodeURIComponent(
+checkoutUrl
+);
 
-window.location.replace(
+console.log(
+"Not logged in. Opening login:",
 loginUrl
 );
 
+window.location.assign(
+loginUrl
+);
+
+}catch(error){
+
+console.error(
+"Licence selection error:",
+error
+);
+
+alert(
+"Something went wrong opening checkout. Please try again."
+);
+
 }
+
+};
 
 
 /* ================================
