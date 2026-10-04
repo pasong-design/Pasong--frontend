@@ -1,5492 +1,635 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1.0"
->
-
-<meta
-  name="theme-color"
-  content="#8b5cf6"
->
-
-<title>PASONG — Admin Panel</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG Admin Control Center</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-body{
-  font-family:Arial,Helvetica,sans-serif;
-  background:#080812;
-  color:#eee;
-  min-height:100vh;
-}
-
-header{
-  height:62px;
-  background:#10101c;
-  border-bottom:1px solid #29293d;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 18px;
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-
-.logo{
-  font-weight:800;
-  letter-spacing:.4px;
-}
-
-.admin-badge{
-  font-size:11px;
-  color:#c084fc;
-  font-weight:800;
-}
-
-.container{
-  max-width:1250px;
-  margin:auto;
-  padding:18px;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.hero{
-  padding:20px 0;
-}
-
-.hero h1{
-  font-size:25px;
-  margin-bottom:7px;
-}
-
-.hero p{
-  color:#a9a9b8;
-  font-size:13px;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:18px;
-}
-
-.stat{
-  background:#11111d;
-  border:1px solid #29293d;
-  border-radius:14px;
-  padding:16px;
-}
-
-.stat-label{
-  color:#999;
-  font-size:12px;
-}
-
-.stat-number{
-  font-size:25px;
-  font-weight:800;
-  margin-top:8px;
-}
-
-.layout{
-  display:grid;
-  grid-template-columns:210px 1fr;
-  gap:16px;
-}
-
-.sidebar{
-  background:#11111d;
-  border:1px solid #29293d;
-  border-radius:14px;
-  padding:10px;
-  height:max-content;
-  position:sticky;
-  top:78px;
-}
-
-.sidebar button{
-  width:100%;
-  text-align:left;
-  border:0;
-  background:transparent;
-  color:#aaa;
-  padding:11px 10px;
-  border-radius:9px;
-  cursor:pointer;
-  margin-bottom:3px;
-}
-
-.sidebar button:hover,
-.sidebar button.active{
-  background:#1d1830;
-  color:#fff;
-}
-
-.card{
-  background:#11111d;
-  border:1px solid #29293d;
-  border-radius:14px;
-  padding:18px;
-  margin-bottom:16px;
-}
-
-.card h2{
-  font-size:18px;
-  margin-bottom:12px;
-}
-
-.card h3{
-  font-size:15px;
-  margin-bottom:10px;
-}
-
-.notice{
-  padding:12px;
-  border:1px solid #3a3852;
-  border-radius:9px;
-  background:#151525;
-  color:#bbb;
-  margin-bottom:14px;
-  line-height:1.5;
-  font-size:13px;
-}
-
-.toolbar{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:12px;
-}
-
-button{
-  border:1px solid #393951;
-  background:#1b1b2a;
-  color:#fff;
-  padding:9px 12px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:.9;
-}
-
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-button.primary{
-  background:#8b5cf6;
-  border-color:#8b5cf6;
-}
-
-button.good{
-  background:#12351f;
-  border-color:#27663a;
-  color:#9df2b5;
-}
-
-button.danger{
-  background:#3a1519;
-  border-color:#6d252d;
-  color:#ffb0b0;
-}
-
-.actions{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-}
-
-.table-wrap{
-  width:100%;
-  overflow:auto;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:12px;
-}
-
-th,
-td{
-  padding:10px;
-  border-bottom:1px solid #27273a;
-  text-align:left;
-  vertical-align:top;
-}
-
-th{
-  color:#aaa;
-  white-space:nowrap;
-}
-
-.pill{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:999px;
-  background:#24243a;
-  font-size:11px;
-}
-
-.muted{
-  color:#999;
-}
-
-.small{
-  font-size:12px;
-}
-
-.empty{
-  text-align:center;
-  color:#888;
-  padding:25px;
-}
-
-.error{
-  color:#ff8b8b;
-}
-
-.success{
-  color:#7ee787;
-}
-
-.warning{
-  color:#ffd166;
-}
-
-.message{
-  display:none;
-  padding:11px;
-  border-radius:8px;
-  margin-top:10px;
-  font-size:12px;
-  line-height:1.5;
-}
-
-.message.show{
-  display:block;
-}
-
-.message.error{
-  background:#35171b;
-  border:1px solid #6b2830;
-  color:#ffb0b0;
-}
-
-.message.success{
-  background:#12351f;
-  border:1px solid #27663a;
-  color:#9df2b5;
-}
-
-.message.info{
-  background:#171d35;
-  border:1px solid #34467a;
-  color:#b8c7ff;
-}
-
-.auth-screen{
-  min-height:calc(100vh - 62px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:25px;
-}
-
-.auth-box{
-  width:min(600px,100%);
-  background:#11111d;
-  border:1px solid #29293d;
-  border-radius:16px;
-  padding:25px;
-}
-
-.auth-box h2{
-  margin-bottom:10px;
-}
-
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.grid3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
-
-.field{
-  margin-bottom:12px;
-}
-
-label{
-  display:block;
-  font-size:12px;
-  color:#aaa;
-  margin-bottom:5px;
-}
-
-input,
-select,
-textarea{
-  width:100%;
-  background:#0b0b15;
-  border:1px solid #333348;
-  color:#fff;
-  padding:10px;
-  border-radius:8px;
-  outline:none;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-  border-color:#8b5cf6;
-}
-
-input[type="file"]{
-  padding:8px;
-}
-
-textarea{
-  min-height:90px;
-  resize:vertical;
-}
-
-.ad-preview{
-  background:#0b0b15;
-  border:1px dashed #393951;
-  border-radius:10px;
-  padding:12px;
-  margin-top:12px;
-}
-
-.ad-preview img{
-  width:100%;
-  max-width:700px;
-  max-height:300px;
-  object-fit:contain;
-  border-radius:8px;
-  display:block;
-  margin:10px 0;
-  background:#111;
-}
-
-.auth-details{
-  margin-top:12px;
-  padding:12px;
-  background:#0b0b15;
-  border:1px solid #29293d;
-  border-radius:9px;
-  font-size:12px;
-  line-height:1.7;
-  word-break:break-word;
-}
-
-.upload-box{
-  padding:12px;
-  border:1px dashed #393951;
-  border-radius:10px;
-  background:#0b0b15;
-}
-
-.featured{
-  color:#ffd166;
-}
-
-@media(max-width:800px){
-
-  .stats{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .layout{
-    grid-template-columns:1fr;
-  }
-
-  .sidebar{
-    position:static;
-  }
-
-  .grid2,
-  .grid3{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:520px){
-
-  .container{
-    padding:10px;
-  }
-
-  .stats{
-    gap:7px;
-  }
-
-  .stat{
-    padding:12px;
-  }
-
-  .stat-number{
-    font-size:20px;
-  }
-
-  .hero h1{
-    font-size:21px;
-  }
-
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#09090f;--card:#11111a;--card2:#171722;--line:#292936;--text:#f5f5f7;--muted:#9999a8;--purple:#8b5cf6;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b}
+body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:20;background:rgba(9,9,15,.95);backdrop-filter:blur(12px)}
+.logo{font-weight:950;letter-spacing:.5px}.logo span{color:var(--purple)}
+.header-right{display:flex;align-items:center;gap:10px}.user-pill{padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:#ddd;font-size:12px}
+.container{max-width:1450px;margin:auto;padding:20px}.layout{display:grid;grid-template-columns:220px 1fr;gap:18px}
+.sidebar{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:10px;height:max-content;position:sticky;top:84px}
+.sidebar button{display:block;width:100%;text-align:left;background:transparent;color:#aaa;border:0;padding:11px 12px;border-radius:9px;margin-bottom:3px;font-weight:700}
+.sidebar button:hover,.sidebar button.active{background:#211832;color:#fff}
+main{min-width:0}.hero{background:linear-gradient(135deg,#181326,#11111a);border:1px solid #30234a;border-radius:17px;padding:22px;margin-bottom:16px}
+.hero h1{font-size:25px;margin-bottom:6px}.hero p{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat,.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px}.stat-num{font-size:24px;font-weight:950}.stat-label{font-size:11px;color:var(--muted);margin-top:4px}
+.card{margin-bottom:16px}.card h2{font-size:18px;margin-bottom:5px}.sub{color:var(--muted);font-size:12px;margin-bottom:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.field{margin-bottom:12px}.field label{display:block;font-size:11px;color:#bbb;margin-bottom:6px;font-weight:800}
+.field input,.field select,.field textarea{width:100%;background:#0c0c13;color:white;border:1px solid var(--line);border-radius:9px;padding:10px;outline:none}
+.field textarea{min-height:90px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple)}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;color:white;background:var(--purple)}
+.btn.secondary{background:var(--card2);border:1px solid var(--line)}.btn.danger{background:#32141a;color:#ff9ca7;border:1px solid #5b2029}
+.btn.green{background:#12341f;color:#8df0ad;border:1px solid #205b34}.btn.small{padding:7px 10px;font-size:11px}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}
+table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:10px;border-bottom:1px solid #20202b;text-align:left;font-size:12px;vertical-align:middle}
+th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{color:#ddd}
+.badge{display:inline-block;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:900}
+.badge.active,.badge.approved,.badge.paid{background:#12341f;color:#7cf3a1}.badge.paused,.badge.pending{background:#392c12;color:#ffd56b}
+.badge.rejected,.badge.failed{background:#35161b;color:#ff929d}.empty,.loading{padding:25px;text-align:center;color:var(--muted)}
+.notice{padding:10px 12px;border-radius:9px;font-size:12px;margin-bottom:12px}.notice.info{background:#16152a;color:#cfc4ff;border:1px solid #30275c}
+.notice.success{background:#10281a;color:#93f2b0;border:1px solid #205b34}.notice.error{background:#32141a;color:#ffabb3;border:1px solid #5b2029}
+.ads-list{display:grid;gap:10px}.ad-row{display:grid;grid-template-columns:180px 1fr auto;gap:13px;background:#0d0d14;border:1px solid var(--line);border-radius:13px;padding:10px;align-items:center}
+.ad-thumb{width:180px;height:100px;border-radius:9px;overflow:hidden;background:#08080d}.ad-thumb img,.ad-thumb video{width:100%;height:100%;object-fit:cover}.ad-info strong{font-size:14px}.ad-info p{font-size:11px;color:var(--muted);margin-top:4px}
+.ad-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ad-preview{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#08080d;min-height:150px;display:flex;align-items:center;justify-content:center}
+.ad-preview img,.ad-preview video{display:block;width:100%;max-height:330px;object-fit:cover}.ad-preview .placeholder{color:#666;font-size:12px;padding:30px}.file-note{font-size:10px;color:#777;margin-top:5px}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.login-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:25px}
+.login-box h1{margin-bottom:5px}.login-box p{color:var(--muted);font-size:12px;margin-bottom:18px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;overflow:auto;gap:5px}.sidebar button{min-width:max-content;margin:0}.stats{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.ad-row{grid-template-columns:1fr}.ad-thumb{width:100%;height:180px}}
+@media(max-width:520px){header{padding:0 12px}.container{padding:12px}.user-pill{display:none}.hero h1{font-size:21px}}
 </style>
-
 </head>
-
 <body>
 
-<header>
-
-  <div class="logo">
-    ◈ PASONG
+<div id="loginScreen" class="login">
+  <div class="login-box">
+    <div class="logo" style="font-size:22px;margin-bottom:14px">◈ <span>PASONG</span></div>
+    <h1>Admin Control Center</h1>
+    <p>Sign in with the PASONG administrator account.</p>
+    <div id="loginNotice"></div>
+    <form id="loginForm">
+      <div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"></div>
+      <div class="field"><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
+      <button class="btn" style="width:100%" type="submit" id="loginBtn">Sign In</button>
+    </form>
   </div>
-
-  <div class="admin-badge">
-    ADMIN PANEL
-  </div>
-
-</header>
-
-
-<!-- =========================================================
-     AUTH SCREEN
-========================================================= -->
-
-<div id="authScreen" class="auth-screen">
-
-  <div class="auth-box">
-
-    <h2 id="authTitle">
-      Checking administrator access…
-    </h2>
-
-    <p
-      id="authText"
-      class="muted small"
-    >
-      Verifying your PASONG account.
-    </p>
-
-    <div
-      id="authMessage"
-      class="message"
-    ></div>
-
-    <div
-      id="authDetails"
-      class="auth-details hidden"
-    ></div>
-
-    <div
-      class="actions"
-      style="margin-top:12px"
-    >
-
-      <button
-        id="retryAuth"
-        class="primary"
-        style="display:none"
-      >
-        Retry
-      </button>
-
-      <button
-        id="loginButton"
-        style="display:none"
-      >
-        Go to Login
-      </button>
-
-    </div>
-
-  </div>
-
 </div>
 
-
-<!-- =========================================================
-     ADMIN APPLICATION
-========================================================= -->
-
-<main
-  id="adminApp"
-  class="container hidden"
->
-
-  <section class="hero">
-
-    <h1>
-      🛡️ PASONG Admin Control Center
-    </h1>
-
-    <p id="adminIdentity">
-      Administrator
-    </p>
-
-  </section>
-
-
-  <!-- =======================================================
-       STATS
-  ======================================================== -->
-
-  <div class="stats">
-
-    <div class="stat">
-
-      <div class="stat-label">
-        Music
-      </div>
-
-      <div
-        class="stat-number"
-        id="countSongs"
-      >
-        0
-      </div>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-label">
-        Beats
-      </div>
-
-      <div
-        class="stat-number"
-        id="countBeats"
-      >
-        0
-      </div>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-label">
-        Artist Profiles
-      </div>
-
-      <div
-        class="stat-number"
-        id="countArtists"
-      >
-        0
-      </div>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="stat-label">
-        Orders
-      </div>
-
-      <div
-        class="stat-number"
-        id="countOrders"
-      >
-        0
-      </div>
-
-    </div>
-
+<div id="app" class="hidden">
+<header>
+  <div class="logo">◈ <span>PASONG</span> ADMIN</div>
+  <div class="header-right">
+    <div class="user-pill" id="adminEmail">Loading...</div>
+    <button class="btn secondary small" id="logoutBtn">Logout</button>
   </div>
-
-
-  <div class="layout">
-
-
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
-
-    <aside class="sidebar">
-
-      <button
-        class="active"
-        data-section="overview"
-      >
-        📊 Overview
-      </button>
-
-      <button
-        data-section="music"
-      >
-        🎵 Music Control
-      </button>
-
-      <button
-        data-section="beats"
-      >
-        🎛️ Beat Control
-      </button>
-
-      <button
-        data-section="dj"
-      >
-        🎧 DJ Mix Control
-      </button>
-
-      <button
-        data-section="orders"
-      >
-        📦 Sales & Orders
-      </button>
-
-      <button
-        data-section="payments"
-      >
-        💳 Payments
-      </button>
-
-      <button
-        data-section="ads"
-      >
-        📢 Advertisements
-      </button>
-
-      <button
-        data-section="covers"
-      >
-        🎨 Cover Requests
-      </button>
-
-      <button
-        data-section="reports"
-      >
-        📈 Reports
-      </button>
-
-      <button id="logoutButton">
-        🚪 Logout
-      </button>
-
-    </aside>
-
-
-    <!-- =====================================================
-         CONTENT
-    ====================================================== -->
-
-    <section>
-
-
-      <!-- ===================================================
-           OVERVIEW
-      ==================================================== -->
-
-      <div
-        id="section-overview"
-        class="section"
-      >
-
-        <div class="card">
-
-          <h2>
-            PASONG Platform Control
-          </h2>
-
-          <div class="notice">
-
-            <strong>
-              Automatic content approval is enabled.
-            </strong>
-
-            <br><br>
-
-            <b>Songs</b>,
-            <b>beats</b>
-            and
-            <b>DJ mixes</b>
-            are intended to go live automatically.
-
-            <br><br>
-
-            There is therefore no manual
-            Approve/Reject queue for those content types.
-
-            <br><br>
-
-            Admin can still manage,
-            edit,
-            hide,
-            suspend,
-            feature
-            or delete content.
-
-          </div>
-
-          <div
-            id="overviewMessage"
-            class="message"
-          ></div>
-
-        </div>
-
-
-        <div class="card">
-
-          <h2>
-            🔐 Administrator
-          </h2>
-
-          <div class="notice">
-
-            Logged in administrator:
-
-            <br><br>
-
-            <strong id="overviewAdminEmail">
-              Loading…
-            </strong>
-
-          </div>
-
-          <div
-            id="adminRoleInfo"
-            class="small muted"
-          ></div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           MUSIC
-      ==================================================== -->
-
-      <div
-        id="section-music"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            🎵 Music Control
-          </h2>
-
-          <div class="notice">
-
-            Songs are automatically approved.
-
-            <br><br>
-
-            There is no Approve/Reject queue.
-
-          </div>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadSongs()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Song</th>
-
-                  <th>Artist</th>
-
-                  <th>Price</th>
-
-                  <th>Status</th>
-
-                  <th>Date</th>
-
-                  <th>Actions</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="songsBody">
-
-                <tr>
-
-                  <td
-                    colspan="6"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           BEATS
-      ==================================================== -->
-
-      <div
-        id="section-beats"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            🎛️ Beat Control
-          </h2>
-
-          <div class="notice">
-
-            Beats are automatically approved when uploaded.
-
-            <br><br>
-
-            Admin can still edit prices,
-            hide/suspend content,
-            feature content,
-            or delete a beat.
-
-          </div>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadBeats()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Beat</th>
-
-                  <th>Producer</th>
-
-                  <th>Prices</th>
-
-                  <th>Status</th>
-
-                  <th>Date</th>
-
-                  <th>Actions</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="beatsBody">
-
-                <tr>
-
-                  <td
-                    colspan="6"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           DJ MIXES
-      ==================================================== -->
-
-      <div
-        id="section-dj"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            🎧 DJ Mix Control
-          </h2>
-
-          <div class="notice">
-
-            DJ mixes are intended to be automatically
-            approved when uploaded.
-
-            <br><br>
-
-            There is no manual approval queue.
-
-            <br><br>
-
-            Admin can manage or delete DJ mixes here.
-
-          </div>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadDjMixes()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Mix</th>
-
-                  <th>DJ</th>
-
-                  <th>Status</th>
-
-                  <th>Date</th>
-
-                  <th>Actions</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="djBody">
-
-                <tr>
-
-                  <td
-                    colspan="5"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           ORDERS
-      ==================================================== -->
-
-      <div
-        id="section-orders"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            📦 Sales & Orders
-          </h2>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadOrders()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Order</th>
-
-                  <th>Buyer</th>
-
-                  <th>Amount</th>
-
-                  <th>Status</th>
-
-                  <th>Date</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="ordersBody">
-
-                <tr>
-
-                  <td
-                    colspan="5"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           PAYMENTS
-      ==================================================== -->
-
-      <div
-        id="section-payments"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            💳 Payments & Verification
-          </h2>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadPayments()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Reference</th>
-
-                  <th>User</th>
-
-                  <th>Amount</th>
-
-                  <th>Status</th>
-
-                  <th>Date</th>
-
-                  <th>Actions</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="paymentsBody">
-
-                <tr>
-
-                  <td
-                    colspan="6"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           ADVERTISEMENTS
-      ==================================================== -->
-
-      <div
-        id="section-ads"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            📢 Advertisement Manager
-          </h2>
-
-          <div class="notice">
-
-            Admin can post advertisements directly from
-            this dashboard.
-
-            <br><br>
-
-            Choose the original advertisement image
-            from your phone or computer.
-
-            <br><br>
-
-            PASONG uploads the image to Cloudinary
-            automatically. You do <strong>not</strong>
-            need to paste an image URL.
-
-          </div>
-
-
-          <form id="adForm">
-
-            <input
-              type="hidden"
-              id="adId"
-            >
-
-
-            <div class="grid2">
-
-              <div class="field">
-
-                <label>
-                  Advertisement Title *
-                </label>
-
-                <input
-                  id="adTitle"
-                  maxlength="200"
-                  required
-                  placeholder="Example: New PASONG Release"
-                >
-
-              </div>
-
-
-              <div class="field">
-
-                <label>
-                  Placement
-                </label>
-
-                <select id="adPlacement">
-
-                  <option value="home">
-                    Home
-                  </option>
-
-                  <option value="music">
-                    Music
-                  </option>
-
-                  <option value="beats">
-                    Beats
-                  </option>
-
-                  <option value="dj">
-                    DJ
-                  </option>
-
-                  <option value="all">
-                    All PASONG
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Description
-              </label>
-
-              <textarea
-                id="adDescription"
-                maxlength="2000"
-                placeholder="Advertisement description..."
-              ></textarea>
-
-            </div>
-
-
-            <!-- ORIGINAL IMAGE UPLOAD -->
-
-            <div class="field">
-
-              <label>
-                Advertisement Image
-              </label>
-
-              <div class="upload-box">
-
-                <input
-                  id="adImageFile"
-                  type="file"
-                  accept="image/jpeg,image/jpg,image/png,image/webp"
-                >
-
-                <div
-                  id="adUploadStatus"
-                  class="muted small"
-                  style="margin-top:8px"
-                >
-                  Choose the original advertisement image
-                  from your device.
-                </div>
-
-              </div>
-
-              <!-- Cloudinary URL is stored here automatically -->
-
-              <input
-                id="adImageUrl"
-                type="hidden"
-              >
-
-            </div>
-
-
-            <div class="field">
-
-              <label>
-                Target URL
-              </label>
-
-              <input
-                id="adTargetUrl"
-                type="url"
-                placeholder="https://..."
-              >
-
-            </div>
-
-
-            <div class="grid3">
-
-              <div class="field">
-
-                <label>
-                  Start Date / Time
-                </label>
-
-                <input
-                  id="adStartAt"
-                  type="datetime-local"
-                >
-
-              </div>
-
-
-              <div class="field">
-
-                <label>
-                  End Date / Time
-                </label>
-
-                <input
-                  id="adEndAt"
-                  type="datetime-local"
-                >
-
-              </div>
-
-
-              <div class="field">
-
-                <label>
-                  Status
-                </label>
-
-                <select id="adStatus">
-
-                  <option value="draft">
-                    Draft
-                  </option>
-
-                  <option value="active">
-                    Active
-                  </option>
-
-                  <option value="paused">
-                    Paused
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-
-            <!-- PREVIEW -->
-
-            <div
-              id="adPreview"
-              class="ad-preview hidden"
-            >
-
-              <strong>
-                Advertisement Preview
-              </strong>
-
-              <img
-                id="adPreviewImage"
-                src=""
-                alt="Advertisement preview"
-              >
-
-              <div
-                id="adPreviewTitle"
-                style="font-weight:800;margin-top:5px"
-              ></div>
-
-              <div
-                id="adPreviewDescription"
-                class="muted small"
-                style="margin-top:5px"
-              ></div>
-
-            </div>
-
-
-            <div
-              class="actions"
-              style="margin-top:12px"
-            >
-
-              <button
-                type="submit"
-                class="primary"
-                id="adSaveButton"
-              >
-                Post Advertisement
-              </button>
-
-              <button
-                type="button"
-                onclick="resetAdForm()"
-              >
-                Clear
-              </button>
-
-            </div>
-
-
-            <div
-              id="adMessage"
-              class="message"
-            ></div>
-
-          </form>
-
-        </div>
-
-
-        <!-- CURRENT ADS -->
-
-        <div class="card">
-
-          <h3>
-            Current Advertisements
-          </h3>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadAds()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Advertisement</th>
-
-                  <th>Placement</th>
-
-                  <th>Schedule</th>
-
-                  <th>Status</th>
-
-                  <th>Clicks</th>
-
-                  <th>Actions</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="adsBody">
-
-                <tr>
-
-                  <td
-                    colspan="6"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           COVERS
-      ==================================================== -->
-
-      <div
-        id="section-covers"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            🎨 Cover Requests
-          </h2>
-
-          <div class="toolbar">
-
-            <button
-              class="primary"
-              onclick="loadCovers()"
-            >
-              Refresh
-            </button>
-
-          </div>
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Title</th>
-
-                  <th>User</th>
-
-                  <th>Style</th>
-
-                  <th>Status</th>
-
-                  <th>Date</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody id="coversBody">
-
-                <tr>
-
-                  <td
-                    colspan="5"
-                    class="empty"
-                  >
-                    Loading…
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           REPORTS
-      ==================================================== -->
-
-      <div
-        id="section-reports"
-        class="section hidden"
-      >
-
-        <div class="card">
-
-          <h2>
-            📈 Reports
-          </h2>
-
-          <div class="grid3">
-
-            <div class="stat">
-
-              <div class="stat-label">
-                Songs
-              </div>
-
-              <div
-                class="stat-number"
-                id="reportSongs"
-              >
-                0
-              </div>
-
-            </div>
-
-
-            <div class="stat">
-
-              <div class="stat-label">
-                Beats
-              </div>
-
-              <div
-                class="stat-number"
-                id="reportBeats"
-              >
-                0
-              </div>
-
-            </div>
-
-
-            <div class="stat">
-
-              <div class="stat-label">
-                Advertisements
-              </div>
-
-              <div
-                class="stat-number"
-                id="reportAds"
-              >
-                0
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-    </section>
-
-  </div>
-
+</header>
+
+<div class="container">
+<div class="layout">
+<aside class="sidebar">
+<button class="active" data-section="dashboard">📊 Dashboard</button>
+<button data-section="songs">🎵 Songs</button>
+<button data-section="beats">🎛️ Beats</button>
+<button data-section="mixes">🎧 DJ Mixes</button>
+<button data-section="orders">💳 Orders & Payments</button>
+<button data-section="covers">🎨 Covers</button>
+<button data-section="reports">🚩 Reports</button>
+<button data-section="copyright">⚖️ Copyright</button>
+<button data-section="ads">📢 Advertisements</button>
+</aside>
+
+<main>
+<div id="globalNotice"></div>
+
+<section id="section-dashboard">
+<div class="hero"><h1>Admin Control Center</h1><p>Manage PASONG content, payments, reports and sponsored advertisements.</p></div>
+<div class="stats">
+<div class="stat"><div class="stat-num" id="statSongs">—</div><div class="stat-label">Songs</div></div>
+<div class="stat"><div class="stat-num" id="statBeats">—</div><div class="stat-label">Beats</div></div>
+<div class="stat"><div class="stat-num" id="statOrders">—</div><div class="stat-label">Orders</div></div>
+<div class="stat"><div class="stat-num" id="statAds">—</div><div class="stat-label">Advertisements</div></div>
+</div>
+<div class="card">
+<h2>Quick Actions</h2><div class="sub">Manage PASONG songs, beats, DJ mixes, payments, reports and advertisements.</div>
+<div class="form-actions">
+<button class="btn" onclick="showSection('ads')">📢 Manage Advertisements</button>
+<button class="btn secondary" onclick="showSection('songs')">🎵 Songs</button>
+<button class="btn secondary" onclick="showSection('beats')">🎛️ Beats</button>
+<button class="btn secondary" onclick="showSection('mixes')">🎧 DJ Mixes</button>
+</div>
+</div>
+</section>
+
+<section id="section-songs" class="hidden"><div class="card"><h2>🎵 Songs</h2><div class="sub">View current song records and approval status.</div><div id="songsTable" class="loading">Loading...</div></div></section>
+<section id="section-beats" class="hidden"><div class="card"><h2>🎛️ Beats</h2><div class="sub">View producer beats and their current status.</div><div id="beatsTable" class="loading">Loading...</div></div></section>
+<section id="section-mixes" class="hidden"><div class="card"><h2>🎧 DJ Mixes</h2><div class="sub">View DJ mix records and their current status.</div><div id="mixesTable" class="loading">Loading...</div></div></section>
+<section id="section-orders" class="hidden"><div class="card"><h2>💳 Orders & Payments</h2><div class="sub">Review recent orders and payment records.</div><div id="ordersTable" class="loading">Loading...</div></div></section>
+<section id="section-covers" class="hidden"><div class="card"><h2>🎨 Covers</h2><div class="sub">Review uploaded cover records.</div><div id="coversTable" class="loading">Loading...</div></div></section>
+<section id="section-reports" class="hidden"><div class="card"><h2>🚩 Reports</h2><div class="sub">Review user/content reports.</div><div id="reportsTable" class="loading">Loading...</div></div></section>
+<section id="section-copyright" class="hidden">
+<div class="card">
+<h2>⚖️ Copyright Center</h2>
+<div class="sub">Review copyright notices, counter-notices, takedowns, restorations and repeat-infringer strikes.</div>
+<div id="copyrightNotice"></div>
+<div class="form-actions" style="margin-bottom:12px">
+<button class="btn secondary small" onclick="loadCopyrightComplaints()">Refresh Complaints</button>
+<button class="btn secondary small" onclick="loadCopyrightStrikes()">Refresh Strikes</button>
+<select id="copyrightStatusFilter" onchange="loadCopyrightComplaints()" style="background:#0c0c13;color:white;border:1px solid #292936;border-radius:9px;padding:7px 10px">
+<option value="all">All Complaints</option><option value="submitted">Submitted</option><option value="reviewing">Reviewing</option><option value="takedown">Takedown</option><option value="restored">Restored</option><option value="rejected">Rejected</option><option value="resolved">Resolved</option>
+</select>
+</div>
+<div id="copyrightComplaints" class="loading">Loading...</div>
+</div>
+<div class="card">
+<h2>🛡️ Copyright Strikes</h2>
+<div class="sub">Strike history for repeat copyright infringement.</div>
+<div id="copyrightStrikes" class="loading">Loading...</div>
+</div>
+</section>
+
+<section id="section-ads" class="hidden">
+<div class="card">
+<h2>📢 Advertisements</h2>
+<div class="sub">Create image or video advertisements for the PASONG homepage. Active homepage ads appear in the Sponsored section below the hero.</div>
+<div id="adNotice"></div>
+<form id="adForm">
+<input type="hidden" id="adId">
+<div class="grid2">
+<div class="field"><label>Title</label><input id="adTitle" maxlength="160" required></div>
+<div class="field"><label>Target URL</label><input id="adTarget" type="url" placeholder="https://..."></div>
+</div>
+<div class="field"><label>Description</label><textarea id="adDescription" maxlength="500"></textarea></div>
+<div class="grid3">
+<div class="field"><label>Placement</label><select id="adPlacement"><option value="home">Home</option><option value="all">All</option></select></div>
+<div class="field"><label>Start date/time</label><input id="adStart" type="datetime-local"></div>
+<div class="field"><label>End date/time</label><input id="adEnd" type="datetime-local"></div>
+</div>
+<div class="grid2">
+<div class="field"><label>Media type</label><select id="adMediaType"><option value="image">Image</option><option value="video">Video</option></select></div>
+<div class="field"><label>Upload media</label><input id="adFile" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/ogg"><div class="file-note">Images: JPG / PNG / WEBP. Videos: MP4 / WEBM / OGG.</div></div>
+</div>
+<div class="grid2">
+<div><label style="display:block;font-size:11px;color:#bbb;font-weight:800;margin-bottom:6px">Preview</label><div class="ad-preview" id="adPreview"><div class="placeholder">Choose an image or video</div></div></div>
+<div class="card" style="margin:25px 0 0;background:#0d0d14"><strong style="font-size:12px">Advertisement rules</strong><p style="font-size:11px;color:#999;margin-top:7px;line-height:1.5">The advertisement is stored in Supabase. The public homepage should render only active home advertisements inside their schedule.</p></div>
+</div>
+<div class="form-actions"><button class="btn" type="submit" id="saveAdBtn">Save Advertisement</button><button class="btn secondary" type="button" id="clearAdBtn">Clear</button></div>
+</form>
+</div>
+
+<div class="card">
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<input id="adSearch" placeholder="Search advertisements..." style="flex:1;background:#0c0c13;border:1px solid #292936;border-radius:9px;padding:10px;color:white">
+<button class="btn secondary small" id="refreshAdsBtn">Refresh</button>
+</div>
+<div id="adsList" class="ads-list"><div class="loading">Loading advertisements...</div></div>
+</div>
+</section>
 </main>
-
+</div>
+</div>
+</div>
 
 <script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const API_BASE="https://pasong-api.onrender.com";
+const CLOUDINARY_CLOUD_NAME="vuehnvkp";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* ============================================================
-   PASONG CONFIG
-============================================================ */
-
-const SUPABASE_URL =
-  "https://mtufczmjlkvycarxylgh.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-
-const API_BASE =
-  "https://pasong-api.onrender.com";
-
-
-const supabaseClient =
-  supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY,
-    {
-      auth:{
-        persistSession:true,
-        autoRefreshToken:true,
-        detectSessionInUrl:true
-      }
-    }
-  );
-
-
-/* ============================================================
-   GLOBAL STATE
-============================================================ */
-
-let currentSession = null;
-let currentUser = null;
-let bootingAdmin = false;
-
-
-/* ============================================================
-   HELPERS
-============================================================ */
-
-function $(id){
-
-  return document.getElementById(id);
-
-}
-
+let currentSession=null;
+let advertisements=[];
 
 function escapeHtml(value){
+return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+function showNotice(target,type,message){
+const el=document.getElementById(target);if(!el)return;
+el.innerHTML='<div class="notice '+type+'">'+escapeHtml(message)+'</div>';
+}
+function clearNotice(target){const el=document.getElementById(target);if(el)el.innerHTML="";}
 
-  return String(
-    value ?? ""
-  ).replace(
-    /[&<>"']/g,
-    character => {
+function showSection(name){
+document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));
+const section=document.getElementById("section-"+name);
+if(section)section.classList.remove("hidden");
+document.querySelectorAll(".sidebar button").forEach(b=>b.classList.toggle("active",b.dataset.section===name));
+if(name==="dashboard")loadStats();
+if(name==="songs")loadGenericTable("songs","songsTable",["title","status","created_at"]);
+if(name==="beats")loadGenericTable("beats","beatsTable",["title","genre","status","created_at"]);
+if(name==="mixes")loadGenericTable("dj_mixes","mixesTable",["title","status","created_at"]);
+if(name==="orders")loadGenericTable("orders","ordersTable",["id","status","amount","currency","created_at"]);
+if(name==="covers")loadGenericTable("covers","coversTable",["id","status","created_at"]);
+if(name==="reports")loadGenericTable("reports","reportsTable",["id","status","created_at"]);
+if(name==="copyright"){loadCopyrightComplaints();loadCopyrightStrikes();}
+if(name==="ads")loadAds();
+}
+window.showSection=showSection;
+document.querySelectorAll(".sidebar button").forEach(b=>b.addEventListener("click",()=>showSection(b.dataset.section)));
 
-      const map = {
+async function isAdmin(user){
+const roles=[user?.user_metadata?.role,user?.app_metadata?.role,user?.user_metadata?.user_role,user?.app_metadata?.user_role].map(v=>String(v||"").toLowerCase());
+if(roles.includes("admin")||roles.includes("super_admin"))return true;
+for(const table of ["profiles","user_profiles","admin_users"]){
+try{
+const r=await supabaseClient.from(table).select("role").eq("id",user.id).maybeSingle();
+if(!r.error&&["admin","super_admin"].includes(String(r.data?.role||"").toLowerCase()))return true;
+}catch(e){console.warn("Admin role lookup:",table,e);}
+}
+return false;
+}
 
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
+async function handleSession(session){
+currentSession=session;
+if(!session?.user)return;
+const allowed=await isAdmin(session.user);
+if(!allowed){
+await supabaseClient.auth.signOut();
+document.getElementById("app").classList.add("hidden");
+document.getElementById("loginScreen").classList.remove("hidden");
+showNotice("loginNotice","error","This account does not have PASONG administrator access.");
+return;
+}
+document.getElementById("loginScreen").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+document.getElementById("adminEmail").textContent=session.user.email||"Administrator";
+loadStats();
+}
 
-      };
+async function boot(){
+const {data:{session}}=await supabaseClient.auth.getSession();
+if(session)await handleSession(session);
+}
+supabaseClient.auth.onAuthStateChange((_event,session)=>{
+if(session)handleSession(session);
+else{
+currentSession=null;
+document.getElementById("app").classList.add("hidden");
+document.getElementById("loginScreen").classList.remove("hidden");
+}
+});
 
-      return map[character];
+document.getElementById("loginForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const button=document.getElementById("loginBtn");
+button.disabled=true;button.textContent="Signing in...";clearNotice("loginNotice");
+const {data,error}=await supabaseClient.auth.signInWithPassword({
+email:document.getElementById("loginEmail").value.trim(),
+password:document.getElementById("loginPassword").value
+});
+if(error)showNotice("loginNotice","error",error.message);
+else if(data.session)await handleSession(data.session);
+button.disabled=false;button.textContent="Sign In";
+});
+document.getElementById("logoutBtn").addEventListener("click",async()=>{await supabaseClient.auth.signOut();});
 
-    }
-  );
+async function countRows(table){
+const r=await supabaseClient.from(table).select("id",{count:"exact",head:true});
+return r.error?null:(r.count??0);
+}
+async function loadStats(){
+const [songs,beats,orders,ads]=await Promise.all([countRows("songs"),countRows("beats"),countRows("orders"),countRows("advertisements")]);
+document.getElementById("statSongs").textContent=songs??"—";
+document.getElementById("statBeats").textContent=beats??"—";
+document.getElementById("statOrders").textContent=orders??"—";
+document.getElementById("statAds").textContent=ads??"—";
+}
 
+async function loadGenericTable(table,elementId,columns){
+const element=document.getElementById(elementId);
+element.innerHTML='<div class="loading">Loading...</div>';
+const r=await supabaseClient.from(table).select("*").order("created_at",{ascending:false}).limit(100);
+if(r.error){element.innerHTML='<div class="empty">Unable to load '+escapeHtml(table)+'. '+escapeHtml(r.error.message)+'</div>';return;}
+const rows=r.data||[];
+if(!rows.length){element.innerHTML='<div class="empty">No records found.</div>';return;}
+element.innerHTML='<div class="table-wrap"><table><thead><tr>'+columns.map(c=>'<th>'+escapeHtml(c)+'</th>').join("")+'</tr></thead><tbody>'+
+rows.map(row=>'<tr>'+columns.map(c=>'<td>'+formatCell(c,row[c])+'</td>').join("")+'</tr>').join("")+
+'</tbody></table></div>';
+}
+function formatCell(key,value){
+if(value===null||value===undefined)return"—";
+if(key==="created_at")return new Date(value).toLocaleString();
+if(key==="status"){
+const status=String(value).toLowerCase();
+let cls="";
+if(["active","approved","paid"].includes(status))cls="active";
+else if(["pending","paused"].includes(status))cls="pending";
+else if(["failed","rejected"].includes(status))cls="failed";
+return'<span class="badge '+cls+'">'+escapeHtml(value)+'</span>';
+}
+if(typeof value==="object")return escapeHtml(JSON.stringify(value));
+return escapeHtml(value);
 }
 
 
-function escapeJs(value){
-
-  return String(
-    value ?? ""
-  )
-  .replace(
-    /\\/g,
-    "\\\\"
-  )
-  .replace(
-    /'/g,
-    "\\'"
-  )
-  .replace(
-    /\r/g,
-    "\\r"
-  )
-  .replace(
-    /\n/g,
-    "\\n"
-  );
-
+async function copyrightApi(path, options={}){
+  if(!currentSession?.access_token) throw new Error("Your admin session has expired. Please sign in again.");
+  const headers={"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token,...(options.headers||{})};
+  const response=await fetch(API_BASE+path,{...options,headers});
+  const text=await response.text();
+  let data={}; try{data=text?JSON.parse(text):{};}catch(e){data={};}
+  if(!response.ok) throw new Error(data.error||data.message||("Request failed: HTTP "+response.status));
+  return data;
 }
 
-
-function formatDate(value){
-
-  if(!value){
-    return "—";
-  }
-
-  const date =
-    new Date(value);
-
-  if(
-    Number.isNaN(
-      date.getTime()
-    )
-  ){
-
-    return "—";
-
-  }
-
-  return date.toLocaleString();
-
+function copyrightBadge(status){
+  const v=String(status||"").toLowerCase();
+  let cls="";
+  if(["restored","resolved"].includes(v))cls="active";
+  else if(["submitted","reviewing","takedown"].includes(v))cls="pending";
+  else if(["rejected","failed"].includes(v))cls="failed";
+  return '<span class="badge '+cls+'">'+escapeHtml(status||"—")+'</span>';
 }
 
-
-function money(
-  amount,
-  currency="UGX"
-){
-
-  const number =
-    Number(amount || 0);
-
-  return (
-    String(currency || "UGX") +
-    " " +
-    number.toLocaleString()
-  );
-
-}
-
-
-function showMessage(
-  id,
-  type,
-  text
-){
-
-  const element =
-    $(id);
-
-  if(!element){
-    return;
-  }
-
-  element.className =
-    "message show " +
-    type;
-
-  element.textContent =
-    text;
-
-}
-
-
-function hideMessage(id){
-
-  const element =
-    $(id);
-
-  if(element){
-
-    element.className =
-      "message";
-
-  }
-
-}
-
-
-/* ============================================================
-   TIMEOUT
-============================================================ */
-
-function withTimeout(
-  promise,
-  milliseconds,
-  message
-){
-
-  return new Promise(
-    (resolve,reject)=>{
-
-      let finished =
-        false;
-
-
-      const timer =
-        setTimeout(
-          ()=>{
-
-            if(finished){
-              return;
-            }
-
-            finished = true;
-
-            reject(
-              new Error(message)
-            );
-
-          },
-          milliseconds
-        );
-
-
-      Promise.resolve(promise)
-        .then(
-          value=>{
-
-            if(finished){
-              return;
-            }
-
-            finished = true;
-
-            clearTimeout(timer);
-
-            resolve(value);
-
-          }
-        )
-        .catch(
-          error=>{
-
-            if(finished){
-              return;
-            }
-
-            finished = true;
-
-            clearTimeout(timer);
-
-            reject(error);
-
-          }
-        );
-
-    }
-  );
-
-}
-
-
-/* ============================================================
-   ADMIN ROLE
-============================================================ */
-
-function getRole(user){
-
-  const appRole =
-    user?.app_metadata?.role;
-
-  const userRole =
-    user?.user_metadata?.role;
-
-  const appUserRole =
-    user?.app_metadata?.user_role;
-
-  const userUserRole =
-    user?.user_metadata?.user_role;
-
-
-  return String(
-
-    appRole ||
-
-    userRole ||
-
-    appUserRole ||
-
-    userUserRole ||
-
-    ""
-
-  )
-  .trim()
-  .toLowerCase();
-
-}
-
-
-/* ============================================================
-   GET ADMIN SESSION
-============================================================ */
-
-async function getAdminSession(){
-
-  let session = null;
-
-
-  /*
-     FIRST:
-     Get the current persisted session.
-  */
-
+async function loadCopyrightComplaints(){
+  const el=document.getElementById("copyrightComplaints"); if(!el)return;
+  el.innerHTML='<div class="loading">Loading copyright complaints...</div>';
   try{
-
-    const sessionResult =
-      await withTimeout(
-
-        supabaseClient.auth.getSession(),
-
-        10000,
-
-        "Supabase session check timed out after 10 seconds."
-
-      );
-
-
-    session =
-      sessionResult?.data?.session || null;
-
-  }catch(error){
-
-    throw new Error(
-
-      "Unable to read your PASONG login session. " +
-
-      (
-        error?.message ||
-        "Unknown Supabase session error."
-      )
-
-    );
-
-  }
-
-
-  /*
-     SECOND:
-     If there is no session, ask Supabase
-     directly for the authenticated user.
-  */
-
-  if(!session){
-
-    try{
-
-      const userResult =
-        await withTimeout(
-
-          supabaseClient.auth.getUser(),
-
-          10000,
-
-          "Supabase user verification timed out after 10 seconds."
-
-        );
-
-
-      if(
-        userResult?.data?.user
-      ){
-
-        const verifiedUser =
-          userResult.data.user;
-
-
-        session = {
-
-          user:
-            verifiedUser,
-
-          access_token:
-            null
-
-        };
-
-      }
-
-    }catch(error){
-
-      throw new Error(
-
-        "Supabase could not verify the logged-in account. " +
-
-        (
-          error?.message ||
-          "Unknown Supabase error."
-        )
-
-      );
-
-    }
-
-  }
-
-
-  /*
-     NO LOGIN
-  */
-
-  if(!session?.user){
-
-    throw new Error(
-
-      "No active PASONG login session was found. " +
-
-      "Log in first, then open the Admin Panel."
-
-    );
-
-  }
-
-
-  const user =
-    session.user;
-
-
-  /*
-     ROLE
-  */
-
-  const role =
-    getRole(user);
-
-
-  /*
-     NOT ADMIN
-  */
-
-  if(role !== "admin"){
-
-    const appRole =
-      user?.app_metadata?.role ??
-      "(missing)";
-
-
-    const userRole =
-      user?.user_metadata?.role ??
-      "(missing)";
-
-
-    throw new Error(
-
-      "Administrator role missing. " +
-
-      "Logged in as " +
-
-      (
-        user.email ||
-        user.id
-      ) +
-
-      ". " +
-
-      "app_metadata.role=" +
-
-      appRole +
-
-      "; user_metadata.role=" +
-
-      userRole +
-
-      ". " +
-
-      'This account must have app_metadata.role set to "admin". ' +
-
-      "After changing the role, sign out and sign in again."
-
-    );
-
-  }
-
-
-  return {
-
-    session,
-    user,
-    role
-
-  };
-
+    const filter=document.getElementById("copyrightStatusFilter")?.value||"all";
+    const data=await copyrightApi("/api/admin/copyright/complaints?status="+encodeURIComponent(filter));
+    const rows=data.complaints||[];
+    if(!rows.length){el.innerHTML='<div class="empty">No copyright complaints found.</div>';return;}
+    el.innerHTML='<div class="table-wrap"><table><thead><tr><th>Song</th><th>Claimant</th><th>Status</th><th>Strike</th><th>Response</th><th>Created</th><th>Actions</th></tr></thead><tbody>'+rows.map(c=>{
+      const song=c.song?.title||c.song_id||"Unknown song";
+      const hasResponse=!!c.uploader_response;
+      return '<tr><td><strong>'+escapeHtml(song)+'</strong><br><small style="color:#777">'+escapeHtml(c.song_id||"")+'</small></td>'+
+      '<td>'+escapeHtml(c.complainant_name||"")+'<br><small style="color:#777">'+escapeHtml(c.complainant_email||"")+'</small></td>'+
+      '<td>'+copyrightBadge(c.status)+'</td>'+
+      '<td>'+escapeHtml(c.strike_number??"—")+'</td>'+
+      '<td>'+ (hasResponse?'<span class="badge active">Counter-notice</span>':'<span class="badge">None</span>') +'</td>'+
+      '<td>'+escapeHtml(c.created_at?new Date(c.created_at).toLocaleString():"—")+'</td>'+
+      '<td><div class="form-actions">'+
+      '<button class="btn small secondary" onclick="viewCopyrightComplaint('+JSON.stringify(c.id)+')">View</button>'+
+      '<button class="btn small danger" onclick="copyrightAction('+JSON.stringify(c.id)+',\'takedown\')">Takedown</button>'+
+      '<button class="btn small green" onclick="copyrightAction('+JSON.stringify(c.id)+',\'restore\')">Restore</button>'+
+      '<button class="btn small secondary" onclick="copyrightAction('+JSON.stringify(c.id)+',\'reject\')">Reject</button>'+
+      '</div></td></tr>';
+    }).join("")+'</tbody></table></div>';
+  }catch(error){el.innerHTML='<div class="empty">'+escapeHtml(error.message||"Unable to load copyright complaints.")+'</div>';}
 }
 
-
-/* ============================================================
-   ADMIN BOOT
-============================================================ */
-
-async function bootAdmin(){
-
-  if(bootingAdmin){
-    return;
-  }
-
-
-  bootingAdmin =
-    true;
-
-
-  $("authTitle").textContent =
-    "Checking administrator access…";
-
-
-  $("authText").textContent =
-    "Verifying your PASONG Supabase session and administrator role.";
-
-
-  hideMessage(
-    "authMessage"
-  );
-
-
-  $("authDetails")
-    .classList
-    .add("hidden");
-
-
-  $("retryAuth").style.display =
-    "none";
-
-
-  $("loginButton").style.display =
-    "none";
-
-
+async function loadCopyrightStrikes(){
+  const el=document.getElementById("copyrightStrikes"); if(!el)return;
+  el.innerHTML='<div class="loading">Loading strikes...</div>';
   try{
-
-    const result =
-      await getAdminSession();
-
-
-    currentSession =
-      result.session;
-
-    currentUser =
-      result.user;
-
-
-    /*
-       If the fallback getUser() was used,
-       get a fresh session if possible.
-    */
-
-    try{
-
-      const freshSession =
-        await supabaseClient.auth.getSession();
-
-
-      if(
-        freshSession?.data?.session
-      ){
-
-        currentSession =
-          freshSession.data.session;
-
-      }
-
-    }catch{
-      /*
-         Existing verified user is still valid.
-      */
-    }
-
-
-    $("adminIdentity").textContent =
-      "Administrator: " +
-      (
-        currentUser.email ||
-        currentUser.id
-      );
-
-
-    $("overviewAdminEmail").textContent =
-      currentUser.email ||
-      currentUser.id;
-
-
-    $("adminRoleInfo").textContent =
-      "Role: " +
-      getRole(currentUser) +
-      " • User ID: " +
-      currentUser.id;
-
-
-    $("authScreen")
-      .classList
-      .add("hidden");
-
-
-    $("adminApp")
-      .classList
-      .remove("hidden");
-
-
-    /*
-       Load data separately.
-       One broken table must not hide the dashboard.
-    */
-
-    await loadAll();
-
-
-  }catch(error){
-
-    console.error(
-      "PASONG Admin authentication error:",
-      error
-    );
-
-
-    currentSession =
-      null;
-
-    currentUser =
-      null;
-
-
-    $("adminApp")
-      .classList
-      .add("hidden");
-
-
-    $("authScreen")
-      .classList
-      .remove("hidden");
-
-
-    $("authTitle").textContent =
-      "Administrator access failed";
-
-
-    $("authText").textContent =
-      "PASONG could not verify administrator access.";
-
-
-    showMessage(
-
-      "authMessage",
-
-      "error",
-
-      error?.message ||
-
-      "Unknown administrator authentication error."
-
-    );
-
-
-    $("authDetails")
-      .classList
-      .remove("hidden");
-
-
-    $("authDetails").innerHTML =
-
-      "<strong>What to check:</strong><br>" +
-
-      "1. Make sure you are logged into PASONG.<br>" +
-
-      "2. Make sure this account has administrator role.<br>" +
-
-      '3. The required role is <b>admin</b>.<br>' +
-
-      "4. After changing the role, sign out and sign in again.";
-
-    $("retryAuth").style.display =
-      "inline-block";
-
-
-    $("loginButton").style.display =
-      "inline-block";
-
-  }finally{
-
-    bootingAdmin =
-      false;
-
-  }
-
+    const data=await copyrightApi("/api/admin/copyright/strikes");
+    const rows=data.strikes||[];
+    if(!rows.length){el.innerHTML='<div class="empty">No copyright strikes recorded.</div>';return;}
+    el.innerHTML='<div class="table-wrap"><table><thead><tr><th>User</th><th>Strike</th><th>Status</th><th>Reason</th><th>Song</th><th>Created</th></tr></thead><tbody>'+rows.map(s=>'<tr>'+
+      '<td>'+escapeHtml(s.user_id||"")+'</td>'+
+      '<td><strong>#'+escapeHtml(s.strike_number||"")+'</strong></td>'+
+      '<td>'+copyrightBadge(s.status)+'</td>'+
+      '<td>'+escapeHtml(s.reason||"")+'</td>'+
+      '<td>'+escapeHtml(s.song_id||"—")+'</td>'+
+      '<td>'+escapeHtml(s.created_at?new Date(s.created_at).toLocaleString():"—")+'</td>'+
+      '</tr>').join("")+'</tbody></table></div>';
+  }catch(error){el.innerHTML='<div class="empty">'+escapeHtml(error.message||"Unable to load strikes.")+'</div>';}
 }
 
-
-/* ============================================================
-   AUTH EVENTS
-============================================================ */
-
-supabaseClient.auth.onAuthStateChange(
-
-  (event,session)=>{
-
-    console.log(
-      "PASONG auth event:",
-      event
-    );
-
-
-    if(event === "SIGNED_OUT"){
-
-      currentSession =
-        null;
-
-      currentUser =
-        null;
-
-
-      $("adminApp")
-        .classList
-        .add("hidden");
-
-
-      $("authScreen")
-        .classList
-        .remove("hidden");
-
-
-      $("authTitle").textContent =
-        "Signed out";
-
-
-      $("authText").textContent =
-        "Please log in again as an administrator.";
-
-
-      $("retryAuth").style.display =
-        "inline-block";
-
-
-      $("loginButton").style.display =
-        "inline-block";
-
-    }
-
-  }
-
-);
-
-
-/* ============================================================
-   BUTTONS
-============================================================ */
-
-$("retryAuth").onclick =
-  ()=>bootAdmin();
-
-
-$("loginButton").onclick =
-  ()=>{
-
-    location.href =
-      "index.html";
-
-  };
-
-
-$("logoutButton").onclick =
-  async()=>{
-
-    try{
-
-      await supabaseClient.auth.signOut();
-
-    }catch(error){
-
-      console.error(
-        "Logout error:",
-        error
-      );
-
-    }
-
-    location.reload();
-
-  };
-
-
-/* ============================================================
-   COUNTS
-============================================================ */
-
-async function countTable(
-  table
-){
-
-  const result =
-    await supabaseClient
-      .from(table)
-      .select(
-        "id",
-        {
-          count:"exact",
-          head:true
-        }
-      );
-
-
-  if(result.error){
-
-    throw new Error(
-
-      table +
-      ": " +
-      result.error.message
-
-    );
-
-  }
-
-
-  return result.count || 0;
-
-}
-
-
-async function loadCounts(){
-
-  const results =
-    await Promise.all([
-
-      countTable("songs"),
-
-      countTable("beats"),
-
-      countTable("artist_profiles"),
-
-      countTable("orders")
-
-    ]);
-
-
-  $("countSongs").textContent =
-    results[0];
-
-
-  $("countBeats").textContent =
-    results[1];
-
-
-  $("countArtists").textContent =
-    results[2];
-
-
-  $("countOrders").textContent =
-    results[3];
-
-
-  $("reportSongs").textContent =
-    results[0];
-
-
-  $("reportBeats").textContent =
-    results[1];
-
-}
-
-
-/* ============================================================
-   SONGS
-============================================================ */
-
-async function loadSongs(){
-
-  $("songsBody").innerHTML =
-    `
-      <tr>
-        <td colspan="6" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from("songs")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(result.error){
-
-    $("songsBody").innerHTML =
-      `
-        <tr>
-          <td colspan="6" class="error">
-            ${escapeHtml(
-              result.error.message
-            )}
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const songs =
-    result.data || [];
-
-
-  if(!songs.length){
-
-    $("songsBody").innerHTML =
-      `
-        <tr>
-          <td colspan="6" class="empty">
-            No songs found.
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("songsBody").innerHTML =
-    songs.map(song=>{
-
-      const status =
-        song.status ||
-        "approved";
-
-
-      return `
-
-        <tr>
-
-          <td>
-
-            <strong>
-              ${escapeHtml(
-                song.title ||
-                "Untitled"
-              )}
-            </strong>
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              song.artist_name ||
-              song.artist_user_id ||
-              song.artist_id ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${money(
-              song.price,
-              song.currency
-            )}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(
-                status
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              song.created_at
-            )}
-
-          </td>
-
-
-          <td>
-
-            <div class="actions">
-
-              <button
-                onclick="editSong(
-                  '${escapeJs(song.id)}',
-                  '${escapeJs(song.title || "")}',
-                  ${Number(song.price || 0)}
-                )"
-              >
-                Edit
-              </button>
-
-
-              <button
-                class="danger"
-                onclick="deleteSong(
-                  '${escapeJs(song.id)}'
-                )"
-              >
-                Delete
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-async function editSong(
-  id,
-  title,
-  price
-){
-
-  const newTitle =
-    prompt(
-      "Song title:",
-      title
-    );
-
-
-  if(newTitle === null){
-    return;
-  }
-
-
-  const newPrice =
-    prompt(
-      "Song price:",
-      price
-    );
-
-
-  if(newPrice === null){
-    return;
-  }
-
-
-  const result =
-    await supabaseClient
-      .from("songs")
-      .update({
-
-        title:
-          newTitle.trim(),
-
-        price:
-          Number(newPrice)
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-      "Song update failed: " +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadSongs();
-  await loadCounts();
-
-}
-
-
-async function deleteSong(id){
-
-  if(
-    !confirm(
-      "Delete this song? This cannot be undone."
-    )
-  ){
-
-    return;
-
-  }
-
-
-  const result =
-    await supabaseClient
-      .from("songs")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-      "Song deletion failed: " +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadSongs();
-  await loadCounts();
-
-}
-
-
-/* ============================================================
-   BEATS
-============================================================ */
-
-async function loadBeats(){
-
-  $("beatsBody").innerHTML =
-    `
-      <tr>
-        <td colspan="6" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from("beats")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(result.error){
-
-    $("beatsBody").innerHTML =
-      `
-        <tr>
-          <td colspan="6" class="error">
-            ${escapeHtml(
-              result.error.message
-            )}
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const beats =
-    result.data || [];
-
-
-  if(!beats.length){
-
-    $("beatsBody").innerHTML =
-      `
-        <tr>
-          <td colspan="6" class="empty">
-            No beats found.
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("beatsBody").innerHTML =
-    beats.map(beat=>{
-
-      return `
-
-        <tr>
-
-          <td>
-
-            <strong>
-              ${escapeHtml(
-                beat.title ||
-                "Untitled Beat"
-              )}
-            </strong>
-
-            <br>
-
-            <span class="muted">
-
-              ${escapeHtml(
-                beat.genre || ""
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              beat.producer_name ||
-              beat.producer_id ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            MP3:
-            ${money(
-              beat.lease_mp3_price
-            )}
-
-            <br>
-
-            WAV:
-            ${money(
-              beat.lease_wav_price
-            )}
-
-            <br>
-
-            Stems:
-            ${money(
-              beat.stems_price
-            )}
-
-            <br>
-
-            Exclusive:
-            ${money(
-              beat.exclusive_price
-            )}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(
-                beat.status ||
-                "approved"
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              beat.created_at
-            )}
-
-          </td>
-
-
-          <td>
-
-            <div class="actions">
-
-              <button
-                onclick="editBeat(
-                  '${escapeJs(beat.id)}',
-                  '${escapeJs(beat.title || "")}',
-                  ${Number(beat.lease_mp3_price || 0)},
-                  ${Number(beat.lease_wav_price || 0)},
-                  ${Number(beat.stems_price || 0)},
-                  ${Number(beat.exclusive_price || 0)}
-                )"
-              >
-                Edit
-              </button>
-
-
-              <button
-                class="danger"
-                onclick="deleteBeat(
-                  '${escapeJs(beat.id)}'
-                )"
-              >
-                Delete
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-async function editBeat(
-  id,
-  title,
-  mp3,
-  wav,
-  stems,
-  exclusive
-){
-
-  const newTitle =
-    prompt(
-      "Beat title:",
-      title
-    );
-
-
-  if(newTitle === null){
-    return;
-  }
-
-
-  const newMp3 =
-    prompt(
-      "MP3 price:",
-      mp3
-    );
-
-
-  if(newMp3 === null){
-    return;
-  }
-
-
-  const newWav =
-    prompt(
-      "WAV price:",
-      wav
-    );
-
-
-  if(newWav === null){
-    return;
-  }
-
-
-  const newStems =
-    prompt(
-      "Stems price:",
-      stems
-    );
-
-
-  if(newStems === null){
-    return;
-  }
-
-
-  const newExclusive =
-    prompt(
-      "Exclusive price:",
-      exclusive
-    );
-
-
-  if(newExclusive === null){
-    return;
-  }
-
-
-  const result =
-    await supabaseClient
-      .from("beats")
-      .update({
-
-        title:
-          newTitle.trim(),
-
-        lease_mp3_price:
-          Number(newMp3),
-
-        lease_wav_price:
-          Number(newWav),
-
-        stems_price:
-          Number(newStems),
-
-        exclusive_price:
-          Number(newExclusive)
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-      "Beat update failed: " +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadBeats();
-  await loadCounts();
-
-}
-
-
-async function deleteBeat(id){
-
-  if(
-    !confirm(
-      "Delete this beat? This cannot be undone."
-    )
-  ){
-
-    return;
-
-  }
-
-
-  const result =
-    await supabaseClient
-      .from("beats")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-      "Beat deletion failed: " +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadBeats();
-  await loadCounts();
-
-}
-
-
-/* ============================================================
-   DJ MIXES
-============================================================ */
-
-async function loadDjMixes(){
-
-  $("djBody").innerHTML =
-    `
-      <tr>
-        <td colspan="5" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from("dj_mixes")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(result.error){
-
-    $("djBody").innerHTML =
-      `
-        <tr>
-
-          <td
-            colspan="5"
-            class="error"
-          >
-
-            DJ mixes could not be loaded:
-
-            ${escapeHtml(
-              result.error.message
-            )}
-
-          </td>
-
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const mixes =
-    result.data || [];
-
-
-  if(!mixes.length){
-
-    $("djBody").innerHTML =
-      `
-        <tr>
-
-          <td
-            colspan="5"
-            class="empty"
-          >
-            No DJ mixes found.
-
-          </td>
-
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("djBody").innerHTML =
-    mixes.map(mix=>{
-
-      const title =
-        mix.title ||
-        mix.name ||
-        "Untitled Mix";
-
-
-      const dj =
-        mix.dj_name ||
-        mix.dj_user_id ||
-        mix.user_id ||
-        mix.dj_id ||
-        "—";
-
-
-      const status =
-        mix.status ||
-        "approved";
-
-
-      return `
-
-        <tr>
-
-          <td>
-
-            <strong>
-              ${escapeHtml(title)}
-            </strong>
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(dj)}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(status)}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              mix.created_at
-            )}
-
-          </td>
-
-
-          <td>
-
-            <button
-              class="danger"
-              onclick="deleteDjMix(
-                '${escapeJs(mix.id)}'
-              )"
-            >
-              Delete
-            </button>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-async function deleteDjMix(id){
-
-  if(
-    !confirm(
-      "Delete this DJ mix? This cannot be undone."
-    )
-  ){
-
-    return;
-
-  }
-
-
-  const result =
-    await supabaseClient
-      .from("dj_mixes")
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-      "DJ mix deletion failed: " +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadDjMixes();
-
-}
-
-
-/* ============================================================
-   ORDERS
-============================================================ */
-
-async function loadOrders(){
-
-  $("ordersBody").innerHTML =
-    `
-      <tr>
-        <td colspan="5" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from("orders")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      )
-      .limit(200);
-
-
-  if(result.error){
-
-    $("ordersBody").innerHTML =
-      `
-        <tr>
-          <td colspan="5" class="error">
-            ${escapeHtml(
-              result.error.message
-            )}
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const orders =
-    result.data || [];
-
-
-  if(!orders.length){
-
-    $("ordersBody").innerHTML =
-      `
-        <tr>
-          <td colspan="5" class="empty">
-            No orders found.
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("ordersBody").innerHTML =
-    orders.map(order=>{
-
-      return `
-
-        <tr>
-
-          <td>
-
-            ${escapeHtml(
-              order.order_number ||
-              order.id
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              order.buyer_email ||
-              order.buyer_id ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${money(
-              order.price ||
-              order.total_amount,
-              order.currency
-            )}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(
-                order.status ||
-                "—"
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              order.created_at
-            )}
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-/* ============================================================
-   PAYMENTS
-============================================================ */
-
-async function loadPayments(){
-
-  $("paymentsBody").innerHTML =
-    `
-      <tr>
-        <td colspan="6" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from(
-        "payment_verifications"
-      )
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      )
-      .limit(200);
-
-
-  if(result.error){
-
-    $("paymentsBody").innerHTML =
-      `
-        <tr>
-          <td colspan="6" class="error">
-            ${escapeHtml(
-              result.error.message
-            )}
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const payments =
-    result.data || [];
-
-
-  if(!payments.length){
-
-    $("paymentsBody").innerHTML =
-      `
-        <tr>
-          <td colspan="6" class="empty">
-            No payment verifications found.
-          </td>
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("paymentsBody").innerHTML =
-    payments.map(payment=>{
-
-      const pending =
-        String(
-          payment.status ||
-          "pending"
-        ).toLowerCase() ===
-        "pending";
-
-
-      return `
-
-        <tr>
-
-          <td>
-
-            ${escapeHtml(
-              payment.reference ||
-              payment.payment_reference ||
-              payment.transaction_id ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              payment.user_email ||
-              payment.user_id ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${money(
-              payment.amount,
-              payment.currency
-            )}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(
-                payment.status ||
-                "pending"
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              payment.created_at
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${
-              pending
-
-              ?
-
-              `
-                <div class="actions">
-
-                  <button
-                    class="good"
-                    onclick="setPayment(
-                      '${escapeJs(payment.id)}',
-                      'approved'
-                    )"
-                  >
-                    Approve
-                  </button>
-
-                  <button
-                    class="danger"
-                    onclick="setPayment(
-                      '${escapeJs(payment.id)}',
-                      'rejected'
-                    )"
-                  >
-                    Reject
-                  </button>
-
-                </div>
-              `
-
-              :
-
-              "—"
-
-            }
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-async function setPayment(
-  id,
-  status
-){
-
-  const result =
-    await supabaseClient
-      .from(
-        "payment_verifications"
-      )
-      .update({
-        status:status
-      })
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-      "Payment update failed: " +
-      result.error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadPayments();
-
-}
-
-
-/* ============================================================
-   AD PREVIEW
-============================================================ */
-
-function updateAdPreview(){
-
-  const title =
-    $("adTitle")
-      .value
-      .trim();
-
-
-  const description =
-    $("adDescription")
-      .value
-      .trim();
-
-
-  const image =
-    $("adImageUrl")
-      .value
-      .trim();
-
-
-  if(
-    !title &&
-    !description &&
-    !image
-  ){
-
-    $("adPreview")
-      .classList
-      .add("hidden");
-
-    return;
-
-  }
-
-
-  $("adPreview")
-    .classList
-    .remove("hidden");
-
-
-  $("adPreviewTitle")
-    .textContent =
-    title ||
-    "Advertisement";
-
-
-  $("adPreviewDescription")
-    .textContent =
-    description;
-
-
-  if(image){
-
-    $("adPreviewImage")
-      .src =
-      image;
-
-    $("adPreviewImage")
-      .style
-      .display =
-      "block";
-
-  }else{
-
-    $("adPreviewImage")
-      .style
-      .display =
-      "none";
-
-  }
-
-}
-
-
-$("adTitle")
-  .addEventListener(
-    "input",
-    updateAdPreview
-  );
-
-
-$("adDescription")
-  .addEventListener(
-    "input",
-    updateAdPreview
-  );
-
-
-/* ============================================================
-   AD IMAGE UPLOAD
-============================================================ */
-
-async function uploadAdvertisementImage(file){
-
-  if(!file){
-
-    throw new Error(
-      "Please choose an advertisement image."
-    );
-
-  }
-
-
-  /*
-     Make sure we have a fresh access token.
-  */
-
-  let session =
-    currentSession;
-
-
+async function viewCopyrightComplaint(id){
   try{
+    const data=await copyrightApi("/api/admin/copyright/complaints?status=all");
+    const c=(data.complaints||[]).find(x=>x.id===id);
+    if(!c){showNotice("copyrightNotice","error","Complaint not found.");return;}
+    const lines=[
+      "Complaint ID: "+c.id,
+      "Song: "+(c.song?.title||c.song_id),
+      "Claimant: "+(c.complainant_name||""),
+      "Email: "+(c.complainant_email||""),
+      "Phone: "+(c.complainant_phone||""),
+      "Address: "+(c.complainant_address||""),
+      "Role: "+(c.claimant_role||""),
+      "Status: "+(c.status||""),
+      "Rights claim: "+(c.rights_claim||""),
+      "Material: "+(c.material_description||""),
+      "Requested action: "+(c.remedial_action||""),
+      "Reason: "+(c.reason||""),
+      "Evidence: "+(c.evidence_url||"None"),
+      "Counter-notice: "+(c.uploader_response||"None"),
+      "Counter evidence: "+(c.response_evidence_url||"None")
+    ];
+    alert(lines.join("\n\n"));
+  }catch(error){showNotice("copyrightNotice","error",error.message||"Unable to load complaint.");}
+}
+window.loadCopyrightComplaints=loadCopyrightComplaints;
+window.loadCopyrightStrikes=loadCopyrightStrikes;
+window.viewCopyrightComplaint=viewCopyrightComplaint;
 
-    const result =
-      await supabaseClient.auth.getSession();
-
-
-    if(
-      result?.data?.session
-    ){
-
-      session =
-        result.data.session;
-
-      currentSession =
-        session;
-
-    }
-
-  }catch(error){
-
-    console.error(
-      "Could not refresh admin session:",
-      error
-    );
-
+async function copyrightAction(id,action){
+  let notes="";
+  if(action!=="restore" && action!=="reject"){
+    notes=prompt("Admin notes for this copyright action (optional):","")||"";
   }
-
-
-  if(
-    !session?.access_token
-  ){
-
-    throw new Error(
-
-      "Your administrator session has expired. " +
-
-      "Please log in again."
-
-    );
-
-  }
-
-
-  const allowedTypes = [
-
-    "image/jpeg",
-
-    "image/jpg",
-
-    "image/png",
-
-    "image/webp"
-
-  ];
-
-
-  if(
-    !allowedTypes.includes(
-      file.type
-    )
-  ){
-
-    throw new Error(
-
-      "Only JPG, JPEG, PNG and WEBP images are allowed."
-
-    );
-
-  }
-
-
-  if(
-    file.size >
-    10 * 1024 * 1024
-  ){
-
-    throw new Error(
-
-      "Advertisement image must be 10MB or smaller."
-
-    );
-
-  }
-
-
-  $("adUploadStatus").textContent =
-    "Requesting secure upload permission…";
-
-
-  $("adUploadStatus").className =
-    "warning small";
-
-
-  /*
-     Get signed Cloudinary upload data
-     from PASONG backend.
-  */
-
-  const signatureResponse =
-    await withTimeout(
-
-      fetch(
-
-        API_BASE +
-        "/api/cloudinary/signature",
-
-        {
-
-          method:"POST",
-
-          headers:{
-
-            "Content-Type":
-              "application/json",
-
-            "Authorization":
-              "Bearer " +
-              session.access_token
-
-          },
-
-          body:JSON.stringify({
-
-            folder:
-              "pasong/ads"
-
-          })
-
-        }
-
-      ),
-
-      15000,
-
-      "Cloudinary signature request timed out."
-
-    );
-
-
-  let signatureData;
-
-
+  if(!confirm("Apply copyright action: "+action+"?"))return;
   try{
-
-    signatureData =
-      await signatureResponse.json();
-
-  }catch{
-
-    throw new Error(
-      "PASONG returned an invalid Cloudinary response."
-    );
-
-  }
-
-
-  if(!signatureResponse.ok){
-
-    throw new Error(
-
-      signatureData?.error ||
-
-      "Advertisement image upload authorization failed."
-
-    );
-
-  }
-
-
-  if(
-    !signatureData.cloud_name ||
-    !signatureData.api_key ||
-    !signatureData.timestamp ||
-    !signatureData.signature ||
-    !signatureData.folder
-  ){
-
-    throw new Error(
-      "PASONG returned incomplete Cloudinary upload information."
-    );
-
-  }
-
-
-  $("adUploadStatus").textContent =
-    "Uploading original advertisement image…";
-
-
-  /*
-     Upload original file directly to Cloudinary.
-  */
-
-  const formData =
-    new FormData();
-
-
-  formData.append(
-    "file",
-    file
-  );
-
-
-  formData.append(
-    "api_key",
-    signatureData.api_key
-  );
-
-
-  formData.append(
-    "timestamp",
-    signatureData.timestamp
-  );
-
-
-  formData.append(
-    "signature",
-    signatureData.signature
-  );
-
-
-  formData.append(
-    "folder",
-    signatureData.folder
-  );
-
-
-  const cloudinaryResponse =
-    await withTimeout(
-
-      fetch(
-
-        "https://api.cloudinary.com/v1_1/" +
-
-        encodeURIComponent(
-          signatureData.cloud_name
-        ) +
-
-        "/image/upload",
-
-        {
-
-          method:"POST",
-
-          body:formData
-
-        }
-
-      ),
-
-      60000,
-
-      "Cloudinary image upload timed out."
-
-    );
-
-
-  let uploaded;
-
-
-  try{
-
-    uploaded =
-      await cloudinaryResponse.json();
-
-  }catch{
-
-    throw new Error(
-      "Cloudinary returned an invalid upload response."
-    );
-
-  }
-
-
-  if(!cloudinaryResponse.ok){
-
-    throw new Error(
-
-      uploaded?.error?.message ||
-
-      "Advertisement image upload failed."
-
-    );
-
-  }
-
-
-  if(
-    !uploaded.secure_url
-  ){
-
-    throw new Error(
-      "Cloudinary did not return the advertisement image URL."
-    );
-
-  }
-
-
-  /*
-     Store returned URL automatically.
-  */
-
-  $("adImageUrl").value =
-    uploaded.secure_url;
-
-
-  /*
-     Preview uploaded image.
-  */
-
-  $("adPreviewImage").src =
-    uploaded.secure_url;
-
-
-  $("adPreviewImage").style.display =
-    "block";
-
-
-  $("adPreview")
-    .classList
-    .remove("hidden");
-
-
-  $("adUploadStatus").textContent =
-    "✓ Original advertisement image uploaded successfully.";
-
-
-  $("adUploadStatus").className =
-    "success small";
-
-
-  updateAdPreview();
-
-
-  return uploaded.secure_url;
-
+    const data=await copyrightApi("/api/admin/copyright/complaints/"+encodeURIComponent(id)+"/action",{
+      method:"POST",
+      body:JSON.stringify({action,admin_notes:notes})
+    });
+    showNotice("copyrightNotice","success",data.message||"Copyright action applied.");
+    await loadCopyrightComplaints();
+    await loadCopyrightStrikes();
+  }catch(error){showNotice("copyrightNotice","error",error.message||"Unable to apply copyright action.");}
+}
+window.copyrightAction=copyrightAction;
+
+function getAdMediaType(ad){
+const explicit=String(ad.media_type||ad.type||"").toLowerCase();
+if(explicit.includes("video"))return"video";
+const url=String(ad.video_url||ad.media_url||ad.image_url||"").toLowerCase();
+if(url.includes("/video/upload/"))return"video";
+if(/\.(mp4|webm|ogg)(\?|#|$)/i.test(url))return"video";
+return"image";
+}
+function getAdMediaUrl(ad){return ad.video_url||ad.media_url||ad.image_url||"";}
+
+function renderAdPreview(url,type){
+const element=document.getElementById("adPreview");
+if(!url){element.innerHTML='<div class="placeholder">Choose an image or video</div>';return;}
+if(type==="video"){
+element.innerHTML='<video src="'+escapeHtml(url)+'" controls muted playsinline preload="metadata"></video>';
+}else{
+element.innerHTML='<img src="'+escapeHtml(url)+'" alt="Advertisement preview">';
+}
 }
 
+document.getElementById("adFile").addEventListener("change",e=>{
+const file=e.target.files[0];if(!file)return;
+const type=file.type.startsWith("video/")?"video":"image";
+document.getElementById("adMediaType").value=type;
+renderAdPreview(URL.createObjectURL(file),type);
+});
+document.getElementById("adMediaType").addEventListener("change",()=>{
+const file=document.getElementById("adFile").files[0];
+if(file)renderAdPreview(URL.createObjectURL(file),document.getElementById("adMediaType").value);
+});
 
-/* ============================================================
-   AD FILE SELECT
-============================================================ */
+async function getCloudinarySignature(folder){
+if(!currentSession?.access_token)throw new Error("Your admin session has expired. Please sign in again.");
+const response=await fetch(API_BASE+"/api/cloudinary/signature",{
+method:"POST",
+headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},
+body:JSON.stringify({folder})
+});
+const text=await response.text();
+let data={};try{data=text?JSON.parse(text):{};}catch(e){throw new Error("Invalid Cloudinary signature response.");}
+if(!response.ok)throw new Error(data.error||data.message||"Cloudinary signature failed.");
+if(!data.api_key||!data.timestamp||!data.signature||!data.folder)throw new Error("PASONG returned incomplete Cloudinary upload information.");
+return data;
+}
 
-$("adImageFile")
-  .addEventListener(
-    "change",
-    async function(){
+async function uploadAdMedia(file){
+const signature=await getCloudinarySignature("pasong/ads");
+const form=new FormData();
+form.append("file",file);
+form.append("api_key",signature.api_key);
+form.append("timestamp",String(signature.timestamp));
+form.append("signature",signature.signature);
+form.append("folder",signature.folder);
+const cloudName=signature.cloud_name||CLOUDINARY_CLOUD_NAME;
+const response=await fetch("https://api.cloudinary.com/v1_1/"+encodeURIComponent(cloudName)+"/auto/upload",{method:"POST",body:form});
+const text=await response.text();
+let data={};try{data=text?JSON.parse(text):{};}catch(e){throw new Error("Cloudinary returned an invalid response.");}
+if(!response.ok)throw new Error(data?.error?.message||data?.message||"Cloudinary upload failed.");
+if(!data.secure_url)throw new Error("Cloudinary did not return a secure file URL.");
+return data.secure_url;
+}
 
-      const file =
-        this.files?.[0];
+function toIsoFromLocal(value){return value?new Date(value).toISOString():null;}
+function fromIsoToLocal(value){
+if(!value)return"";
+const date=new Date(value),pad=n=>String(n).padStart(2,"0");
+return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate())+"T"+pad(date.getHours())+":"+pad(date.getMinutes());
+}
 
+document.getElementById("adForm").addEventListener("submit",async e=>{
+e.preventDefault();
+const button=document.getElementById("saveAdBtn");
+button.disabled=true;button.textContent="Saving...";clearNotice("adNotice");
+try{
+const id=document.getElementById("adId").value.trim();
+const file=document.getElementById("adFile").files[0];
+let mediaType=document.getElementById("adMediaType").value;
+let mediaUrl=null;
+if(file){
+mediaType=file.type.startsWith("video/")?"video":"image";
+if(mediaType==="video"&&file.size>100*1024*1024)throw new Error("Video is too large. Keep advertisement videos under 100 MB.");
+if(mediaType==="image"&&file.size>15*1024*1024)throw new Error("Image is too large. Keep advertisement images under 15 MB.");
+button.textContent="Uploading media...";
+mediaUrl=await uploadAdMedia(file);
+}
+const payload={
+title:document.getElementById("adTitle").value.trim(),
+description:document.getElementById("adDescription").value.trim()||null,
+target_url:document.getElementById("adTarget").value.trim()||null,
+placement:document.getElementById("adPlacement").value,
+start_at:toIsoFromLocal(document.getElementById("adStart").value),
+end_at:toIsoFromLocal(document.getElementById("adEnd").value)
+};
+if(!payload.title)throw new Error("Advertisement title is required.");
+if(payload.start_at&&payload.end_at&&new Date(payload.end_at)<=new Date(payload.start_at))throw new Error("End date must be after start date.");
+if(mediaUrl)payload.image_url=mediaUrl;
 
-      if(!file){
-        return;
-      }
+let result;
+if(id){
+result=await supabaseClient.from("advertisements").update(payload).eq("id",id);
+}else{
+payload.status="active";payload.clicks=0;payload.impressions=0;payload.created_by=currentSession.user.id;
+result=await supabaseClient.from("advertisements").insert(payload).select("id").single();
+}
+if(result.error)throw new Error(result.error.message);
 
+const adId=id||result.data?.id;
+if(adId&&mediaUrl){
+const mediaResult=await supabaseClient.from("advertisements").update({media_type:mediaType}).eq("id",adId);
+if(mediaResult.error&&!/media_type/i.test(mediaResult.error.message))console.warn(mediaResult.error);
+}
+showNotice("adNotice","success",id?"Advertisement updated successfully.":"Advertisement created successfully.");
+clearAdForm();await loadAds();await loadStats();
+}catch(error){
+console.error("Advertisement save error:",error);
+showNotice("adNotice","error",error?.message||"Unable to save advertisement.");
+}finally{
+button.disabled=false;button.textContent="Save Advertisement";
+}
+});
 
-      hideMessage(
-        "adMessage"
-      );
-
-
-      try{
-
-        await uploadAdvertisementImage(
-          file
-        );
-
-
-      }catch(error){
-
-        console.error(
-          "Advertisement image upload error:",
-          error
-        );
-
-
-        showMessage(
-
-          "adMessage",
-
-          "error",
-
-          error?.message ||
-
-          "Advertisement image upload failed."
-
-        );
-
-
-        this.value =
-          "";
-
-
-        $("adImageUrl").value =
-          "";
-
-
-        $("adUploadStatus").textContent =
-          "Image upload failed. Choose another image.";
-
-
-        $("adUploadStatus").className =
-          "error small";
-
-
-        updateAdPreview();
-
-      }
-
-    }
-  );
-
-
-/* ============================================================
-   ADVERTISEMENTS
-============================================================ */
+function clearAdForm(){
+document.getElementById("adForm").reset();
+document.getElementById("adId").value="";
+document.getElementById("adMediaType").value="image";
+document.getElementById("adPreview").innerHTML='<div class="placeholder">Choose an image or video</div>';
+}
+document.getElementById("clearAdBtn").addEventListener("click",clearAdForm);
 
 async function loadAds(){
-
-  $("adsBody").innerHTML =
-    `
-      <tr>
-        <td colspan="6" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from(
-        "advertisements"
-      )
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(result.error){
-
-    $("adsBody").innerHTML =
-      `
-        <tr>
-
-          <td colspan="6">
-
-            <div class="notice error">
-
-              Advertisement table is not ready.
-
-              <br><br>
-
-              ${escapeHtml(
-                result.error.message
-              )}
-
-              <br><br>
-
-              Create the advertisements table
-              before posting advertisements.
-
-            </div>
-
-          </td>
-
-        </tr>
-      `;
-
-
-    $("reportAds")
-      .textContent =
-      "0";
-
-
-    return;
-
-  }
-
-
-  const ads =
-    result.data || [];
-
-
-  $("reportAds")
-    .textContent =
-    ads.length;
-
-
-  if(!ads.length){
-
-    $("adsBody").innerHTML =
-      `
-        <tr>
-
-          <td
-            colspan="6"
-            class="empty"
-          >
-
-            No advertisements yet.
-
-          </td>
-
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("adsBody").innerHTML =
-    ads.map(ad=>{
-
-      const status =
-        String(
-          ad.status ||
-          "draft"
-        );
-
-
-      const actionText =
-        status === "active"
-        ? "Pause"
-        : "Activate";
-
-
-      return `
-
-        <tr>
-
-          <td>
-
-            <strong>
-              ${escapeHtml(
-                ad.title ||
-                "Advertisement"
-              )}
-            </strong>
-
-            <br>
-
-            ${
-              ad.image_url
-              ?
-              `
-                <span class="success small">
-                  ✓ Image
-                </span>
-              `
-              :
-              `
-                <span class="muted small">
-                  No image
-                </span>
-              `
-            }
-
-            <br>
-
-            <span class="muted">
-
-              ${escapeHtml(
-                ad.description ||
-                ""
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              ad.placement ||
-              "home"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              ad.start_at
-            )}
-
-            <br>
-
-            →
-
-            <br>
-
-            ${formatDate(
-              ad.end_at
-            )}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(
-                status
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${Number(
-              ad.clicks ||
-              0
-            ).toLocaleString()}
-
-          </td>
-
-
-          <td>
-
-            <div class="actions">
-
-              <button
-                onclick="editAd(
-                  '${escapeJs(ad.id)}'
-                )"
-              >
-                Edit
-              </button>
-
-
-              <button
-                onclick="toggleAd(
-                  '${escapeJs(ad.id)}',
-                  '${escapeJs(status)}'
-                )"
-              >
-                ${actionText}
-              </button>
-
-
-              <button
-                class="danger"
-                onclick="deleteAd(
-                  '${escapeJs(ad.id)}'
-                )"
-              >
-                Delete
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
+const element=document.getElementById("adsList");
+element.innerHTML='<div class="loading">Loading advertisements...</div>';
+const r=await supabaseClient.from("advertisements").select("*").order("created_at",{ascending:false});
+if(r.error){element.innerHTML='<div class="empty">Unable to load advertisements. '+escapeHtml(r.error.message)+'</div>';return;}
+advertisements=r.data||[];renderAds();
 }
 
-
-/* ============================================================
-   RESET AD FORM
-============================================================ */
-
-function resetAdForm(){
-
-  $("adForm").reset();
-
-
-  $("adId").value =
-    "";
-
-
-  $("adStatus").value =
-    "draft";
-
-
-  $("adImageUrl").value =
-    "";
-
-
-  $("adImageFile").value =
-    "";
-
-
-  $("adSaveButton")
-    .textContent =
-    "Post Advertisement";
-
-
-  $("adPreview")
-    .classList
-    .add("hidden");
-
-
-  $("adUploadStatus").textContent =
-    "Choose the original advertisement image from your device.";
-
-
-  $("adUploadStatus").className =
-    "muted small";
-
-
-  hideMessage(
-    "adMessage"
-  );
-
+function renderAds(){
+const query=document.getElementById("adSearch").value.trim().toLowerCase();
+const rows=advertisements.filter(ad=>
+String(ad.title||"").toLowerCase().includes(query)||
+String(ad.description||"").toLowerCase().includes(query)
+);
+if(!rows.length){document.getElementById("adsList").innerHTML='<div class="empty">No advertisements found.</div>';return;}
+document.getElementById("adsList").innerHTML=rows.map(ad=>{
+const type=getAdMediaType(ad),url=getAdMediaUrl(ad),status=String(ad.status||"paused").toLowerCase();
+let media;
+if(url){
+if(type==="video")media='<video src="'+escapeHtml(url)+'" muted playsinline preload="metadata"></video>';
+else media='<img src="'+escapeHtml(url)+'" alt="">';
+}else media='<div class="placeholder">No media</div>';
+const statusClass=status==="active"?"active":status==="pending"?"pending":"paused";
+return '<div class="ad-row">'+
+'<div class="ad-thumb">'+media+'</div>'+
+'<div class="ad-info">'+
+'<strong>'+escapeHtml(ad.title||"Untitled")+'</strong>'+
+'<p>'+escapeHtml(ad.description||"No description")+'</p>'+
+'<p><span class="badge '+statusClass+'">'+escapeHtml(status)+'</span> · '+escapeHtml(type)+' · '+escapeHtml(ad.placement||"home")+'</p>'+
+'<p>'+((ad.start_at?"Starts: "+new Date(ad.start_at).toLocaleString():"No start date"))+' · '+((ad.end_at?"Ends: "+new Date(ad.end_at).toLocaleString():"No end date"))+'</p>'+
+'</div>'+
+'<div class="ad-actions">'+
+'<button class="btn secondary small" onclick="editAd(\''+escapeHtml(String(ad.id))+'\')">Edit</button>'+
+(status==="active"?
+'<button class="btn secondary small" onclick="setAdStatus(\''+escapeHtml(String(ad.id))+'\',\'paused\')">Pause</button>':
+'<button class="btn green small" onclick="setAdStatus(\''+escapeHtml(String(ad.id))+'\',\'active\')">Activate</button>')+
+'<button class="btn danger small" onclick="deleteAd(\''+escapeHtml(String(ad.id))+'\')">Delete</button>'+
+'</div></div>';
+}).join("");
 }
-
-
-/* ============================================================
-   EDIT AD
-============================================================ */
 
 async function editAd(id){
-
-  const result =
-    await supabaseClient
-      .from(
-        "advertisements"
-      )
-      .select("*")
-      .eq(
-        "id",
-        id
-      )
-      .maybeSingle();
-
-
-  if(
-    result.error ||
-    !result.data
-  ){
-
-    alert(
-
-      "Could not load advertisement: " +
-
-      (
-        result.error?.message ||
-        "Advertisement not found."
-      )
-
-    );
-
-    return;
-
-  }
-
-
-  const ad =
-    result.data;
-
-
-  $("adId").value =
-    ad.id;
-
-
-  $("adTitle").value =
-    ad.title ||
-    "";
-
-
-  $("adDescription").value =
-    ad.description ||
-    "";
-
-
-  $("adImageUrl").value =
-    ad.image_url ||
-    "";
-
-
-  $("adTargetUrl").value =
-    ad.target_url ||
-    "";
-
-
-  $("adPlacement").value =
-    ad.placement ||
-    "home";
-
-
-  $("adStatus").value =
-    ad.status ||
-    "draft";
-
-
-  $("adImageFile").value =
-    "";
-
-
-  if(ad.image_url){
-
-    $("adUploadStatus").textContent =
-      "Existing advertisement image is being used. Choose another file to replace it.";
-
-
-    $("adUploadStatus").className =
-      "muted small";
-
-  }
-
-
-  if(ad.start_at){
-
-    const startDate =
-      new Date(
-        ad.start_at
-      );
-
-
-    if(
-      !Number.isNaN(
-        startDate.getTime()
-      )
-    ){
-
-      $("adStartAt").value =
-        startDate
-          .toISOString()
-          .slice(
-            0,
-            16
-          );
-
-    }
-
-  }else{
-
-    $("adStartAt").value =
-      "";
-
-  }
-
-
-  if(ad.end_at){
-
-    const endDate =
-      new Date(
-        ad.end_at
-      );
-
-
-    if(
-      !Number.isNaN(
-        endDate.getTime()
-      )
-    ){
-
-      $("adEndAt").value =
-        endDate
-          .toISOString()
-          .slice(
-            0,
-            16
-          );
-
-    }
-
-  }else{
-
-    $("adEndAt").value =
-      "";
-
-  }
-
-
-  $("adSaveButton")
-    .textContent =
-    "Update Advertisement";
-
-
-  updateAdPreview();
-
-
-  window.scrollTo({
-
-    top:0,
-
-    behavior:"smooth"
-
-  });
-
+const ad=advertisements.find(x=>String(x.id)===String(id));if(!ad)return;
+document.getElementById("adId").value=ad.id||"";
+document.getElementById("adTitle").value=ad.title||"";
+document.getElementById("adDescription").value=ad.description||"";
+document.getElementById("adTarget").value=ad.target_url||"";
+document.getElementById("adPlacement").value=ad.placement||"home";
+document.getElementById("adStart").value=fromIsoToLocal(ad.start_at);
+document.getElementById("adEnd").value=fromIsoToLocal(ad.end_at);
+document.getElementById("adMediaType").value=getAdMediaType(ad);
+document.getElementById("adFile").value="";
+renderAdPreview(getAdMediaUrl(ad),getAdMediaType(ad));
+document.getElementById("saveAdBtn").textContent="Update Advertisement";
+window.scrollTo({top:document.getElementById("section-ads").offsetTop-80,behavior:"smooth"});
 }
 
+window.editAd=editAd;
 
-/* ============================================================
-   TOGGLE AD
-============================================================ */
-
-async function toggleAd(
-  id,
-  currentStatus
-){
-
-  const nextStatus =
-    currentStatus === "active"
-    ? "paused"
-    : "active";
-
-
-  const result =
-    await supabaseClient
-      .from(
-        "advertisements"
-      )
-      .update({
-
-        status:
-          nextStatus,
-
-        updated_at:
-          new Date()
-            .toISOString()
-
-      })
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-
-      "Advertisement update failed: " +
-
-      result.error.message
-
-    );
-
-    return;
-
-  }
-
-
-  await loadAds();
-
+async function setAdStatus(id,status){
+const r=await supabaseClient.from("advertisements").update({status}).eq("id",id);
+if(r.error){showNotice("adNotice","error",r.error.message);return;}
+await loadAds();await loadStats();showNotice("adNotice","success","Advertisement "+status+".");
 }
 
-
-/* ============================================================
-   DELETE AD
-============================================================ */
+window.setAdStatus=setAdStatus;
 
 async function deleteAd(id){
-
-  if(
-    !confirm(
-      "Delete this advertisement?"
-    )
-  ){
-
-    return;
-
-  }
-
-
-  const result =
-    await supabaseClient
-      .from(
-        "advertisements"
-      )
-      .delete()
-      .eq(
-        "id",
-        id
-      );
-
-
-  if(result.error){
-
-    alert(
-
-      "Advertisement deletion failed: " +
-
-      result.error.message
-
-    );
-
-    return;
-
-  }
-
-
-  await loadAds();
-
+if(!confirm("Delete this advertisement? This cannot be undone."))return;
+const r=await supabaseClient.from("advertisements").delete().eq("id",id);
+if(r.error){showNotice("adNotice","error",r.error.message);return;}
+await loadAds();await loadStats();showNotice("adNotice","success","Advertisement deleted.");
 }
+window.deleteAd=deleteAd;
 
+document.getElementById("adSearch").addEventListener("input",renderAds);
+document.getElementById("refreshAdsBtn").addEventListener("click",loadAds);
 
-/* ============================================================
-   CREATE / UPDATE AD
-============================================================ */
-
-$("adForm")
-  .addEventListener(
-    "submit",
-    async event=>{
-
-      event.preventDefault();
-
-
-      hideMessage(
-        "adMessage"
-      );
-
-
-      $("adSaveButton")
-        .disabled =
-        true;
-
-
-      try{
-
-        const title =
-          $("adTitle")
-            .value
-            .trim();
-
-
-        if(!title){
-
-          throw new Error(
-            "Advertisement title is required."
-          );
-
-        }
-
-
-        /*
-           If a file has been selected but
-           has not finished uploading, stop.
-        */
-
-        const selectedFile =
-          $("adImageFile")
-            .files?.[0];
-
-
-        if(
-          selectedFile &&
-          !$("adImageUrl").value.trim()
-        ){
-
-          throw new Error(
-
-            "Please wait for the advertisement image upload to finish."
-
-          );
-
-        }
-
-
-        const startValue =
-          $("adStartAt")
-            .value;
-
-
-        const endValue =
-          $("adEndAt")
-            .value;
-
-
-        let startAt =
-          null;
-
-
-        let endAt =
-          null;
-
-
-        if(startValue){
-
-          const date =
-            new Date(
-              startValue
-            );
-
-
-          if(
-            Number.isNaN(
-              date.getTime()
-            )
-          ){
-
-            throw new Error(
-              "Invalid advertisement start date."
-            );
-
-          }
-
-
-          startAt =
-            date.toISOString();
-
-        }
-
-
-        if(endValue){
-
-          const date =
-            new Date(
-              endValue
-            );
-
-
-          if(
-            Number.isNaN(
-              date.getTime()
-            )
-          ){
-
-            throw new Error(
-              "Invalid advertisement end date."
-            );
-
-          }
-
-
-          endAt =
-            date.toISOString();
-
-        }
-
-
-        if(
-          startAt &&
-          endAt &&
-          new Date(startAt) >=
-          new Date(endAt)
-        ){
-
-          throw new Error(
-
-            "Advertisement end time must be after the start time."
-
-          );
-
-        }
-
-
-        const payload = {
-
-          title:title,
-
-          description:
-            $("adDescription")
-              .value
-              .trim() ||
-            null,
-
-          image_url:
-            $("adImageUrl")
-              .value
-              .trim() ||
-            null,
-
-          target_url:
-            $("adTargetUrl")
-              .value
-              .trim() ||
-            null,
-
-          placement:
-            $("adPlacement")
-              .value,
-
-          start_at:
-            startAt,
-
-          end_at:
-            endAt,
-
-          status:
-            $("adStatus")
-              .value,
-
-          updated_at:
-            new Date()
-              .toISOString()
-
-        };
-
-
-        let result;
-
-
-        const existingId =
-          $("adId")
-            .value
-            .trim();
-
-
-        if(existingId){
-
-          result =
-            await supabaseClient
-              .from(
-                "advertisements"
-              )
-              .update(
-                payload
-              )
-              .eq(
-                "id",
-                existingId
-              );
-
-        }else{
-
-          payload.created_by =
-            currentUser.id;
-
-
-          result =
-            await supabaseClient
-              .from(
-                "advertisements"
-              )
-              .insert(
-                payload
-              );
-
-        }
-
-
-        if(result.error){
-
-          throw new Error(
-            result.error.message
-          );
-
-        }
-
-
-        const message =
-          existingId
-
-          ?
-
-          "Advertisement updated successfully."
-
-          :
-
-          "Advertisement posted successfully.";
-
-
-        resetAdForm();
-
-
-        showMessage(
-
-          "adMessage",
-
-          "success",
-
-          message
-
-        );
-
-
-        await loadAds();
-
-
-      }catch(error){
-
-        console.error(
-          "Advertisement error:",
-          error
-        );
-
-
-        showMessage(
-
-          "adMessage",
-
-          "error",
-
-          error?.message ||
-
-          "Advertisement save failed."
-
-        );
-
-      }finally{
-
-        $("adSaveButton")
-          .disabled =
-          false;
-
-      }
-
-    }
-  );
-
-
-/* ============================================================
-   COVERS
-============================================================ */
-
-async function loadCovers(){
-
-  $("coversBody").innerHTML =
-    `
-      <tr>
-        <td colspan="5" class="empty">
-          Loading…
-        </td>
-      </tr>
-    `;
-
-
-  const result =
-    await supabaseClient
-      .from(
-        "cover_requests"
-      )
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      )
-      .limit(200);
-
-
-  if(result.error){
-
-    $("coversBody").innerHTML =
-      `
-        <tr>
-
-          <td
-            colspan="5"
-            class="error"
-          >
-
-            ${escapeHtml(
-              result.error.message
-            )}
-
-          </td>
-
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const covers =
-    result.data || [];
-
-
-  if(!covers.length){
-
-    $("coversBody").innerHTML =
-      `
-        <tr>
-
-          <td
-            colspan="5"
-            class="empty"
-          >
-            No cover requests.
-
-          </td>
-
-        </tr>
-      `;
-
-    return;
-
-  }
-
-
-  $("coversBody").innerHTML =
-    covers.map(cover=>{
-
-      return `
-
-        <tr>
-
-          <td>
-
-            ${escapeHtml(
-              cover.title ||
-              cover.song_title ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              cover.user_email ||
-              cover.user_id ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            ${escapeHtml(
-              cover.style ||
-              "—"
-            )}
-
-          </td>
-
-
-          <td>
-
-            <span class="pill">
-
-              ${escapeHtml(
-                cover.status ||
-                "pending"
-              )}
-
-            </span>
-
-          </td>
-
-
-          <td>
-
-            ${formatDate(
-              cover.created_at
-            )}
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-/* ============================================================
-   LOAD EVERYTHING
-============================================================ */
-
-async function safeLoad(
-  name,
-  functionToRun
-){
-
-  try{
-
-    await functionToRun();
-
-  }catch(error){
-
-    console.error(
-      name +
-      " loading error:",
-      error
-    );
-
-  }
-
-}
-
-
-async function loadAll(){
-
-  await safeLoad(
-    "Counts",
-    loadCounts
-  );
-
-
-  await safeLoad(
-    "Songs",
-    loadSongs
-  );
-
-
-  await safeLoad(
-    "Beats",
-    loadBeats
-  );
-
-
-  await safeLoad(
-    "DJ mixes",
-    loadDjMixes
-  );
-
-
-  await safeLoad(
-    "Orders",
-    loadOrders
-  );
-
-
-  await safeLoad(
-    "Payments",
-    loadPayments
-  );
-
-
-  await safeLoad(
-    "Advertisements",
-    loadAds
-  );
-
-
-  await safeLoad(
-    "Covers",
-    loadCovers
-  );
-
-}
-
-
-/* ============================================================
-   SECTION NAVIGATION
-============================================================ */
-
-document
-  .querySelectorAll(
-    ".sidebar button[data-section]"
-  )
-  .forEach(button=>{
-
-    button.addEventListener(
-      "click",
-      ()=>{
-
-        document
-          .querySelectorAll(
-            ".sidebar button[data-section]"
-          )
-          .forEach(
-            item=>
-              item.classList
-                .remove("active")
-          );
-
-
-        button
-          .classList
-          .add("active");
-
-
-        document
-          .querySelectorAll(
-            ".section"
-          )
-          .forEach(
-            section=>
-              section.classList
-                .add("hidden")
-          );
-
-
-        const section =
-          $(
-            "section-" +
-            button.dataset.section
-          );
-
-
-        if(section){
-
-          section
-            .classList
-            .remove("hidden");
-
-        }
-
-      }
-    );
-
-  });
-
-
-/* ============================================================
-   START
-============================================================ */
-
-bootAdmin();
-
+boot();
 </script>
-
 </body>
 </html>
