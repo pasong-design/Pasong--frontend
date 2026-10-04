@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#8b5cf6">
+<title>PASONG — Copyright Disputes</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#09090f;color:#f5f5f7;font-family:Inter,system-ui,sans-serif}.wrap{width:min(950px,100%);margin:auto;padding:20px}.top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:18px}.logo{font-weight:950}.card{background:#11111a;border:1px solid #292936;border-radius:16px;padding:18px;margin-bottom:14px}.muted{color:#9999a8;font-size:12px;line-height:1.5}.row{border:1px solid #292936;border-radius:12px;padding:14px;margin-top:10px}.status{display:inline-block;padding:5px 8px;border-radius:999px;background:#392c12;color:#ffd56b;font-size:10px;font-weight:900}.status.ok{background:#12341f;color:#7cf3a1}.status.bad{background:#35161b;color:#ff929d}.field{margin-top:10px}.field label{display:block;font-size:11px;color:#bbb;font-weight:800;margin-bottom:5px}.field textarea,.field input{width:100%;background:#0c0c13;color:#fff;border:1px solid #292936;border-radius:9px;padding:10px}.field textarea{min-height:90px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:800;cursor:pointer;background:#8b5cf6;color:#fff}.btn.secondary{background:#171722;border:1px solid #292936}.notice{padding:10px;border-radius:9px;margin-bottom:12px;font-size:12px}.error{background:#32141a;color:#ffabb3}.success{background:#10281a;color:#93f2b0}.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div class="logo">◈ PASONG — Copyright Disputes</div><a href="index.html" style="color:#c084fc">Back to PASONG</a></div>
+<div id="notice"></div>
+<div class="card"><h2>Copyright complaints involving your uploads</h2><p class="muted">If a rights holder has reported one of your songs, you can provide a counter-notice or ownership/licence evidence here. Do not submit false information.</p><div id="list">Loading...</div></div>
+</div>
+<script>
+const API_BASE="https://pasong-api.onrender.com";
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
+function notice(type,msg){document.getElementById("notice").innerHTML='<div class="notice '+type+'">'+esc(msg)+'</div>';}
+async function api(path,opts={}){const s=await sb.auth.getSession();const token=s.data?.session?.access_token;if(!token)throw new Error("Please sign in to your PASONG account first.");const r=await fetch(API_BASE+path,{...opts,headers:{"Content-Type":"application/json","Authorization":"Bearer "+token,...(opts.headers||{})}});const t=await r.text();let d={};try{d=t?JSON.parse(t):{};}catch(_){}if(!r.ok)throw new Error(d.error||"Request failed.");return d;}
+async function load(){try{const d=await api("/api/copyright/complaints/mine");const rows=(d.complaints||[]).filter(x=>x.reported_user_id);const el=document.getElementById("list");if(!rows.length){el.innerHTML='<p class="muted">No copyright complaints found for your account.</p>';return;}el.innerHTML=rows.map(c=>`<div class="row"><strong>${esc(c.song?.title||c.song_id||"Reported song")}</strong><div style="margin:7px 0">Status: <span class="status ${["restored","rejected","resolved"].includes(c.status)?"ok":c.status==="takedown"?"bad":""}">${esc(c.status)}</span></div><div class="muted">Complaint submitted: ${esc(c.created_at?new Date(c.created_at).toLocaleString():"")}</div><div class="muted" style="margin-top:7px">Claim: ${esc(c.reason||"")}</div>${c.can_respond?`<div class="field"><label>Your counter-notice / response</label><textarea id="resp_${c.id}" placeholder="Explain why you own the rights or have permission/licence to upload this song.">${esc(c.uploader_response||"")}</textarea></div><div class="field"><label>Evidence URL</label><input id="evidence_${c.id}" type="url" placeholder="https://..." value="${esc(c.response_evidence_url||"")}"></div><div class="actions"><button class="btn" onclick="respond('${c.id}')">Submit Counter-Notice</button></div>`:`<div class="muted" style="margin-top:8px">Counter-notice: ${esc(c.uploader_response||"Not submitted")}</div>`}</div>`).join("");}catch(e){notice("error",e.message);}}
+async function respond(id){try{const response=document.getElementById("resp_"+id).value.trim();const evidence=document.getElementById("evidence_"+id).value.trim();if(!response){notice("error","Your response is required.");return;}await api("/api/copyright/complaints/"+id+"/respond",{method:"POST",body:JSON.stringify({uploader_response:response,response_evidence_url:evidence})});notice("success","Counter-notice submitted. PASONG will review the complaint.");load();}catch(e){notice("error",e.message);}}
+window.respond=respond;load();
+</script>
+</body>
+</html>
