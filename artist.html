@@ -1,297 +1,432 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1">
-
-<meta
-  name="theme-color"
-  content="#8b5cf6">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#08060d">
+<meta name="description" content="Discover artists and music on PASONG.">
 
 <title>PASONG — Artist</title>
 
-<link
-  rel="manifest"
-  href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
 *{
   box-sizing:border-box;
-}
-
-html,
-body{
   margin:0;
   padding:0;
-  min-height:100%;
+}
+
+:root{
+  --bg:#07060b;
+  --bg2:#0d0914;
+  --card:#111018;
+  --card2:#171321;
+  --purple:#8b5cf6;
+  --purple2:#a855f7;
+  --pink:#d946ef;
+  --text:#fff;
+  --muted:#a7a1b3;
+  --muted2:#777180;
+  --border:rgba(255,255,255,.08);
+  --green:#22c55e;
+}
+
+html{
+  scroll-behavior:smooth;
 }
 
 body{
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(139,92,246,.18),
-      transparent 38%
-    ),
-    #08080d;
-  color:#fff;
   font-family:
     Inter,
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
+    Roboto,
+    Arial,
     sans-serif;
-}
-
-a{
-  color:inherit;
-  text-decoration:none;
-}
-
-button{
-  font:inherit;
-}
-
-.page{
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(139,92,246,.20),
+      transparent 35%
+    ),
+    linear-gradient(
+      180deg,
+      #0a0710 0%,
+      #07060b 45%,
+      #050409 100%
+    );
+  color:var(--text);
   min-height:100vh;
-  display:flex;
-  flex-direction:column;
+  overflow-x:hidden;
 }
 
-/* =========================
+/* =========================================================
    HEADER
-========================= */
+========================================================= */
 
-.header{
+header{
   position:sticky;
   top:0;
-  z-index:50;
-  height:64px;
+  z-index:1000;
+  height:62px;
+  background:rgba(8,6,13,.90);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.nav{
+  max-width:1280px;
+  height:100%;
+  margin:auto;
+  padding:0 22px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 24px;
-  background:rgba(8,8,13,.88);
-  border-bottom:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(18px);
 }
 
 .logo{
   display:flex;
   align-items:center;
   gap:9px;
-  font-size:20px;
+  color:#fff;
+  text-decoration:none;
+  font-size:14px;
   font-weight:900;
-  letter-spacing:-.5px;
+  letter-spacing:.3px;
 }
 
 .logo-mark{
-  color:#c084fc;
-  font-size:22px;
+  width:10px;
+  height:10px;
+  border-radius:3px 50% 50% 50%;
+  background:linear-gradient(
+    135deg,
+    #a855f7,
+    #d946ef
+  );
+  transform:rotate(45deg);
+  box-shadow:0 0 15px rgba(168,85,247,.75);
 }
 
-.nav{
+.nav-links{
   display:flex;
   align-items:center;
-  gap:20px;
+  gap:25px;
 }
 
-.nav a{
-  color:#aaa;
-  font-size:14px;
-  font-weight:600;
-  transition:.2s;
+.nav-links a{
+  color:#a9a3b1;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:700;
+  transition:.2s ease;
 }
 
-.nav a:hover{
+.nav-links a:hover,
+.nav-links a.active{
   color:#fff;
 }
 
-.nav a.active{
-  color:#fff;
-}
-
-.account{
-  width:36px;
-  height:36px;
+.account-btn{
+  width:30px;
+  height:30px;
   border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  border:0;
+  cursor:pointer;
   background:
     linear-gradient(
       135deg,
       #8b5cf6,
-      #ec4899
+      #d946ef
     );
-  font-size:14px;
-  font-weight:800;
+  color:white;
+  font-weight:900;
+  box-shadow:
+    0 0 20px rgba(139,92,246,.30);
 }
 
-/* =========================
+/* =========================================================
    MAIN
-========================= */
+========================================================= */
 
 main{
-  width:min(1180px,calc(100% - 32px));
-  margin:0 auto;
-  padding:28px 0 70px;
-  flex:1;
+  max-width:1280px;
+  margin:auto;
+  padding:25px 22px 150px;
 }
 
 .back{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  color:#aaa;
-  font-size:14px;
-  font-weight:600;
-  margin-bottom:24px;
+  color:#9e97aa;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:18px;
 }
 
 .back:hover{
   color:#fff;
 }
 
-/* =========================
+/* =========================================================
    ARTIST HERO
-========================= */
+========================================================= */
 
 .artist-hero{
   position:relative;
   overflow:hidden;
-  min-height:290px;
-  display:flex;
-  align-items:flex-end;
-  gap:28px;
-  padding:34px;
+  min-height:360px;
+  border-radius:28px;
   border:1px solid rgba(255,255,255,.08);
-  border-radius:24px;
+
   background:
     linear-gradient(
-      135deg,
-      rgba(139,92,246,.28),
-      rgba(236,72,153,.08) 45%,
-      rgba(255,255,255,.025)
+      110deg,
+      rgba(30,17,49,.98),
+      rgba(12,9,18,.96)
     );
+
   box-shadow:
-    0 30px 80px rgba(0,0,0,.3);
+    0 30px 90px rgba(0,0,0,.45);
 }
 
-.artist-hero::before{
+.hero-background{
+  position:absolute;
+  inset:0;
+  background-position:center;
+  background-size:cover;
+  filter:blur(25px);
+  transform:scale(1.12);
+  opacity:.16;
+}
+
+.hero-background::after{
   content:"";
   position:absolute;
-  width:360px;
-  height:360px;
-  right:-120px;
-  top:-180px;
-  border-radius:50%;
-  background:rgba(139,92,246,.15);
-  filter:blur(50px);
+  inset:0;
+  background:
+    linear-gradient(
+      90deg,
+      #170d26 0%,
+      rgba(17,12,25,.96) 45%,
+      rgba(10,7,14,.98) 100%
+    );
 }
 
-.artist-image{
+.hero-content{
   position:relative;
   z-index:2;
-  width:190px;
-  height:190px;
-  flex:none;
-  border-radius:22px;
-  overflow:hidden;
-  background:
-    linear-gradient(
-      135deg,
-      #181522,
-      #302043
-    );
-  border:1px solid rgba(255,255,255,.1);
-  box-shadow:0 20px 50px rgba(0,0,0,.4);
-}
-
-.artist-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
-.artist-placeholder{
-  width:100%;
-  height:100%;
+  min-height:360px;
+  padding:38px;
   display:flex;
   align-items:center;
-  justify-content:center;
-  font-size:68px;
-  font-weight:900;
-  color:#d8b4fe;
-  background:
-    radial-gradient(
-      circle at 30% 20%,
-      rgba(192,132,252,.4),
-      transparent 35%
-    ),
-    linear-gradient(
-      135deg,
-      #17131f,
-      #291b36
-    );
+  gap:38px;
+}
+
+.artist-photo-wrap{
+  flex:0 0 250px;
+  position:relative;
+}
+
+.artist-photo{
+  width:250px;
+  height:250px;
+  object-fit:cover;
+  border-radius:26px;
+  display:block;
+  background:#1a1325;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 25px 55px rgba(0,0,0,.55),
+    0 0 60px rgba(139,92,246,.18);
+}
+
+.photo-ring{
+  position:absolute;
+  inset:-8px;
+  border-radius:32px;
+  border:1px solid rgba(168,85,247,.25);
+  pointer-events:none;
 }
 
 .artist-info{
-  position:relative;
-  z-index:2;
   min-width:0;
-  padding-bottom:4px;
+  max-width:720px;
 }
 
-.artist-label{
-  margin-bottom:8px;
+.eyebrow{
   color:#c084fc;
+  font-size:10px;
+  letter-spacing:2px;
+  font-weight:900;
   text-transform:uppercase;
-  letter-spacing:1.5px;
-  font-size:12px;
-  font-weight:800;
+  margin-bottom:9px;
 }
 
-.artist-name{
-  margin:0;
-  font-size:clamp(32px,6vw,58px);
-  line-height:1;
-  letter-spacing:-2px;
-  word-break:break-word;
-}
-
-.artist-meta{
+.artist-title{
   display:flex;
   align-items:center;
   flex-wrap:wrap;
   gap:10px;
-  margin-top:16px;
-  color:#aaa;
-  font-size:14px;
 }
 
-.meta-dot{
-  color:#666;
+.artist-title h1{
+  font-size:48px;
+  line-height:1;
+  letter-spacing:-1.8px;
+  font-weight:900;
 }
 
-.artist-bio{
-  max-width:650px;
-  margin:14px 0 0;
-  color:#aaa;
-  line-height:1.6;
-  font-size:14px;
+.verified{
+  width:22px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:#8b5cf6;
+  color:#fff;
+  font-size:12px;
+  font-weight:900;
+  box-shadow:0 0 18px rgba(139,92,246,.45);
 }
 
-/* =========================
+.artist-meta{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:9px;
+  margin-top:15px;
+}
+
+.meta-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.07);
+  color:#c0bac8;
+  font-size:11px;
+  font-weight:700;
+}
+
+.bio{
+  color:#aaa4b1;
+  line-height:1.65;
+  font-size:13px;
+  margin-top:20px;
+  max-width:680px;
+}
+
+.bio.collapsed{
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.read-more{
+  display:none;
+  border:0;
+  background:none;
+  color:#c084fc;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.hero-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:23px;
+}
+
+.primary-btn,
+.secondary-btn{
+  border:0;
+  cursor:pointer;
+  border-radius:12px;
+  padding:12px 18px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:900;
+  transition:.2s ease;
+}
+
+.primary-btn{
+  background:
+    linear-gradient(
+      135deg,
+      #8b5cf6,
+      #a855f7
+    );
+  color:#fff;
+  box-shadow:
+    0 10px 28px rgba(139,92,246,.28);
+}
+
+.primary-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 15px 35px rgba(139,92,246,.38);
+}
+
+.secondary-btn{
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10);
+  color:#eee;
+}
+
+.secondary-btn:hover{
+  background:rgba(255,255,255,.09);
+}
+
+.following{
+  background:rgba(139,92,246,.18);
+  border-color:rgba(139,92,246,.35);
+}
+
+.stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:28px;
+  margin-top:28px;
+}
+
+.stat{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.stat strong{
+  font-size:19px;
+  font-weight:900;
+}
+
+.stat span{
+  color:#817b89;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:800;
+}
+
+/* =========================================================
    CONTENT
-========================= */
+========================================================= */
 
 .section{
   margin-top:38px;
@@ -299,463 +434,1465 @@ main{
 
 .section-head{
   display:flex;
-  align-items:end;
+  align-items:flex-end;
   justify-content:space-between;
-  gap:16px;
-  margin-bottom:18px;
+  margin-bottom:16px;
 }
 
 .section-title{
-  margin:0;
-  font-size:25px;
-  letter-spacing:-.7px;
+  font-size:21px;
+  font-weight:900;
+  letter-spacing:-.4px;
 }
 
 .section-subtitle{
-  margin:5px 0 0;
-  color:#777;
-  font-size:13px;
+  color:#756f7d;
+  font-size:11px;
+  margin-top:4px;
 }
 
-/* =========================
-   SONGS
-========================= */
+.section-action{
+  color:#b58cff;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:800;
+}
 
-.song-list{
-  display:grid;
-  gap:10px;
+/* =========================================================
+   FEATURED
+========================================================= */
+
+.featured{
+  position:relative;
+  overflow:hidden;
+  min-height:210px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.07);
+  background:
+    linear-gradient(
+      120deg,
+      rgba(139,92,246,.15),
+      rgba(18,14,25,.96) 65%
+    );
+}
+
+.featured-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:.12;
+  filter:blur(15px);
+}
+
+.featured-content{
+  position:relative;
+  z-index:2;
+  padding:25px;
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+.featured-cover{
+  width:160px;
+  height:160px;
+  object-fit:cover;
+  border-radius:18px;
+  flex-shrink:0;
+  box-shadow:0 20px 45px rgba(0,0,0,.45);
+}
+
+.featured-label{
+  color:#c084fc;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-weight:900;
+  margin-bottom:7px;
+}
+
+.featured-title{
+  font-size:26px;
+  font-weight:900;
+  letter-spacing:-.7px;
+}
+
+.featured-artist{
+  color:#908999;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.featured-meta{
+  color:#777180;
+  font-size:11px;
+  margin-top:13px;
+}
+
+.featured-actions{
+  margin-top:20px;
+  display:flex;
+  gap:9px;
+}
+
+/* =========================================================
+   SONG LIST
+========================================================= */
+
+.music-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
 }
 
 .song-card{
-  display:flex;
+  position:relative;
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr) auto auto;
   align-items:center;
-  gap:15px;
+  gap:14px;
   min-height:78px;
-  padding:10px 14px;
-  border:1px solid rgba(255,255,255,.07);
+  padding:9px 13px 9px 9px;
   border-radius:16px;
-  background:rgba(255,255,255,.035);
-  transition:
-    transform .2s,
-    background .2s,
-    border-color .2s;
+  border:1px solid rgba(255,255,255,.055);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.018)
+    );
+  transition:.2s ease;
 }
 
 .song-card:hover{
-  transform:translateY(-2px);
-  background:rgba(255,255,255,.06);
-  border-color:rgba(192,132,252,.22);
+  transform:translateY(-1px);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(139,92,246,.12),
+      rgba(255,255,255,.025)
+    );
+  border-color:rgba(139,92,246,.22);
 }
 
 .song-cover{
   width:58px;
   height:58px;
-  flex:none;
   border-radius:11px;
-  overflow:hidden;
-  background:#17131f;
-}
-
-.song-cover img{
-  width:100%;
-  height:100%;
   object-fit:cover;
-  display:block;
-}
-
-.song-cover-placeholder{
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#c084fc;
-  font-size:20px;
-  font-weight:900;
+  background:#171220;
 }
 
 .song-main{
   min-width:0;
-  flex:1;
 }
 
 .song-title{
-  margin:0 0 5px;
-  font-size:15px;
-  font-weight:800;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.song-genre{
-  color:#888;
-  font-size:12px;
-}
-
-.song-action{
-  flex:none;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.play-btn,
-.view-btn{
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:10px;
-  padding:9px 13px;
-  background:rgba(255,255,255,.05);
-  color:#fff;
-  cursor:pointer;
-  font-size:12px;
-  font-weight:700;
-}
-
-.play-btn:hover,
-.view-btn:hover{
-  background:rgba(139,92,246,.18);
-  border-color:rgba(192,132,252,.35);
-}
-
-.play-btn{
-  width:40px;
-  height:40px;
-  padding:0;
-  border-radius:50%;
-  background:#8b5cf6;
-  border-color:#8b5cf6;
-}
-
-.play-btn:hover{
-  background:#9d6df7;
-}
-
-/* =========================
-   PLAYER
-========================= */
-
-.player{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  z-index:100;
-  width:min(600px,calc(100% - 24px));
-  transform:translateX(-50%);
-  display:none;
-  align-items:center;
-  gap:12px;
-  padding:11px 14px;
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:18px;
-  background:rgba(15,13,22,.94);
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
-  backdrop-filter:blur(20px);
-}
-
-.player.show{
-  display:flex;
-}
-
-.player-cover{
-  width:44px;
-  height:44px;
-  flex:none;
-  border-radius:9px;
-  object-fit:cover;
-  background:#17131f;
-}
-
-.player-info{
-  min-width:0;
-  flex:1;
-}
-
-.player-title{
   font-size:13px;
-  font-weight:800;
+  font-weight:850;
+  color:#fff;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.player-artist{
-  margin-top:3px;
-  color:#888;
-  font-size:11px;
+.song-sub{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:6px;
 }
 
-.player audio{
-  width:230px;
-  max-width:42%;
+.song-sub span{
+  color:#7e7887;
+  font-size:10px;
 }
 
-/* =========================
-   STATES
-========================= */
-
-.state{
-  padding:70px 20px;
-  text-align:center;
-  color:#888;
-}
-
-.spinner{
-  width:32px;
-  height:32px;
-  margin:0 auto 14px;
-  border:3px solid rgba(255,255,255,.1);
-  border-top-color:#8b5cf6;
+.dot{
+  width:3px;
+  height:3px;
+  background:#655f6c;
   border-radius:50%;
-  animation:spin .8s linear infinite;
 }
 
-@keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
+.song-plays{
+  color:#817b89;
+  font-size:10px;
+  white-space:nowrap;
 }
 
-.error{
-  color:#fca5a5;
-}
-
-.empty-icon{
-  width:60px;
-  height:60px;
-  margin:0 auto 15px;
+.play-small{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:0;
+  cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
+  background:#8b5cf6;
+  color:#fff;
+  box-shadow:0 7px 20px rgba(139,92,246,.22);
+  transition:.2s ease;
+}
+
+.play-small:hover{
+  transform:scale(1.07);
+}
+
+.view-btn{
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.04);
+  color:#e7e2eb;
+  padding:8px 12px;
+  border-radius:9px;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:800;
+}
+
+.view-btn:hover{
+  background:rgba(255,255,255,.08);
+}
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+.about-card{
+  padding:24px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.06);
+  background:rgba(255,255,255,.025);
+}
+
+.about-card p{
+  color:#96909d;
+  line-height:1.75;
+  font-size:13px;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.loading{
+  min-height:320px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#918b99;
+  font-size:13px;
+}
+
+.spinner{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.10);
+  border-top-color:#a855f7;
+  animation:spin .8s linear infinite;
+  margin-right:10px;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+.error-box{
+  padding:30px;
   border-radius:18px;
-  background:rgba(139,92,246,.1);
-  color:#c084fc;
-  font-size:25px;
+  border:1px solid rgba(239,68,68,.18);
+  background:rgba(239,68,68,.06);
+  color:#fca5a5;
+  font-size:13px;
 }
 
-.hidden{
-  display:none!important;
+/* =========================================================
+   PLAYER
+========================================================= */
+
+.player{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:1500;
+  min-height:76px;
+  background:rgba(10,8,15,.96);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.08);
+  box-shadow:0 -20px 50px rgba(0,0,0,.35);
 }
 
-/* =========================
-   FOOTER
-========================= */
-
-footer{
-  padding:28px 20px;
-  text-align:center;
-  color:#666;
-  font-size:12px;
-  border-top:1px solid rgba(255,255,255,.06);
+.player-inner{
+  max-width:1280px;
+  margin:auto;
+  min-height:76px;
+  padding:10px 22px;
+  display:grid;
+  grid-template-columns:minmax(180px,1fr) auto minmax(180px,1fr);
+  align-items:center;
+  gap:20px;
 }
 
-/* =========================
+.now-playing{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.now-cover{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:9px;
+  background:#18131f;
+}
+
+.now-info{
+  min-width:0;
+}
+
+.now-title{
+  font-size:11px;
+  font-weight:850;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.now-artist{
+  color:#777180;
+  font-size:9px;
+  margin-top:4px;
+}
+
+.controls{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+
+.control-btn{
+  border:0;
+  background:none;
+  color:#aaa4b1;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.control-btn:hover{
+  color:#fff;
+}
+
+.main-play{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  border:0;
+  background:#8b5cf6;
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 25px rgba(139,92,246,.30);
+}
+
+.player-right{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
+}
+
+.volume{
+  width:100px;
+}
+
+.progress-wrap{
+  position:absolute;
+  top:-2px;
+  left:0;
+  right:0;
+  height:3px;
+  background:rgba(255,255,255,.06);
+}
+
+.progress{
+  width:0%;
+  height:100%;
+  background:
+    linear-gradient(
+      90deg,
+      #8b5cf6,
+      #d946ef
+    );
+}
+
+/* =========================================================
    MOBILE
-========================= */
+========================================================= */
 
-@media(max-width:800px){
+.mobile-nav{
+  display:none;
+}
 
-  .header{
-    padding:0 15px;
-  }
+@media(max-width:850px){
 
   .nav{
+    padding:0 14px;
+  }
+
+  .nav-links{
     display:none;
   }
 
   main{
-    width:min(100% - 20px,1180px);
-    padding-top:18px;
+    padding:
+      18px
+      14px
+      145px;
   }
 
   .artist-hero{
+    border-radius:22px;
+  }
+
+  .hero-content{
     min-height:auto;
+    padding:24px 18px 25px;
     flex-direction:column;
-    align-items:flex-start;
-    padding:22px;
-    gap:20px;
+    align-items:center;
+    text-align:center;
+    gap:22px;
   }
 
-  .artist-image{
-    width:145px;
-    height:145px;
-    border-radius:18px;
+  .artist-photo-wrap{
+    flex-basis:auto;
   }
 
-  .artist-name{
-    font-size:38px;
+  .artist-photo{
+    width:190px;
+    height:190px;
+    border-radius:22px;
+  }
+
+  .artist-title{
+    justify-content:center;
+  }
+
+  .artist-title h1{
+    font-size:34px;
+  }
+
+  .artist-meta{
+    justify-content:center;
+  }
+
+  .bio{
+    font-size:12px;
+    max-width:none;
+  }
+
+  .hero-actions{
+    justify-content:center;
+  }
+
+  .stats{
+    justify-content:center;
+    gap:24px;
+  }
+
+  .featured-content{
+    padding:18px;
+    gap:15px;
+  }
+
+  .featured-cover{
+    width:110px;
+    height:110px;
+    border-radius:14px;
+  }
+
+  .featured-title{
+    font-size:18px;
+  }
+
+  .featured-meta{
+    font-size:10px;
+  }
+
+  .featured-actions{
+    margin-top:12px;
   }
 
   .song-card{
-    padding:9px;
+    grid-template-columns:50px minmax(0,1fr) auto;
+    gap:10px;
   }
 
-  .song-action .view-btn{
+  .song-cover{
+    width:50px;
+    height:50px;
+  }
+
+  .song-plays,
+  .view-btn{
     display:none;
   }
 
-  .player{
-    bottom:8px;
-    padding:9px;
+  .player-inner{
+    padding:8px 12px;
+    grid-template-columns:1fr auto;
   }
 
-  .player audio{
+  .player-right{
     display:none;
   }
 
+  .controls{
+    gap:8px;
+  }
+
+  .control-btn{
+    display:none;
+  }
+
+  .main-play{
+    width:38px;
+    height:38px;
+  }
+
+  .mobile-nav{
+    position:fixed;
+    display:flex;
+    left:10px;
+    right:10px;
+    bottom:84px;
+    z-index:1400;
+    height:52px;
+    border-radius:17px;
+    background:rgba(18,14,25,.94);
+    backdrop-filter:blur(18px);
+    border:1px solid rgba(255,255,255,.08);
+    align-items:center;
+    justify-content:space-around;
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+  }
+
+  .mobile-nav a{
+    color:#797381;
+    text-decoration:none;
+    font-size:9px;
+    font-weight:800;
+    text-align:center;
+  }
+
+  .mobile-nav a.active{
+    color:#c084fc;
+  }
+
+  .mobile-nav-icon{
+    display:block;
+    font-size:16px;
+    margin-bottom:2px;
+  }
 }
 
-</style>
+@media(max-width:480px){
 
+  .artist-photo{
+    width:165px;
+    height:165px;
+  }
+
+  .artist-title h1{
+    font-size:30px;
+  }
+
+  .featured{
+    min-height:160px;
+  }
+
+  .featured-content{
+    align-items:flex-start;
+  }
+
+  .featured-cover{
+    width:92px;
+    height:92px;
+  }
+
+  .featured-title{
+    font-size:16px;
+  }
+
+  .primary-btn,
+  .secondary-btn{
+    padding:11px 14px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<div class="page">
+<header>
+  <div class="nav">
 
-<header class="header">
-
-  <a
-    class="logo"
-    href="index.html">
-
-    <span class="logo-mark">◈</span>
-    <span>PASONG</span>
-
-  </a>
-
-  <nav class="nav">
-
-    <a href="index.html">
-      Home
+    <a href="index.html" class="logo">
+      <span class="logo-mark"></span>
+      PASONG
     </a>
 
-    <a href="store.html">
-      Music Store
-    </a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html" class="active">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
+    </nav>
 
-    <a href="charts.html">
-      Charts
-    </a>
+    <button
+      class="account-btn"
+      onclick="location.href='account.html'"
+      aria-label="Account">
+      •
+    </button>
 
-    <a
-      href="artists.html"
-      class="active">
-      Artists
-    </a>
-
-    <a href="playlists.html">
-      Playlists
-    </a>
-
-    <a href="promotion.html">
-      Promotion
-    </a>
-
-  </nav>
-
-  <a
-    class="account"
-    href="account.html">
-    ◉
-  </a>
-
+  </div>
 </header>
-
 
 <main>
 
-  <a
-    href="artists.html"
-    class="back">
+  <a href="artists.html" class="back">
     ← Back to Artists
   </a>
 
+  <div id="pageContent">
 
-  <div id="loadingState" class="state">
-
-    <div class="spinner"></div>
-
-    Loading artist...
-
-  </div>
-
-
-  <div
-    id="errorState"
-    class="state hidden">
-
-    <div class="empty-icon">
-      !
-    </div>
-
-    <div id="errorMessage">
-      Artist could not be loaded.
+    <div class="loading">
+      <div class="spinner"></div>
+      Loading artist...
     </div>
 
   </div>
 
+</main>
 
-  <div
-    id="artistContent"
-    class="hidden">
+<div class="mobile-nav">
 
+  <a href="index.html">
+    <span class="mobile-nav-icon">⌂</span>
+    Home
+  </a>
+
+  <a href="store.html">
+    <span class="mobile-nav-icon">♫</span>
+    Music
+  </a>
+
+  <a href="artists.html" class="active">
+    <span class="mobile-nav-icon">♟</span>
+    Artists
+  </a>
+
+  <a href="charts.html">
+    <span class="mobile-nav-icon">▥</span>
+    Charts
+  </a>
+
+  <a href="account.html">
+    <span class="mobile-nav-icon">●</span>
+    Account
+  </a>
+
+</div>
+
+<div class="player">
+
+  <div class="progress-wrap">
+    <div class="progress" id="progressBar"></div>
+  </div>
+
+  <div class="player-inner">
+
+    <div class="now-playing">
+
+      <img
+        id="nowCover"
+        class="now-cover"
+        src=""
+        alt="">
+
+      <div class="now-info">
+        <div id="nowTitle" class="now-title">
+          Nothing playing
+        </div>
+
+        <div id="nowArtist" class="now-artist">
+          PASONG
+        </div>
+      </div>
+
+    </div>
+
+    <div class="controls">
+
+      <button
+        class="control-btn"
+        onclick="previousSong()">
+        ↶
+      </button>
+
+      <button
+        id="mainPlay"
+        class="main-play"
+        onclick="togglePlayer()">
+        ▶
+      </button>
+
+      <button
+        class="control-btn"
+        onclick="nextSong()">
+        ↷
+      </button>
+
+    </div>
+
+    <div class="player-right">
+
+      <span
+        id="timeLabel"
+        style="font-size:9px;color:#777180;">
+        0:00 / 0:00
+      </span>
+
+      <input
+        id="volumeControl"
+        class="volume"
+        type="range"
+        min="0"
+        max="1"
+        step=".01"
+        value=".8">
+
+    </div>
+
+  </div>
+
+</div>
+
+<audio id="audioPlayer" preload="metadata"></audio>
+
+<script>
+
+/* =========================================================
+   PASONG CONFIG
+========================================================= */
+
+const API_URL =
+  "https://pasong-api.onrender.com";
+
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let artist = null;
+let songs = [];
+let currentSongIndex = -1;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function getParams(){
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return {
+
+    id:
+      params.get("id") ||
+      params.get("artist_id") ||
+      params.get("artistId") ||
+      params.get("user_id") ||
+      params.get("userId"),
+
+    name:
+      params.get("name") ||
+      params.get("artist")
+
+  };
+
+}
+
+
+function getArtistName(profile){
+
+  return (
+    profile?.performing_name ||
+    profile?.stage_name ||
+    profile?.artist_name ||
+    "Artist"
+  );
+
+}
+
+
+function getArtistImage(profile){
+
+  return (
+    profile?.profile_image_url ||
+    profile?.profile_photo_url ||
+    profile?.avatar_url ||
+    ""
+  );
+
+}
+
+
+function formatNumber(value){
+
+  const number =
+    Number(value || 0);
+
+  if(number >= 1000000){
+
+    return (
+      (number / 1000000)
+        .toFixed(number >= 10000000 ? 0 : 1)
+        .replace(".0","")
+      + "M"
+    );
+
+  }
+
+  if(number >= 1000){
+
+    return (
+      (number / 1000)
+        .toFixed(number >= 10000 ? 0 : 1)
+        .replace(".0","")
+      + "K"
+    );
+
+  }
+
+  return number.toLocaleString();
+
+}
+
+
+function formatTime(seconds){
+
+  if(!Number.isFinite(seconds)){
+    return "0:00";
+  }
+
+  const mins =
+    Math.floor(seconds / 60);
+
+  const secs =
+    Math.floor(seconds % 60)
+      .toString()
+      .padStart(2,"0");
+
+  return mins + ":" + secs;
+
+}
+
+
+function fallbackImage(text){
+
+  const safe =
+    encodeURIComponent(
+      text || "PASONG"
+    );
+
+  return (
+    "data:image/svg+xml;charset=UTF-8," +
+    "<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'>" +
+    "<defs>" +
+    "<linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>" +
+    "<stop offset='0%' stop-color='#24123d'/>" +
+    "<stop offset='100%' stop-color='#0d0815'/>" +
+    "</linearGradient>" +
+    "</defs>" +
+    "<rect width='100%' height='100%' fill='url(#g)'/>" +
+    "<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#c084fc' font-size='52' font-family='Arial' font-weight='900'>" +
+    safe +
+    "</text>" +
+    "</svg>"
+  );
+
+}
+
+
+/* =========================================================
+   LOAD SONGS
+========================================================= */
+
+async function loadSongs(){
+
+  const response =
+    await fetch(
+      API_URL + "/api/songs",
+      {
+        method:"GET",
+        headers:{
+          "Accept":"application/json"
+        }
+      }
+    );
+
+  if(!response.ok){
+
+    throw new Error(
+      "Unable to load PASONG music."
+    );
+
+  }
+
+  const data =
+    await response.json();
+
+  return Array.isArray(data.songs)
+    ? data.songs
+    : [];
+
+}
+
+
+/* =========================================================
+   FIND ARTIST
+========================================================= */
+
+function findArtist(allSongs){
+
+  const params =
+    getParams();
+
+  const requestedId =
+    String(params.id || "")
+      .trim();
+
+  const requestedName =
+    String(params.name || "")
+      .trim()
+      .toLowerCase();
+
+  let matchingSongs =
+    allSongs.filter(song=>{
+
+      const profile =
+        song.artist ||
+        song.artist_profile ||
+        song.artist_profiles ||
+        {};
+
+      const profileId =
+        String(
+          profile.id ||
+          song.artist_id ||
+          ""
+        );
+
+      const userId =
+        String(
+          profile.user_id ||
+          song.artist_user_id ||
+          ""
+        );
+
+      if(
+        requestedId &&
+        (
+          profileId === requestedId ||
+          userId === requestedId ||
+          String(song.artist_id || "") === requestedId ||
+          String(song.artist_user_id || "") === requestedId
+        )
+      ){
+        return true;
+      }
+
+      if(requestedName){
+
+        const name =
+          getArtistName(profile)
+            .toLowerCase();
+
+        return name === requestedName;
+
+      }
+
+      return false;
+
+    });
+
+
+  /*
+    If no ID/name was supplied, use the
+    first artist represented in the song list.
+    This keeps the page from appearing blank.
+  */
+
+  if(
+    !matchingSongs.length &&
+    !requestedId &&
+    !requestedName &&
+    allSongs.length
+  ){
+
+    matchingSongs =
+      [allSongs[0]];
+
+  }
+
+
+  if(!matchingSongs.length){
+
+    return {
+      profile:null,
+      songs:[]
+    };
+
+  }
+
+
+  const first =
+    matchingSongs[0];
+
+  const profile =
+    first.artist ||
+    first.artist_profile ||
+    first.artist_profiles ||
+    {
+
+      id:first.artist_id ||
+      null,
+
+      user_id:first.artist_user_id ||
+      null,
+
+      artist_name:
+        first.artist_name ||
+        null
+
+    };
+
+
+  return {
+
+    profile,
+
+    songs:
+      matchingSongs
+
+  };
+
+}
+
+
+/* =========================================================
+   RENDER PAGE
+========================================================= */
+
+function renderArtist(){
+
+  const container =
+    document.getElementById(
+      "pageContent"
+    );
+
+  if(!artist){
+
+    container.innerHTML = `
+      <div class="error-box">
+        This artist could not be found.
+        <br><br>
+        <a
+          href="artists.html"
+          style="color:#c084fc;">
+          Return to Artists
+        </a>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const name =
+    getArtistName(artist);
+
+  const image =
+    getArtistImage(artist) ||
+    fallbackImage(name);
+
+  const bio =
+    artist.bio ||
+    "Discover music from this artist on PASONG.";
+
+
+  const totalPlays =
+    songs.reduce(
+      (sum,song)=>
+        sum +
+        Number(song.play_count || 0),
+      0
+    );
+
+
+  const location =
+    artist.location ||
+    "Uganda";
+
+
+  const featured =
+    songs[0] || null;
+
+
+  const featuredCover =
+    featured?.cover_url ||
+    fallbackImage(
+      featured?.title ||
+      "PASONG"
+    );
+
+
+  container.innerHTML = `
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
     <section class="artist-hero">
 
-      <div class="artist-image">
-
-        <img
-          id="artistImage"
-          class="hidden"
-          alt="Artist">
-
-        <div
-          id="artistPlaceholder"
-          class="artist-placeholder">
-          A
-        </div>
-
+      <div
+        class="hero-background"
+        style="
+          background-image:url('${image}');
+        ">
       </div>
 
+      <div class="hero-content">
 
-      <div class="artist-info">
+        <div class="artist-photo-wrap">
 
-        <div class="artist-label">
-          PASONG Artist
-        </div>
+          <img
+            class="artist-photo"
+            src="${escapeHtml(image)}"
+            alt="${escapeHtml(name)}"
+            onerror="
+              this.onerror=null;
+              this.src='${fallbackImage(name)}';
+            ">
 
-        <h1
-          id="artistName"
-          class="artist-name">
-          Artist
-        </h1>
-
-        <div class="artist-meta">
-
-          <span id="songCount">
-            0 songs
-          </span>
-
-          <span class="meta-dot">
-            •
-          </span>
-
-          <span>
-            PASONG Music
-          </span>
+          <div class="photo-ring"></div>
 
         </div>
 
-        <p
-          id="artistBio"
-          class="artist-bio hidden">
-        </p>
+
+        <div class="artist-info">
+
+          <div class="eyebrow">
+            PASONG ARTIST
+          </div>
+
+
+          <div class="artist-title">
+
+            <h1>
+              ${escapeHtml(name)}
+            </h1>
+
+            <span
+              class="verified"
+              title="PASONG Artist">
+              ✓
+            </span>
+
+          </div>
+
+
+          <div class="artist-meta">
+
+            <span class="meta-pill">
+              📍
+              ${escapeHtml(location)}
+            </span>
+
+            <span class="meta-pill">
+              🎵
+              Artist
+            </span>
+
+            <span class="meta-pill">
+              PASONG Music
+            </span>
+
+          </div>
+
+
+          <div
+            id="bioText"
+            class="bio collapsed">
+
+            ${escapeHtml(bio)}
+
+          </div>
+
+
+          <button
+            id="readMoreBtn"
+            class="read-more"
+            onclick="toggleBio()">
+            Read more
+          </button>
+
+
+          <div class="hero-actions">
+
+            <button
+              id="followButton"
+              class="primary-btn"
+              onclick="toggleFollow()">
+
+              ＋ Follow
+
+            </button>
+
+
+            <button
+              class="secondary-btn"
+              onclick="playAll()">
+
+              ▶ Play all
+
+            </button>
+
+
+            <button
+              class="secondary-btn"
+              onclick="shareArtist()">
+
+              ↗ Share
+
+            </button>
+
+          </div>
+
+
+          <div class="stats">
+
+            <div class="stat">
+              <strong>
+                ${songs.length}
+              </strong>
+              <span>Songs</span>
+            </div>
+
+
+            <div class="stat">
+              <strong>
+                ${formatNumber(totalPlays)}
+              </strong>
+              <span>Plays</span>
+            </div>
+
+
+            <div class="stat">
+              <strong>
+                ${formatNumber(
+                  Number(
+                    localStorage.getItem(
+                      "pasong_artist_followers_" +
+                      (
+                        artist.id ||
+                        artist.user_id ||
+                        name
+                      )
+                    ) || 0
+                  )
+                )}
+              </strong>
+              <span>Fans</span>
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
     </section>
 
+
+    <!-- =====================================================
+         FEATURED
+    ====================================================== -->
+
+    ${
+      featured
+      ? `
+
+      <section class="section">
+
+        <div class="section-head">
+
+          <div>
+            <div class="section-title">
+              Featured release
+            </div>
+
+            <div class="section-subtitle">
+              Start listening to ${escapeHtml(name)}
+            </div>
+          </div>
+
+        </div>
+
+
+        <div class="featured">
+
+          <div
+            class="featured-bg"
+            style="
+              background-image:
+              url('${escapeHtml(featuredCover)}');
+            ">
+          </div>
+
+
+          <div class="featured-content">
+
+            <img
+              class="featured-cover"
+              src="${escapeHtml(featuredCover)}"
+              alt="${escapeHtml(featured.title || "Song")}"
+              onerror="
+                this.onerror=null;
+                this.src='${fallbackImage("PASONG")}';
+              ">
+
+
+            <div>
+
+              <div class="featured-label">
+                Latest release
+              </div>
+
+              <div class="featured-title">
+                ${escapeHtml(
+                  featured.title ||
+                  "Untitled"
+                )}
+              </div>
+
+              <div class="featured-artist">
+                ${escapeHtml(name)}
+              </div>
+
+              <div class="featured-meta">
+
+                ${
+                  featured.genre
+                    ? escapeHtml(featured.genre)
+                    : "Music"
+                }
+
+                •
+                ${formatNumber(
+                  featured.play_count || 0
+                )}
+                plays
+
+              </div>
+
+
+              <div class="featured-actions">
+
+                <button
+                  class="primary-btn"
+                  onclick="
+                    playSong(0);
+                  ">
+
+                  ▶ Play
+
+                </button>
+
+
+                <a
+                  class="secondary-btn"
+                  href="
+                    pasong.html?id=${encodeURIComponent(
+                      featured.id
+                    )}
+                  ">
+
+                  View song
+
+                </a>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      `
+      : ""
+    }
+
+
+    <!-- =====================================================
+         MUSIC
+    ====================================================== -->
 
     <section class="section">
 
@@ -763,823 +1900,803 @@ footer{
 
         <div>
 
-          <h2 class="section-title">
+          <div class="section-title">
             Music
-          </h2>
+          </div>
 
-          <p class="section-subtitle">
-            Explore music from this artist.
-          </p>
+          <div class="section-subtitle">
+            Explore music from ${escapeHtml(name)}
+          </div>
 
         </div>
+
+        ${
+          songs.length
+            ? `
+              <button
+                class="secondary-btn"
+                onclick="playAll()"
+                style="
+                  padding:8px 12px;
+                  font-size:10px;
+                ">
+                ▶ Play all
+              </button>
+            `
+            : ""
+        }
 
       </div>
 
 
       <div
-        id="songsList"
-        class="song-list">
-      </div>
+        id="musicList"
+        class="music-list">
 
-
-      <div
-        id="songsEmpty"
-        class="state hidden">
-
-        <div class="empty-icon">
-          ♪
-        </div>
-
-        This artist has no songs yet.
+        ${
+          songs.length
+            ? songs.map(
+                (song,index)=>
+                  renderSong(song,index)
+              ).join("")
+            : `
+              <div class="error-box">
+                This artist has no published music yet.
+              </div>
+            `
+        }
 
       </div>
 
     </section>
 
-  </div>
 
-</main>
+    <!-- =====================================================
+         ABOUT
+    ====================================================== -->
 
+    <section class="section">
 
-<div
-  id="player"
-  class="player">
+      <div class="section-head">
 
-  <img
-    id="playerCover"
-    class="player-cover"
-    alt="">
+        <div>
+          <div class="section-title">
+            About ${escapeHtml(name)}
+          </div>
 
-  <div class="player-info">
-
-    <div
-      id="playerTitle"
-      class="player-title">
-      Song
-    </div>
-
-    <div
-      id="playerArtist"
-      class="player-artist">
-      Artist
-    </div>
-
-  </div>
-
-  <audio
-    id="audioPlayer"
-    controls
-    preload="none">
-  </audio>
-
-</div>
-
-
-<footer>
-  © PASONG — Music. Opportunity. Support.
-</footer>
-
-</div>
-
-
-<script>
-
-const API_BASE =
-  "https://pasong-api.onrender.com";
-
-const params =
-  new URLSearchParams(
-    window.location.search
-  );
-
-const artistId =
-  params.get("id");
-
-
-const loadingState =
-  document.getElementById(
-    "loadingState"
-  );
-
-const errorState =
-  document.getElementById(
-    "errorState"
-  );
-
-const errorMessage =
-  document.getElementById(
-    "errorMessage"
-  );
-
-const artistContent =
-  document.getElementById(
-    "artistContent"
-  );
-
-const artistName =
-  document.getElementById(
-    "artistName"
-  );
-
-const artistImage =
-  document.getElementById(
-    "artistImage"
-  );
-
-const artistPlaceholder =
-  document.getElementById(
-    "artistPlaceholder"
-  );
-
-const artistBio =
-  document.getElementById(
-    "artistBio"
-  );
-
-const songCount =
-  document.getElementById(
-    "songCount"
-  );
-
-const songsList =
-  document.getElementById(
-    "songsList"
-  );
-
-const songsEmpty =
-  document.getElementById(
-    "songsEmpty"
-  );
-
-const player =
-  document.getElementById(
-    "player"
-  );
-
-const playerCover =
-  document.getElementById(
-    "playerCover"
-  );
-
-const playerTitle =
-  document.getElementById(
-    "playerTitle"
-  );
-
-const playerArtist =
-  document.getElementById(
-    "playerArtist"
-  );
-
-const audioPlayer =
-  document.getElementById(
-    "audioPlayer"
-  );
-
-
-function firstValue(...values){
-
-  for(const value of values){
-
-    if(
-      value !== undefined &&
-      value !== null &&
-      String(value).trim() !== ""
-    ){
-
-      return value;
-
-    }
-
-  }
-
-  return null;
-
-}
-
-
-function getArtistId(song){
-
-  return firstValue(
-    song.artist_id,
-    song.artistId,
-    song.artist?.id,
-    song.artist_profile?.id,
-    song.artistProfile?.id
-  );
-
-}
-
-
-function getArtistName(song){
-
-  return firstValue(
-
-    song.artist_name,
-    song.artistName,
-
-    song.artist?.performing_name,
-    song.artist?.performingName,
-    song.artist?.stage_name,
-    song.artist?.stageName,
-    song.artist?.name,
-
-    song.artist_profile?.performing_name,
-    song.artist_profile?.performingName,
-    song.artist_profile?.stage_name,
-    song.artist_profile?.stageName,
-    song.artist_profile?.name,
-
-    song.artistProfile?.performing_name,
-    song.artistProfile?.performingName,
-    song.artistProfile?.stage_name,
-    song.artistProfile?.stageName,
-    song.artistProfile?.name,
-
-    song.artist
-
-  );
-
-}
-
-
-function getArtistImage(song){
-
-  return firstValue(
-
-    song.artist_image_url,
-    song.artistImageUrl,
-
-    song.artist?.profile_image_url,
-    song.artist?.profileImageUrl,
-    song.artist?.image_url,
-    song.artist?.imageUrl,
-    song.artist?.avatar_url,
-
-    song.artist_profile?.profile_image_url,
-    song.artist_profile?.profileImageUrl,
-    song.artist_profile?.image_url,
-    song.artist_profile?.imageUrl,
-    song.artist_profile?.avatar_url,
-
-    song.artistProfile?.profile_image_url,
-    song.artistProfile?.profileImageUrl,
-    song.artistProfile?.image_url,
-    song.artistProfile?.imageUrl,
-    song.artistProfile?.avatar_url
-
-  );
-
-}
-
-
-function getArtistBio(song){
-
-  return firstValue(
-
-    song.artist_bio,
-
-    song.artist?.bio,
-    song.artist?.description,
-
-    song.artist_profile?.bio,
-    song.artist_profile?.description,
-
-    song.artistProfile?.bio,
-    song.artistProfile?.description
-
-  );
-
-}
-
-
-function getSongTitle(song){
-
-  return firstValue(
-    song.title,
-    song.song_title,
-    song.name,
-    "Untitled Song"
-  );
-
-}
-
-
-function getSongGenre(song){
-
-  return firstValue(
-    song.genre,
-    song.category,
-    "Music"
-  );
-
-}
-
-
-function getSongCover(song){
-
-  return firstValue(
-
-    song.cover_url,
-    song.coverUrl,
-
-    song.cover_image_url,
-    song.coverImageUrl,
-
-    song.cover,
-
-    song.image_url,
-    song.imageUrl,
-
-    song.thumbnail_url,
-    song.thumbnailUrl
-
-  );
-
-}
-
-
-function getPreviewUrl(song){
-
-  return firstValue(
-
-    song.preview_url,
-    song.previewUrl,
-
-    song.audio_url,
-    song.audioUrl,
-
-    song.stream_url,
-    song.streamUrl
-
-  );
-
-}
-
-
-function getSongUrl(song){
-
-  const id =
-    firstValue(
-      song.id,
-      song.song_id,
-      song.songId
-    );
-
-  if(!id){
-    return null;
-  }
-
-  return "store.html?id=" +
-    encodeURIComponent(id);
-
-}
-
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-function getInitial(name){
-
-  const clean =
-    String(name || "A")
-      .trim();
-
-  return (
-    clean.charAt(0) ||
-    "A"
-  ).toUpperCase();
-
-}
-
-
-function showError(message){
-
-  loadingState.classList.add(
-    "hidden"
-  );
-
-  artistContent.classList.add(
-    "hidden"
-  );
-
-  errorState.classList.remove(
-    "hidden"
-  );
-
-  errorMessage.textContent =
-    message;
-
-}
-
-
-function showArtistImage(url,name){
-
-  if(url){
-
-    artistImage.src = url;
-
-    artistImage.alt =
-      name + " profile image";
-
-    artistImage.classList.remove(
-      "hidden"
-    );
-
-    artistPlaceholder.classList.add(
-      "hidden"
-    );
-
-    artistImage.onerror = function(){
-
-      artistImage.classList.add(
-        "hidden"
-      );
-
-      artistPlaceholder.textContent =
-        getInitial(name);
-
-      artistPlaceholder.classList.remove(
-        "hidden"
-      );
-
-    };
-
-  }else{
-
-    artistPlaceholder.textContent =
-      getInitial(name);
-
-    artistPlaceholder.classList.remove(
-      "hidden"
-    );
-
-    artistImage.classList.add(
-      "hidden"
-    );
-
-  }
-
-}
-
-
-function renderSongs(songs,name){
-
-  songsList.innerHTML = "";
-
-  if(!songs.length){
-
-    songsEmpty.classList.remove(
-      "hidden"
-    );
-
-    return;
-
-  }
-
-  songsEmpty.classList.add(
-    "hidden"
-  );
-
-
-  songs.forEach((song,index)=>{
-
-    const title =
-      getSongTitle(song);
-
-    const genre =
-      getSongGenre(song);
-
-    const cover =
-      getSongCover(song);
-
-    const preview =
-      getPreviewUrl(song);
-
-    const songUrl =
-      getSongUrl(song);
-
-
-    const card =
-      document.createElement(
-        "div"
-      );
-
-    card.className =
-      "song-card";
-
-
-    let coverHtml;
-
-    if(cover){
-
-      coverHtml = `
-        <img
-          src="${escapeHtml(cover)}"
-          alt="${escapeHtml(title)}"
-          onerror="this.style.display='none'">
-      `;
-
-    }else{
-
-      coverHtml = `
-        <div class="song-cover-placeholder">
-          ♪
+          <div class="section-subtitle">
+            Artist profile
+          </div>
         </div>
-      `;
 
-    }
-
-
-    let actionHtml = "";
-
-
-    if(preview){
-
-      actionHtml += `
-        <button
-          class="play-btn"
-          type="button"
-          data-index="${index}"
-          title="Play preview">
-          ▶
-        </button>
-      `;
-
-    }
-
-
-    if(songUrl){
-
-      actionHtml += `
-        <a
-          class="view-btn"
-          href="${songUrl}">
-          View
-        </a>
-      `;
-
-    }
-
-
-    card.innerHTML = `
-
-      <div class="song-cover">
-        ${coverHtml}
       </div>
+
+
+      <div class="about-card">
+
+        <p>
+          ${escapeHtml(bio)}
+        </p>
+
+      </div>
+
+    </section>
+
+  `;
+
+
+  setupBioButton();
+
+}
+
+
+/* =========================================================
+   SONG CARD
+========================================================= */
+
+function renderSong(song,index){
+
+  const cover =
+    song.cover_url ||
+    fallbackImage(
+      song.title ||
+      "PASONG"
+    );
+
+
+  const title =
+    song.title ||
+    "Untitled song";
+
+
+  const genre =
+    song.genre ||
+    "Music";
+
+
+  const plays =
+    Number(
+      song.play_count || 0
+    );
+
+
+  return `
+
+    <div class="song-card">
+
+      <img
+        class="song-cover"
+        src="${escapeHtml(cover)}"
+        alt="${escapeHtml(title)}"
+        onerror="
+          this.onerror=null;
+          this.src='${fallbackImage("PASONG")}';
+        ">
+
 
       <div class="song-main">
 
-        <h3 class="song-title">
+        <div class="song-title">
           ${escapeHtml(title)}
-        </h3>
+        </div>
 
-        <div class="song-genre">
-          ${escapeHtml(genre)}
+        <div class="song-sub">
+
+          <span>
+            ${escapeHtml(genre)}
+          </span>
+
+          <span class="dot"></span>
+
+          <span>
+            ${formatNumber(plays)} plays
+          </span>
+
         </div>
 
       </div>
 
-      <div class="song-action">
-        ${actionHtml}
+
+      <div class="song-plays">
+        ${formatNumber(plays)}
       </div>
 
-    `;
+
+      <button
+        class="play-small"
+        onclick="
+          playSong(${index});
+        "
+        aria-label="Play ${escapeHtml(title)}">
+
+        ▶
+
+      </button>
 
 
-    const playButton =
-      card.querySelector(
-        ".play-btn"
-      );
+      <a
+        class="view-btn"
+        href="
+          pasong.html?id=${encodeURIComponent(
+            song.id
+          )}
+        ">
 
+        View
 
-    if(playButton){
+      </a>
 
-      playButton.addEventListener(
-        "click",
-        ()=>{
+    </div>
 
-          playSong(
-            song,
-            name
-          );
-
-        }
-      );
-
-    }
-
-
-    songsList.appendChild(card);
-
-  });
+  `;
 
 }
 
 
-function playSong(song,name){
+/* =========================================================
+   BIO
+========================================================= */
 
-  const url =
-    getPreviewUrl(song);
+function setupBioButton(){
 
-  if(!url){
+  const bio =
+    document.getElementById(
+      "bioText"
+    );
+
+  const button =
+    document.getElementById(
+      "readMoreBtn"
+    );
+
+  if(!bio || !button){
     return;
   }
 
-  const title =
-    getSongTitle(song);
 
-  const cover =
-    getSongCover(song);
+  /*
+    Show Read More only when the bio
+    is actually long enough.
+  */
 
+  if(
+    bio.scrollHeight >
+    bio.clientHeight + 5
+  ){
 
-  audioPlayer.src = url;
-
-  playerTitle.textContent =
-    title;
-
-  playerArtist.textContent =
-    name;
-
-  if(cover){
-
-    playerCover.src =
-      cover;
-
-  }else{
-
-    playerCover.removeAttribute(
-      "src"
-    );
+    button.style.display =
+      "inline-block";
 
   }
 
-  player.classList.add(
-    "show"
+}
+
+
+function toggleBio(){
+
+  const bio =
+    document.getElementById(
+      "bioText"
+    );
+
+  const button =
+    document.getElementById(
+      "readMoreBtn"
+    );
+
+  if(!bio || !button){
+    return;
+  }
+
+
+  const collapsed =
+    bio.classList.toggle(
+      "collapsed"
+    );
+
+
+  button.textContent =
+    collapsed
+      ? "Read more"
+      : "Show less";
+
+}
+
+
+/* =========================================================
+   FOLLOW
+========================================================= */
+
+function getArtistFollowKey(){
+
+  return (
+    "pasong_follow_" +
+    (
+      artist?.id ||
+      artist?.user_id ||
+      getArtistName(artist)
+    )
   );
 
-  audioPlayer.play()
-    .catch(()=>{});
+}
+
+
+function toggleFollow(){
+
+  if(!artist){
+    return;
+  }
+
+
+  const key =
+    getArtistFollowKey();
+
+
+  const currentlyFollowing =
+    localStorage.getItem(key)
+      === "true";
+
+
+  const newState =
+    !currentlyFollowing;
+
+
+  localStorage.setItem(
+    key,
+    String(newState)
+  );
+
+
+  const button =
+    document.getElementById(
+      "followButton"
+    );
+
+
+  if(button){
+
+    button.classList.toggle(
+      "following",
+      newState
+    );
+
+
+    button.innerHTML =
+      newState
+        ? "✓ Following"
+        : "＋ Follow";
+
+  }
+
+
+  /*
+    Local follower display.
+    This does not change your Supabase
+    database structure.
+  */
+
+  const followerKey =
+    "pasong_artist_followers_" +
+    (
+      artist.id ||
+      artist.user_id ||
+      getArtistName(artist)
+    );
+
+
+  let followers =
+    Number(
+      localStorage.getItem(
+        followerKey
+      ) || 0
+    );
+
+
+  if(newState){
+    followers++;
+  }else{
+    followers =
+      Math.max(
+        0,
+        followers - 1
+      );
+  }
+
+
+  localStorage.setItem(
+    followerKey,
+    String(followers)
+  );
 
 }
 
 
-async function loadArtist(){
+/* =========================================================
+   APPLY FOLLOW STATE
+========================================================= */
 
-  if(!artistId){
+function applyFollowState(){
 
-    showError(
-      "No artist was selected."
+  const button =
+    document.getElementById(
+      "followButton"
     );
 
+  if(!button){
     return;
+  }
+
+
+  const following =
+    localStorage.getItem(
+      getArtistFollowKey()
+    ) === "true";
+
+
+  if(following){
+
+    button.classList.add(
+      "following"
+    );
+
+    button.innerHTML =
+      "✓ Following";
+
+  }
+
+}
+
+
+/* =========================================================
+   SHARE
+========================================================= */
+
+async function shareArtist(){
+
+  const name =
+    getArtistName(artist);
+
+
+  const url =
+    window.location.href;
+
+
+  if(
+    navigator.share
+  ){
+
+    try{
+
+      await navigator.share({
+        title:
+          name + " — PASONG",
+        text:
+          "Listen to " +
+          name +
+          " on PASONG.",
+        url
+      });
+
+      return;
+
+    }catch(error){
+
+      /*
+        User cancelled share.
+      */
+
+    }
 
   }
 
 
   try{
 
-    const response =
-      await fetch(
-        API_BASE +
-        "/api/songs"
+    await navigator.clipboard.writeText(
+      url
+    );
+
+    alert(
+      "Artist link copied."
+    );
+
+  }catch(error){
+
+    prompt(
+      "Copy this artist link:",
+      url
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   AUDIO PLAYER
+========================================================= */
+
+const audio =
+  document.getElementById(
+    "audioPlayer"
+  );
+
+
+const mainPlay =
+  document.getElementById(
+    "mainPlay"
+  );
+
+
+const nowTitle =
+  document.getElementById(
+    "nowTitle"
+  );
+
+
+const nowArtist =
+  document.getElementById(
+    "nowArtist"
+  );
+
+
+const nowCover =
+  document.getElementById(
+    "nowCover"
+  );
+
+
+const progressBar =
+  document.getElementById(
+    "progressBar"
+  );
+
+
+const timeLabel =
+  document.getElementById(
+    "timeLabel"
+  );
+
+
+const volumeControl =
+  document.getElementById(
+    "volumeControl"
+  );
+
+
+audio.volume =
+  Number(
+    volumeControl.value
+  );
+
+
+volumeControl.addEventListener(
+  "input",
+  ()=>{
+    audio.volume =
+      Number(
+        volumeControl.value
+      );
+  }
+);
+
+
+function playSong(index){
+
+  if(
+    !songs[index]
+  ){
+    return;
+  }
+
+
+  const song =
+    songs[index];
+
+
+  const audioUrl =
+    song.preview_url ||
+    song.audio_url;
+
+
+  if(!audioUrl){
+
+    alert(
+      "This song is not available for streaming right now."
+    );
+
+    return;
+
+  }
+
+
+  currentSongIndex =
+    index;
+
+
+  audio.src =
+    audioUrl;
+
+
+  nowTitle.textContent =
+    song.title ||
+    "Untitled";
+
+
+  nowArtist.textContent =
+    getArtistName(
+      artist
+    );
+
+
+  nowCover.src =
+    song.cover_url ||
+    fallbackImage(
+      song.title ||
+      "PASONG"
+    );
+
+
+  audio.play()
+    .then(()=>{
+
+      mainPlay.textContent =
+        "❚❚";
+
+    })
+    .catch(error=>{
+
+      console.error(
+        "Audio playback error:",
+        error
       );
 
+      mainPlay.textContent =
+        "▶";
 
-    if(!response.ok){
+    });
 
-      throw new Error(
-        "Could not load songs."
-      );
+}
+
+
+function togglePlayer(){
+
+  if(!audio.src){
+
+    if(songs.length){
+
+      playSong(0);
 
     }
 
+    return;
 
-    const data =
-      await response.json();
-
-
-    const songs =
-      Array.isArray(data)
-        ? data
-        : (
-            Array.isArray(data?.songs)
-              ? data.songs
-              : (
-                  Array.isArray(data?.data)
-                    ? data.data
-                    : []
-                )
-          );
+  }
 
 
-    const artistSongs =
-      songs.filter(song=>{
+  if(audio.paused){
 
-        const id =
-          getArtistId(song);
+    audio.play();
 
-        return String(id) ===
-          String(artistId);
+    mainPlay.textContent =
+      "❚❚";
 
-      });
+  }else{
+
+    audio.pause();
+
+    mainPlay.textContent =
+      "▶";
+
+  }
+
+}
 
 
-    if(!artistSongs.length){
+function playAll(){
 
-      showError(
-        "No songs were found for this artist."
+  if(!songs.length){
+    return;
+  }
+
+  playSong(0);
+
+}
+
+
+function nextSong(){
+
+  if(!songs.length){
+    return;
+  }
+
+
+  let next =
+    currentSongIndex + 1;
+
+
+  if(next >= songs.length){
+    next = 0;
+  }
+
+
+  playSong(next);
+
+}
+
+
+function previousSong(){
+
+  if(!songs.length){
+    return;
+  }
+
+
+  let previous =
+    currentSongIndex - 1;
+
+
+  if(previous < 0){
+    previous =
+      songs.length - 1;
+  }
+
+
+  playSong(previous);
+
+}
+
+
+/* =========================================================
+   PLAYER EVENTS
+========================================================= */
+
+audio.addEventListener(
+  "play",
+  ()=>{
+    mainPlay.textContent =
+      "❚❚";
+  }
+);
+
+
+audio.addEventListener(
+  "pause",
+  ()=>{
+    mainPlay.textContent =
+      "▶";
+  }
+);
+
+
+audio.addEventListener(
+  "ended",
+  ()=>{
+    nextSong();
+  }
+);
+
+
+audio.addEventListener(
+  "timeupdate",
+  ()=>{
+
+    const duration =
+      audio.duration || 0;
+
+    const current =
+      audio.currentTime || 0;
+
+
+    const percent =
+      duration
+        ? (current / duration) * 100
+        : 0;
+
+
+    progressBar.style.width =
+      percent + "%";
+
+
+    timeLabel.textContent =
+      formatTime(current) +
+      " / " +
+      formatTime(duration);
+
+  }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+async function init(){
+
+  try{
+
+    const allSongs =
+      await loadSongs();
+
+
+    const result =
+      findArtist(
+        allSongs
       );
 
-      return;
 
-    }
-
-
-    const firstSong =
-      artistSongs[0];
+    artist =
+      result.profile;
 
 
-    const name =
-      getArtistName(firstSong) ||
-      "Unknown Artist";
+    songs =
+      result.songs;
 
 
-    const image =
-      getArtistImage(firstSong);
+    renderArtist();
 
 
-    const bio =
-      getArtistBio(firstSong);
-
-
-    artistName.textContent =
-      name;
-
-
-    document.title =
-      "PASONG — " + name;
-
-
-    songCount.textContent =
-      artistSongs.length +
-      (
-        artistSongs.length === 1
-          ? " song"
-          : " songs"
-      );
-
-
-    showArtistImage(
-      image,
-      name
-    );
-
-
-    if(bio){
-
-      artistBio.textContent =
-        bio;
-
-      artistBio.classList.remove(
-        "hidden"
-      );
-
-    }else{
-
-      artistBio.classList.add(
-        "hidden"
-      );
-
-    }
-
-
-    renderSongs(
-      artistSongs,
-      name
-    );
-
-
-    loadingState.classList.add(
-      "hidden"
-    );
-
-    errorState.classList.add(
-      "hidden"
-    );
-
-    artistContent.classList.remove(
-      "hidden"
-    );
+    applyFollowState();
 
 
   }catch(error){
@@ -1589,16 +2706,44 @@ async function loadArtist(){
       error
     );
 
-    showError(
-      "Unable to load this artist right now."
-    );
+
+    document.getElementById(
+      "pageContent"
+    ).innerHTML = `
+
+      <div class="error-box">
+
+        <strong>
+          PASONG could not load this artist.
+        </strong>
+
+        <br><br>
+
+        Please refresh the page and try again.
+
+        <br><br>
+
+        <a
+          href="artists.html"
+          style="
+            color:#c084fc;
+            font-weight:800;
+          ">
+
+          ← Return to Artists
+
+        </a>
+
+      </div>
+
+    `;
 
   }
 
 }
 
 
-loadArtist();
+init();
 
 </script>
 
