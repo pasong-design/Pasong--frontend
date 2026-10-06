@@ -1,89 +1,85 @@
-/* PASONG GLOBAL PROFILE PHOTO UPLOADER */
+/* PASONG Artist Dashboard — Profile Photo Auto-Crop Fix
+   Add this after Supabase is initialized on the Artist Dashboard.
+   It replaces only the profile-image upload behavior.
+*/
+(function () {
+  const API_URL = "https://pasong-api.onrender.com";
 
-window.PASONGProfilePhoto = window.PASONGProfilePhoto || {};
+  async function uploadArtistProfilePhoto(file) {
+    if (!file) return null;
+    if (!/^image\/(jpeg|jpg|png|webp)$/i.test(file.type)) {
+      throw new Error("Profile photo must be JPG, JPEG, PNG or WEBP.");
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("Profile photo must be 5MB or smaller.");
+    }
 
-window.PASONGProfilePhoto.upload = async function (file, accessToken) {
-  if (!file) {
-    throw new Error("Please choose a profile photo.");
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+    const token = data?.session?.access_token;
+    if (!token) throw new Error("Your PASONG login session has expired. Please log in again.");
+
+    const form = new FormData();
+    form.append("file", file);
+
+    const response = await fetch(API_URL + "/api/profile/photo", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token },
+      body: form
+    });
+
+    const raw = await response.text();
+    let result = {};
+    try { result = raw ? JSON.parse(raw) : {}; }
+    catch (_) { throw new Error("PASONG returned an invalid profile-photo response."); }
+
+    if (!response.ok) {
+      throw new Error(result.error || result.message || "Profile photo upload failed. HTTP " + response.status);
+    }
+    if (!result.secure_url) {
+      throw new Error("PASONG did not return the processed profile photo.");
+    }
+
+    return result.secure_url;
   }
 
-  if (!accessToken) {
-    throw new Error(
-      "Your PASONG login session is missing. Please log in again."
-    );
+  window.uploadArtistProfilePhoto = uploadArtistProfilePhoto;
+
+  function showMessage(message, type) {
+    const el = document.getElementById("profileMessage");
+    if (!el) return;
+    el.className = "message " + (type || "info") + " show";
+    el.textContent = message;
   }
 
-  const allowed = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp"
-  ];
+  const input = document.getElementById("profileImage");
+  if (!input) return;
 
-  if (!allowed.includes(file.type)) {
-    throw new Error(
-      "Profile photo must be JPG, JPEG, PNG or WEBP."
-    );
-  }
+  input.addEventListener("change", async function () {
+    const file = this.files?.[0];
+    if (!file) return;
 
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error(
-      "Profile photo must be 5MB or smaller."
-    );
-  }
+    const preview = document.getElementById("profilePreview");
+    if (preview) {
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+    }
 
-  const formData = new FormData();
-  formData.append("file", file);
+    try {
+      showMessage("Processing profile photo…", "info");
+      const url = await uploadArtistProfilePhoto(file);
 
-  let response;
-
-  try {
-    response = await fetch(
-      "https://pasong-api.onrender.com/api/profile/photo",
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + accessToken
-        },
-        body: formData
+      if (preview) {
+        preview.src = url;
+        preview.dataset.processedUrl = url;
       }
-    );
-  } catch (error) {
-    throw new Error(
-      "Could not connect to PASONG. Please check your internet connection and try again."
-    );
-  }
 
-  const text = await response.text();
-
-  let data = {};
-
-  try {
-    data = text ? JSON.parse(text) : {};
-  } catch (error) {
-    throw new Error(
-      "PASONG returned an invalid profile photo response."
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      data.error ||
-      data.message ||
-      "Profile photo upload failed. HTTP " + response.status
-    );
-  }
-
-  if (!data.secure_url) {
-    throw new Error(
-      "PASONG did not return the processed profile photo."
-    );
-  }
-
-  return data;
-};
-
-window.PASONGProfilePhoto.setPreview = function (imgElement, url) {
-  if (!imgElement || !url) return;
-  imgElement.src = url;
-};
+      /* Keep the URL available to saveArtistProfile(). */
+      window.pasongProcessedArtistProfilePhotoUrl = url;
+      showMessage("Profile photo automatically cropped and optimized. Click Save Profile.", "success");
+    } catch (error) {
+      console.error("Artist profile photo error:", error);
+      showMessage(error?.message || "Unable to process profile photo.", "error");
+    }
+  });
+})();
