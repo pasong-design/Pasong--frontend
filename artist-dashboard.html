@@ -2530,81 +2530,99 @@ function authHeaders(){
    CLOUDINARY SIGNATURE  
 ============================================================ */  
   
-async function getCloudinarySignature(){
-  if(!currentSession?.access_token){
-    throw new Error("Your PASONG login session has expired. Please log in again.");
-  }
-
-  const response = await fetch(
-    API_BASE + "/api/cloudinary/signature",
-    { method:"GET", headers:authHeaders() }
-  );
-
-  const raw = await response.text();
-  let result = {};
-  try { result = raw ? JSON.parse(raw) : {}; } catch(e) {}
-
-  if(!response.ok){
-    throw new Error(result?.message || result?.error || raw || "Could not get Cloudinary upload signature.");
-  }
-
-  if(!result?.cloud_name || !result?.api_key || !result?.signature || !result?.timestamp){
-    throw new Error("Cloudinary signature response is incomplete. Check the PASONG backend Cloudinary configuration.");
-  }
-
-  return result;
-}
-
-
-/* ============================================================
-   CLOUDINARY UPLOAD
-   - Fresh signature for every file
-   - Correct resource type for audio/images
-   - Shows Cloudinary's real error when upload fails
-============================================================ */
-async function uploadToCloudinary(file){
-  if(!file) throw new Error("No file was selected.");
-
-  const signature = await getCloudinarySignature();
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("api_key", String(signature.api_key));
-  formData.append("timestamp", String(signature.timestamp));
-  formData.append("signature", String(signature.signature));
-
-  ["folder","public_id","type","invalidate","context","tags","eager","eager_async"]
-    .forEach((key)=>{
-      if(signature[key] !== undefined && signature[key] !== null){
-        formData.append(key, String(signature[key]));
-      }
-    });
-
-  let resourceType = "auto";
-  if(file.type?.startsWith("image/")) resourceType = "image";
-  else if(file.type?.startsWith("audio/") || file.type?.startsWith("video/")) resourceType = "video";
-
-  const uploadUrl = signature.upload_url ||
-    `https://api.cloudinary.com/v1_1/${encodeURIComponent(signature.cloud_name)}/${resourceType}/upload`;
-
-  const response = await fetch(uploadUrl, { method:"POST", body:formData });
-  const raw = await response.text();
-  let result = {};
-  try { result = raw ? JSON.parse(raw) : {}; } catch(e) {}
-
-  if(!response.ok){
-    const msg = result?.error?.message || result?.message || raw || `Cloudinary returned HTTP ${response.status}.`;
-    throw new Error(`Cloudinary upload failed: ${msg}`);
-  }
-
-  if(!result?.secure_url){
-    throw new Error("Cloudinary accepted the upload but did not return a secure URL.");
-  }
-
-  return result;
-}
-
-
-/* ============================================================
+async function getCloudinarySignature(){  
+  
+  const response =  
+    await fetch(  
+      API_BASE +  
+      "/api/cloudinary/signature",  
+      {  
+        method:"GET",  
+        headers:authHeaders()  
+      }  
+    );  
+  
+  
+  if(!response.ok){  
+  
+    throw new Error(  
+      "Could not get Cloudinary upload signature."  
+    );  
+  
+  }  
+  
+  
+  return await response.json();  
+  
+}  
+  
+  
+/* ============================================================  
+   CLOUDINARY UPLOAD  
+============================================================ */  
+  
+async function uploadToCloudinary(  
+  file,  
+  signature  
+){  
+  
+  const formData =  
+    new FormData();  
+  
+  
+  formData.append(  
+    "file",  
+    file  
+  );  
+  
+  
+  formData.append(  
+    "api_key",  
+    signature.api_key  
+  );  
+  
+  
+  formData.append(  
+    "timestamp",  
+    signature.timestamp  
+  );  
+  
+  
+  formData.append(  
+    "signature",  
+    signature.signature  
+  );  
+  
+  
+  const uploadUrl =  
+    `https://api.cloudinary.com/v1_1/${signature.cloud_name}/auto/upload`;  
+  
+  
+  const response =  
+    await fetch(  
+      uploadUrl,  
+      {  
+        method:"POST",  
+        body:formData  
+      }  
+    );  
+  
+  
+  if(!response.ok){  
+  
+    throw new Error(  
+      "Cloudinary upload failed."  
+    );  
+  
+  }  
+  
+  
+  return await response.json();  
+  
+}  
+  
+  
+/* ============================================================  
    USER LOOKUP  
 ============================================================ */  
   
@@ -2952,12 +2970,24 @@ document
   
         button.textContent =  
           "☁️ Uploading files...";  
-
-        const audioResult = await uploadToCloudinary(audioFile);  
+  
+  
+        const signature =  
+          await getCloudinarySignature();  
+  
+  
+        const audioResult =  
+          await uploadToCloudinary(  
+            audioFile,  
+            signature  
+          );  
   
   
         const coverResult =  
-          await uploadToCloudinary(coverFile);  
+          await uploadToCloudinary(  
+            coverFile,  
+            signature  
+          );  
   
   
         button.textContent =  
@@ -3377,8 +3407,17 @@ document
   
         button.textContent =  
           "☁️ Uploading photo...";  
-
-        const photoResult = await uploadToCloudinary(photo);;  
+  
+  
+        const signature =  
+          await getCloudinarySignature();  
+  
+  
+        const photoResult =  
+          await uploadToCloudinary(  
+            photo,  
+            signature  
+          );  
   
   
         if(  
@@ -5117,6 +5156,8 @@ async function loadArtistProfile(){
       "performingName"  
     ).value =  
       data.performing_name ||  
+      data.stage_name ||  
+      data.artist_name ||  
       "";  
   
   
@@ -5245,8 +5286,17 @@ async function saveArtistProfile(){
         );  
   
       }  
-
-      const result = await uploadToCloudinary(imageFile);;  
+  
+  
+      const signature =  
+        await getCloudinarySignature();  
+  
+  
+      const result =  
+        await uploadToCloudinary(  
+          imageFile,  
+          signature  
+        );  
   
   
       profileImageUrl =  
@@ -5255,10 +5305,19 @@ async function saveArtistProfile(){
     }  
   
   
+    /* artist_name is NOT NULL in artist_profiles. */
+    const artistName =
+      performingName ||
+      realName ||
+      "Artist";
+
     const payload = {  
   
       user_id:  
         currentUser.id,  
+  
+      artist_name:
+        artistName,
   
       real_name:  
         realName ||  
@@ -5266,7 +5325,7 @@ async function saveArtistProfile(){
   
       performing_name:  
         performingName ||  
-        null,  
+        artistName,  
   
       mobile_money_provider:  
         provider ||  
