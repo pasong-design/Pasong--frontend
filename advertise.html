@@ -13,7 +13,7 @@
 <nav class="nav"><a class="brand" href="index.html">â—ˆ PASONG</a><div class="navlinks"><a href="index.html">Home</a><a href="account.html">Account</a></div></nav>
 <section class="hero"><h1>Advertise on PASONG</h1><p>Choose where you want your advert to appear, upload your advert, pay securely, and PASONG Admin will review it before it goes live.</p></section><div class="steps"><div class="step"><b>1. Choose</b>Your package</div><div class="step"><b>2. Create</b>Your advert</div><div class="step"><b>3. Pay</b>Securely</div><div class="step"><b>4. Go live</b>After review</div></div>
 <div id="loginBox" class="login">Checking your PASONG accountâ€¦</div>
-<section id="packages" class="grid"></section>
+<section id="packagesWrap" class="hidden"><h2 class="section-title">2. Choose where you want to appear</h2><section id="packages" class="grid"></section></section>
 <section class="card form" id="formCard">
 <h2>ðŸš€ What do you want to promote?</h2>
 <p class="note" style="margin-bottom:14px">Choose one option. PASONG will only show the fields you need.</p>
@@ -22,13 +22,13 @@
 <button type="button" class="promo-type" data-type="profile"><span>ðŸ‘¤</span><b>My Artist / Producer Profile</b><small>Grow your PASONG audience.</small></button>
 <button type="button" class="promo-type" data-type="business"><span>ðŸ¢</span><b>Business / Brand</b><small>Promote a business, service or event.</small></button>
 </div>
-<div id="targetFields" class="hidden">
+<div id="targetFields" class="hidden"><h3 id="targetHeading" class="target-heading">Choose what you want to promote</h3>
 <div id="songTarget" class="field hidden"><label>Choose the song you want to promote *</label><select id="songSelect"><option value="">Loading your songsâ€¦</option></select></div>
 <div id="profileTarget" class="field hidden"><label>Choose your PASONG profile *</label><select id="profileSelect"><option value="">Loading profileâ€¦</option></select></div>
 <div id="businessFields" class="hidden">
 <div class="row"><div class="field"><label>Business / Brand name *</label><input id="businessName"></div><div class="field"><label>Destination URL <span class="note">(optional)</span></label><input id="businessUrl" placeholder="https://example.com"></div></div>
 </div>
-<div class="row">
+<div id="commonFields" class="hidden"><div class="row">
 <div class="field"><label>Contact email *</label><input id="advertiserEmail" type="email" required></div>
 <div class="field"><label>Contact phone</label><input id="advertiserPhone"></div>
 </div>
@@ -41,7 +41,7 @@
 </div>
 <div id="mediaBox" class="field"><label>Advert media *</label><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div>
 <div id="preview" class="preview hidden"><img id="previewImg" alt="Preview"><div class="ptext"><strong id="previewTitle">PASONG</strong><div class="note" id="previewMeta"></div></div></div>
-<p class="note">All campaigns are paid first, then reviewed by PASONG Admin before appearing.</p>
+</div><p class="note">All campaigns are paid first, then reviewed by PASONG Admin before appearing.</p>
 <button id="payBtn" class="btn" type="button">Continue to secure payment</button>
 </div>
 </section>
@@ -61,11 +61,11 @@ const money=n=>"UGX "+Number(n||0).toLocaleString();
 function status(msg,type="info"){const x=$("status");x.className="status show "+type;x.textContent=msg}
 function selectedPackage(){return packages.find(p=>p.key===$("packageKey").value)}
 function coverOf(s){return s?.cover_url||s?.cover_image_url||s?.cover||s?.image_url||""}
-function selectType(type){promoType=type;document.querySelectorAll('.promo-type').forEach(b=>b.classList.toggle('active',b.dataset.type===type));$("targetFields").classList.remove('hidden');$("songTarget").classList.toggle('hidden',type!=='song');$("profileTarget").classList.toggle('hidden',type!=='profile');$("businessFields").classList.toggle('hidden',type!=='business');if(type==='song')loadSongs();if(type==='profile')loadProfile();}
+function selectType(type){promoType=type;document.querySelectorAll('.promo-type').forEach(b=>b.classList.toggle('active',b.dataset.type===type));$("targetFields").classList.remove('hidden');$("commonFields").classList.remove('hidden');$("packagesWrap").classList.remove('hidden');$("songTarget").classList.toggle('hidden',type!=='song');$("profileTarget").classList.toggle('hidden',type!=='profile');$("businessFields").classList.toggle('hidden',type!=='business');$("targetHeading").textContent=type==='song'?'ðŸŽµ Select the song you want to promote':type==='profile'?'ðŸ‘¤ Select your PASONG profile':'ðŸ¢ Enter your business details';if(type==='song')loadSongs();if(type==='profile')loadProfile();togglePackage();}
 async function loadSongs(){const r=await supabase.from('songs').select('id,title,cover_url,cover_image_url,cover,image_url,artist_id,artist_user_id,user_id').or('artist_user_id.eq.'+user.id+',user_id.eq.'+user.id).order('created_at',{ascending:false});songs=r.data||[];$("songSelect").innerHTML='<option value="">Select your song</option>'+songs.map(s=>`<option value="${s.id}">${esc(s.title||'Untitled Song')}</option>`).join('');if(!songs.length)$("songSelect").innerHTML='<option value="">No songs found in your account</option>';}
 async function loadProfile(){const r=await supabase.from('artist_profiles').select('id,user_id,artist_name,stage_name,performing_name').eq('user_id',user.id).maybeSingle();profiles=r.data?[r.data]:[];$("profileSelect").innerHTML=profiles.length?profiles.map(p=>`<option value="${p.id}">${esc(p.performing_name||p.artist_name||p.stage_name||'My Profile')}</option>`).join(''):'<option value="">No PASONG profile found</option>';$("advertiserName").value=profiles[0]?(profiles[0].performing_name||profiles[0].artist_name||profiles[0].stage_name||''):'';}
 function renderPackages(){$("packageKey").innerHTML='<option value="">Choose a package</option>'+packages.map(p=>`<option value="${p.key}">${esc(p.name)} â€” ${money(p.amount)} / ${p.days} days</option>`).join('');}
-function togglePackage(){const p=selectedPackage(),hero=p?.key==='home_hero';$("heroOptions").classList.toggle('hidden',!hero);$("mediaBox").classList.toggle('hidden',hero);if(hero&&promoType!=='song'){status('Homepage Hero uses a song cover or a custom 16:9 flyer.','info');}}
+function togglePackage(){const p=selectedPackage(),hero=p?.key==='home_hero';$("heroOptions").classList.toggle('hidden',!hero);$("mediaBox").classList.toggle('hidden',hero);if(hero){const cover=$('heroOptions').querySelector('input[value="cover"]');if(promoType==='song'){cover.disabled=false;cover.parentElement.style.opacity='1';cover.parentElement.innerHTML='<input type="radio" name="heroType" value="cover" checked> Use the selected song cover';}else{cover.disabled=true;cover.parentElement.style.opacity='.5';document.querySelector('input[name="heroType"][value="flyer"]').checked=true;status('For a Profile or Business Hero, upload a 16:9 Hero flyer.','info');}}}
 async function uploadSigned(file,folder){const {data:{session}}=await supabase.auth.getSession();if(!session)throw new Error('Please sign in again.');const sr=await fetch(API_BASE+'/api/cloudinary/signature',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},body:JSON.stringify({folder})});const sd=await sr.json();if(!sr.ok)throw new Error(sd.error||'Could not prepare upload.');const fd=new FormData();fd.append('file',file);fd.append('api_key',sd.api_key);fd.append('timestamp',sd.timestamp);fd.append('signature',sd.signature);fd.append('folder',sd.folder);const ur=await fetch(CLOUDINARY_UPLOAD_URL,{method:'POST',body:fd});const ud=await ur.json();if(!ur.ok||!ud.secure_url)throw new Error(ud.error?.message||'Cloudinary upload failed.');return ud.secure_url;}
 function validateHero(file){if(file.size>5*1024*1024)throw new Error('Hero flyer must be 5 MB or smaller.');return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{const ratio=im.width/im.height;if(ratio<1.65||ratio>1.82)reject(new Error('Hero flyer must be approximately 16:9. Recommended 1600 Ã— 900.'));else resolve()};im.onerror=()=>reject(new Error('Invalid image file.'));im.src=URL.createObjectURL(file)})}
 function updatePreview(){let src='',title='PASONG',meta='';if(promoType==='song'){const s=songs.find(x=>String(x.id)===$("songSelect").value);if(s){src=coverOf(s);title=s.title||'Song';meta='Song promotion preview';}}else if(promoType==='profile'){title=$("advertiserName").value||'My PASONG Profile';meta='Profile promotion preview';}else{title=$("title").value||'Business / Brand';meta='Business promotion preview';}if(src){$("previewImg").src=src;$("preview").classList.remove('hidden');}$("previewTitle").textContent=title;$("previewMeta").textContent=meta;}
