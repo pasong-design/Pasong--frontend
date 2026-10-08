@@ -85,12 +85,6 @@ a{
   margin-bottom:4px
 }
 
-@media(max-width:560px){
-  .steps{
-    grid-template-columns:1fr 1fr
-  }
-}
-
 .hero h1{
   font-size:clamp(30px,6vw,52px);
   margin:0 0 10px
@@ -119,47 +113,6 @@ a{
 .card.hero-card{
   border-color:#8b5cf6;
   box-shadow:0 0 28px #8b5cf622
-}
-
-.icon{
-  font-size:28px
-}
-
-.card h3{
-  margin:10px 0 7px
-}
-
-.desc{
-  color:#aaa0b9;
-  font-size:13px;
-  min-height:38px
-}
-
-.price{
-  font-size:23px;
-  font-weight:900;
-  margin-top:14px
-}
-
-.days{
-  color:#8f86a0;
-  font-size:12px;
-  margin:4px 0 15px
-}
-
-.btn{
-  border:0;
-  border-radius:11px;
-  padding:12px 15px;
-  font-weight:800;
-  cursor:pointer;
-  background:#8b5cf6;
-  color:white;
-  width:100%
-}
-
-.btn.secondary{
-  background:#21183b
 }
 
 .form{
@@ -219,7 +172,7 @@ a{
 }
 
 .hidden{
-  display:none
+  display:none!important
 }
 
 .preview{
@@ -282,6 +235,7 @@ a{
   margin-bottom:14px
 }
 
+/* PROMOTION TYPE BUTTONS */
 .promo-types{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -290,6 +244,8 @@ a{
 }
 
 .promo-type{
+  appearance:none;
+  -webkit-appearance:none;
   border:1px solid #332656;
   background:#0e0a19;
   color:#eee7f8;
@@ -297,7 +253,12 @@ a{
   padding:16px;
   text-align:left;
   cursor:pointer;
-  min-height:125px
+  min-height:125px;
+  width:100%;
+  display:block;
+  font-family:inherit;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent
 }
 
 .promo-type span{
@@ -328,6 +289,37 @@ a{
   border-color:#6d4bc2
 }
 
+.promo-type:active{
+  transform:scale(.985)
+}
+
+.target-heading{
+  margin:12px 0 15px;
+  color:#fff
+}
+
+.btn{
+  border:0;
+  border-radius:11px;
+  padding:12px 15px;
+  font-weight:800;
+  cursor:pointer;
+  background:#8b5cf6;
+  color:white;
+  width:100%;
+  font-family:inherit;
+  touch-action:manipulation
+}
+
+.btn:disabled{
+  opacity:.5;
+  cursor:not-allowed
+}
+
+.btn.secondary{
+  background:#21183b
+}
+
 @media(max-width:850px){
   .grid{
     grid-template-columns:1fr 1fr
@@ -345,6 +337,10 @@ a{
 }
 
 @media(max-width:560px){
+  .steps{
+    grid-template-columns:1fr 1fr
+  }
+
   .grid,
   .row{
     grid-template-columns:1fr
@@ -376,12 +372,14 @@ a{
 </nav>
 
 <section class="hero">
+
   <h1>Advertise on PASONG</h1>
 
   <p>
     Choose where you want your advert to appear, upload your advert,
     pay securely, and PASONG Admin will review it before it goes live.
   </p>
+
 </section>
 
 <div class="steps">
@@ -409,14 +407,12 @@ a{
 </div>
 
 <div id="loginBox" class="login">
-  Checking your PASONG account&hellip;
+  Checking your PASONG account...
 </div>
 
 <section id="packagesWrap" class="hidden">
 
-  <h2 class="section-title">
-    2. Choose where you want to appear
-  </h2>
+  <h2>2. Choose where you want to appear</h2>
 
   <section id="packages" class="grid"></section>
 
@@ -430,12 +426,15 @@ a{
     Choose one option. PASONG will only show the fields you need.
   </p>
 
+  <!-- PROMOTION TYPES -->
+
   <div class="promo-types" id="promoTypes">
 
     <button
       type="button"
       class="promo-type"
       data-type="song"
+      id="songPromoButton"
     >
       <span>&#127925;</span>
       <b>A Song</b>
@@ -446,6 +445,7 @@ a{
       type="button"
       class="promo-type"
       data-type="profile"
+      id="profilePromoButton"
     >
       <span>&#128100;</span>
       <b>My Artist / Producer Profile</b>
@@ -456,6 +456,7 @@ a{
       type="button"
       class="promo-type"
       data-type="business"
+      id="businessPromoButton"
     >
       <span>&#127970;</span>
       <b>Business / Brand</b>
@@ -464,11 +465,15 @@ a{
 
   </div>
 
+  <!-- TARGET FIELDS -->
+
   <div id="targetFields" class="hidden">
 
     <h3 id="targetHeading" class="target-heading">
       Choose what you want to promote
     </h3>
+
+    <!-- SONG -->
 
     <div id="songTarget" class="field hidden">
 
@@ -477,12 +482,12 @@ a{
       </label>
 
       <select id="songSelect">
-        <option value="">
-          Loading your songs&hellip;
-        </option>
+        <option value="">Loading your songs...</option>
       </select>
 
     </div>
+
+    <!-- PROFILE -->
 
     <div id="profileTarget" class="field hidden">
 
@@ -491,26 +496,32 @@ a{
       </label>
 
       <select id="profileSelect">
-        <option value="">
-          Loading profile&hellip;
-        </option>
+        <option value="">Loading profile...</option>
       </select>
 
     </div>
+
+    <!-- BUSINESS -->
 
     <div id="businessFields" class="hidden">
 
       <div class="row">
 
         <div class="field">
+
           <label>
             Business / Brand name *
           </label>
 
-          <input id="businessName">
+          <input
+            id="businessName"
+            type="text"
+          >
+
         </div>
 
         <div class="field">
+
           <label>
             Destination URL
             <span class="note">(optional)</span>
@@ -518,13 +529,17 @@ a{
 
           <input
             id="businessUrl"
+            type="url"
             placeholder="https://example.com"
           >
+
         </div>
 
       </div>
 
     </div>
+
+    <!-- COMMON FIELDS -->
 
     <div id="commonFields" class="hidden">
 
@@ -550,7 +565,10 @@ a{
             Contact phone
           </label>
 
-          <input id="advertiserPhone">
+          <input
+            id="advertiserPhone"
+            type="text"
+          >
 
         </div>
 
@@ -566,6 +584,7 @@ a{
 
           <input
             id="title"
+            type="text"
             required
           >
 
@@ -579,6 +598,7 @@ a{
 
           <input
             id="advertiserName"
+            type="text"
             required
           >
 
@@ -615,6 +635,8 @@ a{
 
       </div>
 
+      <!-- HERO OPTIONS -->
+
       <div id="heroOptions" class="hidden">
 
         <div class="field">
@@ -625,23 +647,29 @@ a{
 
           <div class="choice">
 
-            <label>
+            <label id="coverChoice">
+
               <input
                 type="radio"
                 name="heroType"
                 value="cover"
                 checked
               >
+
               Use the selected song cover
+
             </label>
 
             <label>
+
               <input
                 type="radio"
                 name="heroType"
                 value="flyer"
               >
+
               Upload Hero flyer
+
             </label>
 
           </div>
@@ -651,7 +679,7 @@ a{
         <div id="flyerBox" class="field hidden">
 
           <label>
-            Hero flyer &mdash; 1600 &times; 900, 16:9, max 5 MB
+            Hero flyer &mdash; 1600 x 900, 16:9, max 5 MB
           </label>
 
           <input
@@ -663,6 +691,8 @@ a{
         </div>
 
       </div>
+
+      <!-- NORMAL MEDIA -->
 
       <div id="mediaBox" class="field">
 
@@ -677,6 +707,8 @@ a{
         >
 
       </div>
+
+      <!-- PREVIEW -->
 
       <div id="preview" class="preview hidden">
 
@@ -703,8 +735,7 @@ a{
     </div>
 
     <p class="note">
-      All campaigns are paid first, then reviewed by PASONG Admin
-      before appearing.
+      All campaigns are paid first, then reviewed by PASONG Admin before appearing.
     </p>
 
     <button
@@ -724,6 +755,7 @@ a{
 </div>
 
 <script>
+
 const SUPABASE_URL =
   "https://mtufczmjlkvycarxylgh.supabase.co";
 
@@ -748,26 +780,25 @@ let songs = [];
 let profiles = [];
 let promoType = null;
 
-const $ = id =>
-  document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-const esc = v =>
-  String(v ?? "").replace(
-    /[&<>\"']/g,
+const esc = value =>
+  String(value ?? "").replace(
+    /[&<>"']/g,
     m => ({
       "&":"&amp;",
       "<":"&lt;",
       ">":"&gt;",
-      "\"":"&quot;",
+      '"':"&quot;",
       "'":"&#039;"
     }[m])
   );
 
 const money = n =>
-  "UGX " +
-  Number(n || 0).toLocaleString();
+  "UGX " + Number(n || 0).toLocaleString();
 
-function status(msg,type="info"){
+function status(msg, type = "info") {
+
   const x = $("status");
 
   x.className =
@@ -776,13 +807,15 @@ function status(msg,type="info"){
   x.textContent = msg;
 }
 
-function selectedPackage(){
+function selectedPackage() {
+
   return packages.find(
     p => p.key === $("packageKey").value
   );
 }
 
-function coverOf(s){
+function coverOf(s) {
+
   return (
     s?.cover_url ||
     s?.cover_image_url ||
@@ -792,126 +825,238 @@ function coverOf(s){
   );
 }
 
-function selectType(type){
+/* =========================================================
+   FIXED PROMOTION BUTTON FUNCTION
+========================================================= */
+
+function selectType(type) {
 
   promoType = type;
 
+  /* Highlight selected button */
+
   document
     .querySelectorAll(".promo-type")
-    .forEach(
-      b =>
-        b.classList.toggle(
-          "active",
-          b.dataset.type === type
-        )
-    );
+    .forEach(button => {
 
-  $("targetFields")
-    .classList.remove("hidden");
+      button.classList.toggle(
+        "active",
+        button.dataset.type === type
+      );
 
-  $("commonFields")
-    .classList.remove("hidden");
+    });
 
-  $("packagesWrap")
-    .classList.remove("hidden");
+  /* Show main fields */
 
-  $("songTarget")
-    .classList.toggle(
-      "hidden",
-      type !== "song"
-    );
+  $("targetFields").classList.remove("hidden");
 
-  $("profileTarget")
-    .classList.toggle(
-      "hidden",
-      type !== "profile"
-    );
+  $("commonFields").classList.remove("hidden");
 
-  $("businessFields")
-    .classList.toggle(
-      "hidden",
-      type !== "business"
-    );
+  $("packagesWrap").classList.remove("hidden");
 
-  $("targetHeading").textContent =
-    type === "song"
-      ? "Select the song you want to promote"
-      : type === "profile"
-      ? "Select your PASONG profile"
-      : "Enter your business details";
+  /* Show correct target */
 
-  if(type === "song"){
+  $("songTarget").classList.toggle(
+    "hidden",
+    type !== "song"
+  );
+
+  $("profileTarget").classList.toggle(
+    "hidden",
+    type !== "profile"
+  );
+
+  $("businessFields").classList.toggle(
+    "hidden",
+    type !== "business"
+  );
+
+  /* Correct heading */
+
+  if(type === "song") {
+
+    $("targetHeading").textContent =
+      "Select the song you want to promote";
+
     loadSongs();
+
   }
 
-  if(type === "profile"){
+  else if(type === "profile") {
+
+    $("targetHeading").textContent =
+      "Select your PASONG profile";
+
     loadProfile();
+
+  }
+
+  else if(type === "business") {
+
+    $("targetHeading").textContent =
+      "Enter your business details";
+
   }
 
   togglePackage();
+
+  /* Scroll the newly opened section into view */
+
+  setTimeout(() => {
+
+    $("targetFields").scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+  }, 100);
+
 }
 
-async function loadSongs(){
+/* =========================================================
+   DIRECT BUTTON EVENTS
+========================================================= */
 
-  const r =
-    await supabase
-      .from("songs")
-      .select(
-        "id,title,cover_url,cover_image_url,cover,image_url,artist_id,artist_user_id,user_id"
-      )
-      .or(
-        "artist_user_id.eq." +
-        user.id +
-        ",user_id.eq." +
-        user.id
-      )
-      .order(
-        "created_at",
-        {ascending:false}
-      );
+$("songPromoButton").addEventListener(
+  "click",
+  function(e) {
 
-  songs = r.data || [];
+    e.preventDefault();
+    selectType("song");
+
+  }
+);
+
+$("profilePromoButton").addEventListener(
+  "click",
+  function(e) {
+
+    e.preventDefault();
+    selectType("profile");
+
+  }
+);
+
+$("businessPromoButton").addEventListener(
+  "click",
+  function(e) {
+
+    e.preventDefault();
+    selectType("business");
+
+  }
+);
+
+/* =========================================================
+   LOAD SONGS
+========================================================= */
+
+async function loadSongs() {
+
+  if(!user) return;
 
   $("songSelect").innerHTML =
-    '<option value="">Select your song</option>' +
-    songs
-      .map(
+    '<option value="">Loading your songs...</option>';
+
+  try {
+
+    const r =
+      await supabase
+        .from("songs")
+        .select(
+          "id,title,cover_url,cover_image_url,cover,image_url,artist_id,artist_user_id,user_id"
+        )
+        .or(
+          "artist_user_id.eq." +
+          user.id +
+          ",user_id.eq." +
+          user.id
+        )
+        .order(
+          "created_at",
+          {ascending:false}
+        );
+
+    if(r.error) {
+
+      console.error(r.error);
+
+      $("songSelect").innerHTML =
+        '<option value="">Could not load songs</option>';
+
+      return;
+    }
+
+    songs = r.data || [];
+
+    $("songSelect").innerHTML =
+      '<option value="">Select your song</option>' +
+      songs.map(
         s =>
           `<option value="${s.id}">
             ${esc(s.title || "Untitled Song")}
           </option>`
-      )
-      .join("");
+      ).join("");
 
-  if(!songs.length){
+    if(!songs.length) {
+
+      $("songSelect").innerHTML =
+        '<option value="">No songs found in your account</option>';
+
+    }
+
+  } catch(error) {
+
+    console.error(error);
 
     $("songSelect").innerHTML =
-      '<option value="">No songs found in your account</option>';
+      '<option value="">Could not load songs</option>';
 
   }
+
 }
 
-async function loadProfile(){
+/* =========================================================
+   LOAD PROFILE
+========================================================= */
 
-  const r =
-    await supabase
-      .from("artist_profiles")
-      .select(
-        "id,user_id,artist_name,stage_name,performing_name"
-      )
-      .eq(
-        "user_id",
-        user.id
-      )
-      .maybeSingle();
+async function loadProfile() {
 
-  profiles =
-    r.data ? [r.data] : [];
+  if(!user) return;
 
   $("profileSelect").innerHTML =
-    profiles.length
-      ? profiles
-          .map(
+    '<option value="">Loading profile...</option>';
+
+  try {
+
+    const r =
+      await supabase
+        .from("artist_profiles")
+        .select(
+          "id,user_id,artist_name,stage_name,performing_name"
+        )
+        .eq(
+          "user_id",
+          user.id
+        )
+        .maybeSingle();
+
+    if(r.error) {
+
+      console.error(r.error);
+
+      $("profileSelect").innerHTML =
+        '<option value="">Could not load profile</option>';
+
+      return;
+    }
+
+    profiles =
+      r.data ? [r.data] : [];
+
+    $("profileSelect").innerHTML =
+      profiles.length
+        ? profiles.map(
             p =>
               `<option value="${p.id}">
                 ${esc(
@@ -921,106 +1066,136 @@ async function loadProfile(){
                   "My Profile"
                 )}
               </option>`
-          )
-          .join("")
-      : '<option value="">No PASONG profile found</option>';
+          ).join("")
+        : '<option value="">No PASONG profile found</option>';
 
-  $("advertiserName").value =
-    profiles[0]
-      ? (
-          profiles[0].performing_name ||
-          profiles[0].artist_name ||
-          profiles[0].stage_name ||
-          ""
-        )
-      : "";
+    if(profiles[0]) {
+
+      $("advertiserName").value =
+        profiles[0].performing_name ||
+        profiles[0].artist_name ||
+        profiles[0].stage_name ||
+        "";
+
+    }
+
+  } catch(error) {
+
+    console.error(error);
+
+    $("profileSelect").innerHTML =
+      '<option value="">Could not load profile</option>';
+
+  }
+
 }
 
-function renderPackages(){
+/* =========================================================
+   PACKAGES
+========================================================= */
+
+function renderPackages() {
 
   $("packageKey").innerHTML =
     '<option value="">Choose a package</option>' +
-    packages
-      .map(
-        p =>
-          `<option value="${p.key}">
-            ${esc(p.name)}
-            &mdash;
-            ${money(p.amount)}
-            / ${p.days} days
-          </option>`
-      )
-      .join("");
+
+    packages.map(
+      p =>
+        `<option value="${esc(p.key)}">
+          ${esc(p.name)} - ${money(p.amount)} / ${p.days} days
+        </option>`
+    ).join("");
+
 }
 
-function togglePackage(){
+/* =========================================================
+   PACKAGE LOGIC
+========================================================= */
 
-  const p =
-    selectedPackage();
+function togglePackage() {
+
+  const p = selectedPackage();
 
   const hero =
     p?.key === "home_hero";
 
   $("heroOptions")
-    .classList.toggle(
+    .classList
+    .toggle(
       "hidden",
       !hero
     );
 
   $("mediaBox")
-    .classList.toggle(
+    .classList
+    .toggle(
       "hidden",
       hero
     );
 
-  if(hero){
+  if(hero) {
 
     const cover =
-      $("heroOptions")
-        .querySelector(
-          'input[value="cover"]'
-        );
+      document.querySelector(
+        'input[name="heroType"][value="cover"]'
+      );
 
-    if(promoType === "song"){
+    if(promoType === "song") {
 
       cover.disabled = false;
 
-      cover.parentElement.style.opacity = "1";
+      $("coverChoice").style.opacity = "1";
 
-      cover.parentElement.innerHTML =
+      $("coverChoice").innerHTML =
         '<input type="radio" name="heroType" value="cover" checked> Use the selected song cover';
 
-    }else{
+    }
+
+    else {
 
       cover.disabled = true;
 
-      cover.parentElement.style.opacity = ".5";
+      $("coverChoice").style.opacity = ".5";
 
-      document
-        .querySelector(
+      const flyerRadio =
+        document.querySelector(
           'input[name="heroType"][value="flyer"]'
-        )
-        .checked = true;
+        );
+
+      if(flyerRadio) {
+
+        flyerRadio.checked = true;
+
+      }
 
       status(
         "For a Profile or Business Hero, upload a 16:9 Hero flyer.",
         "info"
       );
+
     }
+
   }
+
 }
 
-async function uploadSigned(file,folder){
+/* =========================================================
+   CLOUDINARY SIGNED UPLOAD
+========================================================= */
+
+async function uploadSigned(file, folder) {
 
   const {
-    data:{session}
-  } =
-    await supabase.auth.getSession();
+    data: {session}
+  } = await supabase.auth.getSession();
 
-  if(!session)
+  if(!session) {
+
     throw new Error(
       "Please sign in again."
     );
+
+  }
 
   const sr =
     await fetch(
@@ -1028,7 +1203,6 @@ async function uploadSigned(file,folder){
       "/api/cloudinary/signature",
       {
         method:"POST",
-
         headers:{
           "Content-Type":
             "application/json",
@@ -1037,7 +1211,6 @@ async function uploadSigned(file,folder){
             "Bearer " +
             session.access_token
         },
-
         body:JSON.stringify({
           folder
         })
@@ -1047,11 +1220,14 @@ async function uploadSigned(file,folder){
   const sd =
     await sr.json();
 
-  if(!sr.ok)
+  if(!sr.ok) {
+
     throw new Error(
       sd.error ||
       "Could not prepare upload."
     );
+
+  }
 
   const fd =
     new FormData();
@@ -1096,36 +1272,43 @@ async function uploadSigned(file,folder){
   if(
     !ur.ok ||
     !ud.secure_url
-  ){
+  ) {
 
     throw new Error(
       ud.error?.message ||
       "Cloudinary upload failed."
     );
+
   }
 
   return ud.secure_url;
+
 }
 
-function validateHero(file){
+/* =========================================================
+   HERO VALIDATION
+========================================================= */
+
+function validateHero(file) {
 
   if(
     file.size >
     5 * 1024 * 1024
-  ){
+  ) {
 
     throw new Error(
       "Hero flyer must be 5 MB or smaller."
     );
+
   }
 
   return new Promise(
-    (resolve,reject)=>{
+    (resolve,reject) => {
 
       const im =
         new Image();
 
-      im.onload = ()=>{
+      im.onload = () => {
 
         const ratio =
           im.width /
@@ -1134,22 +1317,25 @@ function validateHero(file){
         if(
           ratio < 1.65 ||
           ratio > 1.82
-        ){
+        ) {
 
           reject(
             new Error(
-              "Hero flyer must be approximately 16:9. Recommended 1600 × 900."
+              "Hero flyer must be approximately 16:9. Recommended 1600 x 900."
             )
           );
 
-        }else{
+        }
+
+        else {
 
           resolve();
 
         }
+
       };
 
-      im.onerror = ()=>{
+      im.onerror = () => {
 
         reject(
           new Error(
@@ -1161,11 +1347,17 @@ function validateHero(file){
 
       im.src =
         URL.createObjectURL(file);
+
     }
   );
+
 }
 
-function updatePreview(){
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+function updatePreview() {
 
   let src = "";
   let title = "PASONG";
@@ -1173,7 +1365,7 @@ function updatePreview(){
 
   if(
     promoType === "song"
-  ){
+  ) {
 
     const s =
       songs.find(
@@ -1182,7 +1374,7 @@ function updatePreview(){
           $("songSelect").value
       );
 
-    if(s){
+    if(s) {
 
       src =
         coverOf(s);
@@ -1193,11 +1385,14 @@ function updatePreview(){
 
       meta =
         "Song promotion preview";
+
     }
 
-  }else if(
+  }
+
+  else if(
     promoType === "profile"
-  ){
+  ) {
 
     title =
       $("advertiserName").value ||
@@ -1206,206 +1401,275 @@ function updatePreview(){
     meta =
       "Profile promotion preview";
 
-  }else{
+  }
+
+  else if(
+    promoType === "business"
+  ) {
 
     title =
-      $("title").value ||
+      $("businessName").value ||
       "Business / Brand";
 
     meta =
       "Business promotion preview";
+
   }
 
-  if(src){
+  if(src) {
 
     $("previewImg").src =
       src;
 
-    $("preview")
-      .classList.remove(
-        "hidden"
-      );
+    $("preview").classList.remove(
+      "hidden"
+    );
+
   }
 
-  $("previewTitle")
-    .textContent =
-      title;
+  $("previewTitle").textContent =
+    title;
 
-  $("previewMeta")
-    .textContent =
-      meta;
+  $("previewMeta").textContent =
+    meta;
+
 }
 
-document
-  .querySelectorAll(
-    ".promo-type"
-  )
-  .forEach(
-    b =>
-      b.onclick =
-        () =>
-          selectType(
-            b.dataset.type
-          )
-  );
+/* =========================================================
+   SONG SELECT
+========================================================= */
 
-$("packageKey").onchange =
-  togglePackage;
+$("songSelect").addEventListener(
+  "change",
+  updatePreview
+);
 
-$("songSelect").onchange =
-  updatePreview;
+/* =========================================================
+   PROFILE SELECT
+========================================================= */
 
-$("profileSelect").onchange =
-  () => {
+$("profileSelect").addEventListener(
+  "change",
+  function() {
 
     const p =
       profiles.find(
-        p =>
-          String(p.id) ===
+        x =>
+          String(x.id) ===
           $("profileSelect").value
       );
 
-    $("advertiserName").value =
-      p?.performing_name ||
-      p?.artist_name ||
-      "";
+    if(p) {
+
+      $("advertiserName").value =
+        p.performing_name ||
+        p.artist_name ||
+        p.stage_name ||
+        "";
+
+    }
 
     updatePreview();
-  };
 
-$("flyer").onchange =
-  () => {
+  }
+);
+
+/* =========================================================
+   BUSINESS NAME PREVIEW
+========================================================= */
+
+$("businessName").addEventListener(
+  "input",
+  updatePreview
+);
+
+/* =========================================================
+   HERO PACKAGE CHANGE
+========================================================= */
+
+$("packageKey").addEventListener(
+  "change",
+  togglePackage
+);
+
+/* =========================================================
+   HERO RADIO CHANGE
+========================================================= */
+
+document.addEventListener(
+  "change",
+  function(e) {
+
+    if(
+      e.target.matches(
+        'input[name="heroType"]'
+      )
+    ) {
+
+      const flyer =
+        e.target.value === "flyer" &&
+        e.target.checked;
+
+      $("flyerBox")
+        .classList
+        .toggle(
+          "hidden",
+          !flyer
+        );
+
+      if(
+        !flyer &&
+        promoType === "song"
+      ) {
+
+        updatePreview();
+
+      }
+
+    }
+
+  }
+);
+
+/* =========================================================
+   FLYER
+========================================================= */
+
+$("flyer").addEventListener(
+  "change",
+  function() {
 
     const f =
       $("flyer").files[0];
 
-    if(f){
+    if(!f) return;
 
-      validateHero(f)
+    validateHero(f)
 
-        .then(
-          () => {
+      .then(() => {
 
-            $("previewImg").src =
-              URL.createObjectURL(f);
+        $("previewImg").src =
+          URL.createObjectURL(f);
 
-            $("preview")
-              .classList.remove(
-                "hidden"
-              );
+        $("preview")
+          .classList
+          .remove("hidden");
 
-            $("previewTitle")
-              .textContent =
-                "Hero flyer";
+        $("previewTitle")
+          .textContent =
+          "Hero flyer";
 
-            $("previewMeta")
-              .textContent =
-                "16:9 Homepage Hero";
-          }
-        )
+        $("previewMeta")
+          .textContent =
+          "16:9 Homepage Hero";
 
-        .catch(
-          e =>
-            status(
-              e.message,
-              "err"
-            )
-        );
-    }
-  };
+      })
 
-document
-  .querySelectorAll(
-    'input[name="heroType"]'
-  )
-  .forEach(
-    r =>
-      r.onchange =
-        () => {
+      .catch(
+        e =>
+          status(
+            e.message,
+            "err"
+          )
+      );
 
-          const flyer =
-            r.value === "flyer" &&
-            r.checked;
+  }
+);
 
-          $("flyerBox")
-            .classList.toggle(
-              "hidden",
-              !flyer
-            );
+/* =========================================================
+   INIT
+========================================================= */
 
-          if(
-            !flyer &&
-            promoType === "song"
-          ){
+async function init() {
 
-            updatePreview();
-          }
-        }
-  );
+  try {
 
-async function init(){
+    const r =
+      await supabase.auth.getUser();
 
-  const r =
-    await supabase.auth.getUser();
+    user =
+      r.data?.user ||
+      null;
 
-  user =
-    r.data?.user ||
-    null;
+    if(!user) {
 
-  if(!user){
-
-    $("loginBox")
-      .textContent =
+      $("loginBox").textContent =
         "Please sign in to purchase advertising.";
 
-    $("payBtn").disabled =
-      true;
+      $("payBtn").disabled =
+        true;
 
-    return;
+      return;
+
+    }
+
+    $("loginBox").textContent =
+      "Signed in as " +
+      (
+        user.email ||
+        "PASONG user"
+      );
+
+    const pr =
+      await fetch(
+        API_BASE +
+        "/api/advertising/packages"
+      );
+
+    const pd =
+      await pr.json();
+
+    packages =
+      pd.packages ||
+      [];
+
+    renderPackages();
+
   }
 
-  $("loginBox")
-    .textContent =
-      "✓ Signed in as " +
-      (user.email ||
-       "PASONG user");
+  catch(error) {
 
-  const pr =
-    await fetch(
-      API_BASE +
-      "/api/advertising/packages"
+    console.error(error);
+
+    $("loginBox").textContent =
+      "Could not load your PASONG account.";
+
+    status(
+      "Could not load advertising packages.",
+      "err"
     );
 
-  const pd =
-    await pr.json();
+  }
 
-  packages =
-    pd.packages ||
-    [];
-
-  renderPackages();
 }
 
-$("payBtn").onclick =
-  async () => {
+/* =========================================================
+   PAYMENT
+========================================================= */
 
-    try{
+$("payBtn").addEventListener(
+  "click",
+  async function() {
 
-      if(!promoType){
+    try {
+
+      if(!promoType) {
 
         throw new Error(
           "First choose what you want to promote."
         );
+
       }
 
       const p =
         selectedPackage();
 
-      if(!p){
+      if(!p) {
 
         throw new Error(
           "Choose an advertising package."
         );
+
       }
 
       if(
@@ -1420,11 +1684,12 @@ $("payBtn").onclick =
         !$("description")
           .value
           .trim()
-      ){
+      ) {
 
         throw new Error(
           "Please complete the required fields."
         );
+
       }
 
       let mediaUrl = "";
@@ -1436,19 +1701,21 @@ $("payBtn").onclick =
           .value
           .trim();
 
+      /* SONG */
+
       if(
         promoType === "song"
-      ){
+      ) {
 
         songId =
-          $("songSelect")
-            .value;
+          $("songSelect").value;
 
-        if(!songId){
+        if(!songId) {
 
           throw new Error(
             "Select the song you want to promote."
           );
+
         }
 
         const s =
@@ -1467,26 +1734,31 @@ $("payBtn").onclick =
             songId
           );
 
-        if(!mediaUrl){
+        if(!mediaUrl) {
 
           throw new Error(
             "This song has no cover image."
           );
+
         }
 
-      }else if(
+      }
+
+      /* PROFILE */
+
+      else if(
         promoType === "profile"
-      ){
+      ) {
 
         const pid =
-          $("profileSelect")
-            .value;
+          $("profileSelect").value;
 
-        if(!pid){
+        if(!pid) {
 
           throw new Error(
             "Select your PASONG profile."
           );
+
         }
 
         targetUrl =
@@ -1497,51 +1769,54 @@ $("payBtn").onclick =
 
         mediaUrl = "";
 
-      }else{
+      }
+
+      /* BUSINESS */
+
+      else {
 
         if(
           !$("businessName")
             .value
             .trim()
-        ){
+        ) {
 
           throw new Error(
             "Enter your business or brand name."
           );
+
         }
 
-        $("advertiserName")
-          .value =
-            $("businessName")
-              .value
-              .trim();
+        $("advertiserName").value =
+          $("businessName")
+            .value
+            .trim();
+
       }
+
+      /* HOMEPAGE HERO */
 
       if(
         p.key === "home_hero"
-      ){
+      ) {
 
         const ht =
-          document
-            .querySelector(
-              'input[name="heroType"]:checked'
-            )
-            ?.value ||
+          document.querySelector(
+            'input[name="heroType"]:checked'
+          )?.value ||
           "cover";
 
-        if(
-          ht === "flyer"
-        ){
+        if(ht === "flyer") {
 
           const f =
-            $("flyer")
-              .files[0];
+            $("flyer").files[0];
 
-          if(!f){
+          if(!f) {
 
             throw new Error(
               "Upload a Hero flyer."
             );
+
           }
 
           await validateHero(f);
@@ -1552,32 +1827,35 @@ $("payBtn").onclick =
               "pasong/heroes"
             );
 
-        }else if(
-          !mediaUrl
-        ){
+        }
+
+        else if(!mediaUrl) {
 
           throw new Error(
             "For Hero, select a song or upload a Hero flyer."
           );
+
         }
 
-      }else{
+      }
+
+      /* NORMAL AD */
+
+      else {
 
         const f =
-          $("media")
-            .files[0];
+          $("media").files[0];
 
-        if(!f){
+        if(!f) {
 
           throw new Error(
             "Choose advert media."
           );
+
         }
 
         mediaType =
-          f.type.startsWith(
-            "video/"
-          )
+          f.type.startsWith("video/")
             ? "video"
             : "image";
 
@@ -1586,19 +1864,29 @@ $("payBtn").onclick =
             f,
             "pasong/ads"
           );
+
       }
 
-      if(!mediaUrl){
+      if(!mediaUrl) {
 
         throw new Error(
           "Please provide advert media."
         );
+
       }
 
       const {
         data:{session}
       } =
         await supabase.auth.getSession();
+
+      if(!session) {
+
+        throw new Error(
+          "Please sign in again."
+        );
+
+      }
 
       const payload = {
 
@@ -1641,20 +1929,18 @@ $("payBtn").onclick =
 
         hero_type:
           p.key === "home_hero"
-            ? document
-                .querySelector(
-                  'input[name="heroType"]:checked'
-                )
-                ?.value ||
-              null
+            ? document.querySelector(
+                'input[name="heroType"]:checked'
+              )?.value
             : null,
 
         song_id:
           songId
+
       };
 
       status(
-        "Opening secure payment&hellip;",
+        "Opening secure payment...",
         "ok"
       );
 
@@ -1678,24 +1964,36 @@ $("payBtn").onclick =
               JSON.stringify(
                 payload
               )
+
           }
         );
 
       const d =
         await rr.json();
 
-      if(!rr.ok){
+      if(!rr.ok) {
 
         throw new Error(
           d.error ||
           "Checkout failed."
         );
+
+      }
+
+      if(!d.checkout_url) {
+
+        throw new Error(
+          "Payment page was not returned by PASONG."
+        );
+
       }
 
       location.href =
         d.checkout_url;
 
-    }catch(e){
+    }
+
+    catch(e) {
 
       console.error(e);
 
@@ -1704,10 +2002,16 @@ $("payBtn").onclick =
         "Something went wrong.",
         "err"
       );
+
     }
-  };
+
+  }
+);
+
+/* START */
 
 init();
+
 </script>
 
 </body>
