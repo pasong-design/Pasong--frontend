@@ -1719,7 +1719,11 @@ onclick="toggleMobileMenu()"
         type="file"  
         id="profileImage"  
         accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"  
-      >  
+      >
+
+      <div class="help" style="margin-top:7px;">
+        ✨ PASONG Auto Crop: your profile photo is automatically cropped to a square and face-centered when saved.
+      </div>  
 
     </div>  
 
@@ -5293,15 +5297,27 @@ async function saveArtistProfile(){
         await getCloudinarySignature("pasong-producers/profile");  
   
   
-      const result =  
-        await uploadToCloudinary(  
-          imageFile,  
-          signature  
-        );  
-  
-  
-      profileImageUrl =  
-        result.secure_url;  
+      const result =
+        await uploadToCloudinary(
+          imageFile,
+          signature
+        );
+
+      /*
+       * PASONG AUTO CROP
+       * Cloudinary detects the face and delivers an
+       * 800x800 square crop centered on the face.
+       * The original upload remains untouched in Cloudinary.
+       */
+      profileImageUrl =
+        String(result.secure_url || "").replace(
+          "/upload/",
+          "/upload/c_fill,g_face,w_800,h_800,q_auto,f_auto/"
+        );
+
+      if(!profileImageUrl){
+        throw new Error("Cloudinary did not return an image URL.");
+      }  
   
     }  
   
