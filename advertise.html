@@ -1,101 +1,2051 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#120b2b"><title>PASONG - Advertise</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#080611;color:#f5f1ff;font-family:Inter,Arial,sans-serif}a{text-decoration:none;color:inherit}.wrap{max-width:1100px;margin:auto;padding:18px}.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}.brand{font-size:22px;font-weight:900;color:#c084fc}.navlinks{display:flex;gap:10px}.navlinks a{padding:9px 12px;border-radius:10px;color:#bbb2ce}.navlinks a:hover{background:#171126;color:#fff}.hero{padding:34px 0 22px}.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 22px}.step{padding:12px;border:1px solid #302354;border-radius:12px;background:#0d0919;color:#aaa0b9;font-size:12px;text-align:center}.step b{display:block;color:#fff;margin-bottom:4px}@media(max-width:560px){.steps{grid-template-columns:1fr 1fr}}.hero h1{font-size:clamp(30px,6vw,52px);margin:0 0 10px}.hero p{color:#a99fb9;max-width:700px;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:linear-gradient(180deg,#151026,#0d0919);border:1px solid #302354;border-radius:16px;padding:18px;box-shadow:0 12px 35px #0006}.card.hero-card{border-color:#8b5cf6;box-shadow:0 0 28px #8b5cf622}.icon{font-size:28px}.card h3{margin:10px 0 7px}.desc{color:#aaa0b9;font-size:13px;min-height:38px}.price{font-size:23px;font-weight:900;margin-top:14px}.days{color:#8f86a0;font-size:12px;margin:4px 0 15px}.btn{border:0;border-radius:11px;padding:12px 15px;font-weight:800;cursor:pointer;background:#8b5cf6;color:white;width:100%}.btn.secondary{background:#21183b}.form{margin-top:24px}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:14px}.field label{display:block;font-size:12px;color:#aaa0b9;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;padding:12px;border-radius:10px;border:1px solid #332656;background:#0b0813;color:white;outline:none}.field textarea{min-height:90px;resize:vertical}.choice{display:flex;gap:10px;flex-wrap:wrap}.choice label{border:1px solid #332656;padding:11px;border-radius:10px;cursor:pointer;background:#0e0a19}.choice input{accent-color:#8b5cf6}.hidden{display:none}.preview{margin-top:12px;border-radius:14px;overflow:hidden;border:1px solid #332656;background:#090612}.preview img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.preview .ptext{padding:12px}.status{display:none;margin:14px 0;padding:13px;border-radius:10px}.status.show{display:block}.ok{background:#12351f;color:#9ff0b7}.err{background:#3a1419;color:#ffb2b8}.info{background:#19112d;color:#d9c6ff}.note{font-size:12px;color:#8f86a0;line-height:1.6;margin-top:9px}.login{padding:13px;border:1px solid #332656;border-radius:11px;color:#b9accb;margin-bottom:14px}@media(max-width:850px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.grid,.row{grid-template-columns:1fr}.navlinks a{font-size:12px;padding:8px}.wrap{padding:13px}}
-.promo-types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 20px}.promo-type{border:1px solid #332656;background:#0e0a19;color:#eee7f8;border-radius:14px;padding:16px;text-align:left;cursor:pointer;min-height:125px}.promo-type span{font-size:25px;display:block;margin-bottom:8px}.promo-type b{display:block;font-size:15px}.promo-type small{display:block;color:#8f86a0;line-height:1.45;margin-top:6px}.promo-type.active{border-color:#8b5cf6;box-shadow:0 0 0 2px #8b5cf622;background:#17102a}.promo-type:hover{border-color:#6d4bc2}@media(max-width:700px){.promo-types{grid-template-columns:1fr}.promo-type{min-height:auto}}</style>
-</head>
-<body>
-<div class="wrap">
-<nav class="nav"><a class="brand" href="index.html">PASONG</a><div class="navlinks"><a href="index.html">Home</a><a href="account.html">Account</a></div></nav>
-<section class="hero"><h1>Advertise on PASONG</h1><p>Choose where you want your advert to appear, upload your advert, pay securely, and PASONG Admin will review it before it goes live.</p></section><div class="steps"><div class="step"><b>1. Choose</b>Your package</div><div class="step"><b>2. Create</b>Your advert</div><div class="step"><b>3. Pay</b>Securely</div><div class="step"><b>4. Go live</b>After review</div></div>
-<div id="loginBox" class="login">Checking your PASONG account...</div>
-<section id="packagesWrap" class="hidden"><h2 class="section-title">2. Choose where you want to appear</h2><section id="packages" class="grid"></section></section>
-<section class="card form" id="formCard">
-<h2>What do you want to promote?</h2>
-<p class="note" style="margin-bottom:14px">Choose one option. PASONG will only show the fields you need.</p>
-<div class="promo-types" id="promoTypes">
-<button type="button" class="promo-type" data-type="song"><span>Song</span><b>A Song</b><small>Get more listeners for your release.</small></button>
-<button type="button" class="promo-type" data-type="profile"><span>Profile</span><b>My Artist / Producer Profile</b><small>Grow your PASONG audience.</small></button>
-<button type="button" class="promo-type" data-type="business"><span>Business</span><b>Business / Brand</b><small>Promote a business, service or event.</small></button>
-</div>
-<div id="targetFields" class="hidden"><h3 id="targetHeading" class="target-heading">Choose what you want to promote</h3>
-<div id="songTarget" class="field hidden"><label>Choose the song you want to promote *</label><select id="songSelect"><option value="">Loading your songs...</option></select></div>
-<div id="profileTarget" class="field hidden"><label>Choose your PASONG profile *</label><select id="profileSelect"><option value="">Loading profile...</option></select></div>
-<div id="businessFields" class="hidden">
-<div class="row"><div class="field"><label>Business / Brand name *</label><input id="businessName"></div><div class="field"><label>Destination URL <span class="note">(optional)</span></label><input id="businessUrl" placeholder="https://example.com"></div></div>
-</div>
-<div id="commonFields" class="hidden"><div class="row">
-<div class="field"><label>Contact email *</label><input id="advertiserEmail" type="email" required></div>
-<div class="field"><label>Contact phone</label><input id="advertiserPhone"></div>
-</div>
-<div class="field hidden"><input id="title"><input id="advertiserName"><textarea id="description"></textarea></div>
-<div class="field"><label>Choose advertising package *</label><select id="packageKey"><option value="">Choose a package</option></select></div>
-<div id="heroOptions" class="hidden">
-<div class="field"><label>Homepage Hero artwork</label><div class="choice"><label><input type="radio" name="heroType" value="cover" checked> Use the selected song cover</label><label><input type="radio" name="heroType" value="flyer"> Upload Hero flyer</label></div></div>
-<div id="flyerBox" class="field hidden"><label>Hero flyer - 1600 x 900, 16:9, max 5 MB</label><input id="flyer" type="file" accept="image/jpeg,image/png,image/webp"></div>
-</div>
-<div id="mediaBox" class="field"><label>Advert media *</label><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div>
-<div id="preview" class="preview hidden"><img id="previewImg" alt="Preview"><div class="ptext"><strong id="previewTitle">PASONG</strong><div class="note" id="previewMeta"></div></div></div>
-</div><p class="note">All campaigns are paid first, then reviewed by PASONG Admin before appearing.</p>
-<button id="payBtn" class="btn" type="button">Continue to secure payment</button>
-</div>
-</section>
-<div id="status" class="status"></div>
-</section>
-</div>
-<script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_BASE="https://pasong-api.vercel.app";
-const CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload";
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let user=null,packages=[],songs=[],profiles=[],promoType=null;
-const $=id=>document.getElementById(id);
-const esc=v=>String(v??"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
-const money=n=>"UGX "+Number(n||0).toLocaleString();
-function status(msg,type="info"){const x=$("status");x.className="status show "+type;x.textContent=msg}
-function selectedPackage(){return packages.find(p=>p.key===$("packageKey").value)}
-function coverOf(s){return s?.cover_url||""}
-function selectType(type){promoType=type;document.querySelectorAll('.promo-type').forEach(b=>b.classList.toggle('active',b.dataset.type===type));$("targetFields").classList.remove('hidden');$("commonFields").classList.remove('hidden');$("packagesWrap").classList.remove('hidden');$("songTarget").classList.toggle('hidden',type!=='song');$("profileTarget").classList.toggle('hidden',type!=='profile');$("businessFields").classList.toggle('hidden',type!=='business');$("targetHeading").textContent=type==='song'?'Song Select the song you want to promote':type==='profile'?'Profile Select your PASONG profile':'Business Enter your business details';if(type==='song')loadSongs();if(type==='profile')loadProfile();togglePackage();}
-async function loadSongs(){const r=await supabase.from('songs').select('id,title,cover_url,artist_user_id,producer_user_id,writer_user_id,uploader_user_id,created_at').or('artist_user_id.eq.'+user.id+',producer_user_id.eq.'+user.id+',writer_user_id.eq.'+user.id+',uploader_user_id.eq.'+user.id).order('created_at',{ascending:false});songs=r.data||[];$("songSelect").innerHTML='<option value="">Select your song</option>'+songs.map(s=>`<option value="${s.id}">${esc(s.title||'Untitled Song')}</option>`).join('');if(!songs.length)$("songSelect").innerHTML='<option value="">No songs found in your account</option>';}
-async function loadProfile(){const r=await supabase.from('artist_profiles').select('id,user_id,artist_name,stage_name,performing_name').eq('user_id',user.id).maybeSingle();profiles=r.data?[r.data]:[];$("profileSelect").innerHTML=profiles.length?profiles.map(p=>`<option value="${p.id}">${esc(p.performing_name||p.artist_name||p.stage_name||'My Profile')}</option>`).join(''):'<option value="">No PASONG profile found</option>';$("advertiserName").value=profiles[0]?(profiles[0].performing_name||profiles[0].artist_name||profiles[0].stage_name||''):'';}
-function renderPackages(){$("packageKey").innerHTML='<option value="">Choose a package</option>'+packages.map(p=>`<option value="${p.key}">${esc(p.name)} - ${money(p.amount)} / ${p.days} days</option>`).join('');}
-function togglePackage(){const p=selectedPackage(),hero=p?.key==='home_hero';$("heroOptions").classList.toggle('hidden',!hero);$("mediaBox").classList.toggle('hidden',hero);if(hero){const cover=$('heroOptions').querySelector('input[value="cover"]');if(promoType==='song'){cover.disabled=false;cover.parentElement.style.opacity='1';cover.parentElement.innerHTML='<input type="radio" name="heroType" value="cover" checked> Use the selected song cover';}else{cover.disabled=true;cover.parentElement.style.opacity='.5';document.querySelector('input[name="heroType"][value="flyer"]').checked=true;status('For a Profile or Business Hero, upload a 16:9 Hero flyer.','info');}}}
-async function uploadSigned(file,folder){
-  const {data:{session}}=await supabase.auth.getSession();
-  if(!session?.access_token) throw new Error('Please sign in again.');
-  const sr=await fetch(API_BASE+'/api/cloudinary/signature',{
-    method:'POST',
-    headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
-    body:JSON.stringify({folder})
-  });
-  const sd=await sr.json().catch(()=>({}));
-  if(!sr.ok) throw new Error(sd.error||'Could not prepare Cloudinary upload.');
-  const uploadUrl='https://api.cloudinary.com/v1_1/'+encodeURIComponent(sd.cloud_name||'vuehnvkp')+'/auto/upload';
-  const fd=new FormData();
-  fd.append('file',file);
-  fd.append('api_key',sd.api_key);
-  fd.append('timestamp',sd.timestamp);
-  fd.append('signature',sd.signature);
-  fd.append('folder',sd.folder||folder);
-  const ur=await fetch(uploadUrl,{method:'POST',body:fd});
-  const ud=await ur.json().catch(()=>({}));
-  if(!ur.ok||!ud.secure_url) throw new Error(ud.error?.message||'Cloudinary upload failed.');
-  return ud.secure_url;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#120b2b">
+<title>PASONG - Advertise</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ background:#080611;
+ color:#f5f1ff;
+ font-family:Inter,Arial,sans-serif
 }
 
-function validateHero(file){if(file.size>5*1024*1024)throw new Error('Hero flyer must be 5 MB or smaller.');return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{const ratio=im.width/im.height;if(ratio<1.65||ratio>1.82)reject(new Error('Hero flyer must be approximately 16:9. Recommended 1600 x 900.'));else resolve()};im.onerror=()=>reject(new Error('Invalid image file.'));im.src=URL.createObjectURL(file)})}
-function updatePreview(){let src='',title='PASONG',meta='';if(promoType==='song'){const s=songs.find(x=>String(x.id)===$("songSelect").value);if(s){src=coverOf(s);title=s.title||'Song';meta='Song promotion preview';}}else if(promoType==='profile'){title=$("advertiserName").value||'My PASONG Profile';meta='Profile promotion preview';}else{title=$("title").value||'Business / Brand';meta='Business promotion preview';}if(src){$("previewImg").src=src;$("preview").classList.remove('hidden');}$("previewTitle").textContent=title;$("previewMeta").textContent=meta;}
-document.querySelectorAll('.promo-type').forEach(b=>b.onclick=()=>selectType(b.dataset.type));$("packageKey").onchange=togglePackage;$("songSelect").onchange=updatePreview;$("profileSelect").onchange=()=>{$("advertiserName").value=profiles.find(p=>String(p.id)===$("profileSelect").value)?.performing_name||profiles.find(p=>String(p.id)===$("profileSelect").value)?.artist_name||'';updatePreview()};$("flyer").onchange=()=>{const f=$("flyer").files[0];if(f){validateHero(f).then(()=>{$("previewImg").src=URL.createObjectURL(f);$("preview").classList.remove('hidden');$("previewTitle").textContent='Hero flyer';$("previewMeta").textContent='16:9 Homepage Hero';}).catch(e=>status(e.message,'err'))}};
-document.querySelectorAll('input[name="heroType"]').forEach(r=>r.onchange=()=>{const flyer=r.value==='flyer'&&r.checked;$("flyerBox").classList.toggle('hidden',!flyer);if(!flyer&&promoType==='song')updatePreview()});
-async function init(){const r=await supabase.auth.getUser();user=r.data?.user||null;if(!user){$("loginBox").textContent='Please sign in to purchase advertising.';$("payBtn").disabled=true;return}$("loginBox").textContent='Signed in as '+(user.email||'PASONG user');const pr=await fetch(API_BASE+'/api/advertising/packages');const pd=await pr.json();packages=pd.packages||[];renderPackages();}
-$("payBtn").onclick=async()=>{try{if(!promoType)throw new Error('First choose what you want to promote.');const p=selectedPackage();if(!p)throw new Error('Choose an advertising package.');if(!$("advertiserEmail").value.trim())throw new Error('Enter your contact email.');let mediaUrl='',mediaType='image',songId=null,targetUrl=$("businessUrl").value.trim();if(promoType==='song'){songId=$("songSelect").value;if(!songId)throw new Error('Select the song you want to promote.');const s=songs.find(x=>String(x.id)===songId);mediaUrl=coverOf(s);targetUrl='song.html?id='+encodeURIComponent(songId);if(!mediaUrl)throw new Error('This song has no cover image.');}else if(promoType==='profile'){const pid=$("profileSelect").value;if(!pid)throw new Error('Select your PASONG profile.');targetUrl='artist.html?id='+encodeURIComponent(pid);mediaUrl='';}else{if(!$("businessName").value.trim())throw new Error('Enter your business or brand name.');$("advertiserName").value=$("businessName").value.trim();}
-if(p.key==='home_hero'){const ht=document.querySelector('input[name="heroType"]:checked')?.value||'cover';if(ht==='flyer'){const f=$("flyer").files[0];if(!f)throw new Error('Upload a Hero flyer.');await validateHero(f);mediaUrl=await uploadSigned(f,'pasong/heroes');}else if(!mediaUrl){throw new Error('For Hero, select a song or upload a Hero flyer.');}}else{const f=$("media").files[0];if(!f)throw new Error('Choose advert media.');mediaType=f.type.startsWith('video/')?'video':'image';mediaUrl=await uploadSigned(f,'pasong/ads');}
-if(!mediaUrl)throw new Error('Please provide advert media.');if(promoType==='song'){const s=songs.find(x=>String(x.id)===String(songId));$("title").value=(s&&s.title)||'Song promotion';$("advertiserName").value=$("advertiserName").value.trim()||user.email||'PASONG user';$("description").value='Promote this song on PASONG.';}else if(promoType==='profile'){const p=profiles[0];$("title").value=(p&&(p.performing_name||p.artist_name||p.stage_name))||'PASONG profile';$("advertiserName").value=$("advertiserName").value.trim()||user.email||'PASONG user';$("description").value='Promote this PASONG profile.';}else{$("title").value=$("businessName").value.trim()||'Business promotion';$("advertiserName").value=$("businessName").value.trim();$("description").value='Business or brand promotion on PASONG.';}const {data:{session}}=await supabase.auth.getSession();const payload={package_key:p.key,advertiser_name:$("advertiserName").value.trim(),advertiser_email:$("advertiserEmail").value.trim(),advertiser_phone:$("advertiserPhone").value.trim(),title:$("title").value.trim(),description:$("description").value.trim(),target_url:targetUrl,media_url:mediaUrl,media_type:mediaType,hero_type:p.key==='home_hero'?document.querySelector('input[name="heroType"]:checked')?.value:null,song_id:songId};status('Opening secure payment...','ok');const rr=await fetch(API_BASE+'/api/advertising/checkout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},body:JSON.stringify(payload)});const d=await rr.json();if(!rr.ok)throw new Error(d.error||'Checkout failed.');location.href=d.checkout_url;}catch(e){console.error(e);status(e.message||'Something went wrong.','err')}};
-init();
-</script>
-</body></html>
+a{
+ text-decoration:none;
+ color:inherit
+}
+
+.wrap{
+ max-width:1100px;
+ margin:auto;
+ padding:18px
+}
+
+.nav{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:12px 0
+}
+
+.brand{
+ font-size:22px;
+ font-weight:900;
+ color:#c084fc
+}
+
+.navlinks{
+ display:flex;
+ gap:10px
+}
+
+.navlinks a{
+ padding:9px 12px;
+ border-radius:10px;
+ color:#bbb2ce
+}
+
+.navlinks a:hover{
+ background:#171126;
+ color:#fff
+}
+
+.hero{
+ padding:34px 0 22px
+}
+
+.hero h1{
+ font-size:clamp(30px,6vw,52px);
+ margin:0 0 10px
+}
+
+.hero p{
+ color:#a99fb9;
+ max-width:700px;
+ line-height:1.6
+}
+
+.steps{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:10px;
+ margin:8px 0 22px
+}
+
+.step{
+ padding:12px;
+ border:1px solid #302354;
+ border-radius:12px;
+ background:#0d0919;
+ color:#aaa0b9;
+ font-size:12px;
+ text-align:center
+}
+
+.step b{
+ display:block;
+ color:#fff;
+ margin-bottom:4px
+}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:14px
+}
+
+.card{
+ background:linear-gradient(180deg,#151026,#0d0919);
+ border:1px solid #302354;
+ border-radius:16px;
+ padding:18px;
+ box-shadow:0 12px 35px #0006
+}
+
+.package-card{
+ cursor:pointer;
+ transition:.18s ease;
+ position:relative
+}
+
+.package-card:hover{
+ transform:translateY(-2px);
+ border-color:#6d4bc2
+}
+
+.package-card.active{
+ border-color:#8b5cf6;
+ box-shadow:0 0 0 2px #8b5cf633,0 0 28px #8b5cf622;
+ background:linear-gradient(180deg,#1b1232,#100b20)
+}
+
+.package-card .selected-badge{
+ display:none;
+ position:absolute;
+ top:12px;
+ right:12px;
+ background:#8b5cf6;
+ color:white;
+ padding:5px 8px;
+ border-radius:8px;
+ font-size:10px;
+ font-weight:900
+}
+
+.package-card.active .selected-badge{
+ display:block
+}
+
+.icon{
+ font-size:28px
+}
+
+.card h3{
+ margin:10px 0 7px
+}
+
+.desc{
+ color:#aaa0b9;
+ font-size:13px;
+ min-height:38px
+}
+
+.price{
+ font-size:23px;
+ font-weight:900;
+ margin-top:14px
+}
+
+.days{
+ color:#8f86a0;
+ font-size:12px;
+ margin:4px 0 15px
+}
+
+.btn{
+ border:0;
+ border-radius:11px;
+ padding:12px 15px;
+ font-weight:800;
+ cursor:pointer;
+ background:#8b5cf6;
+ color:white;
+ width:100%
+}
+
+.btn:hover{
+ background:#9b6cff
+}
+
+.btn:disabled{
+ opacity:.5;
+ cursor:not-allowed
+}
+
+.form{
+ margin-top:24px
+}
+
+.row{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:14px
+}
+
+.field{
+ margin-bottom:14px
+}
+
+.field label{
+ display:block;
+ font-size:12px;
+ color:#aaa0b9;
+ margin-bottom:7px
+}
+
+.field input,
+.field textarea,
+.field select{
+ width:100%;
+ padding:12px;
+ border-radius:10px;
+ border:1px solid #332656;
+ background:#0b0813;
+ color:white;
+ outline:none
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+ border-color:#8b5cf6
+}
+
+.field textarea{
+ min-height:90px;
+ resize:vertical
+}
+
+.choice{
+ display:flex;
+ gap:10px;
+ flex-wrap:wrap
+}
+
+.choice label{
+ border:1px solid #332656;
+ padding:11px;
+ border-radius:10px;
+ cursor:pointer;
+ background:#0e0a19
+}
+
+.choice input{
+ accent-color:#8b5cf6
+}
+
+.hidden{
+ display:none!important
+}
+
+.preview{
+ margin-top:12px;
+ border-radius:14px;
+ overflow:hidden;
+ border:1px solid #332656;
+ background:#090612
+}
+
+.preview img{
+ display:block;
+ width:100%;
+ aspect-ratio:16/9;
+ object-fit:cover
+}
+
+.preview .ptext{
+ padding:12px
+}
+
+.status{
+ display:none;
+ margin:14px 0;
+ padding:13px;
+ border-radius:10px
+}
+
+.status.show{
+ display:block
+}
+
+.ok{
+ background:#12351f;
+ color:#9ff0b7
+}
+
+.err{
+ background:#3a1419;
+ color:#ffb2b8
+}
+
+.info{
+ background:#19112d;
+ color:#d9c6ff
+}
+
+.note{
+ font-size:12px;
+ color:#8f86a0;
+ line-height:1.6;
+ margin-top:9px
+}
+
+.login{
+ padding:13px;
+ border:1px solid #332656;
+ border-radius:11px;
+ color:#b9accb;
+ margin-bottom:14px
+}
+
+.section-title{
+ margin-top:0
+}
+
+.promo-types{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:12px;
+ margin:12px 0 20px
+}
+
+.promo-type{
+ border:1px solid #332656;
+ background:#0e0a19;
+ color:#eee7f8;
+ border-radius:14px;
+ padding:16px;
+ text-align:left;
+ cursor:pointer;
+ min-height:125px;
+ width:100%;
+ transition:.18s ease
+}
+
+.promo-type span{
+ font-size:25px;
+ display:block;
+ margin-bottom:8px
+}
+
+.promo-type b{
+ display:block;
+ font-size:15px
+}
+
+.promo-type small{
+ display:block;
+ color:#8f86a0;
+ line-height:1.45;
+ margin-top:6px
+}
+
+.promo-type.active{
+ border-color:#8b5cf6;
+ box-shadow:0 0 0 2px #8b5cf622;
+ background:#17102a;
+ transform:translateY(-2px)
+}
+
+.promo-type:hover{
+ border-color:#6d4bc2
+}
+
+.package-title{
+ margin-top:24px
+}
+
+@media(max-width:850px){
+ .grid{
+  grid-template-columns:1fr 1fr
+ }
+}
+
+@media(max-width:700px){
+ .promo-types{
+  grid-template-columns:1fr
+ }
+
+ .promo-type{
+  min-height:auto
+ }
+}
+
+@media(max-width:560px){
+ .steps{
+  grid-template-columns:1fr 1fr
+ }
+
+ .grid,
+ .row{
+  grid-template-columns:1fr
+ }
+
+ .navlinks a{
+  font-size:12px;
+  padding:8px
+ }
+
+ .wrap{
+  padding:13px
+ }
+}
+</style></head><body><div class="wrap"><nav class="nav">
+ <a class="brand" href="index.html">PASONG</a> <div class="navlinks">
+  <a href="index.html">Home</a>
+  <a href="account.html">Account</a>
+ </div>
+</nav><section class="hero">
+ <h1>Advertise on PASONG</h1>
+ <p>
+  Choose where you want your advert to appear, upload your advert,
+  pay securely, and PASONG Admin will review it before it goes live.
+ </p>
+</section><div class="steps">
+ <div class="step">
+  <b>1. Choose</b>
+  Your package
+ </div> <div class="step">
+  <b>2. Create</b>
+  Your advert
+ </div> <div class="step">
+  <b>3. Pay</b>
+  Securely
+ </div> <div class="step">
+  <b>4. Go live</b>
+  After review
+ </div>
+</div><div id="loginBox" class="login">
+ Checking your PASONG account...
+</div><section id="packagesWrap" class="hidden"> <h2 class="section-title">1. Choose an advertising package</h2> <p class="note">
+  Tap a package to select where and how long your advert will appear.
+ </p> <section id="packages" class="grid"></section></section><section class="card form" id="formCard"> <h2>2. What do you want to promote?</h2> <p class="note" style="margin-bottom:14px">
+  Choose one option. PASONG will only show the fields you need.
+ </p> <div class="promo-types" id="promoTypes"><button type="button"
+class="promo-type"
+data-type="song">
+<span>Song</span>
+<b>A Song</b>
+<small>
+Get more listeners for your release.
+</small>
+</button>
+
+<button type="button"
+class="promo-type"
+data-type="profile">
+<span>Profile</span>
+<b>My Artist / Producer Profile</b>
+<small>
+Grow your PASONG audience.
+</small>
+</button>
+
+<button type="button"
+class="promo-type"
+data-type="business">
+<span>Business</span>
+<b>Business / Brand</b>
+<small>
+Promote a business, service or event.
+</small>
+</button>
+
+ </div> <div id="targetFields" class="hidden">  <h3 id="targetHeading">
+   Choose what you want to promote
+  </h3>  <div id="songTarget" class="field hidden">
+   <label>Choose the song you want to promote *</label>   <select id="songSelect">
+    <option value="">Loading your songs...</option>
+   </select>
+  </div>  <div id="profileTarget" class="field hidden">
+   <label>Choose your PASONG profile *</label>   <select id="profileSelect">
+    <option value="">Loading profile...</option>
+   </select>
+  </div>  <div id="businessFields" class="hidden">   <div class="row"><div class="field">
+ <label>Business / Brand name *</label>
+ <input id="businessName" type="text">
+</div>
+
+<div class="field">
+ <label>
+  Destination URL
+  <span class="note">(optional)</span>
+ </label>
+
+ <input
+  id="businessUrl"
+  type="url"
+  placeholder="https://example.com">
+</div>
+
+   </div>  </div>  <div id="commonFields" class="hidden">   <div class="row"><div class="field">
+ <label>Contact email *</label>
+ <input
+  id="advertiserEmail"
+  type="email"
+  required>
+</div>
+
+<div class="field">
+ <label>Contact phone</label>
+ <input
+  id="advertiserPhone"
+  type="tel">
+</div>
+
+   </div>   <!-- Automatically generated fields -->   <div class="field hidden">
+    <input id="title">
+    <input id="advertiserName">
+    <textarea id="description"></textarea>
+   </div>   <h3 class="package-title">
+    3. Choose advertising package
+   </h3>   <div class="field">
+    <label>Select package *</label><select id="packageKey">
+ <option value="">Choose a package</option>
+</select>
+
+   </div>   <div id="heroOptions" class="hidden"><div class="field">
+
+ <label>Homepage Hero artwork</label>
+
+ <div class="choice">
+
+  <label id="coverChoice">
+   <input
+    type="radio"
+    name="heroType"
+    value="cover"
+    checked>
+   Use the selected song cover
+  </label>
+
+  <label id="flyerChoice">
+   <input
+    type="radio"
+    name="heroType"
+    value="flyer">
+   Upload Hero flyer
+  </label>
+
+ </div>
+
+</div>
+
+<div id="flyerBox" class="field hidden">
+
+ <label>
+  Hero flyer - 1600 x 900, 16:9, max 5 MB
+ </label>
+
+ <input
+  id="flyer"
+  type="file"
+  accept="image/jpeg,image/png,image/webp">
+
+</div>
+
+   </div>   <div id="mediaBox" class="field"><label>Advert media *</label>
+
+<input
+ id="media"
+ type="file"
+ accept="image/jpeg,image/png,image/webp,video/mp4,video/webm">
+
+   </div>   <div id="preview" class="preview hidden"><img id="previewImg" alt="Preview">
+
+<div class="ptext">
+ <strong id="previewTitle">PASONG</strong>
+ <div class="note" id="previewMeta"></div>
+</div>
+
+   </div>  </div>  <p class="note">
+   All campaigns are paid first, then reviewed by PASONG Admin before appearing.
+  </p><button
+id="payBtn"
+class="btn"
+type="button"
+disabled>
+Continue to secure payment
+</button>
+
+ </div></section><div id="status" class="status"></div></div><script>
+
+const SUPABASE_URL =
+ "https://mtufczmjlkvycarxylgh.supabase.co";
+
+const SUPABASE_KEY =
+ "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const API_BASE =
+ "https://pasong-api.vercel.app";
+
+const supabase =
+ window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+ );
+
+let user = null;
+let packages = [];
+let songs = [];
+let profiles = [];
+let promoType = null;
+
+const $ = id =>
+ document.getElementById(id);
+
+const esc = v =>
+ String(v ?? "")
+ .replace(/[&<>\"']/g,m=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  "\"":"&quot;",
+  "'":"&#039;"
+ }[m]));
+
+const money = n =>
+ "UGX " + Number(n || 0).toLocaleString();
+
+function status(msg,type="info"){
+
+ const x = $("status");
+
+ x.className =
+  "status show " + type;
+
+ x.textContent = msg;
+}
+
+function selectedPackage(){
+
+ return packages.find(
+  p => String(p.key) === String($("packageKey").value)
+ );
+}
+
+function coverOf(song){
+
+ return song?.cover_url || "";
+}
+
+
+/* =========================
+   PROMOTION BOX SELECTION
+========================= */
+
+function selectType(type){
+
+ promoType = type;
+
+ document
+  .querySelectorAll(".promo-type")
+  .forEach(button=>{
+   button.classList.toggle(
+    "active",
+    button.dataset.type === type
+   );
+  });
+
+ $("targetFields")
+  .classList
+  .remove("hidden");
+
+ $("commonFields")
+  .classList
+  .remove("hidden");
+
+ $("packagesWrap")
+  .classList
+  .remove("hidden");
+
+ $("songTarget")
+  .classList.toggle(
+   "hidden",
+   type !== "song"
+  );
+
+ $("profileTarget")
+  .classList.toggle(
+   "hidden",
+   type !== "profile"
+  );
+
+ $("businessFields")
+  .classList.toggle(
+   "hidden",
+   type !== "business"
+  );
+
+ if(type === "song"){
+
+  $("targetHeading").textContent =
+   "Choose the song you want to promote";
+
+  loadSongs();
+
+ }else if(type === "profile"){
+
+  $("targetHeading").textContent =
+   "Choose your PASONG profile";
+
+  loadProfile();
+
+ }else{
+
+  $("targetHeading").textContent =
+   "Enter your business details";
+
+ }
+
+ updatePayButton();
+ updatePreview();
+}
+
+
+/* =========================
+   PACKAGE BOXES
+========================= */
+
+function selectPackage(key){
+
+ $("packageKey").value = key;
+
+ document
+  .querySelectorAll(".package-card")
+  .forEach(card=>{
+   card.classList.toggle(
+    "active",
+    card.dataset.key === key
+   );
+  });
+
+ togglePackage();
+
+ updatePayButton();
+
+ const p = selectedPackage();
+
+ if(p){
+
+  status(
+   "Selected: " +
+   p.name +
+   " - " +
+   money(p.amount) +
+   " for " +
+   p.days +
+   " days.",
+   "ok"
+  );
+ }
+}
+
+function renderPackages(){
+
+ const container = $("packages");
+
+ if(!packages.length){
+
+  container.innerHTML =
+   '<div class="card">' +
+   '<h3>No advertising packages available</h3>' +
+   '<p class="note">Please try again later.</p>' +
+   '</div>';
+
+  return;
+ }
+
+ container.innerHTML = packages.map(p=>{
+
+  const icon =
+   p.key === "home_hero"
+    ? "Hero"
+    : p.key.includes("song")
+     ? "Song"
+     : p.key.includes("profile")
+      ? "Profile"
+      : "Ad";
+
+  return `
+   <div
+    class="card package-card"
+    data-key="${esc(p.key)}"
+    role="button"
+    tabindex="0">
+
+    <div class="selected-badge">
+     SELECTED
+    </div>
+
+    <div class="icon">${icon}</div>
+
+    <h3>${esc(p.name || p.key)}</h3>
+
+    <div class="desc">
+     ${esc(
+      p.description ||
+      "Promote your content on PASONG."
+     )}
+    </div>
+
+    <div class="price">
+     ${money(p.amount)}
+    </div>
+
+    <div class="days">
+     ${Number(p.days || 0)} days
+    </div>
+
+    <button
+     type="button"
+     class="btn package-select-btn">
+     Select Package
+    </button>
+
+   </div>
+  `;
+
+ }).join("");
+
+ document
+  .querySelectorAll(".package-card")
+  .forEach(card=>{
+
+   const key = card.dataset.key;
+
+   card.addEventListener("click",e=>{
+
+    e.preventDefault();
+
+    selectPackage(key);
+
+   });
+
+   card.addEventListener("keydown",e=>{
+
+    if(e.key === "Enter" || e.key === " "){
+
+     e.preventDefault();
+
+     selectPackage(key);
+    }
+
+   });
+
+   const button =
+    card.querySelector(".package-select-btn");
+
+   if(button){
+
+    button.addEventListener("click",e=>{
+
+     e.preventDefault();
+     e.stopPropagation();
+
+     selectPackage(key);
+
+    });
+   }
+
+  });
+}
+
+
+/* =========================
+   PACKAGE UI
+========================= */
+
+function togglePackage(){
+
+ const p = selectedPackage();
+
+ const hero =
+  p?.key === "home_hero";
+
+ $("heroOptions")
+  .classList.toggle(
+   "hidden",
+   !hero
+  );
+
+ $("mediaBox")
+  .classList.toggle(
+   "hidden",
+   hero
+  );
+
+ if(!hero){
+
+  $("flyerBox")
+   .classList
+   .add("hidden");
+
+  updatePayButton();
+
+  return;
+ }
+
+ const coverRadio =
+  document.querySelector(
+   'input[name="heroType"][value="cover"]'
+  );
+
+ const flyerRadio =
+  document.querySelector(
+   'input[name="heroType"][value="flyer"]'
+  );
+
+ if(promoType === "song"){
+
+  coverRadio.disabled = false;
+
+  $("coverChoice")
+   .style.opacity = "1";
+
+  if(!document.querySelector(
+   'input[name="heroType"]:checked'
+  )){
+
+   coverRadio.checked = true;
+  }
+
+ }else{
+
+  coverRadio.disabled = true;
+
+  $("coverChoice")
+   .style.opacity = ".45";
+
+  flyerRadio.checked = true;
+
+  $("flyerBox")
+   .classList
+   .remove("hidden");
+
+  status(
+   "For a Profile or Business Hero, upload a 16:9 Hero flyer.",
+   "info"
+  );
+ }
+
+ const checked =
+  document.querySelector(
+   'input[name="heroType"]:checked'
+  );
+
+ if(checked){
+
+  $("flyerBox")
+   .classList.toggle(
+    "hidden",
+    checked.value !== "flyer"
+   );
+ }
+
+ updatePayButton();
+}
+
+
+/* =========================
+   LOAD SONGS
+========================= */
+
+async function loadSongs(){
+
+ if(!user) return;
+
+ $("songSelect").innerHTML =
+  '<option value="">Loading your songs...</option>';
+
+ const r =
+  await supabase
+   .from("songs")
+   .select(
+    "id,title,cover_url,artist_user_id,producer_user_id,writer_user_id,uploader_user_id,created_at"
+   )
+   .or(
+    "artist_user_id.eq."+user.id+
+    ",producer_user_id.eq."+user.id+
+    ",writer_user_id.eq."+user.id+
+    ",uploader_user_id.eq."+user.id
+   )
+   .order(
+    "created_at",
+    {ascending:false}
+   );
+
+ if(r.error){
+
+  console.error(r.error);
+
+  $("songSelect").innerHTML =
+   '<option value="">Could not load songs</option>';
+
+  status(
+   "Could not load your songs.",
+   "err"
+  );
+
+  return;
+ }
+
+ songs = r.data || [];
+
+ if(!songs.length){
+
+  $("songSelect").innerHTML =
+   '<option value="">No songs found in your account</option>';
+
+  return;
+ }
+
+ $("songSelect").innerHTML =
+  '<option value="">Select your song</option>' +
+  songs.map(song=>`
+   <option value="${song.id}">
+    ${esc(song.title || "Untitled Song")}
+   </option>
+  `).join("");
+
+ updatePayButton();
+}
+
+
+/* =========================
+   LOAD PROFILE
+========================= */
+
+async function loadProfile(){
+
+ if(!user) return;
+
+ $("profileSelect").innerHTML =
+  '<option value="">Loading profile...</option>';
+
+ const r =
+  await supabase
+   .from("artist_profiles")
+   .select(
+    "id,user_id,artist_name,stage_name,performing_name"
+   )
+   .eq("user_id",user.id)
+   .maybeSingle();
+
+ if(r.error){
+
+  console.error(r.error);
+
+  $("profileSelect").innerHTML =
+   '<option value="">Could not load profile</option>';
+
+  status(
+   "Could not load your PASONG profile.",
+   "err"
+  );
+
+  return;
+ }
+
+ profiles =
+  r.data ? [r.data] : [];
+
+ if(!profiles.length){
+
+  $("profileSelect").innerHTML =
+   '<option value="">No PASONG profile found</option>';
+
+  return;
+ }
+
+ $("profileSelect").innerHTML =
+  profiles.map(p=>`
+   <option value="${p.id}">
+    ${esc(
+     p.performing_name ||
+     p.artist_name ||
+     p.stage_name ||
+     "My Profile"
+    )}
+   </option>
+  `).join("");
+
+ $("advertiserName").value =
+  profiles[0].performing_name ||
+  profiles[0].artist_name ||
+  profiles[0].stage_name ||
+  "";
+
+ updatePreview();
+ updatePayButton();
+}
+
+
+/* =========================
+   CLOUDINARY SIGNED UPLOAD
+========================= */
+
+async function uploadSigned(file,folder){
+
+ const {
+  data:{
+   session
+  }
+ } =
+  await supabase.auth.getSession();
+
+ if(!session?.access_token){
+
+  throw new Error(
+   "Please sign in again."
+  );
+ }
+
+ const sr =
+  await fetch(
+   API_BASE +
+   "/api/cloudinary/signature",
+   {
+    method:"POST",
+    headers:{
+     "Content-Type":
+      "application/json",
+
+     Authorization:
+      "Bearer " +
+      session.access_token
+    },
+    body:JSON.stringify({
+     folder
+    })
+   }
+  );
+
+ const sd =
+  await sr.json()
+   .catch(()=>({}));
+
+ if(!sr.ok){
+
+  throw new Error(
+   sd.error ||
+   "Could not prepare Cloudinary upload."
+  );
+ }
+
+ const cloudName =
+  sd.cloud_name || "vuehnvkp";
+
+ const uploadUrl =
+  "https://api.cloudinary.com/v1_1/" +
+  encodeURIComponent(cloudName) +
+  "/auto/upload";
+
+ const fd =
+  new FormData();
+
+ fd.append("file",file);
+ fd.append("api_key",sd.api_key);
+ fd.append("timestamp",sd.timestamp);
+ fd.append("signature",sd.signature);
+ fd.append(
+  "folder",
+  sd.folder || folder
+ );
+
+ const ur =
+  await fetch(
+   uploadUrl,
+   {
+    method:"POST",
+    body:fd
+   }
+  );
+
+ const ud =
+  await ur.json()
+   .catch(()=>({}));
+
+ if(!ur.ok || !ud.secure_url){
+
+  throw new Error(
+   ud.error?.message ||
+   "Cloudinary upload failed."
+  );
+ }
+
+ return ud.secure_url;
+}
+
+
+/* =========================
+   HERO VALIDATION
+========================= */
+
+function validateHero(file){
+
+ if(file.size > 5 * 1024 * 1024){
+
+  throw new Error(
+   "Hero flyer must be 5 MB or smaller."
+  );
+ }
+
+ return new Promise(
+  (resolve,reject)=>{
+
+   const im =
+    new Image();
+
+   im.onload = ()=>{
+
+    const ratio =
+     im.width / im.height;
+
+    if(
+     ratio < 1.65 ||
+     ratio > 1.82
+    ){
+
+     reject(
+      new Error(
+       "Hero flyer must be approximately 16:9. Recommended 1600 x 900."
+      )
+     );
+
+     return;
+    }
+
+    resolve();
+   };
+
+   im.onerror = ()=>{
+
+    reject(
+     new Error(
+      "Invalid image file."
+     )
+    );
+   };
+
+   im.src =
+    URL.createObjectURL(file);
+  }
+ );
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
+
+function updatePreview(){
+
+ let src = "";
+ let title = "PASONG";
+ let meta = "";
+
+ if(promoType === "song"){
+
+  const song =
+   songs.find(
+    x =>
+     String(x.id) ===
+     String($("songSelect").value)
+   );
+
+  if(song){
+
+   src =
+    coverOf(song);
+
+   title =
+    song.title ||
+    "Song";
+
+   meta =
+    "Song promotion preview";
+  }
+
+ }else if(promoType === "profile"){
+
+  title =
+   $("advertiserName").value ||
+   "My PASONG Profile";
+
+  meta =
+   "Profile promotion preview";
+
+ }else if(promoType === "business"){
+
+  title =
+   $("businessName").value ||
+   "Business / Brand";
+
+  meta =
+   "Business promotion preview";
+ }
+
+ if(src){
+
+  $("previewImg").src =
+   src;
+
+  $("preview").classList
+   .remove("hidden");
+
+ }else{
+
+  $("preview").classList
+   .add("hidden");
+ }
+
+ $("previewTitle").textContent =
+  title;
+
+ $("previewMeta").textContent =
+  meta;
+}
+
+
+/* =========================
+   VALIDATION
+========================= */
+
+function updatePayButton(){
+
+ const button =
+  $("payBtn");
+
+ const hasType =
+  !!promoType;
+
+ const hasPackage =
+  !!selectedPackage();
+
+ button.disabled =
+  !(user &&
+    hasType &&
+    hasPackage);
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+function setupEvents(){
+
+ document
+  .querySelectorAll(".promo-type")
+  .forEach(button=>{
+
+   button.addEventListener(
+    "click",
+    ()=>{
+
+     selectType(
+      button.dataset.type
+     );
+
+    }
+   );
+
+  });
+
+
+ $("packageKey")
+  .addEventListener(
+   "change",
+   ()=>{
+
+    const key =
+     $("packageKey").value;
+
+    document
+     .querySelectorAll(".package-card")
+     .forEach(card=>{
+      card.classList.toggle(
+       "active",
+       card.dataset.key === key
+      );
+     });
+
+    togglePackage();
+    updatePayButton();
+
+   }
+  );
+
+
+ $("songSelect")
+  .addEventListener(
+   "change",
+   ()=>{
+    updatePreview();
+    updatePayButton();
+   }
+  );
+
+
+ $("profileSelect")
+  .addEventListener(
+   "change",
+   ()=>{
+
+    const p =
+     profiles.find(
+      x =>
+       String(x.id) ===
+       String($("profileSelect").value)
+     );
+
+    $("advertiserName").value =
+     p?.performing_name ||
+     p?.artist_name ||
+     p?.stage_name ||
+     "";
+
+    updatePreview();
+    updatePayButton();
+
+   }
+  );
+
+
+ $("businessName")
+  .addEventListener(
+   "input",
+   ()=>{
+
+    updatePreview();
+    updatePayButton();
+
+   }
+  );
+
+
+ $("advertiserEmail")
+  .addEventListener(
+   "input",
+   updatePayButton
+  );
+
+
+ $("flyer")
+  .addEventListener(
+   "change",
+   async ()=>{
+
+    const file =
+     $("flyer").files[0];
+
+    if(!file) return;
+
+    try{
+
+     await validateHero(file);
+
+     $("previewImg").src =
+      URL.createObjectURL(file);
+
+     $("preview").classList
+      .remove("hidden");
+
+     $("previewTitle").textContent =
+      "Hero flyer";
+
+     $("previewMeta").textContent =
+      "16:9 Homepage Hero";
+
+    }catch(e){
+
+     $("flyer").value = "";
+
+     status(
+      e.message,
+      "err"
+     );
+    }
+   }
+  );
+
+
+ document
+  .querySelectorAll(
+   'input[name="heroType"]'
+  )
+  .forEach(radio=>{
+
+   radio.addEventListener(
+    "change",
+    ()=>{
+
+     const flyer =
+      radio.value === "flyer" &&
+      radio.checked;
+
+     $("flyerBox")
+      .classList.toggle(
+       "hidden",
+       !flyer
+      );
+
+     if(
+      !flyer &&
+      promoType === "song"
+     ){
+
+      updatePreview();
+     }
+
+    }
+   );
+
+  });
+
+}
+
+
+/* =========================
+   PAYMENT
+========================= */
+
+async function startPayment(){
+
+ try{
+
+  if(!user){
+
+   throw new Error(
+    "Please sign in first."
+   );
+  }
+
+  if(!promoType){
+
+   throw new Error(
+    "First choose what you want to promote."
+   );
+  }
+
+  const p =
+   selectedPackage();
+
+  if(!p){
+
+   throw new Error(
+    "Choose an advertising package."
+   );
+  }
+
+  const email =
+   $("advertiserEmail")
+    .value.trim();
+
+  if(!email){
+
+   throw new Error(
+    "Enter your contact email."
+   );
+  }
+
+  let mediaUrl = "";
+  let mediaType = "image";
+  let songId = null;
+
+  let targetUrl =
+   $("businessUrl")
+    .value.trim();
+
+
+  /* SONG */
+
+  if(promoType === "song"){
+
+   songId =
+    $("songSelect").value;
+
+   if(!songId){
+
+    throw new Error(
+     "Select the song you want to promote."
+    );
+   }
+
+   const song =
+    songs.find(
+     x =>
+      String(x.id) ===
+      String(songId)
+    );
+
+   if(!song){
+
+    throw new Error(
+     "Selected song could not be found."
+    );
+   }
+
+   mediaUrl =
+    coverOf(song);
+
+   targetUrl =
+    "song.html?id=" +
+    encodeURIComponent(songId);
+
+   if(!mediaUrl){
+
+    throw new Error(
+     "This song has no cover image."
+    );
+   }
+
+  }
+
+
+  /* PROFILE */
+
+  else if(promoType === "profile"){
+
+   const profileId =
+    $("profileSelect").value;
+
+   if(!profileId){
+
+    throw new Error(
+     "Select your PASONG profile."
+    );
+   }
+
+   targetUrl =
+    "artist.html?id=" +
+    encodeURIComponent(profileId);
+
+   mediaUrl = "";
+
+  }
+
+
+  /* BUSINESS */
+
+  else{
+
+   const businessName =
+    $("businessName")
+     .value.trim();
+
+   if(!businessName){
+
+    throw new Error(
+     "Enter your business or brand name."
+    );
+   }
+
+   $("advertiserName").value =
+    businessName;
+
+   if(!targetUrl){
+
+    targetUrl = "#";
+   }
+
+  }
+
+
+  /* MEDIA */
+
+  if(p.key === "home_hero"){
+
+   const heroType =
+    document.querySelector(
+     'input[name="heroType"]:checked'
+    )?.value || "cover";
+
+
+   if(heroType === "flyer"){
+
+    const file =
+     $("flyer").files[0];
+
+    if(!file){
+
+     throw new Error(
+      "Upload a Hero flyer."
+     );
+    }
+
+    await validateHero(file);
+
+    status(
+     "Uploading your Hero flyer...",
+     "info"
+    );
+
+    mediaUrl =
+     await uploadSigned(
+      file,
+      "pasong/heroes"
+     );
+
+   }else{
+
+    if(!mediaUrl){
+
+     throw new Error(
+      "For Homepage Hero, select a song or upload a Hero flyer."
+     );
+    }
+
+   }
+
+  }else{
+
+   const file =
+    $("media").files[0];
+
+   if(!file){
+
+    throw new Error(
+     "Choose advert media."
+    );
+   }
+
+   mediaType =
+    file.type.startsWith("video/")
+     ? "video"
+     : "image";
+
+   status(
+    "Uploading your advert...",
+    "info"
+   );
+
+   mediaUrl =
+    await uploadSigned(
+     file,
+     "pasong/ads"
+    );
+  }
+
+
+  if(!mediaUrl){
+
+   throw new Error(
+    "Please provide advert media."
+   );
+  }
+
+
+  /* AUTO-GENERATED AD DATA */
+
+  if(promoType === "song"){
+
+   const song =
+    songs.find(
+     x =>
+      String(x.id) ===
+      String(songId)
+    );
+
+   $("title").value =
+    song?.title ||
+    "Song promotion";
+
+   $("advertiserName").value =
+    $("advertiserName").value.trim() ||
+    user.email ||
+    "PASONG user";
+
+   $("description").value =
+    "Promote this song on PASONG.";
+
+  }else if(promoType === "profile"){
+
+   const profile =
+    profiles[0];
+
+   $("title").value =
+    profile?.performing_name ||
+    profile?.artist_name ||
+    profile?.stage_name ||
+    "PASONG profile";
+
+   $("advertiserName").value =
+    $("advertiserName").value.trim() ||
+    user.email ||
+    "PASONG user";
+
+   $("description").value =
+    "Promote this PASONG profile.";
+
+  }else{
+
+   $("title").value =
+    $("businessName")
+     .value.trim() ||
+    "Business promotion";
+
+   $("advertiserName").value =
+    $("businessName")
+     .value.trim();
+
+   $("description").value =
+    "Business or brand promotion on PASONG.";
+  }
+
+
+  const {
+   data:{
+    session
+   }
+  } =
+   await supabase.auth.getSession();
+
+  if(!session?.access_token){
+
+   throw new Error(
+    "Your login session expired. Please sign in again."
+   );
+  }
+
+
+  const heroType =
+   p.key === "home_hero"
+    ? document.querySelector(
+       'input[name="heroType"]:checked'
+      )?.value || null
+    : null;
+
+
+  const payload = {
+
+   package_key:
+    p.key,
+
+   advertiser_name:
+    $("advertiserName")
+     .value.trim(),
+
+   advertiser_email:
+    $("advertiserEmail")
+     .value.trim(),
+
+   advertiser_phone:
+    $("advertiserPhone")
+     .value.trim(),
+
+   title:
+    $("title")
+     .value.trim(),
+
+   description:
+    $("description")
+     .value.trim(),
+
+   target_url:
+    targetUrl,
+
+   media_url:
+    mediaUrl,
+
+   media_type:
+    mediaType,
+
+   hero_type:
+    heroType,
+
+   song_id:
+    songId
+
+  };
+
+
+  status(
+   "Opening secure payment...",
+   "ok"
+  );
+
+
+  const rr =
+   await fetch(
+    API_BASE +
+    "/api/advertising/checkout",
+    {
+     method:"POST",
+
+     headers:{
+      "Content-Type":
+       "application/json",
+
+      Authorization:
+       "Bearer " +
+       session.access_token
+     },
+
+     body:
+      JSON.stringify(payload)
+    }
+   );
+
+
+  const d =
+   await rr.json()
+    .catch(()=>({}));
+
+
+  if(!rr.ok){
+
+   throw new Error(
+    d.error ||
+    "Checkout failed."
+   );
+  }
+
+
+  if(!d.checkout_url){
+
+   throw new Error(
+    "Payment checkout URL was not returned."
+   );
+  }
+
+
+  location.href =
+   d.checkout_url;
+
+
+ }catch(e){
+
+  console.error(
+   "PASONG advertising error:",
+   e
+  );
+
+  status(
+   e.message ||
+   "Something went wrong.",
+   "err"
+  );
+ }
+
+}
+
+
+/* =========================
+   INITIALIZATION
+========================= */
+
+async function init(){
+
+ try{
+
+  const r =
+   await supabase.auth.getUser();
+
+  user =
+   r.data?.user ||
+   null;
+
+
+  if(!user){
+
+   $("loginBox").textContent =
+    "Please sign in to purchase advertising.";
+
+   $("payBtn").disabled =
+    true;
+
+   return;
+  }
+
+
+  $("loginBox").textContent =
+   "Signed in as " +
+   (user.email ||
+    "PASONG user");
+
+
+  const pr =
+   await fetch(
+    API_BASE +
+    "/api/advertising/packages",
+    {
+     cache:"no-store"
+    }
+   );
+
+
+  const pd =
+   await pr.json()
+    .catch(()=>({}));
+
+
+  if(!pr.ok){
+
+   throw new Error(
+    pd.error ||
+    "Could not load advertising packages."
+   );
+  }
+
+
+  packages =
+   pd.packages ||
+   [];
+
+
+  renderPackages();
+
+  updatePayButton();
+
+
+ }catch(e){
+
+  console.error(e);
+
+  status(
+   e.message ||
+   "Could not initialize advertising.",
+   "err"
+  );
+
+ }
+
+}
+
+
+/* START */
+
+document.addEventListener(
+ "DOMContentLoaded",
+ ()=>{
+
+  setupEvents();
+
+  $("payBtn")
+   .addEventListener(
+    "click",
+    startPayment
+   );
+
+  init();
+
+ }
+);
+
+</script></body>
+</html>
