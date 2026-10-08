@@ -140,6 +140,10 @@ function money(value,currency){if(value===null||value===undefined||value==="")re
 function getPackageKey(p){return p&&(p.key||p.package_key||p.slug||p.id)}
 function getPackagePrice(p){return p&&(p.price!=null?p.price:p.amount!=null?p.amount:p.price_amount)}
 function getPackageCurrency(p){return p&&(p.currency||p.price_currency)||"UGX"}
+function packageLabel(){var p=selectedPackage||{};return String([p.key,p.package_key,p.slug,p.name,p.title,p.display_name].filter(Boolean).join(" ")).toLowerCase().replace(/[_-]+/g," ").trim()}
+function isHomeVideoPackage(){var n=packageLabel();return n.indexOf("homepage video")>=0||n.indexOf("home video")>=0||n.indexOf("hero video")>=0}
+function isHomeImagePackage(){var n=packageLabel();return n.indexOf("homepage image")>=0||n.indexOf("home image")>=0||n.indexOf("home hero")>=0}
+function isHeroPackage(){return isHomeImagePackage()||isHomeVideoPackage()||packageLabel().indexOf("home hero")>=0}
 
 try{
   if(window.supabase&&typeof window.supabase.createClient==="function"){
@@ -256,7 +260,7 @@ async function uploadSigned(file,folder){
 }
 function updatePreview(){
   var preview=$("preview");preview.innerHTML="";
-  var heroSelected=selectedPackage&&getPackageKey(selectedPackage)==="home_hero";
+  var heroSelected=selectedPackage&&isHeroPackage();
   var heroChoice=document.querySelector('input[name="heroType"]:checked');
   if(heroSelected&&heroChoice&&heroChoice.value==="flyer"&&$("flyer").files[0]){
     var flyer=$("flyer").files[0];showLocalPreview(flyer,preview);return;
@@ -272,14 +276,18 @@ function showLocalPreview(file,preview){
   else{var img=document.createElement("img");img.src=url;img.alt="Advert preview";preview.appendChild(img)}
 }
 function updateHeroFields(){
-  var isHero=!!(selectedPackage&&getPackageKey(selectedPackage)==="home_hero");
+  var isHero=!!(selectedPackage&&isHeroPackage());
   $("heroSection").classList.toggle("hidden",!isHero);
   if(!isHero){$("mediaSection").classList.remove("hidden");updatePreview();return}
   var choice=document.querySelector('input[name="heroType"]:checked');var type=choice?choice.value:"cover";
-  $("flyerField").classList.toggle("hidden",type!=="flyer");
-  $("mediaSection").classList.toggle("hidden",type==="flyer");
+  var videoPackage=isHomeVideoPackage();
+  $("flyerField").classList.toggle("hidden",type!=="flyer"||videoPackage);
+  $("mediaSection").classList.toggle("hidden",type==="flyer"&&!videoPackage);
+  if(videoPackage){$("mediaSection").classList.remove("hidden");$("flyerField").classList.add("hidden");$("media").setAttribute("accept","video/mp4,video/webm");}
+  else{$("media").setAttribute("accept","image/jpeg,image/png,image/webp,video/mp4,video/webm");}
   updatePreview();
 }
+
 async function startPayment(){
   var message=$("mainMessage");hideMessage(message);
   if(!currentSession)throw new Error("Please sign in to your PASONG account first.");
@@ -290,29 +298,45 @@ async function startPayment(){
   if(!advertiserName)throw new Error("Enter your advertiser name.");
   if(!advertiserEmail||!$("advertiserEmail").checkValidity())throw new Error("Enter a valid email address.");
   var mediaUrl="",mediaType="image",songId=null,targetUrl=$("businessUrl").value.trim();
+  var selectedMedia=$("media").files[0]||null;
   if(selectedType==="song"){
     var song=selectedSong();if(!song)throw new Error("Select the song you want to promote.");
     songId=song.id;mediaUrl=coverOf(song);targetUrl="song.html?id="+encodeURIComponent(song.id);
-    if(!mediaUrl)throw new Error("This song has no cover image.");
   }else if(selectedType==="profile"){
     var profile=selectedProfile();if(!profile)throw new Error("Select your PASONG profile.");
     targetUrl="artist.html?id="+encodeURIComponent(profile.id);
+    mediaUrl=profile.profile_image_url||profile.avatar_url||profile.image_url||"";
   }else{
     if(!$("businessName").value.trim())throw new Error("Enter your business or brand name.");
   }
   var packageKey=getPackageKey(selectedPackage);if(!packageKey)throw new Error("The selected package has no package key. Check the advertising packages API.");
   var heroTypeFinal=null;
-  if(packageKey==="home_hero"){
-    var heroChoice=document.querySelector('input[name="heroType"]:checked');heroTypeFinal=heroChoice?heroChoice.value:"cover";
-    if(heroTypeFinal==="flyer"){
+  var heroChoice=document.querySelector('input[name="heroType"]:checked');
+  var heroChoiceValue=heroChoice?heroChoice.value:"cover";
+  if(isHomeVideoPackage()){
+    if(!selectedMedia)throw new Error("Choose a video for the Homepage Video package.");
+    if(["video/mp4","video/webm"].indexOf(selectedMedia.type)<0)throw new Error("Homepage Video requires an MP4 or WEBM video.");
+    mediaType="video";
+  }else if(isHeroPackage()){
+    heroTypeFinal=heroChoiceValue;
+    if(heroChoiceValue==="flyer"){
       var flyer=$("flyer").files[0];await validateHero(flyer);showMessage(message,"Uploading your Hero flyer...","info");mediaUrl=await uploadSigned(flyer,"pasong/heroes");mediaType="image";
-    }else if(selectedType!=="song"||!mediaUrl){throw new Error("For a Home Hero cover advert, select a song with a cover image.");}
-  }else if(selectedType!=="profile"){
-    var mediaFile=$("media").files[0];if(!mediaFile)throw new Error("Choose advert media.");
-    var allowed=["image/jpeg","image/png","image/webp","video/mp4","video/webm"];if(allowed.indexOf(mediaFile.type)<0)throw new Error("Choose JPG, PNG, WEBP, MP4 or WEBM media.");
-    if(mediaFile.size>100*1024*1024)throw new Error("Advert media must be 100 MB or smaller.");
-    showMessage(message,"Uploading your advert...","info");mediaType=mediaFile.type.indexOf("video/")===0?"video":"image";mediaUrl=await uploadSigned(mediaFile,"pasong/ads");
+    }else if(!mediaUrl){
+      if(selectedMedia){mediaType=selectedMedia.type.indexOf("video/")===0?"video":"image";}
+      else throw new Error("Select a song with a cover image, or choose Upload Hero flyer.");
+    }
   }
+  if(selectedMedia && !(isHeroPackage()&&!isHomeVideoPackage()&&heroChoiceValue==="flyer")){
+    var allowed=["image/jpeg","image/png","image/webp","video/mp4","video/webm"];
+    if(allowed.indexOf(selectedMedia.type)<0)throw new Error("Choose JPG, PNG, WEBP, MP4 or WEBM media.");
+    if(selectedMedia.size>100*1024*1024)throw new Error("Advert media must be 100 MB or smaller.");
+    if(isHomeVideoPackage()&&selectedMedia.type.indexOf("video/")!==0)throw new Error("Homepage Video requires a video file.");
+    showMessage(message,"Uploading your advert...","info");
+    mediaType=selectedMedia.type.indexOf("video/")===0?"video":"image";
+    mediaUrl=await uploadSigned(selectedMedia,"pasong/ads");
+  }
+  if(selectedType==="song"&&!mediaUrl)throw new Error("This song has no cover image. Upload advert media or choose a different song.");
+  if(selectedType==="business"&&!mediaUrl&&!selectedMedia)throw new Error("Choose an image or video for your business advert.");
   var payload={package_key:packageKey,advertiser_name:advertiserName,advertiser_email:advertiserEmail,advertiser_phone:advertiserPhone,title:$("title").value.trim(),description:$("description").value.trim(),target_url:targetUrl||"#",media_url:mediaUrl,media_type:mediaType,hero_type:heroTypeFinal,song_id:songId};
   showMessage(message,"Creating your advertising checkout...","info");
   var response=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify(payload)});
