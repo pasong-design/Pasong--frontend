@@ -2159,7 +2159,7 @@ const SUPABASE_ANON_KEY =
   "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";  
   
 const API_BASE =  
-  "https://pasong-api.onrender.com";  
+  "https://pasong-api.vercel.app";  
   
 const PASONG_PRICE =  
   700;  
@@ -2530,37 +2530,33 @@ function authHeaders(){
    CLOUDINARY SIGNATURE  
 ============================================================ */  
   
-async function getCloudinarySignature(){  
-  
-  const response =  
-    await fetch(  
-      API_BASE +  
-      "/api/cloudinary/signature",  
-      {  
-        method:"GET",  
-        headers:authHeaders()  
-      }  
-    );  
-  
-  
-  if(!response.ok){  
-  
-    throw new Error(  
-      "Could not get Cloudinary upload signature."  
-    );  
-  
-  }  
-  
-  
-  return await response.json();  
-  
-}  
-  
-  
-/* ============================================================  
-   CLOUDINARY UPLOAD  
-============================================================ */  
-  
+async function getCloudinarySignature(folder){
+
+  const response = await fetch(
+    API_BASE +
+    "/api/cloudinary/signature",
+    {
+      method:"POST",
+      headers:authHeaders(),
+      body:JSON.stringify({
+        folder: folder || "pasong-songs"
+      })
+    }
+  );
+
+  const data = await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(
+      data?.error || data?.message ||
+      "Could not get Cloudinary upload signature (HTTP " + response.status + ")."
+    );
+  }
+
+  return data;
+}
+
+
 async function uploadToCloudinary(  
   file,  
   signature  
@@ -2591,7 +2587,11 @@ async function uploadToCloudinary(
   formData.append(  
     "signature",  
     signature.signature  
-  );  
+  );
+
+  if(signature.folder){
+    formData.append("folder",signature.folder);
+  }  
   
   
   const uploadUrl =  
@@ -2608,12 +2608,13 @@ async function uploadToCloudinary(
     );  
   
   
-  if(!response.ok){  
-  
-    throw new Error(  
-      "Cloudinary upload failed."  
-    );  
-  
+  if(!response.ok){
+    const errorData = await response.json().catch(()=>({}));
+    throw new Error(
+      errorData?.error?.message ||
+      errorData?.message ||
+      "Cloudinary upload failed (HTTP " + response.status + ")."
+    );
   }  
   
   
@@ -2973,7 +2974,7 @@ document
   
   
         const signature =  
-          await getCloudinarySignature();  
+          await getCloudinarySignature("pasong-songs");  
   
   
         const audioResult =  
@@ -3410,7 +3411,7 @@ document
   
   
         const signature =  
-          await getCloudinarySignature();  
+          await getCloudinarySignature("pasong/covers");  
   
   
         const photoResult =  
@@ -5289,7 +5290,7 @@ async function saveArtistProfile(){
   
   
       const signature =  
-        await getCloudinarySignature();  
+        await getCloudinarySignature("pasong-producers/profile");  
   
   
       const result =  
