@@ -54,16 +54,16 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 <button class="btn" id="sellerSubmit" type="submit">Apply & Continue to Payment</button><div id="sellerStatus" class="status"></div>
 </form><div id="sellerProfile" class="notice" style="margin-top:12px">Your Music Seller application status will appear here.</div></section>
 </div>
-<section class="card" style="margin-top:16px"><h2>💳 Payment options</h2><p class="muted">Choose your preferred payment method after submitting an application.</p>
-<div class="row"><label class="check"><input type="radio" name="payMethod" value="MTN_MOMO" checked><span>MTN Mobile Money</span></label><label class="check"><input type="radio" name="payMethod" value="AIRTEL_MONEY"><span>Airtel Money</span></label><label class="check"><input type="radio" name="payMethod" value="CARD"><span>Visa / Mastercard</span></label></div>
-<div id="paymentInfo" class="notice">Applications are saved first. Checkout opens through PASONG's secure payment provider. Payment is recorded separately from admin approval.</div>
+<section class="card" style="margin-top:16px"><h2>💳 Payment options</h2><p class="muted">MTN Mobile Money checkout. Other methods will appear when their server integrations are available.</p>
+<div class="row"><label class="check"><input type="radio" name="payMethod" value="MTN_MOMO" checked><span>MTN Mobile Money</span></label></div>
+<div id="paymentInfo" class="notice">Your application is saved first. Enter a mobile number on the form and approve the payment prompt on your phone. A licence activates only after the server verifies successful payment.</div>
 <p class="fine">Important: payment credentials must remain on the server. Never paste a payment secret or API key into this page. Existing song and beat purchases remain separate from licensing fees.</p></section>
 </main>
 <datalist id="countryList"><option>Uganda</option><option>Kenya</option><option>Tanzania</option><option>Rwanda</option><option>South Sudan</option><option>Nigeria</option><option>Ghana</option><option>South Africa</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>India</option><option>Australia</option><option>Other</option></datalist>
 <script>
 (() => {
 'use strict';
-const API_BASE=(window.PASONG_API_BASE||'https://pasong-api.onrender.com').replace(/\/$/,'');
+const API_BASE='https://pasong-api.onrender.com';
 const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co';
 const SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -75,6 +75,7 @@ async function session(){const {data,error}=await sb.auth.getSession();if(error)
 async function api(path,body){const s=await session();if(!s?.access_token)throw new Error('Please sign in to your PASONG account first.');const r=await fetch(API_BASE+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.access_token},...(body?{body:JSON.stringify(body)}:{})});let d={};try{d=await r.json()}catch{}if(!r.ok||d.success===false)throw new Error(d.error||'Request failed. Please try again.');return d}
 function chosenScopes(){return [...document.querySelectorAll('input[name="djScope"]:checked')].map(x=>x.value)}
 function paymentMethod(){return document.querySelector('input[name="payMethod"]:checked')?.value||'MTN_MOMO'}
+async function watchPayment(id,statusId){for(let i=0;i<18;i++){await new Promise(r=>setTimeout(r,5000));try{const d=await api('/api/licensing/payment-status/'+encodeURIComponent(id));if(d.status==='successful'){show(statusId,'Payment verified by PASONG. Your application still requires PASONG review before the licence becomes active.','ok');await refreshProfile();return}if(d.status==='failed'){show(statusId,'MTN reports that the payment failed. You can try again when ready.','error');return}}catch(e){/* temporary status-check failure: continue polling */}}show(statusId,'Payment is still pending. If you approved the MTN prompt, refresh your application status shortly. The licence is not active until payment is verified and the application is approved.','info')}
 $('sellerType').addEventListener('change',()=>{$('businessWrap').classList.toggle('hidden',$('sellerType').value!=='shop');$('businessName').required=$('sellerType').value==='shop'});
 async function refreshProfile(){
  try{const s=await session();currentUser=s?.user||null;$('signedIn').textContent=currentUser?'Signed in as '+(currentUser.email||'your PASONG account')+'. You can submit a licence application.':'Please sign in to PASONG before applying. Sign in, then return to this page.';if(!currentUser)return;
@@ -85,21 +86,18 @@ async function refreshProfile(){
 }
 $('djForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('djSubmit');const label='Apply & Continue to Payment';const scopes=chosenScopes();if(!scopes.length){show('djStatus','Select at least one DJ activity.','error');return}setBusy(btn,true,label);
  try{await api('/api/dj-licenses/register',{dj_name:$('djName').value.trim(),legal_name:$('djLegal').value.trim(),contact_phone:$('djPhone').value.trim(),country:$('djCountry').value.trim(),district:$('djDistrict').value.trim(),city:$('djCity').value.trim(),requested_scopes:scopes,accepted_terms:$('djTerms').checked});
- show('djStatus','Your DJ application has been saved. Opening secure checkout…','ok');
- const result=await api('/api/licensing/checkout',{licence_type:'dj',amount:35000,currency:'UGX',payment_method:paymentMethod()});
- if(result.checkout_url)location.href=result.checkout_url;else if(result.payment_url)location.href=result.payment_url;else show('djStatus','Application saved, but the licensing checkout endpoint did not return a payment link. No payment has been taken. Ask PASONG to deploy the licensing checkout backend before accepting payments.','info');
+ show('djStatus','Your DJ application has been saved. Next, checkout must be initiated by the server.','ok');
+ const result=await api('/api/licensing/checkout',{licence_type:'dj',amount:35000,currency:'UGX',payment_method:paymentMethod(),phone_number:$('djPhone').value.trim()});
+ if(result.success){show('djStatus',result.message||'Payment request sent. Approve it on your phone.','info');if(result.payment_id)watchPayment(result.payment_id,'djStatus')}
  }catch(err){show('djStatus',err.message||'Unable to submit application.','error')}finally{setBusy(btn,false,label);await refreshProfile()}
 });
 $('sellerForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('sellerSubmit');const label='Apply & Continue to Payment';setBusy(btn,true,label);
  try{await api('/api/music-sellers/register',{seller_type:$('sellerType').value,legal_name:$('sellerLegal').value.trim(),business_name:$('businessName').value.trim(),contact_phone:$('sellerPhone').value.trim(),country:$('sellerCountry').value.trim(),district:$('sellerDistrict').value.trim(),city:$('sellerCity').value.trim(),registration_number:$('registrationNumber').value.trim(),accepted_terms:$('sellerTerms').checked});
- show('sellerStatus','Your Music Seller application has been saved. Opening secure checkout…','ok');
- const result=await api('/api/licensing/checkout',{licence_type:'seller',amount:50000,currency:'UGX',payment_method:paymentMethod()});
- if(result.checkout_url)location.href=result.checkout_url;else if(result.payment_url)location.href=result.payment_url;else show('sellerStatus','Application saved, but the licensing checkout endpoint did not return a payment link. No payment has been taken. Deploy the licensing checkout backend before accepting payments.','info');
+ show('sellerStatus','Your Music Seller application has been saved. Next, checkout must be initiated by the server.','ok');
+ const result=await api('/api/licensing/checkout',{licence_type:'seller',amount:50000,currency:'UGX',payment_method:paymentMethod(),phone_number:$('sellerPhone').value.trim()});
+ if(result.success){show('sellerStatus',result.message||'Payment request sent. Approve it on your phone.','info');if(result.payment_id)watchPayment(result.payment_id,'sellerStatus')}
  }catch(err){show('sellerStatus',err.message||'Unable to submit application.','error')}finally{setBusy(btn,false,label);await refreshProfile()}
 });
-const paymentResult=new URLSearchParams(location.search).get('payment');
-if(paymentResult==='verified') $('paymentInfo').textContent='Payment verified by PASONG. Your application still requires PASONG admin approval; payment alone does not activate a licence.';
-else if(paymentResult==='not_verified') $('paymentInfo').textContent='Payment was not verified. If money was deducted, contact PASONG support with your transaction receipt.';
 refreshProfile();
 })();
 </script></body></html>
