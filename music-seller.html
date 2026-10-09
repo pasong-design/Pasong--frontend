@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10091f">
+<title>PASONG Music Seller Program</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0c0718;--panel:#171027;--panel2:#211537;--purple:#9b5cff;--pink:#ff4fd8;--text:#f7f2ff;--muted:#b8aacd;--line:#382750;--green:#49e2a1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#24113d 0,#0c0718 58%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px max(16px,calc((100% - 1050px)/2));border-bottom:1px solid var(--line);background:#0c0718cc;position:sticky;top:0;z-index:2;backdrop-filter:blur(12px)}
+.brand{font-weight:900;letter-spacing:1.5px;font-size:20px}.brand span{color:var(--pink)}a{color:#d9baff;text-decoration:none}.wrap{max-width:1000px;margin:auto;padding:28px 16px 60px}.hero{padding:26px;border:1px solid #59378a;border-radius:22px;background:linear-gradient(135deg,#24123d,#151025 70%);box-shadow:0 16px 60px #0005}.eyebrow{color:#d6a7ff;font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase}.hero h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:12px 0}.hero p,.muted{color:var(--muted);line-height:1.6}.pill{display:inline-block;border:1px solid #7042a0;border-radius:99px;padding:7px 11px;margin:4px 5px 0 0;font-size:12px;color:#e3caff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0}.card h2{margin:0 0 14px;font-size:20px}.field{margin:12px 0}.field label{display:block;font-size:13px;color:#d9cce9;margin-bottom:7px}.field input,.field select,.field textarea{width:100%;background:#0d0818;color:var(--text);border:1px solid #493360;border-radius:10px;padding:12px;font:inherit;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple)}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.check{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:13px;line-height:1.5}.check input{margin-top:3px}.btn{border:0;border-radius:11px;padding:12px 16px;background:linear-gradient(100deg,var(--purple),var(--pink));color:white;font-weight:800;cursor:pointer;width:100%;margin-top:8px}.btn:disabled{opacity:.5;cursor:not-allowed}.btn.secondary{background:#302044;border:1px solid #65438a}.notice{padding:12px;border-radius:10px;background:#211537;color:#d8c9ed;font-size:13px;line-height:1.5}.status{display:none;padding:12px;margin-top:12px;border-radius:10px;font-size:14px;line-height:1.5}.status.show{display:block}.status.error{background:#471b2b;color:#ffd9e4}.status.ok{background:#123a2e;color:#c8ffe7}.status.info{background:#24163a;color:#e5d4ff}.hidden{display:none!important}.catalog-item{padding:13px 0;border-bottom:1px solid var(--line)}.catalog-item:last-child{border-bottom:0}.catalog-item strong{display:block}.catalog-item small{display:block;color:var(--muted);margin-top:5px;line-height:1.5}.badge{display:inline-block;border-radius:99px;padding:5px 9px;background:#2d2040;color:#e6d4ff;font-size:11px;font-weight:800;text-transform:uppercase}.badge.approved{background:#12402f;color:#a8ffda}.badge.pending{background:#493416;color:#ffe1a3}.fine{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}.hero{padding:21px}.wrap{padding-top:18px}}
+</style>
+</head>
+<body>
+<header><div class="brand">◈ <span>PASONG</span></div><a href="pasong.html">← Back to PASONG</a></header>
+<main class="wrap">
+<section class="hero"><div class="eyebrow">Official distribution programme</div><h1>Become a PASONG Music Seller</h1><p>Apply as an individual seller or a music shop. Once approved, sellers can view only the catalogue that PASONG has cleared for the specific distribution rights shown on each title.</p><span class="pill">Individual sellers</span><span class="pill">Music shops</span><span class="pill">Digital distribution</span><span class="pill">Physical distribution</span></section>
+<div class="grid">
+<section class="card" id="applicationCard">
+<h2>Seller application</h2><p class="muted" id="signedIn">Checking your PASONG account…</p>
+<form id="sellerForm">
+<div class="field"><label for="sellerType">Seller type *</label><select id="sellerType" required><option value="individual">Individual music seller</option><option value="shop">Music shop / business</option></select></div>
+<div class="field"><label for="legalName">Legal name *</label><input id="legalName" autocomplete="name" required maxlength="120"></div>
+<div class="field hidden" id="businessNameWrap"><label for="businessName">Music shop / business name *</label><input id="businessName" maxlength="150"></div>
+<div class="field"><label for="phone">Contact phone *</label><input id="phone" type="tel" autocomplete="tel" required maxlength="40" placeholder="+256…"></div>
+<div class="row"><div class="field"><label for="country">Country *</label><input id="country" value="Uganda" required></div><div class="field"><label for="district">District / region *</label><input id="district" required></div></div>
+<div class="field"><label for="city">Town / city</label><input id="city"></div>
+<div class="field"><label for="registrationNumber">Business registration number (if applicable)</label><input id="registrationNumber" maxlength="100"></div>
+<label class="check"><input id="terms" type="checkbox" required><span>I agree to follow each licence's terms. I understand that streaming access or an ordinary personal download does not grant permission to copy, resell, or distribute music. I will distribute only titles and formats specifically authorised by PASONG.</span></label>
+<button class="btn" id="submitBtn" type="submit">Submit application</button>
+<div id="formStatus" class="status"></div></form>
+<p class="fine">Applications are reviewed by PASONG Admin. Do not upload or distribute music you do not have permission to reproduce or resell.</p>
+</section>
+<section class="card"><h2>Your seller status</h2><div id="sellerStatus" class="notice">Sign in to check your application status.</div><div id="catalogWrap" class="hidden"><h2 style="margin-top:22px">Authorised catalogue</h2><p class="muted">Titles appear here only when distribution permissions are recorded and active.</p><div id="catalogList"></div></div><div id="catalogMessage" class="status"></div><button class="btn secondary" id="refreshBtn" type="button">Refresh status</button>
+<p class="fine">Digital delivery, physical-copy limits, licence fees, expiry and reporting must follow the terms approved for each title. Payment checkout and licence-certificate issuance are not activated by this application page.</p></section>
+</div>
+<div id="globalStatus" class="status"></div>
+</main>
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const API_BASE="https://pasong-api.vercel.app";
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let session=null;
+const $=id=>document.getElementById(id);
+function show(el,msg,type="info"){el.textContent=msg;el.className="status show "+type;}
+function hide(el){el.className="status";}
+function statusBadge(s){const b=document.createElement("span");b.className="badge "+s;b.textContent=s;return b;}
+async function api(path,options={}){if(!session)throw new Error("Please sign in to your PASONG account first.");const response=await fetch(API_BASE+path,{...options,headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token,...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||"Request failed.");return data;}
+function updateSellerType(){const shop=$("sellerType").value==="shop";$("businessNameWrap").classList.toggle("hidden",!shop);$("businessName").required=shop;}
+$("sellerType").addEventListener("change",updateSellerType);
+function renderCatalog(items){const box=$("catalogList");box.replaceChildren();if(!items.length){box.textContent="No authorised titles are currently listed. PASONG will add titles only after rights clearance.";return;}for(const item of items){const div=document.createElement("div");div.className="catalog-item";const title=document.createElement("strong");title.textContent=item.title+" — "+item.artist_name;const meta=document.createElement("small");meta.textContent=[item.genre||"Genre not specified",item.license_summary,"Formats: "+(item.format_options||[]).join(", "),"Fee: "+item.currency+" "+item.license_fee,"Licence expires: "+new Date(item.license_end).toLocaleDateString()].join(" · ");div.append(title,meta);box.append(div);}}
+async function refresh(){hide($("globalStatus"));if(!session){$("sellerStatus").textContent="Please sign in to PASONG, then refresh this page.";return;}try{const d=await api("/api/music-sellers/me");const seller=d.seller;$("catalogWrap").classList.add("hidden");if(!seller){$("sellerStatus").textContent="No application yet. Complete the form to apply.";return;}const statusBox=$("sellerStatus");statusBox.replaceChildren();statusBox.append(document.createTextNode("Application status: "),statusBadge(seller.status));const details=document.createElement("p");details.className="muted";details.textContent=(seller.business_name||seller.legal_name)+" · "+seller.district+", "+seller.country+(seller.review_note?" · Admin note: "+seller.review_note:"");statusBox.append(details);if(seller.status==="approved"){ $("catalogWrap").classList.remove("hidden");try{const c=await api("/api/music-sellers/catalog");renderCatalog(c.catalog||[]);}catch(e){show($("catalogMessage"),e.message,"error");}}}catch(e){show($("globalStatus"),e.message,"error");}}
+$("sellerForm").addEventListener("submit",async e=>{e.preventDefault();hide($("formStatus"));$("submitBtn").disabled=true;try{const payload={seller_type:$("sellerType").value,legal_name:$("legalName").value.trim(),business_name:$("businessName").value.trim(),contact_phone:$("phone").value.trim(),country:$("country").value.trim(),district:$("district").value.trim(),city:$("city").value.trim(),registration_number:$("registrationNumber").value.trim(),accepted_terms:$("terms").checked};const d=await api("/api/music-sellers/register",{method:"POST",body:JSON.stringify(payload)});show($("formStatus"),d.message||"Application submitted.","ok");await refresh();}catch(e){show($("formStatus"),e.message,"error");}finally{$("submitBtn").disabled=false;}});
+$("refreshBtn").addEventListener("click",refresh);
+async function init(){try{const r=await supabase.auth.getSession();session=r.data.session;if(!session){$("signedIn").textContent="You are not signed in. Please sign in to PASONG before submitting.";return;}const u=session.user;$("signedIn").textContent="Signed in as "+(u.email||"PASONG user");await refresh();}catch(e){show($("globalStatus"),e.message,"error");}}
+init();
+</script>
+</body></html>
