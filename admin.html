@@ -204,10 +204,10 @@ document.querySelectorAll(".sidebar button").forEach(b=>b.classList.toggle("acti
 if(name==="dashboard")loadStats();
 if(name==="songs")loadGenericTable("songs","songsTable",["title","status","created_at"]);
 if(name==="beats")loadGenericTable("beats","beatsTable",["title","genre","status","created_at"]);
-if(name==="mixes")loadGenericTable("dj_mixes","mixesTable",["title","status","created_at"]);
-if(name==="orders")loadGenericTable("orders","ordersTable",["id","status","amount","currency","created_at"]);
-if(name==="covers")loadGenericTable("covers","coversTable",["id","status","created_at"]);
-if(name==="reports")loadGenericTable("reports","reportsTable",["id","status","created_at"]);
+if(name==="mixes")loadMixes();
+if(name==="orders")loadGenericTable("orders","ordersTable",["id","status","total_amount","currency","created_at"]);
+if(name==="covers")loadCovers();
+if(name==="reports")loadReports();
 if(name==="copyright"){loadCopyrightComplaints();loadCopyrightStrikes();}
 if(name==="ads")loadAds();
 }
@@ -293,6 +293,48 @@ element.innerHTML='<div class="table-wrap"><table><thead><tr>'+columns.map(c=>'<
 rows.map(row=>'<tr>'+columns.map(c=>'<td>'+formatCell(c,row[c])+'</td>').join("")+'</tr>').join("")+
 '</tbody></table></div>';
 }
+function renderAdminRows(element, rows, columns, emptyMessage="No records found."){
+  if(!rows || !rows.length){element.innerHTML='<div class="empty">'+escapeHtml(emptyMessage)+'</div>';return;}
+  element.innerHTML='<div class="table-wrap"><table><thead><tr>'+columns.map(c=>'<th>'+escapeHtml(c.label||c.key)+'</th>').join("")+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+columns.map(c=>'<td>'+formatCell(c.key,row[c.key])+'</td>').join("")+'</tr>').join("")+'</tbody></table></div>';
+}
+async function loadCovers(){
+  const element=document.getElementById("coversTable");
+  element.innerHTML='<div class="loading">Loading cover requests...</div>';
+  const [dj, song]=await Promise.all([
+    supabaseClient.from("cover_requests").select("*").order("created_at",{ascending:false}).limit(100),
+    supabaseClient.from("cover_design_requests").select("*").order("created_at",{ascending:false}).limit(100)
+  ]);
+  const errors=[dj.error&&("DJ mix covers: "+dj.error.message),song.error&&("Song covers: "+song.error.message)].filter(Boolean);
+  const rows=[...(dj.data||[]).map(r=>({...r,_cover_type:"DJ Mix Cover",_display_title:r.mix_title,_display_status:r.request_status||r.payment_status})),...(song.data||[]).map(r=>({...r,_cover_type:"Song Cover",_display_title:r.song_title,_display_status:r.request_status||r.payment_status}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  if(!rows.length && errors.length){element.innerHTML='<div class="empty">Unable to load cover requests. '+escapeHtml(errors.join(" | "))+'</div>';return;}
+  renderAdminRows(element,rows,[{key:"_cover_type",label:"Type"},{key:"_display_title",label:"Title"},{key:"request_status",label:"Request Status"},{key:"payment_status",label:"Payment"},{key:"created_at",label:"Created"}],"No cover requests found.");
+  if(errors.length)element.insertAdjacentHTML("afterbegin",'<div class="notice info">Some cover records could not be loaded: '+escapeHtml(errors.join(" | "))+'</div>');
+}
+async function loadReports(){
+  const element=document.getElementById("reportsTable");
+  element.innerHTML='<div class="loading">Loading report records...</div>';
+  const [complaints,messages]=await Promise.all([
+    supabaseClient.from("copyright_complaints").select("*").order("created_at",{ascending:false}).limit(100),
+    supabaseClient.from("contact_messages").select("*").order("created_at",{ascending:false}).limit(100)
+  ]);
+  const errors=[complaints.error&&("Copyright reports: "+complaints.error.message),messages.error&&("Contact reports: "+messages.error.message)].filter(Boolean);
+  const rows=[...(complaints.data||[]).map(r=>({...r,_report_type:"Copyright complaint",_report_details:r.reason||r.rights_claim||r.material_description||"—",_report_status:r.status})),...(messages.data||[]).map(r=>({...r,_report_type:"Contact message",_report_details:r.subject||r.message||"—",_report_status:r.status||"unreviewed"}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  if(!rows.length && errors.length){element.innerHTML='<div class="empty">Unable to load report records. '+escapeHtml(errors.join(" | "))+'</div>';return;}
+  renderAdminRows(element,rows,[{key:"_report_type",label:"Type"},{key:"_report_details",label:"Details"},{key:"_report_status",label:"Status"},{key:"created_at",label:"Created"}],"No report records found.");
+  if(errors.length)element.insertAdjacentHTML("afterbegin",'<div class="notice info">Some report records could not be loaded: '+escapeHtml(errors.join(" | "))+'</div>');
+}
+async function loadMixes(){
+  const element=document.getElementById("mixesTable");
+  element.innerHTML='<div class="loading">Checking DJ mix records...</div>';
+  const r=await supabaseClient.from("dj_mixes").select("*").order("created_at",{ascending:false}).limit(100);
+  if(!r.error){renderAdminRows(element,r.data||[],[{key:"title",label:"Title"},{key:"status",label:"Status"},{key:"created_at",label:"Created"}]);return;}
+  if(/does not exist|schema cache|could not find the table/i.test(r.error.message||"")){
+    element.innerHTML='<div class="empty">The Supabase database has no <code>dj_mixes</code> table, so this section cannot list DJ mixes yet. I have left the existing data unchanged rather than displaying ordinary songs as DJ mixes.</div>';
+    return;
+  }
+  element.innerHTML='<div class="empty">Unable to load DJ mixes. '+escapeHtml(r.error.message)+'</div>';
+}
+
 function formatCell(key,value){
 if(value===null||value===undefined)return"—";
 if(key==="created_at")return new Date(value).toLocaleString();
