@@ -459,9 +459,11 @@ Paid licences provide downloadable files and the usage rights attached to the pu
 <input id="musicalKey" type="text" placeholder="C Major">
 </div>
 
-<div class="field">
+<div class="field full">
 <label for="cover">Beat Cover</label>
 <input id="cover" type="file" accept="image/jpeg,image/png,image/webp">
+<div class="price-help">Already have artwork? Upload it above. Need PASONG to design the cover for you?</div>
+<button type="button" class="btn btn-secondary" id="requestBeatCoverDesign" style="margin-top:10px;width:100%">🎨 Request PASONG Cover Design</button>
 </div>
 
 <div class="field full">
@@ -779,6 +781,15 @@ async function loadProducerCoverRequests(){
  if(!data?.length){el.innerHTML='<div class="empty">You have not made any cover requests yet.</div>';return;}
  el.innerHTML='<div class="table-wrap"><table><thead><tr><th>Title</th><th>Fee</th><th>Payment</th><th>Design</th><th>Artwork</th></tr></thead><tbody>'+data.map(r=>'<tr><td>'+escapeHtml(r.song_title||"—")+'</td><td>'+escapeHtml((r.fee_currency||"UGX")+" "+Number(r.fee_amount||0).toLocaleString())+'</td><td>'+escapeHtml(r.payment_status||"pending")+'</td><td>'+escapeHtml(r.design_status||r.request_status||"pending")+'</td><td>'+(r.finished_cover_url?'<a href="'+escapeHtml(r.finished_cover_url)+'" target="_blank" rel="noopener">View cover</a>':"Not ready")+'</td></tr>').join('')+'</tbody></table></div>';
 }
+// Let producers request designed artwork directly from the Beat Upload screen.
+document.getElementById("requestBeatCoverDesign")?.addEventListener("click",()=>{
+ const beatTitle=document.getElementById("beatTitle")?.value?.trim()||"";
+ const titleInput=document.getElementById("producerCoverTitle");
+ if(titleInput && beatTitle && !titleInput.value.trim()) titleInput.value=beatTitle;
+ showSection("covers");
+ document.getElementById("producerCoverTitle")?.focus();
+});
+
 document.getElementById("producerCoverForm")?.addEventListener("submit",async e=>{
  e.preventDefault();const btn=document.getElementById("producerCoverSubmit");btn.disabled=true;btn.textContent="Saving request…";producerCoverMsg("");
  try{
