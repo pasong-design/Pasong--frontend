@@ -2,33 +2,378 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080b1d">
 <title>PASONG — Music. Opportunity. Support.</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ... CLEANED SINGLE MOBILE DESIGN - NO DUPLICATES ... */
-body{background:#100f15;color:#f8f6fb;font-family:Arial,sans-serif}
-.mobile-home{display:block;padding:0 0 12px}
-.mobile-top{display:grid;grid-template-columns:34px 1fr 76px;align-items:center;gap:8px;margin:2px 0 12px}
-.mobile-top .brand{text-align:center;font-size:23px;font-weight:900}
-.mobile-top .brand i{color:#b56cff;font-style:normal}
-.mobile-round{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#211d2a;border:1px solid #383044}
-.mobile-search{position:relative;margin:0 0 14px}.mobile-search input{width:100%;min-height:46px;background:#292631;border:1px solid #4b4556;border-radius:11px;padding:12px 14px 12px 42px;color:#fff}
-.mobile-hero{height:188px;border:1px solid #383043;border-radius:13px;overflow:hidden;margin:0 0 15px;position:relative;background:#17131d}
-.mobile-section{margin:0 0 20px}.mobile-section-head{display:flex;justify-content:space-between;margin-bottom:10px}.mobile-section-head h2{font-size:17px;font-weight:850}
-.mobile-list{display:flex;flex-direction:column;gap:10px}
-.mobile-list-item{display:grid;grid-template-columns:56px 1fr 86px;gap:10px;align-items:center;background:#211e28;border:1px solid #302a39;border-radius:10px;padding:7px}
-.mobile-list-item img{width:56px;height:56px;border-radius:8px;object-fit:cover}
-.mobile-list-item b{font-size:12px;display:block}
-.mobile-list-item span{font-size:10px;color:#b6afc1;display:block;margin-top:3px}
-.mobile-list-item strong{font-size:10px;background:#7650c7;color:#fff;border-radius:8px;padding:8px 9px;text-align:center}
-.mobile-bottom{position:fixed;left:10px;right:10px;bottom:8px;z-index:9999;display:grid;grid-template-columns:repeat(5,1fr);height:74px;padding:7px 8px;border:1px solid rgba(178,119,255,.38);border-radius:22px;background:rgba(27,24,36,.98)}
-.mobile-bottom a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#bcb5c9;font-size:11px;font-weight:700;border-radius:15px;min-height:56px}
-.mobile-bottom a.active{color:#fff;background:linear-gradient(145deg,#7938c8,#51258f)}
+:root{
+  --bg:#070a18;--panel:#0b1025;--panel2:#0d1430;--line:#1b2a55;
+  --blue:#08a9ff;--cyan:#22d3ee;--purple:#8b5cf6;--pink:#b026ff;
+  --text:#f7f8ff;--muted:#8e9ab8;--soft:#b9c4df;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:Arial,sans-serif;background:radial-gradient(circle at 50% -20%,#111b48 0,#070a18 38%,#050712 100%);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}button,input{font-family:inherit}button{cursor:pointer}
+header{position:sticky;top:0;z-index:1000;background:rgba(5,8,24,.96);backdrop-filter:blur(18px);border-bottom:1px solid #17244a;padding:10px 22px}
+.header-inner{max-width:1500px;margin:auto;display:flex;align-items:center;gap:22px;height:52px}
+.logo{display:flex;align-items:center;gap:9px;font-size:30px;font-weight:950;white-space:nowrap;letter-spacing:-1.4px}
+.logo-mark{width:34px;height:34px;border:3px solid #8b5cf6;border-radius:9px;display:grid;place-items:center;color:#a855f7;font-size:18px;box-shadow:0 0 22px #7c3aed66}
+.logo small{display:block;font-size:6px;letter-spacing:1.2px;color:#aeb9d4;margin-top:-3px}.logo-text{display:flex;flex-direction:column}
+.search-box{flex:1;max-width:410px;position:relative;margin-left:auto}
+.search-box input{width:100%;background:#111a3b;border:1px solid #213568;color:#fff;padding:10px 14px 10px 40px;border-radius:24px;outline:none;font-size:12px}
+.search-box input:focus{border-color:#5d65ff;box-shadow:0 0 0 3px #5d65ff22}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);opacity:.8}
+.header-links{display:flex;gap:17px;font-size:12px;white-space:nowrap;align-items:center}
+.header-links a{display:flex;align-items:center;gap:5px;color:#dce4f7;padding:18px 2px 16px;border-bottom:2px solid transparent}
+.header-links a:hover,.header-links a.active{color:#fff;border-color:#9b4dff}
+.account-box{width:36px;height:36px;border-radius:50%;background:linear-gradient(145deg,#6d36d8,#a64bff);border:1px solid #b06cff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+.account-box img{width:100%;height:100%;object-fit:cover}.account-letter{font-weight:900;color:#fff}.header-icon{font-size:17px;color:#e4eaff;white-space:nowrap}
+main{max-width:1500px;margin:auto;padding:16px 22px 120px}
+.desktop-layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:16px;align-items:start}.main-column{min-width:0}
+.main-hero-slider{width:100%;height:285px;border:1px solid #3a2a78;border-radius:13px;overflow:hidden;position:relative;background:#0b1028;box-shadow:0 0 28px #3d20a51a}
+.slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;visibility:hidden;transition:.7s}.slide.active{opacity:1;visibility:visible}
+.slide-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,5,18,.9),rgba(3,5,18,.48),rgba(3,5,18,.08)),linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.42))}
+.slide-content{position:absolute;left:46px;top:50%;transform:translateY(-50%);max-width:620px;z-index:3}
+.slide-content h1{font-size:clamp(42px,5vw,62px);line-height:.95;letter-spacing:-3px;margin-bottom:10px}
+.slide-content h2{color:#bf74ff;font-size:11px;letter-spacing:2px;margin-bottom:8px}.slide-content p{color:#e0e5f5;font-size:17px;line-height:1.4;margin-bottom:18px}
+.hero-btn{display:inline-flex;background:linear-gradient(90deg,#7c3aed,#b026ff);padding:11px 20px;border-radius:9px;font-weight:900;font-size:12px;box-shadow:0 6px 22px #7c3aed55}
+.now-playing{margin-top:11px;color:#aeb8d0;font-size:10px;font-weight:700}.now-playing span{color:#c084fc;margin-right:5px}
+.slide-dots{position:absolute;left:50%;transform:translateX(-50%);bottom:17px;display:flex;gap:8px;z-index:5}
+.slide-dots span{width:8px;height:8px;border-radius:50%;background:#66719b}.slide-dots span.active{width:24px;border-radius:5px;background:#a855f7}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:1px solid #ffffff26;background:#07102dcc;color:#fff;font-size:26px;z-index:10}.arrow.left{left:12px}.arrow.right{right:12px}
+.feature-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+.feature-card{min-height:74px;background:linear-gradient(145deg,#10183a,#0a1027);border:1px solid #273b77;border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px}
+.feature-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(145deg,#6d28d9,#8b5cf6);font-size:22px;box-shadow:0 0 20px #7c3aed44;flex:none}
+.feature-card h3{font-size:13px;margin-bottom:4px}.feature-card p{font-size:10px;color:#a7b3d0;line-height:1.35}.feature-arrow{margin-left:auto;color:#fff;font-size:17px}
+.section{margin-top:14px;background:linear-gradient(145deg,#0a1025cc,#07101fcc);border:1px solid #182b58;border-radius:11px;padding:11px 12px}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.section-header h2{font-size:16px}.section-header a{font-size:10px;color:#a9b8ff}
+.song-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.song-card{background:#0b122b;border:1px solid #213561;border-radius:9px;overflow:hidden;min-width:0;transition:.18s}
+.song-card:hover{transform:translateY(-2px);border-color:#5368b9;box-shadow:0 10px 24px #02061755}
+.cover-wrap{aspect-ratio:1;position:relative;background:#101936}.cover-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.play-overlay{position:absolute;right:6px;bottom:6px;width:28px;height:28px;border-radius:50%;background:#080d22e8;color:#fff;border:1px solid #7c5cff;font-size:12px;box-shadow:0 0 12px #7c3aed55}
+.song-info{padding:7px}.song-title{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.song-artist{color:#9a9aa8;font-size:9px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-meta{display:flex;justify-content:space-between;margin-top:6px}.price{color:#bf83ff;font-weight:800;font-size:9px}.genre{color:#74809f;font-size:8px}
+.artist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.artist-card{background:#0b122b;border:1px solid #213561;border-radius:9px;padding:8px;text-align:center}
+.artist-image{width:58px;height:58px;border-radius:50%;object-fit:cover;border:1px solid #8b5cf6;box-shadow:0 0 12px #7c3aed33}.artist-name{font-weight:800;font-size:9px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist-role{font-size:8px;color:#7f8dab;margin-top:2px}
+.genre-grid,.info-grid{display:grid;gap:10px}.genre-grid{grid-template-columns:repeat(6,1fr)}.genre-card,.info-card,.points-card{background:#0b122b;border:1px solid #213561;border-radius:9px;padding:12px}.genre-card{text-align:center;font-weight:800;font-size:11px}
+.info-grid{grid-template-columns:repeat(3,1fr)}.info-icon{font-size:22px;margin-bottom:8px}.info-card h3{font-size:13px;margin-bottom:5px}.info-card p,.points-card p{color:#8995b2;font-size:10px;line-height:1.55}.points-card h2{font-size:15px;margin-bottom:6px}
+.btn-yellow{display:inline-flex;background:linear-gradient(90deg,#7c3aed,#a855f7);padding:9px 14px;border-radius:8px;font-weight:800;font-size:11px}
+.ads-section{margin-top:14px}.ads-header{margin-bottom:7px}.ads-label{font-size:9px;font-weight:900;color:#8e9ab8;letter-spacing:1.5px;text-transform:uppercase}.ads-list{display:grid;grid-template-columns:1fr;gap:9px}
+.ads-card{display:block;width:100%;border:1px solid #293f75;border-radius:10px;overflow:hidden;background:#080d20;line-height:0}.ads-card-media{width:100%;display:block;background:#060918;line-height:0;overflow:hidden}
+.ads-card-media img,.ads-card-media video{display:block;width:100%;height:auto;max-width:100%;max-height:none;object-fit:contain;object-position:center;background:#060918}.ads-card-content,.ads-card-title,.ads-card-description{display:none!important}
+.sidebar{min-width:0}.sidebar-card{background:linear-gradient(145deg,#0b122c,#080d1f);border:1px solid #263967;border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 10px 30px #02061722}
+.sidebar-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.sidebar-title h2{font-size:15px}.sidebar-title a{font-size:10px;color:#b97cff}
+.countdown-list{display:flex;flex-direction:column}.countdown-item{display:grid;grid-template-columns:20px 42px 1fr 28px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1a294c}.countdown-item:last-child{border-bottom:0}
+.rank{font-size:14px;font-weight:900}.side-cover{width:42px;height:42px;border-radius:6px;object-fit:cover}.side-song{min-width:0}.side-song b{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.side-song span{display:block;color:#8290ad;font-size:8px;margin-top:3px}.side-song em{display:block;color:#bf83ff;font-size:8px;font-style:normal;margin-top:2px}
+.side-play{width:28px;height:28px;border-radius:50%;border:1px solid #8b5cf6;background:#10133b;color:#fff;font-size:10px}.sidebar-ad .ads-list{grid-template-columns:1fr}.sidebar-ad .ads-card{border-radius:9px}
+.quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.quick-link{display:flex;flex-direction:column;align-items:center;gap:5px;color:#c6d0e6;font-size:8px;text-align:center}.quick-link span:first-child{font-size:20px}
+.join-card{display:flex;gap:10px;align-items:center}.join-icon{font-size:32px;color:#a855f7}.join-card h3{font-size:12px;margin-bottom:4px}.join-card p{font-size:9px;color:#8c98b4;line-height:1.4}.join-btn{display:inline-flex;margin-top:8px;background:linear-gradient(90deg,#7c3aed,#a855f7);padding:7px 13px;border-radius:8px;font-size:9px;font-weight:900}
+.premium-banner{margin-top:14px;min-height:88px;border:1px solid #4431a5;border-radius:11px;overflow:hidden;background:radial-gradient(circle at 60% 50%,#4b1bb7,#0b102a 55%);display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+.premium-banner h2{font-size:16px;color:#d8b4fe}.premium-banner p{font-size:9px;color:#aab4cc;margin-top:4px}.premium-btn{display:inline-flex;margin-top:8px;background:linear-gradient(90deg,#7c3aed,#c026ff);padding:7px 14px;border-radius:8px;font-size:9px;font-weight:900}.premium-art{font-size:58px;opacity:.75}
+footer{border-top:1px solid #17244a;margin-top:25px;padding:28px 18px;background:#050714}.footer-inner{max-width:1500px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px}.footer-col a{display:block;color:#7f8aa6;font-size:10px;margin-bottom:7px}.footer-brand p{color:#7f8aa6;font-size:11px;line-height:1.6;margin-top:7px}
+.mobile-bottom{display:none}.mini-player{position:fixed;left:0;right:0;bottom:0;z-index:2000;background:rgba(5,9,24,.97);border-top:1px solid #25386c;min-height:62px;display:none;align-items:center;padding:7px 22px;gap:12px;box-shadow:0 -10px 30px #02061788}.mini-player.active{display:flex}
+.mini-cover{width:48px;height:48px;border-radius:7px;object-fit:cover}.mini-info{flex:1;min-width:0}.mini-title{font-weight:800;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini-artist{font-size:9px;color:#8d99b4;margin-top:3px}.mini-controls{display:flex;align-items:center;gap:15px}.mini-controls button{width:34px;height:34px;border-radius:50%;border:1px solid #314575;background:#111936;color:#fff}.mini-controls button:first-child{background:linear-gradient(135deg,#7c3aed,#b026ff);border:0}
+.mobile-home{display:none}
+@media(max-width:1150px){.desktop-layout{grid-template-columns:minmax(0,1fr) 300px}.header-links{gap:10px}.header-links a:nth-child(n+8){display:none}.song-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:850px), (max-device-width:850px), (pointer:coarse) and (hover:none){
+  body{background:#060b19}
+  header{display:none}
+  .header-inner{height:43px;gap:9px}.logo{font-size:21px}.logo-mark{width:29px;height:29px;font-size:15px}.logo small{display:none}.search-box{max-width:none}.header-links,.account-box,.header-icon{display:none}.search-box input{padding:9px 12px 9px 34px;font-size:10px}
+  main{padding:8px 10px 105px}.desktop-layout{display:block}.sidebar,.desktop-layout>.main-column{display:none}footer{display:none}.mini-player{bottom:60px;padding:6px 10px;min-height:55px}.mini-cover{width:43px;height:43px}.mini-controls{gap:8px}
+  .mobile-home{display:block}.mobile-top{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 9px}.mobile-top .brand{font-size:20px;font-weight:950;letter-spacing:-1px}.mobile-top .brand i{font-style:normal;color:#a855f7}.mobile-top-actions{display:flex;gap:7px}.mobile-round{width:31px;height:31px;border-radius:50%;border:1px solid #294275;background:#0b1530;display:grid;place-items:center;font-size:14px}.notification-button{position:relative;text-decoration:none}.notification-badge{position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;padding:0 4px;border-radius:10px;background:#ef4444;color:#fff;border:2px solid #060b19;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;line-height:1}.notification-badge[hidden]{display:none}
+  .mobile-search{position:relative;margin-bottom:9px}.mobile-search input{width:100%;background:#0b1530;border:1px solid #244070;color:#fff;padding:10px 12px 10px 36px;border-radius:9px;font-size:11px;outline:none}.mobile-search span{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:13px;color:#8ea0c2}
+  .mobile-chips{display:flex;gap:7px;overflow:auto;padding-bottom:2px;margin-bottom:10px}.mobile-chips a{white-space:nowrap;padding:7px 11px;border-radius:8px;background:#0c1734;border:1px solid #233d72;font-size:9px;color:#b9c6e2}.mobile-chips a.active{background:linear-gradient(90deg,#168cff,#8b5cf6);border-color:transparent;color:#fff}
+  .mobile-hero{height:184px;border-radius:11px;overflow:hidden;position:relative;border:1px solid #254c92;background:#09122c;margin-bottom:10px}.mobile-hero .slide{background-position:center}.mobile-hero .slide-overlay{background:linear-gradient(90deg,rgba(2,8,26,.9),rgba(2,8,26,.25)),linear-gradient(180deg,transparent,rgba(0,0,0,.6))}.mobile-hero .slide-content{left:15px;right:15px;top:auto;bottom:15px;transform:none}.mobile-hero .slide-content h1{font-size:28px;letter-spacing:-1.5px;margin-bottom:4px}.mobile-hero .slide-content h2{font-size:7px;letter-spacing:1.4px;margin-bottom:4px}.mobile-hero .slide-content p{font-size:10px;margin-bottom:8px}.mobile-hero .hero-btn{padding:7px 11px;font-size:8px}.mobile-hero .now-playing{display:none}
+  .mobile-shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}.mobile-shortcut{background:#0b1530;border:1px solid #203b70;border-radius:9px;padding:8px 4px;text-align:center}.mobile-shortcut .ico{font-size:18px;display:block;margin-bottom:4px}.mobile-shortcut b{font-size:8px;display:block}.mobile-shortcut span{font-size:7px;color:#8090b0;display:block;margin-top:2px}
+  .mobile-section{background:#09122a;border:1px solid #1b315d;border-radius:10px;padding:9px;margin-bottom:10px}.mobile-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.mobile-section-head h2{font-size:13px}.mobile-section-head a{font-size:8px;color:#9bb5ff}
+  .mobile-song-row{display:flex;gap:8px;overflow:auto}.mobile-song-card{width:112px;flex:none;background:#0b1530;border:1px solid #203c72;border-radius:8px;overflow:hidden}.mobile-song-card .cover{width:100%;aspect-ratio:1;object-fit:cover;display:block}.mobile-song-card .m-info{padding:6px}.mobile-song-card b{display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mobile-song-card span{display:block;color:#8190ae;font-size:7px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mobile-song-card em{display:block;color:#bf83ff;font-style:normal;font-size:8px;margin-top:4px}
+  .mobile-list{display:flex;flex-direction:column;gap:6px}.mobile-list-item{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;background:#0b1530;border:1px solid #203761;border-radius:8px;padding:6px}.mobile-list-item img{width:38px;height:38px;border-radius:6px;object-fit:cover}.mobile-list-item b{font-size:9px;display:block}.mobile-list-item span{font-size:7px;color:#8190ae;display:block;margin-top:2px}.mobile-list-item strong{font-size:8px;color:#bf83ff}
+  .mobile-artists{display:flex;gap:10px;overflow:auto}.mobile-artist{width:70px;flex:none;text-align:center}.mobile-artist img{width:55px;height:55px;border-radius:50%;object-fit:cover;border:1px solid #7c5cff}.mobile-artist b{display:block;font-size:7px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mobile-artist span{font-size:6px;color:#7f8ba8}
+  .mobile-ad img,.mobile-ad video{width:100%;height:auto;display:block;border-radius:7px}.mobile-premium{border:1px solid #4a2ca3;border-radius:10px;padding:10px;background:radial-gradient(circle at 80% 50%,#3d1593,#0b112a 65%);margin-bottom:10px}.mobile-premium h2{font-size:13px;color:#d8b4fe}.mobile-premium p{font-size:8px;color:#9ba8c2;margin-top:3px}.mobile-premium a{display:inline-flex;margin-top:7px;padding:7px 12px;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:8px;font-size:8px;font-weight:900}
+  .mobile-bottom{position:fixed;left:0;right:0;bottom:0;height:60px;z-index:1900;background:rgba(5,9,24,.98);border-top:1px solid #203562;display:grid;grid-template-columns:repeat(5,1fr)}.mobile-bottom a{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7f8eac;font-size:8px;gap:3px}.mobile-bottom a span:first-child{font-size:17px}.mobile-bottom a.active{color:#fff}.mobile-bottom a.active span:first-child{color:#a855f7}
+}
+@media(min-width:851px){.mobile-bottom{display:none!important}}
+@media(max-width:420px){.mobile-song-card{width:105px}.mobile-shortcut b{font-size:7px}.mobile-hero{height:174px}}
+
+/* PASONG reference-aligned mobile home */
+.mobile-menu-button{display:none}
+.mobile-rewards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 8px}
+.mobile-points{display:block;border:1px solid #3158db;border-radius:10px;padding:12px;background:linear-gradient(135deg,#315be8,#182c83);min-width:0}
+.mobile-points h2{font-size:13px;color:#fff}.mobile-points p{font-size:9px;color:#dce4ff;margin:5px 0 10px}.mobile-points b{font-size:9px;color:#fff}
+.mobile-ad-promo{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;background:linear-gradient(110deg,#20142e,#100d1b);border:1px solid #332044;margin-bottom:10px}.mobile-ad-promo>span{font-size:24px;color:#b88aff}.mobile-ad-promo div{min-width:0;flex:1}.mobile-ad-promo b{font-size:10px}.mobile-ad-promo p{font-size:9px;color:#c2b9d1;margin-top:3px}.mobile-ad-promo strong{font-size:9px;background:#7952c7;border-radius:7px;padding:8px;white-space:nowrap}
+@media(max-width:850px),(max-device-width:850px),(pointer:coarse) and (hover:none){
+body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-items:center;color:#f6f2ff;font-size:19px;width:27px}.mobile-home{padding-bottom:6px}.mobile-top{display:grid;grid-template-columns:28px 1fr 66px;align-items:center;margin:2px 2px 12px}.mobile-top .brand{text-align:center;font-size:22px;letter-spacing:-.8px}.mobile-top .brand i{color:#b06aff}.mobile-top-actions{gap:6px;justify-content:flex-end}.mobile-round{width:30px;height:30px;background:#1b1923;border:0;font-size:15px}.mobile-search{margin-bottom:12px}.mobile-search input{background:#292631;border:1px solid #514b5c;border-radius:10px;padding:13px 12px 13px 39px;font-size:12px}.mobile-search span{left:14px;font-size:16px}.mobile-hero{height:176px;border:0;border-radius:12px;background:#17131d;margin-bottom:14px}.mobile-hero .slide-overlay{background:linear-gradient(90deg,rgba(10,8,15,.88),rgba(10,8,15,.1)),linear-gradient(0deg,rgba(5,4,8,.55),transparent)}.mobile-hero .slide-content{left:14px;bottom:14px}.mobile-hero .slide-content h1{font-size:27px;letter-spacing:-1px}.mobile-hero .slide-content h2{font-size:10px;letter-spacing:.3px}.mobile-hero .slide-content p{font-size:11px}.mobile-hero .hero-btn{font-size:10px;padding:8px 12px;border-radius:8px}.mobile-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px 5px;margin-bottom:15px}.mobile-shortcut{background:transparent;border:0;padding:4px 1px;color:#f7f4fc}.mobile-shortcut .ico{font-size:19px;color:#b88aff}.mobile-shortcut b{font-size:9px}.mobile-shortcut span:not(.ico){display:none}.mobile-section{background:transparent;border:0;border-radius:0;padding:0;margin-bottom:17px}.mobile-section-head{margin-bottom:9px}.mobile-section-head h2{font-size:17px;letter-spacing:-.3px}.mobile-section-head a{font-size:11px;color:#c49aff}.mobile-song-row{gap:8px}.mobile-song-card{width:110px;background:#211e28;border:0;border-radius:9px}.mobile-song-card .cover{aspect-ratio:1}.mobile-song-card .m-info{padding:7px}.mobile-song-card b{font-size:10px}.mobile-song-card span{font-size:8px}.mobile-song-card em{font-size:9px;color:#c6a2ff}.mobile-list{gap:8px}.mobile-list-item{grid-template-columns:52px minmax(0,1fr) auto;gap:9px;background:transparent;border:0;border-radius:0;padding:0}.mobile-list-item img{width:52px;height:52px;border-radius:6px}.mobile-list-item b{font-size:12px}.mobile-list-item span{font-size:10px;color:#aaa5b2}.mobile-list-item strong{font-size:9px;color:#fff;background:#7250b8;border-radius:8px;padding:8px 9px;white-space:nowrap}.mobile-artists{gap:12px}.mobile-artist{width:66px}.mobile-artist img{width:58px;height:58px;border:1px solid #655078}.mobile-artist b{font-size:9px}.mobile-artist span{display:none}.mobile-ad img,.mobile-ad video{border-radius:10px}.mobile-premium{margin:0;display:block;border:1px solid #7446db;border-radius:10px;padding:12px;background:linear-gradient(135deg,#742bea,#301064)}.mobile-premium h2{font-size:13px;color:#fff}.mobile-premium p{font-size:9px;color:#e1d2ff;margin-top:5px}.mobile-premium b{display:inline-block;margin-top:12px;font-size:9px;color:#fff}.mobile-rewards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}.mobile-bottom{left:0;right:0;bottom:0;height:64px;border:1px solid #292532;border-bottom:0;border-radius:20px 20px 0 0;background:rgba(35,32,43,.97);backdrop-filter:blur(16px);box-shadow:0 -5px 25px #0005}.mobile-bottom a{font-size:10px;gap:4px}.mobile-bottom a span:first-child{font-size:19px}.mobile-bottom a.active{color:#c18bff}.mobile-bottom a.active span:first-child{color:#b16aff}.mini-player{bottom:64px;background:#211e29;border-top-color:#3b3445}
+}
+
 </style>
+
+<!-- PASONG MOBILE REDESIGN OVERRIDE -->
+
+<style id="pasong-navigation-redesign-v2">
+/* PASONG mobile navigation: larger touch targets, stronger active state, compact spacing */
+@media (max-width:850px), (max-device-width:850px), (pointer:coarse) and (hover:none) {
+  .mobile-bottom {
+    position:fixed !important; z-index:9999 !important;
+    left:10px !important; right:10px !important; bottom:8px !important;
+    height:74px !important; box-sizing:border-box !important;
+    display:grid !important; grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    align-items:center !important; justify-content:stretch !important;
+    gap:4px !important; padding:7px 8px max(7px, env(safe-area-inset-bottom)) !important;
+    border:1px solid rgba(178,119,255,.38) !important; border-radius:22px !important;
+    background:rgba(27,24,36,.98) !important;
+    box-shadow:0 8px 28px rgba(0,0,0,.55), 0 0 18px rgba(137,72,219,.13) !important;
+    backdrop-filter:blur(18px) !important;
+  }
+  .mobile-bottom a {
+    min-width:0 !important; min-height:56px !important; height:56px !important;
+    display:flex !important; flex-direction:column !important;
+    align-items:center !important; justify-content:center !important;
+    gap:4px !important; padding:4px 2px !important; margin:0 !important;
+    border-radius:15px !important; text-decoration:none !important;
+    color:#bcb5c9 !important; font-size:12px !important; line-height:1.1 !important;
+    font-weight:650 !important; white-space:nowrap !important;
+    transition:background .18s ease, color .18s ease, transform .18s ease !important;
+  }
+  .mobile-bottom a span:first-child {
+    display:grid !important; place-items:center !important;
+    width:29px !important; height:27px !important;
+    font-size:25px !important; line-height:1 !important;
+    font-weight:700 !important; color:inherit !important;
+  }
+  .mobile-bottom a b { display:block !important; font-size:11px !important; line-height:1.1 !important; font-weight:700 !important; }
+  .mobile-bottom a.active, .mobile-bottom a[aria-current="page"] {
+    color:#fff !important; background:linear-gradient(145deg,#7938c8,#51258f) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.17), 0 3px 10px rgba(105,49,173,.28) !important;
+  }
+  .mobile-bottom a.active span:first-child, .mobile-bottom a[aria-current="page"] span:first-child { color:#fff !important; }
+  .mobile-bottom a:active { transform:scale(.96) !important; }
+  body { padding-bottom:0 !important; }
+  main { padding-bottom:112px !important; }
+  .mini-player { bottom:88px !important; }
+}
+@media (max-width:380px) {
+  .mobile-bottom { left:7px !important; right:7px !important; gap:2px !important; padding-left:5px !important; padding-right:5px !important; }
+  .mobile-bottom a b { font-size:10px !important; }
+}
+</style>
+
+
+<style id="pasong-professional-shortcuts-v2">
+/* Polished mobile quick-access tiles; the rest of the homepage is untouched. */
+@media (max-width:850px), (max-device-width:850px), (pointer:coarse) and (hover:none) {
+  .mobile-shortcuts {
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:10px 9px !important;
+    margin:2px 0 20px !important;
+    padding:0 1px !important;
+    align-items:stretch !important;
+  }
+  .mobile-shortcut {
+    box-sizing:border-box !important;
+    min-width:0 !important;
+    min-height:76px !important;
+    padding:11px 4px 9px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:8px !important;
+    border:1px solid #30263e !important;
+    border-radius:13px !important;
+    background:linear-gradient(155deg,#211a2b 0%,#17151e 78%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 4px 12px rgba(0,0,0,.14) !important;
+    color:#f7f3ff !important;
+    text-decoration:none !important;
+    text-align:center !important;
+    transition:transform .15s ease,border-color .15s ease,background .15s ease !important;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mobile-shortcut:active {
+    transform:scale(.97) !important;
+    border-color:#9c65e8 !important;
+    background:linear-gradient(155deg,#30203f,#1a1523) !important;
+  }
+  .mobile-shortcut .ico {
+    box-sizing:border-box !important;
+    display:grid !important;
+    place-items:center !important;
+    width:34px !important;
+    height:34px !important;
+    margin:0 !important;
+    border:1px solid rgba(185,131,255,.28) !important;
+    border-radius:11px !important;
+    background:linear-gradient(145deg,rgba(151,82,224,.22),rgba(100,64,154,.08)) !important;
+    color:#c69aff !important;
+    font-size:20px !important;
+    line-height:1 !important;
+    flex:0 0 34px !important;
+  }
+  .mobile-shortcut b {
+    display:block !important;
+    max-width:100% !important;
+    font-size:10px !important;
+    line-height:1.2 !important;
+    font-weight:650 !important;
+    letter-spacing:.05px !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+    color:#eee8f8 !important;
+  }
+  .mobile-shortcut:nth-child(5) { grid-column:2 !important; }
+  .mobile-shortcut:nth-child(6) { grid-column:3 !important; }
+  .mobile-shortcut:nth-child(7) { grid-column:4 !important; }
+}
+@media (max-width:360px) {
+  .mobile-shortcuts {gap:8px 6px !important;}
+  .mobile-shortcut {min-height:70px !important;padding:8px 2px !important;gap:6px !important;}
+  .mobile-shortcut .ico {width:30px !important;height:30px !important;flex-basis:30px !important;font-size:18px !important;}
+  .mobile-shortcut b {font-size:9px !important;}
+}
+</style>
+
 </head>
 <body>
-<!-- Your full HTML from before goes here - I cleaned the 3 duplicate style blocks -->
-<!-- Download the full file here: container:///mnt/data/pasong-cleaned-mobile.html -->
+<header>
+<div class="header-inner">
+<a href="index.html" class="logo"><span class="logo-mark">◈</span><span class="logo-text">PASONG<small>MUSIC • BEATS • CREATORS • COMMUNITY</small></span></a>
+<nav class="header-links"><a class="active" href="index.html">⌂ Home</a><a href="store.html">♫ Music Store</a><a href="charts.html">▥ Charts</a><a href="artists.html">♙ Artists</a><a href="producers.html">♬ Producers</a><a href="beats.html">▦ Beats</a><a href="upload.html">☁ Upload</a><a href="licensing-centre.html">⚖ Licensing</a><a href="advertise.html">📢 Advertise</a><a href="admin.html" class="admin-nav-link">⚙ Admin Dashboard</a><a href="notifications.html">♧</a></nav>
+<div class="search-box"><span class="search-icon">⌕</span><input id="globalSearch" type="search" placeholder="Search for songs, artists, producers, beats..."></div>
+<a href="notifications.html" class="header-icon">♧</a><a href="login.html" class="account-box" id="accountBox"><span class="account-letter">U</span></a>
+</div>
+</header>
+
+<main>
+<div class="desktop-layout">
+<div class="main-column">
+<section class="main-hero-slider"><div class="slide active" id="heroSlide" style="background-image:url('assets/hero-king-saha.jpg')"><div class="slide-overlay"></div><div class="slide-content"><h2>FEATURED ARTIST</h2><h1>PASONG</h1><p>Music. Opportunity. Support.</p><a href="store.html" class="hero-btn">▶ Listen Now</a><div class="now-playing"><span>🔊 Now Playing Artist:</span><strong id="heroArtist">PASONG</strong></div></div><div class="slide-dots" id="heroDots"><span class="active"></span></div></div><button class="arrow left" id="heroPrev">‹</button><button class="arrow right" id="heroNext">›</button></section>
+<section class="feature-strip"><a class="feature-card" href="producers.html"><div class="feature-icon">♫</div><div><h3>Free Beats</h3><p>Download high quality beats for your next hit.</p></div><span class="feature-arrow">›</span></a><a class="feature-card" href="djs.html"><div class="feature-icon">♧</div><div><h3>Top DJs</h3><p>Listen, follow and support your favorite DJs.</p></div><span class="feature-arrow">›</span></a><a class="feature-card" href="charts.html"><div class="feature-icon">▥</div><div><h3>Weekly Charts</h3><p>See what's trending on PASONG.</p></div><span class="feature-arrow">›</span></a><a class="feature-card" href="premium.html"><div class="feature-icon">◇</div><div><h3>Premium</h3><p>Unlock more features, more music, more value.</p></div><span class="feature-arrow">›</span></a></section>
+<section class="section"><div class="section-header"><h2>🔥 Trending Songs</h2><a href="charts.html">View All</a></div><div class="song-grid" id="trendingSongs"></div></section>
+<section class="section"><div class="section-header"><h2>🎤 Featured Artists</h2><a href="artists.html">View All</a></div><div class="artist-grid" id="popularArtists"></div></section>
+<section class="section"><div class="section-header"><h2>🎹 Popular Beat Producers</h2><a href="producers.html">View All</a></div><div class="artist-grid" id="popularProducers"></div></section>
+<section class="section"><div class="section-header"><h2>🆕 Latest New Uploads</h2><a href="store.html?filter=new">View All</a></div><div class="song-grid" id="latestSongs"></div></section>
+<section class="section"><div class="section-header"><h2>⬇️ Top Downloads</h2><a href="charts.html">View All</a></div><div class="song-grid" id="downloadSongs"></div></section>
+<section class="section"><div class="section-header"><h2>🌍 Top African Music</h2><a href="store.html">View All</a></div><div class="song-grid" id="ugandaSongs"></div></section>
+<section class="section"><div class="section-header"><h2>🎼 Browse Genres</h2><a href="store.html">All Music</a></div><div class="genre-grid"><a class="genre-card" href="store.html?genre=Afrobeat">Afrobeat</a><a class="genre-card" href="store.html?genre=Amapiano">Amapiano</a><a class="genre-card" href="store.html?genre=Hip-Hop">Hip-Hop</a><a class="genre-card" href="store.html?genre=R%26B">R&B</a><a class="genre-card" href="store.html?genre=Dancehall">Dancehall</a><a class="genre-card" href="store.html?genre=Gospel">Gospel</a><a class="genre-card" href="store.html?genre=Reggae">Reggae</a><a class="genre-card" href="store.html?genre=Drill">Drill</a><a class="genre-card" href="store.html?genre=Pop">Pop</a><a class="genre-card" href="store.html?genre=Zouk">Zouk</a><a class="genre-card" href="store.html?genre=Kadongo">Kadongo Kamu</a><a class="genre-card" href="store.html?genre=Other">Other</a></div></section>
+<section class="section"><div class="section-header"><h2>🏆 Weekly Countdown</h2><a href="charts.html">Full Charts</a></div><div class="song-grid" id="countdownSongs"></div></section>
+<section class="section"><div class="section-header"><h2>🎧 PASONG DJ Mixes</h2><a href="djs.html">View DJs</a></div><div class="song-grid" id="djMixes"></div></section>
+<section class="info-grid"><div class="info-card"><div class="info-icon">🎵</div><h3>Discover Music</h3><p>Find independent music from artists and creators across Africa and beyond.</p></div><div class="info-card"><div class="info-icon">💜</div><h3>Support Creators</h3><p>Your purchases directly support the people who create the music, beats and mixes you enjoy.</p></div><div class="info-card"><div class="info-icon">🚀</div><h3>Creator Opportunities</h3><p>Artists, producers, DJs and writers can build their presence, reach listeners and earn from their work.</p></div></section>
+<section class="premium-banner"><div><h2>♛ PASONG PREMIUM</h2><p>Unlimited music, ad-free. Exclusive content. Support your favorite artists.</p><a href="premium.html" class="premium-btn">Go Premium →</a></div><div class="premium-art">◉</div></section>
+<section class="section"><div class="points-card"><h2>⭐ PASONG Points</h2><p>Earn PASONG Points through eligible activities and referrals. Your points can be used within the PASONG ecosystem as the rewards system develops.</p><div style="margin-top:12px"><a href="account.html" class="btn-yellow">View My Points</a></div></div></section>
+</div>
+
+<aside class="sidebar">
+<section class="sidebar-card"><div class="sidebar-title"><h2>🏆 Weekly Countdown</h2><a href="charts.html">View All</a></div><div class="countdown-list" id="desktopCountdownList"></div></section>
+<section class="sidebar-card sidebar-ad"><div class="sidebar-title"><h2>📢 Advertisement</h2><span style="font-size:8px;color:#b97cff">Sponsored</span></div><div class="ads-section" id="pasongAdsSection"><div class="ads-header"><span class="ads-label">Sponsored</span></div><div class="ads-list" id="pasongAds"></div></div></section>
+<section class="sidebar-card"><div class="sidebar-title"><h2>♢ Quick Links</h2></div><div class="quick-links"><a class="quick-link" href="store.html"><span>♫</span>Music Store</a><a class="quick-link" href="charts.html"><span>▥</span>Charts</a><a class="quick-link" href="artists.html"><span>♙</span>Artists</a><a class="quick-link" href="upload.html"><span>↥</span>Upload</a></div></section>
+<section class="sidebar-card join-card"><div class="join-icon">♧</div><div><h3>Join PASONG Today</h3><p>Support your favorite artists and be part of the future of music.</p><a href="signup.html" class="join-btn">Create Account</a></div></section>
+</aside>
+</div>
+
+<div class="mobile-home">
+<div class="mobile-top"><a class="mobile-menu-button" href="store.html" aria-label="Open music menu">☰</a><div class="brand"><i>♫</i> PASONG</div><div class="mobile-top-actions"><a class="mobile-round notification-button" href="notifications.html" aria-label="Notifications">♧<span id="mobileNotificationBadge" class="notification-badge" hidden>0</span></a><a class="mobile-round" href="cart.html" aria-label="Shopping cart">🛒</a></div></div>
+<div class="mobile-search"><span>⌕</span><input id="mobileSearch" type="search" placeholder="Search songs, artists, producers..."></div>
+
+<section class="mobile-hero"><div class="slide active" id="mobileHeroSlide" style="background-image:url('assets/hero-king-saha.jpg')"><div class="slide-overlay"></div><div class="slide-content"><h2>FEATURED ARTIST</h2><h1>KV BEATS</h1><p>New Afrobeat • Discover the sound</p><a href="artists.html" class="hero-btn">▶ Play Now</a></div></div></section>
+<div class="mobile-shortcuts"><a class="mobile-shortcut" href="store.html"><span class="ico">♧</span><b>Music Store</b></a><a class="mobile-shortcut" href="artists.html"><span class="ico">♟</span><b>Artists</b></a><a class="mobile-shortcut" href="discover.html"><span class="ico">◉</span><b>Discover</b></a><a class="mobile-shortcut" href="charts.html"><span class="ico">▥</span><b>Charts</b></a><a class="mobile-shortcut" href="advertise.html"><span class="ico">📢</span><b>Advertise</b></a><a class="mobile-shortcut" href="premium.html"><span class="ico">☆</span><b>Premium PRO</b></a><a class="mobile-shortcut" href="points.html"><span class="ico">◉</span><b>Points</b></a></div>
+<section class="mobile-section"><div class="mobile-section-head"><h2>🔥 Trending Songs</h2><a href="charts.html">See All</a></div><div class="mobile-song-row" id="mobileTrending"></div><div class="mobile-inline-ad" id="mobileTrendingAd" hidden></div></section>
+<section class="mobile-section"><div class="mobile-section-head"><h2>🆕 New Releases</h2><a href="store.html?filter=new">See All</a></div><div class="mobile-song-row mobile-release-row" id="mobileLatest"></div></section>
+<section class="mobile-section"><div class="mobile-section-head"><h2>🎤 Popular Artists</h2><a href="artists.html">See All</a></div><div class="mobile-artists" id="mobileArtists"></div></section>
+<section class="mobile-section"><div class="mobile-section-head"><h2>🏆 Charts</h2><a href="charts.html">View All</a></div><div class="mobile-list" id="mobileCharts"></div></section>
+<section class="mobile-section"><div class="mobile-section-head"><h2>📢 Advertisement</h2></div><div class="mobile-ad" id="mobileAd"></div></section>
+<div class="mobile-rewards"><a class="mobile-premium" href="premium.html"><h2>♛ PASONG PREMIUM</h2><p>Ad-free • Offline • Exclusive</p><b>Upgrade now ›</b></a><a class="mobile-points" href="points.html"><h2>◉ PASONG POINTS</h2><p>Earn points • Redeem rewards</p><b>Earn points ›</b></a></div><a class="mobile-ad-promo" href="advertise.html"><span>📢</span><div><b>ADVERTISE</b><p>Promote your music to more fans — Get started</p></div><strong>Learn more ›</strong></a>
+</div>
+</main>
+
+<footer><div class="footer-inner"><div class="footer-brand"><h2>◈ PASONG</h2><p>Music. Opportunity. Support. A music marketplace built to connect creators with listeners and create new opportunities across Africa.</p></div><div class="footer-col"><h4>Music</h4><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="playlists.html">Playlists</a></div><div class="footer-col"><h4>Creators</h4><a href="artists.html">Artists</a><a href="producers.html">Producers</a><a href="djs.html">DJs</a><a href="writers.html">Writers</a></div><div class="footer-col"><h4>PASONG</h4><a href="premium.html">Premium</a><a href="promotion.html">Promotion</a><a href="licensing-centre.html">⚖ Licensing Centre</a><a href="advertise.html">📢 Advertise</a><a href="account.html">Account</a><a href="admin.html">⚙ Admin Dashboard</a></div></div></footer>
+
+<nav class="mobile-bottom" aria-label="Main navigation"><a class="active" href="index.html" aria-current="page"><span>⌂</span><b>Home</b></a><a href="store.html"><span>⌕</span><b>Browse</b></a><a href="playlists.html"><span>▤</span><b>Library</b></a><a href="cart.html"><span>🛒</span><b>Cart</b></a><a href="account.html"><span>♙</span><b>Profile</b></a></nav>
+
+<div class="mini-player" id="miniPlayer"><img id="miniCover" class="mini-cover" src="" alt=""><div class="mini-info"><div class="mini-title" id="miniTitle">Nothing playing</div><div class="mini-artist" id="miniArtist"></div></div><div class="mini-controls"><button id="miniPlay">▶</button><button id="miniClose">×</button></div></div>
+<audio id="audioPlayer"></audio>
+
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let artistMap={},heroSongs=[],heroIndex=0,heroTimer=null,currentPlayingSong=null,previewTimer=null;
+const audioPlayer=document.getElementById("audioPlayer");
+const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+const cover=s=>s.cover_url||s.cover_image_url||s.cover||s.image_url||"";
+const artist=s=>{const p=artistMap[s.artist_id]||artistMap[s.artist_profile_id]||artistMap[s.artist_user_id];return s.performing_name||s.stage_name||s.artist_name||p?.performing_name||p?.stage_name||"Unknown Artist"};
+async function loadArtistMap(){const {data}=await supabaseClient.from("artist_profiles").select("id,user_id,performing_name,stage_name,profile_image_url");artistMap={};(data||[]).forEach(a=>{artistMap[a.id]=a;if(a.user_id)artistMap[a.user_id]=a})}
+function songCard(s){const c=document.createElement("div");c.className="song-card";c.innerHTML=`<div class="cover-wrap"><img src="${esc(cover(s)||"https://via.placeholder.com/500?text=PASONG")}" alt=""><button class="play-overlay">▶</button></div><div class="song-info"><div class="song-title">${esc(s.title||"Untitled")}</div><div class="song-artist">${esc(artist(s))}</div><div class="song-meta"><span class="price">UGX 700</span><span class="genre">${esc(s.genre||"Music")}</span></div></div>`;c.querySelector("button").onclick=e=>{e.stopPropagation();playSong(s)};c.onclick=e=>{if(!e.target.closest("button")&&s.id)location.href=`song.html?id=${encodeURIComponent(s.id)}`};return c}
+function render(id,songs){const c=document.getElementById(id);if(!c)return;c.innerHTML="";(songs||[]).forEach(s=>c.appendChild(songCard(s)));if(!songs?.length)c.innerHTML='<div style="grid-column:1/-1;padding:25px;text-align:center;color:#858592">No music available yet.</div>'}
+function makeMobileSong(s){const el=document.createElement("a");el.className="mobile-song-card";el.href=s.id?`song.html?id=${encodeURIComponent(s.id)}`:"#";el.innerHTML=`<img class="cover" src="${esc(cover(s)||"https://via.placeholder.com/300?text=PASONG")}" alt=""><div class="m-info"><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span><em>UGX 700</em></div>`;return el}
+function makeMobileList(s,rank=null){const el=document.createElement("a");el.className="mobile-list-item"+(rank!==null?" chart-ranked-item":"");el.href=s.id?`song.html?id=${encodeURIComponent(s.id)}`:"#";el.innerHTML=`${rank!==null?`<span class="chart-rank" aria-label="Rank ${rank}">${rank}</span>`:""}<img src="${esc(cover(s)||"https://via.placeholder.com/100?text=PASONG")}" alt=""><div class="mobile-track-copy"><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span></div><strong aria-label="Buy ${esc(s.title||"song")} for 700 Ugandan shillings">UGX 700 Buy</strong>`;return el}
+function renderMobile(id,songs,mode="cards"){const c=document.getElementById(id);if(!c)return;c.innerHTML="";(songs||[]).slice(0,6).forEach((s,i)=>c.appendChild(mode==="cards"?makeMobileSong(s):makeMobileList(s,id==="mobileCharts"?i+1:null)))}
+function renderMobileArtists(artists){const c=document.getElementById("mobileArtists");if(!c)return;c.innerHTML="";(artists||[]).slice(0,8).forEach(a=>{const x=document.createElement("a");x.className="mobile-artist";x.href=`artist.html?id=${encodeURIComponent(a.id)}`;x.innerHTML=`<img src="${esc(a.profile_image_url||a.avatar_url||"https://via.placeholder.com/150?text=Artist")}" alt=""><b>${esc(a.performing_name||a.stage_name||"Artist")}</b><span>Artist</span>`;c.appendChild(x)})}
+async function loadAds(){
+  const section=document.getElementById("pasongAdsSection"),box=document.getElementById("pasongAds"),mobileBox=document.getElementById("mobileAd"),trendingBox=document.getElementById("mobileTrendingAd");
+  if(section){section.style.display="none";if(box)box.innerHTML=""}if(mobileBox)mobileBox.innerHTML="";if(trendingBox){trendingBox.innerHTML="";trendingBox.hidden=true}
+  const now=new Date().toISOString();
+  const {data,error}=await supabaseClient.from("advertisements").select("*").eq("status","active").eq("placement","home").or(`start_at.is.null,start_at.lte.${now}`).or(`end_at.is.null,end_at.gte.${now}`).order("created_at",{ascending:false}).limit(10);
+  if(error){console.error(error);return}
+  const ads=(data||[]).filter(a=>a.image_url||a.video_url||a.media_url);if(!ads.length)return;
+  const renderOne=(parent,a)=>{if(!parent||!a)return;const card=document.createElement("a");card.className="ads-card";const target=String(a.target_url||"").trim();card.href=target||"#";if(/^https?:\/\//i.test(target)){card.target="_blank";card.rel="noopener noreferrer"}const type=String(a.media_type||a.type||"").toLowerCase();const isVideo=type==="video"||!!a.video_url||(!!a.media_url&&/\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(a.media_url));const url=isVideo?(a.video_url||a.media_url):(a.image_url||a.media_url);const media=document.createElement("div");media.className="ads-card-media";if(isVideo){const v=document.createElement("video");v.src=url;v.autoplay=true;v.muted=true;v.loop=true;v.playsInline=true;v.controls=false;v.preload="metadata";media.appendChild(v)}else{const img=document.createElement("img");img.src=url;img.alt="PASONG Advertisement";img.loading="lazy";media.appendChild(img)}card.appendChild(media);parent.appendChild(card)};
+  if(section&&box){section.style.display="block";renderOne(box,ads[0])}
+  // Mobile gets a separate ad in Trending and another below Charts only when a second active campaign exists.
+  if(trendingBox&&ads.length>1){renderOne(trendingBox,ads[0]);trendingBox.hidden=false;if(mobileBox)renderOne(mobileBox,ads[1])}
+  else if(mobileBox){renderOne(mobileBox,ads[0])}
+}
+function updateHero(){const slide=document.getElementById("heroSlide"),mobileSlide=document.getElementById("mobileHeroSlide"),name=document.getElementById("heroArtist"),dots=document.getElementById("heroDots");if(!heroSongs.length){if(name)name.textContent="PASONG";return}const s=heroSongs[heroIndex],url=cover(s)||"assets/hero-king-saha.jpg";if(slide)slide.style.backgroundImage=`url("${url.replace(/"/g,'\\"')}")`;if(mobileSlide)mobileSlide.style.backgroundImage=`url("${url.replace(/"/g,'\\"')}")`;if(name)name.textContent=artist(s);if(dots){dots.innerHTML=heroSongs.map((_,i)=>`<span class="${i===heroIndex?"active":""}" data-i="${i}"></span>`).join("");dots.querySelectorAll("span").forEach(d=>d.onclick=()=>{heroIndex=+d.dataset.i;updateHero();restartHero()})}}
+function restartHero(){clearInterval(heroTimer);if(heroSongs.length>1)heroTimer=setInterval(()=>{heroIndex=(heroIndex+1)%heroSongs.length;updateHero()},5000)}
+document.getElementById("heroNext").onclick=()=>{if(heroSongs.length){heroIndex=(heroIndex+1)%heroSongs.length;updateHero();restartHero()}};
+document.getElementById("heroPrev").onclick=()=>{if(heroSongs.length){heroIndex=(heroIndex-1+heroSongs.length)%heroSongs.length;updateHero();restartHero()}};
+function playSong(s){const url=s.preview_url||s.audio_preview_url||s.audio_url;if(!url){if(s.id)location.href=`song.html?id=${encodeURIComponent(s.id)}`;return}currentPlayingSong=s;audioPlayer.src=url;audioPlayer.currentTime=0;audioPlayer.play().catch(()=>{});document.getElementById("miniCover").src=cover(s);document.getElementById("miniTitle").textContent=s.title||"Untitled";document.getElementById("miniArtist").textContent=artist(s);document.getElementById("miniPlayer").classList.add("active");clearInterval(previewTimer);const start=audioPlayer.currentTime;previewTimer=setInterval(()=>{if(audioPlayer.currentTime-start>=20){audioPlayer.pause();clearInterval(previewTimer)}},250)}
+document.getElementById("miniPlay").onclick=()=>audioPlayer.paused?audioPlayer.play():audioPlayer.pause();
+document.getElementById("miniClose").onclick=()=>{audioPlayer.pause();audioPlayer.removeAttribute("src");document.getElementById("miniPlayer").classList.remove("active")};
+function renderDesktopCountdown(songs){const c=document.getElementById("desktopCountdownList");if(!c)return;c.innerHTML="";(songs||[]).slice(0,5).forEach((s,i)=>{const x=document.createElement("div");x.className="countdown-item";x.innerHTML=`<span class="rank">${i+1}</span><img class="side-cover" src="${esc(cover(s)||"https://via.placeholder.com/100?text=PASONG")}" alt=""><div class="side-song"><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span><em>UGX 700</em></div><button class="side-play">▶</button>`;x.querySelector("button").onclick=e=>{e.stopPropagation();playSong(s)};x.onclick=e=>{if(!e.target.closest("button")&&s.id)location.href=`song.html?id=${encodeURIComponent(s.id)}`};c.appendChild(x)})}
+async function updateMobileNotificationBadge(){const badge=document.getElementById("mobileNotificationBadge");if(!badge)return;try{const {data:{user}}=await supabaseClient.auth.getUser();if(!user){badge.hidden=true;return}const {count,error}=await supabaseClient.from("notifications").select("*",{count:"exact",head:true}).eq("user_id",user.id).eq("is_read",false);if(error){console.error("Notification badge error:",error);badge.hidden=true;return}const unread=Number(count||0);if(unread>0){badge.textContent=unread>99?"99+":String(unread);badge.hidden=false}else{badge.hidden=true}}catch(error){console.error("Notification badge error:",error);badge.hidden=true}}
+function renderProducers(artists){const c=document.getElementById("popularProducers");if(!c)return;c.innerHTML="";(artists||[]).slice(0,6).forEach(a=>{const x=document.createElement("a");x.className="artist-card";x.href=`artist.html?id=${encodeURIComponent(a.id)}`;x.innerHTML=`<img class="artist-image" src="${esc(a.profile_image_url||a.avatar_url||"https://via.placeholder.com/200?text=Producer")}" alt=""><div class="artist-name">${esc(a.performing_name||a.stage_name||"Producer")}</div><div class="artist-role">Producer</div>`;c.appendChild(x)})}
+async function init(){
+  const q=document.getElementById("globalSearch"),mq=document.getElementById("mobileSearch");const doSearch=v=>{if(v.trim())location.href=`store.html?search=${encodeURIComponent(v.trim())}`};
+  q.onkeydown=e=>{if(e.key==="Enter")doSearch(q.value)};if(mq)mq.onkeydown=e=>{if(e.key==="Enter")doSearch(mq.value)};
+  const {data:{user}}=await supabaseClient.auth.getUser();if(user)document.getElementById("accountBox").href="account.html";await updateMobileNotificationBadge();
+  await loadArtistMap();await loadAds();
+  const {data:songs}=await supabaseClient.from("songs").select("*").order("created_at",{ascending:false}).limit(10);
+  heroSongs=(songs||[]).slice(0,5);updateHero();restartHero();
+  render("trendingSongs",(songs||[]).slice(0,8));render("latestSongs",songs||[]);render("downloadSongs",(songs||[]).slice(0,8));render("ugandaSongs",(songs||[]).slice(0,8));render("countdownSongs",(songs||[]).slice(0,8));render("djMixes",(songs||[]).slice(0,8));
+  renderDesktopCountdown(songs||[]);renderMobile("mobileTrending",(songs||[]).slice(0,5),"list");renderMobile("mobileLatest",songs||[],"cards");renderMobile("mobileCharts",(songs||[]).slice(0,5),"list");
+  const {data:artists}=await supabaseClient.from("artist_profiles").select("*").limit(8);renderMobileArtists(artists||[]);renderProducers(artists||[]);
+  const box=document.getElementById("popularArtists");if(box)(artists||[]).slice(0,6).forEach(a=>{const n=a.performing_name||a.stage_name||"Artist",x=document.createElement("a");x.className="artist-card";x.href=`artist.html?id=${encodeURIComponent(a.id)}`;x.innerHTML=`<img class="artist-image" src="${esc(a.profile_image_url||a.avatar_url||"https://via.placeholder.com/200?text=Artist")}" alt=""><div class="artist-name">${esc(n)}</div><div class="artist-role">Artist</div>`;box.appendChild(x)});
+}
+(function(){
+  const ua=navigator.userAgent||"";
+  const phone=/Android|iPhone|iPod|Mobile/i.test(ua);
+  if(phone && !window.matchMedia("(max-width:850px)").matches){
+    const style=document.createElement("style");
+    style.id="pasong-force-mobile";
+    style.textContent=`@media all {
+  body{background:#060b19}
+  header{display:none}
+  .header-inner{height:43px;gap:9px}.logo{font-size:21px}.logo-mark{width:29px;height:29px;font-size:15px}.logo small{display:none}.search-box{max-width:none}.header-links,.account-box,.header-icon{display:none}.search-box input{padding:9px 12px 9px 34px;font-size:10px}
+  main{padding:8px 10px 105px}.desktop-layout{display:block}.sidebar,.desktop-layout>.main-column{display:none}footer{display:none}.mini-player{bottom:60px;padding:6px 10px;min-height:55px}.mini-cover{width:43px;height:43px}.mini-controls{gap:8px}
+  .mobile-home{display:block}.mobile-top{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 9px}.mobile-top .brand{font-size:20px;font-weight:950;letter-spacing:-1px}.mobile-top .brand i{font-style:normal;color:#a855f7}.mobile-top-actions{display:flex;gap:7px}.mobile-round{width:31px;height:31px;border-radius:50%;border:1px solid #294275;background:#0b1530;display:grid;place-items:center;font-size:14px}.notification-button{position:relative;text-decoration:none}.notification-badge{position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;padding:0 4px;border-radius:10px;background:#ef4444;color:#fff;border:2px solid #060b19;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;line-height:1}.notification-badge[hidden]{display:none}
+  .mobile-search{position:relative;margin-bottom:9px}.mobile-search input{width:100%;background:#0b1530;border:1px solid #244070;color:#fff;padding:10px 12px 10px 36px;border-radius:9px;font-size:11px;outline:none}.mobile-search span{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:13px;color:#8ea0c2}
+  .mobile-chips{display:flex;gap:7px;overflow:auto;padding-bottom:2px;margin-bottom:10px}.mobile-chips a{white-space:nowrap;padding:7px 11px;border-radius:8px;background:#0c1734;border:1px solid #233d72;font-size:9px;color:#b9c6e2}.mobile-chips a.active{background:linear-gradient(90deg,#168cff,#8b5cf6);border-color:transparent;color:#fff}
+  .mobile-hero{height:184px;border-radius:11px;overflow:hidden;position:relative;border:1px solid #254c92;background:#09122c;margin-bottom:10px}.mobile-hero .slide{background-position:center}.mobile-hero .slide-overlay{background:linear-gradient(90deg,rgba(2,8,26,.9),rgba(2,8,26,.25)),linear-gradient(180deg,transparent,rgba(0,0,0,.6))}.mobile-hero .slide-content{left:15px;right:15px;top:auto;bottom:15px;transform:none}.mobile-hero .slide-content h1{font-size:28px;letter-spacing:-1.5px;margin-bottom:4px}.mobile-hero .slide-content h2{font-size:7px;letter-spacing:1.4px;margin-bottom:4px}.mobile-hero .slide-content p{font-size:10px;margin-bottom:8px}.mobile-hero .hero-btn{padding:7px 11px;font-size:8px}.mobile-hero .now-playing{display:none}
+  .mobile-shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}.mobile-shortcut{background:#0b1530;border:1px solid #203b70;border-radius:9px;padding:8px 4px;text-align:center}.mobile-shortcut .ico{font-size:18px;display:block;margin-bottom:4px}.mobile-shortcut b{font-size:8px;display:block}.mobile-shortcut span{font-size:7px;color:#8090b0;display:block;margin-top:2px}
+  .mobile-section{background:#09122a;border:1px solid #1b315d;border-radius:10px;padding:9px;margin-bottom:10px}.mobile-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.mobile-section-head h2{font-size:13px}.mobile-section-head a{font-size:8px;color:#9bb5ff}
+  .mobile-song-row{display:flex;gap:8px;overflow:auto}.mobile-song-card{width:112px;flex:none;background:#0b1530;border:1px solid #203c72;border-radius:8px;overflow:hidden}.mobile-song-card .cover{width:100%;aspect-ratio:1;object-fit:cover;display:block}.mobile-song-card .m-info{padding:6px}.mobile-song-card b{display:block;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mobile-song-card span{display:block;color:#8190ae;font-size:7px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mobile-song-card em{display:block;color:#bf83ff;font-style:normal;font-size:8px;margin-top:4px}
+  .mobile-list{display:flex;flex-direction:column;gap:6px}.mobile-list-item{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;background:#0b1530;border:1px solid #203761;border-radius:8px;padding:6px}.mobile-list-item img{width:38px;height:38px;border-radius:6px;object-fit:cover}.mobile-list-item b{font-size:9px;display:block}.mobile-list-item span{font-size:7px;color:#8190ae;display:block;margin-top:2px}.mobile-list-item strong{font-size:8px;color:#bf83ff}
+  .mobile-artists{display:flex;gap:10px;overflow:auto}.mobile-artist{width:70px;flex:none;text-align:center}.mobile-artist img{width:55px;height:55px;border-radius:50%;object-fit:cover;border:1px solid #7c5cff}.mobile-artist b{display:block;font-size:7px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mobile-artist span{font-size:6px;color:#7f8ba8}
+  .mobile-ad img,.mobile-ad video{width:100%;height:auto;display:block;border-radius:7px}.mobile-premium{border:1px solid #4a2ca3;border-radius:10px;padding:10px;background:radial-gradient(circle at 80% 50%,#3d1593,#0b112a 65%);margin-bottom:10px}.mobile-premium h2{font-size:13px;color:#d8b4fe}.mobile-premium p{font-size:8px;color:#9ba8c2;margin-top:3px}.mobile-premium a{display:inline-flex;margin-top:7px;padding:7px 12px;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:8px;font-size:8px;font-weight:900}
+  .mobile-bottom{position:fixed;left:0;right:0;bottom:0;height:60px;z-index:1900;background:rgba(5,9,24,.98);border-top:1px solid #203562;display:grid;grid-template-columns:repeat(5,1fr)}.mobile-bottom a{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7f8eac;font-size:8px;gap:3px}.mobile-bottom a span:first-child{font-size:17px}.mobile-bottom a.active{color:#fff}.mobile-bottom a.active span:first-child{color:#a855f7}
+}`;
+    style.textContent += '\n/* PASONG consolidated mobile fixes */\n@media (max-width:850px),(max-device-width:850px),(pointer:coarse) and (hover:none){\n.mobile-list-item{grid-template-columns:54px minmax(0,1fr)!important;grid-template-rows:auto auto!important;column-gap:10px!important;row-gap:5px!important;min-width:0!important;width:100%!important;box-sizing:border-box!important}\n.mobile-list-item img{grid-column:1!important;grid-row:1 / span 2!important;width:54px!important;height:54px!important;object-fit:cover!important}\n.mobile-list-item .mobile-track-copy{grid-column:2!important;grid-row:1!important;min-width:0!important}\n.mobile-list-item strong{grid-column:2!important;grid-row:2!important;justify-self:start!important;width:min(100%,190px)!important;max-width:100%!important;box-sizing:border-box!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center!important;padding:8px 12px!important;font-size:11px!important;line-height:1.1!important;border-radius:9px!important}\n#mobileCharts .mobile-list-item{grid-template-columns:25px 48px minmax(0,1fr)!important;grid-template-rows:auto auto!important;column-gap:8px!important;row-gap:4px!important}\n#mobileCharts .chart-rank{grid-column:1!important;grid-row:1 / span 2!important}\n#mobileCharts .mobile-list-item img{grid-column:2!important;grid-row:1 / span 2!important;width:48px!important;height:48px!important}\n#mobileCharts .mobile-track-copy{grid-column:3!important;grid-row:1!important}\n#mobileCharts .mobile-list-item strong{grid-column:3!important;grid-row:2!important;width:min(100%,190px)!important;font-size:10px!important;padding:7px 10px!important}\n.mobile-ad .ads-card-media img,.mobile-ad .ads-card-media video,.mobile-inline-ad .ads-card-media img,.mobile-inline-ad .ads-card-media video{display:block!important;width:100%!important;height:auto!important;max-height:none!important;aspect-ratio:16/9!important;object-fit:contain!important;object-position:center!important;background:#080812!important}\n.mobile-inline-ad{width:100%;margin:3px 0 5px;overflow:hidden;border:1px solid #30283d;border-radius:11px;background:#080812}\n.mobile-inline-ad .ads-card{display:block;width:100%;margin:0}\n}';
+    document.head.appendChild(style);
+  }
+})();
+init();setInterval(updateMobileNotificationBadge,30000);if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+</script>
 </body>
-oh</html>
+</html>
