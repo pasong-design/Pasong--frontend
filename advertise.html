@@ -37,8 +37,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
 .hero-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hero-option{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;background:#171022;cursor:pointer}
 .hero-option input{margin-right:7px;width:auto}.hero-option strong{font-size:13px}.hero-option p{color:#91889b;font-size:11px;margin-top:5px;line-height:1.4}
 .file-box{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:18px;text-align:center;background:#0d0715}.file-box input{border:0;background:transparent;padding:0}
-.preview{border-radius:14px;overflow:hidden;background:#08050d;min-height:120px;display:flex;align-items:center;justify-content:center;margin-top:15px}
-.preview img,.preview video{width:100%;max-height:350px;object-fit:contain;display:block}.preview-empty{color:#756d7d;font-size:13px;padding:35px;text-align:center}
+/* Preview the standard advert as the same wide banner shown on mobile PASONG. */
+.preview{border-radius:14px;overflow:hidden;background:#08050d;aspect-ratio:2.9/1;min-height:100px;max-height:260px;display:flex;align-items:center;justify-content:center;margin-top:15px}
+ .preview img,.preview video{width:100%;height:100%;max-height:100%;object-fit:contain;display:block}.preview-empty{color:#756d7d;font-size:13px;padding:35px;text-align:center}
 .account-status{padding:13px 15px;border-radius:11px;background:#171022;border:1px solid rgba(255,255,255,.08);color:#aaa1b4;font-size:13px;margin-bottom:18px}
 .account-status.success{border-color:rgba(34,197,94,.35);color:#86efac}.account-status.error{border-color:rgba(239,68,68,.35);color:#fca5a5}
 .pay-area{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:8px}.total-box{font-size:13px;color:#aaa1b4}.total-box strong{display:block;color:#fff;font-size:24px;margin-top:3px}
@@ -108,8 +109,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
   </section>
 
   <section id="mediaSection" class="card">
-    <h2>&#128444; Advert media</h2><p class="card-sub">Upload the image or video you want to advertise.</p>
-    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div class="help">Images: JPG, PNG or WEBP. Videos: MP4 or WEBM.</div></div>
+    <h2>&#128444; Advert media</h2><p class="card-sub">Create a mobile-friendly banner advert. Wide artwork gives the clearest result on PASONG phones.</p>
+    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div class="help">Recommended mobile banner: <strong>1600 × 550 px (about 2.9:1)</strong>. Keep logos and text away from the edges. JPG, PNG and WEBP images are accepted; MP4 and WEBM videos are also accepted. Other image shapes remain accepted, but may not fill the wide mobile banner slot.</div></div>
     <div id="preview" class="preview"><div class="preview-empty">Your advert preview will appear here.</div></div>
   </section>
 
@@ -341,21 +342,6 @@ async function startPayment(){
   showMessage(message,"Creating your advertising checkout...","info");
   var response=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify(payload)});
   var data=await response.json();if(!response.ok)throw new Error(data.error||data.message||"Could not create advertising checkout.");
-  if(data.provider==="MTN_MOMO_SANDBOX"&&data.campaign_id&&data.transaction_id){
-    showMessage(message,data.message||"MTN MoMo payment request sent. Approve it on your test phone.","info");
-    var attempts=0;
-    var timer=setInterval(async function(){
-      attempts++;
-      try{
-        var sr=await fetch(API_BASE+"/api/advertising/payment/status?campaign_id="+encodeURIComponent(data.campaign_id)+"&transaction_id="+encodeURIComponent(data.transaction_id),{headers:{"Authorization":"Bearer "+currentSession.access_token},cache:"no-store"});
-        var sd=await sr.json();
-        if(sd.paid){clearInterval(timer);showMessage(message,"Payment confirmed. Your advert is now waiting for PASONG Admin review.","success");return;}
-        if(sd.status==="FAILED"){clearInterval(timer);showMessage(message,sd.message||"MTN reports that the payment failed. You can try again.","error");return;}
-        if(attempts>=60){clearInterval(timer);showMessage(message,"Payment is still pending. Check the MTN test phone and refresh/check your campaign status before trying again.","info");}
-      }catch(err){if(attempts>=60){clearInterval(timer);showMessage(message,"Could not verify payment status. Please check again before making another payment.","error");}}
-    },5000);
-    return;
-  }
   var url=data.checkout_url||data.checkoutUrl||data.url||data.payment_url||data.redirect_url;
   if(url){window.location.href=url;return}
   showMessage(message,data.message||"Checkout response received, but no payment redirect URL was returned.","success");
