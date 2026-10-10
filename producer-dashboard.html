@@ -170,6 +170,7 @@ Paid licences provide the downloadable files and usage rights attached to each p
 <button data-section="profile">👤 Public Profile</button>
 <button data-section="upload">🎛️ Upload Beat</button>
 <button data-section="my-beats">🎵 My Beats</button>
+<button data-section="covers">🎨 Cover Design</button>
 <button data-section="orders">📦 Orders & Deliveries</button>
 <button data-section="rules">📜 Beat Rules</button>
 </aside>
@@ -592,6 +593,23 @@ Beats uploaded through your Producer Dashboard.
 
 </div>
 
+<div id="section-covers" class="hidden">
+<div class="card">
+<h2>🎨 Request PASONG Cover Design</h2>
+<p class="card-subtitle">Uganda: UGX 10,000. Outside Uganda: US$10. Requests stay out of the design queue until payment is verified.</p>
+<form id="producerCoverForm">
+<label for="producerCoverTitle">Beat / release title *</label><input id="producerCoverTitle" required maxlength="200" placeholder="Enter beat or release title">
+<label for="producerCoverArtists">Artist name(s)</label><input id="producerCoverArtists" maxlength="250" placeholder="Performing artist(s)">
+<label for="producerCoverGenre">Genre</label><input id="producerCoverGenre" maxlength="100" placeholder="e.g. Afrobeat">
+<label for="producerCoverLabel">Label (optional)</label><input id="producerCoverLabel" maxlength="150">
+<label for="producerCoverText">Text to appear on the cover (optional)</label><textarea id="producerCoverText" maxlength="1000" rows="3"></textarea>
+<label for="producerCoverPhoto">Photo / reference URL (optional)</label><input id="producerCoverPhoto" type="url" maxlength="2000" placeholder="https://...">
+<div id="producerCoverPrice" class="card-subtitle">Cover design fee: UGX 10,000 in Uganda / US$10 outside Uganda.</div>
+<button class="btn" type="submit" id="producerCoverSubmit">Create Cover Request</button><div id="producerCoverMessage" class="message" role="status"></div>
+</form></div>
+<div class="card"><h2>My Cover Requests</h2><div id="producerCoverRequests" class="loading">Loading cover requests…</div></div>
+</div>
+
 <div id="section-orders" class="hidden">
 
 <div class="card">
@@ -671,6 +689,7 @@ const sections=[
 "profile",
 "upload",
 "my-beats",
+"covers",
 "orders",
 "rules"
 ];
@@ -746,6 +765,32 @@ return getProfileValue(profile,[
 ]);
 }
 
+async function loadProducerCoverPrice(){
+ const el=document.getElementById("producerCoverPrice");
+ try{const r=await fetch(API_URL+"/api/cover-design-price",{cache:"no-store"});const d=await r.json();if(!r.ok)throw new Error();el.textContent="Cover design fee: "+(d.label||((d.currency||"UGX")==="UGX"?"UGX "+Number(d.price).toLocaleString():"$"+d.price));}catch(e){el.textContent="Cover design fee: UGX 10,000 in Uganda / US$10 outside Uganda.";}
+}
+function producerCoverMsg(message,type="info"){const el=document.getElementById("producerCoverMessage");el.className="message "+type;el.textContent=message;}
+async function loadProducerCoverRequests(){
+ const el=document.getElementById("producerCoverRequests");if(!el)return;
+ if(!currentProducerProfile){el.innerHTML='<div class="empty">Sign in with your Producer account to view requests.</div>';return;}
+ el.textContent="Loading cover requests…";
+ const {data,error}=await supabaseClient.from("cover_design_requests").select("id,song_title,requester_type,payment_status,request_status,design_status,finished_cover_url,fee_amount,fee_currency,created_at").eq("artist_id",currentProducerProfile.id).eq("requester_type","producer").order("created_at",{ascending:false}).limit(50);
+ if(error){el.innerHTML='<div class="empty">Unable to load cover requests: '+escapeHtml(error.message)+'</div>';return;}
+ if(!data?.length){el.innerHTML='<div class="empty">You have not made any cover requests yet.</div>';return;}
+ el.innerHTML='<div class="table-wrap"><table><thead><tr><th>Title</th><th>Fee</th><th>Payment</th><th>Design</th><th>Artwork</th></tr></thead><tbody>'+data.map(r=>'<tr><td>'+escapeHtml(r.song_title||"—")+'</td><td>'+escapeHtml((r.fee_currency||"UGX")+" "+Number(r.fee_amount||0).toLocaleString())+'</td><td>'+escapeHtml(r.payment_status||"pending")+'</td><td>'+escapeHtml(r.design_status||r.request_status||"pending")+'</td><td>'+(r.finished_cover_url?'<a href="'+escapeHtml(r.finished_cover_url)+'" target="_blank" rel="noopener">View cover</a>':"Not ready")+'</td></tr>').join('')+'</tbody></table></div>';
+}
+document.getElementById("producerCoverForm")?.addEventListener("submit",async e=>{
+ e.preventDefault();const btn=document.getElementById("producerCoverSubmit");btn.disabled=true;btn.textContent="Saving request…";producerCoverMsg("");
+ try{
+  const session=await getCurrentSession();if(!session?.user)throw new Error("Please sign in first.");
+  const profile=currentProducerProfile||await loadProducer();if(!profile)throw new Error("Your Producer profile could not be loaded.");
+  let pricing={price:10000,currency:"UGX",country:"UG"};try{const pr=await fetch(API_URL+"/api/cover-design-price",{cache:"no-store"});const pd=await pr.json();if(pr.ok)pricing=pd;}catch{}
+  const payload={artist_id:profile.id,artist_email:session.user.email||"",requester_type:"producer",song_title:document.getElementById("producerCoverTitle").value.trim(),performing_artists:document.getElementById("producerCoverArtists").value.trim()||null,producer:profile.performing_name||profile.artist_name||profile.stage_name||"Producer",genre:document.getElementById("producerCoverGenre").value.trim()||null,label:document.getElementById("producerCoverLabel").value.trim()||null,cover_text:document.getElementById("producerCoverText").value.trim()||null,photo_url:document.getElementById("producerCoverPhoto").value.trim()||null,country:pricing.country==="UG"?"Uganda":(pricing.country||"International"),fee_amount:Number(pricing.price||10000),fee_currency:pricing.currency||"UGX",payment_status:"pending",request_status:"awaiting_payment",design_status:"pending"};
+  const {error}=await supabaseClient.from("cover_design_requests").insert(payload);if(error)throw error;
+  producerCoverMsg("Request saved as awaiting payment. The current backend has no cover-design checkout endpoint, so no payment has been taken. The admin design queue will only show the request after payment is verified.","success");e.target.reset();await loadProducerCoverRequests();
+ }catch(err){producerCoverMsg(err?.message||"Unable to save cover request.","error");}finally{btn.disabled=false;btn.textContent="Create Cover Request";}
+});
+
 function showSection(section){
 
 sections.forEach(name=>{
@@ -774,6 +819,7 @@ loadBeats();
 if(section==="orders"){
 loadProducerOrders();
 }
+if(section==="covers"){loadProducerCoverPrice();loadProducerCoverRequests();}
 }
 
 document.querySelectorAll(".sidebar button").forEach(button=>{
