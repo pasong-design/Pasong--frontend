@@ -301,6 +301,11 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
   #mobileAd .ads-card-media img,#mobileAd .ads-card-media video{width:100%!important;height:100%!important;object-fit:contain!important;}
 }
 </style>
+<!-- Keep faces in view in wide hero crops without changing the hero box size. -->
+<style id="pasong-hero-face-crop-fix">
+.main-hero-slider .slide{background-position:center 24%!important;background-size:cover!important}
+.mobile-hero .slide{background-position:center 24%!important;background-size:cover!important}
+</style>
 </head>
 <body>
 <header>
@@ -390,7 +395,19 @@ async function loadAds(){
     if(!parent||!a)return;
     parent.innerHTML="";
     const card=document.createElement("a");card.className="ads-card";
-    const target=String(a.target_url||"").trim();card.href=target||"#";
+    let target=String(a.target_url||"").trim();
+    // If an uploaded promotional flyer has no meaningful destination, route it by its campaign text.
+    // Preserve every explicit, meaningful target URL already set by the advertiser/admin.
+    const campaignTitle=String(a.title||"").toLowerCase();
+    const campaignText=[a.title,a.description,a.advertiser_name,a.promo_type,a.category].filter(Boolean).join(" ").toLowerCase();
+    const genericTarget=!target||target==="#"||/^(index|advertise|advertising)(\.html)?(#[^ ]*)?$/i.test(target)||/pasong-frontend\.vercel\.app\/?$/i.test(target);
+    const producerBeatCampaign=/\b(producer beats|free beats|beats|beat store)\b/.test(campaignTitle);
+    const djMixCampaign=/\b(dj|djs|mix|mixes)\b/.test(campaignTitle);
+    if(genericTarget && producerBeatCampaign) target="beats.html";
+    else if(genericTarget && djMixCampaign) target="djs.html";
+    else if(genericTarget && /\b(producer beats|free beats|beats|beat store)\b/.test(campaignText)) target="beats.html";
+    else if(genericTarget && /\b(dj|djs|mix|mixes)\b/.test(campaignText)) target="djs.html";
+    card.href=target||"#";
     if(/^https?:\/\//i.test(target)){card.target="_blank";card.rel="noopener noreferrer"}
     const type=String(a.media_type||a.type||"").toLowerCase();
     const isVideo=type==="video"||!!a.video_url||(!!a.media_url&&/\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(a.media_url));
