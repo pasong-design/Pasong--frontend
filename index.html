@@ -196,6 +196,32 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
 }
 
 </style>
+
+<style id="pasong-nav-chart-polish">
+@media (max-width:850px), (max-device-width:850px), (pointer:coarse) and (hover:none) {
+  /* Clearer, thumb-friendly five-item navigation */
+  .mobile-bottom{height:76px!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;padding:6px 5px max(7px,env(safe-area-inset-bottom))!important;background:rgba(30,27,39,.98)!important;border:1px solid #40334f!important;border-bottom:0!important;border-radius:20px 20px 0 0!important;box-shadow:0 -8px 24px rgba(0,0,0,.35)!important;backdrop-filter:blur(18px)!important}
+  .mobile-bottom a{gap:5px!important;min-width:0!important;color:#bdb4cc!important;text-decoration:none!important;font-size:11px!important;font-weight:600!important;letter-spacing:.1px!important}
+  .mobile-bottom a span:first-child{display:grid!important;place-items:center!important;width:31px!important;height:28px!important;font-size:21px!important;line-height:1!important;border-radius:10px!important}
+  .mobile-bottom a b{font-size:11px!important;font-weight:650!important;line-height:1.1!important}
+  .mobile-bottom a.active{color:#d6b4ff!important}
+  .mobile-bottom a.active span:first-child{color:#d6b4ff!important;background:#4a2866!important}
+  .mobile-bottom a:active{transform:scale(.96)}
+  body{padding-bottom:8px!important}
+  main{padding-bottom:112px!important}
+  /* Charts are presented as a ranked chart list, distinct from Trending */
+  #mobileCharts{gap:9px!important}
+  #mobileCharts .chart-ranked-item{grid-template-columns:28px 54px minmax(0,1fr) auto!important;gap:9px!important;min-height:58px!important;padding:5px 0!important;border-bottom:1px solid rgba(157,133,184,.14)!important}
+  #mobileCharts .chart-rank{display:grid!important;place-items:center!important;width:26px!important;height:30px!important;border-radius:8px!important;background:#292132!important;color:#d4a9ff!important;font-size:15px!important;font-weight:900!important}
+  #mobileCharts .chart-ranked-item:nth-child(1) .chart-rank{background:linear-gradient(135deg,#f7cf72,#a86a24)!important;color:#20150b!important}
+  #mobileCharts .chart-ranked-item:nth-child(2) .chart-rank{background:linear-gradient(135deg,#e8eaf2,#777e92)!important;color:#171923!important}
+  #mobileCharts .chart-ranked-item:nth-child(3) .chart-rank{background:linear-gradient(135deg,#d99b70,#70412c)!important;color:#1c100b!important}
+  #mobileCharts .mobile-list-item img{width:54px!important;height:54px!important}
+  #mobileCharts .mobile-track-copy{min-width:0!important}
+  #mobileCharts .mobile-track-copy b{font-size:13px!important}
+  #mobileCharts .mobile-list-item strong{padding:8px 9px!important;font-size:9px!important}
+}
+</style>
 </head>
 <body>
 <header>
@@ -251,7 +277,7 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
 
 <footer><div class="footer-inner"><div class="footer-brand"><h2>◈ PASONG</h2><p>Music. Opportunity. Support. A music marketplace built to connect creators with listeners and create new opportunities across Africa.</p></div><div class="footer-col"><h4>Music</h4><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="playlists.html">Playlists</a></div><div class="footer-col"><h4>Creators</h4><a href="artists.html">Artists</a><a href="producers.html">Producers</a><a href="djs.html">DJs</a><a href="writers.html">Writers</a></div><div class="footer-col"><h4>PASONG</h4><a href="premium.html">Premium</a><a href="promotion.html">Promotion</a><a href="licensing-centre.html">⚖ Licensing Centre</a><a href="advertise.html">📢 Advertise</a><a href="account.html">Account</a><a href="admin.html">⚙ Admin Dashboard</a></div></div></footer>
 
-<nav class="mobile-bottom"><a class="active" href="index.html"><span>⌂</span>Home</a><a href="store.html"><span>♫</span>Music</a><a href="artists.html"><span>♙</span>Artists</a><a href="charts.html"><span>▥</span>Charts</a><a href="account.html"><span>◉</span>Account</a></nav>
+<nav class="mobile-bottom" aria-label="Main navigation"><a class="active" href="index.html" aria-current="page"><span>⌂</span><b>Home</b></a><a href="store.html"><span>⌕</span><b>Browse</b></a><a href="playlists.html"><span>▤</span><b>Library</b></a><a href="cart.html"><span>🛒</span><b>Cart</b></a><a href="account.html"><span>♙</span><b>Profile</b></a></nav>
 
 <div class="mini-player" id="miniPlayer"><img id="miniCover" class="mini-cover" src="" alt=""><div class="mini-info"><div class="mini-title" id="miniTitle">Nothing playing</div><div class="mini-artist" id="miniArtist"></div></div><div class="mini-controls"><button id="miniPlay">▶</button><button id="miniClose">×</button></div></div>
 <audio id="audioPlayer"></audio>
@@ -269,8 +295,8 @@ async function loadArtistMap(){const {data}=await supabaseClient.from("artist_pr
 function songCard(s){const c=document.createElement("div");c.className="song-card";c.innerHTML=`<div class="cover-wrap"><img src="${esc(cover(s)||"https://via.placeholder.com/500?text=PASONG")}" alt=""><button class="play-overlay">▶</button></div><div class="song-info"><div class="song-title">${esc(s.title||"Untitled")}</div><div class="song-artist">${esc(artist(s))}</div><div class="song-meta"><span class="price">UGX 700</span><span class="genre">${esc(s.genre||"Music")}</span></div></div>`;c.querySelector("button").onclick=e=>{e.stopPropagation();playSong(s)};c.onclick=e=>{if(!e.target.closest("button")&&s.id)location.href=`song.html?id=${encodeURIComponent(s.id)}`};return c}
 function render(id,songs){const c=document.getElementById(id);if(!c)return;c.innerHTML="";(songs||[]).forEach(s=>c.appendChild(songCard(s)));if(!songs?.length)c.innerHTML='<div style="grid-column:1/-1;padding:25px;text-align:center;color:#858592">No music available yet.</div>'}
 function makeMobileSong(s){const el=document.createElement("a");el.className="mobile-song-card";el.href=s.id?`song.html?id=${encodeURIComponent(s.id)}`:"#";el.innerHTML=`<img class="cover" src="${esc(cover(s)||"https://via.placeholder.com/300?text=PASONG")}" alt=""><div class="m-info"><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span><em>UGX 700</em></div>`;return el}
-function makeMobileList(s){const el=document.createElement("a");el.className="mobile-list-item";el.href=s.id?`song.html?id=${encodeURIComponent(s.id)}`:"#";el.innerHTML=`<img src="${esc(cover(s)||"https://via.placeholder.com/100?text=PASONG")}" alt=""><div><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span></div><strong>UGX 700 Buy</strong>`;return el}
-function renderMobile(id,songs,mode="cards"){const c=document.getElementById(id);if(!c)return;c.innerHTML="";(songs||[]).slice(0,6).forEach(s=>c.appendChild(mode==="cards"?makeMobileSong(s):makeMobileList(s)))}
+function makeMobileList(s,rank=null){const el=document.createElement("a");el.className="mobile-list-item"+(rank!==null?" chart-ranked-item":"");el.href=s.id?`song.html?id=${encodeURIComponent(s.id)}`:"#";el.innerHTML=`${rank!==null?`<span class="chart-rank" aria-label="Rank ${rank}">${rank}</span>`:""}<img src="${esc(cover(s)||"https://via.placeholder.com/100?text=PASONG")}" alt=""><div class="mobile-track-copy"><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span></div><strong>UGX 700 Buy</strong>`;return el}
+function renderMobile(id,songs,mode="cards"){const c=document.getElementById(id);if(!c)return;c.innerHTML="";(songs||[]).slice(0,6).forEach((s,i)=>c.appendChild(mode==="cards"?makeMobileSong(s):makeMobileList(s,id==="mobileCharts"?i+1:null)))}
 function renderMobileArtists(artists){const c=document.getElementById("mobileArtists");if(!c)return;c.innerHTML="";(artists||[]).slice(0,8).forEach(a=>{const x=document.createElement("a");x.className="mobile-artist";x.href=`artist.html?id=${encodeURIComponent(a.id)}`;x.innerHTML=`<img src="${esc(a.profile_image_url||a.avatar_url||"https://via.placeholder.com/150?text=Artist")}" alt=""><b>${esc(a.performing_name||a.stage_name||"Artist")}</b><span>Artist</span>`;c.appendChild(x)})}
 async function loadAds(){
   const section=document.getElementById("pasongAdsSection"),box=document.getElementById("pasongAds"),mobileBox=document.getElementById("mobileAd");
