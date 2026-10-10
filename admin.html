@@ -44,7 +44,6 @@ th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{col
 .ad-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ad-preview{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#08080d;min-height:150px;display:flex;align-items:center;justify-content:center}
 .ad-preview img,.ad-preview video{display:block;width:100%;max-height:330px;object-fit:cover}.ad-preview .placeholder{color:#666;font-size:12px;padding:30px}.file-note{font-size:10px;color:#777;margin-top:5px}
 .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.login-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:25px}
-.login-box h1{margin-bottom:5px}.login-box p{color:var(--muted);font-size:12px;margin-bottom:18px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;overflow:auto;gap:5px}.sidebar button{min-width:max-content;margin:0}.stats{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.ad-row{grid-template-columns:1fr}.ad-thumb{width:100%;height:180px}}
 @media(max-width:520px){header{padding:0 12px}.container{padding:12px}.user-pill{display:none}.hero h1{font-size:21px}}
 </style>
@@ -144,11 +143,10 @@ th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{col
 <div id="adNotice"></div>
 <form id="adForm">
 <input type="hidden" id="adId">
-<div class="grid2">
-<div class="field"><label>Title</label><input id="adTitle" maxlength="160" required></div>
+<!-- Title and description are generated internally; they are not shown on the admin form. -->
+<input type="hidden" id="adTitle" value="PASONG Advertisement">
+<input type="hidden" id="adDescription" value="">
 <div class="field"><label>Target URL</label><input id="adTarget" type="url" placeholder="https://..."></div>
-</div>
-<div class="field"><label>Description</label><textarea id="adDescription" maxlength="500"></textarea></div>
 <div class="grid3">
 <div class="field"><label>Placement</label><select id="adPlacement"><option value="home">Home</option><option value="all">All</option></select></div>
 <div class="field"><label>Start date/time</label><input id="adStart" type="datetime-local"></div>
@@ -508,14 +506,14 @@ button.textContent="Uploading media...";
 mediaUrl=await uploadAdMedia(file);
 }
 const payload={
-title:document.getElementById("adTitle").value.trim(),
+title:document.getElementById("adTitle").value.trim()||"PASONG Advertisement",
 description:document.getElementById("adDescription").value.trim()||null,
 target_url:document.getElementById("adTarget").value.trim()||null,
 placement:document.getElementById("adPlacement").value,
 start_at:toIsoFromLocal(document.getElementById("adStart").value),
 end_at:toIsoFromLocal(document.getElementById("adEnd").value)
 };
-if(!payload.title)throw new Error("Advertisement title is required.");
+
 if(payload.start_at&&payload.end_at&&new Date(payload.end_at)<=new Date(payload.start_at))throw new Error("End date must be after start date.");
 if(mediaUrl)payload.image_url=mediaUrl;
 
@@ -595,7 +593,7 @@ return '<div class="ad-row">'+
 async function editAd(id){
 const ad=advertisements.find(x=>String(x.id)===String(id));if(!ad)return;
 document.getElementById("adId").value=ad.id||"";
-document.getElementById("adTitle").value=ad.title||"";
+document.getElementById("adTitle").value=ad.title||"PASONG Advertisement";
 document.getElementById("adDescription").value=ad.description||"";
 document.getElementById("adTarget").value=ad.target_url||"";
 document.getElementById("adPlacement").value=ad.placement||"home";
