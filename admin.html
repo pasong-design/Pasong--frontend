@@ -113,7 +113,7 @@ th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{col
 <section id="section-beats" class="hidden"><div class="card"><h2>🎛️ Beats</h2><div class="sub">View producer beats and their current status.</div><div id="beatsTable" class="loading">Loading...</div></div></section>
 <section id="section-mixes" class="hidden"><div class="card"><h2>🎧 DJ Mixes</h2><div class="sub">View DJ mix records and their current status.</div><div id="mixesTable" class="loading">Loading...</div></div></section>
 <section id="section-orders" class="hidden"><div class="card"><h2>💳 Orders & Payments</h2><div class="sub">Review recent orders and payment records.</div><div id="ordersTable" class="loading">Loading...</div></div></section>
-<section id="section-covers" class="hidden"><div class="card"><h2>🎨 Covers</h2><div class="sub">Song cover requests: check payment, view the submitted photo and requirements, upload the finished cover, then approve it. DJ cover records remain visible below.</div><div class="form-actions" style="margin-bottom:12px"><button class="btn secondary small" onclick="loadCovers()">Refresh Covers</button></div><div id="coversTable" class="loading">Loading...</div></div></section>
+<section id="section-covers" class="hidden"><div class="card"><h2>🎨 Covers</h2><div class="sub">Review uploaded cover records.</div><div id="coversTable" class="loading">Loading...</div></div></section>
 <section id="section-reports" class="hidden"><div class="card"><h2>🚩 Reports</h2><div class="sub">Review user/content reports.</div><div id="reportsTable" class="loading">Loading...</div></div></section>
 <section id="section-copyright" class="hidden">
 <div class="card">
@@ -299,63 +299,25 @@ function renderAdminRows(element, rows, columns, emptyMessage="No records found.
 }
 async function loadCovers(){
   const element=document.getElementById("coversTable");
-  element.innerHTML='<div class="loading">Loading cover requests...</div>';
-  let songRequests=[];
-  try{
-    const data=await copyrightApi("/api/admin/cover-design-requests",{method:"GET",headers:{}});
-    songRequests=data.requests||[];
-  }catch(e){
-    element.innerHTML='<div class="notice error">Could not load song cover requests from the backend: '+escapeHtml(e.message)+'. Check that the updated server.js is deployed.</div>';
-    return;
-  }
-  const dj=await supabaseClient.from("cover_requests").select("*").order("created_at",{ascending:false}).limit(100);
-  const htmlEscape=escapeHtml;
-  const cards=songRequests.map(r=>{
-    const paid=String(r.payment_status||"").toLowerCase()==="paid";
-    const approved=String(r.design_status||r.request_status||"").toLowerCase()==="approved";
-    const safeId=htmlEscape(r.id);
-    const photo=validAdminImageUrl(r.photo_url)?htmlEscape(r.photo_url):"";
-    const finished=validAdminImageUrl(r.finished_cover_url)?htmlEscape(r.finished_cover_url):"";
-    return `<article class="card" style="margin-bottom:14px"><div class="form-actions" style="justify-content:space-between"><h3 style="margin:0">Song Cover — ${htmlEscape(r.song_title||"Untitled song")}</h3><span class="badge ${paid?'active':'pending'}">${htmlEscape(r.payment_status||"pending")}</span></div>
-      <div class="grid2" style="margin-top:12px"><div><p><b>Artist email:</b> ${htmlEscape(r.artist_email||"—")}</p><p><b>Performing artists:</b> ${htmlEscape(r.performing_artists||"—")}</p><p><b>Featured artists:</b> ${htmlEscape(r.featured_artists||"—")}</p><p><b>Producer:</b> ${htmlEscape(r.producer||"—")}</p><p><b>Writer:</b> ${htmlEscape(r.writer||"—")}</p><p><b>Genre / label:</b> ${htmlEscape([r.genre,r.label].filter(Boolean).join(" / ")||"—")}</p><p><b>Cover text / instructions:</b><br>${htmlEscape(r.cover_text||"—")}</p><p><b>Fee:</b> ${htmlEscape(r.fee_currency||r.currency||"UGX")} ${htmlEscape(r.fee_amount??r.amount??"—")}</p><p><b>Payment reference:</b> ${htmlEscape(r.payment_reference||"—")}</p><p><b>Workflow:</b> ${htmlEscape(r.request_status||"—")} / ${htmlEscape(r.design_status||"—")}</p><p><b>Created:</b> ${htmlEscape(r.created_at?new Date(r.created_at).toLocaleString():"—")}</p></div>
-      <div><div style="margin-bottom:12px"><b>Customer photo</b>${photo?`<a href="${photo}" target="_blank" rel="noopener noreferrer"><img src="${photo}" alt="Customer photo" style="display:block;max-width:100%;max-height:260px;object-fit:contain;margin-top:8px;border-radius:10px;border:1px solid var(--line)"></a>`:'<p>No photo URL found.</p>'}</div><div><b>Finished cover</b>${finished?`<a href="${finished}" target="_blank" rel="noopener noreferrer"><img src="${finished}" alt="Finished cover" style="display:block;max-width:100%;max-height:260px;object-fit:contain;margin-top:8px;border-radius:10px;border:1px solid var(--line)"></a>`:'<p>No finished cover uploaded.</p>'}</div></div></div>
-      <div class="field"><label>Upload finished cover (JPG / PNG / WEBP, max 5MB)</label><input type="file" id="finished-file-${safeId}" accept="image/jpeg,image/png,image/webp"><label style="margin-top:8px">Admin notes</label><textarea id="finished-note-${safeId}" rows="2" placeholder="Notes for this cover request">${htmlEscape(r.admin_notes||r.admin_note||"")}</textarea></div>
-      <div class="form-actions"><button class="btn secondary small" onclick="saveSongCover('${safeId}','start')" ${!paid?'disabled title="Payment must be confirmed first"':''}>Start Design</button><button class="btn secondary small" onclick="saveSongCover('${safeId}','save')">Save Artwork / Notes</button><button class="btn small" onclick="saveSongCover('${safeId}','approve')" ${!paid||!finished?'disabled title="Paid request and uploaded artwork required"':''}>Approve Cover</button><button class="btn danger small" onclick="saveSongCover('${safeId}','reject')">Reject</button></div>
-      ${approved?'<div class="notice success" style="margin-top:10px">Approved — customer cover is ready.</div>':''}</article>`;
-  }).join("");
-  let djHtml='';
-  if(dj.error) djHtml='<div class="notice info">DJ cover requests could not be loaded: '+htmlEscape(dj.error.message)+'</div>';
-  else if((dj.data||[]).length){
-    djHtml='<div class="card"><h3>DJ Mix Cover Requests</h3><div class="table-wrap"><table><thead><tr><th>DJ</th><th>Mix title</th><th>Request status</th><th>Payment</th><th>Created</th></tr></thead><tbody>'+(dj.data||[]).map(r=>'<tr><td>'+htmlEscape(r.dj_name||"—")+'</td><td>'+htmlEscape(r.mix_title||"—")+'</td><td>'+htmlEscape(r.request_status||"—")+'</td><td>'+htmlEscape(r.payment_status||"—")+'</td><td>'+htmlEscape(r.created_at?new Date(r.created_at).toLocaleString():"—")+'</td></tr>').join('')+'</tbody></table></div></div>';
-  }
-  element.innerHTML=(cards||'<div class="empty">No song cover requests found.</div>')+djHtml;
+  element.innerHTML='<div class="loading">Loading verified-paid cover requests...</div>';
+  const [dj, design]=await Promise.all([
+    supabaseClient.from("cover_requests").select("*").in("payment_status",["paid","verified","successful","completed"]).order("created_at",{ascending:false}).limit(100),
+    supabaseClient.from("cover_design_requests").select("*").in("payment_status",["paid","verified","successful","completed"]).order("created_at",{ascending:false}).limit(100)
+  ]);
+  const errors=[dj.error&&("DJ mix covers: "+dj.error.message),design.error&&("Cover design requests: "+design.error.message)].filter(Boolean);
+  const rows=[...(dj.data||[]).map(r=>({...r,_source_table:"cover_requests",_cover_type:"DJ Mix Cover",_display_title:r.mix_title||r.title||"DJ mix"})),...(design.data||[]).map(r=>({...r,_source_table:"cover_design_requests",_cover_type:(r.requester_type||"artist").toUpperCase()+" Cover",_display_title:r.song_title||"Untitled cover"}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  if(!rows.length&&errors.length){element.innerHTML='<div class="empty">Unable to load cover requests. '+escapeHtml(errors.join(" | "))+'</div>';return;}
+  if(!rows.length){element.innerHTML='<div class="empty">No verified-paid cover requests yet. Requests awaiting payment are intentionally hidden from the design queue.</div>';return;}
+  element.innerHTML='<div class="table-wrap"><table><thead><tr><th>Type</th><th>Title</th><th>Customer</th><th>Fee</th><th>Payment</th><th>Design status</th><th>Finished artwork</th><th>Admin action</th></tr></thead><tbody>'+rows.map(r=>{
+    const customer=r.artist_email||r.dj_email||r.user_email||"—";const fee=(r.fee_currency||r.currency||"UGX")+" "+Number(r.fee_amount??r.amount??0).toLocaleString();const artwork=r.finished_cover_url||r.cover_url||"";const id=String(r.id||"");
+    return '<tr><td>'+escapeHtml(r._cover_type)+'</td><td>'+escapeHtml(r._display_title)+'</td><td>'+escapeHtml(customer)+'</td><td>'+escapeHtml(fee)+'</td><td>'+escapeHtml(r.payment_status||"paid")+'</td><td>'+escapeHtml(r.design_status||r.request_status||"pending")+'</td><td>'+(artwork?'<a href="'+escapeHtml(artwork)+'" target="_blank" rel="noopener">View</a>':"Not uploaded")+'</td><td>'+(r._source_table==="cover_design_requests"?'<input type="file" accept="image/png,image/jpeg,image/webp" id="coverfile-'+escapeHtml(id)+'" style="max-width:180px;color:#aaa"><button class="btn small finish-cover-btn" data-cover-id="'+escapeHtml(id)+'">Upload & Approve</button>':'DJ cover remains in its existing request flow.')+'</td></tr>';
+  }).join('')+'</tbody></table></div>';
+  element.querySelectorAll('.finish-cover-btn').forEach(button=>button.addEventListener('click',()=>window.finishCoverRequest(button.dataset.coverId)));
+  if(errors.length)element.insertAdjacentHTML("afterbegin",'<div class="notice info">Some cover records could not be loaded: '+escapeHtml(errors.join(" | "))+'</div>');
 }
-function validAdminImageUrl(value){try{const u=new URL(String(value||""));return u.protocol==="https:"||u.protocol==="http:";}catch(_){return false;}}
-async function saveSongCover(id,action){
-  const fileInput=document.getElementById('finished-file-'+id);
-  const noteInput=document.getElementById('finished-note-'+id);
-  const note=noteInput?noteInput.value.trim():'';
-  let finishedUrl='';
-  try{
-    if(fileInput&&fileInput.files&&fileInput.files[0]){
-      const file=fileInput.files[0];
-      if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw new Error('Choose a JPG, PNG or WEBP image.');
-      if(file.size>5*1024*1024)throw new Error('Finished cover must be 5MB or smaller.');
-      const sig=await copyrightApi('/api/cloudinary/signature',{method:'POST',body:JSON.stringify({folder:'pasong/covers/finished'})});
-      const fd=new FormData();fd.append('file',file);fd.append('api_key',sig.api_key);fd.append('timestamp',sig.timestamp);fd.append('folder',sig.folder);fd.append('signature',sig.signature);
-      const up=await fetch('https://api.cloudinary.com/v1_1/'+encodeURIComponent(sig.cloud_name)+'/image/upload',{method:'POST',body:fd});
-      const uploaded=await up.json();if(!up.ok||!uploaded.secure_url)throw new Error(uploaded.error?.message||'Finished cover upload failed.');finishedUrl=uploaded.secure_url;
-    }
-    const payload={admin_notes:note};
-    if(finishedUrl)payload.finished_cover_url=finishedUrl;
-    if(action==='start')payload.action='start';
-    if(action==='approve')payload.action='approve';
-    if(action==='reject')payload.action='reject';
-    const result=await copyrightApi('/api/admin/cover-design-requests/'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify(payload)});
-    showNotice('globalNotice','success',action==='approve'?'Cover approved successfully.':action==='reject'?'Cover request rejected.':action==='start'?'Design marked in progress.':'Artwork / notes saved.');
-    await loadCovers();
-  }catch(e){showNotice('globalNotice','error',e.message||'Could not update cover request.');}
-}
+window.finishCoverRequest=async function(id){
+ try{const input=document.getElementById("coverfile-"+id);const file=input?.files?.[0];if(!file)throw new Error("Choose the finished cover image first.");if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Use a JPG, PNG, or WEBP image.");if(file.size>5*1024*1024)throw new Error("Cover image must be 5 MB or smaller.");const url=await uploadAdMedia(file,"pasong/covers");const result=await supabaseClient.from("cover_design_requests").update({finished_cover_url:url,design_status:"approved",request_status:"completed",approved_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("id",id).in("payment_status",["paid","verified","successful","completed"]);if(result.error)throw result.error;alert("Finished cover uploaded and approved.");await loadCovers();}catch(error){alert(error?.message||"Could not approve cover.");}
+};
 
 async function loadReports(){
   const element=document.getElementById("reportsTable");
@@ -564,8 +526,8 @@ if(!data.api_key||!data.timestamp||!data.signature||!data.folder)throw new Error
 return data;
 }
 
-async function uploadAdMedia(file){
-const signature=await getCloudinarySignature("pasong/ads");
+async function uploadAdMedia(file,folder="pasong/ads"){
+const signature=await getCloudinarySignature(folder);
 const form=new FormData();
 form.append("file",file);
 form.append("api_key",signature.api_key);
