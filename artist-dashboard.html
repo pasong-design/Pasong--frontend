@@ -2163,7 +2163,10 @@ const SUPABASE_ANON_KEY =
   "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";  
   
 const API_BASE =  
-  "https://pasong-api.vercel.app";  
+  "https://pasong-api.vercel.app";
+
+// Cover requests use the backend serving PASONG Admin Control Center.
+const COVER_API_BASE = "https://pasong-api.onrender.com";  
   
 const PASONG_PRICE =  
   700;  
@@ -3414,8 +3417,12 @@ document
           "☁️ Uploading photo...";  
   
   
-        const signature =  
-          await getCloudinarySignature("pasong/covers");  
+        const signatureResponse = await fetch(
+          COVER_API_BASE + "/api/cloudinary/signature",
+          { method: "POST", headers: authHeaders(), body: JSON.stringify({ folder: "pasong/covers" }) }
+        );
+        const signature = await signatureResponse.json().catch(() => ({}));
+        if (!signatureResponse.ok) throw new Error(signature.error || "Could not prepare cover photo upload.");  
   
   
         const photoResult =  
@@ -3440,95 +3447,36 @@ document
           "💾 Saving request...";  
   
   
-        const {  
-          data,  
-          error  
-        } =  
-          await supabaseClient  
-            .from(  
-              "cover_design_requests"  
-            )  
-            .insert({  
-  
-              artist_id:  
-                currentUser.id,  
-  
-              artist_email:  
-                currentUser.email ||  
-                null,  
-  
-              song_title:  
-                songTitle,  
-  
-              performing_artists:  
-                performingArtists,  
-  
-              featured_artists:  
-                featuredArtists ||  
-                null,  
-  
-              producer:  
-                producer ||  
-                null,  
-  
-              writer:  
-                writer ||  
-                null,  
-  
-              genre:  
-                genre,  
-  
-              label:  
-                label ||  
-                null,  
-  
-              cover_text:  
-                coverText ||  
-                null,  
-  
-              photo_url:  
-                photoResult.secure_url,  
-  
-              country:  
-                "Uganda",  
-  
-              fee_amount:  
-                10000,  
-  
-              fee_currency:  
-                "UGX",  
-  
-              payment_status:  
-                "pending",  
-  
-              request_status:  
-                "awaiting_payment"  
-  
-            })  
-            .select()  
-            .single();  
-  
-  
-        if(error){  
-  
-          console.error(error);  
-  
-          throw new Error(  
-            error.message ||  
-            "Could not save cover request."  
-          );  
-  
-        }  
-  
-  
-        window.currentCoverRequestId =  
+        const requestResponse = await fetch(
+          COVER_API_BASE + "/api/cover-design-requests",
+          {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+              song_title: songTitle,
+              performing_artists: performingArtists,
+              featured_artists: featuredArtists || null,
+              producer: producer || null,
+              writer: writer || null,
+              genre,
+              label: label || null,
+              cover_text: coverText || null,
+              photo_url: photoResult.secure_url
+            })
+          }
+        );
+        const requestData = await requestResponse.json().catch(() => ({}));
+        if (!requestResponse.ok || !requestData.request) {
+          throw new Error(requestData.error || "Could not save cover request.");
+        }
+        const data = requestData.request;window.currentCoverRequestId =  
           data?.id ||  
           null;  
   
   
         showMessage(  
           "coverMessage",  
-          "✓ Cover request saved successfully. Payment will be connected next.",  
+          "✓ Cover request saved. Payment is not confirmed yet; design starts only after verified payment.",  
           "success"  
         );  
   
