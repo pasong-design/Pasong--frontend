@@ -3153,54 +3153,69 @@ document
   );  
   
   
-/* ============================================================  
-   COVER REQUEST GEO-PRICING  
-   Uganda: UGX 15,000 | Other countries: USD 10  
-============================================================ */  
-let coverPricing = { country: "", countryCode: "", amount: 10, currency: "USD" };  
-let coverPricingPromise = null;  
+/* ============================================================
+   COVER REQUEST GEO-PRICING
+   Uganda: UGX 15,000 | All other countries: USD 10
+============================================================ */
+let coverPricing = { country: "", countryCode: "", amount: 10, currency: "USD" };
+let coverPricingPromise = null;
 
 async function detectCoverPricing(force = false){
   if (coverPricingPromise && !force) return coverPricingPromise;
   coverPricingPromise = (async function(){
     const badges = document.querySelectorAll(".cover-price-current");
-    badges.forEach(el => { el.textContent = "Checking your location and price…"; });
+    badges.forEach(el => { el.textContent = "Checking location…"; });
     let country = "", countryCode = "";
-    try {
-      const response = await fetch("https://ipapi.co/json/", { cache: "no-store" });
-      if (!response.ok) throw new Error("IP country lookup failed");
-      const info = await response.json();
-      country = String(info.country_name || "").trim();
-      countryCode = String(info.country_code || "").trim().toUpperCase();
-    } catch (firstError) {
-      try {
-        const response = await fetch("https://ipwho.is/", { cache: "no-store" });
-        if (!response.ok) throw new Error("Fallback IP lookup failed");
-        const info = await response.json();
-        if (info.success === false) throw new Error("IP lookup unavailable");
-        country = String(info.country || "").trim();
-        countryCode = String(info.country_code || "").trim().toUpperCase();
-      } catch (secondError) {
-        // Safe fallback: do not assume the visitor is in Uganda when IP lookup fails.
-        country = "Location unavailable";
-        countryCode = "";
+
+    // Try two IP-geolocation services so one blocked request does not leave
+    // the old/static price visible. Country is never inferred from browser locale.
+    const lookups = [
+      async () => {
+        const r = await fetch("https://ipwho.is/", { cache: "no-store" });
+        if (!r.ok) throw new Error("IP lookup failed");
+        const d = await r.json();
+        if (d.success === false) throw new Error("IP lookup unavailable");
+        return { country: d.country || "", code: d.country_code || "" };
+      },
+      async () => {
+        const r = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+        if (!r.ok) throw new Error("IP lookup failed");
+        const d = await r.json();
+        return { country: d.country_name || "", code: d.country_code || "" };
       }
+    ];
+    for (const lookup of lookups) {
+      try {
+        const result = await lookup();
+        country = String(result.country || "").trim();
+        countryCode = String(result.code || "").trim().toUpperCase();
+        if (countryCode) break;
+      } catch (e) { /* Try the next provider. */ }
     }
+
     const isUganda = countryCode === "UG";
     coverPricing = {
-      country: country || (isUganda ? "Uganda" : "Location unavailable"),
+      country: country || "Location unavailable",
       countryCode,
       amount: isUganda ? 15000 : 10,
       currency: isUganda ? "UGX" : "USD"
     };
-    const label = isUganda ? "🇺🇬 Uganda price: UGX 15,000" : "🌍 International price: $10 USD";
+
+    // Show only the applicable price, never both country prices.
+    const label = isUganda ? "UGX 15,000" : "$10 USD";
     badges.forEach(el => { el.textContent = label; });
     return coverPricing;
   })();
-  return coverPricingPromise;
+  try { return await coverPricingPromise; }
+  catch (e) {
+    coverPricingPromise = null;
+    document.querySelectorAll(".cover-price-current").forEach(el => { el.textContent = "$10 USD"; });
+    coverPricing = { country: "Location unavailable", countryCode: "", amount: 10, currency: "USD" };
+    return coverPricing;
+  }
 }
 
-// Detect the visitor's country as soon as the dashboard loads.
+// Resolve IP country pricing when the dashboard loads.
 detectCoverPricing();
 
 /* ============================================================  
