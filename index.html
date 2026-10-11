@@ -328,24 +328,27 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
 </style>
 
 <style id="pasong-professional-shortcut-grid-final">
-/* Professional 4-column shortcut grid: scoped only to the mobile shortcut section. */
+/* Seven compact shortcuts in one horizontal row; scoped to this shortcut section only. */
 .mobile-shortcuts {
   display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:12px !important;
-  padding:12px !important;
-  margin:0 0 14px !important;
+  grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+  gap:4px !important;
+  padding:6px 4px !important;
+  margin:2px 0 14px !important;
   background:#0c0a14 !important;
   align-items:start !important;
 }
 .mobile-shortcuts > .mobile-shortcut {
-  display:block !important;
-  grid-column:auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
   min-width:0 !important;
   min-height:0 !important;
   height:auto !important;
   padding:0 !important;
   margin:0 !important;
+  gap:4px !important;
   text-align:center !important;
   text-decoration:none !important;
   color:#fff !important;
@@ -356,34 +359,39 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
 }
 .mobile-shortcuts > .mobile-shortcut .ico {
   display:flex !important;
-  width:60px !important;
-  height:60px !important;
+  width:36px !important;
+  height:36px !important;
   max-width:100% !important;
+  flex:0 0 36px !important;
   align-items:center !important;
   justify-content:center !important;
   margin:0 auto !important;
   padding:0 !important;
   box-sizing:border-box !important;
   border:0 !important;
-  border-radius:16px !important;
+  border-radius:10px !important;
   background:#6d45c0 !important;
   color:#fff !important;
-  font-size:28px !important;
+  font-size:20px !important;
   line-height:1 !important;
 }
 .mobile-shortcuts > .mobile-shortcut b {
   display:block !important;
-  margin:6px 0 0 !important;
+  width:100% !important;
+  margin:0 !important;
   color:#fff !important;
-  font-size:11px !important;
-  line-height:1.2 !important;
-  font-weight:400 !important;
+  font-size:7px !important;
+  line-height:1.1 !important;
+  font-weight:600 !important;
   white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  text-align:center !important;
 }
+.mobile-shortcuts > .mobile-shortcut span:not(.ico) { display:none !important; }
 @media(max-width:360px) {
-  .mobile-shortcuts {gap:10px 6px !important;padding:10px !important;}
-  .mobile-shortcuts > .mobile-shortcut .ico {width:54px !important;height:54px !important;font-size:26px !important;}
-  .mobile-shortcuts > .mobile-shortcut b {font-size:10px !important;}
+  .mobile-shortcuts {gap:3px !important;padding:6px 2px !important;}
+  .mobile-shortcuts > .mobile-shortcut .ico {width:32px !important;height:32px !important;flex-basis:32px !important;font-size:18px !important;border-radius:8px !important;}
+  .mobile-shortcuts > .mobile-shortcut b {font-size:6.5px !important;}
 }
 </style>
 
@@ -528,7 +536,7 @@ async function init(){
   const {data:songs}=await supabaseClient.from("songs").select("*").order("created_at",{ascending:false}).limit(10);
   heroSongs=(songs||[]).slice(0,5);updateHero();restartHero();
   render("trendingSongs",(songs||[]).slice(0,8));render("latestSongs",songs||[]);render("downloadSongs",(songs||[]).slice(0,8));render("ugandaSongs",(songs||[]).slice(0,8));render("countdownSongs",(songs||[]).slice(0,8));render("djMixes",(songs||[]).slice(0,8));
-  renderDesktopCountdown(songs||[]);renderMobile("mobileTrending",(songs||[]).slice(0,5),"list");renderMobile("mobileLatest",songs||[],"cards");renderMobile("mobileCharts",(songs||[]).slice(0,5),"list");
+  renderDesktopCountdown(songs||[]);renderMobile("mobileTrending",(songs||[]).slice(0,5),"cards");renderMobile("mobileLatest",songs||[],"cards");renderMobile("mobileCharts",(songs||[]).slice(0,5),"list");
   const {data:artists}=await supabaseClient.from("artist_profiles").select("*").limit(8);renderMobileArtists(artists||[]);renderProducers(artists||[]);
   const box=document.getElementById("popularArtists");if(box)(artists||[]).slice(0,6).forEach(a=>{const n=a.performing_name||a.stage_name||"Artist",x=document.createElement("a");x.className="artist-card";x.href=`artist.html?id=${encodeURIComponent(a.id)}`;x.innerHTML=`<img class="artist-image" src="${esc(a.profile_image_url||a.avatar_url||"https://via.placeholder.com/200?text=Artist")}" alt=""><div class="artist-name">${esc(n)}</div><div class="artist-role">Artist</div>`;box.appendChild(x)});
 }
