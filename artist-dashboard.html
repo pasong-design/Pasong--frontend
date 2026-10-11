@@ -777,6 +777,16 @@ input[type="checkbox"]{
   
 }  
   
+
+/* PASONG song-rights declaration panel */
+.rights-declaration-box{grid-column:1/-1;background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(15,23,42,.94));border:1px solid rgba(168,85,247,.55);border-radius:14px;padding:18px;margin-top:4px}
+.rights-declaration-box h3{color:#d8b4fe;margin:0 0 8px;font-size:1.05rem}
+.rights-declaration-box p{color:#cbd5e1;line-height:1.55;margin:0 0 14px}
+.rights-declaration-box label{display:block;font-weight:700;margin:12px 0 6px}
+.rights-declaration-box select,.rights-declaration-box input,.rights-declaration-box textarea{width:100%;padding:12px;border-radius:9px;border:1px solid #475569;background:#0b1120;color:#f8fafc;font:inherit}
+.rights-declaration-box textarea{min-height:90px;resize:vertical}
+.rights-declaration-box .rights-help{font-size:.86rem;color:#a5b4fc;margin-top:8px}
+
 </style>  </head>  <body>  <!-- =========================================================  
      MOBILE HEADER  
 ========================================================= -->  <header class="mobile-header">    <div class="logo">◈ PASONG</div>  <button
@@ -1214,7 +1224,8 @@ onclick="toggleMobileMenu()"
         <input  
           type="email"  
           id="producerEmail"  
-          placeholder="Optional"  
+          placeholder="producer@example.com"  
+          required
         >  
 
       </div>  
@@ -1336,7 +1347,28 @@ onclick="toggleMobileMenu()"
 
         </label>  
 
-      </div>  
+      </div>
+
+      <div class="rights-declaration-box">
+        <h3>📜 Music Rights Declaration</h3>
+        <p>Tell PASONG whether a collecting society or another party controls any rights in this song. This declaration will be saved with your submission for Admin review.</p>
+
+        <label for="collectingSocietyStatus">Collecting Society / Rights Status *</label>
+        <select id="collectingSocietyStatus" required>
+          <option value="">Select your rights status</option>
+          <option value="none">Not represented by a collecting society</option>
+          <option value="registered">Registered with a collecting society</option>
+          <option value="third_party">Some rights are controlled or assigned to another party</option>
+          <option value="unsure">I'm unsure</option>
+        </select>
+
+        <label for="collectingSocietyName">Collecting Society / Rights Holder Name</label>
+        <input id="collectingSocietyName" type="text" maxlength="200" placeholder="Enter name if applicable">
+
+        <label for="rightsNotes">Additional Rights Information</label>
+        <textarea id="rightsNotes" maxlength="2000" placeholder="Mention samples, collaborations, licences, permissions or other relevant rights information."></textarea>
+        <p class="rights-help">Songs remain pending until PASONG Admin reviews the submission. Do not claim rights that belong to another person or organisation.</p>
+      </div>
 
     </div>  
 
@@ -1719,11 +1751,7 @@ onclick="toggleMobileMenu()"
         type="file"  
         id="profileImage"  
         accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"  
-      >
-
-      <div class="help" style="margin-top:7px;">
-        ✨ PASONG Auto Crop: your profile photo is automatically cropped to a square and face-centered when saved.
-      </div>  
+      >  
 
     </div>  
 
@@ -2163,10 +2191,7 @@ const SUPABASE_ANON_KEY =
   "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";  
   
 const API_BASE =  
-  "https://pasong-api.vercel.app";
-
-// Cover requests use the backend serving PASONG Admin Control Center.
-const COVER_API_BASE = "https://pasong-api.onrender.com";  
+  "https://pasong-api.onrender.com";  
   
 const PASONG_PRICE =  
   700;  
@@ -2537,100 +2562,81 @@ function authHeaders(){
    CLOUDINARY SIGNATURE  
 ============================================================ */  
   
-async function getCloudinarySignature(folder){
-
-  const response = await fetch(
-    API_BASE +
-    "/api/cloudinary/signature",
-    {
-      method:"POST",
-      headers:authHeaders(),
-      body:JSON.stringify({
-        folder: folder || "pasong-songs"
-      })
-    }
-  );
-
-  const data = await response.json().catch(()=>({}));
-
-  if(!response.ok){
-    throw new Error(
-      data?.error || data?.message ||
-      "Could not get Cloudinary upload signature (HTTP " + response.status + ")."
-    );
+async function getCloudinarySignature(){
+  if(!currentSession?.access_token){
+    throw new Error("Your PASONG login session has expired. Please log in again.");
   }
 
-  return data;
+  const response = await fetch(
+    API_BASE + "/api/cloudinary/signature",
+    { method:"GET", headers:authHeaders() }
+  );
+
+  const raw = await response.text();
+  let result = {};
+  try { result = raw ? JSON.parse(raw) : {}; } catch(e) {}
+
+  if(!response.ok){
+    throw new Error(result?.message || result?.error || raw || "Could not get Cloudinary upload signature.");
+  }
+
+  if(!result?.cloud_name || !result?.api_key || !result?.signature || !result?.timestamp){
+    throw new Error("Cloudinary signature response is incomplete. Check the PASONG backend Cloudinary configuration.");
+  }
+
+  return result;
 }
 
 
-async function uploadToCloudinary(  
-  file,  
-  signature  
-){  
-  
-  const formData =  
-    new FormData();  
-  
-  
-  formData.append(  
-    "file",  
-    file  
-  );  
-  
-  
-  formData.append(  
-    "api_key",  
-    signature.api_key  
-  );  
-  
-  
-  formData.append(  
-    "timestamp",  
-    signature.timestamp  
-  );  
-  
-  
-  formData.append(  
-    "signature",  
-    signature.signature  
-  );
+/* ============================================================
+   CLOUDINARY UPLOAD
+   - Fresh signature for every file
+   - Correct resource type for audio/images
+   - Shows Cloudinary's real error when upload fails
+============================================================ */
+async function uploadToCloudinary(file){
+  if(!file) throw new Error("No file was selected.");
 
-  if(signature.folder){
-    formData.append("folder",signature.folder);
-  }  
-  
-  
-  const uploadUrl =  
-    `https://api.cloudinary.com/v1_1/${signature.cloud_name}/auto/upload`;  
-  
-  
-  const response =  
-    await fetch(  
-      uploadUrl,  
-      {  
-        method:"POST",  
-        body:formData  
-      }  
-    );  
-  
-  
+  const signature = await getCloudinarySignature();
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("api_key", String(signature.api_key));
+  formData.append("timestamp", String(signature.timestamp));
+  formData.append("signature", String(signature.signature));
+
+  ["folder","public_id","type","invalidate","context","tags","eager","eager_async"]
+    .forEach((key)=>{
+      if(signature[key] !== undefined && signature[key] !== null){
+        formData.append(key, String(signature[key]));
+      }
+    });
+
+  let resourceType = "auto";
+  if(file.type?.startsWith("image/")) resourceType = "image";
+  else if(file.type?.startsWith("audio/") || file.type?.startsWith("video/")) resourceType = "video";
+
+  const uploadUrl = signature.upload_url ||
+    `https://api.cloudinary.com/v1_1/${encodeURIComponent(signature.cloud_name)}/${resourceType}/upload`;
+
+  const response = await fetch(uploadUrl, { method:"POST", body:formData });
+  const raw = await response.text();
+  let result = {};
+  try { result = raw ? JSON.parse(raw) : {}; } catch(e) {}
+
   if(!response.ok){
-    const errorData = await response.json().catch(()=>({}));
-    throw new Error(
-      errorData?.error?.message ||
-      errorData?.message ||
-      "Cloudinary upload failed (HTTP " + response.status + ")."
-    );
-  }  
-  
-  
-  return await response.json();  
-  
-}  
-  
-  
-/* ============================================================  
+    const msg = result?.error?.message || result?.message || raw || `Cloudinary returned HTTP ${response.status}.`;
+    throw new Error(`Cloudinary upload failed: ${msg}`);
+  }
+
+  if(!result?.secure_url){
+    throw new Error("Cloudinary accepted the upload but did not return a secure URL.");
+  }
+
+  return result;
+}
+
+
+/* ============================================================
    USER LOOKUP  
 ============================================================ */  
   
@@ -2745,7 +2751,20 @@ document
         document  
           .getElementById("producerEmail")  
           .value  
-          .trim();  
+          .trim();
+
+      const collectingSocietyStatus =
+        document.getElementById("collectingSocietyStatus").value;
+
+      const collectingSocietyName =
+        document.getElementById("collectingSocietyName").value.trim();
+
+      const rightsNotes =
+        document.getElementById("rightsNotes").value.trim();
+
+      const contractAccepted =
+        document.getElementById("rightsCheck").checked &&
+        document.getElementById("termsCheck").checked;  
   
   
       const audioFile =  
@@ -2844,24 +2863,19 @@ document
       }  
   
   
-      if(  
-        !document  
-          .getElementById("rightsCheck")  
-          .checked ||  
-  
-        !document  
-          .getElementById("termsCheck")  
-          .checked  
-      ){  
-  
-        showMessage(  
-          "uploadMessage",  
-          "You must confirm the rights and upload terms.",  
-          "error"  
-        );  
-  
-        return;  
-  
+      if(!contractAccepted){
+        showMessage("uploadMessage","You must confirm the rights and upload terms.","error");
+        return;
+      }
+
+      if(!collectingSocietyStatus){
+        showMessage("uploadMessage","Please select your collecting society / rights status.","error");
+        return;
+      }
+
+      if(!producerEmail){
+        showMessage("uploadMessage","Enter the PASONG email of the song's producer. The producer account is required for royalty allocation.","error");
+        return;
       }  
   
   
@@ -2978,30 +2992,28 @@ document
   
         button.textContent =  
           "☁️ Uploading files...";  
-  
-  
-        const signature =  
-          await getCloudinarySignature("pasong-songs");  
-  
-  
-        const audioResult =  
-          await uploadToCloudinary(  
-            audioFile,  
-            signature  
-          );  
+
+        const audioResult = await uploadToCloudinary(audioFile);  
   
   
         const coverResult =  
-          await uploadToCloudinary(  
-            coverFile,  
-            signature  
-          );  
+          await uploadToCloudinary(coverFile);  
   
   
         button.textContent =  
           "🎵 Creating song...";  
   
   
+        // Cloudinary stores audio as a video resource. Deliver a 30-second
+        // preview using a transformation URL while keeping the original audio URL.
+        const previewUrl = (() => {
+          const fullUrl = audioResult.secure_url;
+          if (!fullUrl.includes("/video/upload/")) {
+            throw new Error("The audio upload did not return a Cloudinary video URL, so PASONG could not create a preview URL.");
+          }
+          return fullUrl.replace("/video/upload/", "/video/upload/so_0,du_30/");
+        })();
+
         const songPayload = {  
   
           title:title,  
@@ -3018,13 +3030,21 @@ document
             "UGX",  
   
           status:  
-            "approved",  
+            "pending",  
   
           audio_url:  
-            audioResult.secure_url,  
+            audioResult.secure_url,
+
+          preview_url:
+            previewUrl,
   
           cover_url:  
-            coverResult.secure_url,  
+            coverResult.secure_url,
+
+          contractAccepted: contractAccepted,
+          collecting_society_status: collectingSocietyStatus,
+          collecting_society_name: collectingSocietyName || null,
+          rights_notes: rightsNotes || null,  
   
           artist_user_ids:  
             artistIds,  
@@ -3074,14 +3094,11 @@ document
   
         showMessage(  
           "uploadMessage",  
-          "✓ Song uploaded successfully with " +  
-          artistIds.length +  
-          " performing artist" +  
-          (  
-            artistIds.length === 1  
-              ? "."  
-              : "s."  
-          ),  
+          "✓ Song submitted successfully with " +
+          artistIds.length +
+          " performing artist" +
+          (artistIds.length === 1 ? "." : "s.") +
+          " Your rights declaration has been saved. The song is awaiting PASONG Admin review and will not be published until approved.",
           "success"  
         );  
   
@@ -3415,21 +3432,8 @@ document
   
         button.textContent =  
           "☁️ Uploading photo...";  
-  
-  
-        const signatureResponse = await fetch(
-          COVER_API_BASE + "/api/cloudinary/signature",
-          { method: "POST", headers: authHeaders(), body: JSON.stringify({ folder: "pasong/covers" }) }
-        );
-        const signature = await signatureResponse.json().catch(() => ({}));
-        if (!signatureResponse.ok) throw new Error(signature.error || "Could not prepare cover photo upload.");  
-  
-  
-        const photoResult =  
-          await uploadToCloudinary(  
-            photo,  
-            signature  
-          );  
+
+        const photoResult = await uploadToCloudinary(photo);;  
   
   
         if(  
@@ -3447,36 +3451,95 @@ document
           "💾 Saving request...";  
   
   
-        const requestResponse = await fetch(
-          COVER_API_BASE + "/api/cover-design-requests",
-          {
-            method: "POST",
-            headers: authHeaders(),
-            body: JSON.stringify({
-              song_title: songTitle,
-              performing_artists: performingArtists,
-              featured_artists: featuredArtists || null,
-              producer: producer || null,
-              writer: writer || null,
-              genre,
-              label: label || null,
-              cover_text: coverText || null,
-              photo_url: photoResult.secure_url
-            })
-          }
-        );
-        const requestData = await requestResponse.json().catch(() => ({}));
-        if (!requestResponse.ok || !requestData.request) {
-          throw new Error(requestData.error || "Could not save cover request.");
-        }
-        const data = requestData.request;window.currentCoverRequestId =  
+        const {  
+          data,  
+          error  
+        } =  
+          await supabaseClient  
+            .from(  
+              "cover_design_requests"  
+            )  
+            .insert({  
+  
+              artist_id:  
+                currentUser.id,  
+  
+              artist_email:  
+                currentUser.email ||  
+                null,  
+  
+              song_title:  
+                songTitle,  
+  
+              performing_artists:  
+                performingArtists,  
+  
+              featured_artists:  
+                featuredArtists ||  
+                null,  
+  
+              producer:  
+                producer ||  
+                null,  
+  
+              writer:  
+                writer ||  
+                null,  
+  
+              genre:  
+                genre,  
+  
+              label:  
+                label ||  
+                null,  
+  
+              cover_text:  
+                coverText ||  
+                null,  
+  
+              photo_url:  
+                photoResult.secure_url,  
+  
+              country:  
+                "Uganda",  
+  
+              fee_amount:  
+                10000,  
+  
+              fee_currency:  
+                "UGX",  
+  
+              payment_status:  
+                "pending",  
+  
+              request_status:  
+                "awaiting_payment"  
+  
+            })  
+            .select()  
+            .single();  
+  
+  
+        if(error){  
+  
+          console.error(error);  
+  
+          throw new Error(  
+            error.message ||  
+            "Could not save cover request."  
+          );  
+  
+        }  
+  
+  
+        window.currentCoverRequestId =  
           data?.id ||  
           null;  
   
   
         showMessage(  
           "coverMessage",  
-          "✓ Cover request saved. Payment is not confirmed yet; design starts only after verified payment.",  
+          "✓ Cover request saved successfully. Payment will be connected next.",  
           "success"  
         );  
   
@@ -5109,8 +5172,6 @@ async function loadArtistProfile(){
       "performingName"  
     ).value =  
       data.performing_name ||  
-      data.stage_name ||  
-      data.artist_name ||  
       "";  
   
   
@@ -5239,50 +5300,20 @@ async function saveArtistProfile(){
         );  
   
       }  
-  
-  
-      const signature =  
-        await getCloudinarySignature("pasong-producers/profile");  
-  
-  
-      const result =
-        await uploadToCloudinary(
-          imageFile,
-          signature
-        );
 
-      /*
-       * PASONG AUTO CROP
-       * Cloudinary detects the face and delivers an
-       * 800x800 square crop centered on the face.
-       * The original upload remains untouched in Cloudinary.
-       */
-      profileImageUrl =
-        String(result.secure_url || "").replace(
-          "/upload/",
-          "/upload/c_fill,g_face,w_800,h_800,q_auto,f_auto/"
-        );
-
-      if(!profileImageUrl){
-        throw new Error("Cloudinary did not return an image URL.");
-      }  
+      const result = await uploadToCloudinary(imageFile);;  
+  
+  
+      profileImageUrl =  
+        result.secure_url;  
   
     }  
   
   
-    /* artist_name is NOT NULL in artist_profiles. */
-    const artistName =
-      performingName ||
-      realName ||
-      "Artist";
-
     const payload = {  
   
       user_id:  
         currentUser.id,  
-  
-      artist_name:
-        artistName,
   
       real_name:  
         realName ||  
@@ -5290,7 +5321,7 @@ async function saveArtistProfile(){
   
       performing_name:  
         performingName ||  
-        artistName,  
+        null,  
   
       mobile_money_provider:  
         provider ||  
