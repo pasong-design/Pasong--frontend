@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#100b1b">
+<title>PASONG — Pricing Test</title>
+<style>
+:root{color-scheme:dark;--bg:#0d0a14;--panel:#191324;--border:#332344;--purple:#8b3dff;--muted:#b8a9c9;--text:#f8f4ff;--green:#45d483;--red:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#24123b 0,#0d0a14 52%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:760px;margin:auto;padding:22px 15px 40px}.brand{font-weight:900;letter-spacing:.04em;font-size:1.15rem}.brand span{color:#c18cff}
+h1{font-size:1.65rem;margin:.6rem 0 .25rem}p{color:var(--muted);margin:.3rem 0 1rem}
+.card{background:rgba(25,19,36,.95);border:1px solid var(--border);border-radius:18px;padding:17px;margin:14px 0;box-shadow:0 12px 30px #0003}
+label{display:block;font-weight:700;margin:10px 0 6px}input,select,button{font:inherit;width:100%;border-radius:11px;padding:12px;border:1px solid #4a355f;background:#100c18;color:var(--text)}
+button{background:linear-gradient(100deg,#6824b8,#9b4dff);border:0;font-weight:800;margin-top:12px;cursor:pointer}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.price{font-size:2rem;font-weight:900;color:#d3aaff;overflow-wrap:anywhere}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#2d2040;color:#d9c1ff;font-size:.8rem}
+.status{padding:10px;border-radius:10px;background:#100c18;border:1px solid var(--border);white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem}
+.ok{color:var(--green)}.bad{color:var(--red)}small{color:var(--muted)}code{color:#e2c7ff;overflow-wrap:anywhere}
+@media(max-width:520px){.row{grid-template-columns:1fr}h1{font-size:1.4rem}.card{padding:14px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><span>♫</span> PASONG</div>
+  <h1>Country Pricing Test</h1>
+  <p>Test country detection and the existing PASONG pricing API without changing the live checkout or homepage.</p>
+
+  <section class="card">
+    <span class="pill">Step 1 · API configuration</span>
+    <label for="apiBase">PASONG API base URL</label>
+    <input id="apiBase" value="https://pasong-api.vercel.app" inputmode="url" autocomplete="url">
+    <small>Uses the existing <code>/api/pricing</code> endpoint. No payment is started from this test page.</small>
+    <button id="testApi">Test pricing endpoint</button>
+    <div id="apiStatus" class="status" style="margin-top:12px">Not tested yet.</div>
+  </section>
+
+  <section class="card">
+    <span class="pill">Step 2 · IP country detection</span>
+    <div class="row">
+      <div><label>Detected country</label><div id="country" class="price">—</div><div id="countryName"><small>Not checked yet</small></div></div>
+      <div><label>Displayed test price</label><div id="price" class="price">—</div><div id="priceNote"><small>Will use API response when available</small></div></div>
+    </div>
+    <button id="detect">Detect country from IP</button>
+    <div id="geoStatus" class="status" style="margin-top:12px">IP lookup has not run.</div>
+    <small>Country lookup is handled by a third-party IP geolocation service. VPNs and mobile networks can report an approximate country.</small>
+  </section>
+
+  <section class="card">
+    <span class="pill">Step 3 · Manual country test</span>
+    <label for="manualCountry">Choose a country to test</label>
+    <select id="manualCountry">
+      <option value="UG">Uganda (UG)</option><option value="KE">Kenya (KE)</option>
+      <option value="TZ">Tanzania (TZ)</option><option value="RW">Rwanda (RW)</option>
+      <option value="BI">Burundi (BI)</option><option value="SS">South Sudan (SS)</option>
+      <option value="ET">Ethiopia (ET)</option><option value="GB">United Kingdom (GB)</option>
+      <option value="US">United States (US)</option><option value="NG">Nigeria (NG)</option>
+      <option value="ZA">South Africa (ZA)</option>
+    </select>
+    <button id="testCountry">Test selected country</button>
+    <div id="manualStatus" class="status" style="margin-top:12px">Choose a country and test it.</div>
+  </section>
+
+  <section class="card">
+    <strong>Important before going live</strong>
+    <p>This page is a diagnostic tool, not the production pricing integration. The browser must never be trusted to set the amount charged. The server should determine/validate the country and price at checkout, and the payment request must use that server-calculated amount.</p>
+    <p>Current known server pricing configuration includes UGX 700 for Uganda, UGX 1,000 for KE/TZ/RW/BI/SS/ET, GBP 1 for GB, and USD 1 fallback; some other African countries use USD 0.57. Verify the actual API response below before changing any live page.</p>
+  </section>
+</main>
+<script src="pasong-pricing.js"></script>
+</body>
+</html>
