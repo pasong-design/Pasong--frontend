@@ -109,7 +109,10 @@ th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{col
 </div>
 </section>
 
-<section id="section-songs" class="hidden"><div class="card"><h2>🎵 Songs</h2><div class="sub">View current song records and approval status.</div><div id="songsTable" class="loading">Loading...</div></div></section>
+<section id="section-songs" class="hidden">
+<div class="card"><h2>🎵 Song & Artist Verification</h2><div class="sub">Review the song, artist declaration and collecting-society disclosure before approving public release. An artist declaration is not automatic proof of ownership.</div>
+<div class="form-actions" style="margin-bottom:12px"><select id="songReviewFilter" onchange="loadSongReviewQueue()" style="background:#0c0c13;color:white;border:1px solid #292936;border-radius:9px;padding:8px"><option value="pending">Pending review</option><option value="more_information_required">More information required</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All songs</option></select><button class="btn secondary small" onclick="loadSongReviewQueue()">Refresh queue</button></div>
+<div id="songsTable" class="loading">Loading review queue...</div></div></section>
 <section id="section-beats" class="hidden"><div class="card"><h2>🎛️ Beats</h2><div class="sub">View producer beats and their current status.</div><div id="beatsTable" class="loading">Loading...</div></div></section>
 <section id="section-mixes" class="hidden"><div class="card"><h2>🎧 DJ Mixes</h2><div class="sub">View DJ mix records and their current status.</div><div id="mixesTable" class="loading">Loading...</div></div></section>
 <section id="section-orders" class="hidden"><div class="card"><h2>💳 Orders & Payments</h2><div class="sub">Review recent orders and payment records.</div><div id="ordersTable" class="loading">Loading...</div></div></section>
@@ -202,7 +205,7 @@ const section=document.getElementById("section-"+name);
 if(section)section.classList.remove("hidden");
 document.querySelectorAll(".sidebar button").forEach(b=>b.classList.toggle("active",b.dataset.section===name));
 if(name==="dashboard")loadStats();
-if(name==="songs")loadGenericTable("songs","songsTable",["title","status","created_at"]);
+if(name==="songs")loadSongReviewQueue();
 if(name==="beats")loadGenericTable("beats","beatsTable",["title","genre","status","created_at"]);
 if(name==="mixes")loadMixes();
 if(name==="orders")loadGenericTable("orders","ordersTable",["id","status","total_amount","currency","created_at"]);
@@ -299,26 +302,17 @@ function renderAdminRows(element, rows, columns, emptyMessage="No records found.
 }
 async function loadCovers(){
   const element=document.getElementById("coversTable");
-  element.innerHTML='<div class="loading">Loading verified-paid cover requests...</div>';
-  const [dj, design]=await Promise.all([
-    supabaseClient.from("cover_requests").select("*").in("payment_status",["paid","verified","successful","completed"]).order("created_at",{ascending:false}).limit(100),
-    supabaseClient.from("cover_design_requests").select("*").in("payment_status",["paid","verified","successful","completed"]).order("created_at",{ascending:false}).limit(100)
+  element.innerHTML='<div class="loading">Loading cover requests...</div>';
+  const [dj, song]=await Promise.all([
+    supabaseClient.from("cover_requests").select("*").order("created_at",{ascending:false}).limit(100),
+    supabaseClient.from("cover_design_requests").select("*").order("created_at",{ascending:false}).limit(100)
   ]);
-  const errors=[dj.error&&("DJ mix covers: "+dj.error.message),design.error&&("Cover design requests: "+design.error.message)].filter(Boolean);
-  const rows=[...(dj.data||[]).map(r=>({...r,_source_table:"cover_requests",_cover_type:"DJ Mix Cover",_display_title:r.mix_title||r.title||"DJ mix"})),...(design.data||[]).map(r=>({...r,_source_table:"cover_design_requests",_cover_type:(r.requester_type||"artist").toUpperCase()+" Cover",_display_title:r.song_title||"Untitled cover"}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  if(!rows.length&&errors.length){element.innerHTML='<div class="empty">Unable to load cover requests. '+escapeHtml(errors.join(" | "))+'</div>';return;}
-  if(!rows.length){element.innerHTML='<div class="empty">No verified-paid cover requests yet. Requests awaiting payment are intentionally hidden from the design queue.</div>';return;}
-  element.innerHTML='<div class="table-wrap"><table><thead><tr><th>Type</th><th>Title</th><th>Customer</th><th>Fee</th><th>Payment</th><th>Design status</th><th>Finished artwork</th><th>Admin action</th></tr></thead><tbody>'+rows.map(r=>{
-    const customer=r.artist_email||r.dj_email||r.user_email||"—";const fee=(r.fee_currency||r.currency||"UGX")+" "+Number(r.fee_amount??r.amount??0).toLocaleString();const artwork=r.finished_cover_url||r.cover_url||"";const id=String(r.id||"");
-    return '<tr><td>'+escapeHtml(r._cover_type)+'</td><td>'+escapeHtml(r._display_title)+'</td><td>'+escapeHtml(customer)+'</td><td>'+escapeHtml(fee)+'</td><td>'+escapeHtml(r.payment_status||"paid")+'</td><td>'+escapeHtml(r.design_status||r.request_status||"pending")+'</td><td>'+(artwork?'<a href="'+escapeHtml(artwork)+'" target="_blank" rel="noopener">View</a>':"Not uploaded")+'</td><td>'+(r._source_table==="cover_design_requests"?'<input type="file" accept="image/png,image/jpeg,image/webp" id="coverfile-'+escapeHtml(id)+'" style="max-width:180px;color:#aaa"><button class="btn small finish-cover-btn" data-cover-id="'+escapeHtml(id)+'">Upload & Approve</button>':'DJ cover remains in its existing request flow.')+'</td></tr>';
-  }).join('')+'</tbody></table></div>';
-  element.querySelectorAll('.finish-cover-btn').forEach(button=>button.addEventListener('click',()=>window.finishCoverRequest(button.dataset.coverId)));
+  const errors=[dj.error&&("DJ mix covers: "+dj.error.message),song.error&&("Song covers: "+song.error.message)].filter(Boolean);
+  const rows=[...(dj.data||[]).map(r=>({...r,_cover_type:"DJ Mix Cover",_display_title:r.mix_title,_display_status:r.request_status||r.payment_status})),...(song.data||[]).map(r=>({...r,_cover_type:"Song Cover",_display_title:r.song_title,_display_status:r.request_status||r.payment_status}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+  if(!rows.length && errors.length){element.innerHTML='<div class="empty">Unable to load cover requests. '+escapeHtml(errors.join(" | "))+'</div>';return;}
+  renderAdminRows(element,rows,[{key:"_cover_type",label:"Type"},{key:"_display_title",label:"Title"},{key:"request_status",label:"Request Status"},{key:"payment_status",label:"Payment"},{key:"created_at",label:"Created"}],"No cover requests found.");
   if(errors.length)element.insertAdjacentHTML("afterbegin",'<div class="notice info">Some cover records could not be loaded: '+escapeHtml(errors.join(" | "))+'</div>');
 }
-window.finishCoverRequest=async function(id){
- try{const input=document.getElementById("coverfile-"+id);const file=input?.files?.[0];if(!file)throw new Error("Choose the finished cover image first.");if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Use a JPG, PNG, or WEBP image.");if(file.size>5*1024*1024)throw new Error("Cover image must be 5 MB or smaller.");const url=await uploadAdMedia(file,"pasong/covers");const result=await supabaseClient.from("cover_design_requests").update({finished_cover_url:url,design_status:"approved",request_status:"completed",approved_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq("id",id).in("payment_status",["paid","verified","successful","completed"]);if(result.error)throw result.error;alert("Finished cover uploaded and approved.");await loadCovers();}catch(error){alert(error?.message||"Could not approve cover.");}
-};
-
 async function loadReports(){
   const element=document.getElementById("reportsTable");
   element.innerHTML='<div class="loading">Loading report records...</div>';
@@ -353,6 +347,39 @@ async function loadMixes(){
   }
   element.innerHTML='<div class="empty">Unable to load DJ mixes. '+escapeHtml(r.error.message)+'</div>';
 }
+
+async function loadSongReviewQueue(){
+  const el=document.getElementById("songsTable"); if(!el)return;
+  el.innerHTML='<div class="loading">Loading song review queue...</div>';
+  try{
+    const filter=document.getElementById("songReviewFilter")?.value||"pending";
+    const data=await copyrightApi("/api/admin/songs/review?status="+encodeURIComponent(filter));
+    const songs=data.songs||[];
+    if(!songs.length){el.innerHTML='<div class="empty">No songs in this review filter.</div>';return;}
+    el.innerHTML='<div style="display:grid;gap:14px">'+songs.map(song=>{
+      const d=song.rights_declaration||{};
+      const society=({none:"Artist declares no collecting-society representation for these rights",registered:"Artist reports collecting-society registration",third_party:"Some rights may be controlled by another party",unsure:"Artist is unsure about rights representation"})[d.collecting_society_status]||"Rights declaration not found";
+      const audio=song.preview_url?'<audio controls preload="none" style="width:100%;margin-top:8px" src="'+escapeHtml(song.preview_url)+'"></audio>':'<p style="color:#999;font-size:12px;margin-top:8px">No preview URL saved.</p>';
+      const actionButtons=String(song.status).toLowerCase()==="pending"||String(song.status).toLowerCase()==="more_information_required"?'<div class="form-actions"><button class="btn green small" onclick="reviewSong(&quot;'+escapeHtml(song.id)+'&quot;,&quot;approve&quot;)">Approve</button><button class="btn secondary small" onclick="reviewSong(&quot;'+escapeHtml(song.id)+'&quot;,&quot;request_info&quot;)">Request more information</button><button class="btn danger small" onclick="reviewSong(&quot;'+escapeHtml(song.id)+'&quot;,&quot;reject&quot;)">Reject</button></div>':'';
+      return '<article class="card" style="margin:0;background:#0d0d14"><div style="display:flex;gap:12px;align-items:flex-start">'+(song.cover_url?'<img src="'+escapeHtml(song.cover_url)+'" alt="Cover" style="width:84px;height:84px;object-fit:cover;border-radius:9px;border:1px solid #292936">':'')+'<div style="flex:1;min-width:0"><h3 style="font-size:16px">'+escapeHtml(song.title||"Untitled song")+'</h3><p style="font-size:11px;color:#aaa;margin-top:5px">Song ID: '+escapeHtml(song.id)+' · Uploaded: '+escapeHtml(song.created_at?new Date(song.created_at).toLocaleString():"—")+'</p><p style="margin-top:8px">Status: '+formatCell("status",song.status)+'</p></div></div>'+audio+'<div style="margin-top:12px;padding:12px;border:1px solid #292936;border-radius:9px"><strong style="font-size:12px">Rights & collecting-society declaration</strong><p style="font-size:12px;margin-top:7px">Agreement accepted: <b>'+((d.contract_accepted===true)?"Yes":"Not recorded")+'</b></p><p style="font-size:12px;margin-top:5px">Version: '+escapeHtml(d.agreement_version||"—")+' · Accepted: '+escapeHtml(d.accepted_at?new Date(d.accepted_at).toLocaleString():"—")+'</p><p style="font-size:12px;margin-top:5px">Disclosure: '+escapeHtml(society)+'</p><p style="font-size:12px;margin-top:5px">Society/third party: '+escapeHtml(d.collecting_society_name||"Not provided")+'</p><p style="font-size:12px;margin-top:5px">Artist notes: '+escapeHtml(d.rights_notes||"None provided")+'</p><p style="font-size:12px;margin-top:5px">Previous admin notes: '+escapeHtml(d.admin_notes||"None")+'</p></div>'+actionButtons+'</article>';
+    }).join('')+'</div>';
+  }catch(e){el.innerHTML='<div class="empty">Unable to load the review queue: '+escapeHtml(e.message||"Unknown error")+'. Check that the SQL migration and updated backend are deployed.</div>';}
+}
+async function reviewSong(songId,action){
+  let notes="";
+  if(action==="reject"||action==="request_info"){
+    notes=prompt(action==="reject"?"Enter the reason for rejection:":"What additional information must the artist provide?");
+    if(notes===null)return;
+    notes=notes.trim();
+    if(!notes){alert("Please enter a reason or request.");return;}
+  }else if(!confirm("Approve this song for PASONG public availability? Confirm that the review checks are complete."))return;
+  try{
+    await copyrightApi("/api/admin/songs/"+encodeURIComponent(songId)+"/review",{method:"POST",body:JSON.stringify({action,admin_notes:notes})});
+    showNotice("globalNotice","success","Song review decision saved.");
+    await loadSongReviewQueue();
+  }catch(e){showNotice("globalNotice","error",e.message||"Could not save the review decision.");}
+}
+window.loadSongReviewQueue=loadSongReviewQueue; window.reviewSong=reviewSong;
 
 function formatCell(key,value){
 if(value===null||value===undefined)return"—";
@@ -526,8 +553,8 @@ if(!data.api_key||!data.timestamp||!data.signature||!data.folder)throw new Error
 return data;
 }
 
-async function uploadAdMedia(file,folder="pasong/ads"){
-const signature=await getCloudinarySignature(folder);
+async function uploadAdMedia(file){
+const signature=await getCloudinarySignature("pasong/ads");
 const form=new FormData();
 form.append("file",file);
 form.append("api_key",signature.api_key);
