@@ -3177,6 +3177,7 @@ async function detectSongPricing(force = false){
     if (label) label.textContent = "Detecting your country…";
     let countryCode = "";
     const lookups = [
+      async () => { const r = await fetch(API_BASE + "/api/pricing?ts=" + Date.now(), {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d.detected && d.country) return d.country; throw 0; },
       async () => { const r = await fetch("https://ipwho.is/", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d.success===false) throw 0; return d.country_code; },
       async () => { const r = await fetch("https://ipapi.co/json/", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); return d.country_code; },
       async () => { const r = await fetch("https://free.freeipapi.com/api/json", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); return d.countryCode || d.country_code; },
