@@ -2698,8 +2698,11 @@ document
       event.preventDefault();
 
       // Resolve country-specific song price before creating the song record.
-      await detectSongPricing();  
-  
+      const detectedSongPricing = await detectSongPricing(true);
+      if (!detectedSongPricing || !detectedSongPricing.detected || !detectedSongPricing.countryCode) {
+        showMessage("uploadMessage", "PASONG could not detect your IP country, so the song was not uploaded with an incorrect price. Check your connection or disable any VPN/ad blocker, then try again.", "error");
+        return;
+      }
   
       const button =  
         document.getElementById(  
@@ -3216,6 +3219,9 @@ async function detectSongPricing(force = false){
     return {countryCode:"", amount:PASONG_PRICE, currency:PASONG_CURRENCY, detected:false};
   }
 }
+
+// IMPORTANT: resolve and display the visitor's IP-country song price on page load.
+detectSongPricing();
 
 /* ============================================================
    COVER REQUEST GEO-PRICING
