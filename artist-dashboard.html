@@ -1086,7 +1086,7 @@ onclick="toggleMobileMenu()"
   <p class="panel-description">  
     Upload your original music to PASONG.  
     Current PASONG song price:  
-    <strong>UGX 700</strong>.  
+    <strong id="pasongSongPriceLabel">Checking your location and price…</strong>.  
   </p>  
 
   <div  
@@ -2201,8 +2201,10 @@ const SUPABASE_ANON_KEY =
 const API_BASE =  
   "https://pasong-api.onrender.com";  
   
-const PASONG_PRICE =  
-  700;  
+let PASONG_PRICE = 700;
+let PASONG_CURRENCY = "UGX";
+let PASONG_SONG_COUNTRY = "";
+let pasongSongPricingPromise = null;  
   
 const supabaseClient =  
   window.supabase.createClient(  
@@ -2693,7 +2695,10 @@ document
     "submit",  
     async function(event){  
   
-      event.preventDefault();  
+      event.preventDefault();
+
+      // Resolve country-specific song price before creating the song record.
+      await detectSongPricing();  
   
   
       const button =  
@@ -3035,7 +3040,10 @@ document
             PASONG_PRICE,  
   
           currency:  
-            "UGX",  
+            PASONG_CURRENCY,  
+
+          country_code:  
+            PASONG_SONG_COUNTRY,  
   
           status:  
             "pending",  
@@ -3153,6 +3161,62 @@ document
   );  
   
   
+/* ============================================================
+   SONG PRICE BY VISITOR IP COUNTRY
+   UG: UGX 700 | KE/TZ/RW/BI/SS/ET: UGX 1,000
+   Selected other African countries: USD 0.57
+   GB: GBP 1 | Other countries: USD 1
+============================================================ */
+async function detectSongPricing(force = false){
+  if (pasongSongPricingPromise && !force) return pasongSongPricingPromise;
+  pasongSongPricingPromise = (async () => {
+    const label = document.getElementById("pasongSongPriceLabel");
+    if (label) label.textContent = "Detecting your country…";
+    let countryCode = "";
+    const lookups = [
+      async () => { const r = await fetch("https://ipwho.is/", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); if(d.success===false) throw 0; return d.country_code; },
+      async () => { const r = await fetch("https://ipapi.co/json/", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); return d.country_code; },
+      async () => { const r = await fetch("https://free.freeipapi.com/api/json", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); return d.countryCode || d.country_code; },
+      async () => { const r = await fetch("https://geolocation-db.com/json/", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); return d.country_code; },
+      async () => { const r = await fetch("https://ipinfo.io/json", {cache:"no-store"}); if(!r.ok) throw 0; const d=await r.json(); return d.country; }
+    ];
+    for (const lookup of lookups){
+      try {
+        const code = String(await lookup() || "").trim().toUpperCase();
+        if (/^[A-Z]{2}$/.test(code) && code !== "XX") { countryCode = code; break; }
+      } catch(e) {}
+    }
+    if (!countryCode) {
+      // Do not silently pretend the visitor is in another country when all lookups fail.
+      if (label) label.textContent = "Country detection unavailable — refresh to retry";
+      pasongSongPricingPromise = null;
+      return {countryCode:"", amount:PASONG_PRICE, currency:PASONG_CURRENCY, detected:false};
+    }
+    const eastAfrica = ["KE","TZ","RW","BI","SS","ET"];
+    const africa = ["NG","GH","ZA","ZM","ZW","MW","MZ","BW","NA","CM","SN","CI","SL","LR","GM","GN","EG","MA","DZ","TN"];
+    if (countryCode === "UG") { PASONG_PRICE = 700; PASONG_CURRENCY = "UGX"; }
+    else if (eastAfrica.includes(countryCode)) { PASONG_PRICE = 1000; PASONG_CURRENCY = "UGX"; }
+    else if (africa.includes(countryCode)) { PASONG_PRICE = 0.57; PASONG_CURRENCY = "USD"; }
+    else if (countryCode === "GB") { PASONG_PRICE = 1; PASONG_CURRENCY = "GBP"; }
+    else { PASONG_PRICE = 1; PASONG_CURRENCY = "USD"; }
+    PASONG_SONG_COUNTRY = countryCode;
+    const formatted = PASONG_CURRENCY === "UGX"
+      ? "UGX " + Number(PASONG_PRICE).toLocaleString("en-US")
+      : PASONG_CURRENCY === "GBP"
+        ? "£" + Number(PASONG_PRICE).toLocaleString("en-GB")
+        : "$" + Number(PASONG_PRICE).toLocaleString("en-US", {minimumFractionDigits:PASONG_PRICE < 1 ? 2 : 0, maximumFractionDigits:2}) + " USD";
+    if (label) label.textContent = formatted;
+    return {countryCode:countryCode, amount:PASONG_PRICE, currency:PASONG_CURRENCY, detected:true};
+  })();
+  try { return await pasongSongPricingPromise; }
+  catch(e) {
+    pasongSongPricingPromise = null;
+    const label = document.getElementById("pasongSongPriceLabel");
+    if (label) label.textContent = "Country detection unavailable — refresh to retry";
+    return {countryCode:"", amount:PASONG_PRICE, currency:PASONG_CURRENCY, detected:false};
+  }
+}
+
 /* ============================================================
    COVER REQUEST GEO-PRICING
    Uganda: UGX 15,000 | All other countries: USD 10
