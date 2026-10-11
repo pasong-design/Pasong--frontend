@@ -3,24 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PASONG — Upload Song</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#07070b;color:#fff}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}header{min-height:76px;border-bottom:1px solid #292334;display:flex;align-items:center;padding:0 5%;background:#08070d}.logo{font-size:27px;font-weight:900;color:#fff}.logo span{color:#d946ef}.logo small{display:block;font-size:7px;letter-spacing:4px;color:#888;margin-top:3px}.container{width:92%;max-width:850px;margin:35px auto 60px}.back{display:inline-block;margin-bottom:18px;color:#c026d3;font-weight:800}.box{background:#111019;border:1px solid #30283d;border-radius:16px;padding:25px;box-shadow:0 10px 35px rgba(0,0,0,.25)}h1{margin-top:0;margin-bottom:10px;font-size:32px}.sub{color:#999;margin-bottom:25px}.price-box{background:linear-gradient(135deg,#171124,#21112a);border:1px solid #4b2a5d;border-radius:12px;padding:15px;margin-bottom:25px}.price-box strong{color:#e879f9;font-size:18px}.price-box small{display:block;color:#aaa;margin-top:5px}.field{margin:18px 0}label{display:block;font-weight:800;margin-bottom:8px}input,textarea,select{width:100%;background:#15141c;border:1px solid #383243;border-radius:10px;padding:13px;color:#fff;outline:none}input:focus,textarea:focus,select:focus{border-color:#c026d3;box-shadow:0 0 0 2px rgba(192,38,211,.12)}textarea{min-height:110px;resize:vertical}select{cursor:pointer}input[type=file]{padding:10px}.note{font-size:12px;color:#888;margin-top:8px}.contract{background:#0c0b11;border:1px solid #383243;border-radius:10px;padding:15px;line-height:1.6;color:#bbb}.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px}.check input{width:auto;margin-top:4px}.check span{color:#ddd;font-size:14px;line-height:1.5}button{width:100%;border:0;border-radius:10px;padding:14px;background:linear-gradient(90deg,#9333ea,#d946ef);color:#fff;font-weight:900;cursor:pointer;margin-top:20px}button:hover{opacity:.92}button:disabled{opacity:.55;cursor:not-allowed}.status{margin-top:15px;color:#e879f9;white-space:pre-wrap;line-height:1.5}.footer{text-align:center;color:#666;font-size:13px;margin-top:30px}.preview{margin-top:10px;display:none;width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid #30283d}.required{color:#e879f9}
-</style></head><body><header><a class="logo" href="index.html">◈ PAS<span>ONG</span><small>MUSIC MARKETPLACE</small></a></header><main class="container"><a class="back" href="index.html">← Back to PASONG</a><section class="box"><h1>Upload Your Song</h1><p class="sub">Upload your music to PASONG and make it available in the Music Store.</p><div class="price-box"><strong>Song price: UGX 500</strong><small>PASONG will use the marketplace revenue-sharing system for qualifying sales.</small></div><div class="field"><label for="artistName">Artist Name</label><input id="artistName" type="text" placeholder="Enter artist name" maxlength="100"></div><div class="field"><label for="songTitle">Song Title</label><input id="songTitle" type="text" placeholder="Enter song title" maxlength="150"></div><div class="field"><label for="genre">Genre</label><select id="genre"><option value="">Select genre</option><option value="Afrobeats">Afrobeats</option><option value="Amapiano">Amapiano</option><option value="Bongo">Bongo</option><option value="Gengetone">Gengetone</option><option value="Hip Hop">Hip Hop</option><option value="Gospel">Gospel</option><option value="Dancehall">Dancehall</option><option value="R&B">R&B</option><option value="Other">Other</option></select></div><div class="field"><label for="description">Description</label><textarea id="description" placeholder="Tell listeners about your song..."></textarea></div><div class="field"><label for="songFile">Song File</label><input id="songFile" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav"><div class="note">MP3 or WAV — maximum 10 MB.</div></div><div class="field"><label for="coverFile">Cover Image *</label><input id="coverFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"><div class="note">JPG, PNG or WEBP — maximum 5 MB. REQUIRED</div><img id="coverPreview" class="preview"></div><div class="field"><label>PASONG Upload Contract</label><div class="contract">By uploading this song, you confirm that you have the right to upload and distribute the music and artwork, that the information you provide is accurate, and that your upload does not knowingly violate another person's rights. PASONG may review, reject or remove content that violates its rules or applicable law.</div><label class="check"><input id="contractAccepted" type="checkbox"><span>I confirm that I have the right to upload this music and artwork. I understand that PASONG may make the song available for sale after verification.</span></label></div><button id="uploadBtn" onclick="uploadSong()">Upload Song</button><div id="status" class="status"></div></section><div class="footer">PASONG © 2026</div></main><script>
+<title>PASONG — Upload Song</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#07070b;color:#fff}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}header{min-height:76px;border-bottom:1px solid #292334;display:flex;align-items:center;padding:0 5%;background:#08070d}.logo{font-size:27px;font-weight:900;color:#fff}.logo span{color:#d946ef}.logo small{display:block;font-size:7px;letter-spacing:4px;color:#888;margin-top:3px}.container{width:92%;max-width:850px;margin:35px auto 60px}.back{display:inline-block;margin-bottom:18px;color:#c026d3;font-weight:800}.box{background:#111019;border:1px solid #30283d;border-radius:16px;padding:25px;box-shadow:0 10px 35px rgba(0,0,0,.25)}h1{margin-top:0;margin-bottom:10px;font-size:32px}.sub{color:#999;margin-bottom:25px}.price-box{background:linear-gradient(135deg,#171124,#21112a);border:1px solid #4b2a5d;border-radius:12px;padding:15px;margin-bottom:25px}.price-box strong{color:#e879f9;font-size:18px}.price-box small{display:block;color:#aaa;margin-top:5px}.field{margin:18px 0}label{display:block;font-weight:800;margin-bottom:8px}input,textarea,select{width:100%;background:#15141c;border:1px solid #383243;border-radius:10px;padding:13px;color:#fff;outline:none}input:focus,textarea:focus,select:focus{border-color:#c026d3;box-shadow:0 0 0 2px rgba(192,38,211,.12)}textarea{min-height:110px;resize:vertical}select{cursor:pointer}input[type=file]{padding:10px}.note{font-size:12px;color:#888;margin-top:8px}.contract{background:#0c0b11;border:1px solid #383243;border-radius:10px;padding:15px;line-height:1.6;color:#bbb}.check{display:flex;gap:10px;align-items:flex-start;margin-top:14px}.check input{width:auto;margin-top:4px}.check span{color:#ddd;font-size:14px;line-height:1.5}button{width:100%;border:0;border-radius:10px;padding:14px;background:linear-gradient(90deg,#9333ea,#d946ef);color:#fff;font-weight:900;cursor:pointer;margin-top:20px}button:hover{opacity:.92}button:disabled{opacity:.55;cursor:not-allowed}.status{margin-top:15px;color:#e879f9;white-space:pre-wrap;line-height:1.5}.footer{text-align:center;color:#666;font-size:13px;margin-top:30px}.preview{margin-top:10px;display:none;width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid #30283d}.required{color:#e879f9}.cover-design{background:linear-gradient(135deg,#171124,#21112a);border:1px solid #4b2a5d;border-radius:12px;padding:18px;margin:24px 0}.cover-design h2{font-size:21px;margin:0 0 8px}.cover-design p{color:#bbb;line-height:1.5;margin:8px 0}.cover-design .cover-price{font-size:20px;font-weight:900;color:#e879f9}.cover-design .cover-note{font-size:12px;color:#999}.cover-design button{margin-top:12px}.cover-request-form{display:none;margin-top:16px;padding-top:14px;border-top:1px solid #493253}.cover-request-status{font-size:13px;line-height:1.5;color:#e879f9;margin-top:10px;white-space:pre-wrap}
+</style></head><body><header><a class="logo" href="index.html">◈ PAS<span>ONG</span><small>MUSIC MARKETPLACE</small></a></header><main class="container"><a class="back" href="index.html">← Back to PASONG</a><section class="box"><h1>Upload Your Song</h1><p class="sub">Upload your music to PASONG and make it available in the Music Store.</p><div class="price-box"><strong>Song price: UGX 700</strong><small>PASONG will use the marketplace revenue-sharing system for qualifying sales.</small></div>
+<section class="cover-design" aria-labelledby="coverDesignTitle"><h2 id="coverDesignTitle">🎨 Need PASONG to design your cover?</h2><p>Ask PASONG to create professional artwork for your song. Your song price stays <strong>UGX 700</strong>; this is a separate cover-design service.</p><div class="cover-price" id="coverDesignPrice" aria-live="polite">Checking your location and price…</div><div class="cover-note" id="coverDesignLocation">The price is selected using your IP country.</div><button type="button" id="showCoverRequest">I Need a Cover</button><div class="cover-request-form" id="coverRequestForm"><p>Enter the song details for your cover-design request. This does not change or interrupt the song upload form.</p><div class="field"><label for="coverArtistName">Artist Name</label><input id="coverArtistName" type="text" maxlength="100" placeholder="Enter artist name"></div><div class="field"><label for="coverSongTitle">Song Title</label><input id="coverSongTitle" type="text" maxlength="150" placeholder="Enter song title"></div><div class="field"><label for="coverPhoto">Photo to use (optional)</label><input id="coverPhoto" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"><div class="note">JPG, PNG or WEBP — maximum 5 MB.</div></div><button type="button" id="submitCoverRequest">Submit Cover Request</button><div class="cover-request-status" id="coverRequestStatus"></div></div></section>
+<div class="field"><label for="artistName">Artist Name</label><input id="artistName" type="text" placeholder="Enter artist name" maxlength="100"></div><div class="field"><label for="songTitle">Song Title</label><input id="songTitle" type="text" placeholder="Enter song title" maxlength="150"></div><div class="field"><label for="genre">Genre</label><select id="genre"><option value="">Select genre</option><option value="Afrobeats">Afrobeats</option><option value="Amapiano">Amapiano</option><option value="Bongo">Bongo</option><option value="Gengetone">Gengetone</option><option value="Hip Hop">Hip Hop</option><option value="Gospel">Gospel</option><option value="Dancehall">Dancehall</option><option value="R&B">R&amp;B</option><option value="Other">Other</option></select></div><div class="field"><label for="description">Description</label><textarea id="description" placeholder="Tell listeners about your song..."></textarea></div><div class="field"><label for="songFile">Song File</label><input id="songFile" type="file" accept=".mp3,.wav,audio/mpeg,audio/wav"><div class="note">MP3 or WAV — maximum 10 MB.</div></div><div class="field"><label for="coverFile">Cover Image <span class="required">*</span></label><input id="coverFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"><div class="note">JPG, PNG or WEBP — maximum 5 MB. REQUIRED for song upload.</div><img id="coverPreview" class="preview" alt="Cover preview"></div><div class="field"><label>PASONG Upload Contract</label><div class="contract">By uploading this song, you confirm that you have the right to upload and distribute the music and artwork, that the information you provide is accurate, and that your upload does not knowingly violate another person's rights. PASONG may review, reject or remove content that violates its rules or applicable law.</div><label class="check"><input id="contractAccepted" type="checkbox"><span>I confirm that I have the right to upload this music and artwork. I understand that PASONG may make the song available for sale after verification.</span></label></div><button id="uploadBtn" onclick="uploadSong()">Upload Song</button><div id="status" class="status"></div></section><div class="footer">PASONG © 2026</div></main><script>
 const API_BASE = "https://pasong-api.vercel.app";
 function setStatus(m){document.getElementById("status").textContent=m}
+
+// Country-based cover design display: Uganda = UGX 15,000; all other countries = USD 10.
+// This only controls the displayed cover-design price. Payment amount must also be validated by the backend.
+let coverCountryCode = "";
+let coverCurrency = "USD";
+let coverAmount = 10;
+async function detectCoverPrice(){
+  const priceEl=document.getElementById("coverDesignPrice");
+  const locationEl=document.getElementById("coverDesignLocation");
+  try{
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),4500);
+    const res=await fetch("https://ipapi.co/json/",{cache:"no-store",signal:controller.signal});
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error("Country lookup unavailable");
+    const data=await res.json();
+    coverCountryCode=String(data.country_code||"").toUpperCase();
+    if(coverCountryCode==="UG"){
+      coverCurrency="UGX";coverAmount=15000;
+      priceEl.textContent="Cover design: UGX 15,000";
+      locationEl.textContent="Uganda price";
+    }else{
+      coverCurrency="USD";coverAmount=10;
+      priceEl.textContent="Cover design: $10 USD";
+      locationEl.textContent="International price";
+    }
+  }catch(error){
+    // If the country lookup fails, show the international price rather than displaying both prices.
+    coverCountryCode="";coverCurrency="USD";coverAmount=10;
+    priceEl.textContent="Cover design: $10 USD";
+    locationEl.textContent="International price. We could not verify your country automatically.";
+  }
+}
+detectCoverPrice();
+
+document.getElementById("showCoverRequest").addEventListener("click",function(){
+  const form=document.getElementById("coverRequestForm");
+  form.style.display=form.style.display==="block"?"none":"block";
+  document.getElementById("coverArtistName").value=document.getElementById("artistName").value.trim();
+  document.getElementById("coverSongTitle").value=document.getElementById("songTitle").value.trim();
+});
+document.getElementById("submitCoverRequest").addEventListener("click",async function(){
+  const artistName=document.getElementById("coverArtistName").value.trim();
+  const songTitle=document.getElementById("coverSongTitle").value.trim();
+  const photo=document.getElementById("coverPhoto").files[0];
+  const status=document.getElementById("coverRequestStatus");
+  if(!artistName||!songTitle){status.textContent="Please enter the artist name and song title.";return}
+  if(photo&&photo.size>5*1024*1024){status.textContent="Photo is larger than 5 MB.";return}
+  // Do not pretend a request was saved until the real server endpoint is connected.
+  status.textContent="Your selected cover-design price is "+(coverCurrency==="UGX"?"UGX 15,000":"$10 USD")+". The cover-request submission endpoint is not yet connected on this page. Please connect the existing PASONG cover-design request API before accepting requests or payments.";
+});
+
 document.getElementById("coverFile").addEventListener("change",function(e){const f=e.target.files[0];const p=document.getElementById("coverPreview");if(f){p.src=URL.createObjectURL(f);p.style.display="block"}else{p.style.display="none"}});
 async function uploadToCloudinary(file,info){
   const form=new FormData();
-  form.append("file",file);
-  form.append("api_key",info.apiKey);
-  form.append("timestamp",info.timestamp);
-  form.append("signature",info.signature);
-  form.append("folder",info.folder);
-  form.append("public_id",info.publicId);
-  if(info.tags) form.append("tags",info.tags);
-  if(info.context) form.append("context",info.context);
+  form.append("file",file);form.append("api_key",info.apiKey);form.append("timestamp",info.timestamp);form.append("signature",info.signature);form.append("folder",info.folder);form.append("public_id",info.publicId);
+  if(info.tags) form.append("tags",info.tags);if(info.context) form.append("context",info.context);
   const res=await fetch(info.uploadUrl,{method:"POST",body:form});
-  let data; try{data=await res.json()}catch(e){throw new Error("Cloudinary invalid response")};
+  let data; try{data=await res.json()}catch(e){throw new Error("Cloudinary invalid response")}
   if(!res.ok||data.error){throw new Error(data.error?.message||"Cloudinary upload failed")}
   return data;
 }
