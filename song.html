@@ -100,6 +100,56 @@ const copyrightReportButton=$("copyrightReportButton"),supportTitle=$("supportTi
 const freeStreamBadge=$("freeStreamBadge"),djFreeBadge=$("djFreeBadge"),previewTitle=$("previewTitle"),previewText=$("previewText");
 const endTime=$("endTime"),audio=$("audio"),previewButton=$("previewButton"),progress=$("progress"),currentTime=$("currentTime"),playCount=$("playCount");
 let isDjMix=false,currentSongId="",isFavorite=false,favoriteBusy=false,playRecorded=false,playTimer=null,playSeconds=0;
+
+// Country-based pricing from PASONG API. This updates the visible price only;
+// checkout/payment must independently validate and charge the same server-side price.
+let pasongCountryPricing = null;
+let pasongPricingLoaded = false;
+
+function formatPasongPrice(pricing) {
+  if (!pricing) return "UGX 700";
+  const amount = Number(pricing.amount ?? pricing.price);
+  if (!Number.isFinite(amount)) return pricing.label || "UGX 700";
+  const currency = String(pricing.currency || "UGX").toUpperCase();
+  const symbols = {
+    UGX: "UGX ", KES: "KES ", TZS: "TZS ", RWF: "RWF ",
+    BIF: "BIF ", SSP: "SSP ", ETB: "ETB ", GBP: "£", USD: "$"
+  };
+  const decimals = ["GBP", "USD"].includes(currency) ? 2 : 0;
+  return (symbols[currency] || currency + " ") + amount.toLocaleString("en-GB", {
+    minimumFractionDigits: decimals, maximumFractionDigits: decimals
+  });
+}
+
+async function loadPasongCountryPricing() {
+  try {
+    const response = await fetch(API_BASE + "/api/pricing", {
+      method: "GET",
+      cache: "no-store",
+      headers: { "Accept": "application/json" }
+    });
+    if (!response.ok) throw new Error("Country pricing request failed");
+    const data = await response.json();
+    if (!data || (!data.currency && !data.label)) throw new Error("Pricing response is incomplete");
+    pasongCountryPricing = data;
+    pasongPricingLoaded = true;
+    console.log("PASONG country pricing:", {
+      country: data.country, detected: data.detected,
+      currency: data.currency, amount: data.amount
+    });
+    return data;
+  } catch (error) {
+    console.error("PASONG country pricing unavailable:", error);
+    return null;
+  }
+}
+
+function applyPasongSongPrice() {
+  const priceText = formatPasongPrice(pasongCountryPricing);
+  songPrice.textContent = priceText;
+  buyButton.textContent = "BUY & DOWNLOAD — " + priceText;
+}
+
 function getSongId(){const p=new URLSearchParams(location.search);return(p.get("id")||p.get("song_id")||p.get("songId")||"").trim()}
 function formatTime(s){if(!Number.isFinite(s))return"0:00";return Math.floor(s/60)+":"+Math.floor(s%60).toString().padStart(2,"0")}
 function showError(m){loading.className="error-box";loading.innerHTML="<strong>Unable to load song</strong><br><br>"+m+'<br><br><a href="store.html">← Back to Music Store</a>'}
@@ -115,9 +165,19 @@ async function recordPlay(){if(playRecorded)return;playRecorded=true;try{const{d
 audio.onplay=()=>{if(playTimer||playRecorded)return;playTimer=setInterval(()=>{if(!audio.paused&&!audio.ended&&++playSeconds>=30){clearInterval(playTimer);playTimer=null;recordPlay()}},1000)};
 audio.onpause=()=>{if(playTimer){clearInterval(playTimer);playTimer=null}};
 function setupAudio(url){resetTracking();if(url){audio.src=url;audio.load();previewButton.disabled=false}else previewButton.disabled=true}
-function setupNormal(data){priceLabel.textContent="Download price";songPrice.textContent="UGX 700";buyButton.textContent="BUY & DOWNLOAD — UGX 700";show(freeStreamBadge);hide(djFreeBadge);hide(tipButton);previewTitle.textContent="🎧 FREE FULL SONG STREAM";previewText.textContent="Listen to the complete song free on PASONG.";setupAudio(data.audio_url||data.audioUrl||data.preview_url||data.previewUrl||"")}
+async function setupNormal(data){
+  priceLabel.textContent="Download price";
+  songPrice.textContent="UGX 700";
+  buyButton.textContent="BUY & DOWNLOAD — UGX 700";
+  show(freeStreamBadge);hide(djFreeBadge);hide(tipButton);
+  previewTitle.textContent="🎧 FREE FULL SONG STREAM";
+  previewText.textContent="Listen to the complete song free on PASONG.";
+  setupAudio(data.audio_url||data.audioUrl||data.preview_url||data.previewUrl||"");
+  await loadPasongCountryPricing();
+  applyPasongSongPrice();
+}
 async function setupDj(data){priceLabel.textContent="DJ Mix download price";hide(freeStreamBadge);show(djFreeBadge);show(tipButton);previewTitle.textContent="🎧 FREE FULL DJ MIX STREAM";previewText.textContent="Listen to the full DJ Mix free on PASONG.";songPrice.textContent="UGX 1,000";buyButton.textContent="DOWNLOAD — UGX 1,000";setupAudio(data.mix_audio_url||data.audio_url||data.audioUrl||data.preview_url||data.previewUrl||"")}
-async function loadSong(){currentSongId=getSongId();if(!currentSongId){showError("Song ID is missing.");return}try{const r=await fetch(API_BASE+"/api/songs/"+encodeURIComponent(currentSongId),{cache:"no-store"});if(!r.ok)throw Error("Song could not be found.");const j=await r.json(),d=j.song||j.data||j;isDjMix=String(d.content_type||"music").toLowerCase()==="dj_mix";songTitle.textContent=d.title||d.name||"Untitled Song";songArtist.textContent=d.artist_name||d.artistName||d.artist?.name||"Unknown Artist";const g=d.genre||d.category_name||d.category?.name||(isDjMix?"DJ Mix":"Music");songGenre.textContent=g;songGenreText.textContent=g;songDescription.textContent=d.description||(isDjMix?"Stream this DJ Mix free on PASONG.":"Stream this complete song free on PASONG.");const c=d.cover_url||d.coverUrl||d.cover_image_url||d.coverImageUrl||d.image_url||d.imageUrl||"";if(c){songCover.src=c;songCover.style.display="block";coverPlaceholder.style.display="none"}else{songCover.style.display="none";coverPlaceholder.style.display="flex"}isDjMix?await setupDj(d):setupNormal(d);await loadPlayCount();await loadFav();loading.style.display="none";songContent.style.display="block"}catch(e){console.error(e);showError(e.message||"Failed to fetch song.")}}
+async function loadSong(){currentSongId=getSongId();if(!currentSongId){showError("Song ID is missing.");return}try{const r=await fetch(API_BASE+"/api/songs/"+encodeURIComponent(currentSongId),{cache:"no-store"});if(!r.ok)throw Error("Song could not be found.");const j=await r.json(),d=j.song||j.data||j;isDjMix=String(d.content_type||"music").toLowerCase()==="dj_mix";songTitle.textContent=d.title||d.name||"Untitled Song";songArtist.textContent=d.artist_name||d.artistName||d.artist?.name||"Unknown Artist";const g=d.genre||d.category_name||d.category?.name||(isDjMix?"DJ Mix":"Music");songGenre.textContent=g;songGenreText.textContent=g;songDescription.textContent=d.description||(isDjMix?"Stream this DJ Mix free on PASONG.":"Stream this complete song free on PASONG.");const c=d.cover_url||d.coverUrl||d.cover_image_url||d.coverImageUrl||d.image_url||d.imageUrl||"";if(c){songCover.src=c;songCover.style.display="block";coverPlaceholder.style.display="none"}else{songCover.style.display="none";coverPlaceholder.style.display="flex"}isDjMix?await setupDj(d):await setupNormal(d);await loadPlayCount();await loadFav();loading.style.display="none";songContent.style.display="block"}catch(e){console.error(e);showError(e.message||"Failed to fetch song.")}}
 previewButton.onclick=async()=>{if(!audio.src){alert("Full song stream is not available.");return}try{if(audio.paused){await audio.play();previewButton.textContent="❚❚"}else{audio.pause();previewButton.textContent="▶"}}catch(e){alert("Unable to play the audio.")}};
 audio.onloadedmetadata=()=>{if(Number.isFinite(audio.duration)){progress.max=audio.duration;endTime.textContent=formatTime(audio.duration)}};
 audio.ontimeupdate=()=>{currentTime.textContent=formatTime(audio.currentTime);if(Number.isFinite(audio.duration)){progress.max=audio.duration;progress.value=audio.currentTime;endTime.textContent=formatTime(audio.duration)}};
