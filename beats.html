@@ -55,7 +55,7 @@
   </div>
 </section>
 <main class="container" id="beatLibrary">
-<div class="section-head"><div><h2>The beat library</h2><p>Find the rhythm behind your next hit.</p></div><span class="count" id="resultCount">Loading…</span></div>
+<div class="section-head"><div><h2>The beat library</h2><p>Find the rhythm behind your next hit.</p></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px"><span class="count" id="resultCount">Loading…</span><span id="currencyStatus" style="font-size:11px;color:#a8a3c7">Detecting your currency…</span></div></div>
 <div class="toolbar">
 <input id="searchInput" class="field search" type="search" placeholder="Search beat or producer…" aria-label="Search beats">
 <select id="genreFilter" class="field" aria-label="Filter by genre"><option value="">All genres</option></select>
@@ -78,6 +78,34 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 const grid=$('beatGrid'),status=$('status');
 let allBeats=[],currentAudio=null;
+let buyerCountry='UG',buyerCurrency='UGX',fxRates=null,fxReady=false;
+const COUNTRY_CURRENCY={UG:'UGX',US:'USD',GB:'GBP',FR:'EUR',DE:'EUR',IT:'EUR',ES:'EUR',PT:'EUR',NL:'EUR',BE:'EUR',IE:'EUR',AT:'EUR',FI:'EUR',GR:'EUR',CY:'EUR',EE:'EUR',LV:'EUR',LT:'EUR',LU:'EUR',MT:'EUR',SK:'EUR',SI:'EUR',HR:'EUR',CA:'CAD',AU:'AUD',NZ:'NZD',KE:'KES',TZ:'TZS',RW:'RWF',BI:'BIF',SS:'SSP',NG:'NGN',GH:'GHS',ZA:'ZAR',IN:'INR',JP:'JPY',CN:'CNY',CH:'CHF',SE:'SEK',NO:'NOK',DK:'DKK',PL:'PLN',BR:'BRL',MX:'MXN',AE:'AED',SA:'SAR',SG:'SGD',HK:'HKD',PK:'PKR',ET:'ETB'};
+function currencyForCountry(code){return COUNTRY_CURRENCY[String(code||'').toUpperCase()]||'USD'}
+async function detectBuyerCurrency(){
+ const statusEl=$('currencyStatus');
+ try{
+  let country='';
+  try{const cached=JSON.parse(localStorage.getItem('pasong_beats_geo_v1')||'null');if(cached&&cached.country&&Date.now()-cached.time<86400000)country=cached.country}catch{}
+  if(!country){
+   for(const url of ['https://ipwho.is/','https://ipapi.co/json/']){
+    try{const res=await fetch(url,{cache:'no-store'});if(!res.ok)continue;const data=await res.json();country=String(data.country_code||data.countryCode||'').toUpperCase();if(country){localStorage.setItem('pasong_beats_geo_v1',JSON.stringify({country,time:Date.now()}));break}}catch{}
+   }
+  }
+  if(country)buyerCountry=country;
+ }catch{}
+ buyerCurrency=currencyForCountry(buyerCountry);
+ try{const res=await fetch('https://open.er-api.com/v6/latest/USD',{cache:'no-store'});if(res.ok){const data=await res.json();if(data.result==='success'&&data.rates){fxRates=data.rates;fxReady=true}}}catch{}
+ statusEl.textContent='Your location: '+buyerCountry+' · '+buyerCurrency+(fxReady?' · live conversion':' · conversion unavailable');
+ statusEl.title=fxReady?'Prices are converted for your detected location.':'Exchange rates unavailable; original listing currency will be shown.';
+ render();
+}
+function convertPrice(amount,fromCurrency){
+ const from=String(fromCurrency||'UGX').toUpperCase(),to=buyerCurrency;
+ if(from===to)return {amount:num(amount),currency:to,converted:false};
+ if(!fxReady||!fxRates||!fxRates[from]||!fxRates[to])return {amount:num(amount),currency:from,converted:false};
+ return {amount:num(amount)/fxRates[from]*fxRates[to],currency:to,converted:true};
+}
+function listingCurrency(b){return String(first(b,['price_currency','currency','currency_code'],'UGX')).toUpperCase()}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const first=(o,keys,fallback='')=>{for(const k of keys){if(o&&o[k]!=null&&o[k]!=='')return o[k]}return fallback};
 const num=v=>{const n=Number(v);return Number.isFinite(n)?n:0};
@@ -94,7 +122,7 @@ function safeImage(url){return /^https?:\/\//i.test(url||'')?url:''}
 function getCart(){try{const x=JSON.parse(localStorage.getItem('pasong_cart_v1')||'[]');return Array.isArray(x)?x:[]}catch{return []}}
 function addToCart(b){
  const cart=getCart(),id=String(first(b,['id','beat_id'],''));if(!id){toast('This beat has no listing ID, so it cannot be added to the cart.');return}
- const item={id,beat_id:id,type:'beat',item_type:'beat',title:titleOf(b),name:titleOf(b),producer:producerOf(b),price:priceOf(b),currency:first(b,['currency'],'UGX'),cover_url:coverOf(b),audio_url:audioOf(b),quantity:1};
+ const item={id,beat_id:id,type:'beat',item_type:'beat',title:titleOf(b),name:titleOf(b),producer:producerOf(b),price:priceOf(b),currency:listingCurrency(b),listing_price:priceOf(b),listing_currency:listingCurrency(b),display_price:convertPrice(priceOf(b),listingCurrency(b)).amount,display_currency:convertPrice(priceOf(b),listingCurrency(b)).currency,fx_converted:convertPrice(priceOf(b),listingCurrency(b)).converted,cover_url:coverOf(b),audio_url:audioOf(b),quantity:1};
  const found=cart.find(x=>String(x.beat_id||x.id)===id&&(x.type==='beat'||x.item_type==='beat'));
  if(found)found.quantity=Math.max(1,num(found.quantity)+1);else cart.push(item);
  localStorage.setItem('pasong_cart_v1',JSON.stringify(cart));toast('Added to cart. Review checkout before purchasing.');
@@ -117,14 +145,14 @@ function render(){
   if(q&&!hay.includes(q))return false;if(genre&&genreOf(b)!==genre)return false;
   const n=bpmOf(b);if(bpm==='slow'&&(!n||n>=90))return false;if(bpm==='mid'&&(n<90||n>=130))return false;if(bpm==='fast'&&n<130)return false;return true;
  });
- if(sort==='priceLow')rows.sort((a,b)=>priceOf(a)-priceOf(b));if(sort==='priceHigh')rows.sort((a,b)=>priceOf(b)-priceOf(a));if(sort==='title')rows.sort((a,b)=>titleOf(a).localeCompare(titleOf(b)));
+ if(sort==='priceLow')rows.sort((a,b)=>convertPrice(priceOf(a),listingCurrency(a)).amount-convertPrice(priceOf(b),listingCurrency(b)).amount);if(sort==='priceHigh')rows.sort((a,b)=>convertPrice(priceOf(b),listingCurrency(b)).amount-convertPrice(priceOf(a),listingCurrency(a)).amount);if(sort==='title')rows.sort((a,b)=>titleOf(a).localeCompare(titleOf(b)));
  if(sort==='newest')rows.sort((a,b)=>new Date(first(b,['created_at','published_at'],0))-new Date(first(a,['created_at','published_at'],0)));
  $('resultCount').textContent=rows.length+' beat'+(rows.length===1?'':'s');
  grid.innerHTML='';
  if(!rows.length){grid.hidden=true;status.hidden=false;status.className='empty';status.textContent=allBeats.length?'No beats match those filters. Try another search or genre.':'No beats are published yet. Check back soon.';return}
  status.hidden=true;grid.hidden=false;
  for(const b of rows){
-  const id=String(first(b,['id','beat_id'],'')),cover=safeImage(coverOf(b)),bpm=bpmOf(b),genre=genreOf(b),price=priceOf(b),currency=first(b,['currency'],'UGX');
+  const id=String(first(b,['id','beat_id'],'')),cover=safeImage(coverOf(b)),bpm=bpmOf(b),genre=genreOf(b),price=priceOf(b),currency=listingCurrency(b),display=convertPrice(price,currency);
   const card=document.createElement('article');card.className='beat-card';
   const coverWrap=document.createElement('div');coverWrap.className='cover-wrap';
   if(cover){const img=document.createElement('img');img.className='cover';img.src=cover;img.alt=titleOf(b)+' cover';img.loading='lazy';img.onerror=()=>{img.remove();const f=document.createElement('div');f.className='cover-fallback';f.textContent='♫';coverWrap.prepend(f)};coverWrap.appendChild(img)}
@@ -135,13 +163,14 @@ function render(){
   const t=document.createElement('h3');t.className='beat-title';t.textContent=titleOf(b);
   const p=document.createElement('div');p.className='producer';p.textContent='by '+producerOf(b);
   const meta=document.createElement('div');meta.className='meta';const g=document.createElement('span');g.className='chip';g.textContent=genre;meta.appendChild(g);if(bpm){const x=document.createElement('span');x.className='chip';x.textContent=bpm+' BPM';meta.appendChild(x)}
-  const bottom=document.createElement('div');bottom.className='card-bottom';const pr=document.createElement('span');pr.className='price';pr.textContent=money(price,currency);
+  const bottom=document.createElement('div');bottom.className='card-bottom';const pr=document.createElement('span');pr.className='price';pr.textContent=money(display.amount,display.currency);if(display.converted)pr.title='Original producer price: '+money(price,currency);
   const add=document.createElement('button');add.className='add';add.type='button';add.textContent='＋ Add to cart';add.addEventListener('click',()=>addToCart(b));
   bottom.append(pr,add);body.append(t,p,meta,bottom);card.append(coverWrap,body);grid.appendChild(card);
  }
 }
 async function load(){
  $('year').textContent=new Date().getFullYear();
+ detectBuyerCurrency();
  // Use the existing PASONG public beat table. RLS/public policies determine which published listings are visible.
  const candidates=['beats','producer_beats'];
  let lastError=null;
