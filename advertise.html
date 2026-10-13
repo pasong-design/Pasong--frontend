@@ -37,9 +37,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
 .hero-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hero-option{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;background:#171022;cursor:pointer}
 .hero-option input{margin-right:7px;width:auto}.hero-option strong{font-size:13px}.hero-option p{color:#91889b;font-size:11px;margin-top:5px;line-height:1.4}
 .file-box{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:18px;text-align:center;background:#0d0715}.file-box input{border:0;background:transparent;padding:0}
-/* Preview the standard advert as the same wide banner shown on mobile PASONG. */
-.preview{border-radius:14px;overflow:hidden;background:#08050d;aspect-ratio:2.9/1;min-height:100px;max-height:260px;display:flex;align-items:center;justify-content:center;margin-top:15px}
- .preview img,.preview video{width:100%;height:100%;max-height:100%;object-fit:contain;display:block}.preview-empty{color:#756d7d;font-size:13px;padding:35px;text-align:center}
+.preview{border-radius:14px;overflow:hidden;background:#08050d;min-height:120px;display:flex;align-items:center;justify-content:center;margin-top:15px}
+.preview img,.preview video{width:100%;max-height:350px;object-fit:contain;display:block}.preview-empty{color:#756d7d;font-size:13px;padding:35px;text-align:center}
 .account-status{padding:13px 15px;border-radius:11px;background:#171022;border:1px solid rgba(255,255,255,.08);color:#aaa1b4;font-size:13px;margin-bottom:18px}
 .account-status.success{border-color:rgba(34,197,94,.35);color:#86efac}.account-status.error{border-color:rgba(239,68,68,.35);color:#fca5a5}
 .pay-area{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:8px}.total-box{font-size:13px;color:#aaa1b4}.total-box strong{display:block;color:#fff;font-size:24px;margin-top:3px}
@@ -67,7 +66,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
     <div class="step"><strong>3. Pay</strong>Securely</div>
     <div class="step"><strong>4. Go live</strong>After review</div>
   </div>
-  <div id="accountStatus" class="account-status">Checking your PASONG account&#8230;</div>
+  <div id="accountStatus" class="account-status">Checking your PASONG account&#8230;</div>\n  <div id="countryPriceStatus" class="account-status">Detecting your country for advertising prices&#8230;</div>
 
   <section class="card">
     <h2>&#128640; What do you want to promote?</h2>
@@ -109,8 +108,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
   </section>
 
   <section id="mediaSection" class="card">
-    <h2>&#128444; Advert media</h2><p class="card-sub">Create a mobile-friendly banner advert. Wide artwork gives the clearest result on PASONG phones.</p>
-    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div class="help">Recommended mobile banner: <strong>1600 × 550 px (about 2.9:1)</strong>. Keep logos and text away from the edges. JPG, PNG and WEBP images are accepted; MP4 and WEBM videos are also accepted. Other image shapes remain accepted, but may not fill the wide mobile banner slot.</div></div>
+    <h2>&#128444; Advert media</h2><p class="card-sub">Upload the image or video you want to advertise.</p>
+    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div class="help">Images: JPG, PNG or WEBP. Videos: MP4 or WEBM.</div></div>
     <div id="preview" class="preview"><div class="preview-empty">Your advert preview will appear here.</div></div>
   </section>
 
@@ -132,12 +131,58 @@ var SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 var CLOUDINARY_CLOUD_NAME="vuehnvkp";
 var CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD_NAME+"/auto/upload";
 var supabaseClient=null,selectedType="",packages=[],selectedPackage=null,songs=[],profiles=[],currentSession=null;
+var advertCountry={code:"",name:"",currency:"UGX",detected:false,source:"default"};
+var advertCurrencyRates={UGX:1,KES:0.037,TZS:0.69,RWF:0.28,BIF:0.00028,SSP:0.00027,ETB:0.015,GBP:0.00022,USD:0.00028};
+var advertCurrencyNames={UGX:"UGX",KES:"KES",TZS:"TZS",RWF:"RWF",BIF:"BIF",SSP:"SSP",ETB:"ETB",GBP:"GBP",USD:"USD"};
+function countryCurrency(code){
+  code=String(code||"").toUpperCase();
+  if(code==="UG")return "UGX";
+  if(code==="KE")return "KES";
+  if(code==="TZ")return "TZS";
+  if(code==="RW")return "RWF";
+  if(code==="BI")return "BIF";
+  if(code==="SS")return "SSP";
+  if(code==="ET")return "ETB";
+  if(code==="GB")return "GBP";
+  if(["NG","GH","ZA","EG","MA","DZ","TN","SN","CI","CM","CD","CG","AO","ZM","ZW","MW","MZ","BW","NA","LS","SZ","GM","LR","SL","GN","NE","BF","ML","TG","BJ","GA","GQ","ST","CV","KM","MU","SC","ER","SO","DJ","SD","LY","MR","CF","TD","MG","RE","YT"].indexOf(code)>=0)return "USD";
+  return "USD";
+}
+async function detectAdvertCountry(){
+  var cached=null;
+  try{cached=JSON.parse(sessionStorage.getItem("pasong_advert_country")||"null")}catch(e){}
+  if(cached&&cached.code&&cached.currency){advertCountry=cached;updateCountryPriceStatus();return advertCountry}
+  var sources=[
+    async function(){var r=await fetch("https://ipapi.co/json/",{cache:"no-store"});if(!r.ok)throw Error("IP lookup failed");var d=await r.json();if(!d.country_code)throw Error("Country unavailable");return {code:d.country_code,name:d.country_name||d.country_code}},
+    async function(){var r=await fetch("https://ipwho.is/",{cache:"no-store"});if(!r.ok)throw Error("IP lookup failed");var d=await r.json();if(!d.success||!d.country_code)throw Error("Country unavailable");return {code:d.country_code,name:d.country||d.country_code}}
+  ];
+  for(var i=0;i<sources.length;i++){
+    try{var found=await sources[i]();advertCountry={code:String(found.code).toUpperCase(),name:found.name,currency:countryCurrency(found.code),detected:true,source:"ip"};sessionStorage.setItem("pasong_advert_country",JSON.stringify(advertCountry));updateCountryPriceStatus();return advertCountry}catch(e){console.warn("Advertising country detection attempt failed",e)}
+  }
+  advertCountry={code:"",name:"",currency:"UGX",detected:false,source:"default"};
+  return advertCountry;
+}
+function updateCountryPriceStatus(){
+  var el=$("countryPriceStatus");if(!el)return;
+  if(advertCountry.detected){el.className="account-status success";el.textContent="Advertising prices localized for "+(advertCountry.name||advertCountry.code)+" ("+advertCountry.currency+")."}
+  else{el.className="account-status";el.textContent="Could not detect your country. Showing default pricing until country detection is available."}
+}
+function convertedPackagePrice(p){
+  var base=Number(p&&(p.price!=null?p.price:p.amount!=null?p.amount:p.price_amount));
+  if(!Number.isFinite(base))return null;
+  var baseCurrency=String(p&&(p.currency||p.price_currency)||"UGX").toUpperCase();
+  var target=advertCountry.currency||baseCurrency;
+  if(target===baseCurrency)return {amount:base,currency:target};
+  // Approximate conversions are used only for display. Checkout must validate pricing on the server.
+  var ugxValue=base*(advertCurrencyRates[baseCurrency]||1);
+  var amount=ugxValue/(advertCurrencyRates[target]||1);
+  return {amount:amount,currency:target};
+}
 
 function $(id){return document.getElementById(id)}
 function showMessage(el,message,type){if(el){el.textContent=message||"";el.className="message show "+(type||"info")}}
 function hideMessage(el){if(el){el.textContent="";el.className="message"}}
 function escapeHtml(value){return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
-function money(value,currency){if(value===null||value===undefined||value==="")return "-";var n=Number(value);if(!Number.isFinite(n))return String(value);var cur=currency||"UGX";return cur==="UGX"?"UGX "+n.toLocaleString("en-US"):cur+" "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function money(value,currency){if(value===null||value===undefined||value==="")return "-";var n=Number(value);if(!Number.isFinite(n))return String(value);var cur=String(currency||"UGX").toUpperCase();var decimals=["GBP","USD"].indexOf(cur)>=0?2:0;return (cur==="GBP"?"£":cur==="USD"?"$":cur+" ")+n.toLocaleString("en-US",{minimumFractionDigits:decimals,maximumFractionDigits:decimals})}
 function getPackageKey(p){return p&&(p.key||p.package_key||p.slug||p.id)}
 function getPackagePrice(p){return p&&(p.price!=null?p.price:p.amount!=null?p.amount:p.price_amount)}
 function getPackageCurrency(p){return p&&(p.currency||p.price_currency)||"UGX"}
@@ -167,7 +212,7 @@ window.selectPackageByIndex=function(index){
   selectedPackage=packages[index];
   document.querySelectorAll(".package-card").forEach(function(c){c.classList.remove("selected")});
   var card=$("package-"+index);if(card)card.classList.add("selected");
-  $("totalPrice").textContent=money(getPackagePrice(selectedPackage),getPackageCurrency(selectedPackage));
+  var chosenPrice=convertedPackagePrice(selectedPackage);$("totalPrice").textContent=chosenPrice?money(chosenPrice.amount,chosenPrice.currency):"-";
   showMessage($("packageMessage"),"Package selected: "+(selectedPackage.name||selectedPackage.title||getPackageKey(selectedPackage)||"Advertising package"),"success");
   updateHeroFields();
 };
@@ -180,7 +225,7 @@ function renderPackages(){
     var card=document.createElement("div");card.className="package-card";card.id="package-"+i;
     var name=p.name||p.title||p.display_name||getPackageKey(p)||"Advertising Package";
     var description=p.description||p.details||p.summary||"Advertise on PASONG.";
-    card.innerHTML='<div class="package-name">'+escapeHtml(name)+'</div><div class="package-description">'+escapeHtml(description)+'</div><div class="package-price">'+escapeHtml(money(getPackagePrice(p),getPackageCurrency(p)))+'</div><button type="button" class="package-select-btn">Select Package</button>';
+    card.innerHTML='<div class="package-name">'+escapeHtml(name)+'</div><div class="package-description">'+escapeHtml(description)+'</div><div class="package-price">'+escapeHtml((function(){var cp=convertedPackagePrice(p);return cp?money(cp.amount,cp.currency):"-"})())+'</div><button type="button" class="package-select-btn">Select Package</button>';
     card.addEventListener("click",function(){window.selectPackageByIndex(i)});
     card.querySelector("button").addEventListener("click",function(e){e.stopPropagation();window.selectPackageByIndex(i)});
     grid.appendChild(card);
@@ -188,6 +233,7 @@ function renderPackages(){
 }
 async function loadPackages(){
   try{
+    await detectAdvertCountry();
     var response=await fetch(API_BASE+"/api/advertising/packages",{cache:"no-store"});
     var data=await response.json();
     if(!response.ok)throw new Error(data.error||data.message||"Could not load advertising packages.");
@@ -338,7 +384,8 @@ async function startPayment(){
   }
   if(selectedType==="song"&&!mediaUrl)throw new Error("This song has no cover image. Upload advert media or choose a different song.");
   if(selectedType==="business"&&!mediaUrl&&!selectedMedia)throw new Error("Choose an image or video for your business advert.");
-  var payload={package_key:packageKey,advertiser_name:advertiserName,advertiser_email:advertiserEmail,advertiser_phone:advertiserPhone,title:$("title").value.trim(),description:$("description").value.trim(),target_url:targetUrl||"#",media_url:mediaUrl,media_type:mediaType,hero_type:heroTypeFinal,song_id:songId};
+  var displayPrice=convertedPackagePrice(selectedPackage);
+  var payload={package_key:packageKey,advertiser_name:advertiserName,advertiser_email:advertiserEmail,advertiser_phone:advertiserPhone,title:$("title").value.trim(),description:$("description").value.trim(),target_url:targetUrl||"#",media_url:mediaUrl,media_type:mediaType,hero_type:heroTypeFinal,song_id:songId,country_code:advertCountry.code||null,country_name:advertCountry.name||null,display_currency:displayPrice?displayPrice.currency:(getPackageCurrency(selectedPackage)||"UGX"),display_amount:displayPrice?displayPrice.amount:null};
   showMessage(message,"Creating your advertising checkout...","info");
   var response=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify(payload)});
   var data=await response.json();if(!response.ok)throw new Error(data.error||data.message||"Could not create advertising checkout.");
