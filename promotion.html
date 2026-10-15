@@ -125,7 +125,8 @@ try {
  if (window.supabase && typeof window.supabase.createClient === "function") {
   supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  }
-} catch(e) { console.error("PASONG Supabase initialization failed:",e); }
+} catch(e) { console.error("PASONG Supabase client initialization failed",e); }
+
 
 let currentUser=null,currentArtist=null,packages=[],songs=[],selectedGoal="streams",selectedPackage=null;
 const $=id=>document.getElementById(id);
@@ -145,14 +146,16 @@ function chooseGoal(btn,goal){document.querySelectorAll(".goal").forEach(x=>x.cl
 async function checkLogin(){
  try{
   if(!supabase){
-   $("songSelect").innerHTML='<option value="">PASONG database client did not load — refresh this page</option>';
+   currentUser=null;
+   $("songSelect").innerHTML='<option value="">Database client did not load — refresh this page</option>';
    $("submitBtn").disabled=true;
-   $("promotionList").innerHTML='<div class="empty">Database client unavailable. Refresh the page after checking your connection.</div>';
+   $("promotionList").innerHTML='<div class="empty">Supabase JavaScript did not load. Check your connection and reload.</div>';
+   showStatus("Supabase client unavailable. The page could not initialize the database connection.","error");
    return false;
   }
   const {data:sessionData}=await supabase.auth.getSession();
   const sessionUser=sessionData?.session?.user||null;
-  const {data,error}=sessionUser ? {data:{user:sessionUser},error:null} : await supabase.auth.getUser();
+  const {data,error}=sessionUser?{data:{user:sessionUser},error:null}:await supabase.auth.getUser();
   if(error)console.warn("PASONG auth check:",error.message);
   if(error||!data?.user){
    currentUser=null;
@@ -176,7 +179,7 @@ async function checkLogin(){
 
 
 async function loadArtistProfile(){
- if(!supabase||!currentUser)return;
+ if(!currentUser)return;
  try{
   const {data,error}=await supabase.from("artist_profiles").select("*").eq("user_id",currentUser.id).maybeSingle();
   if(error){console.error("PASONG artist profile error:",error);currentArtist=null;return}
@@ -188,15 +191,15 @@ async function loadArtistProfile(){
 async function loadPackages(){
  const grid=$("packageGrid");
  if(!supabase){
-  grid.innerHTML='<div class="card empty">PASONG database client did not load. Check your internet connection and refresh this page.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="location.reload()">Reload Page</button></div>';
-  showStatus("Supabase client failed to initialize. The page could not connect to the database.","error");
+  grid.innerHTML='<div class="card empty">Supabase client did not load. Check your internet connection and reload.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="location.reload()">Reload Page</button></div>';
+  showStatus("Supabase client unavailable; packages cannot be requested.","error");
   return;
  }
  grid.innerHTML='<div class="card empty">Connecting to PASONG promotion packages…</div>';
  let timer;
  try{
   const request=supabase.from("promotion_packages").select("*").order("price",{ascending:true});
-  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("Request timed out after 12 seconds")),12000)});
+  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("Request timed out after 8 seconds")),8000)});
   const result=await Promise.race([request,timeout]);
   clearTimeout(timer);
   if(result.error)throw result.error;
@@ -211,8 +214,8 @@ async function loadPackages(){
   console.error("PASONG promotion package loading failed:",e);
   packages=[];
   fillPackageSelect();
-  grid.innerHTML='<div class="card empty">Supabase did not return promotion packages. Check the connection, project URL/key, table SELECT policy, and browser console.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="loadPackages()">Retry</button></div>';
-  showStatus("Promotion packages failed to load: "+(e?.message||"database request failed"),"error");
+  grid.innerHTML='<div class="card empty">Could not load promotion packages. Tap Retry. If it fails again, the project URL/key or network request is failing.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="loadPackages()">Retry</button></div>';
+  showStatus("Promotion package request failed: "+(e?.message||"unknown error")+". Check the browser console and confirm this page uses the same Supabase project/key as account.html.","error");
  }
 }
 
@@ -222,8 +225,9 @@ function renderPackages(){
  $("packageGrid").innerHTML=packages.map((p,i)=>{
   const hero=packageIsHero(p),days=durationOf(p),currency=p.currency||"UGX";
   const f=hero?["Homepage Hero exposure","Featured presentation","16:9 hero-ready artwork","Campaign duration"]:["Promotional visibility","PASONG campaign placement","Release exposure","Campaign duration"];
-  return `<article class="card package ${hero?"hero-package":""}">${hero?'<div class="package-tag">🏠 HOMEPAGE HERO</div>':""}<div class="package-icon">${hero?"🏠":i===0?"🚀":i===1?"🔥":"💎"}</div><h3>${escapeHtml(p.name||"Promotion Package")}</h3><div class="package-desc">${escapeHtml(p.description||"Promote your music on PASONG.")}</div><div class="package-price">${money(p.price,currency)}</div><div class="package-duration">${days?days+" day"+(days===1?"":"s"):"Custom duration"}</div><ul class="features">${f.map(x=>`<li>${x}</li>`).join("")}</ul><button class="btn btn-primary" style="width:100%" onclick="selectPackage('${p.id}')">${hero?"Choose Hero Promotion":"Choose Package"}</button></article>`
- }).join("")
+  return `<article class="card package ${hero?"hero-package":""}">${hero?'<div class="package-tag">🏠 HOMEPAGE HERO</div>':""}<div class="package-icon">${hero?"🏠":i===0?"🚀":i===1?"🔥":"💎"}</div><h3>${escapeHtml(p.name||"Promotion Package")}</h3><div class="package-desc">${escapeHtml(p.description||"Promote your music on PASONG.")}</div><div class="package-price">${money(p.price,currency)}</div><div class="package-duration">${days?days+" day"+(days===1?"":"s"):"Custom duration"}</div><ul class="features">${f.map(x=>`<li>${x}</li>`).join("")}</ul><button class="btn btn-primary package-choose" data-package-id="${escapeHtml(p.id)}" style="width:100%">${hero?"Choose Hero Promotion":"Choose Package"}</button></article>`
+ }).join("");
+ document.querySelectorAll(".package-choose").forEach(btn=>btn.addEventListener("click",()=>selectPackage(btn.dataset.packageId)));
 }
 
 function fillPackageSelect(){$("packageSelect").innerHTML='<option value="">Select a package</option>'+packages.map(p=>`<option value="${p.id}">${escapeHtml(p.name||"Promotion")} — ${money(p.price,p.currency||"UGX")}</option>`).join("")}
@@ -280,18 +284,18 @@ async function submitPromotion(){
  if(!packageId||!selectedPackage){showStatus("Select an available promotion package.","error");return}
  if(!startValue){showStatus("Choose a campaign start date.","error");return}
  if(startValue<todayString()){showStatus("The campaign start date cannot be in the past.","error");return}
- const startDate=new Date(startValue+"T00:00:00"),days=durationOf(selectedPackage);
+ const startDate=new Date(startValue+"T00:00:00+03:00"),days=durationOf(selectedPackage);
  if(Number.isNaN(startDate.getTime())){showStatus("Choose a valid start date.","error");return}
  if(!Number.isFinite(days)||days<1){showStatus("This package has no valid duration. PASONG admin must correct its duration value.","error");return}
  if(!songs.some(x=>String(x.id)===String(songId))){showStatus("The selected song could not be verified. Reload your songs and try again.","error");return}
- const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+days);
+ const endDateLocal=new Date(startValue+"T00:00:00+03:00");endDateLocal.setUTCDate(endDateLocal.getUTCDate()+days);const endDate=endDateLocal;
  const b=$("submitBtn");b.disabled=true;b.textContent="Submitting…";
  // promotions.start_date and promotions.end_date are timestamptz columns.
  const row={song_id:songId,artist_id:currentArtist.id,package_id:selectedPackage.id,start_date:startDate.toISOString(),end_date:endDate.toISOString(),amount:Number(selectedPackage.price||0),currency:selectedPackage.currency||"UGX",status:"pending"};
  try{
   const {error}=await supabase.from("promotions").insert(row);
   if(error)throw error;
-  showStatus("Promotion submitted successfully and is pending PASONG review/processing. The optional campaign note is not saved because the promotions table has no note column.","success");
+  showStatus("Promotion submitted successfully and is pending PASONG review/processing. Campaign notes are not saved in this database schema yet.","success");
   $("campaignNote").value="";
   await loadMyPromotions();
  }catch(e){
