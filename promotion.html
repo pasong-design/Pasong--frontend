@@ -234,9 +234,10 @@ async function loadArtistSongs(){
    const r=await supabase.from("songs").select("*").eq("artist_id",currentArtist.id).order("created_at",{ascending:false});
    if(!r.error)songs=r.data||[];else lastError=r.error;
   }
-  if(!songs.length){
-   const r=await supabase.from("songs").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false});
-   if(!r.error)songs=r.data||[];else lastError=r.error;
+  // The songs table does not have a user_id column. Use the artist profile ID,
+  // which matches the songs.artist_id ownership relationship in this database.
+  if(!currentArtist?.id){
+   lastError=lastError||new Error("No artist profile is linked to this signed-in user.");
   }
  }catch(e){lastError=e;console.error("PASONG songs load failed:",e)}
  const s=$("songSelect");
@@ -267,11 +268,12 @@ async function submitPromotion(){
  if(!songs.some(x=>String(x.id)===String(songId))){showStatus("The selected song could not be verified. Reload your songs and try again.","error");return}
  const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+days);
  const b=$("submitBtn");b.disabled=true;b.textContent="Submitting…";
- const row={song_id:songId,artist_id:currentArtist.id,package_id:selectedPackage.id,start_date:startValue,end_date:endDate.toISOString().slice(0,10),amount:Number(selectedPackage.price||0),currency:selectedPackage.currency||"UGX",status:"pending"};
+ // promotions.start_date and promotions.end_date are timestamptz columns.
+ const row={song_id:songId,artist_id:currentArtist.id,package_id:selectedPackage.id,start_date:startDate.toISOString(),end_date:endDate.toISOString(),amount:Number(selectedPackage.price||0),currency:selectedPackage.currency||"UGX",status:"pending"};
  try{
   const {error}=await supabase.from("promotions").insert(row);
   if(error)throw error;
-  showStatus("Promotion submitted successfully and is pending PASONG review/processing.","success");
+  showStatus("Promotion submitted successfully and is pending PASONG review/processing. The optional campaign note is not saved because the promotions table has no note column.","success");
   $("campaignNote").value="";
   await loadMyPromotions();
  }catch(e){
