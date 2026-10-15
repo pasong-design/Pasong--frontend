@@ -78,7 +78,7 @@ input,select,textarea{width:100%;background:#0b0611;border:1px solid #392151;bor
 <section class="section">
 <div class="section-head"><div><h2>👀 Promotion Preview</h2><p>Your selected music will appear here before you submit.</p></div></div>
 <div class="card preview">
-<div class="preview-art"><img id="previewCover" src="https://ui-avatars.com/api/?name=PASONG&background=171022&color=c084fc&bold=true&size=600" alt="Song cover"><div class="preview-overlay"><div class="preview-play">▶</div></div></div>
+<div class="preview-art"><img id="previewCover" src="https://ui-avatars.com/api/?name=PASONG&background=171022&color=c084fc&bold=true&size=600" alt="Song cover" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 338%22%3E%3Crect width=%22600%22 height=%22338%22 fill=%22%23171022%22/%3E%3Ctext x=%2250%25%22 y=%2255%25%22 fill=%22%23c084fc%22 font-size=%2260%22 text-anchor=%22middle%22 font-family=%22Arial%22%3EPASONG%3C/text%3E%3C/svg%3E'"><div class="preview-overlay"><div class="preview-play">▶</div></div></div>
 <div class="preview-info"><h3 id="previewTitle">Select a song below</h3><p id="previewArtist">Your promotion preview will update when you choose a song.</p><div class="preview-badges"><span class="pill" id="previewPackage">No package selected</span><span class="pill" id="previewDuration">Choose duration</span><span class="pill" id="previewGoal">🎧 Streams</span></div></div>
 </div>
 </section>
@@ -87,7 +87,7 @@ input,select,textarea{width:100%;background:#0b0611;border:1px solid #392151;bor
 <div class="section-head"><div><h2>🚀 Create Your Campaign</h2><p>Select your music and package.</p></div></div>
 <div class="card">
 <div class="form-grid">
-<div class="field full"><label for="songSelect">🎵 What do you want to promote?</label><select id="songSelect"><option value="">Login first to load your songs</option></select><div class="help">Only songs belonging to your logged-in artist account are shown.</div></div>
+<div class="field full"><label for="songSelect">🎵 What do you want to promote?</label><select id="songSelect"><option value="">Login first to load your songs</option></select><div class="help">Only songs belonging to your logged-in artist account are shown. <a href="account.html" style="color:#c084fc;text-decoration:underline">Sign in to PASONG</a>.</div></div>
 <div class="field"><label for="packageSelect">📦 Promotion Package</label><select id="packageSelect"><option value="">Select a package</option></select></div>
 <div class="field"><label for="startDate">📅 Start Date</label><input id="startDate" type="date"></div>
 <div class="field full"><label for="campaignNote">📝 Campaign Note <span style="color:#666">(optional)</span></label><textarea id="campaignNote" maxlength="500" placeholder="Tell PASONG what this campaign is promoting..."></textarea></div>
@@ -156,10 +156,11 @@ async function checkLogin(){
   currentUser=null;
   $("songSelect").innerHTML='<option value="">Could not verify login — refresh or sign in again</option>';
   $("submitBtn").disabled=true;
-  $("promotionList").innerHTML='<div class="empty">Could not verify your login. Refresh the page after signing in.</div>';
+  $("promotionList").innerHTML='<div class="empty">Could not verify your login. Refresh this page after signing in.</div>';
   return false;
  }
 }
+
 
 async function loadArtistProfile(){
  if(!currentUser)return;
@@ -170,27 +171,33 @@ async function loadArtistProfile(){
  }catch(e){console.error("PASONG artist profile request failed:",e);currentArtist=null}
 }
 
+
 async function loadPackages(){
  const grid=$("packageGrid");
- grid.innerHTML='<div class="card empty">Loading promotion packages...</div>';
+ grid.innerHTML='<div class="card empty">Connecting to PASONG promotion packages…</div>';
+ let timer;
  try{
-  const {data,error}=await supabase.from("promotion_packages").select("*").order("price",{ascending:true});
-  if(error){
-   console.error("PASONG promotion_packages error:",error);
-   packages=[];fillPackageSelect();
-   grid.innerHTML='<div class="card empty">Promotion packages could not load. Refresh the page. If this continues, PASONG admin must check the promotion_packages table and its Supabase SELECT permissions.</div>';
-   showStatus("Packages failed to load: "+(error.message||"Supabase request failed."),"error");
-   return;
-  }
-  packages=Array.isArray(data)?data:[];
-  renderPackages();fillPackageSelect();
-  if(!packages.length)grid.innerHTML='<div class="card empty">No promotion packages are published yet. PASONG admin must add packages before a campaign can be created.</div>';
+  const request=supabase.from("promotion_packages").select("*").order("price",{ascending:true});
+  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("Request timed out after 12 seconds")),12000)});
+  const result=await Promise.race([request,timeout]);
+  clearTimeout(timer);
+  if(result.error)throw result.error;
+  packages=Array.isArray(result.data)?result.data:[];
+  renderPackages();
+  fillPackageSelect();
+  if(!packages.length){
+   grid.innerHTML='<div class="card empty">No promotion packages are published yet. PASONG admin must add packages to the promotion_packages table.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="loadPackages()">Retry</button></div>';
+  }else clearStatus();
  }catch(e){
-  console.error("PASONG package loading exception:",e);
-  grid.innerHTML='<div class="card empty">Could not connect to load promotion packages. Check your internet connection and refresh.</div>';
-  showStatus("Could not connect to load packages. Please check your connection and retry.","error");
+  clearTimeout(timer);
+  console.error("PASONG promotion package loading failed:",e);
+  packages=[];
+  fillPackageSelect();
+  grid.innerHTML='<div class="card empty">Promotion packages could not be loaded from Supabase. Check the connection, promotion_packages table, and its SELECT permissions.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="loadPackages()">Retry</button></div>';
+  showStatus("Promotion packages failed to load: "+(e?.message||"database request failed"),"error");
  }
 }
+
 
 function renderPackages(){
  if(!packages.length){$("packageGrid").innerHTML='<div class="card empty">No promotion packages have been published yet.</div>';return}
@@ -231,12 +238,12 @@ async function loadArtistSongs(){
    const r=await supabase.from("songs").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false});
    if(!r.error)songs=r.data||[];else lastError=r.error;
   }
- }catch(e){lastError=e;console.error("PASONG song loading failed:",e)}
+ }catch(e){lastError=e;console.error("PASONG songs load failed:",e)}
  const s=$("songSelect");
  if(!songs.length){
-  s.innerHTML=`<option value="">${lastError?"Songs could not load — check access permissions":"No songs found in your account"}</option>`;
+  s.innerHTML=`<option value="">${lastError?"Songs could not load — check permissions":"No songs found in your account"}</option>`;
   loadSongPreview();
-  if(lastError)showStatus("Your songs could not be loaded. Check the songs table, artist_id/user_id fields, and Supabase row-level security (RLS). "+(lastError.message||""),"error");
+  if(lastError)showStatus("Your songs could not load. Check the songs table columns and Supabase row-level security (RLS). "+(lastError.message||""),"error");
   return;
  }
  s.innerHTML='<option value="">Select a song</option>'+songs.map(x=>`<option value="${escapeHtml(x.id)}">${escapeHtml(x.title||"Untitled Song")}</option>`).join("");
@@ -244,25 +251,37 @@ async function loadArtistSongs(){
  loadSongPreview();
 }
 
+
 async function submitPromotion(){
  clearStatus();
- if(!currentUser){showStatus("Please log in to create a promotion.","error");return}
- if(!currentArtist){showStatus("Your artist profile could not be found. Please complete your Artist Profile first.","error");return}
+ if(!currentUser){showStatus("Please sign in to your PASONG artist account first.","error");return}
+ if(!currentArtist){showStatus("Your PASONG artist profile could not be loaded. Check your Artist Profile and refresh this page.","error");return}
  const songId=$("songSelect").value,packageId=$("packageSelect").value,startValue=$("startDate").value;
- if(!songId){showStatus("Please select the song you want to promote.","error");return}
- if(!packageId||!selectedPackage){showStatus("Please select a promotion package.","error");return}
- if(!startValue){showStatus("Please choose a campaign start date.","error");return}
- const startDate=new Date(startValue+"T00:00:00"),days=durationOf(selectedPackage);
- if(Number.isNaN(startDate.getTime())){showStatus("Please choose a valid start date.","error");return}
+ if(!songId){showStatus("Select the song you want to promote.","error");return}
+ if(!packageId||!selectedPackage){showStatus("Select an available promotion package.","error");return}
+ if(!startValue){showStatus("Choose a campaign start date.","error");return}
  if(startValue<todayString()){showStatus("The campaign start date cannot be in the past.","error");return}
- if(!days||days<1){showStatus("This package does not have a valid duration. Please ask PASONG admin to check the package.","error");return}
+ const startDate=new Date(startValue+"T00:00:00"),days=durationOf(selectedPackage);
+ if(Number.isNaN(startDate.getTime())){showStatus("Choose a valid start date.","error");return}
+ if(!Number.isFinite(days)||days<1){showStatus("This package has no valid duration. PASONG admin must correct its duration value.","error");return}
+ if(!songs.some(x=>String(x.id)===String(songId))){showStatus("The selected song could not be verified. Reload your songs and try again.","error");return}
  const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+days);
- const b=$("submitBtn");b.disabled=true;b.textContent="Submitting...";
- const row={song_id:songId,artist_id:currentArtist.id,package_id:selectedPackage.id,start_date:startDate.toISOString(),end_date:endDate.toISOString(),amount:Number(selectedPackage.price||0),currency:selectedPackage.currency||"UGX",status:"pending"};
- const {error}=await supabase.from("promotions").insert(row);
- if(error){console.error(error);showStatus("Promotion could not be submitted. "+(error.message||"Please try again."),"error");b.disabled=false;b.textContent="🚀 Start Promotion";return}
- showStatus("Promotion submitted successfully. Your campaign is pending processing/review.","success");await loadMyPromotions();b.disabled=false;b.textContent="🚀 Start Promotion"
+ const b=$("submitBtn");b.disabled=true;b.textContent="Submitting…";
+ const row={song_id:songId,artist_id:currentArtist.id,package_id:selectedPackage.id,start_date:startValue,end_date:endDate.toISOString().slice(0,10),amount:Number(selectedPackage.price||0),currency:selectedPackage.currency||"UGX",status:"pending"};
+ try{
+  const {error}=await supabase.from("promotions").insert(row);
+  if(error)throw error;
+  showStatus("Promotion submitted successfully and is pending PASONG review/processing.","success");
+  $("campaignNote").value="";
+  await loadMyPromotions();
+ }catch(e){
+  console.error("PASONG promotion submission failed:",e);
+  showStatus("Promotion was not submitted: "+(e?.message||"database request failed")+". Check the promotions table columns and INSERT policy.","error");
+ }finally{
+  b.disabled=!currentUser;b.textContent="🚀 Start Promotion";
+ }
 }
+
 
 async function loadMyPromotions(){
  const box=$("promotionList");if(!currentUser||!currentArtist){box.innerHTML='<div class="empty">Login to view your promotions.</div>';return}
@@ -272,25 +291,27 @@ async function loadMyPromotions(){
  box.innerHTML=data.map(p=>{const pkg=packages.find(x=>String(x.id)===String(p.package_id)),song=songs.find(x=>String(x.id)===String(p.song_id));return `<div class="promo-row"><div><div class="promo-title">${escapeHtml(song?.title||"Promotion Campaign")}</div><div class="promo-meta">${escapeHtml(pkg?.name||"Promotion")} · ${formatDate(p.start_date)} → ${formatDate(p.end_date)}</div></div><div class="promo-status">${escapeHtml(String(p.status||"pending").replace(/_/g," "))}</div><div class="promo-price">${money(p.amount,p.currency||"UGX")}</div></div>`}).join("")
 }
 
-function resetForm(){$("songSelect").value="";$("packageSelect").value="";$("startDate").value=todayString();$("campaignNote").value="";selectedPackage=null;updatePackageSummary();loadSongPreview();clearStatus()}
+function resetForm(){$("songSelect").value="";$("packageSelect").value="";$("startDate").min=todayString();$("startDate").value=todayString();$("campaignNote").value="";selectedPackage=null;updatePackageSummary();loadSongPreview();clearStatus()}
 $("packageSelect").addEventListener("change",updatePackageSummary);
 
-((async function init(){
+(async function init(){
+ $("startDate").min=todayString();
  $("startDate").value=todayString();
  try{
+  // Packages load even when the visitor is signed out.
   const results=await Promise.allSettled([checkLogin(),loadPackages()]);
   const loginResult=results[0];
   const ok=loginResult.status==="fulfilled"&&loginResult.value===true;
-  if(loginResult.status==="rejected")console.error("PASONG auth startup failed:",loginResult.reason);
+  if(loginResult.status==="rejected")console.error("PASONG login initialization failed:",loginResult.reason);
   if(!ok)return;
   await loadArtistProfile();
   await loadArtistSongs();
   await loadMyPromotions();
  }catch(e){
-  console.error("PASONG Promotion Center startup error:",e);
-  showStatus("The Promotion Center could not finish loading. Refresh the page; if it continues, check the browser console and Supabase configuration.","error");
+  console.error("PASONG Promotion Center initialization failed:",e);
+  showStatus("Promotion Center could not finish loading. Refresh the page and sign in again. If this continues, check the Supabase table permissions.","error");
  }
-})();)();
+})();
 </script>
 </body>
 </html>
