@@ -120,7 +120,12 @@ input,select,textarea{width:100%;background:#0b0611;border:1px solid #392151;bor
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let supabase=null;
+try {
+ if (window.supabase && typeof window.supabase.createClient === "function") {
+  supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ }
+} catch(e) { console.error("PASONG Supabase initialization failed:",e); }
 
 let currentUser=null,currentArtist=null,packages=[],songs=[],selectedGoal="streams",selectedPackage=null;
 const $=id=>document.getElementById(id);
@@ -139,7 +144,15 @@ function chooseGoal(btn,goal){document.querySelectorAll(".goal").forEach(x=>x.cl
 
 async function checkLogin(){
  try{
-  const {data,error}=await supabase.auth.getUser();
+  if(!supabase){
+   $("songSelect").innerHTML='<option value="">PASONG database client did not load — refresh this page</option>';
+   $("submitBtn").disabled=true;
+   $("promotionList").innerHTML='<div class="empty">Database client unavailable. Refresh the page after checking your connection.</div>';
+   return false;
+  }
+  const {data:sessionData}=await supabase.auth.getSession();
+  const sessionUser=sessionData?.session?.user||null;
+  const {data,error}=sessionUser ? {data:{user:sessionUser},error:null} : await supabase.auth.getUser();
   if(error)console.warn("PASONG auth check:",error.message);
   if(error||!data?.user){
    currentUser=null;
@@ -163,7 +176,7 @@ async function checkLogin(){
 
 
 async function loadArtistProfile(){
- if(!currentUser)return;
+ if(!supabase||!currentUser)return;
  try{
   const {data,error}=await supabase.from("artist_profiles").select("*").eq("user_id",currentUser.id).maybeSingle();
   if(error){console.error("PASONG artist profile error:",error);currentArtist=null;return}
@@ -174,6 +187,11 @@ async function loadArtistProfile(){
 
 async function loadPackages(){
  const grid=$("packageGrid");
+ if(!supabase){
+  grid.innerHTML='<div class="card empty">PASONG database client did not load. Check your internet connection and refresh this page.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="location.reload()">Reload Page</button></div>';
+  showStatus("Supabase client failed to initialize. The page could not connect to the database.","error");
+  return;
+ }
  grid.innerHTML='<div class="card empty">Connecting to PASONG promotion packages…</div>';
  let timer;
  try{
@@ -193,7 +211,7 @@ async function loadPackages(){
   console.error("PASONG promotion package loading failed:",e);
   packages=[];
   fillPackageSelect();
-  grid.innerHTML='<div class="card empty">Promotion packages could not be loaded from Supabase. Check the connection, promotion_packages table, and its SELECT permissions.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="loadPackages()">Retry</button></div>';
+  grid.innerHTML='<div class="card empty">Supabase did not return promotion packages. Check the connection, project URL/key, table SELECT policy, and browser console.<br><button class="btn btn-secondary" style="margin-top:10px" onclick="loadPackages()">Retry</button></div>';
   showStatus("Promotion packages failed to load: "+(e?.message||"database request failed"),"error");
  }
 }
@@ -226,7 +244,7 @@ function loadSongPreview(){
 }
 
 async function loadArtistSongs(){
- if(!currentUser)return;
+ if(!supabase||!currentUser)return;
  songs=[];
  let lastError=null;
  try{
@@ -286,7 +304,7 @@ async function submitPromotion(){
 
 
 async function loadMyPromotions(){
- const box=$("promotionList");if(!currentUser||!currentArtist){box.innerHTML='<div class="empty">Login to view your promotions.</div>';return}
+ const box=$("promotionList");if(!supabase||!currentUser||!currentArtist){box.innerHTML='<div class="empty">Login to view your promotions.</div>';return}
  const {data,error}=await supabase.from("promotions").select("*").eq("artist_id",currentArtist.id).order("created_at",{ascending:false});
  if(error){console.error(error);box.innerHTML='<div class="empty">Could not load your promotions.</div>';return}
  if(!data?.length){box.innerHTML='<div class="empty">You have no promotion campaigns yet.</div>';return}
