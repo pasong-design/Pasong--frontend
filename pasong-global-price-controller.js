@@ -1,188 +1,489 @@
-/*
- * PASONG Global Price Controller (standalone shared asset)
- * Version 1.0.0
- *
- * Purpose: detect visitor country through PASONG API, resolve local currency,
- * and convert clearly currency-labelled prices in the rendered page.
- *
- * Load once globally (site-wide layout/template, or a single shared header script).
- * For prices without currency labels, add data-pasong-price="10000"
- * data-pasong-currency="UGX" to the price element.
- *
- * IMPORTANT: display-only. Never use this browser script to authorize payments.
- * Checkout/backend must calculate and validate the final amount server-side.
- */
+/* =========================================================
+   PASONG GLOBAL PRICE CONTROLLER
+   Detects visitor country and provides local-currency helpers.
+   Display conversion only — never authorizes payment amounts.
+   ========================================================= */
+
 (function () {
-  'use strict';
+  "use strict";
+
   if (window.PASONGGlobalPriceController) return;
 
-  var API_BASE = (window.PASONG_API_BASE || 'https://pasong-api.vercel.app').replace(/\/$/, '');
-  var PRICING_ENDPOINT = API_BASE + '/api/pricing';
-  var FX_ENDPOINT = 'https://open.er-api.com/v6/latest/USD';
-  var COUNTRY_CURRENCY = {
-    UG:'UGX', KE:'KES', TZ:'TZS', RW:'RWF', BI:'BIF', SS:'SSP', ET:'ETB',
-    US:'USD', GB:'GBP', FR:'EUR', DE:'EUR', IT:'EUR', ES:'EUR', PT:'EUR', NL:'EUR',
-    BE:'EUR', AT:'EUR', IE:'EUR', FI:'EUR', GR:'EUR', LU:'EUR', SK:'EUR', SI:'EUR',
-    HR:'EUR', CY:'EUR', MT:'EUR', EE:'EUR', LV:'EUR', LT:'EUR', MC:'EUR', AD:'EUR',
-    JP:'JPY', CN:'CNY', IN:'INR', CA:'CAD', AU:'AUD', NZ:'NZD', CH:'CHF',
-    ZA:'ZAR', NG:'NGN', GH:'GHS', EG:'EGP', MA:'MAD', ZM:'ZMW', MW:'MWK',
-    BR:'BRL', MX:'MXN', SG:'SGD', AE:'AED', SA:'SAR', TR:'TRY', PK:'PKR',
-    SE:'SEK', NO:'NOK', DK:'DKK', PL:'PLN', CZ:'CZK', HU:'HUF', RO:'RON',
-    BG:'BGN', IS:'ISK', HK:'HKD', KR:'KRW', ID:'IDR', MY:'MYR', TH:'THB',
-    PH:'PHP', VN:'VND', AR:'ARS', CL:'CLP', CO:'COP', PE:'PEN'
-  };
-  var SYMBOLS = {
-    UGX:'UGX', KES:'KES', TZS:'TZS', RWF:'RWF', BIF:'BIF', SSP:'SSP', ETB:'ETB',
-    USD:'USD', GBP:'GBP', EUR:'EUR', JPY:'JPY', CNY:'CNY', INR:'INR', CAD:'CAD',
-    AUD:'AUD', NZD:'NZD', CHF:'CHF', ZAR:'ZAR', NGN:'NGN', GHS:'GHS', EGP:'EGP',
-    MAD:'MAD', ZMW:'ZMW', MWK:'MWK', BRL:'BRL', MXN:'MXN', SGD:'SGD', AED:'AED',
-    SAR:'SAR', TRY:'TRY', PKR:'PKR', SEK:'SEK', NOK:'NOK', DKK:'DKK', PLN:'PLN',
-    CZK:'CZK', HUF:'HUF', RON:'RON', BGN:'BGN', ISK:'ISK', HKD:'HKD', KRW:'KRW',
-    IDR:'IDR', MYR:'MYR', THB:'THB', PHP:'PHP', VND:'VND', ARS:'ARS', CLP:'CLP',
-    COP:'COP', PEN:'PEN'
-  };
-  var state = { ready:false, country:null, currency:null, rates:null, source:'IP', error:null };
-  var originalText = new WeakMap();
-  var processing = false;
-  var supportedCodes = Object.keys(SYMBOLS).join('|');
-  var currencyToken = new RegExp('(?:\\b(' + supportedCodes + ')\\b|([$£€¥₹])\\s*)', 'g');
+  const API_BASE = "https://pasong-api.vercel.app";
+  const FX_API = "https://open.er-api.com/v6/latest/USD";
 
-  function fetchJson(url, timeoutMs) {
-    var controller = window.AbortController ? new AbortController() : null;
-    var timer = controller ? setTimeout(function(){ controller.abort(); }, timeoutMs || 7000) : null;
-    return fetch(url, {cache:'no-store', credentials:'omit', signal:controller ? controller.signal : undefined})
-      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .finally(function(){ if (timer) clearTimeout(timer); });
+  const COUNTRY_CURRENCY = {
+    UG: "UGX",
+    KE: "KES",
+    TZ: "TZS",
+    RW: "RWF",
+    BI: "BIF",
+    SS: "SSP",
+    ET: "ETB",
+    NG: "NGN",
+    GH: "GHS",
+    ZA: "ZAR",
+    EG: "EGP",
+    MA: "MAD",
+    DZ: "DZD",
+    TN: "TND",
+    ZM: "ZMW",
+    MW: "MWK",
+    MZ: "MZN",
+    BW: "BWP",
+    NA: "NAD",
+    SZ: "SZL",
+    LS: "LSL",
+    AO: "AOA",
+    CM: "XAF",
+    SN: "XOF",
+    CI: "XOF",
+    BF: "XOF",
+    ML: "XOF",
+    NE: "XOF",
+    TG: "XOF",
+    BJ: "XOF",
+    GN: "GNF",
+    LR: "LRD",
+    SL: "SLL",
+    GM: "GMD",
+    MR: "MRU",
+    CV: "CVE",
+    MU: "MUR",
+    SC: "SCR",
+    KM: "KMF",
+    DJ: "DJF",
+    ER: "ERN",
+    US: "USD",
+    GB: "GBP",
+    FR: "EUR",
+    DE: "EUR",
+    IT: "EUR",
+    ES: "EUR",
+    PT: "EUR",
+    NL: "EUR",
+    BE: "EUR",
+    IE: "EUR",
+    AT: "EUR",
+    FI: "EUR",
+    GR: "EUR",
+    LU: "EUR",
+    CY: "EUR",
+    MT: "EUR",
+    SK: "EUR",
+    SI: "EUR",
+    EE: "EUR",
+    LV: "EUR",
+    LT: "EUR",
+    AU: "AUD",
+    NZ: "NZD",
+    CA: "CAD",
+    CH: "CHF",
+    SE: "SEK",
+    NO: "NOK",
+    DK: "DKK",
+    PL: "PLN",
+    CZ: "CZK",
+    HU: "HUF",
+    RO: "RON",
+    BG: "BGN",
+    TR: "TRY",
+    IN: "INR",
+    PK: "PKR",
+    BD: "BDT",
+    LK: "LKR",
+    NP: "NPR",
+    CN: "CNY",
+    JP: "JPY",
+    KR: "KRW",
+    SG: "SGD",
+    MY: "MYR",
+    ID: "IDR",
+    PH: "PHP",
+    TH: "THB",
+    VN: "VND",
+    HK: "HKD",
+    TW: "TWD",
+    AE: "AED",
+    SA: "SAR",
+    QA: "QAR",
+    KW: "KWD",
+    BH: "BHD",
+    OM: "OMR",
+    IL: "ILS",
+    JO: "JOD",
+    MX: "MXN",
+    BR: "BRL",
+    AR: "ARS",
+    CL: "CLP",
+    CO: "COP",
+    PE: "PEN",
+    UY: "UYU",
+    PA: "PAB",
+    CR: "CRC",
+    DO: "DOP",
+    JM: "JMD",
+    TT: "TTD",
+    BS: "BSD",
+    BB: "BBD",
+    GD: "XCD",
+    AG: "XCD",
+    DM: "XCD",
+    LC: "XCD",
+    VC: "XCD",
+    KN: "XCD"
+  };
+
+  const COUNTRY_NAMES = {
+    UG: "Uganda",
+    KE: "Kenya",
+    TZ: "Tanzania",
+    RW: "Rwanda",
+    BI: "Burundi",
+    SS: "South Sudan",
+    ET: "Ethiopia",
+    GB: "United Kingdom",
+    US: "United States",
+    FR: "France",
+    DE: "Germany",
+    AU: "Australia",
+    CA: "Canada"
+  };
+
+  const state = {
+    ready: false,
+    country: null,
+    countryName: null,
+    currency: null,
+    rates: null,
+    source: null,
+    error: null
+  };
+
+  let initPromise = null;
+
+  function safeJSON(response) {
+    if (!response.ok) {
+      throw new Error("Request failed: " + response.status);
+    }
+    return response.json();
   }
-  function symbolCurrency(sym) {
-    return ({'$':'USD','£':'GBP','€':'EUR','¥':'JPY','₹':'INR'})[sym] || null;
-  }
-  function parseAmount(raw) {
-    var clean = String(raw).replace(/,/g, '').replace(/\s/g, '');
-    var n = Number(clean);
-    return Number.isFinite(n) ? n : null;
-  }
-  function formatMoney(amount, currency) {
+
+  async function fetchCountry() {
+    /*
+      PASONG backend is the preferred source.
+      The backend must detect the country from trusted
+      request headers, not from a user-supplied country value.
+    */
     try {
-      return new Intl.NumberFormat(undefined, {style:'currency', currency:currency,
-        maximumFractionDigits: ['UGX','KES','TZS','RWF','BIF','JPY','KRW','VND','CLP'].indexOf(currency) >= 0 ? 0 : 2
-      }).format(amount);
-    } catch (_) { return currency + ' ' + amount.toFixed(2); }
+      const response = await fetch(API_BASE + "/api/pricing", {
+        method: "GET",
+        mode: "cors",
+        credentials: "omit",
+        cache: "no-store",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      const data = await safeJSON(response);
+
+      const country = String(data.country || "")
+        .trim()
+        .toUpperCase();
+
+      if (/^[A-Z]{2}$/.test(country)) {
+        state.country = country;
+        state.countryName =
+          COUNTRY_NAMES[country] || country;
+        state.currency =
+          COUNTRY_CURRENCY[country] || "USD";
+        state.source = "PASONG API";
+
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        "[PASONG currency] Backend country detection failed:",
+        error.message
+      );
+    }
+
+    /*
+      Fallback uses a public IP-country service.
+      It is for display convenience only.
+    */
+    try {
+      const response = await fetch(
+        "https://ipwho.is/",
+        {
+          method: "GET",
+          mode: "cors",
+          credentials: "omit",
+          cache: "no-store"
+        }
+      );
+
+      const data = await safeJSON(response);
+
+      if (data.success && data.country_code) {
+        const country = String(data.country_code)
+          .trim()
+          .toUpperCase();
+
+        if (/^[A-Z]{2}$/.test(country)) {
+          state.country = country;
+          state.countryName =
+            data.country || COUNTRY_NAMES[country] || country;
+          state.currency =
+            COUNTRY_CURRENCY[country] || "USD";
+          state.source = "IP fallback";
+
+          return;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "[PASONG currency] IP fallback failed:",
+        error.message
+      );
+    }
+
+    /*
+      Safe fallback: use USD if the country cannot be detected.
+    */
+    state.country = null;
+    state.countryName = "International";
+    state.currency = "USD";
+    state.source = "Default";
   }
-  function convert(amount, from, to) {
-    if (from === to) return amount;
-    if (!state.rates || !state.rates[from] || !state.rates[to]) return null;
-    // FX table is expressed as units per USD.
-    return (amount / state.rates[from]) * state.rates[to];
+
+  async function fetchExchangeRates() {
+    try {
+      const response = await fetch(FX_API, {
+        method: "GET",
+        mode: "cors",
+        credentials: "omit",
+        cache: "no-store"
+      });
+
+      const data = await safeJSON(response);
+
+      if (
+        data.result === "success" &&
+        data.rates &&
+        typeof data.rates.USD === "number"
+      ) {
+        state.rates = data.rates;
+        return;
+      }
+
+      throw new Error("Exchange rates were unavailable.");
+    } catch (error) {
+      console.warn(
+        "[PASONG currency] Exchange-rate request failed:",
+        error.message
+      );
+
+      state.rates = null;
+    }
   }
-  function skipNode(node) {
-    var p = node.parentElement;
-    if (!p) return true;
-    if (p.closest('script,style,noscript,textarea,input,select,option,code,pre,[data-pasong-no-convert],.pasong-price-original')) return true;
-    if (p.closest('[data-pasong-price]')) return true;
-    return false;
+
+  async function init() {
+    if (initPromise) return initPromise;
+
+    initPromise = (async function () {
+      await fetchCountry();
+      await fetchExchangeRates();
+
+      state.ready = true;
+
+      document.documentElement.dataset.pasongCountry =
+        state.country || "unknown";
+
+      document.documentElement.dataset.pasongCurrency =
+        state.currency || "USD";
+
+      window.dispatchEvent(
+        new CustomEvent("pasong:currency-ready", {
+          detail: getInfo()
+        })
+      );
+
+      return getInfo();
+    })();
+
+    return initPromise;
   }
-  function convertMarkedPrices(root) {
-    (root || document).querySelectorAll('[data-pasong-price]').forEach(function(el){
-      var amount = Number(el.getAttribute('data-pasong-price'));
-      var from = (el.getAttribute('data-pasong-currency') || 'UGX').toUpperCase();
-      if (!Number.isFinite(amount) || !state.currency) return;
-      var result = convert(amount, from, state.currency);
-      if (result !== null) {
-        if (!el.hasAttribute('data-pasong-original-text')) el.setAttribute('data-pasong-original-text', el.textContent || '');
-        el.textContent = formatMoney(result, state.currency);
-        el.setAttribute('data-pasong-displayed-currency', state.currency);
+
+  function getInfo() {
+    return {
+      ready: state.ready,
+      country: state.country,
+      countryName: state.countryName,
+      currency: state.currency,
+      ratesAvailable: !!state.rates,
+      source: state.source,
+      error: state.error
+    };
+  }
+
+  function convert(amount, fromCurrency, toCurrency) {
+    const value = Number(amount);
+    const from = String(fromCurrency || "").toUpperCase();
+    const to = String(toCurrency || "").toUpperCase();
+
+    if (!Number.isFinite(value)) {
+      throw new Error("Invalid amount.");
+    }
+
+    if (!from || !to) {
+      throw new Error("Currency code is required.");
+    }
+
+    if (from === to) return value;
+
+    if (!state.rates) {
+      throw new Error("Exchange rates are unavailable.");
+    }
+
+    /*
+      Rates are quoted against USD:
+      amount in source currency -> USD -> destination currency.
+    */
+    const fromRate = from === "USD" ? 1 : state.rates[from];
+    const toRate = to === "USD" ? 1 : state.rates[to];
+
+    if (
+      typeof fromRate !== "number" ||
+      typeof toRate !== "number" ||
+      fromRate <= 0 ||
+      toRate <= 0
+    ) {
+      throw new Error(
+        "A required exchange rate is unavailable."
+      );
+    }
+
+    return (value / fromRate) * toRate;
+  }
+
+  function format(amount, currency) {
+    const code = String(currency || state.currency || "USD")
+      .toUpperCase();
+
+    const value = Number(amount);
+
+    if (!Number.isFinite(value)) {
+      return String(amount);
+    }
+
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: code,
+        maximumFractionDigits: 2
+      }).format(value);
+    } catch (error) {
+      return value.toFixed(2) + " " + code;
+    }
+  }
+
+  function convertAndFormat(amount, fromCurrency, toCurrency) {
+    const target = toCurrency || state.currency || "USD";
+    return format(convert(amount, fromCurrency, target), target);
+  }
+
+  /*
+    Convert only elements that explicitly provide a numeric amount
+    and the original currency in data attributes.
+
+    Example:
+      <span
+        data-pasong-price
+        data-amount="700"
+        data-currency="UGX"
+      >UGX 700</span>
+
+    This avoids guessing what unlabeled numbers mean.
+  */
+  function renderPriceElement(element) {
+    if (!element || !element.dataset) return;
+
+    if (!element.hasAttribute("data-pasong-price")) return;
+
+    const amount = Number(element.dataset.amount);
+    const sourceCurrency = element.dataset.currency;
+
+    if (!Number.isFinite(amount) || !sourceCurrency) return;
+
+    try {
+      const output = convertAndFormat(
+        amount,
+        sourceCurrency,
+        state.currency
+      );
+
+      element.textContent = output;
+      element.dataset.displayCurrency = state.currency;
+    } catch (error) {
+      /*
+        If rates are unavailable, leave the original display intact.
+      */
+      console.warn(
+        "[PASONG currency] Price not converted:",
+        error.message
+      );
+    }
+  }
+
+  function renderMarkedPrices(root) {
+    const container = root || document;
+
+    if (container.matches &&
+        container.matches("[data-pasong-price]")) {
+      renderPriceElement(container);
+    }
+
+    if (container.querySelectorAll) {
+      container
+        .querySelectorAll("[data-pasong-price]")
+        .forEach(renderPriceElement);
+    }
+  }
+
+  function observeMarkedPrices() {
+    renderMarkedPrices(document);
+
+    if (!document.body || !window.MutationObserver) return;
+
+    const observer = new MutationObserver(function (records) {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            renderMarkedPrices(node);
+          }
+        }
       }
     });
-  }
-  function convertTextNode(node) {
-    if (!node || node.nodeType !== Node.TEXT_NODE || skipNode(node)) return;
-    var text = node.nodeValue;
-    if (!text || !/(UGX|KES|TZS|RWF|BIF|SSP|ETB|USD|GBP|EUR|JPY|CNY|INR|CAD|AUD|NZD|CHF|ZAR|NGN|GHS|EGP|MAD|ZMW|MWK|BRL|MXN|SGD|AED|SAR|TRY|PKR|SEK|NOK|DKK|PLN|CZK|HUF|RON|BGN|ISK|HKD|KRW|IDR|MYR|THB|PHP|VND|ARS|CLP|COP|PEN|[$£€¥₹])/i.test(text)) return;
-    if (!originalText.has(node)) originalText.set(node, text);
-    var source = originalText.get(node);
-    var changed = source.replace(/\b(UGX|KES|TZS|RWF|BIF|SSP|ETB|USD|GBP|EUR|JPY|CNY|INR|CAD|AUD|NZD|CHF|ZAR|NGN|GHS|EGP|MAD|ZMW|MWK|BRL|MXN|SGD|AED|SAR|TRY|PKR|SEK|NOK|DKK|PLN|CZK|HUF|RON|BGN|ISK|HKD|KRW|IDR|MYR|THB|PHP|VND|ARS|CLP|COP|PEN)\s*([0-9][0-9,.]*(?:\.[0-9]{1,2})?)/g,
-      function(full, code, number){
-        var from = code.toUpperCase(), amount = parseAmount(number);
-        if (amount === null || !state.currency) return full;
-        var converted = convert(amount, from, state.currency);
-        return converted === null ? full : formatMoney(converted, state.currency);
-      });
-    // Convert symbol-labelled amounts only when the symbol unambiguously identifies currency.
-    changed = changed.replace(/([$£€₹])\s*([0-9][0-9,.]*(?:\.[0-9]{1,2})?)/g, function(full, sym, number){
-      var from = symbolCurrency(sym), amount = parseAmount(number);
-      if (!from || amount === null || !state.currency) return full;
-      var converted = convert(amount, from, state.currency);
-      return converted === null ? full : formatMoney(converted, state.currency);
-    });
-    if (changed !== node.nodeValue) node.nodeValue = changed;
-  }
-  function scan(root) {
-    if (!state.ready || processing) return;
-    processing = true;
-    try {
-      convertMarkedPrices(root || document);
-      var walker = document.createTreeWalker(root || document.body, NodeFilter.SHOW_TEXT);
-      var nodes = [], n;
-      while ((n = walker.nextNode())) nodes.push(n);
-      nodes.forEach(convertTextNode);
-    } finally { processing = false; }
-  }
-  function startObserver() {
-    if (!document.body || !window.MutationObserver) return;
-    var observer = new MutationObserver(function(records){
-      records.forEach(function(rec){
-        if (rec.type === 'characterData') convertTextNode(rec.target);
-        (rec.addedNodes || []).forEach(function(n){ if (n.nodeType === 1) scan(n); else if (n.nodeType === 3) convertTextNode(n); });
-      });
-    });
-    observer.observe(document.body, {subtree:true, childList:true, characterData:true});
-  }
-  function init() {
-    return fetchJson(PRICING_ENDPOINT, 7000).then(function(data){
-      var country = String(data.country || data.country_code || '').toUpperCase();
-      if (!/^[A-Z]{2}$/.test(country)) throw new Error('Country could not be detected by PASONG API');
-      state.country = country;
-      state.currency = COUNTRY_CURRENCY[country] || 'USD';
-      state.source = 'PASONG IP pricing API';
-      return fetchJson(FX_ENDPOINT, 7000).then(function(fx){
-        if (!fx || !fx.rates || !fx.rates.USD) throw new Error('Exchange rates unavailable');
-        state.rates = fx.rates;
-        // Ensure USD base is present for currency conversions.
-        state.rates.USD = 1;
-        state.ready = true;
-        document.documentElement.setAttribute('data-pasong-country', state.country);
-        document.documentElement.setAttribute('data-pasong-currency', state.currency);
-        scan(document);
-        startObserver();
-        window.dispatchEvent(new CustomEvent('pasong:currency-ready', {detail:{country:state.country,currency:state.currency,ratesUpdatedAt:fx.time_last_update_utc || null}}));
-        return publicApi;
-      });
-    }).catch(function(err){
-      state.error = err && err.message ? err.message : 'Price controller failed';
-      window.dispatchEvent(new CustomEvent('pasong:currency-error', {detail:{message:state.error}}));
-      console.warn('[PASONG pricing]', state.error);
-      return publicApi;
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
   }
-  var publicApi = {
-    version:'1.0.0',
-    getState:function(){ return Object.assign({}, state); },
-    refresh:function(){ return init(); },
-    convertAmount:function(amount, fromCurrency){
-      var result = convert(Number(amount), String(fromCurrency || 'UGX').toUpperCase(), state.currency);
-      return result === null ? null : {amount:result,currency:state.currency,formatted:formatMoney(result,state.currency)};
-    },
-    scan:function(){ scan(document); },
-    // Mark a price explicitly for dependable conversion, e.g. setPrice(element, 10000, 'UGX').
-    setPrice:function(element, amount, fromCurrency){
-      if (!element) return;
-      element.setAttribute('data-pasong-price', String(amount));
-      element.setAttribute('data-pasong-currency', String(fromCurrency || 'UGX').toUpperCase());
-      if (state.ready) convertMarkedPrices(element.parentElement || document);
-    }
+
+  window.PASONGGlobalPriceController = {
+    init,
+    getInfo,
+    convert,
+    format,
+    convertAndFormat,
+    renderMarkedPrices
   };
-  window.PASONGGlobalPriceController = publicApi;
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
-  else init();
+
+  init().then(observeMarkedPrices).catch(function (error) {
+    state.error = error.message;
+    console.error("[PASONG currency]", error);
+  });
 })();
