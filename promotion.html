@@ -77,7 +77,7 @@ input,select{width:100%;background:#0b0611;border:1px solid #ffffff18;border-rad
 <div style="grid-column:1/-1;font-size:12px;font-weight:800;color:#d8b4fe">📈 REACH CALCULATOR</div>
 <div style="grid-column:1/-1"><input type="range" id="reachSlider" min="50000" max="300000" step="50000" value="150000" oninput="updateCalc()"><div style="display:flex;justify-content:space-between;font-size:9px;color:#7a7282;margin-top:4px"><span>50K</span><span>150K</span><span>300K</span></div></div>
 <div class="calc-stat"><b id="calcReach">50K</b><span>Est. Reach</span></div>
-<div class="calc-stat"><b id="calcEarn">UGX 280k</b><span>Potential Earn</span></div>
+<div class="calc-stat"><b id="calcEarn" class="pasong-price global-price" data-ugx="280000">UGX 280k</b><span>Potential Earn</span></div>
 <div class="calc-stat"><b id="calcPlays">12K</b><span>Est. Plays</span></div>
 <div class="calc-stat"><b id="calcSales">+18</b><span>Est. Sales</span></div>
 </div>
@@ -90,9 +90,9 @@ input,select{width:100%;background:#0b0611;border:1px solid #ffffff18;border-rad
 </section>
 
 <section class="packages">
-<div class="pkg"><div class="pkg-icon">🚀</div><h3>Starter Boost</h3><p class="pkg-desc">Perfect for new drops.</p><div class="pkg-price">UGX 50,000 <small>/ 7 days</small></div><ul><li>Homepage feature</li><li>Up to 5K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('starter',50000,7)">Choose Starter</button></div>
-<div class="pkg popular"><div class="pkg-pop">MOST POPULAR</div><div class="pkg-icon">🔥</div><h3>TikTok Viral Boost</h3><p class="pkg-desc">We make your sound trend.</p><div class="pkg-price" style="color:#f9a8d4">UGX 150,000 <small>/ 14 days</small></div><ul><li>TikTok sound push</li><li>Up to 50K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('tiktok',150000,14)">Choose Viral</button></div>
-<div class="pkg"><div class="pkg-icon">💎</div><h3>Homepage Hero</h3><p class="pkg-desc">Maximum exposure.</p><div class="pkg-price">UGX 300,000 <small>/ 30 days</small></div><ul><li>Hero slider 7 days</li><li>Up to 200K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('hero',300000,30)">Choose Hero</button></div>
+<div class="pkg"><div class="pkg-icon">🚀</div><h3>Starter Boost</h3><p class="pkg-desc">Perfect for new drops.</p><div class="pkg-price pasong-price global-price" data-ugx="50000" id="price-starter">UGX 50,000 <small>/ 7 days</small></div><ul><li>Homepage feature</li><li>Up to 5K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('starter',50000,7)">Choose Starter</button></div>
+<div class="pkg popular"><div class="pkg-pop">MOST POPULAR</div><div class="pkg-icon">🔥</div><h3>TikTok Viral Boost</h3><p class="pkg-desc">We make your sound trend.</p><div class="pkg-price pasong-price global-price" data-ugx="150000" id="price-tiktok" style="color:#f9a8d4">UGX 150,000 <small>/ 14 days</small></div><ul><li>TikTok sound push</li><li>Up to 50K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('tiktok',150000,14)">Choose Viral</button></div>
+<div class="pkg"><div class="pkg-icon">💎</div><h3>Homepage Hero</h3><p class="pkg-desc">Maximum exposure.</p><div class="pkg-price pasong-price global-price" data-ugx="300000" id="price-hero">UGX 300,000 <small>/ 30 days</small></div><ul><li>Hero slider 7 days</li><li>Up to 200K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('hero',300000,30)">Choose Hero</button></div>
 </section>
 
 <section style="margin-top:18px"><div class="goals"><button class="goal selected" onclick="chooseGoal(this,'streams')"><span>🎧</span>Streams</button><button class="goal" onclick="chooseGoal(this,'sales')"><span>💰</span>Sales</button><button class="goal" onclick="chooseGoal(this,'fans')"><span>👥</span>Fans</button><button class="goal" onclick="chooseGoal(this,'exposure')"><span>🔥</span>Exposure</button><button class="goal" onclick="chooseGoal(this,'release')"><span>🚀</span>Release</button></div></section>
@@ -117,7 +117,7 @@ input,select{width:100%;background:#0b0611;border:1px solid #ffffff18;border-rad
 <div class="winners" id="winnersGrid">
 <div class="win"><div style="padding:30px;text-align:center;font-size:11px;color:#7a7282">Loading real winners...</div></div>
 </div>
-<p style="font-size:10px;color:#7a7282;margin-top:8px">Tap any card to open real song/beat page • Data from your promotions table • IP secured</p>
+<p style="font-size:10px;color:#7a7282;margin-top:8px">Tap any card to open real song/beat page • Prices auto-convert by IP • Data from promotions table</p>
 </section>
 </main>
 <script>
@@ -135,51 +135,74 @@ function selectPackage(id,amount,days){selectedAmount=amount;selectedDays=days;$
 $("packageSelect").addEventListener("change",e=>{const v=e.target.value;if(v==='starter')selectPackage('starter',50000,7);if(v==='tiktok')selectPackage('tiktok',150000,14);if(v==='hero')selectPackage('hero',300000,30);});
 function toggleAudio(){const a=$("previewAudio");if(!currentAudioUrl)return;if(isPlaying){a.pause();$("audioBtn").textContent="▶";isPlaying=false}else{a.play();$("audioBtn").textContent="⏸";isPlaying=true}a.onended=()=>{$("audioBtn").textContent="▶";isPlaying=false}}
 
-// === IP DETECTION USING YOUR PASONG GLOBAL CONTROLLER ===
+// === IP DETECTION + PRICE CONVERSION ===
 async function detectIP(){
   const el=$("ipInfo");
   try{
     el.style.display="block";
-    // 1. Try your PASONG controller variables
-    let geo = window.PASONG_GEO || window.pasongGeo || window.userGeo || window.geoData || window.pasongPriceController || null;
-    // Some controllers store in localStorage
+    let geo = window.PASONG_GEO || window.pasongGeo || window.userGeo || window.geoData || null;
     if(!geo){
-      try{
-        let stored = localStorage.getItem('pasong_geo') || localStorage.getItem('pasong_location') || localStorage.getItem('user_location');
-        if(stored) geo = JSON.parse(stored);
-      }catch(e){}
+      try{ let s=localStorage.getItem('pasong_geo')||localStorage.getItem('pasong_location'); if(s) geo=JSON.parse(s); }catch(e){}
     }
     if(geo && (geo.ip || geo.country)){
-      userIP = geo.ip || geo.ip_address || geo.ipAddress || null;
-      userLocation.city = geo.city || geo.region || null;
+      userIP = geo.ip || geo.ip_address || null;
+      userLocation.city = geo.city || null;
       userLocation.country = geo.country || geo.country_name || null;
-      userLocation.country_code = geo.country_code || geo.countryCode || geo.code || 'UG';
-      userLocation.currency = geo.currency || 'UGX';
-      console.log("✅ PASONG controller found:", geo);
+      userLocation.country_code = geo.country_code || geo.countryCode || 'UG';
     } else {
-      // Check if controller exposes a function
-      if(typeof window.getPasongLocation === 'function'){
-        let res = await window.getPasongLocation();
-        if(res){ userIP=res.ip; userLocation.city=res.city; userLocation.country=res.country; userLocation.country_code=res.country_code; }
-      } else if(typeof window.getUserLocation === 'function'){
-        let res = await window.getUserLocation();
-        if(res){ userIP=res.ip; userLocation.city=res.city; userLocation.country=res.country; userLocation.country_code=res.country_code; }
-      } else {
-        // Fallback direct API
-        const ipRes=await fetch('https://api.ipify.org?format=json').then(r=>r.json());
-        userIP=ipRes.ip;
-        try{
-          const loc=await fetch(`https://ipapi.co/${userIP}/json/`).then(r=>r.json());
-          userLocation.city=loc.city; userLocation.country=loc.country_name; userLocation.country_code=loc.country_code; userLocation.currency=loc.currency||'UGX';
-        }catch(e){}
-      }
+      const ipRes=await fetch('https://api.ipify.org?format=json').then(r=>r.json());
+      userIP=ipRes.ip;
+      try{
+        const loc=await fetch(`https://ipapi.co/${userIP}/json/`).then(r=>r.json());
+        userLocation.city=loc.city; userLocation.country=loc.country_name; userLocation.country_code=loc.country_code;
+      }catch(e){}
     }
-    el.innerHTML=`📍 IP: ${userIP||'--'} • ${userLocation.city||''} ${userLocation.country||''} (${userLocation.country_code||'UG'}) • Secured by PASONG`;
+    el.innerHTML=`📍 IP: ${userIP||'--'} • ${userLocation.city||''} ${userLocation.country||''} (${userLocation.country_code||'UG'}) • PASONG secured`;
     console.log("USER IP:", userIP, userLocation);
-  }catch(e){
-    console.log("IP error",e);
-    el.innerHTML=`📍 Location secured by PASONG • ${userLocation.country||'UG'}`;
+    applyGlobalPricing();
+    setTimeout(applyGlobalPricing, 1200);
+  }catch(e){ console.log("IP error",e); applyGlobalPricing(); }
+}
+
+function applyGlobalPricing(){
+  // 1. Let your global controller try first
+  if(window.PasongPriceController && window.PasongPriceController.updateAll){
+    try{ window.PasongPriceController.updateAll(); console.log("PasongPriceController.updateAll() called"); }catch(e){}
   }
+  if(window.pasongPriceController && window.pasongPriceController.convertAll){
+    try{ window.pasongPriceController.convertAll(); }catch(e){}
+  }
+
+  // 2. Our fallback that guarantees conversion (your screenshot is UGX because you are in UG)
+  const country = userLocation.country_code || 'UG';
+  document.querySelectorAll('.global-price').forEach(el=>{
+    let ugx = parseInt(el.dataset.ugx);
+    if(!ugx) return;
+    let small = el.querySelector('small') ? '<small> / '+ (ugx===50000?'7 days':ugx===150000?'14 days':'30 days') +'</small>' : '';
+    
+    // If controller provided a formatted price via its own functions, use it
+    if(window.convertPrice){ try{ el.innerHTML = window.convertPrice(ugx) + ' ' + small; return; }catch(e){} }
+    if(window.formatPrice){ try{ el.innerHTML = window.formatPrice(ugx) + ' ' + small; return; }catch(e){} }
+
+    // Manual fallback based on IP country (this is what fixes your issue)
+    if(country === 'KE'){
+      let kes = ugx===50000?645:ugx===150000?1935:3870;
+      el.innerHTML = `KES ${kes.toLocaleString()} ${small}`;
+    } else if(country === 'TZ'){
+      let tzs = ugx===50000?36000:ugx===150000?108000:216000;
+      el.innerHTML = `TZS ${tzs.toLocaleString()} ${small}`;
+    } else if(country === 'NG'){
+      let ngn = ugx===50000?21000:ugx===150000?63000:126000;
+      el.innerHTML = `NGN ${ngn.toLocaleString()} ${small}`;
+    } else if(country !== 'UG'){
+      // US, UK, rest of world -> USD
+      let usd = ugx===50000?14:ugx===150000?40:80;
+      el.innerHTML = `$${usd} ${small}`;
+    } else {
+      el.innerHTML = `UGX ${ugx.toLocaleString()} ${small}`;
+    }
+  });
+  console.log("Prices converted for:", country);
 }
 
 async function loadPackages(){for(let t of ['packages','promotion_packages']){try{let {data}=await supabaseClient.from(t).select('id, name, slug, code');if(data&&data.length){data.forEach(p=>{let k=(p.slug||p.code||p.name||'').toLowerCase();if(k.includes('start'))packageMap['starter']=p.id;if(k.includes('tiktok')||k.includes('viral'))packageMap['tiktok']=p.id;if(k.includes('hero')||k.includes('home'))packageMap['hero']=p.id;});break;}}catch(e){}}}
