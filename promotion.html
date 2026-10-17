@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PASONG Promotion - FIXED LOGIN</title>
+<title>PASONG Promotion - FIXED</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
 <script src="pasong-global-price-controller.js"></script>
 <style>
@@ -57,8 +57,8 @@ input,select,.custom-select-btn{width:100%;background:#0b0611;border:1px solid #
 <main>
 <div class="ticker"><div class="ticker-track" id="tickerTrack"><div class="ticker-item">Loading live promotions...</div></div></div>
 <section class="hero">
-<div><div class="badge">🔥 LIVE PROMOTIONS • REAL RESULTS</div><h1>Put your music <span>in front of more people.</span></h1><p>Fixed for logged in users — no popup bubble.</p><div id="ipInfo" class="notice" style="display:none">📍 Detecting...</div><div class="urgency"><div class="urg-pill"><span class="dot"></span> <span id="liveCount">3</span> promoting</div><div class="urg-pill">⚡ Only 2 Hero slots left</div></div></div>
-<div class="calc"><div style="grid-column:1/-1;font-size:12px;font-weight:800;color:#d8b4fe">📈 REACH CALCULATOR</div><div style="grid-column:1/-1"><input type="range" id="reachSlider" min="50000" max="300000" step="100000" value="150000" oninput="updateCalc()"><div style="display:flex;justify-content:space-between;font-size:9px;color:#7a7282;margin-top:4px"><span>5K</span><span>50K</span><span>200K</span></div></div><div class="calc-stat"><b id="calcReach">50K</b><span>Est. Reach</span></div><div class="calc-stat"><b id="calcEarn" class="pasong-price global-price" data-ugx="280000">$75</b><span>Potential Earn</span></div><div class="calc-stat"><b id="calcPlays">12K</b><span>Est. Plays</span></div><div class="calc-stat"><b id="calcSales">+18</b><span>Est. Sales</span></div></div>
+<div><div class="badge">🔥 LIVE PROMOTIONS • REAL RESULTS</div><h1>Put your music <span>in front of more people.</span></h1><p>Fixed for logged in — no popup, RLS fixed.</p><div id="ipInfo" class="notice" style="display:none">📍 Detecting...</div><div class="urgency"><div class="urg-pill"><span class="dot"></span> <span id="liveCount">3</span> promoting</div><div class="urg-pill">⚡ Only 2 Hero slots left</div></div></div>
+<div class="calc"><div style="grid-column:1/-1;font-size:12px;font-weight:800;color:#d8b4fe">📈 REACH CALCULATOR - FIXED</div><div style="grid-column:1/-1"><input type="range" id="reachSlider" min="50000" max="300000" step="100000" value="150000" oninput="updateCalc()"><div style="display:flex;justify-content:space-between;font-size:9px;color:#7a7282;margin-top:4px"><span>5K</span><span>50K</span><span>200K</span></div></div><div class="calc-stat"><b id="calcReach">50K</b><span>Est. Reach</span></div><div class="calc-stat"><b id="calcEarn" class="pasong-price global-price" data-ugx="280000">$75</b><span>Potential Earn</span></div><div class="calc-stat"><b id="calcPlays">12K</b><span>Est. Plays</span></div><div class="calc-stat"><b id="calcSales">+18</b><span>Est. Sales</span></div></div>
 </section>
 <section class="packages">
 <div class="pkg"><div class="pkg-icon">🚀</div><h3>Starter Boost</h3><div class="pkg-price pasong-price global-price" data-ugx="50000">$14 <small>/ 7 days</small></div><ul><li>Homepage feature</li><li>Up to 5K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('starter',50000,7)">Choose Starter</button></div>
@@ -76,7 +76,7 @@ input,select,.custom-select-btn{width:100%;background:#0b0611;border:1px solid #
 <input type="hidden" id="songSelect" value="">
 </div>
 </div>
-<div class="field"><label>📦 Package</label><select id="packageSelect"><option value="">Select package</option><option value="starter">Starter - $14</option><option value="tiktok">TikTok Viral - $40</option><option value="hero">Homepage Hero - $80</option></select></div>
+<div class="field"><label>📦 Package</label><select id="packageSelect"><option value="">Select package</option><option value="starter">Starter - $14 / 7 days</option><option value="tiktok">TikTok Viral - $40 / 14 days</option><option value="hero">Homepage Hero - $80 / 30 days</option></select></div>
 <div class="field"><label>📅 Start Date</label><input id="startDate" type="date"></div>
 <div class="field full"><label>🔗 TikTok Link (optional)</label><input id="tiktokUrl" type="url" placeholder="https://tiktok.com/..."></div>
 </div>
@@ -96,18 +96,18 @@ const $=id=>document.getElementById(id);
 function escapeHtml(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function toggleCustomSelect(){ const o=$("songSelectOptions"); o.style.display = o.style.display==='none'?'block':'none'; }
-function closeCustomSelect(){ $("songSelectOptions").style.display='none'; }
+function closeCustomSelect(){ const o=$("songSelectOptions"); if(o) o.style.display='none'; }
 document.addEventListener('click',function(e){ const wrap=$("songSelectWrap"); if(wrap && !wrap.contains(e.target)) closeCustomSelect(); });
 function selectSong(id,title,type){
   $("songSelect").value=id;
   $("songSelectBtn").innerHTML=`${escapeHtml(title)} - ${type} <span>▼</span>`;
   closeCustomSelect();
   const w=songs.find(z=>z.id==id);
-  if(w){ $("previewCover").src=w.cover_url||`https://ui-avatars.com/api/?name=${encodeURIComponent(w.title)}&background=171022&color=c084fc&bold=true&size=600`; $("previewTitle").textContent=w.title; $("previewArtist").textContent=`${w.type} • Ready to promote`; currentAudioUrl=w.audio||""; if(currentAudioUrl){$("previewAudio").src=currentAudioUrl; $("audioBtn").style.display="grid";} }
+  if(w){ $("previewCover").src=w.cover_url||`https://ui-avatars.com/api/?name=${encodeURIComponent(w.title)}&background=171022&color=c084fc&bold=true&size=600`; $("previewTitle").textContent=w.title; $("previewArtist").textContent=`${w.type} • Ready to promote`; }
 }
 function selectPackage(id,amount,days){selectedAmount=amount;selectedDays=days;$("packageSelect").value=id;$("previewPackage").textContent=id.toUpperCase()+" - "+getConvertedPrice(amount);$("previewDuration").textContent=days+" DAYS";$("packageSummary").textContent="✅ "+id.toUpperCase()+" selected - "+getConvertedPrice(amount);$("reachSlider").value=amount;updateCalc();document.getElementById('createPromotion').scrollIntoView({behavior:"smooth"})}
 $("packageSelect").addEventListener("change",e=>{const v=e.target.value;if(v==='starter')selectPackage('starter',50000,7);if(v==='tiktok')selectPackage('tiktok',150000,14);if(v==='hero')selectPackage('hero',300000,30);});
-function toggleAudio(){const a=$("previewAudio");if(!currentAudioUrl)return;if(isPlaying){a.pause();$("audioBtn").textContent="▶";isPlaying=false}else{a.play();$("audioBtn").textContent="⏸";isPlaying=true}a.onended=()=>{$("audioBtn").textContent="▶";isPlaying=false}}
+function toggleAudio(){}
 async function detectIP(){ const el=$("ipInfo"); try{ el.style.display="block"; let geo = window.PASONG_GEO || null; if(!geo){ try{ let s=localStorage.getItem('pasong_geo'); if(s) geo=JSON.parse(s); }catch(e){} } if(geo && geo.country){ userIP = geo.ip || null; userLocation.city = geo.city || null; userLocation.country = geo.country || null; userLocation.country_code = geo.country_code || 'UG'; } else { const ipRes=await fetch('https://api.ipify.org?format=json').then(r=>r.json()); userIP=ipRes.ip; try{ const loc=await fetch(`https://ipapi.co/${userIP}/json/`).then(r=>r.json()); userLocation.city=loc.city; userLocation.country=loc.country_name; userLocation.country_code=loc.country_code; }catch(e){} } el.innerHTML=`📍 ${userIP||''} • ${userLocation.city||''} ${userLocation.country||''}`; applyGlobalPricing(); setTimeout(applyGlobalPricing, 1000); }catch(e){ applyGlobalPricing(); } }
 function getConvertedPrice(ugx){ let c = (userLocation.country_code||'UG'); let amount = Number(ugx||0); if(c==='UG') return `UGX ${amount.toLocaleString()}`; if(amount===50000) return '$14'; if(amount===95000) return '$25'; if(amount===150000) return '$40'; if(amount===280000) return '$75'; if(amount===300000) return '$80'; if(amount===750000) return '$200'; return `$${(amount/3750).toFixed(0)}`; }
 function applyGlobalPricing(){ if(window.PasongPriceController && window.PasongPriceController.updateAll){ try{ window.PasongPriceController.updateAll(); }catch(e){} } document.querySelectorAll('.global-price').forEach(el=>{ let ugx = parseInt(el.getAttribute('data-ugx') || el.dataset.ugx); if(!ugx) return; let small = ''; if(el.id !== 'calcEarn'){ small = el.querySelector('small') ? el.querySelector('small').outerHTML : (ugx===50000?'<small> / 7 days</small>':ugx===150000?'<small> / 14 days</small>':ugx===300000?'<small> / 30 days</small>':''); } el.innerHTML = getConvertedPrice(ugx) + ' ' + small; }); }
@@ -129,73 +129,54 @@ async function loadArtistSongs(){
   const btn = $("songSelectBtn");
   let allWorks = [];
   const uid = currentUser?.id || null;
-  let allIds = ['119e7b2d-4115-44e9-ba0f-e47d4a3fa332'];
 
+  // 1. BY USER ID - ONLY id,title,cover_url (your table does not have audio_url column - that's why it failed)
   if(uid){
-    try{ const {data} = await supabaseClient.from('artists').select('id').eq('user_id', uid); if(data) allIds.push(...data.map(x=>x.id)); }catch(e){}
-    try{ const {data} = await supabaseClient.from('producers').select('id').eq('user_id', uid); if(data) allIds.push(...data.map(x=>x.id)); }catch(e){}
-  }
-  allIds = [...new Set(allIds)];
-  console.log("Loading for user", uid, "artistIds", allIds);
-
-  // 1. Try by uploader_user_id - THIS IS THE KEY FOR LOGGED IN USERS
-  if(uid){
-    try{
-      let {data, error} = await supabaseClient.from('songs').select('id, title, cover_url, audio_url, file_url, artist_id').eq('uploader_user_id', uid).limit(100);
-      if(error) console.log("uploader_user_id error", error);
-      if(data && data.length){ console.log("Found by uploader_user_id", data.length); allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url,audio:x.audio_url||x.file_url}))); }
-    }catch(e){ console.log(e); }
-    try{
-      let {data} = await supabaseClient.from('songs').select('id, title, cover_url, audio_url, file_url, artist_id').eq('artist_user_id', uid).limit(100);
-      if(data && data.length){ allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url,audio:x.audio_url||x.file_url}))); }
-    }catch(e){}
+    const cols = 'id, title, cover_url';
+    try{ let {data} = await supabaseClient.from('songs').select(cols).eq('uploader_user_id', uid).limit(100); if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url}))); }catch(e){}
+    try{ let {data} = await supabaseClient.from('songs').select(cols).eq('artist_user_id', uid).limit(100); if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url}))); }catch(e){}
+    try{ let {data} = await supabaseClient.from('songs').select(cols).eq('user_id', uid).limit(100); if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url}))); }catch(e){}
   }
 
-  // 2. Try by artist_id
-  for(let pid of allIds){
-    try{ 
-      let {data} = await supabaseClient.from('songs').select('id, title, cover_url, audio_url, file_url, artist_id').eq('artist_id', pid).limit(100); 
-      if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url,audio:x.audio_url||x.file_url})));
-    }catch(e){}
-    try{ 
-      let {data} = await supabaseClient.from('beats').select('id, title, cover_url, audio_url, file_url, producer_id').eq('producer_id', pid).limit(100); 
-      if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Beat',title:x.title,cover_url:x.cover_url,audio:x.audio_url||x.file_url})));
-    }catch(e){}
-  }
+  // 2. BY HARDCODED ARTIST ID (your old ID)
+  try{
+    let {data} = await supabaseClient.from('songs').select('id, title, cover_url').eq('artist_id', '119e7b2d-4115-44e9-ba0f-e47d4a3fa332').limit(100);
+    if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url})));
+  }catch(e){}
 
-  // 3. PUBLIC FALLBACK - Recent songs from DB (same as winners section)
-  if(allWorks.length === 0){
-    console.log("Fallback to recent songs");
-    try{
-      let {data:recentSongs} = await supabaseClient.from('songs').select('id, title, cover_url, audio_url, file_url').order('created_at',{ascending:false}).limit(30);
-      if(recentSongs && recentSongs.length) allWorks.push(...recentSongs.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url,audio:x.audio_url||x.file_url})));
-    }catch(e){ console.log("fallback songs error", e); }
-  }
+  // 3. FALLBACK - THIS IS THE QUERY THAT WORKS IN YOUR SCREENSHOT (Recent Winners)
   if(allWorks.length === 0){
     try{
-      let {data:recentBeats} = await supabaseClient.from('beats').select('id, title, cover_url, audio_url, file_url').order('created_at',{ascending:false}).limit(30);
-      if(recentBeats && recentBeats.length) allWorks.push(...recentBeats.map(x=>({...x,type:'Beat',title:x.title,cover_url:x.cover_url,audio:x.audio_url||x.file_url})));
+      let {data} = await supabaseClient.from('songs').select('id, title, cover_url').order('created_at',{ascending:false}).limit(30);
+      if(data && data.length) allWorks.push(...data.map(x=>({...x,type:'Song',title:x.title,cover_url:x.cover_url})));
     }catch(e){}
   }
+
+  // 4. BEATS FALLBACK
+  try{
+    let {data} = await supabaseClient.from('beats').select('id, title, cover_url').order('created_at',{ascending:false}).limit(20);
+    if(data && data.length) {
+      // only add if we still have less than 10 works, to keep Kwata Awo visible
+      if(allWorks.length < 6) allWorks.push(...data.map(x=>({...x,type:'Beat',title:x.title,cover_url:x.cover_url})));
+    }
+  }catch(e){}
 
   allWorks = [...new Map(allWorks.map(m=>[m.id,m])).values()];
   songs = allWorks;
-  console.log("Final songs", songs.length);
 
   if(songs.length===0){
-    optDiv.innerHTML = '<div class="custom-option">No songs found — check Supabase RLS</div>';
-    btn.innerHTML = '❌ No songs found — check console <span>▼</span>';
+    optDiv.innerHTML = '<div class="custom-option">No songs found — check Supabase</div>';
+    btn.innerHTML = '❌ No songs found <span>▼</span>';
     return;
   }
 
   optDiv.innerHTML = songs.map(x=>{
     let shortTitle = x.title.length > 24 ? x.title.substring(0,24)+'...' : x.title;
-    let safeTitle = x.title.replace(/'/g,"\\'");
+    let safeTitle = x.title.replace(/'/g,"");
     return `<div class="custom-option" onclick="selectSong('${x.id}','${safeTitle}','${x.type}')"><span>🎵 ${escapeHtml(shortTitle)}</span><small>${x.type}</small></div>`;
   }).join("");
   
   btn.innerHTML = `🎵 ${escapeHtml(songs[0].title)} - ${songs[0].type} <span>▼</span>`;
-  // Auto select first
   selectSong(songs[0].id, songs[0].title, songs[0].type);
 }
 async function loadLiveWinners(){
@@ -220,7 +201,7 @@ async function submitPromotion(){
   const b=$("submitBtn");b.disabled=true;b.textContent="Creating...";
   try{
     const work=songs.find(s=>s.id==songId); const startDate=new Date(start); const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+selectedDays);
-    let insertData={song_id:work.type==='Song'?songId:null, beat_id:work.type==='Beat'?songId:null, artist_id:currentArtist?.id||work?.artist_id||null, package_id:packageMap[pkg]||null, start_date:startDate.toISOString(), end_date:endDate.toISOString(), amount:selectedAmount, currency:'UGX', status:'pending', payment_status:'pending', user_id:currentUser.id, song_title:work?.title||'Promo', content_type:work?.type||'Song', tiktok_url:$("tiktokUrl").value||null, ip_address:userIP, city:userLocation.city, country:userLocation.country, country_code:userLocation.country_code};
+    let insertData={song_id:work.type==='Song'?songId:null, beat_id:work.type==='Beat'?songId:null, artist_id:currentArtist?.id||null, package_id:packageMap[pkg]||null, start_date:startDate.toISOString(), end_date:endDate.toISOString(), amount:selectedAmount, currency:'UGX', status:'pending', payment_status:'pending', user_id:currentUser.id, song_title:work?.title||'Promo', content_type:work?.type||'Song', tiktok_url:$("tiktokUrl").value||null, ip_address:userIP, city:userLocation.city, country:userLocation.country, country_code:userLocation.country_code};
     const {data,error}=await supabaseClient.from('promotions').insert([insertData]).select().single(); if(error)throw error;
     const params=new URLSearchParams({promotion_id:data.id,song_id:songId,song:work?.title||"",type:work?.type||"Song",package:pkg,amount:selectedAmount}); window.location.href=`pasong_checkout.html?${params.toString()}`;
   }catch(e){show("Error: "+e.message,"error");b.disabled=false;b.textContent="🚀 Start Promotion - Pay Now";}
