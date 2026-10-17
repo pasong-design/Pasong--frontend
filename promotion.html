@@ -29,12 +29,13 @@ input,select,textarea{width:100%;background:#0b0611;border:1px solid #392151;bor
 .status{display:none;padding:11px;border-radius:10px;margin-top:12px;font-size:10px}.status.show{display:block}.status.success{background:#0d2115;border:1px solid #245d32;color:#9ae6a8}.status.error{background:#2a1017;border:1px solid #6c2636;color:#ff9caf}
 .notice{margin-top:10px;padding:10px;border-radius:10px;background:#8b5cf612;border:1px solid #8b5cf62b;color:#9c91a7;font-size:9px}
 .promo-row{display:flex;justify-content:space-between;gap:10px;padding:12px;border:1px solid #2d1944;border-radius:12px;background:#120a1b;margin-bottom:8px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.goals{grid-template-columns:repeat(2,1fr)}.preview{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header><div class="nav"><a href="index.html" class="logo"><span class="logo-mark"></span>PASONG</a><nav class="nav-links"><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html" class="active">Promotion</a></nav></div></header>
 <main>
-<section class="hero"><div class="hero-badge">🚀 PASONG PROMOTION - ARTISTS, PRODUCERS, DJs</div><h1>Put your music <span>in front of more people.</span></h1><p>For Songs, Beats, Mixes & Videos - One checkout: pasong_checkout.html</p></section>
+<section class="hero"><div class="hero-badge">🚀 PASONG PROMOTION - FIXED LOADER</div><h1>Put your music <span>in front of more people.</span></h1><p>Shows Songs, Beats, Mixes - Goes to pasong_checkout.html</p></section>
 
 <section class="section" id="packages"><div class="section-head"><h2>🔥 Promotion Packages</h2></div>
 <div class="grid">
@@ -52,10 +53,10 @@ input,select,textarea{width:100%;background:#0b0611;border:1px solid #392151;bor
 <button class="goal" onclick="chooseGoal(this,'release')"><span>🚀</span>Release</button>
 </div></section>
 
-<section class="section"><div class="section-head"><h2>👀 Promotion Preview</h2></div><div class="card preview"><div class="preview-art"><img id="previewCover" src="https://ui-avatars.com/api/?name=PASONG&background=171022&color=c084fc&bold=true&size=600"><div class="preview-overlay"><div class="preview-play">▶</div></div></div><div class="preview-info"><h3 id="previewTitle">Select your work below</h3><p id="previewArtist">Artists=Songs, Producers=Beats, DJs=Mixes</p><div style="margin-top:8px"><span class="pill" id="previewPackage">No package</span><span class="pill" id="previewDuration"></span><span class="pill" id="previewGoal">🎧 Streams</span></div></div></div></section>
+<section class="section"><div class="section-head"><h2>👀 Promotion Preview</h2></div><div class="card preview"><div class="preview-art"><img id="previewCover" src="https://ui-avatars.com/api/?name=PASONG&background=171022&color=c084fc&bold=true&size=600"><div class="preview-overlay"><div class="preview-play">▶</div></div></div><div class="preview-info"><h3 id="previewTitle">Select your work below</h3><p id="previewArtist">Will show Kwata Awo again</p><div style="margin-top:8px"><span class="pill" id="previewPackage">No package</span><span class="pill" id="previewDuration"></span><span class="pill" id="previewGoal">🎧 Streams</span></div></div></div></section>
 
 <section class="section" id="createPromotion"><div class="section-head"><h2>🚀 Create Campaign</h2><p id="foundCount" style="font-size:10px;color:#c084fc;margin-top:4px"></p></div><div class="card"><div class="form-grid">
-<div class="field full"><label>🎵 What to promote? (Songs / Beats / Mixes)</label><select id="songSelect"><option>Loading...</option></select></div>
+<div class="field full"><label>🎵 What to promote?</label><select id="songSelect"><option>Loading...</option></select></div>
 <div class="field"><label>📦 Package</label><select id="packageSelect"><option value="">Select package</option><option value="starter">Starter - UGX 50,000</option><option value="tiktok">TikTok Viral - UGX 150,000</option><option value="hero">Homepage Hero - UGX 300,000</option></select></div>
 <div class="field"><label>📅 Start Date</label><input id="startDate" type="date"></div>
 <div class="field"><label>🎵 TikTok Link</label><input id="tiktokUrl" type="url" placeholder="https://tiktok.com/@..."></div>
@@ -77,7 +78,6 @@ function selectPackage(id,amount,days){selectedPackage=id;selectedAmount=amount;
 $("packageSelect").addEventListener("change",e=>{const v=e.target.value;if(v==='starter')selectPackage('starter',50000,7);if(v==='tiktok')selectPackage('tiktok',150000,14);if(v==='hero')selectPackage('hero',300000,30)});
 
 async function loadPackages(){
-  // Try to find real package uuids from packages table
   const tables=['packages','promotion_packages','promo_packages'];
   for(let t of tables){
     try{
@@ -89,7 +89,6 @@ async function loadPackages(){
           if(key.includes('tiktok')||key.includes('viral')) packageMap['tiktok']=p.id;
           if(key.includes('hero')||key.includes('home')) packageMap['hero']=p.id;
         });
-        console.log('Packages found in',t, packageMap);
         break;
       }
     }catch(e){}
@@ -103,41 +102,79 @@ async function checkLogin(){
     const user = session?.user || (await supabaseClient.auth.getUser()).data?.user;
     if(!user){$("songSelect").innerHTML='<option>Please login</option>';return false}
     currentUser=user;
-    const {data:artist}=await supabaseClient.from('artists').select('id').eq('user_id', currentUser.id).maybeSingle();
-    if(artist) currentArtist=artist;
+    try{
+      const {data:artist}=await supabaseClient.from('artists').select('id').eq('user_id', currentUser.id).maybeSingle();
+      if(artist) currentArtist=artist;
+    }catch(e){}
     return true;
   }catch(e){return false}
 }
 
+// FIXED LOADER - tries each column separately, no .or() that breaks
 async function loadArtistSongs(){
   if(!currentUser || !supabaseClient) return;
-  const s=$("songSelect");s.innerHTML='<option>Loading your works...</option>';
-  try{
-    let allWorks=[];
+  const s=$("songSelect");
+  s.innerHTML='<option>Loading your works...</option>';
+  let allWorks=[];
+  const tryQuery = async (table, col) => {
     try{
-      let { data } = await supabaseClient.from('songs').select('id, title, cover_url, artist_id').or(`artist_user_id.eq.${currentUser.id},uploader_user_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).order('created_at',{ascending:false}).limit(100);
-      if(data) allWorks=[...allWorks, ...data.map(x=>({...x, type:'Song', label:`🎵 ${x.title} (Song)`}))];
-    }catch(e){}
-    for(let table of ['beats','productions','instrumentals']){
+      const {data, error} = await supabaseClient.from(table).select('id, title, cover_url, artist_id').eq(col, currentUser.id).limit(100);
+      if(error) return [];
+      return data || [];
+    }catch(e){ return []; }
+  };
+
+  try{
+    // SONGS - try uploader_user_id first (this worked before with Kwata Awo)
+    let songs1 = await tryQuery('songs','uploader_user_id');
+    if(songs1.length===0) songs1 = await tryQuery('songs','artist_user_id');
+    if(songs1.length===0) songs1 = await tryQuery('songs','user_id');
+    
+    // If still 0, try via artists table
+    if(songs1.length===0 && currentArtist){
       try{
-        let { data } = await supabaseClient.from(table).select('id, title, cover_url').or(`producer_user_id.eq.${currentUser.id},uploader_user_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).limit(50);
-        if(data && data.length) allWorks=[...allWorks, ...data.map(x=>({...x, type:'Beat', label:`🎹 ${x.title} (Beat)`}))];
+        const {data} = await supabaseClient.from('songs').select('id, title, cover_url, artist_id').eq('artist_id', currentArtist.id).limit(100);
+        if(data) songs1=data;
       }catch(e){}
     }
-    for(let table of ['mixtapes','mixes','dj_mixes','videos']){
+
+    allWorks = [...allWorks, ...songs1.map(x=>({...x, type:'Song', label:`🎵 ${x.title} (Song)`}))];
+
+    // BEATS
+    for(let col of ['uploader_user_id','producer_user_id','user_id']){
       try{
-        let { data } = await supabaseClient.from(table).select('id, title, cover_url').or(`dj_user_id.eq.${currentUser.id},uploader_user_id.eq.${currentUser.id},user_id.eq.${currentUser.id}`).limit(50);
+        const {data} = await supabaseClient.from('beats').select('id, title, cover_url').eq(col, currentUser.id).limit(50);
         if(data && data.length){
-          let type=table.includes('video')?'Video':'Mix';
-          let icon=table.includes('video')?'🎬':'🎧';
-          allWorks=[...allWorks, ...data.map(x=>({...x, type:type, label:`${icon} ${x.title} (${type})`}))];
+          allWorks=[...allWorks, ...data.map(x=>({...x, type:'Beat', label:`🎹 ${x.title} (Beat)`}))];
+          break;
         }
       }catch(e){}
     }
+
+    // MIXES
+    for(let table of ['mixtapes','mixes','dj_mixes']){
+      for(let col of ['uploader_user_id','dj_user_id','user_id']){
+        try{
+          const {data} = await supabaseClient.from(table).select('id, title, cover_url').eq(col, currentUser.id).limit(50);
+          if(data && data.length){
+            allWorks=[...allWorks, ...data.map(x=>({...x, type:'Mix', label:`🎧 ${x.title} (Mix)`}))];
+            break;
+          }
+        }catch(e){}
+      }
+    }
+
     songs=allWorks;
-    if(!songs.length){s.innerHTML='<option>No works found</option>';return}
+    console.log('Found works:', songs);
+
+    if(!songs.length){
+      s.innerHTML='<option>No works found - upload first</option>';
+      $("foundCount").textContent='No works found. Check songs table has uploader_user_id = '+currentUser.id;
+      return;
+    }
+
     $("foundCount").textContent=`Found ${songs.length} works`;
-    s.innerHTML='<option value="">Select what to promote</option>'+songs.map(x=>`<option value="${x.id}">${escapeHtml(x.label)}</option>`).join("");
+    s.innerHTML='<option value="">Select what to promote (Kwata Awo should be here)</option>'+songs.map(x=>`<option value="${x.id}">${escapeHtml(x.label)}</option>`).join("");
     s.onchange=()=>{
       const work=songs.find(z=>z.id==s.value);
       if(work){
@@ -146,7 +183,10 @@ async function loadArtistSongs(){
         $("previewArtist").textContent=`${work.type} • Ready`;
       }
     };
-  }catch(e){s.innerHTML=`<option>Error: ${escapeHtml(e.message)}</option>`}
+  }catch(e){
+    s.innerHTML=`<option>Error: ${escapeHtml(e.message)}</option>`;
+    console.error(e);
+  }
 }
 
 async function submitPromotion(){
@@ -161,10 +201,9 @@ async function submitPromotion(){
     const startDate=new Date(start);
     const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+selectedDays);
     
-    // Build insert with EXACT columns from your table
     let insertData={
       song_id: songId,
-      artist_id: currentArtist?.id || null,
+      artist_id: currentArtist?.id || work?.artist_id || null,
       package_id: packageMap[pkg] || null,
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
