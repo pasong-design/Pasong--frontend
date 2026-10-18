@@ -20,8 +20,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(8,8,16,.92);backdrop-fil
 .section{margin-top:18px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.section-head h2{font-size:13px}.section-head a{font-size:9px;color:#a78bfa;text-decoration:none;border:1px solid #2a2440;padding:4px 8px;border-radius:999px}
 .grid{display:flex;gap:9px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}.grid::-webkit-scrollbar{display:none}
 .top-producers{display:flex;gap:8px;overflow:auto;margin-top:6px;padding-bottom:4px}.prod{flex:0 0 auto;text-align:center}.prod img{width:36px;height:36px;border-radius:999px;border:1px solid #3a2a6a}.prod div{font-size:7px;margin-top:2px;color:#888}
-.card{min-width:112px;max-width:112px;flex:0 0 auto;background:transparent;border:0;padding:0;display:block}
-.cover-wrap{position:relative;width:100%;height:112px}.cover{width:100%;height:112px;border-radius:8px;object-fit:cover;background:#1c1630;display:block}
+.card{min-width:128px;max-width:128px;flex:0 0 auto;background:transparent;border:0;padding:0;display:block}
+.cover-wrap{position:relative;width:100%;height:128px}.cover{width:100%;height:128px;border-radius:8px;object-fit:cover;background:#1c1630;display:block}
 .play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);border-radius:8px;display:grid;place-items:center;opacity:0;transition:.2s;font-size:18px;cursor:pointer;color:#fff}.card:hover .play-overlay{opacity:1}
 .badge-abs{position:absolute;top:4px;left:4px;font-size:6px;font-weight:900;padding:2px 4px;border-radius:999px}.badge-abs.hot{background:#ff184d;color:#fff}.badge-abs.new{background:#00ff8a;color:#000}
 .info{padding:5px 1px 0}.title{font-weight:700;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist{color:#888;font-size:8px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -55,17 +55,10 @@ let allSongs=[],allBeats=[],allMixes=[],query="",activeGenre="All";
 const GENRES=["All","Afrobeat","Hip-Hop","Dancehall","Amapiano","Gospel","RnB"];
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
-function getArtistRaw(s){
-  return (s.artist_name||s.producer_name||s.producer||s.artist||s.artistName||"").trim();
-}
-function isRealArtist(a){
-  if(!a) return false;
-  let l=a.toLowerCase();
-  return l!=="unknown" && l!=="pasong" && l!=="p" && l.length>1;
-}
+function getArtistRaw(s){return (s.artist_name||s.producer_name||s.producer||s.artist||"").trim();}
+function isRealArtist(a){if(!a) return false;let l=a.toLowerCase();return l!=="unknown" && l!=="pasong" && l!=="p" && l.length>1;}
 function playsText(s){let n=s.play_count||s.plays||0;if(n===0)n=Math.floor(Math.random()*900+100);return n>999?(n/1000).toFixed(1)+"k":n;}
 function isInWishlist(id){try{return JSON.parse(localStorage.getItem("pasong_wish_v1")||"[]").some(x=>String(x.id)===String(id));}catch(e){return false;}}
-
 function spotifyCard(s,i,type="song"){
 let isWished=isInWishlist(s.id);
 let badge=i===0?`<span class="badge-abs hot">HOT</span>`:i===1?`<span class="badge-abs new">NEW</span>`:"";
@@ -84,25 +77,20 @@ return `<div class="card">
 </div></div>`;
 }
 function renderGrid(id,list,type){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No items</div>';return;}el.innerHTML=list.map((x,i)=>spotifyCard(x,i,type)).join("");}
-
 function renderAll(){
 let q=query.toLowerCase();
 let songsF=allSongs.filter(s=>{let t=(s.title||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
 let beatsF=allBeats.filter(b=>{let t=(b.title||b.beat_name||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
-
 renderGrid("trendingGrid",[...songsF].sort((a,b)=>(b.play_count||0)-(a.play_count||0)).slice(0,12),"song");
 renderGrid("latestGrid",[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,12),"song");
 renderGrid("beatsGrid",beatsF.slice(0,12),"beat");
 renderGrid("freeGrid",beatsF.slice(0,1),"beat");
 let mixesSec=document.getElementById("mixesSec");
 if(allMixes.length===0){mixesSec.style.display="none";}else{renderGrid("mixesGrid",allMixes.slice(0,10),"mix");}
-
-// TOP PRODUCERS - HIDE PASONG BOX
 let allArtists=[...allSongs.map(getArtistRaw),...allBeats.map(getArtistRaw)].filter(a=>isRealArtist(a));
 let prods=[...new Set(allArtists)].slice(0,12);
 let topEl=document.getElementById("topProds");
 if(prods.length===0){topEl.style.display="none";}else{topEl.style.display="flex";topEl.innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/100x100/241633/fff?text=${esc(n[0])}"><div>${esc(n.slice(0,8))}</div></div>`).join("");}
-
 if(beatsF.length){let fb=beatsF[0];document.getElementById("featuredHero").style.display="flex";document.getElementById("heroCover").src=cover(fb)||'';let raw=getArtistRaw(fb);document.getElementById("heroSub").textContent=isRealArtist(raw)?raw+" • 90 BPM":"90 BPM";}
 updateCounts();
 }
