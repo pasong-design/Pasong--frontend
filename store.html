@@ -64,7 +64,6 @@ function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
 function getArtistRaw(s){return (s.artist_name||s.producer_name||s.producer||s.artist||"").trim();}
 function isRealArtist(a){if(!a) return false;let l=a.toLowerCase();return l!=="unknown" && l!=="pasong" && l!=="p" && l.length>1;}
 function isLiked(id){return wishlist.includes(String(id));}
-
 function songCard(s){
   let liked=isLiked(s.id);
   return `<div class="card">
@@ -107,21 +106,14 @@ function beatCard(s){
     </div>
   </div>`;
 }
+// FEATURED CHARTS - NO BUTTONS
 function chartCardSmall(c){
-  return `<div class="card">
-    <div class="cover-wrap" onclick="location.href='charts.html'"><img class="cover" src="${c.img}"><div class="play-overlay">▶</div></div>
-    <div class="info"><div class="title">${c.title}</div><div class="artist">${c.sub}</div>
-      <div class="actions">
-        <div class="act-btn play" onclick="event.stopPropagation();location.href='charts.html'">▶</div>
-        <div class="act-btn heart">♡</div>
-        <div class="act-btn">↗</div>
-        <div class="act-btn plus" onclick="event.stopPropagation();location.href='charts.html'">+</div>
-      </div>
-    </div>
+  return `<div class="card" style="background:transparent;padding:0" onclick="location.href='charts.html'">
+    <div class="cover-wrap"><img class="cover" src="${c.img}"><div class="play-overlay">▶</div></div>
+    <div class="info" style="padding:8px 2px"><div class="title">${c.title}</div><div class="artist">${c.sub}</div></div>
   </div>`;
 }
 function artistCard(name){return `<div class="card"><div class="cover-wrap"><img class="cover" style="border-radius:999px" src="https://placehold.co/400x400/181818/fff?text=${esc(name[0])}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(name)}</div><div class="actions"><div class="act-btn play">▶</div><div class="act-btn heart">♡</div><div class="act-btn">↗</div><div class="act-btn plus">+</div></div></div></div>`;}
-
 function renderAll(){
 let q=query.toLowerCase();
 let songsF=allSongs.filter(s=>{let t=(s.title||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
@@ -144,19 +136,8 @@ let prods=[...new Set(allArtists)].slice(0,12);
 document.getElementById("artistsGrid").innerHTML=prods.map(n=>artistCard(n)).join("");
 document.getElementById("topProds").innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/200x200/181818/fff?text=${esc(n[0])}"><div>${esc(n)}</div></div>`).join("");
 }
-function toggleHeart(id,el){
-  id=String(id);
-  if(wishlist.includes(id)){wishlist=wishlist.filter(x=>x!==id);el.classList.remove('active');el.textContent='♡';}
-  else{wishlist.push(id);el.classList.add('active');el.textContent='♥';}
-  localStorage.setItem('wishlist',JSON.stringify(wishlist));
-}
-function shareItem(id,type){
-  let url=location.origin+`/${type}.html?id=${id}`;
-  if(navigator.share){navigator.share({title:'PASONG',url}).catch(()=>{});}
-  else{navigator.clipboard.writeText(url);alert('Link copied: '+url);}
-}
-
-// PLAY ONLY SECOND + TAKE TO BUY
+function toggleHeart(id,el){id=String(id);if(wishlist.includes(id)){wishlist=wishlist.filter(x=>x!==id);el.classList.remove('active');el.textContent='♡';}else{wishlist.push(id);el.classList.add('active');el.textContent='♥';}localStorage.setItem('wishlist',JSON.stringify(wishlist));}
+function shareItem(id,type){let url=location.origin+`/${type}.html?id=${id}`;if(navigator.share){navigator.share({title:'PASONG',url}).catch(()=>{});}else{navigator.clipboard.writeText(url);alert('Link copied: '+url);}}
 function playPlus(id,type){
   currentBuyId=id; currentBuyType=type;
   let obj=null;
@@ -165,32 +146,16 @@ function playPlus(id,type){
   if(!obj) return;
   let url=obj.audio_url||obj.file_url||obj.preview_url||"";
   let a=document.getElementById("audio");
-  a.src=url;
-  a.currentTime=0;
-  a.play();
+  a.src=url; a.currentTime=0; a.play();
   document.getElementById("player").classList.add("show");
   document.getElementById("pCover").src=cover(obj)||'';
   document.getElementById("pTitle").textContent=obj.title||obj.beat_name||"";
   document.getElementById("pSub").textContent="15s preview • Tap + to Buy";
-  
   clearTimeout(previewTimer);
-  a.ontimeupdate=()=>{
-    document.getElementById("progress").style.width=(a.currentTime/15*100)+"%";
-    if(a.currentTime>=15){
-      a.pause();
-      goBuy();
-    }
-  };
-  // Auto go to buy after 15s
+  a.ontimeupdate=()=>{document.getElementById("progress").style.width=(a.currentTime/15*100)+"%"; if(a.currentTime>=15){a.pause();goBuy();}};
   previewTimer=setTimeout(()=>{ goBuy(); },15000);
 }
-function goBuy(){
-  if(!currentBuyId) return;
-  clearTimeout(previewTimer);
-  document.getElementById("audio").pause();
-  if(currentBuyType==='beat') location.href="beats.html?id="+currentBuyId;
-  else location.href="song.html?id="+currentBuyId;
-}
+function goBuy(){if(!currentBuyId) return;clearTimeout(previewTimer);document.getElementById("audio").pause();if(currentBuyType==='beat') location.href="beats.html?id="+currentBuyId; else location.href="song.html?id="+currentBuyId;}
 function closePlayer(){clearTimeout(previewTimer);document.getElementById("audio").pause();document.getElementById("player").classList.remove("show");}
 async function init(){
 document.getElementById("chips").innerHTML=GENRES.map(g=>`<div class="chip ${g===activeGenre?'active':''}" onclick="setGenre('${g}')">${g}</div>`).join("");
