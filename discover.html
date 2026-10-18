@@ -1,11 +1,11 @@
-m <!doctype html>
+<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Discover | PASONG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--line:#30243e;--purple:#a78bfa}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#201233 0,#0b0912 50%);color:#f8f5ff;font-family:Inter,system-ui,sans-serif}
 .top{position:sticky;top:0;z-index:20;background:#0d0a15ed;backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .ticker{white-space:nowrap;overflow:hidden;background:#7c3aed;color:#fff;font-size:12px;font-weight:800;padding:9px 0;border-bottom:1px solid #a78bfa}
-.ticker-track{display:inline-block;animation:ticker 35s linear infinite;padding-left:100%}@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.ticker-track{display:inline-block;animation:ticker 40s linear infinite;padding-left:100%}@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
 .top-inner{max-width:1200px;margin:auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
 .brand{font-weight:950;font-size:21px}.brand span{color:var(--purple)}
 .search{flex:1;max-width:580px;position:relative}.search input{width:100%;padding:12px 16px 12px 42px;background:#171222;border:1px solid #3b2b4f;border-radius:13px;color:#fff;outline:none}
@@ -29,96 +29,60 @@ m <!doctype html>
 @media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}.top-inner{flex-wrap:wrap}.search{order:3;flex-basis:100%}}
 </style></head><body>
 <header class="top">
-<div class="ticker"><div class="ticker-track" id="tickerTrack">Loading REAL PASONG activity…</div></div>
+<div class="ticker"><div class="ticker-track" id="tickerTrack">Loading PASONG trending…</div></div>
 <div class="top-inner"><a class="brand" href="index.html">◈ PASONG<span>.</span></a><label class="search"><input id="searchInput" type="search" placeholder="Search songs…"></label><a class="cart-link" href="cart.html">🛒 Cart</a></div>
 </header>
 <main class="wrap">
-<section class="hero"><div><div style="color:#d8b4fe;font-size:11px;font-weight:800;letter-spacing:2px">PASONG DISCOVER</div><h1>Discover music.<br><span style="color:#c4b5fd">Find your sound.</span></h1><p style="color:#d0c5df" id="ipInfo">Detecting your location for pricing…</p></div><div class="vinyl"></div></section>
+<section class="hero"><div><div style="color:#d8b4fe;font-size:11px;font-weight:800;letter-spacing:2px">PASONG DISCOVER • REAL MUSIC</div><h1>Discover music.<br><span style="color:#c4b5fd">Find your sound.</span></h1><p style="color:#d0c5df">Trending sounds from PASONG artists. Real plays, real artists.</p></div><div class="vinyl"></div></section>
 <nav class="pills" id="filters"><button class="pill active" data-filter="all">All Music</button><button class="pill" data-filter="Afrobeats">Afrobeats</button><button class="pill" data-filter="Dancehall">Dancehall</button><button class="pill" data-filter="Hip Hop">Hip Hop</button><button class="pill" data-filter="Gospel">Gospel</button></nav>
 <div style="display:flex;justify-content:space-between;margin:15px 0"><h2>Explore music</h2><span id="songCount" style="color:#c4b5fd;font-size:12px"></span></div>
 <div class="grid" id="songGrid"><div style="grid-column:1/-1;text-align:center;padding:28px;color:#aaa">Loading music…</div></div>
 </main>
 
 <script>
-// ===== PASONG PRICING TABLE =====
+// ===== PASONG PRICING TABLE (IP DETECTION STILL WORKS, BUT HIDDEN) =====
 const PRICING_TABLE = {
-  EAST_AFRICA: ['UG','KE','TZ','RW','BI','SS','ET'], // 1000 UGX in his currency
-  OTHER_AFRICA: ['NG','GH','ZA','EG','MA','DZ','TN','ZM','MW','MZ','BW','NA','SZ','LS','AO','CM','SN','CI','BF','ML','NE','TG','BJ','GN','LR','SL','GM','MR','CV','MU','SC','KM','DJ','ER','SD','LY','SO'], // 0.57 USD
-  UK: ['GB','GG','IM','JE'], // 1 GBP
-  // rest = 1 USD
+  EAST_AFRICA: ['UG','KE','TZ','RW','BI','SS','ET'],
+  OTHER_AFRICA: ['NG','GH','ZA','EG','MA','DZ','TN','ZM','MW','MZ','BW','NA','SZ','LS','AO','CM','SN','CI','BF','ML','NE','TG','BJ','GN','LR','SL','GM','MR','CV','MU','SC','KM','DJ','ER','SD','LY','SO'],
+  UK: ['GB','GG','IM','JE'],
 };
 const COUNTRY_CURRENCY = {UG:"UGX",KE:"KES",TZ:"TZS",RW:"RWF",BI:"BIF",SS:"SSP",ET:"ETB",NG:"NGN",GH:"GHS",ZA:"ZAR",EG:"EGP",MA:"MAD",DZ:"DZD",TN:"TND",ZM:"ZMW",MW:"MWK",MZ:"MZN",BW:"BWP",NA:"NAD",SZ:"SZL",LS:"LSL",AO:"AOA",CM:"XAF",SN:"XOF",CI:"XOF",BF:"XOF",ML:"XOF",NE:"XOF",TG:"XOF",BJ:"XOF",GN:"GNF",LR:"LRD",SL:"SLL",GM:"GMD",MR:"MRU",CV:"CVE",MU:"MUR",SC:"SCR",KM:"KMF",DJ:"DJF",ER:"ERN",GB:"GBP",US:"USD"};
 const FX_API = "https://open.er-api.com/v6/latest/USD";
-let currentPricing = {amount:700,currency:"UGX",label:"UGX 700",country:"UG"};
+let currentPricing = {amount:700,currency:"UGX",label:"UGX 700",country:"UG",sub:""};
 let fxRates = null;
 
-async function getRates(){
-  try{const r=await fetch(FX_API);const j=await r.json();if(j.result==="success") fxRates=j.rates;}catch(e){console.log('FX failed')}
-}
+async function getRates(){try{const r=await fetch(FX_API);const j=await r.json();if(j.result==="success") fxRates=j.rates;}catch(e){}}
 function convert(amount, from, to){
-  if(from===to) return amount;
-  if(!fxRates) return amount;
-  const fromRate = from==="USD"?1:fxRates[from];
-  const toRate = to==="USD"?1:fxRates[to];
-  if(!fromRate||!toRate) return amount;
-  return (amount/fromRate)*toRate;
+  if(from===to) return amount; if(!fxRates) return amount;
+  const fromRate = from==="USD"?1:fxRates[from]; const toRate = to==="USD"?1:fxRates[to];
+  if(!fromRate||!toRate) return amount; return (amount/fromRate)*toRate;
 }
-function formatPrice(amount,currency){
-  try{return new Intl.NumberFormat(undefined,{style:"currency",currency:currency,maximumFractionDigits:2}).format(amount);}catch{return amount.toFixed(2)+" "+currency;}
-}
+function formatPrice(amount,currency){try{return new Intl.NumberFormat(undefined,{style:"currency",currency:currency,maximumFractionDigits:2}).format(amount);}catch{return amount.toFixed(2)+" "+currency;}}
 function getPriceForCountry(cc){
-  cc=(cc||"").toUpperCase();
-  const localCur = COUNTRY_CURRENCY[cc] || "USD";
+  cc=(cc||"").toUpperCase(); const localCur = COUNTRY_CURRENCY[cc] || "USD";
   if(PRICING_TABLE.EAST_AFRICA.includes(cc)){
-    // 1000 UGX converted to his currency
     const converted = convert(1000,"UGX",localCur);
-    return {base:1000,baseCur:"UGX",amount:converted,currency:localCur,label:formatPrice(converted,localCur),sub:"(1000 UGX)"};
+    return {base:1000,baseCur:"UGX",amount:converted,currency:localCur,label:formatPrice(converted,localCur),sub:"East Africa",country:cc};
   }
   if(PRICING_TABLE.OTHER_AFRICA.includes(cc)){
     const converted = convert(0.57,"USD",localCur);
-    return {base:0.57,baseCur:"USD",amount:converted,currency:localCur,label:formatPrice(converted,localCur),sub:"($0.57)"};
+    return {base:0.57,baseCur:"USD",amount:converted,currency:localCur,label:formatPrice(converted,localCur),sub:"Africa",country:cc};
   }
-  if(PRICING_TABLE.UK.includes(cc)){
-    return {base:1,baseCur:"GBP",amount:1,currency:"GBP",label:"£1.00",sub:"UK price"};
-  }
-  // Other countries + US
-  return {base:1,baseCur:"USD",amount:1,currency:"USD",label:"$1.00",sub:"Intl price"};
+  if(PRICING_TABLE.UK.includes(cc)){return {base:1,baseCur:"GBP",amount:1,currency:"GBP",label:"£1.00",sub:"UK",country:cc};}
+  return {base:1,baseCur:"USD",amount:1,currency:"USD",label:"$1.00",sub:"Intl",country:cc};
 }
-
-// IP DETECTION + APPLY PRICING
 async function detectIPAndPricing(){
-  const infoEl=document.getElementById('ipInfo');
-  const ticker=document.getElementById('tickerTrack');
-  await getRates();
-  let country=null,city='',ip='';
-  try{
-    const res=await fetch("https://pasong-api.vercel.app/api/pricing",{mode:"cors",credentials:"omit",cache:"no-store"});
-    const data=await res.json();
-    if(data.country){country=data.country.toUpperCase();city=data.city||'';ip=data.ip||'';}
-  }catch(e){}
-  if(!country){
-    try{
-      const res2=await fetch("https://ipwho.is/",{mode:"cors",cache:"no-store"});
-      const j=await res2.json();
-      if(j.success){country=j.country_code;city=j.city||'';ip=j.ip||'';}
-    }catch(e){}
-  }
-  country=country||"UG";
-  currentPricing=getPriceForCountry(country);
-  currentPricing.country=country;
-  // Save for cart
-  localStorage.setItem('pasong_country',country);
-  localStorage.setItem('pasong_pricing',JSON.stringify(currentPricing));
-  
-  infoEl.innerHTML=`🌍 You: ${city} ${country} • IP ${ip} • Price: <b style="color:#fff">${currentPricing.label}</b> <span style="color:#a78bfa">${currentPricing.sub}</span>`;
-  ticker.textContent=`🌍 ${city} ${country} • ${currentPricing.label} ${currentPricing.sub} • 🔥 PASONG • UGX 1000 East Africa • $0.57 Other Africa • £1 UK • $1 World • `;
-  
+  await getRates(); let country=null;
+  try{const res=await fetch("https://pasong-api.vercel.app/api/pricing",{mode:"cors",credentials:"omit",cache:"no-store"});const data=await res.json();if(data.country) country=data.country.toUpperCase();}catch(e){}
+  if(!country){try{const res2=await fetch("https://ipwho.is/",{mode:"cors",cache:"no-store"});const j=await res2.json();if(j.success) country=j.country_code;}catch(e){}}
+  country=country||"UG"; currentPricing=getPriceForCountry(country);
+  localStorage.setItem('pasong_country',country); localStorage.setItem('pasong_pricing',JSON.stringify(currentPricing));
   document.documentElement.dataset.pasongCountry=country;
   window.dispatchEvent(new CustomEvent('pasong:pricing-ready',{detail:currentPricing}));
   return currentPricing;
 }
 
-// DISCOVER LOGIC
+// REAL TICKER - LATEST UPLOAD + BIG PLAYS, NO PRICES
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
@@ -127,27 +91,42 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const cover=s=>s.cover_url||s.cover_image_url||'';
 let songs=[],artistMap={},activeFilter='all',query='';
 
+async function loadRealTicker(){
+  try{
+    const [latest, mostPlayed, total] = await Promise.all([
+      db.from('songs').select('title,artist_name').order('created_at',{ascending:false}).limit(1).single(),
+      db.from('songs').select('title,play_count,artist_name').order('play_count',{ascending:false}).limit(1).single(),
+      db.from('songs').select('*',{count:'exact',head:true})
+    ]);
+    const latestTitle = latest.data?.title || 'New music';
+    const topTitle = mostPlayed.data?.title || latestTitle;
+    const topPlays = mostPlayed.data?.play_count || 0;
+    const totalSongs = total.count || 0;
+    // NO PRICES, NO IP - ONLY LATEST + BIG PLAYS
+    $('tickerTrack').textContent = `🆕 Latest Upload: ${latestTitle} • 🔥 Most Played: ${topTitle} ${topPlays?`(${topPlays.toLocaleString()} plays)`:''} • 🎧 ${totalSongs} songs on PASONG • 🆕 ${latestTitle} • 🔥 ${topTitle} trending • 🎧 ${totalSongs} songs • `;
+  }catch{
+    $('tickerTrack').textContent = '🎧 PASONG • Discover trending music • Real artists • Real plays • ';
+  }
+}
+
 function songArtist(s){return artistMap[s.artist_id]?.performing_name||s.artist_name||'Unknown';}
 function genre(s){return String(s.genre||'Other').trim();}
 function matches(s){const txt=[s.title,songArtist(s),genre(s)].join(' ').toLowerCase();return (!query||txt.includes(query.toLowerCase())) && (activeFilter==='all'||genre(s).toLowerCase().includes(activeFilter.toLowerCase()));}
-
 function addToCart(s,btn){
   const key='pasong_cart_v1';let items=[];try{items=JSON.parse(localStorage.getItem(key)||'[]')||[]}catch{};
   if(items.some(x=>String(x.id)===String(s.id))){btn.textContent='✓ In Cart';return;}
-  // Cart stores correct pricing for country
   items.push({id:String(s.id),title:s.title||'Untitled',artist:songArtist(s),cover:cover(s),price:currentPricing.amount,currency:currentPricing.currency,basePrice:currentPricing.base,baseCurrency:currentPricing.baseCur,country:currentPricing.country});
   localStorage.setItem(key,JSON.stringify(items));btn.textContent='✓ Added';
 }
-
 function render(){
   const grid=$('songGrid'),list=songs.filter(matches);$('songCount').textContent=list.length+' songs • '+currentPricing.label;
   if(!list.length){grid.innerHTML='<div style="grid-column:1/-1;padding:26px;text-align:center;color:#aaa">No songs found</div>';return;}
-  grid.innerHTML=list.map(s=>`<article class="song"><div class="art"><img loading="lazy" src="${esc(cover(s)||'https://placehold.co/500x500/241633/ffffff?text=PASONG')}"><button class="play">▶</button></div><div class="title">${esc(s.title||'Untitled')}</div><div class="artist">${esc(songArtist(s))}</div><div class="price-main">${esc(currentPricing.label)}</div><div class="price-sub">${esc(currentPricing.sub)} • ${esc(currentPricing.country)}</div><span class="genre">${esc(genre(s))}</span><button class="add-cart-btn" data-cart="${esc(s.id)}">＋ Add to Cart</button></article>`).join('');
+  grid.innerHTML=list.map(s=>`<article class="song"><div class="art"><img loading="lazy" src="${esc(cover(s)||'https://placehold.co/500x500/241633/ffffff?text=PASONG')}"><button class="play">▶</button></div><div class="title">${esc(s.title||'Untitled')}</div><div class="artist">${esc(songArtist(s))}</div><div class="price-main">${esc(currentPricing.label)}</div><div class="price-sub">${esc(currentPricing.sub)}</div><span class="genre">${esc(genre(s))}</span><button class="add-cart-btn" data-cart="${esc(s.id)}">＋ Add to Cart</button></article>`).join('');
   grid.querySelectorAll('[data-cart]').forEach(b=>b.onclick=e=>{e.stopPropagation();const s=list.find(x=>String(x.id)===b.dataset.cart);if(s)addToCart(s,b)});
 }
-
 async function initPage(){
   detectIPAndPricing().then(()=>render());
+  loadRealTicker();
   const [sr,ar]=await Promise.all([db.from('songs').select('*').order('created_at',{ascending:false}).limit(200),db.from('artist_profiles').select('*').limit(200)]);
   songs=sr.data||[];(ar.data||[]).forEach(a=>{artistMap[a.id]=a;if(a.user_id)artistMap[a.user_id]=a;});
   render();
