@@ -3,346 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PASONG Music Store</title>
+<title>PASONG - Music Store</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#080810;color:#fff;font-family:Inter,Arial,sans-serif;min-height:100vh}
-nav{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(8,8,16,.94);position:sticky;top:0;z-index:100;backdrop-filter:blur(15px)}
-.logo{font-size:21px;font-weight:900;letter-spacing:.5px;color:#fff}.logo span{color:#d946ef}
-.nav-links{display:flex;gap:24px;align-items:center}.nav-links a{color:#aaa;text-decoration:none;font-size:14px;transition:.2s}.nav-links a:hover{color:#fff}
-.nav-icons{display:flex;gap:15px;align-items:center}.icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);background:#11111c;color:#fff;font-size:17px}
-.hero{padding:55px 6% 30px}.hero-badge{display:inline-block;padding:8px 14px;border-radius:30px;background:rgba(217,70,239,.1);border:1px solid rgba(217,70,239,.25);color:#e879f9;font-size:12px;font-weight:800;letter-spacing:.5px;margin-bottom:18px}
-.hero h1{font-size:clamp(32px,6vw,58px);line-height:1.02;max-width:700px;font-weight:900;letter-spacing:-2px}.hero h1 span{background:linear-gradient(90deg,#d946ef,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{color:#aaa;max-width:650px;margin-top:18px;line-height:1.7;font-size:15px}
-.search-wrap{padding:0 6% 30px}.search-box{max-width:700px;position:relative}.search-box span{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:#888;font-size:18px}
-.search-box input{width:100%;height:52px;padding:0 18px 0 50px;border-radius:15px;border:1px solid rgba(255,255,255,.08);background:#11111c;color:#fff;outline:none;font-size:14px}
-.search-box input:focus{border-color:rgba(217,70,239,.55);box-shadow:0 0 0 3px rgba(217,70,239,.08)}
-.price-note{margin-top:10px;color:#777;font-size:12px}
-.section{padding:10px 6% 60px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.section-title{font-size:22px;font-weight:900}.section-sub{color:#777;font-size:12px}
-.genre-filter{display:none;margin-top:10px;margin-bottom:22px;padding:10px 14px;width:max-content;max-width:100%;border-radius:12px;background:#151520;border:1px solid rgba(217,70,239,.2);color:#d946ef;font-size:12px;font-weight:800}
-.genre-filter a{color:#aaa;text-decoration:none;margin-left:10px}.genre-filter a:hover{color:#fff}
-.song-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
-.song-card{background:#10101a;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:12px;transition:.25s;overflow:hidden}
-.song-card:hover{transform:translateY(-4px);border-color:rgba(217,70,239,.3);box-shadow:0 15px 40px rgba(0,0,0,.25)}
-.cover-wrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:15px;overflow:hidden;background:linear-gradient(135deg,#1a1024,#151526);cursor:pointer}
-.cover-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.cover-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#777;background:radial-gradient(circle at 30% 20%,rgba(217,70,239,.22),transparent 35%),radial-gradient(circle at 80% 80%,rgba(236,72,153,.16),transparent 35%),#12121d}
-.cover-placeholder strong{font-size:32px;color:#d946ef}.cover-placeholder small{font-size:11px}
-.play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);opacity:0;transition:.2s}.cover-wrap:hover .play-overlay{opacity:1}
-.play-circle{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#d946ef,#ec4899);display:flex;align-items:center;justify-content:center;font-size:21px;box-shadow:0 10px 30px rgba(217,70,239,.35)}
-.song-info{padding:14px 4px 4px}.song-title{font-size:16px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.artist{margin-top:6px;color:#999;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.genre{display:inline-block;margin-top:9px;padding:5px 9px;border-radius:20px;background:#191923;color:#999;font-size:10px}
-.song-stats{display:flex;align-items:center;gap:12px;margin-top:10px;color:#777;font-size:11px}.song-stat{display:inline-flex;align-items:center;gap:4px}
-.song-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
-.price{font-size:14px;font-weight:900;color:#fff}.preview-label{color:#777;font-size:10px;margin-top:3px}
-.buy-btn{border:0;cursor:pointer;color:#fff;background:linear-gradient(135deg,#d946ef,#ec4899);padding:10px 13px;border-radius:11px;font-size:11px;font-weight:900;transition:.2s}
-.buy-btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(217,70,239,.25)}.buy-btn:active{transform:scale(.97)}
-.preview-area{margin-top:12px}.preview-btn{width:100%;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#151520;color:#ddd;cursor:pointer;font-size:11px;font-weight:800}
-.preview-btn:hover{border-color:rgba(217,70,239,.35);color:#fff}.preview-status{color:#777;font-size:10px;margin-top:5px;min-height:12px}
-.state{padding:45px 20px;text-align:center;border:1px dashed rgba(255,255,255,.1);border-radius:18px;color:#888}
-.spinner{width:28px;height:28px;margin:0 auto 12px;border:3px solid rgba(255,255,255,.1);border-top-color:#d946ef;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-footer{padding:30px 6%;border-top:1px solid rgba(255,255,255,.07);color:#666;font-size:12px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.footer-brand{color:#aaa;font-weight:800}
-@media(max-width:700px){nav{padding:0 18px}.nav-links{display:none}.hero{padding:42px 18px 25px}.search-wrap{padding:0 18px 25px}.section{padding:10px 18px 45px}.song-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.song-card{padding:9px;border-radius:16px}.song-info{padding:11px 2px 2px}.song-title{font-size:14px}.artist{font-size:11px}.genre{font-size:9px}.song-stats{gap:8px;font-size:9px}.song-bottom{align-items:flex-end}.buy-btn{padding:9px 9px;font-size:10px}footer{padding:25px 18px}}
-@media(max-width:380px){.song-grid{grid-template-columns:1fr}}
+body{background:#080810;color:#fff;font-family:Inter,Arial,sans-serif}
+header{position:sticky;top:0;z-index:100;background:#080810;border-bottom:1px solid #1e1e2a;padding:14px 5%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:20px}
+nav{display:flex;gap:18px}
+nav a{color:#777;font-size:13px;font-weight:600}
+nav a.active{color:#fff}
+.pill{padding:6px 12px;border-radius:999px;background:#1b1628;border:1px solid #3a2a5a;color:#d8b4fe;font-size:11px;font-weight:700}
+.wrap{width:min(1100px,92%);margin:auto;padding:30px 0 80px}
+h1{font-size:42px;line-height:1;letter-spacing:-1px}
+h1 span{color:#a855f7}
+.sub{color:#8888a0;margin-top:8px;font-size:13px}
+.search{margin-top:20px;background:#12121a;border:1px solid #23233a;border-radius:12px;padding:12px;display:flex;gap:10px;max-width:520px}
+.search input{flex:1;background:transparent;border:0;outline:none;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}
+.card{display:flex;gap:12px;background:#11111c;border:1px solid #23233a;border-radius:16px;padding:12px;align-items:center}
+.card:hover{border-color:#6b46a3}
+.cover{width:78px;height:78px;border-radius:12px;object-fit:cover;background:#1c1630;flex-shrink:0}
+.info{flex:1;min-width:0}
+.title{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artist{color:#999;font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.price{color:#c084fc;font-weight:900;font-size:13px;margin-top:6px}
+.actions{display:flex;flex-direction:column;gap:8px}
+.btn{border:0;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800;cursor:pointer}
+.btn-play{background:#1e1a2e;color:#fff;border:1px solid #4a3a6a}
+.btn-buy{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
+.count{color:#777;font-size:12px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:28px}}
 </style>
 </head>
 <body>
+
+<header>
+<div class="logo">PASONG</div>
 <nav>
-  <div class="logo">â—ˆ PASONG<span>.</span></div>
-  <div class="nav-links">
-    <a href="index.html">Home</a><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="account.html">Account</a>
-  </div>
-  <div class="nav-icons"><div class="icon-btn" aria-label="Search">âŒ•</div><div class="icon-btn" aria-label="Account">â—‰</div></div>
+<a href="index.html">Home</a>
+<a class="active" href="store.html">Music Store</a>
+<a href="charts.html">Charts</a>
+<a href="artists.html">Artists</a>
 </nav>
-<section class="hero">
-  <div class="hero-badge">âœ¦ PASONG MUSIC MARKETPLACE</div>
-  <h1>Discover your next <span>favorite sound.</span></h1>
-  <p>Explore music from independent artists and creators. Listen to a preview, then support the music you love.</p>
-</section>
-<section class="search-wrap">
-  <div class="search-box"><span>âŒ•</span><input type="text" id="searchInput" placeholder="Search songs or artists..." autocomplete="off"></div>
-  <div class="price-note" id="priceNote">Detecting your country priceâ€¦</div>
-</section>
-<section class="section">
-  <div class="section-head"><div><div class="section-title" id="sectionTitle">ðŸ”¥ Trending Music</div><div class="section-sub" id="sectionSub">Listen before you buy</div></div></div>
-  <div id="genreFilter" class="genre-filter"></div>
-  <div id="songState" class="state"><div class="spinner"></div>Loading music...</div>
-  <div id="songGrid" class="song-grid" style="display:none;"></div>
-</section>
-<audio id="previewAudio" preload="none"></audio>
-<footer><div class="footer-brand">PASONG</div><div>â–¶ &nbsp; â– </div><div>PASONG Â© 2026 â€¢ Music â€¢ Artists â€¢ Opportunity</div></footer>
+<div class="pill" id="pricePill">UGX 700 Uganda</div>
+</header>
+
+<main class="wrap">
+<h1>Music <span>Store</span></h1>
+<p class="sub">Listen preview then support artist. <span id="yourPrice"></span></p>
+
+<div class="search">
+<span>Search</span>
+<input id="searchInput" placeholder="KUBE, WOMAN, KWATA AWO">
+</div>
+
+<div style="display:flex;justify-content:space-between;margin-top:28px">
+<h3>Trending Music</h3>
+<span class="count" id="songCount">Loading</span>
+</div>
+
+<div class="grid" id="songList">
+<div style="grid-column:1/-1;padding:30px;text-align:center;color:#777">Loading...</div>
+</div>
+</main>
+
 <script>
-"use strict";
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const API_URL="https://pasong-api.vercel.app";
-let allSongs=[];
-let currentPreview=null;
-let previewTimer=null;
-let pasongCountryPricing=null;
-let pasongCountryPriceLabel="";
-const urlParams=new URLSearchParams(window.location.search);
-const selectedGenre=(urlParams.get("genre")||"").trim();
-const songGrid=document.getElementById("songGrid");
-const songState=document.getElementById("songState");
-const searchInput=document.getElementById("searchInput");
-const previewAudio=document.getElementById("previewAudio");
-const priceNote=document.getElementById("priceNote");
-const sectionTitle=document.getElementById("sectionTitle");
-const sectionSub=document.getElementById("sectionSub");
-const genreFilter=document.getElementById("genreFilter");
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-function normalizeGenre(value){return String(value??"").trim().toLowerCase().replace(/\s+/g," ");}
-function getSongId(song){return String(song?.id||song?.song_id||song?.songId||song?.uuid||"").trim();}
-function getSongTitle(song){return song?.title||song?.name||"Untitled Song";}
-function getArtistName(song){
-  if(song?.artist_name)return song.artist_name;
-  if(song?.artist){
-    if(typeof song.artist==="string")return song.artist;
-    if(typeof song.artist==="object")return song.artist.name||song.artist.artist_name||song.artist.display_name||"Unknown Artist";
-  }
-  return "Unknown Artist";
-}
-function getGenre(song){return song?.genre||song?.category_name||song?.category?.name||song?.category||"Music";}
-function getCover(song){return song?.cover_url||song?.coverUrl||song?.cover||"";}
-function getPreview(song){return song?.preview_url||song?.previewUrl||song?.audio_url||song?.audioUrl||"";}
+const COUNTRY_CURRENCY={UG:"UGX",KE:"KES",TZ:"TZS",RW:"RWF",BI:"BIF",SS:"SSP",ET:"ETB",NG:"NGN",GH:"GHS",ZA:"ZAR",GB:"GBP",US:"USD"};
+let currentPricing={label:"UGX 700",amount:700,currency:"UGX",country:"UG",sub:"Uganda"};
+let fxRates=null;
 
-function formatPasongPricing(data){
-  if(!data || typeof data !== "object") return "";
-
-  // Accept the common API response formats.
-  if(data.label) return String(data.label);
-  if(data.marketplace_label) return String(data.marketplace_label);
-
-  const amount = Number(
-    data.amount ??
-    data.price ??
-    data.marketplace_price ??
-    data.song_price ??
-    data.pricing?.amount ??
-    data.pricing?.price
-  );
-
-  const currency = String(
-    data.currency ??
-    data.marketplace_currency ??
-    data.pricing?.currency ??
-    ""
-  ).toUpperCase();
-
-  if(!Number.isFinite(amount) || !currency) return "";
-
-  const symbols = {
-    UGX:"UGX ", KES:"KES ", TZS:"TZS ", RWF:"RWF ",
-    BIF:"BIF ", SSP:"SSP ", ETB:"ETB ", GBP:"Â£", USD:"$"
-  };
-  const decimals = ["USD","GBP"].includes(currency) ? 2 : 0;
-
-  return (symbols[currency] || currency + " ") +
-    amount.toLocaleString("en-GB", {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals
-    });
+async function getRates(){try{let r=await fetch("https://open.er-api.com/v6/latest/USD");let j=await r.json();if(j.result==="success")fxRates=j.rates;}catch(e){}}
+function convert(a,f,t){if(f===t)return a;if(!fxRates)return a;let fr=f==="USD"?1:fxRates[f];let tr=t==="USD"?1:fxRates[t];if(!fr||!tr)return a;return (a/fr)*tr;}
+function formatPrice(a,c){try{return new Intl.NumberFormat(undefined,{style:"currency",currency:c,maximumFractionDigits:2}).format(a);}catch(e){return a.toFixed(2)+" "+c;}}
+function getPriceForCountry(cc){
+cc=(cc||"UG").toUpperCase();
+let lc=COUNTRY_CURRENCY[cc]||"USD";
+if(cc==="UG"){return{amount:700,currency:"UGX",label:"UGX 700",sub:"Uganda",country:cc,base:700,baseCur:"UGX"};}
+if(["KE","TZ","RW","BI","SS","ET"].includes(cc)){let conv=convert(1000,"UGX",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc),sub:"East Africa",country:cc,base:1000,baseCur:"UGX"};}
+if(["NG","GH","ZA","EG"].includes(cc)){let conv=convert(0.57,"USD",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc),sub:"Africa",country:cc,base:0.57,baseCur:"USD"};}
+if(["GB"].includes(cc)){return{amount:1,currency:"GBP",label:"GBP 1.00",sub:"UK",country:cc,base:1,baseCur:"GBP"};}
+return{amount:1,currency:"USD",label:"USD 1.00",sub:"Intl",country:cc,base:1,baseCur:"USD"};
 }
 
-async function loadPasongCountryPricing(){
-  try{
-    const response = await fetch(API_URL + "/api/pricing", {
-      method:"GET",
-      headers:{"Accept":"application/json"},
-      cache:"no-store"
-    });
+async function detectPrice(){
+await getRates();
+let country="UG";
+try{let r=await fetch("https://ipwho.is/");let j=await r.json();if(j.success)country=j.country_code;}catch(e){}
+currentPricing=getPriceForCountry(country);
+document.getElementById("pricePill").textContent=currentPricing.label+" "+currentPricing.sub;
+document.getElementById("yourPrice").textContent="Your price: "+currentPricing.label;
+render();
+}
 
-    if(!response.ok) throw new Error("Pricing API returned " + response.status);
+let songs=[];
+let query="";
 
-    const data = await response.json();
-    pasongCountryPricing = data;
+function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function cover(s){return s.cover_url||s.cover_image_url||"";}
+function getArtist(s){return s.artist_name||"Unknown";}
 
-    // Handle wrapped or direct responses.
-    const pricingData = data?.pricing || data?.data?.pricing || data?.data || data;
-    pasongCountryPriceLabel = formatPasongPricing(pricingData);
-
-    if(pasongCountryPriceLabel){
-      priceNote.textContent = "Your price: " + pasongCountryPriceLabel;
-    } else {
-      console.warn("PASONG pricing response did not contain a recognized price:", data);
-    }
-
-    return pasongCountryPriceLabel;
-  }catch(error){
-    console.warn("PASONG country pricing unavailable; using /api/songs fallback.", error);
-    return "";
-  }
-}
-function getPriceLabel(song){
-  // Country pricing takes precedence over per-song UGX fallback values.
-  if(pasongCountryPriceLabel)return pasongCountryPriceLabel;
-  if(song?.marketplace_label)return song.marketplace_label;
-  if(song?.marketplace_price!==undefined){
-    const currency=song.marketplace_currency||song.currency||"UGX";
-    return `${currency} ${Number(song.marketplace_price).toLocaleString()}`;
-  }
-  if(song?.price!==undefined){
-    const currency=song.currency||"UGX";
-    return `${currency} ${Number(song.price).toLocaleString()}`;
-  }
-  return "Checking priceâ€¦";
-}
-function getGenreFilteredSongs(songs){
-  if(!selectedGenre)return songs;
-  const wanted=normalizeGenre(selectedGenre);
-  return songs.filter(song=>normalizeGenre(getGenre(song))===wanted);
-}
-function setupGenrePage(){
-  if(!selectedGenre){sectionTitle.textContent="ðŸ”¥ Trending Music";sectionSub.textContent="Listen before you buy";genreFilter.style.display="none";return;}
-  sectionTitle.textContent="ðŸŽµ "+selectedGenre+" Music";sectionSub.textContent="Music in this genre";genreFilter.style.display="block";
-  genreFilter.innerHTML=`Showing: <strong style="color:#fff;">${escapeHtml(selectedGenre)}</strong><a href="store.html">âœ• Clear filter</a>`;
-}
-async function getPlayCount(songId){
-  if(!songId)return 0;
-  try{
-    const {data,error}=await supabaseClient.rpc("get_song_play_count",{p_song_id:songId});
-    if(error){console.error("PASONG store play count error:",error);return 0;}
-    return Number(data||0);
-  }catch(error){console.error("PASONG store play count error:",error);return 0;}
-}
-async function loadPlayCounts(songs){
-  await Promise.all(songs.map(async song=>{
-    const songId=getSongId(song);if(!songId)return;
-    const count=await getPlayCount(songId);song._pasongPlayCount=count;
-    const countElement=document.querySelector(`[data-play-count="${CSS.escape(songId)}"]`);
-    if(countElement)countElement.textContent="â–¶ "+count.toLocaleString()+(count===1?" play":" plays");
-  }));
-}
-async function loadSongs(){
-  songState.style.display="block";songGrid.style.display="none";songState.innerHTML='<div class="spinner"></div>Loading music...';
-  try{
-    const response=await fetch(API_URL+"/api/songs",{method:"GET",headers:{"Accept":"application/json"},cache:"no-store"});
-    if(!response.ok)throw new Error("API request failed: "+response.status);
-    const result=await response.json();
-    console.log("PASONG API /api/songs:",result);
-    allSongs=Array.isArray(result?.songs)?result.songs:Array.isArray(result)?result:[];
-    // Keep /api/songs pricing as fallback only. /api/pricing has priority.
-    if(!pasongCountryPriceLabel){
-      if(result?.pricing)pasongCountryPriceLabel=formatPasongPricing(result.pricing);
-      else if(result?.marketplace_label)pasongCountryPriceLabel=String(result.marketplace_label);
-      if(pasongCountryPriceLabel)priceNote.textContent="Your price: "+pasongCountryPriceLabel;
-      else priceNote.textContent="Detecting your country priceâ€¦";
-    }
-    if(!allSongs.length){songState.style.display="block";songGrid.style.display="none";songState.textContent="No music is available yet.";return;}
-    const filteredSongs=getGenreFilteredSongs(allSongs);
-    renderSongs(filteredSongs);
-    loadPlayCounts(filteredSongs);
-  }catch(error){
-    console.error("PASONG Store error:",error);
-    songGrid.style.display="none";songState.style.display="block";
-    songState.innerHTML='<strong style="color:#fff;">Unable to load songs</strong><br><br><span style="font-size:12px;">'+escapeHtml(error.message||"Failed to fetch")+'</span>';
-  }
-}
-function renderSongs(songs){
-  songGrid.innerHTML="";
-  const validSongs=songs.filter(song=>getSongId(song)!=="");
-  if(!validSongs.length){
-    songState.style.display="block";songGrid.style.display="none";
-    if(selectedGenre){
-      songState.innerHTML='<strong style="color:#fff;">No '+escapeHtml(selectedGenre)+' songs available</strong><br><br><span style="font-size:12px;">Try another genre or <a href="store.html" style="color:#d946ef;text-decoration:none;">view all songs</a>.</span>';
-    }else{
-      songState.innerHTML='<strong style="color:#fff;">Songs were found, but their IDs are missing.</strong><br><br><span style="font-size:12px;">Please check the API song ID field.</span>';
-    }
-    return;
-  }
-  validSongs.forEach(song=>songGrid.appendChild(createSongCard(song)));
-  songState.style.display="none";songGrid.style.display="grid";
-}
-function createSongCard(song){
-  const card=document.createElement("article");card.className="song-card";
-  const songId=getSongId(song),title=getSongTitle(song),artist=getArtistName(song),genre=getGenre(song),cover=getCover(song),preview=getPreview(song);
-  const existingPlayCount=Number(song._pasongPlayCount||0);
-  let coverHTML;
-  if(cover){
-    coverHTML='<img src="' + escapeAttribute(cover) + '" alt="' + escapeAttribute(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="cover-placeholder" style="display:none;"><strong>â–¶</strong><small>PASONG</small></div>';
-  }else coverHTML='<div class="cover-placeholder"><strong>â–¶</strong><small>PASONG</small></div>';
-  card.innerHTML=`
-    <div class="cover-wrap" data-song-id="${escapeAttribute(songId)}" role="button" tabindex="0" aria-label="Open ${escapeAttribute(title)}">
-      ${coverHTML}<div class="play-overlay"><div class="play-circle">â–¶</div></div>
-    </div>
-    <div class="song-info">
-      <div class="song-title" title="${escapeAttribute(title)}">${escapeHtml(title)}</div>
-      <div class="artist" title="${escapeAttribute(artist)}">${escapeHtml(artist)}</div>
-      <div class="genre">${escapeHtml(genre)}</div>
-      <div class="song-stats"><span class="song-stat" data-play-count="${escapeAttribute(songId)}">â–¶ ${existingPlayCount.toLocaleString()} ${existingPlayCount===1?"play":"plays"}</span></div>
-      <div class="song-bottom">
-        <div><div class="price">${escapeHtml(getPriceLabel(song))}</div><div class="preview-label">20-sec preview</div></div>
-        <button class="buy-btn" type="button" data-song-id="${escapeAttribute(songId)}">BUY NOW</button>
-      </div>
-      <div class="preview-area"><button class="preview-btn" type="button" data-preview-id="${escapeAttribute(songId)}">${preview?"â–¶ Preview":"Preview unavailable"}</button><div class="preview-status" id="preview-status-${escapeAttribute(songId)}"></div></div>
-    </div>`;
-  const coverElement=card.querySelector(".cover-wrap");
-  coverElement.addEventListener("click",()=>openSong(songId));
-  coverElement.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openSong(songId);}});
-  card.querySelector(".buy-btn").addEventListener("click",()=>openSong(songId));
-  card.querySelector(".preview-btn").addEventListener("click",function(){if(preview)playPreview(song,this);});
-  return card;
-}
-function openSong(songId){
-  const cleanId=String(songId||"").trim();
-  if(!cleanId){alert("This song is missing its ID. Please refresh the page.");return;}
-  const songPage=new URL("song.html",window.location.href);songPage.searchParams.set("id",cleanId);
-  stopPreview();window.location.href=songPage.href;
-}
-function playPreview(song,button){
-  const audioUrl=getPreview(song);if(!audioUrl)return;
-  stopPreview();currentPreview=button;previewAudio.src=audioUrl;previewAudio.currentTime=0;button.textContent="â–  Stop Preview";
-  const status=document.getElementById("preview-status-"+getSongId(song));if(status)status.textContent="Playing preview...";
-  previewAudio.play().catch(error=>{console.error("Preview playback failed:",error);stopPreview();});
-  previewTimer=setTimeout(stopPreview,20000);previewAudio.onended=stopPreview;
-}
-function stopPreview(){
-  if(previewTimer){clearTimeout(previewTimer);previewTimer=null;}
-  previewAudio.pause();previewAudio.currentTime=0;previewAudio.removeAttribute("src");previewAudio.load();
-  if(currentPreview){
-    currentPreview.textContent="â–¶ Preview";
-    const songId=currentPreview.dataset.previewId;const status=document.getElementById("preview-status-"+songId);if(status)status.textContent="";
-  }
-  currentPreview=null;
-}
-searchInput.addEventListener("input",function(){
-  const query=this.value.trim().toLowerCase();const genreSongs=getGenreFilteredSongs(allSongs);
-  if(!query){renderSongs(genreSongs);loadPlayCounts(genreSongs);return;}
-  const filtered=genreSongs.filter(song=>getSongTitle(song).toLowerCase().includes(query)||getArtistName(song).toLowerCase().includes(query)||String(getGenre(song)).toLowerCase().includes(query));
-  if(!filtered.length){songGrid.style.display="none";songState.style.display="block";songState.innerHTML='No songs found for "<strong style="color:#fff;">'+escapeHtml(query)+'</strong>"'+(selectedGenre?' in <strong style="color:#d946ef;">'+escapeHtml(selectedGenre)+'</strong>':'');return;}
-  renderSongs(filtered);loadPlayCounts(filtered);
+function render(){
+let list=songs.filter(s=>{
+let txt=(s.title+" "+getArtist(s)).toLowerCase();
+return !query || txt.includes(query.toLowerCase());
 });
-function escapeHtml(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
-function escapeAttribute(value){return escapeHtml(value);}
-setupGenrePage();
+let el=document.getElementById("songList");
+let count=document.getElementById("songCount");
+count.textContent=list.length+" songs "+currentPricing.label;
+if(!list.length){el.innerHTML='<div style="grid-column:1/-1;padding:20px;text-align:center;color:#777">No songs</div>';return;}
+el.innerHTML=list.map(s=>`
+<div class="card">
+<img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/241633/fff?text=PASONG')}">
+<div class="info">
+<div class="title">${esc(s.title||"Untitled")}</div>
+<div class="artist">${esc(getArtist(s))}</div>
+<div class="price">${esc(currentPricing.label)}</div>
+</div>
+<div class="actions">
+<button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Preview</button>
+<button class="btn btn-buy" onclick="buySong('${esc(s.id)}')">BUY NOW</button>
+</div>
+</div>
+`).join("");
+}
 
-// Load songs and IP-country pricing independently. Once pricing arrives,
-// refresh visible cards without disturbing the current search or genre filter.
-loadSongs();
+function previewSong(id){
+let s=songs.find(x=>String(x.id)===String(id));
+if(!s)return;
+let url=s.audio_url||s.file_url||s.song_url||"";
+if(!url){alert("No audio for "+s.title);return;}
+let a=new Audio(url);
+a.play();
+}
 
-loadPasongCountryPricing().then(function(label){
-  if(!label || !allSongs.length) return;
+function buySong(id){
+let s=songs.find(x=>String(x.id)===String(id));
+if(!s)return;
+let key="pasong_cart_v1";
+let items=[];
+try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}
+if(!items.find(x=>String(x.id)===String(id))){
+items.push({id:String(id),title:s.title,artist:getArtist(s),cover:cover(s),price:currentPricing.amount,currency:currentPricing.currency});
+localStorage.setItem(key,JSON.stringify(items));
+}
+window.location.href="song.html?id="+encodeURIComponent(id);
+}
 
-  const query = searchInput.value.trim().toLowerCase();
-  let visibleSongs = getGenreFilteredSongs(allSongs);
+async function init(){
+await detectPrice();
+let res=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(100);
+songs=res.data||[];
+render();
+}
 
-  if(query){
-    visibleSongs = visibleSongs.filter(function(song){
-      return getSongTitle(song).toLowerCase().includes(query) ||
-        getArtistName(song).toLowerCase().includes(query) ||
-        String(getGenre(song)).toLowerCase().includes(query);
-    });
-  }
-
-  renderSongs(visibleSongs);
-  loadPlayCounts(visibleSongs);
-});
+document.getElementById("searchInput").addEventListener("input",e=>{query=e.target.value;render();});
+init();
 </script>
+
 </body>
 </html>
