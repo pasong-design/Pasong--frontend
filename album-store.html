@@ -4,41 +4,159 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b1d">
-<title>PASONG Album Store</title>
+<title>PASONG Album Store — One album. Every track.</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#070a18;--panel:#0b1025;--line:#1b2a55;--purple:#8b5cf6;--pink:#b026ff;--text:#f7f8ff;--muted:#8e9ab8}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:radial-gradient(circle at 50% -20%,#111b48 0,#070a18 42%,#050712 100%);color:var(--text);min-height:100vh}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}
-nav{position:sticky;top:0;z-index:10;background:rgba(5,8,24,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:12px 20px}.nav-inner{max-width:1400px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{font-size:22px;font-weight:950;letter-spacing:-.8px}.logo span{color:#b026ff}.links{display:flex;gap:18px;align-items:center;font-size:12px;color:#cbd5ee}.links a:hover{color:#fff}
-.wrap{max-width:1400px;margin:auto;padding:28px 22px 90px}.hero{padding:26px 0 28px}.eyebrow{display:inline-block;color:#d7b9ff;background:#7c3aed22;border:1px solid #8b5cf655;border-radius:20px;padding:7px 11px;font-size:11px;font-weight:800;letter-spacing:1px}h1{font-size:clamp(34px,6vw,62px);line-height:1.02;letter-spacing:-2px;margin-top:16px;max-width:850px}h1 span{background:linear-gradient(90deg,#08a9ff,#b026ff,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{color:#aeb9d4;max-width:720px;line-height:1.7;margin-top:14px;font-size:14px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.btn{border:1px solid #34416e;background:#111a3b;color:#fff;border-radius:10px;padding:11px 15px;font-size:12px;font-weight:800;cursor:pointer}.btn.primary{border:0;background:linear-gradient(90deg,#7c3aed,#b026ff)}.btn:disabled{opacity:.5;cursor:not-allowed}
-.search{display:flex;gap:10px;margin:4px 0 24px}.search input{flex:1;min-width:0}input,textarea,select{width:100%;background:#080d20;border:1px solid #26345f;border-radius:10px;padding:12px;color:#fff;outline:none}input:focus,textarea:focus,select:focus{border-color:#8b5cf6}.section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:28px 0 16px}.section-head h2{font-size:22px}.muted{color:var(--muted);font-size:12px;line-height:1.6}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px}.card{min-width:0;background:linear-gradient(155deg,#101832,#0b1022);border:1px solid #202d53;border-radius:17px;padding:12px;overflow:hidden}.cover{aspect-ratio:1/1;border-radius:12px;background:radial-gradient(circle at 30% 20%,#572e8b,#121b3a 55%,#080d20);display:grid;place-items:center;overflow:hidden;color:#d8b4fe;font-size:42px;font-weight:900}.cover img{width:100%;height:100%;object-fit:cover;display:block}.album-title{font-size:16px;font-weight:900;margin-top:13px;overflow-wrap:anywhere}.artist{font-size:12px;color:#aab6d2;margin-top:6px}.desc{font-size:12px;color:#8e9ab8;line-height:1.5;margin-top:9px;min-height:18px}.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:15px}.price{font-weight:900;color:#fff;font-size:14px}.small-btn{padding:9px 10px;font-size:11px}.state{padding:30px 18px;text-align:center;color:#aeb9d4;border:1px dashed #29365e;border-radius:15px;line-height:1.7}.panel{background:#0b1025;border:1px solid #202d53;border-radius:18px;padding:18px;margin-top:25px}.panel h2{font-size:20px;margin-bottom:6px}.panel-intro{color:#9aa8c9;font-size:12px;line-height:1.6;margin-bottom:17px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;font-weight:800;color:#dce4f7}.field.full{grid-column:1/-1}.track-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;border:1px solid #202d53;border-radius:12px;margin-top:10px}.track-heading{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}.notice{display:none;padding:12px 14px;border:1px solid #554080;background:#17112a;color:#e4d7ff;border-radius:10px;font-size:12px;line-height:1.6;margin:14px 0}.notice.show{display:block}.notice.error{border-color:#85425a;background:#28111c;color:#ffd0da}.notice.ok{border-color:#256d57;background:#0d241f;color:#b8ffe8}.helper{font-size:11px;color:#8290b1;line-height:1.6}.hidden{display:none!important}footer{border-top:1px solid #17244a;color:#8290b1;padding:25px 22px;text-align:center;font-size:11px}
-@media(max-width:650px){nav{padding:12px 15px}.links{gap:10px;font-size:11px}.wrap{padding:20px 15px 70px}.hero{padding-top:20px}.form-grid,.track-row{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{padding:9px;border-radius:14px}.album-title{font-size:14px}.desc{font-size:11px}.card-bottom{align-items:flex-start;flex-direction:column}.small-btn{width:100%}.panel{padding:13px}}@media(max-width:390px){.grid{grid-template-columns:1fr}.links a:nth-child(2){display:none}}
+:root{--bg:#070a18;--panel:#0e1430;--line:#1f2f5e;--purple:#8b5cf6;--pink:#b026ff;--cyan:#22d3ee;--text:#f7f8ff;--muted:#8e9ab8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:radial-gradient(circle at 15% -10%,#2a1a6b 0%,#111a4a 18%,#070a18 42%,#050712 100%);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}button,input{font:inherit}button{cursor:pointer}
+nav{position:sticky;top:0;z-index:50;background:rgba(5,8,24,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:12px 18px}
+.nav-inner{max-width:1400px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:22px;font-weight:950;letter-spacing:-.8px}.logo span{color:var(--pink)}
+.links{display:flex;gap:14px;font-size:12px;color:#cbd5ee}
+.wrap{max-width:1400px;margin:auto;padding:20px 16px 90px}
+
+/* NEW INTERESTING HERO */
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center;padding:22px;background:linear-gradient(155deg,rgba(18,24,64,.9),rgba(11,16,37,.95));border:1px solid #25356a;border-radius:20px;margin-top:14px;overflow:hidden;position:relative}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,#7c3aed55,transparent 70%);pointer-events:none}
+.eyebrow{display:inline-flex;gap:6px;align-items:center;color:#d7b9ff;background:#7c3aed22;border:1px solid #8b5cf655;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:800;letter-spacing:1px}
+h1{font-size:clamp(32px,5vw,54px);line-height:.98;letter-spacing:-2px;margin-top:14px}
+h1 span{background:linear-gradient(90deg,#08a9ff,#b026ff,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:#aeb9d4;line-height:1.6;margin-top:12px;font-size:13px;max-width:600px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{border:1px solid #34416e;background:#111a3b;color:#fff;border-radius:12px;padding:11px 16px;font-size:12px;font-weight:800}
+.btn.primary{border:0;background:linear-gradient(90deg,#7c3aed,#b026ff);box-shadow:0 0 22px #7c3aed66}
+.btn:disabled{opacity:.5}
+
+/* VINYL */
+.vinyl-wrap{display:grid;place-items:center;position:relative}
+.vinyl{width:180px;height:180px;border-radius:50%;background:conic-gradient(from 0deg,#111,#222,#111,#333,#111);border:8px solid #1a1a2e;box-shadow:0 0 0 6px #0a0e27,0 0 40px #7c3aed55;display:grid;place-items:center;animation:spin 8s linear infinite}
+.vinyl::after{content:'♫';width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#7c3aed,#b026ff);display:grid;place-items:center;color:white;font-size:22px;border:3px solid #0a0e27}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stats{display:flex;gap:14px;margin-top:14px}
+.stat{background:#0b1025;border:1px solid #1f2d5a;border-radius:12px;padding:8px 12px;font-size:11px}
+.stat b{display:block;font-size:16px;color:#fff}
+
+.search-wrap{margin:22px 0;display:flex;gap:10px}
+.search-wrap input{flex:1;background:#0a1025;border:1px solid #25356a;border-radius:12px;padding:13px 14px 13px 38px;color:#fff;outline:none}
+.search-wrap{position:relative}.search-wrap::before{content:'⌕';position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#7d8ab0}
+.filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+.filter-btn{white-space:nowrap;border:1px solid #2a3660;background:#0c122c;color:#aeb9d4;border-radius:20px;padding:8px 14px;font-size:11px;font-weight:800}
+.filter-btn.active{background:#fff;color:#111;border-color:#fff}
+
+.section-head{display:flex;justify-content:space-between;align-items:end;margin:24px 0 12px}
+.section-head h2{font-size:18px}
+.muted{color:var(--muted);font-size:11px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.card{position:relative;background:linear-gradient(155deg,#121c3d,#0b1022);border:1px solid #22305a;border-radius:18px;padding:10px;overflow:hidden;transition:.25s}
+.card:hover{transform:translateY(-4px);border-color:#8b5cf6;box-shadow:0 10px 30px rgba(124,58,237,.25)}
+.cover{aspect-ratio:1;border-radius:12px;background:radial-gradient(circle at 30% 20%,#572e8b,#121b3a 55%,#080d20);display:grid;place-items:center;overflow:hidden;font-size:38px;position:relative}
+.cover img{width:100%;height:100%;object-fit:cover}
+.cover .play{position:absolute;bottom:8px;right:8px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-size:14px;opacity:0;transform:scale(.8);transition:.2s}
+.card:hover .cover .play{opacity:1;transform:scale(1)}
+.album-title{font-size:14px;font-weight:900;margin-top:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artist{font-size:11px;color:#aab6d2;margin-top:4px}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.price{font-weight:900;font-size:13px;color:#c9b2ff}
+.buy{padding:7px 10px;border-radius:9px;border:0;background:#fff;color:#000;font-size:11px;font-weight:900}
+
+.skeleton{background:linear-gradient(90deg,#111a3b 25%,#1a234a 50%,#111a3b 75%);background-size:200% 100%;animation:skeleton 1.2s infinite}
+@keyframes skeleton{to{background-position:-200% 0}}
+.state{padding:28px;text-align:center;color:#aeb9d4;border:1px dashed #2a3660;border-radius:14px;line-height:1.6;background:#0a1025}
+.panel{margin-top:26px;background:linear-gradient(155deg,#0e1535,#0a1025);border:1px solid #22305a;border-radius:18px;padding:18px}
+.notice{padding:12px;border-radius:10px;font-size:12px;margin:12px 0;display:none}.notice.show{display:block}.notice.error{background:#28111c;border:1px solid #85425a;color:#ffd0da}.notice.ok{background:#0d241f;border:1px solid #256d57;color:#b8ffe8}
+
+@media(max-width:750px){
+.hero{grid-template-columns:1fr;padding:18px}
+.vinyl{width:140px;height:140px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wrap{padding:14px 12px 90px}
+}
 </style>
 </head>
 <body>
-<nav><div class="nav-inner"><a class="logo" href="index.html">♫ PASONG<span>.</span></a><div class="links"><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="artists.html">Artists</a><a href="account.html">Account</a></div></div></nav>
+<nav><div class="nav-inner"><a class="logo" href="index.html">♫ PASONG<span>.</span></a><div class="links"><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="account.html">Account</a></div></div></nav>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">PASONG • ALBUM MARKETPLACE</div><h1>One album. <span>Every track.</span></h1><p>Discover complete albums from PASONG artists. Artists set their album price. Browse published albums below. Checkout and full-album delivery must be connected to a verified album-payment backend before purchases can be taken.</p><div class="actions"><button class="btn" id="refreshBtn">Refresh releases</button><a class="btn primary" href="album-upload.html" style="text-decoration:none;display:inline-flex;align-items:center">Artist Upload Studio</a></div></section>
-<div class="search"><input id="searchInput" type="search" placeholder="Search albums or artists..." autocomplete="off"></div><div id="catalogNotice" class="notice" role="status"></div>
-<div class="section-head"><div><h2>Published releases</h2><div class="muted">Albums and EPs from PASONG artists</div></div><div class="muted" id="albumCount"></div></div><div class="actions" style="margin:12px 0"><button class="btn release-filter primary" data-kind="all">All releases</button><button class="btn release-filter" data-kind="album">Albums</button><button class="btn release-filter" data-kind="ep">EPs</button></div><div id="albumState" class="state">Loading published albums…</div><div id="albumGrid" class="grid hidden"></div>
+<section class="hero">
+<div>
+<div class="eyebrow">● PASONG ALBUM MARKETPLACE • LIVE</div>
+<h1>One album. <span>Every track.</span></h1>
+<p>Own the full story. Discover complete albums from PASONG artists — curated, verified, and ready to collect. From Afrobeat to Amapiano.</p>
+<div class="actions">
+<button class="btn primary" id="refreshBtn">↻ Refresh releases</button>
+<a class="btn" href="album-upload.html" style="display:inline-flex;align-items:center">🎤 Artist Upload Studio</a>
+</div>
+<div class="stats">
+<div class="stat"><b id="statCount">—</b> Albums</div>
+<div class="stat"><b>UGX</b> Artist pricing</div>
+<div class="stat"><b>🔒</b> Secure</div>
+</div>
+</div>
+<div class="vinyl-wrap"><div class="vinyl"></div></div>
+</section>
 
-<section class="panel"><h2>My purchased albums</h2><p class="panel-intro">Sign in to view purchase records linked to your account. Full downloads stay locked until verified album checkout and protected-file delivery are connected.</p><div id="purchasesState" class="state">Checking account…</div><div id="purchasesGrid" class="grid hidden"></div></section>
-</main><footer>PASONG Album Store • Artist-set pricing • Payment status is controlled by the trusted backend.</footer>
+<div class="search-wrap"><input id="searchInput" type="search" placeholder="Search albums or artists..."></div>
+<div id="catalogNotice" class="notice"></div>
+
+<div class="section-head"><div><h2>Published releases</h2><div class="muted">Fresh drops from PASONG artists</div></div><div class="muted" id="albumCount"></div></div>
+<div class="filters">
+<button class="filter-btn active release-filter" data-kind="all">🔥 All releases</button>
+<button class="filter-btn release-filter" data-kind="album">💿 Albums</button>
+<button class="filter-btn release-filter" data-kind="ep">🎧 EPs</button>
+</div>
+
+<div id="albumState" class="state">Loading published albums…</div>
+<div id="albumGrid" class="grid" style="display:none"></div>
+
+<section class="panel">
+<h2>🎧 My purchased albums</h2>
+<p class="muted" style="margin:6px 0 14px">Your collection lives here. Sign in to see your albums.</p>
+<div id="purchasesState" class="state">Checking account…</div>
+<div id="purchasesGrid" class="grid" style="display:none"></div>
+</section>
+</main>
+
 <script>
 "use strict";
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const $=id=>document.getElementById(id);let albums=[];let currentUser=null;let currentArtist=null;
+const $=id=>document.getElementById(id);let albums=[];let currentUser=null;
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function money(v,c){const n=Number(v),code=String(c||"UGX").toUpperCase();if(!Number.isFinite(n))return"Price unavailable";try{return new Intl.NumberFormat(undefined,{style:"currency",currency:code,maximumFractionDigits:["UGX","KES","TZS","RWF","BIF","SSP","ETB"].includes(code)?0:2}).format(n)}catch{return code+" "+n.toLocaleString()}}
 function notice(id,msg,type=""){const el=$(id);el.textContent=msg;el.className="notice show"+(type?" "+type:"")}function hideNotice(id){$(id).className="notice"}
-function setState(id,msg){$(id).textContent=msg;$(id).classList.remove("hidden")}
+function setState(id,msg){$(id).textContent=msg;$(id).style.display="block"}
 function profileName(p){return p?.performing_name||p?.stage_name||p?.artist_name||"PASONG Artist"}
-function albumCard(a){const p=a.artist_profiles||{};const cover=a.cover_url?'<img loading="lazy" src="'+esc(a.cover_url)+'" alt="'+esc(a.title)+' cover" onerror="this.remove()">':"";const count=Array.isArray(a.album_tracks)?a.album_tracks.length:null;const kind=a.release_type==="ep"?"EP":"Album";return '<article class="card"><div class="cover">'+(cover||"♫")+'</div><div class="helper">'+kind+'</div><div class="album-title">'+esc(a.title||"Untitled release")+'</div><div class="artist">'+esc(profileName(p))+'</div><div class="desc">'+esc(a.description||"Complete album")+'</div><div class="card-bottom"><div><div class="price">'+esc(money(a.price,a.currency))+'</div><div class="helper">'+(count===null?"Album":count+" tracks")+'</div></div><button class="btn small-btn" type="button" data-buy="'+esc(a.id)+'">Buy full album</button></div></article>'}
-let releaseKind="all";function renderAlbums(){const q=$("searchInput").value.trim().toLowerCase();const list=albums.filter(a=>(releaseKind==="all"||((a.release_type||"album")===releaseKind))&&((a.title||"").toLowerCase().includes(q)||(a.description||"").toLowerCase().includes(q)||profileName(a.artist_profiles).toLowerCase().includes(q)));$("albumCount").textContent=list.length+" album"+(list.length===1?"":"s");if(!list.length){$("albumGrid").classList.add("hidden");setState("albumState",q?"No albums match your search.":"No published albums are available yet.");return}$("albumState").classList.add("hidden");$("albumGrid").classList.remove("hidden");$("albumGrid").innerHTML=list.map(albumCard).join("")}
+function albumCard(a){
+ const p=a.artist_profiles||{};
+ const cover=a.cover_url?'<img loading="lazy" src="'+esc(a.cover_url)+'" alt="">':'♫';
+ const count=Array.isArray(a.album_tracks)?a.album_tracks.length:null;
+ const kind=a.release_type==="ep"?"EP":"ALBUM";
+ return '<article class="card"><div class="cover">'+cover+'<div class="play">▶</div></div><div style="font-size:9px;color:#8b5cf6;font-weight:800;margin-top:8px;letter-spacing:1px">'+kind+'</div><div class="album-title">'+esc(a.title||"Untitled")+'</div><div class="artist">'+esc(profileName(p))+'</div><div class="price-row"><div class="price">'+esc(money(a.price,a.currency))+'</div><div class="muted" style="font-size:10px">'+(count===null?"":count+" tracks")+'</div></div><button class="buy" style="width:100%;margin-top:10px" data-buy="'+esc(a.id)+'">Buy full album</button></article>'
+}
+let releaseKind="all";
+function renderAlbums(){
+ const q=$("searchInput").value.trim().toLowerCase();
+ const list=albums.filter(a=>(releaseKind==="all"||((a.release_type||"album")===releaseKind))&&((a.title||"").toLowerCase().includes(q)||(a.description||"").toLowerCase().includes(q)||profileName(a.artist_profiles).toLowerCase().includes(q)));
+ $("albumCount").textContent=list.length+" album"+(list.length===1?"":"s");
+ $("statCount").textContent=list.length;
+ if(!list.length){
+   $("albumGrid").style.display="none";
+   $("albumState").style.display="block";
+   $("albumState").textContent=q?"No albums match your search. Try another keyword.":"No published albums yet. Be the first to drop!";
+   return
+ }
+ $("albumState").style.display="none";
+ $("albumGrid").style.display="grid";
+ $("albumGrid").innerHTML=list.map(albumCard).join("")
+}
 async function loadAlbums(){
- setState("albumState","Loading published albums...");$("albumGrid").classList.add("hidden");hideNotice("catalogNotice");
+ $("albumState").innerHTML='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div></div>';
+ $("albumState").style.display="block";
+ $("albumGrid").style.display="none";
+ hideNotice("catalogNotice");
  try{
   const {data:base,error}=await supabaseClient.from("albums").select("id,artist_id,title,cover_url,description,release_date,price,currency,status,created_at,release_type").eq("status","published").order("created_at",{ascending:false});
   if(error)throw error;
@@ -52,15 +170,35 @@ async function loadAlbums(){
   if(!t.error)(t.data||[]).forEach(x=>countsById[x.album_id]=(countsById[x.album_id]||0)+1);
   albums=albums.map(a=>({...a,artist_profiles:profilesById[a.artist_id]||{},album_tracks:Array.from({length:countsById[a.id]||0},(_,i)=>({id:String(i)}))}));
   renderAlbums();
- }catch(e){console.error("Album catalogue error:",e);setState("albumState","Could not load albums: "+(e.message||"Supabase request failed"));notice("catalogNotice","The catalogue could not load. Check the albums table read policy and browser connection.","error");}
-}async function startAlbumCheckout(id){const a=albums.find(x=>String(x.id)===String(id));if(!a)return;const{data:{user},error}=await supabaseClient.auth.getUser();if(error||!user){location.href="login.html?redirect="+encodeURIComponent(location.href);return}notice("catalogNotice","Checkout is not started. The verified existing endpoint /api/cart/mobile-money-checkout accepts song_ids; an album-specific payment flow has not been verified. No payment request was sent and no purchase was marked paid.","error");window.scrollTo({top:0,behavior:"smooth"})}
-function addTrackRow(){const row=document.createElement("div");row.className="track-row";const n=$("trackRows").children.length+1;row.innerHTML='<div class="field"><label>Track '+n+' title *</label><input class="track-title" required maxlength="180" placeholder="Track title"><label>Track audio file *</label><input class="track-file" type="file" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac" required><div class="helper">Audio file from your device, max 100 MB.</div><label>Producer name *</label><input class="track-producer" required maxlength="160" placeholder="Producer name"><label>Artist / performer *</label><input class="track-artist" required maxlength="160" placeholder="Artist name"><label>Songwriter name (if applicable)</label><input class="track-writer" maxlength="160" placeholder="Songwriter name"></div><div class="field"><div class="cover" style="aspect-ratio:16/9;font-size:20px">♫ <span class="track-file-name helper">No audio selected</span></div><div class="track-royalty helper">PASONG 25% · Producer 37.5% · Artist 37.5%</div><button class="btn small-btn remove-track" type="button">Remove track</button></div>';const file=row.querySelector(".track-file");file.addEventListener("change",()=>{row.querySelector(".track-file-name").textContent=file.files[0]?.name||"No audio selected"});row.querySelector(".track-writer").addEventListener("input",()=>{const w=row.querySelector(".track-writer").value.trim();row.querySelector(".track-royalty").textContent=w?"PASONG 25% · Producer 37.5% · Artist 31.875% · Songwriter 5.625%":"PASONG 25% · Producer 37.5% · Artist 37.5%"});row.querySelector(".remove-track").addEventListener("click",()=>{row.remove();renumberTracks()});$("trackRows").appendChild(row);renumberTracks()}
-function renumberTracks(){[...$("trackRows").children].forEach((row,i)=>row.querySelector(".track-title").previousElementSibling.textContent="Track "+(i+1)+" title *")}
-async function getArtistProfile(){if(!currentUser)return null;const{data,error}=await supabaseClient.from("artist_profiles").select("id,user_id,artist_name,stage_name,performing_name").eq("user_id",currentUser.id).maybeSingle();if(error)throw error;return data}
-async function showUpload(){hideNotice("uploadNotice");$("uploadPanel").classList.remove("hidden");$("uploadPanel").scrollIntoView({behavior:"smooth",block:"start"});const{data:{user},error}=await supabaseClient.auth.getUser();if(error||!user){notice("uploadNotice","Sign in to your PASONG account first. Redirecting to login…","error");setTimeout(()=>location.href="login.html?redirect="+encodeURIComponent(location.href),900);return}currentUser=user;try{currentArtist=await getArtistProfile();if(!currentArtist){notice("uploadNotice","No artist profile was found for this account. Complete your PASONG artist profile before uploading albums.","error");$("saveAlbumBtn").disabled=true;return}notice("uploadNotice","Signed in as "+profileName(currentArtist)+". New albums will be saved as drafts.","ok");$("saveAlbumBtn").disabled=false}catch(e){notice("uploadNotice","Could not load your artist profile: "+(e.message||"Unknown error"),"error");$("saveAlbumBtn").disabled=true}}
-async function saveAlbum(event){event.preventDefault();hideNotice("uploadNotice");$("saveAlbumBtn").disabled=true;try{const{data:{user},error:authError}=await supabaseClient.auth.getUser();if(authError||!user)throw new Error("Please sign in again.");currentUser=user;currentArtist=await getArtistProfile();if(!currentArtist)throw new Error("No artist profile found for this account.");const title=$("albumTitle").value.trim(),price=Number($("albumPrice").value),currency=$("albumCurrency").value,coverFile=$("coverFile").files[0];const trackForms=[...$("trackRows").children];if(!coverFile)throw new Error("Choose an album cover photo.");if(coverFile.size>8*1024*1024)throw new Error("Cover photo must be 8 MB or smaller.");if(!title||!Number.isFinite(price)||price<=0)throw new Error("Enter an album title and a price greater than zero.");if(!trackForms.length)throw new Error("Add at least one track.");const tracks=trackForms.map(r=>({title:r.querySelector(".track-title").value.trim(),file:r.querySelector(".track-file").files[0],producer:r.querySelector(".track-producer").value.trim(),artist:r.querySelector(".track-artist").value.trim(),writer:r.querySelector(".track-writer").value.trim()}));if(tracks.some(t=>!t.title||!t.file||!t.producer||!t.artist))throw new Error("Every track needs a title, audio file, producer and artist.");if(tracks.some(t=>t.file.size>100*1024*1024))throw new Error("Each audio file must be 100 MB or smaller.");notice("uploadNotice","Uploading cover photo…");const safe=n=>n.normalize("NFKD").replace(/[^a-zA-Z0-9._-]+/g,"-").slice(-100)||"file";const coverPath=user.id+"/"+crypto.randomUUID()+"-"+safe(coverFile.name);const cu=await supabaseClient.storage.from("album-covers").upload(coverPath,coverFile,{upsert:false,contentType:coverFile.type||"image/jpeg"});if(cu.error)throw new Error("Cover upload failed. Create the public Supabase Storage bucket 'album-covers' and its authenticated upload policy first. "+cu.error.message);const coverUrl=supabaseClient.storage.from("album-covers").getPublicUrl(coverPath).data.publicUrl;const{data:a,error}=await supabaseClient.from("albums").insert({artist_id:currentArtist.id,title,cover_url:coverUrl,description:$("albumDescription").value.trim()||null,release_date:$("releaseDate").value||null,price,currency,status:"draft"}).select("id").single();if(error)throw error;const rows=[];for(let i=0;i<tracks.length;i++){const t=tracks[i],path=user.id+"/"+a.id+"/"+String(i+1).padStart(2,"0")+"-"+safe(t.file.name);notice("uploadNotice","Uploading audio track "+(i+1)+" of "+tracks.length+"…");const up=await supabaseClient.storage.from("album-audio").upload(path,t.file,{upsert:false,contentType:t.file.type||"audio/mpeg"});if(up.error)throw new Error("Album draft exists but audio upload failed. Create private bucket 'album-audio' and its authenticated upload policy. "+up.error.message);rows.push({album_id:a.id,title:t.title,track_number:i+1,audio_storage_path:path});}const{data:savedTracks,error:te}=await supabaseClient.from("album_tracks").insert(rows).select("id,title,track_number");if(te)throw new Error("Files uploaded but track metadata failed: "+te.message);const contributors=[];savedTracks.forEach((st,i)=>{const t=tracks[i];contributors.push({track_id:st.id,contributor_name:t.producer,contributor_role:"producer",royalty_percentage:37.5},{track_id:st.id,contributor_name:t.artist,contributor_role:"artist",royalty_percentage:t.writer?31.875:37.5},{track_id:st.id,contributor_name:"PASONG",contributor_role:"platform",royalty_percentage:25});if(t.writer)contributors.push({track_id:st.id,contributor_name:t.writer,contributor_role:"songwriter",royalty_percentage:5.625})});const{error:re}=await supabaseClient.from("album_track_contributors").insert(contributors);if(re)throw new Error("Album and tracks saved, but royalty records failed. Run album-royalties-schema.sql in Supabase SQL Editor. "+re.message);notice("uploadNotice","Album draft saved with cover, "+tracks.length+" audio track(s), and per-track royalty records. It remains a draft until published.","ok");$("albumForm").reset();$("coverPreview").classList.add("hidden");$("trackRows").innerHTML="";addTrackRow()}catch(e){console.error("Album upload error:",e);notice("uploadNotice","Could not complete upload: "+(e.message||"Unknown error"),"error")}finally{$("saveAlbumBtn").disabled=false}}
-async function loadPurchases(){try{const{data:{user},error}=await supabaseClient.auth.getUser();if(error||!user){setState("purchasesState","Sign in to view your album purchase records.");return}const{data,error:purchaseError}=await supabaseClient.from("album_purchases").select("id,album_id,amount,currency,payment_status,paid_at,created_at,albums(id,title,cover_url)").eq("buyer_user_id",user.id).order("created_at",{ascending:false});if(purchaseError)throw purchaseError;if(!data?.length){setState("purchasesState","No album purchases found for this account.");return}$("purchasesState").classList.add("hidden");$("purchasesGrid").classList.remove("hidden");$("purchasesGrid").innerHTML=data.map(p=>'<article class="card"><div class="album-title">'+esc(p.albums?.title||"Album purchase")+'</div><div class="artist">'+esc(money(p.amount,p.currency))+' · '+esc(p.payment_status||"pending")+'</div><div class="desc">'+(p.payment_status==="paid"?"Payment recorded. Protected download delivery is not yet connected.":"Payment is not confirmed.")+'</div></article>').join("")}catch(e){console.error("Purchase history error:",e);setState("purchasesState","Could not load purchases: "+(e.message||"Unknown error"))}}
-$("coverFile").addEventListener("change",()=>{const f=$("coverFile").files[0];if(!f){$("coverPreview").classList.add("hidden");return}if(f.size>8*1024*1024){notice("uploadNotice","Cover photo must be 8 MB or smaller.","error");$("coverFile").value="";return}$("coverPreviewImg").src=URL.createObjectURL(f);$("coverPreview").classList.remove("hidden")});document.querySelectorAll(".release-filter").forEach(b=>b.addEventListener("click",()=>{releaseKind=b.dataset.kind;document.querySelectorAll(".release-filter").forEach(x=>x.classList.toggle("primary",x===b));renderAlbums()}));$("refreshBtn").addEventListener("click",loadAlbums);$("searchInput").addEventListener("input",renderAlbums);$("albumGrid").addEventListener("click",e=>{const b=e.target.closest("[data-buy]");if(b)startAlbumCheckout(b.dataset.buy)});loadAlbums();loadPurchases();
+ }catch(e){
+   $("albumState").textContent="Could not load albums: "+(e.message||"connection failed");
+   notice("catalogNotice","Catalogue could not load. Check Supabase policy.","error");
+ }
+}
+async function startAlbumCheckout(id){
+ const a=albums.find(x=>String(x.id)===String(id));if(!a)return;
+ const{data:{user}}=await supabaseClient.auth.getUser();
+ if(!user){location.href="login.html?redirect="+encodeURIComponent(location.href);return}
+ notice("catalogNotice","Checkout for albums is coming soon. Your purchase system is not yet connected for albums.","error");
+ window.scrollTo({top:0,behavior:"smooth"})
+}
+async function loadPurchases(){
+ try{
+  const{data:{user}}=await supabaseClient.auth.getUser();
+  if(!user){setState("purchasesState","Sign in to view your album collection.");return}
+  const{data,error}=await supabaseClient.from("album_purchases").select("id,album_id,amount,currency,payment_status,paid_at,created_at,albums(id,title,cover_url)").eq("buyer_user_id",user.id).order("created_at",{ascending:false});
+  if(error)throw error;
+  if(!data?.length){setState("purchasesState","No albums in your collection yet. Buy your first album and it will appear here.");return}
+  $("purchasesState").style.display="none";
+  $("purchasesGrid").style.display="grid";
+  $("purchasesGrid").innerHTML=data.map(p=>'<article class="card"><div class="cover">'+(p.albums?.cover_url?'<img src="'+esc(p.albums.cover_url)+'">':'💿')+'</div><div class="album-title">'+esc(p.albums?.title||"Album")+'</div><div class="artist">'+esc(money(p.amount,p.currency))+' • '+esc(p.payment_status||"pending")+'</div></article>').join("")
+ }catch(e){setState("purchasesState","Could not load purchases: "+(e.message||"error"))}
+}
+document.querySelectorAll(".release-filter").forEach(b=>b.addEventListener("click",()=>{releaseKind=b.dataset.kind;document.querySelectorAll(".release-filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderAlbums()}));
+$("refreshBtn").addEventListener("click",loadAlbums);
+$("searchInput").addEventListener("input",renderAlbums);
+$("albumGrid").addEventListener("click",e=>{const b=e.target.closest("[data-buy]");if(b)startAlbumCheckout(b.dataset.buy)});
+loadAlbums();loadPurchases();
 </script>
 </body>
 </html>
