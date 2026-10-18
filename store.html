@@ -6,11 +6,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#080810;color:#fff;font-family:Inter,sans-serif;padding-bottom:90px}
+body{background:#080810;color:#fff;font-family:Inter,system-ui,sans-serif;padding-bottom:90px}
 header{position:sticky;top:0;z-index:50;background:rgba(8,8,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1e1e2a;padding:12px 5%;display:flex;justify-content:space-between;align-items:center}
 .logo{font-weight:900;letter-spacing:1px}
 nav{display:flex;gap:14px}nav a{color:#666;font-size:11px;font-weight:700;text-decoration:none}nav a.active{color:#fff}
-.hdr-icons{display:flex;gap:8px}.icon-btn{position:relative;background:#16162a;border:1px solid #2a2a4a;width:34px;height:34px;border-radius:999px;display:grid;place-items:center;cursor:pointer;font-size:14px}.badge-count{position:absolute;top:-5px;right:-5px;background:#a855f7;color:#fff;font-size:9px;font-weight:900;min-width:16px;height:16px;border-radius:999px;display:grid;place-items:center}
+.hdr-icons{display:flex;gap:8px}.icon-btn{position:relative;background:#16162a;border:1px solid #2a2a4a;width:34px;height:34px;border-radius:999px;display:grid;place-items:center;cursor:pointer;font-size:14px}
+.badge-count{position:absolute;top:-5px;right:-5px;background:#a855f7;color:#fff;font-size:9px;font-weight:900;min-width:16px;height:16px;border-radius:999px;display:grid;place-items:center}
 .wrap{width:min(1180px,92%);margin:auto;padding:12px 0 0}
 .hero{background:linear-gradient(135deg,#1a1240,#2a1640,#1a1030);border:1px solid #3a2a6a;border-radius:16px;padding:10px;display:flex;gap:10px;align-items:center}
 .hero img{width:64px;height:64px;border-radius:10px;object-fit:cover}.hero h2{font-size:14px}.hero p{font-size:10px;color:#b8a0ff;margin-top:2px}
@@ -20,17 +21,13 @@ nav{display:flex;gap:14px}nav a{color:#666;font-size:11px;font-weight:700;text-d
 .chip{white-space:nowrap;border:1px solid #2a2a4a;background:#12122a;padding:5px 10px;border-radius:999px;font-size:9px;font-weight:700;cursor:pointer;color:#777}.chip.active{background:#fff;color:#000;border-color:#fff}
 .section{margin-top:18px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.section-head h2{font-size:13px}.section-head a{font-size:9px;color:#a78bfa;text-decoration:none;border:1px solid #2a2440;padding:4px 8px;border-radius:999px}
 .grid{display:flex;gap:9px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}.grid::-webkit-scrollbar{display:none}
-.top-producers{display:flex;gap:8px;overflow:auto;margin-top:6px;padding-bottom:4px}.prod{flex:0 0 auto;text-align:center}.prod img{width:36px;height:36px;border-radius:999px;border:1px solid #3a2a6a;object-fit:cover}.prod div{font-size:7px;margin-top:2px;color:#888}
-
-/* SPOTIFY SMALL BOX + ALL FEATURES */
-.card{
-  min-width:112px;max-width:112px;flex:0 0 auto;
-  background:transparent;border:0;padding:0;display:block;
-}
+.top-producers{display:flex;gap:8px;overflow:auto;margin-top:6px;padding-bottom:4px}.top-producers::-webkit-scrollbar{display:none}
+.prod{flex:0 0 auto;text-align:center}.prod img{width:36px;height:36px;border-radius:999px;border:1px solid #3a2a6a;object-fit:cover}.prod div{font-size:7px;margin-top:2px;color:#888}
+.card{min-width:112px;max-width:112px;flex:0 0 auto;background:transparent;border:0;padding:0;display:block}
 .cover-wrap{position:relative;width:100%;height:112px}
 .cover{width:100%;height:112px;border-radius:8px;object-fit:cover;background:#1c1630;display:block}
 .play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);border-radius:8px;display:grid;place-items:center;opacity:0;transition:.2s;font-size:18px;cursor:pointer;color:#fff}.card:hover .play-overlay{opacity:1}
-.badge-abs{position:absolute;top:4px;left:4px;font-size:6px;font-weight:900;padding:2px 4px;border-radius:999px;letter-spacing:.3px}
+.badge-abs{position:absolute;top:4px;left:4px;font-size:6px;font-weight:900;padding:2px 4px;border-radius:999px}
 .badge-abs.hot{background:#ff184d;color:#fff}.badge-abs.new{background:#00ff8a;color:#000}
 .info{padding:5px 1px 0}
 .title{font-weight:700;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -43,18 +40,24 @@ nav{display:flex;gap:14px}nav a{color:#666;font-size:11px;font-weight:700;text-d
 .btn-buy-small{margin-top:4px;width:100%;border:0;border-radius:999px;padding:4px 0;font-size:7px;font-weight:900;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;cursor:pointer}
 .empty{font-size:11px;color:#666;padding:10px}
 .player{position:fixed;left:0;right:0;bottom:0;z-index:100;background:rgba(15,15,28,.97);backdrop-filter:blur(14px);border-top:1px solid #2a2a4a;padding:8px 4%;display:none;gap:8px;align-items:center}.player.show{display:flex}.player img{width:42px;height:42px;border-radius:8px;object-fit:cover}.p-info{flex:1;min-width:0}.p-title{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.p-artist{font-size:9px;color:#888}.progress{position:absolute;top:0;left:0;height:2px;background:#a855f7;width:0%}
+@media(max-width:900px){nav{display:none}}
 </style>
 </head>
 <body>
-<header><div class="logo">PASONG</div><nav><a href="index.html">Home</a><a class="active" href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="beats.html">Beats</a><a href="mixes.html">Mixes</a></nav>
+<header>
+<div class="logo">PASONG</div>
+<nav><a href="index.html">Home</a><a class="active" href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="beats.html">Beats</a><a href="mixes.html">Mixes</a></nav>
 <div class="hdr-icons">
 <div class="icon-btn" onclick="location.href='wishlist.html'">❤️<span class="badge-count" id="wishCount" style="display:none">0</span></div>
 <div class="icon-btn" onclick="location.href='cart.html'">🛒<span class="badge-count" id="cartCount" style="display:none">0</span></div>
-</div></header>
+</div>
+</header>
 
 <main class="wrap">
 <div class="hero" id="featuredHero" style="display:none"><img id="heroCover"><div><h2 id="heroTitle">Nyange — Featured</h2><p id="heroSub">KV BEATS • Exclusive</p><div style="margin-top:6px;display:flex;gap:5px"><button class="btn-buy-small" style="width:auto;padding:4px 10px" onclick="featuredPlay()">▶ Preview</button><button class="btn-buy-small" style="width:auto;padding:4px 10px" onclick="location.href='beats.html'">BUY BEAT</button></div></div></div>
+
 <div class="promo"><span>🔥 BUNDLE: Buy 3 Beats Get 1 FREE</span><span onclick="location.href='beats.html'" style="background:#fff;color:#000;padding:4px 8px;border-radius:999px;font-size:8px;cursor:pointer">CLAIM</span></div>
+
 <div class="search">🔍<input id="searchInput" placeholder="Search songs, artists, beats..."></div>
 <div class="chips" id="chips"></div>
 <div class="top-producers" id="topProds"></div>
@@ -62,18 +65,21 @@ nav{display:flex;gap:14px}nav a{color:#666;font-size:11px;font-weight:700;text-d
 <div class="section"><div class="section-head"><h2>Trending Songs</h2><a href="charts.html">View All</a></div><div class="grid" id="trendingGrid"></div></div>
 <div class="section"><div class="section-head"><h2>Latest Uploads</h2><a href="latest.html">View All</a></div><div class="grid" id="latestGrid"></div></div>
 <div class="section"><div class="section-head"><h2>Producer Beats</h2><a href="beats.html">View All</a></div><div class="grid" id="beatsGrid"></div></div>
+<div class="section"><div class="section-head"><h2>Free Beat of the Week</h2><a href="beats.html">Get Free</a></div><div class="grid" id="freeGrid"></div></div>
 <div class="section" id="mixesSec"><div class="section-head"><h2>DJ Mixes</h2><a href="mixes.html">View All</a></div><div class="grid" id="mixesGrid"></div></div>
 </main>
 
 <div class="player" id="player"><div class="progress" id="progress"></div><img id="pCover"><div class="p-info"><div class="p-title" id="pTitle"></div><div class="p-artist" id="pArtist"></div></div><button class="btn-icon" id="pPlay">⏸</button><button class="btn-icon" onclick="closePlayer()">✕</button><audio id="audio" preload="none"></audio></div>
 
 <script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 let allSongs=[],allBeats=[],allMixes=[],query="",activeGenre="All";
 const GENRES=["All","Afrobeat","Hip-Hop","Dancehall","Amapiano","Gospel","RnB"];
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
-function getArtist(s){return s.artist_name||s.producer_name||s.producer||"Unknown";}
+function getArtist(s){return s.artist_name||s.producer_name||s.producer||"";}
 function playsText(s){let n=s.play_count||s.plays||Math.floor(Math.random()*900+100);return n>999?(n/1000).toFixed(1)+"k":n;}
 function isInWishlist(id){try{return JSON.parse(localStorage.getItem("pasong_wish_v1")||"[]").some(x=>String(x.id)===String(id));}catch(e){return false;}}
 
@@ -93,21 +99,46 @@ return `<div class="card">
 </div></div>`;
 }
 function renderGrid(id,list,type){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No items</div>';return;}el.innerHTML=list.map((x,i)=>spotifyCard(x,i,type)).join("");}
+
 function renderAll(){
 let q=query.toLowerCase();
-let songsF=allSongs.filter(s=>{let okQ=!q||(s.title+" "+getArtist(s)).toLowerCase().includes(q);let okG=activeGenre==="All"||(s.genre||"").toLowerCase().includes(activeGenre.toLowerCase());return okQ&&okG;});
-let beatsF=allBeats.filter(b=>!q||(b.title+" "+getArtist(b)).toLowerCase().includes(q));
-let mixesF=allMixes.filter(m=>!q||(m.title+" "+getArtist(m)).toLowerCase().includes(q));
+let songsF=allSongs.filter(s=>{
+  let a=getArtist(s);
+  if(!s.title) return false;
+  if(!a || a.toLowerCase()==="unknown") return false;
+  let okQ=!q||(s.title+" "+a).toLowerCase().includes(q);
+  let okG=activeGenre==="All"||(s.genre||"").toLowerCase().includes(activeGenre.toLowerCase());
+  return okQ&&okG;
+});
+let beatsF=allBeats.filter(b=>{
+  let a=getArtist(b);
+  let title=b.title||b.beat_name||"";
+  if(!title) return false;
+  if(!a || a.toLowerCase()==="unknown") return false;
+  return !q||(title+" "+a).toLowerCase().includes(q);
+});
+let mixesF=allMixes.filter(m=>{
+  let a=getArtist(m);
+  if(!m.title) return false;
+  if(!a || a.toLowerCase()==="unknown") return false;
+  return !q||(m.title+" "+a).toLowerCase().includes(q);
+});
+
 renderGrid("trendingGrid",[...songsF].sort((a,b)=>(b.play_count||0)-(a.play_count||0)).slice(0,10),"song");
 renderGrid("latestGrid",[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10),"song");
 renderGrid("beatsGrid",beatsF.slice(0,10),"beat");
+renderGrid("freeGrid",beatsF.slice(0,1),"beat");
+
 let mixesSec=document.getElementById("mixesSec");
 if(!allMixes.length && !q){mixesSec.style.display="none";}else{mixesSec.style.display="block";renderGrid("mixesGrid",mixesF.slice(0,10),"mix");}
-if(beatsF.length){let fb=beatsF[0];document.getElementById("featuredHero").style.display="flex";document.getElementById("heroCover").src=cover(fb)||'https://placehold.co/400x400/1a1430/fff?text=BEAT';document.getElementById("heroTitle").textContent=(fb.title||"Nyange")+" — Featured";document.getElementById("heroSub").textContent=getArtist(fb)+" • "+(fb.bpm?fb.bpm+" BPM":"Afrobeat");}
-let prods=[...new Set(allSongs.map(getArtist).concat(allBeats.map(getArtist)))].slice(0,12);
+
+let prods=[...new Set(allSongs.map(getArtist).concat(allBeats.map(getArtist)))].filter(n=>n && n.toLowerCase()!=="unknown" && n.length>1).slice(0,12);
 document.getElementById("topProds").innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/100x100/241633/fff?text=${esc(n[0])}"><div>${esc(n.slice(0,8))}</div></div>`).join("");
+
+if(beatsF.length){let fb=beatsF[0];document.getElementById("featuredHero").style.display="flex";document.getElementById("heroCover").src=cover(fb)||'https://placehold.co/400x400/1a1430/fff?text=BEAT';document.getElementById("heroTitle").textContent=(fb.title||"Nyange")+" — Featured";document.getElementById("heroSub").textContent=getArtist(fb)+" • "+(fb.bpm?fb.bpm+" BPM":"Afrobeat");}
 updateCounts();
 }
+
 function setPlayer(s){document.getElementById("player").classList.add("show");document.getElementById("pCover").src=cover(s)||'';document.getElementById("pTitle").textContent=s.title||"Untitled";document.getElementById("pArtist").textContent=getArtist(s);}
 function playUrl(url,obj){let a=document.getElementById("audio");a.src=url;a.play();setPlayer(obj);a.ontimeupdate=()=>{document.getElementById("progress").style.width=(a.currentTime/a.duration*100)+"%";};let btn=document.getElementById("pPlay");btn.textContent="⏸";btn.onclick=()=>{if(a.paused){a.play();btn.textContent="⏸";}else{a.pause();btn.textContent="▶";}};a.onended=()=>closePlayer();}
 function previewSong(id){let s=allSongs.find(x=>String(x.id)===String(id));playUrl(s.audio_url||s.file_url||"",s);}
@@ -118,7 +149,7 @@ function closePlayer(){document.getElementById("audio").pause();document.getElem
 function buySong(id){let s=allSongs.find(x=>String(x.id)===String(id));let items=[];try{items=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]")}catch(e){}items.push({id,title:s.title,artist:getArtist(s),cover:cover(s),price:700,type:"song"});localStorage.setItem("pasong_cart_v1",JSON.stringify(items));location.href="song.html?id="+id;}
 function goToBeatsStore(id){location.href="beats.html?id="+id;}
 function buyMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let items=[];try{items=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]")}catch(e){}items.push({id,title:m.title,artist:getArtist(m),cover:cover(m),price:700,type:"mix"});localStorage.setItem("pasong_cart_v1",JSON.stringify(items));location.href="mix.html?id="+id;}
-function toggleWish(id,type){let k="pasong_wish_v1";let items=[];try{items=JSON.parse(localStorage.getItem(k)||"[]")}catch(e){}let idx=items.findIndex(x=>String(x.id)===String(id));if(idx>=0)items.splice(idx,1);else{let o=type==="beat"?allBeats.find(x=>String(x.id)===String(id)):type==="mix"?allMixes.find(x=>String(x.id)===String(id)):allSongs.find(x=>String(x.id)===String(id));items.push({id,title:o.title,type});}localStorage.setItem(k,JSON.stringify(items));renderAll();}
+function toggleWish(id,type){let k="pasong_wish_v1";let items=[];try{items=JSON.parse(localStorage.getItem(k)||"[]")}catch(e){}let idx=items.findIndex(x=>String(x.id)===String(id));if(idx>=0)items.splice(idx,1);else{let o=type==="beat"?allBeats.find(x=>String(x.id)===String(id)):type==="mix"?allMixes.find(x=>String(x.id)===String(id)):allSongs.find(x=>String(x.id)===String(id));items.push({id,title:o.title||o.beat_name||"Untitled",type});}localStorage.setItem(k,JSON.stringify(items));renderAll();}
 function shareItem(id,type){let url=location.origin+location.pathname.replace("store.html","")+(type==="beat"?"beats.html":type==="mix"?"mix.html":"song.html")+"?id="+id;if(navigator.share)navigator.share({title:"PASONG",url});else window.open("https://wa.me/?text="+encodeURIComponent("Check PASONG: "+url),"_blank");}
 function updateCounts(){try{let c=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]");let el=document.getElementById("cartCount");el.style.display=c.length?"grid":"none";el.textContent=c.length;}catch(e){}try{let w=JSON.parse(localStorage.getItem("pasong_wish_v1")||"[]");let el=document.getElementById("wishCount");el.style.display=w.length?"grid":"none";el.textContent=w.length;}catch(e){}}
 async function init(){
