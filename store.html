@@ -86,54 +86,61 @@ const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-const COUNTRY_CURRENCY={UG:"UGX",KE:"KES",TZ:"TZS",RW:"RWF",BI:"BIF",SS:"SSP",ET:"ETB",NG:"NGN",GH:"GHS",ZA:"ZAR",GB:"GBP",US:"USD"};
 let currentPricing={label:"UGX 700",amount:700,currency:"UGX"};
-let fxRates=null;
-async function getRates(){try{let r=await fetch("https://open.er-api.com/v6/latest/USD");let j=await r.json();if(j.result==="success")fxRates=j.rates;}catch(e){}}
-function convert(a,f,t){if(f===t)return a;if(!fxRates)return a;let fr=f==="USD"?1:fxRates[f];let tr=t==="USD"?1:fxRates[t];if(!fr||!tr)return a;return (a/fr)*tr;}
-function formatPrice(a,c){try{return new Intl.NumberFormat(undefined,{style:"currency",currency:c,maximumFractionDigits:2}).format(a);}catch(e){return a.toFixed(2)+" "+c;}}
-function getPriceForCountry(cc){
-cc=(cc||"UG").toUpperCase();let lc=COUNTRY_CURRENCY[cc]||"USD";
-if(cc==="UG")return{amount:700,currency:"UGX",label:"UGX 700"};
-if(["KE","TZ","RW","BI","SS","ET"].includes(cc)){let conv=convert(1000,"UGX",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc)};}
-if(["NG","GH","ZA","EG"].includes(cc)){let conv=convert(0.57,"USD",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc)};}
-if(["GB"].includes(cc))return{amount:1,currency:"GBP",label:"£1.00"};
-return{amount:1,currency:"USD",label:"$1.00"};
-}
-async function detectPrice(){
-await getRates();let country="UG";try{let r=await fetch("https://ipwho.is/");let j=await r.json();if(j.success)country=j.country_code;}catch(e){}
-currentPricing=getPriceForCountry(country);
-}
-
 let allSongs=[], allBeats=[], allMixes=[];
 let query="";
 
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
 function getArtist(s){return s.artist_name||s.producer_name||s.producer||"Unknown";}
-function getPlays(s){return Number(s.play_count||s.plays||0);}
+
+// SONG PRICE = UGX 700 (geo pricing)
+function getSongPrice(){return currentPricing;}
+
+// BEAT PRICE = each beat own price from Supabase
+function getBeatPrice(b){
+// Check all possible price fields
+let price = b.price || b.amount || b.price_ugx || b.cost || 0;
+let currency = b.currency || b.price_currency || "UGX";
+let label = "";
+
+// If price field exists, use it
+if(price && price > 0){
+  if(currency === "UGX" || !b.currency){
+    label = "UGX " + Number(price).toLocaleString();
+  } else {
+    label = currency + " " + Number(price).toLocaleString();
+  }
+  return {amount: Number(price), currency: currency, label: label};
+}
+// Fallback if no price set
+return {amount: 25000, currency: "UGX", label: "UGX 25,000"};
+}
 
 function songCard(s){
+let p=getSongPrice();
 return `<div class="card">
 <img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/241633/fff?text=PASONG')}">
-<div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtist(s))}</div><div class="price">${esc(currentPricing.label)}</div></div>
+<div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtist(s))}</div><div class="price">${esc(p.label)}</div></div>
 <div class="actions"><button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Preview</button><button class="btn btn-buy" onclick="buySong('${esc(s.id)}')">BUY NOW</button></div></div>`;
 }
 
 function beatCard(b){
+let p=getBeatPrice(b);
 let title=b.title||b.beat_name||"Nyange Beat";
-let producer=b.producer_name||b.producer||b.artist_name||"KV BEATS";
+let producer=b.producer_name||b.producer||"KV BEATS";
 let bpm=b.bpm ? b.bpm+" BPM" : "Afrobeat";
 return `<div class="card" style="border-color:#7c3aed55">
 <img class="cover" src="${esc(cover(b)||'https://placehold.co/400x400/1a1430/fff?text=BEAT')}">
-<div class="info"><div class="title">${esc(title)}</div><div class="artist">${esc(producer)} • ${esc(bpm)}</div><div class="price">${esc(currentPricing.label)}</div></div>
+<div class="info"><div class="title">${esc(title)}</div><div class="artist">${esc(producer)} • ${esc(bpm)}</div><div class="price">${esc(p.label)}</div></div>
 <div class="actions"><button class="btn btn-play" onclick="previewBeat('${esc(b.id)}')">Preview</button><button class="btn btn-buy" onclick="buyBeat('${esc(b.id)}')">BUY BEAT</button></div></div>`;
 }
 
 function mixCard(m){
+let p=getSongPrice();
 return `<div class="card">
 <img class="cover" src="${esc(cover(m)||'https://placehold.co/400x400/241633/fff?text=MIX')}">
-<div class="info"><div class="title">${esc(m.title||"DJ Mix")}</div><div class="artist">${esc(getArtist(m))}</div><div class="price">${esc(currentPricing.label)}</div></div>
+<div class="info"><div class="title">${esc(m.title||"DJ Mix")}</div><div class="artist">${esc(getArtist(m))}</div><div class="price">${esc(p.label)}</div></div>
 <div class="actions"><button class="btn btn-play" onclick="previewMix('${esc(m.id)}')">Preview</button><button class="btn btn-buy" onclick="buyMix('${esc(m.id)}')">BUY NOW</button></div></div>`;
 }
 
@@ -150,7 +157,7 @@ let q=query.toLowerCase();
 let songsFiltered=allSongs.filter(s=>!q||(s.title+" "+getArtist(s)).toLowerCase().includes(q));
 let beatsFiltered=allBeats.filter(b=>!q||(b.title+" "+getArtist(b)).toLowerCase().includes(q));
 let mixesFiltered=allMixes.filter(m=>!q||(m.title+" "+getArtist(m)).toLowerCase().includes(q));
-let trending=[...songsFiltered].sort((a,b)=>getPlays(b)-getPlays(a));
+let trending=[...songsFiltered].sort((a,b)=>(b.play_count||0)-(a.play_count||0));
 let latest=[...songsFiltered].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
 renderGrid("trendingGrid", trending, "song");
 renderGrid("latestGrid", latest, "song");
@@ -159,23 +166,39 @@ renderGrid("mixesGrid", mixesFiltered, "mix");
 }
 
 function previewSong(id){let s=allSongs.find(x=>String(x.id)===String(id));let url=s.audio_url||s.file_url||"";if(!url)return alert("No audio");new Audio(url).play();}
-function buySong(id){let s=allSongs.find(x=>String(x.id)===String(id));let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:s.title,artist:getArtist(s),cover:cover(s),price:currentPricing.amount,currency:currentPricing.currency,type:"song"});localStorage.setItem(key,JSON.stringify(items));location.href="song.html?id="+id;}
+function buySong(id){let s=allSongs.find(x=>String(x.id)===String(id));let p=getSongPrice();let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:s.title,artist:getArtist(s),cover:cover(s),price:p.amount,currency:p.currency,type:"song"});localStorage.setItem(key,JSON.stringify(items));location.href="song.html?id="+id;}
+
 function previewBeat(id){let b=allBeats.find(x=>String(x.id)===String(id));let url=b.audio_url||b.file_url||b.preview_url||"";if(!url)return alert("No beat preview");new Audio(url).play();}
-function buyBeat(id){let b=allBeats.find(x=>String(x.id)===String(id));let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:b.title||"Nyange Beat",artist:getArtist(b),cover:cover(b),price:currentPricing.amount,currency:currentPricing.currency,type:"beat"});localStorage.setItem(key,JSON.stringify(items));location.href="beat.html?id="+id;}
+function buyBeat(id){
+let b=allBeats.find(x=>String(x.id)===String(id));
+let p=getBeatPrice(b);
+let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}
+// FIXED: goes to correct beat page with its own price
+items.push({id:String(id),title:b.title||"Nyange Beat",artist:getArtist(b),cover:cover(b),price:p.amount,currency:p.currency,type:"beat",beat_price:p.label});
+localStorage.setItem(key,JSON.stringify(items));
+// CORRECT PAGE FOR BEAT
+location.href="beats.html?id="+id+"&type=beat";
+}
+
 function previewMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let url=m.audio_url||m.file_url||"";if(!url)return alert("No mix preview");new Audio(url).play();}
-function buyMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:m.title,artist:getArtist(m),cover:cover(m),price:currentPricing.amount,currency:currentPricing.currency,type:"mix"});localStorage.setItem(key,JSON.stringify(items));location.href="mix.html?id="+id;}
+function buyMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let p=getSongPrice();let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:m.title,artist:getArtist(m),cover:cover(m),price:p.amount,currency:p.currency,type:"mix"});localStorage.setItem(key,JSON.stringify(items));location.href="mix.html?id="+id;}
 
 async function init(){
-await detectPrice();
+// geo price for songs only
+try{let r=await fetch("https://ipwho.is/");let j=await r.json();if(j.country_code==="UG")currentPricing={label:"UGX 700",amount:700,currency:"UGX"};}catch(e){}
+
 let sRes=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(150);
 allSongs=sRes.data||[];
+
 let bRes=await db.from("beats").select("*").order("created_at",{ascending:false}).limit(50);
 if(!bRes.data||!bRes.data.length){let bRes2=await db.from("producer_beats").select("*").limit(50);bRes=bRes2;}
 if(bRes.data&&bRes.data.length){allBeats=bRes.data;}
-else{allBeats=allSongs.filter(s=>{let g=(s.genre||s.category||"").toLowerCase();return g.includes("beat");}); if(!allBeats.length) allBeats=[{id:"demo1",title:"Nyange Beat",producer_name:"KV BEATS",bpm:98},{id:"demo2",title:"Kampala Afro Beat",producer_name:"Producer X",bpm:102},{id:"demo3",title:"Ghetto Youth Beat",producer_name:"KV BEATS",bpm:95}];}
+else{allBeats=[{id:"demo1",title:"Nyange Beat",producer_name:"KV BEATS",bpm:98,price:30000,currency:"UGX"},{id:"demo2",title:"Kampala Afro Beat",producer_name:"Producer X",bpm:102,price:50000},{id:"demo3",title:"Ghetto Youth Beat",producer_name:"KV BEATS",bpm:95,price:25000}];}
+
 let mRes=await db.from("mixes").select("*").limit(50);
 if(mRes.data&&mRes.data.length) allMixes=mRes.data;
 else {let mRes2=await db.from("dj_mixes").select("*").limit(50); if(mRes2.data&&mRes2.data.length) allMixes=mRes2.data; else allMixes=allSongs.filter(s=>{let g=(s.genre||"").toLowerCase();return g.includes("mix")||g.includes("dj");});}
+
 renderAll();
 }
 document.getElementById("searchInput").addEventListener("input",e=>{query=e.target.value;renderAll();});
