@@ -12,7 +12,7 @@ header{position:sticky;top:0;z-index:100;background:#080810;border-bottom:1px so
 .logo{font-weight:900;font-size:20px}
 nav{display:flex;gap:18px}nav a{color:#777;font-size:13px;font-weight:600}nav a.active{color:#fff}
 .wrap{width:min(1150px,92%);margin:auto;padding:30px 0 80px}
-h1{font-size:42px;line-height:1;letter-spacing:-1px}h1 span{color:#a855f7}
+h1{font-size:42px;line-height:1}h1 span{color:#a855f7}
 .sub{color:#8888a0;margin-top:8px;font-size:13px}
 .search{margin-top:20px;background:#12121a;border:1px solid #23233a;border-radius:12px;padding:12px;display:flex;gap:10px;max-width:520px}
 .search input{flex:1;background:transparent;border:0;outline:none;color:#fff}
@@ -22,7 +22,6 @@ h1{font-size:42px;line-height:1;letter-spacing:-1px}h1 span{color:#a855f7}
 .section-head a{font-size:11px;color:#a78bfa;border:1px solid #2a2440;padding:6px 10px;border-radius:999px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .card{display:flex;gap:12px;background:#11111c;border:1px solid #23233a;border-radius:16px;padding:12px;align-items:center}
-.card:hover{border-color:#6b46a3}
 .cover{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#1c1630;flex-shrink:0}
 .info{flex:1;min-width:0}
 .title{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -38,167 +37,51 @@ h1{font-size:42px;line-height:1;letter-spacing:-1px}h1 span{color:#a855f7}
 </style>
 </head>
 <body>
-
-<header>
-<div class="logo">PASONG</div>
-<nav>
-<a href="index.html">Home</a>
-<a class="active" href="store.html">Music Store</a>
-<a href="charts.html">Charts</a>
-<a href="beats.html">Beats</a>
-<a href="mixes.html">Mixes</a>
-</nav>
-<div></div>
-</header>
-
+<header><div class="logo">PASONG</div><nav><a href="index.html">Home</a><a class="active" href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="beats.html">Beats</a><a href="mixes.html">Mixes</a></nav><div></div></header>
 <main class="wrap">
-<h1>Music <span>Store</span></h1>
-<p class="sub">Browse everything we sell on PASONG.</p>
-
-<div class="search">
-<span>Search</span>
-<input id="searchInput" placeholder="Search songs or artists...">
-</div>
-
-<div class="section">
-<div class="section-head"><h2>Trending Songs</h2><a href="charts.html">View All</a></div>
-<div class="grid" id="trendingGrid"></div>
-</div>
-
-<div class="section">
-<div class="section-head"><h2>Latest Uploads</h2><a href="latest.html">View All</a></div>
-<div class="grid" id="latestGrid"></div>
-</div>
-
-<div class="section">
-<div class="section-head"><h2>Producer Beats</h2><a href="beats.html">View All</a></div>
-<div class="grid" id="beatsGrid"></div>
-</div>
-
-<div class="section">
-<div class="section-head"><h2>DJ Mixes</h2><a href="mixes.html">View All</a></div>
-<div class="grid" id="mixesGrid"></div>
-</div>
+<h1>Music <span>Store</span></h1><p class="sub">Browse everything we sell.</p>
+<div class="search"><span>Search</span><input id="searchInput" placeholder="Search songs or artists..."></div>
+<div class="section"><div class="section-head"><h2>Trending Songs</h2><a href="charts.html">View All</a></div><div class="grid" id="trendingGrid"></div></div>
+<div class="section"><div class="section-head"><h2>Latest Uploads</h2><a href="latest.html">View All</a></div><div class="grid" id="latestGrid"></div></div>
+<div class="section"><div class="section-head"><h2>Producer Beats</h2><a href="beats.html">View All</a></div><div class="grid" id="beatsGrid"></div></div>
+<div class="section"><div class="section-head"><h2>DJ Mixes</h2><a href="mixes.html">View All</a></div><div class="grid" id="mixesGrid"></div></div>
 </main>
-
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-
 let currentPricing={label:"UGX 700",amount:700,currency:"UGX"};
-let allSongs=[], allBeats=[], allMixes=[];
-let query="";
-
+let allSongs=[],allBeats=[],allMixes=[],query="";
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
 function getArtist(s){return s.artist_name||s.producer_name||s.producer||"Unknown";}
-
-// SONG PRICE = UGX 700 (geo pricing)
 function getSongPrice(){return currentPricing;}
-
-// BEAT PRICE = each beat own price from Supabase
 function getBeatPrice(b){
-// Check all possible price fields
-let price = b.price || b.amount || b.price_ugx || b.cost || 0;
-let currency = b.currency || b.price_currency || "UGX";
-let label = "";
-
-// If price field exists, use it
-if(price && price > 0){
-  if(currency === "UGX" || !b.currency){
-    label = "UGX " + Number(price).toLocaleString();
-  } else {
-    label = currency + " " + Number(price).toLocaleString();
-  }
-  return {amount: Number(price), currency: currency, label: label};
+  let raw=b.price??b.beat_price??b.original_price??b.amount??b.cost??b.price_ugx??null;
+  if(raw===null||raw===""||raw===0) return null;
+  let price=Number(raw);
+  let currency=b.currency||b.price_currency||"UGX";
+  let label=currency==="UGX"?"UGX "+price.toLocaleString():currency+" "+price.toLocaleString();
+  return {amount:price,currency:currency,label:label};
 }
-// Fallback if no price set
-return {amount: 25000, currency: "UGX", label: "UGX 25,000"};
-}
-
-function songCard(s){
-let p=getSongPrice();
-return `<div class="card">
-<img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/241633/fff?text=PASONG')}">
-<div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtist(s))}</div><div class="price">${esc(p.label)}</div></div>
-<div class="actions"><button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Preview</button><button class="btn btn-buy" onclick="buySong('${esc(s.id)}')">BUY NOW</button></div></div>`;
-}
-
-function beatCard(b){
-let p=getBeatPrice(b);
-let title=b.title||b.beat_name||"Nyange Beat";
-let producer=b.producer_name||b.producer||"KV BEATS";
-let bpm=b.bpm ? b.bpm+" BPM" : "Afrobeat";
-return `<div class="card" style="border-color:#7c3aed55">
-<img class="cover" src="${esc(cover(b)||'https://placehold.co/400x400/1a1430/fff?text=BEAT')}">
-<div class="info"><div class="title">${esc(title)}</div><div class="artist">${esc(producer)} • ${esc(bpm)}</div><div class="price">${esc(p.label)}</div></div>
-<div class="actions"><button class="btn btn-play" onclick="previewBeat('${esc(b.id)}')">Preview</button><button class="btn btn-buy" onclick="buyBeat('${esc(b.id)}')">BUY BEAT</button></div></div>`;
-}
-
-function mixCard(m){
-let p=getSongPrice();
-return `<div class="card">
-<img class="cover" src="${esc(cover(m)||'https://placehold.co/400x400/241633/fff?text=MIX')}">
-<div class="info"><div class="title">${esc(m.title||"DJ Mix")}</div><div class="artist">${esc(getArtist(m))}</div><div class="price">${esc(p.label)}</div></div>
-<div class="actions"><button class="btn btn-play" onclick="previewMix('${esc(m.id)}')">Preview</button><button class="btn btn-buy" onclick="buyMix('${esc(m.id)}')">BUY NOW</button></div></div>`;
-}
-
-function renderGrid(elId, list, type){
-let el=document.getElementById(elId);
-if(!list.length){el.innerHTML='<div class="empty">No items yet</div>';return;}
-if(type==="beat") el.innerHTML=list.slice(0,6).map(beatCard).join("");
-else if(type==="mix") el.innerHTML=list.slice(0,6).map(mixCard).join("");
-else el.innerHTML=list.slice(0,6).map(songCard).join("");
-}
-
-function renderAll(){
-let q=query.toLowerCase();
-let songsFiltered=allSongs.filter(s=>!q||(s.title+" "+getArtist(s)).toLowerCase().includes(q));
-let beatsFiltered=allBeats.filter(b=>!q||(b.title+" "+getArtist(b)).toLowerCase().includes(q));
-let mixesFiltered=allMixes.filter(m=>!q||(m.title+" "+getArtist(m)).toLowerCase().includes(q));
-let trending=[...songsFiltered].sort((a,b)=>(b.play_count||0)-(a.play_count||0));
-let latest=[...songsFiltered].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-renderGrid("trendingGrid", trending, "song");
-renderGrid("latestGrid", latest, "song");
-renderGrid("beatsGrid", beatsFiltered, "beat");
-renderGrid("mixesGrid", mixesFiltered, "mix");
-}
-
+function songCard(s){let p=getSongPrice();return `<div class="card"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/241633/fff?text=PASONG')}"><div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtist(s))}</div><div class="price">${esc(p.label)}</div></div><div class="actions"><button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Preview</button><button class="btn btn-buy" onclick="buySong('${esc(s.id)}')">BUY NOW</button></div></div>`;}
+function beatCard(b){let p=getBeatPrice(b);let title=b.title||b.beat_name||"Nyange Beat";let producer=b.producer_name||b.producer||"KV BEATS";let bpm=b.bpm?b.bpm+" BPM":"Afrobeat";let priceHTML=p?`<div class="price">${esc(p.label)}</div>`:`<div class="price" style="color:#666">Set price in source</div>`;return `<div class="card" style="border-color:#7c3aed55"><img class="cover" src="${esc(cover(b)||'https://placehold.co/400x400/1a1430/fff?text=BEAT')}"><div class="info"><div class="title">${esc(title)}</div><div class="artist">${esc(producer)} • ${esc(bpm)}</div>${priceHTML}</div><div class="actions"><button class="btn btn-play" onclick="previewBeat('${esc(b.id)}')">Preview</button><button class="btn btn-buy" onclick="buyBeat('${esc(b.id)}')">BUY BEAT</button></div></div>`;}
+function mixCard(m){let p=getSongPrice();return `<div class="card"><img class="cover" src="${esc(cover(m)||'https://placehold.co/400x400/241633/fff?text=MIX')}"><div class="info"><div class="title">${esc(m.title||"DJ Mix")}</div><div class="artist">${esc(getArtist(m))}</div><div class="price">${esc(p.label)}</div></div><div class="actions"><button class="btn btn-play" onclick="previewMix('${esc(m.id)}')">Preview</button><button class="btn btn-buy" onclick="buyMix('${esc(m.id)}')">BUY NOW</button></div></div>`;}
+function renderGrid(elId,list,type){let el=document.getElementById(elId);if(!list.length){el.innerHTML='<div class="empty">No items yet</div>';return;}if(type==="beat")el.innerHTML=list.map(beatCard).join("");else if(type==="mix")el.innerHTML=list.map(mixCard).join("");else el.innerHTML=list.map(songCard).join("");}
+function renderAll(){let q=query.toLowerCase();let songsFiltered=allSongs.filter(s=>!q||(s.title+" "+getArtist(s)).toLowerCase().includes(q));let beatsFiltered=allBeats.filter(b=>!q||(b.title+" "+getArtist(b)).toLowerCase().includes(q));let mixesFiltered=allMixes.filter(m=>!q||(m.title+" "+getArtist(m)).toLowerCase().includes(q));let trending=[...songsFiltered].sort((a,b)=>(b.play_count||0)-(a.play_count||0));let latest=[...songsFiltered].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));renderGrid("trendingGrid",trending,"song");renderGrid("latestGrid",latest,"song");renderGrid("beatsGrid",beatsFiltered,"beat");renderGrid("mixesGrid",mixesFiltered,"mix");}
 function previewSong(id){let s=allSongs.find(x=>String(x.id)===String(id));let url=s.audio_url||s.file_url||"";if(!url)return alert("No audio");new Audio(url).play();}
 function buySong(id){let s=allSongs.find(x=>String(x.id)===String(id));let p=getSongPrice();let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:s.title,artist:getArtist(s),cover:cover(s),price:p.amount,currency:p.currency,type:"song"});localStorage.setItem(key,JSON.stringify(items));location.href="song.html?id="+id;}
-
 function previewBeat(id){let b=allBeats.find(x=>String(x.id)===String(id));let url=b.audio_url||b.file_url||b.preview_url||"";if(!url)return alert("No beat preview");new Audio(url).play();}
-function buyBeat(id){
-let b=allBeats.find(x=>String(x.id)===String(id));
-let p=getBeatPrice(b);
-let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}
-// FIXED: goes to correct beat page with its own price
-items.push({id:String(id),title:b.title||"Nyange Beat",artist:getArtist(b),cover:cover(b),price:p.amount,currency:p.currency,type:"beat",beat_price:p.label});
-localStorage.setItem(key,JSON.stringify(items));
-// CORRECT PAGE FOR BEAT
-location.href="beats.html?id="+id+"&type=beat";
-}
-
+function buyBeat(id){let b=allBeats.find(x=>String(x.id)===String(id));let p=getBeatPrice(b);if(!p){alert("Set price in Supabase beats table for this beat");return;}let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:b.title||"Nyange Beat",artist:getArtist(b),cover:cover(b),price:p.amount,currency:p.currency,type:"beat"});localStorage.setItem(key,JSON.stringify(items));location.href="beats.html?id="+id+"&type=beat";}
 function previewMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let url=m.audio_url||m.file_url||"";if(!url)return alert("No mix preview");new Audio(url).play();}
 function buyMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let p=getSongPrice();let key="pasong_cart_v1";let items=[];try{items=JSON.parse(localStorage.getItem(key)||"[]")}catch(e){}items.push({id:String(id),title:m.title,artist:getArtist(m),cover:cover(m),price:p.amount,currency:p.currency,type:"mix"});localStorage.setItem(key,JSON.stringify(items));location.href="mix.html?id="+id;}
-
 async function init(){
-// geo price for songs only
-try{let r=await fetch("https://ipwho.is/");let j=await r.json();if(j.country_code==="UG")currentPricing={label:"UGX 700",amount:700,currency:"UGX"};}catch(e){}
-
-let sRes=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(150);
-allSongs=sRes.data||[];
-
+let sRes=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(150);allSongs=sRes.data||[];
 let bRes=await db.from("beats").select("*").order("created_at",{ascending:false}).limit(50);
 if(!bRes.data||!bRes.data.length){let bRes2=await db.from("producer_beats").select("*").limit(50);bRes=bRes2;}
-if(bRes.data&&bRes.data.length){allBeats=bRes.data;}
-else{allBeats=[{id:"demo1",title:"Nyange Beat",producer_name:"KV BEATS",bpm:98,price:30000,currency:"UGX"},{id:"demo2",title:"Kampala Afro Beat",producer_name:"Producer X",bpm:102,price:50000},{id:"demo3",title:"Ghetto Youth Beat",producer_name:"KV BEATS",bpm:95,price:25000}];}
-
+allBeats=bRes.data||[];
 let mRes=await db.from("mixes").select("*").limit(50);
-if(mRes.data&&mRes.data.length) allMixes=mRes.data;
-else {let mRes2=await db.from("dj_mixes").select("*").limit(50); if(mRes2.data&&mRes2.data.length) allMixes=mRes2.data; else allMixes=allSongs.filter(s=>{let g=(s.genre||"").toLowerCase();return g.includes("mix")||g.includes("dj");});}
-
+if(mRes.data&&mRes.data.length)allMixes=mRes.data;else{let mRes2=await db.from("dj_mixes").select("*").limit(50);if(mRes2.data&&mRes2.data.length)allMixes=mRes2.data;else allMixes=[];}
 renderAll();
 }
 document.getElementById("searchInput").addEventListener("input",e=>{query=e.target.value;renderAll();});
