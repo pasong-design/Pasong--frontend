@@ -35,7 +35,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(8,8,16,.92);backdrop-fil
 <body>
 <header><div class="logo">PASONG</div><nav><a href="index.html">Home</a><a class="active" href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="beats.html">Beats</a><a href="mixes.html">Mixes</a></nav><div class="hdr-icons"><div class="icon-btn" onclick="location.href='wishlist.html'">❤️<span class="badge-count" id="wishCount" style="display:none">0</span></div><div class="icon-btn" onclick="location.href='cart.html'">🛒<span class="badge-count" id="cartCount" style="display:none">0</span></div></div></header>
 <main class="wrap">
-<div class="hero" id="featuredHero" style="display:none"><img id="heroCover"><div><h2 id="heroTitle">Nyange — Featured</h2><p id="heroSub">KV BEATS • Exclusive</p><div style="margin-top:6px;display:flex;gap:5px"><button class="btn-buy-small" style="width:auto;padding:4px 10px" onclick="featuredPlay()">▶ Preview</button><button class="btn-buy-small" style="width:auto;padding:4px 10px" onclick="location.href='beats.html'">BUY BEAT</button></div></div></div>
+<div class="hero" id="featuredHero" style="display:none"><img id="heroCover"><div><h2 id="heroTitle">Nyange — Featured</h2><p id="heroSub">90 BPM</p><div style="margin-top:6px;display:flex;gap:5px"><button class="btn-buy-small" style="width:auto;padding:4px 10px" onclick="featuredPlay()">▶ Preview</button><button class="btn-buy-small" style="width:auto;padding:4px 10px" onclick="location.href='beats.html'">BUY BEAT</button></div></div></div>
 <div class="promo"><span>🔥 BUNDLE: Buy 3 Beats Get 1 FREE</span><span onclick="location.href='beats.html'" style="background:#fff;color:#000;padding:4px 8px;border-radius:999px;font-size:8px;cursor:pointer">CLAIM</span></div>
 <div class="search">🔍<input id="searchInput" placeholder="Search..."></div>
 <div class="chips" id="chips"></div>
@@ -55,65 +55,69 @@ let allSongs=[],allBeats=[],allMixes=[],query="",activeGenre="All";
 const GENRES=["All","Afrobeat","Hip-Hop","Dancehall","Amapiano","Gospel","RnB"];
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
-function getArtist(s){
-  let a=s.artist_name||s.producer_name||s.producer||s.artist||s.artistName||"";
-  if(!a || a.toLowerCase().trim()==="unknown") return "PASONG";
-  return a;
+function getArtistRaw(s){
+  return (s.artist_name||s.producer_name||s.producer||s.artist||s.artistName||"").trim();
+}
+function isRealArtist(a){
+  if(!a) return false;
+  let l=a.toLowerCase();
+  return l!=="unknown" && l!=="pasong" && l!=="p" && l.length>1;
 }
 function playsText(s){let n=s.play_count||s.plays||0;if(n===0)n=Math.floor(Math.random()*900+100);return n>999?(n/1000).toFixed(1)+"k":n;}
 function isInWishlist(id){try{return JSON.parse(localStorage.getItem("pasong_wish_v1")||"[]").some(x=>String(x.id)===String(id));}catch(e){return false;}}
+
 function spotifyCard(s,i,type="song"){
 let isWished=isInWishlist(s.id);
 let badge=i===0?`<span class="badge-abs hot">HOT</span>`:i===1?`<span class="badge-abs new">NEW</span>`:"";
+let rawArtist=getArtistRaw(s);
+let hasArtist=isRealArtist(rawArtist);
+let artistHtml=hasArtist?`<div class="artist">${esc(rawArtist)}</div>`:"";
 let price=type==="beat"?"BEAT":"UGX 700";
 let playFn=type==="beat"?`previewBeat('${esc(s.id)}')`:type==="mix"?`previewMix('${esc(s.id)}')`:`previewSong('${esc(s.id)}')`;
 let buyFn=type==="beat"?`goToBeatsStore('${esc(s.id)}')`:type==="mix"?`buyMix('${esc(s.id)}')`:`buySong('${esc(s.id)}')`;
-let buyLabel=type==="beat"?"BUY BEAT":"BUY NOW";
 return `<div class="card">
 <div class="cover-wrap" onclick="${playFn}"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/241633/fff?text=PASONG')}">${badge}<div class="play-overlay">▶</div></div>
-<div class="info"><div class="title">${esc(s.title||s.beat_name||"Untitled")}</div><div class="artist">${esc(getArtist(s))}</div>
-<div class="meta-line"><span class="price">${price}</span><span class="plays">${type!=="beat"?playsText(s)+" plays":""}</span></div>
+<div class="info"><div class="title">${esc(s.title||s.beat_name||"Untitled")}</div>${artistHtml}
+<div class="meta-line"><span class="price">${price}</span><span class="plays">${playsText(s)} plays</span></div>
 <div class="row-actions"><button class="btn-icon ${isWished?'wished':''}" onclick="toggleWish('${esc(s.id)}','${type}')">${isWished?'❤️':'🤍'}</button><button class="btn-icon" onclick="shareItem('${esc(s.id)}','${type}')">↗</button></div>
-<button class="btn-buy-small" onclick="${buyFn}">${buyLabel}</button>
+<button class="btn-buy-small" onclick="${buyFn}">${type==="beat"?"BUY BEAT":"BUY NOW"}</button>
 </div></div>`;
 }
-function renderGrid(id,list,type){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No items — add songs in Supabase</div>';return;}el.innerHTML=list.map((x,i)=>spotifyCard(x,i,type)).join("");}
+function renderGrid(id,list,type){let el=document.getElementById(id);if(!list.length){el.innerHTML='<div class="empty">No items</div>';return;}el.innerHTML=list.map((x,i)=>spotifyCard(x,i,type)).join("");}
+
 function renderAll(){
 let q=query.toLowerCase();
-let songsF=allSongs.filter(s=>{
-  let title=(s.title||"").toLowerCase();
-  if(title.includes("unknown")) return false;
-  return !q||(title+" "+getArtist(s).toLowerCase()).includes(q);
-});
-let beatsF=allBeats.filter(b=>{
-  let title=(b.title||b.beat_name||"").toLowerCase();
-  if(title.includes("unknown")) return false;
-  return !q||title.includes(q);
-});
-let mixesF=allMixes;
+let songsF=allSongs.filter(s=>{let t=(s.title||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
+let beatsF=allBeats.filter(b=>{let t=(b.title||b.beat_name||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
+
 renderGrid("trendingGrid",[...songsF].sort((a,b)=>(b.play_count||0)-(a.play_count||0)).slice(0,12),"song");
 renderGrid("latestGrid",[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,12),"song");
 renderGrid("beatsGrid",beatsF.slice(0,12),"beat");
 renderGrid("freeGrid",beatsF.slice(0,1),"beat");
 let mixesSec=document.getElementById("mixesSec");
-if(allMixes.length===0){mixesSec.style.display="none";}else{renderGrid("mixesGrid",mixesF.slice(0,10),"mix");}
-let prods=[...new Set(allSongs.map(getArtist).concat(allBeats.map(getArtist)))].filter(n=>n && n!=="PASONG").slice(0,12);
-document.getElementById("topProds").innerHTML=prods.length?prods.map(n=>`<div class="prod"><img src="https://placehold.co/100x100/241633/fff?text=${esc(n[0])}"><div>${esc(n.slice(0,8))}</div></div>`).join(""):`<div class="prod"><img src="https://placehold.co/100x100/241633/fff?text=P"><div>PASONG</div></div>`;
-if(beatsF.length){let fb=beatsF[0];document.getElementById("featuredHero").style.display="flex";document.getElementById("heroCover").src=cover(fb)||'https://placehold.co/400x400/1a1430/fff?text=BEAT';document.getElementById("heroTitle").textContent=(fb.title||fb.beat_name||"Nyange")+" — Featured";document.getElementById("heroSub").textContent=getArtist(fb)+" • "+(fb.bpm?fb.bpm+" BPM":"Afrobeat");}
+if(allMixes.length===0){mixesSec.style.display="none";}else{renderGrid("mixesGrid",allMixes.slice(0,10),"mix");}
+
+// TOP PRODUCERS - HIDE PASONG BOX
+let allArtists=[...allSongs.map(getArtistRaw),...allBeats.map(getArtistRaw)].filter(a=>isRealArtist(a));
+let prods=[...new Set(allArtists)].slice(0,12);
+let topEl=document.getElementById("topProds");
+if(prods.length===0){topEl.style.display="none";}else{topEl.style.display="flex";topEl.innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/100x100/241633/fff?text=${esc(n[0])}"><div>${esc(n.slice(0,8))}</div></div>`).join("");}
+
+if(beatsF.length){let fb=beatsF[0];document.getElementById("featuredHero").style.display="flex";document.getElementById("heroCover").src=cover(fb)||'';let raw=getArtistRaw(fb);document.getElementById("heroSub").textContent=isRealArtist(raw)?raw+" • 90 BPM":"90 BPM";}
 updateCounts();
 }
-function setPlayer(s){document.getElementById("player").classList.add("show");document.getElementById("pCover").src=cover(s)||'';document.getElementById("pTitle").textContent=s.title||s.beat_name||"Untitled";document.getElementById("pArtist").textContent=getArtist(s);}
+function setPlayer(s){document.getElementById("player").classList.add("show");document.getElementById("pCover").src=cover(s)||'';document.getElementById("pTitle").textContent=s.title||s.beat_name||"Untitled";document.getElementById("pArtist").textContent=getArtistRaw(s)||"";}
 function playUrl(url,obj){let a=document.getElementById("audio");a.src=url;a.play();setPlayer(obj);a.ontimeupdate=()=>{document.getElementById("progress").style.width=(a.currentTime/a.duration*100)+"%";};let btn=document.getElementById("pPlay");btn.textContent="⏸";btn.onclick=()=>{if(a.paused){a.play();btn.textContent="⏸";}else{a.pause();btn.textContent="▶";}};a.onended=()=>closePlayer();}
 function previewSong(id){let s=allSongs.find(x=>String(x.id)===String(id));playUrl(s.audio_url||s.file_url||"",s);}
 function previewBeat(id){let b=allBeats.find(x=>String(x.id)===String(id));playUrl(b.audio_url||b.file_url||b.preview_url||"",b);}
 function previewMix(id){let m=allMixes.find(x=>String(x.id)===String(id));playUrl(m.audio_url||m.file_url||"",m);}
 function featuredPlay(){if(allBeats[0])previewBeat(allBeats[0].id);}
 function closePlayer(){document.getElementById("audio").pause();document.getElementById("player").classList.remove("show");}
-function buySong(id){let s=allSongs.find(x=>String(x.id)===String(id));let items=[];try{items=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]")}catch(e){}items.push({id,title:s.title,artist:getArtist(s),cover:cover(s),price:700,type:"song"});localStorage.setItem("pasong_cart_v1",JSON.stringify(items));location.href="song.html?id="+id;}
+function buySong(id){location.href="song.html?id="+id;}
 function goToBeatsStore(id){location.href="beats.html?id="+id;}
-function buyMix(id){let m=allMixes.find(x=>String(x.id)===String(id));let items=[];try{items=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]")}catch(e){}items.push({id,title:m.title,artist:getArtist(m),cover:cover(m),price:700,type:"mix"});localStorage.setItem("pasong_cart_v1",JSON.stringify(items));location.href="mix.html?id="+id;}
-function toggleWish(id,type){let k="pasong_wish_v1";let items=[];try{items=JSON.parse(localStorage.getItem(k)||"[]")}catch(e){}let idx=items.findIndex(x=>String(x.id)===String(id));if(idx>=0)items.splice(idx,1);else{let o=type==="beat"?allBeats.find(x=>String(x.id)===String(id)):type==="mix"?allMixes.find(x=>String(x.id)===String(id)):allSongs.find(x=>String(x.id)===String(id));items.push({id,title:o.title||o.beat_name||"Untitled",type});}localStorage.setItem(k,JSON.stringify(items));renderAll();}
-function shareItem(id,type){let url=location.origin+location.pathname.replace("store.html","")+(type==="beat"?"beats.html":type==="mix"?"mix.html":"song.html")+"?id="+id;if(navigator.share)navigator.share({title:"PASONG",url});else window.open("https://wa.me/?text="+encodeURIComponent("Check PASONG: "+url),"_blank");}
+function buyMix(id){location.href="mix.html?id="+id;}
+function toggleWish(id,type){let k="pasong_wish_v1";let items=[];try{items=JSON.parse(localStorage.getItem(k)||"[]")}catch(e){}let idx=items.findIndex(x=>String(x.id)===String(id));if(idx>=0)items.splice(idx,1);else{let o=type==="beat"?allBeats.find(x=>String(x.id)===String(id)):allSongs.find(x=>String(x.id)===String(id));items.push({id,title:o.title||o.beat_name||"Untitled",type});}localStorage.setItem(k,JSON.stringify(items));renderAll();}
+function shareItem(id,type){let url=location.origin+location.pathname.replace("store.html","")+(type==="beat"?"beats.html":"song.html")+"?id="+id;if(navigator.share)navigator.share({title:"PASONG",url});else window.open("https://wa.me/?text="+encodeURIComponent(url),"_blank");}
 function updateCounts(){try{let c=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]");let el=document.getElementById("cartCount");el.style.display=c.length?"grid":"none";el.textContent=c.length;}catch(e){}try{let w=JSON.parse(localStorage.getItem("pasong_wish_v1")||"[]");let el=document.getElementById("wishCount");el.style.display=w.length?"grid":"none";el.textContent=w.length;}catch(e){}}
 async function init(){
 document.getElementById("chips").innerHTML=GENRES.map(g=>`<div class="chip ${g===activeGenre?'active':''}" onclick="setGenre('${g}')">${g}</div>`).join("");
