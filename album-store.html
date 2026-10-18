@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b1d">
-<title>PASONG Album Store — One album. Every track.</title>
+<title>PASONG Album Store — Buy Full Albums</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#070a18;--panel:#0e1430;--line:#1f2f5e;--purple:#8b5cf6;--pink:#b026ff;--text:#f7f8ff;--muted:#8e9ab8}
@@ -17,44 +17,41 @@ nav{position:sticky;top:0;z-index:50;background:rgba(5,8,24,.88);backdrop-filter
 .links{display:flex;gap:14px;font-size:12px;color:#cbd5ee}
 .wrap{max-width:1400px;margin:auto;padding:20px 16px 90px}
 .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:center;padding:22px;background:linear-gradient(155deg,rgba(18,24,64,.9),rgba(11,16,37,.95));border:1px solid #25356a;border-radius:20px;margin-top:14px;overflow:hidden;position:relative}
-.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,#7c3aed55,transparent 70%);pointer-events:none}
 .eyebrow{display:inline-flex;color:#d7b9ff;background:#7c3aed22;border:1px solid #8b5cf655;border-radius:20px;padding:7px 12px;font-size:11px;font-weight:800;letter-spacing:1px}
 h1{font-size:clamp(32px,5vw,54px);line-height:.98;letter-spacing:-2px;margin-top:14px}
 h1 span{background:linear-gradient(90deg,#08a9ff,#b026ff,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero p{color:#aeb9d4;line-height:1.6;margin-top:12px;font-size:13px;max-width:600px}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.actions{display:flex;gap:10px;margin-top:18px}
 .btn{border:1px solid #34416e;background:#111a3b;color:#fff;border-radius:12px;padding:11px 16px;font-size:12px;font-weight:800}
 .btn.primary{border:0;background:linear-gradient(90deg,#7c3aed,#b026ff);box-shadow:0 0 22px #7c3aed66}
 .vinyl-wrap{display:grid;place-items:center}
 .vinyl{width:180px;height:180px;border-radius:50%;background:conic-gradient(from 0deg,#111,#222,#111,#333,#111);border:8px solid #1a1a2e;box-shadow:0 0 0 6px #0a0e27,0 0 40px #7c3aed55;display:grid;place-items:center;animation:spin 8s linear infinite}
 .vinyl::after{content:'♫';width:64px;height:64px;border-radius:50%;background:linear-gradient(145deg,#7c3aed,#b026ff);display:grid;place-items:center;color:white;font-size:22px;border:3px solid #0a0e27}
 @keyframes spin{to{transform:rotate(360deg)}}
-.stats{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap}
+.stats{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
 .stat{background:#0b1025;border:1px solid #1f2d5a;border-radius:12px;padding:8px 12px;font-size:11px}.stat b{display:block;font-size:16px;color:#fff}
-.search-wrap{margin:22px 0;display:flex;gap:10px;position:relative}
-.search-wrap input{flex:1;background:#0a1025;border:1px solid #25356a;border-radius:12px;padding:13px 14px 13px 38px;color:#fff;outline:none}
+.search-wrap{margin:22px 0;position:relative}
+.search-wrap input{width:100%;background:#0a1025;border:1px solid #25356a;border-radius:12px;padding:13px 14px 13px 38px;color:#fff;outline:none}
 .search-wrap::before{content:'⌕';position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#7d8ab0}
 .filters{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
 .filter-btn{white-space:nowrap;border:1px solid #2a3660;background:#0c122c;color:#aeb9d4;border-radius:20px;padding:8px 14px;font-size:11px;font-weight:800}
 .filter-btn.active{background:#fff;color:#111;border-color:#fff}
 .section-head{display:flex;justify-content:space-between;align-items:end;margin:24px 0 12px}
-.section-head h2{font-size:18px}.muted{color:var(--muted);font-size:11px}
+.muted{color:var(--muted);font-size:11px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
-.card{position:relative;background:linear-gradient(155deg,#121c3d,#0b1022);border:1px solid #22305a;border-radius:18px;padding:10px;overflow:hidden;transition:.25s}
+.card{background:linear-gradient(155deg,#121c3d,#0b1022);border:1px solid #22305a;border-radius:18px;padding:10px;overflow:hidden;transition:.25s}
 .card:hover{transform:translateY(-4px);border-color:#8b5cf6;box-shadow:0 10px 30px rgba(124,58,237,.25)}
 .cover{aspect-ratio:1;border-radius:12px;background:radial-gradient(circle at 30% 20%,#572e8b,#121b3a 55%,#080d20);display:grid;place-items:center;overflow:hidden;font-size:38px;position:relative}
 .cover img{width:100%;height:100%;object-fit:cover}
-.cover .play{position:absolute;bottom:8px;right:8px;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-size:14px;opacity:0;transform:scale(.8);transition:.2s}
-.card:hover .cover .play{opacity:1;transform:scale(1)}
 .album-title{font-size:14px;font-weight:900;margin-top:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .artist{font-size:11px;color:#aab6d2;margin-top:4px}
-.price-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
-.price{font-weight:900;font-size:13px;color:#c9b2ff}
+.price{font-weight:900;font-size:14px;color:#c9b2ff;margin-top:8px}
+.buy{width:100%;margin-top:10px;padding:10px;border-radius:10px;border:0;background:#fff;color:#000;font-size:12px;font-weight:900}
 .skeleton{background:linear-gradient(90deg,#111a3b 25%,#1a234a 50%,#111a3b 75%);background-size:200% 100%;animation:skeleton 1.2s infinite}
 @keyframes skeleton{to{background-position:-200% 0}}
-.state{padding:28px;text-align:center;color:#aeb9d4;border:1px dashed #2a3660;border-radius:14px;line-height:1.6;background:#0a1025}
+.state{padding:32px 20px;text-align:center;color:#aeb9d4;border:1px dashed #2a3660;border-radius:14px;line-height:1.6;background:#0a1025}
 .notice{padding:12px;border-radius:10px;font-size:12px;margin:12px 0;display:none}.notice.show{display:block}.notice.error{background:#28111c;border:1px solid #85425a;color:#ffd0da}
-@media(max-width:750px){.hero{grid-template-columns:1fr;padding:18px}.vinyl{width:140px;height:140px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.wrap{padding:14px 12px 90px}}
+@media(max-width:750px){.hero{grid-template-columns:1fr;padding:18px}.vinyl{width:130px;height:130px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.wrap{padding:14px 12px 90px}}
 </style>
 </head>
 <body>
@@ -62,25 +59,29 @@ h1 span{background:linear-gradient(90deg,#08a9ff,#b026ff,#ec4899);-webkit-backgr
 <main class="wrap">
 <section class="hero">
 <div>
-<div class="eyebrow">● PASONG ALBUM MARKETPLACE • LIVE</div>
+<div class="eyebrow">● ALBUM STORE — SELLING</div>
 <h1>One album. <span>Every track.</span></h1>
-<p>Own the full story. Discover complete albums from PASONG artists — curated, verified, and ready to collect.</p>
-<div class="actions"><button class="btn primary" id="refreshBtn">↻ Refresh releases</button></div>
-<div class="stats"><div class="stat"><b id="statCount">—</b> Releases</div><div class="stat"><b>✓</b> Artist-set price</div><div class="stat"><b>🔒</b> Secure</div></div>
+<p>Buy complete albums directly from PASONG artists. Each artist sets his own price and currency.</p>
+<div class="actions"><button class="btn primary" id="refreshBtn">↻ Refresh</button></div>
+<div class="stats"><div class="stat"><b id="statCount">0</b> Albums for sale</div><div class="stat"><b>✓</b> Artist-set price</div></div>
 </div>
 <div class="vinyl-wrap"><div class="vinyl"></div></div>
 </section>
-<div class="search-wrap"><input id="searchInput" type="search" placeholder="Search albums or artists..."></div>
+
+<div class="search-wrap"><input id="searchInput" type="search" placeholder="Search albums or artists to buy..."></div>
 <div id="catalogNotice" class="notice"></div>
-<div class="section-head"><div><h2>Published releases</h2><div class="muted">Artist-priced • Artist currency</div></div><div class="muted" id="albumCount"></div></div>
+
+<div class="section-head"><div><h2>Albums for sale</h2><div class="muted">Tap Buy to own full album</div></div><div class="muted" id="albumCount"></div></div>
 <div class="filters">
-<button class="filter-btn active release-filter" data-kind="all">🔥 All releases</button>
+<button class="filter-btn active release-filter" data-kind="all">🔥 All</button>
 <button class="filter-btn release-filter" data-kind="album">💿 Albums</button>
 <button class="filter-btn release-filter" data-kind="ep">🎧 EPs</button>
 </div>
-<div id="albumState" class="state">Loading published albums…</div>
+
+<div id="albumState" class="state">Loading albums for sale…</div>
 <div id="albumGrid" class="grid" style="display:none"></div>
 </main>
+
 <script>
 "use strict";
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
@@ -89,15 +90,58 @@ const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY
 const $=id=>document.getElementById(id);let albums=[];
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function money(v,c){const n=Number(v),code=String(c||"").toUpperCase().trim();if(!Number.isFinite(n))return "Price unavailable";if(!code)return n.toLocaleString();try{return new Intl.NumberFormat(undefined,{style:"currency",currency:code,maximumFractionDigits:0}).format(n)}catch{return code+" "+n.toLocaleString()}}
-function notice(id,msg,type=""){const el=$(id);el.textContent=msg;el.className="notice show"+(type?" "+type:"")}function hideNotice(id){$(id).className="notice"}
+function notice(id,msg,type=""){const el=$(id);el.textContent=msg;el.className="notice show "+(type||"")}function hideNotice(id){$(id).className="notice"}
 function profileName(p){return p?.performing_name||p?.stage_name||p?.artist_name||"PASONG Artist"}
-function albumCard(a){const p=a.artist_profiles||{};const cover=a.cover_url?'<img loading="lazy" src="'+esc(a.cover_url)+'" alt="">':'♫';const count=Array.isArray(a.album_tracks)?a.album_tracks.length:null;const kind=a.release_type==="ep"?"EP":"ALBUM";return '<article class="card"><div class="cover">'+cover+'<div class="play">▶</div></div><div style="font-size:9px;color:#8b5cf6;font-weight:800;margin-top:8px;letter-spacing:1px">'+kind+'</div><div class="album-title">'+esc(a.title||"Untitled")+'</div><div class="artist">'+esc(profileName(p))+'</div><div class="price-row"><div class="price">'+esc(money(a.price,a.currency))+'</div><div class="muted" style="font-size:10px">'+(count===null?"":count+" tracks")+'</div></div><button class="buy" style="width:100%;margin-top:10px;padding:8px;border-radius:9px;border:0;background:#fff;color:#000;font-size:11px;font-weight:900" data-buy="'+esc(a.id)+'">Buy full album</button></article>'}
+function albumCard(a){
+ const p=a.artist_profiles||{};
+ const cover=a.cover_url?'<img src="'+esc(a.cover_url)+'">':'💿';
+ const count=Array.isArray(a.album_tracks)?a.album_tracks.length:null;
+ return '<article class="card"><div class="cover">'+cover+'</div><div style="font-size:9px;color:#8b5cf6;font-weight:800;margin-top:8px">ALBUM</div><div class="album-title">'+esc(a.title||"Untitled")+'</div><div class="artist">'+esc(profileName(p))+'</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><div class="price">'+esc(money(a.price,a.currency))+'</div><div class="muted" style="font-size:10px">'+(count?count+' tracks':'')+'</div></div><button class="buy" data-buy="'+esc(a.id)+'">Buy full album — '+esc(money(a.price,a.currency))+'</button></article>'
+}
 let releaseKind="all";
-function renderAlbums(){const q=$("searchInput").value.trim().toLowerCase();const list=albums.filter(a=>(releaseKind==="all"||((a.release_type||"album")===releaseKind))&&((a.title||"").toLowerCase().includes(q)||(a.description||"").toLowerCase().includes(q)||profileName(a.artist_profiles).toLowerCase().includes(q)));$("albumCount").textContent=list.length+" albums";$("statCount").textContent=list.length;if(!list.length){$("albumGrid").style.display="none";$("albumState").style.display="block";$("albumState").textContent=q?"No match.":"No published albums yet.";return}$("albumState").style.display="none";$("albumGrid").style.display="grid";$("albumGrid").innerHTML=list.map(albumCard).join("")}
-async function loadAlbums(){$("albumState").innerHTML='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div></div>';$("albumState").style.display="block";$("albumGrid").style.display="none";hideNotice("catalogNotice");try{const {data:base,error}=await supabaseClient.from("albums").select("id,artist_id,title,cover_url,description,release_date,price,currency,status,created_at,release_type").eq("status","published").order("created_at",{ascending:false});if(error)throw error;albums=base||[];if(!albums.length){renderAlbums();return;}const artistIds=[...new Set(albums.map(a=>a.artist_id).filter(Boolean))];const albumIds=albums.map(a=>a.id);let profilesById={},countsById={};if(artistIds.length){const p=await supabaseClient.from("artist_profiles").select("id,artist_name,stage_name,performing_name").in("id",artistIds);if(!p.error)(p.data||[]).forEach(x=>profilesById[x.id]=x);}const t=await supabaseClient.from("album_tracks").select("id,album_id").in("album_id",albumIds);if(!t.error)(t.data||[]).forEach(x=>countsById[x.album_id]=(countsById[x.album_id]||0)+1);albums=albums.map(a=>({...a,artist_profiles:profilesById[a.artist_id]||{},album_tracks:Array.from({length:countsById[a.id]||0},(_,i)=>({id:String(i)}))}));renderAlbums();}catch(e){$("albumState").textContent="Could not load: "+(e.message||"error");notice("catalogNotice","Catalogue error.","error");}}
-async function startAlbumCheckout(id){const{data:{user}}=await supabaseClient.auth.getUser();if(!user){location.href="login.html?redirect="+encodeURIComponent(location.href);return}notice("catalogNotice","Checkout for albums coming soon.","error");window.scrollTo({top:0,behavior:"smooth"})}
+function renderAlbums(){
+ const q=$("searchInput").value.trim().toLowerCase();
+ const list=albums.filter(a=>(releaseKind==="all"||(a.release_type||"album")===releaseKind)&&((a.title||"").toLowerCase().includes(q)||profileName(a.artist_profiles).toLowerCase().includes(q)));
+ $("albumCount").textContent=list.length+" for sale";
+ $("statCount").textContent=list.length;
+ if(!list.length){
+   $("albumGrid").style.display="none";
+   $("albumState").style.display="block";
+   if(q){
+     $("albumState").textContent="No results for '"+q+"'";
+   }else{
+     $("albumState").innerHTML="<div style='text-align:center'><div style='width:90px;height:90px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(145deg,#211a3b,#13162e);display:grid;place-items:center;font-size:40px;border:1px solid #2a3560'>💿</div><div style='font-size:20px;font-weight:900'>No uploaded album yet!</div><div style='color:#8e9ab8;font-size:13px;margin-top:8px;line-height:1.5'>No albums for sale right now.<br>Once artists publish albums, they will appear here for fans to buy.</div></div>";
+   }
+   return
+ }
+ $("albumState").style.display="none";
+ $("albumGrid").style.display="grid";
+ $("albumGrid").innerHTML=list.map(albumCard).join("")
+}
+async function loadAlbums(){
+ $("albumState").innerHTML='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div></div>';
+ $("albumState").style.display="block";$("albumGrid").style.display="none";hideNotice("catalogNotice");
+ try{
+  const {data:base,error}=await supabaseClient.from("albums").select("id,artist_id,title,cover_url,description,release_date,price,currency,status,created_at,release_type").eq("status","published").order("created_at",{ascending:false});
+  if(error)throw error;albums=base||[];if(!albums.length){renderAlbums();return;}
+  const artistIds=[...new Set(albums.map(a=>a.artist_id).filter(Boolean))];
+  const albumIds=albums.map(a=>a.id);let profilesById={},countsById={};
+  if(artistIds.length){const p=await supabaseClient.from("artist_profiles").select("id,artist_name,stage_name,performing_name").in("id",artistIds);if(!p.error)(p.data||[]).forEach(x=>profilesById[x.id]=x);}
+  const t=await supabaseClient.from("album_tracks").select("id,album_id").in("album_id",albumIds);if(!t.error)(t.data||[]).forEach(x=>countsById[x.album_id]=(countsById[x.album_id]||0)+1);
+  albums=albums.map(a=>({...a,artist_profiles:profilesById[a.artist_id]||{},album_tracks:Array.from({length:countsById[a.id]||0},(_,i)=>({id:String(i)}))}));
+  renderAlbums();
+ }catch(e){$("albumState").textContent="Could not load: "+(e.message||"error")}
+}
+async function startBuy(id){
+ const{data:{user}}=await supabaseClient.auth.getUser();
+ if(!user){location.href="login.html?redirect="+encodeURIComponent(location.href);return}
+ notice("catalogNotice","Buying albums will be enabled once payment is connected. No charge made yet.","error");
+}
 document.querySelectorAll(".release-filter").forEach(b=>b.addEventListener("click",()=>{releaseKind=b.dataset.kind;document.querySelectorAll(".release-filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderAlbums()}));
-$("refreshBtn").addEventListener("click",loadAlbums);$("searchInput").addEventListener("input",renderAlbums);$("albumGrid").addEventListener("click",e=>{const b=e.target.closest("[data-buy]");if(b)startAlbumCheckout(b.dataset.buy)});loadAlbums();
+$("refreshBtn").addEventListener("click",loadAlbums);
+$("searchInput").addEventListener("input",renderAlbums);
+$("albumGrid").addEventListener("click",e=>{const b=e.target.closest("[data-buy]");if(b)startBuy(b.dataset.buy)});
+loadAlbums();
 </script>
 </body>
 </html>
