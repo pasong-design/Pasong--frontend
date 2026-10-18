@@ -13,7 +13,6 @@ header{position:sticky;top:0;z-index:100;background:#080810;border-bottom:1px so
 nav{display:flex;gap:18px}
 nav a{color:#777;font-size:13px;font-weight:600}
 nav a.active{color:#fff}
-.pill{padding:6px 12px;border-radius:999px;background:#1b1628;border:1px solid #3a2a5a;color:#d8b4fe;font-size:11px;font-weight:700}
 .wrap{width:min(1100px,92%);margin:auto;padding:30px 0 80px}
 h1{font-size:42px;line-height:1;letter-spacing:-1px}
 h1 span{color:#a855f7}
@@ -46,12 +45,12 @@ h1 span{color:#a855f7}
 <a href="charts.html">Charts</a>
 <a href="artists.html">Artists</a>
 </nav>
-<div class="pill" id="pricePill">UGX 700 Uganda</div>
+<div></div>
 </header>
 
 <main class="wrap">
 <h1>Music <span>Store</span></h1>
-<p class="sub">Listen preview then support artist. <span id="yourPrice"></span></p>
+<p class="sub">Listen preview then support artist.</p>
 
 <div class="search">
 <span>Search</span>
@@ -74,7 +73,7 @@ const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
 const COUNTRY_CURRENCY={UG:"UGX",KE:"KES",TZ:"TZS",RW:"RWF",BI:"BIF",SS:"SSP",ET:"ETB",NG:"NGN",GH:"GHS",ZA:"ZAR",GB:"GBP",US:"USD"};
-let currentPricing={label:"UGX 700",amount:700,currency:"UGX",country:"UG",sub:"Uganda"};
+let currentPricing={label:"UGX 700",amount:700,currency:"UGX",country:"UG"};
 let fxRates=null;
 
 async function getRates(){try{let r=await fetch("https://open.er-api.com/v6/latest/USD");let j=await r.json();if(j.result==="success")fxRates=j.rates;}catch(e){}}
@@ -83,11 +82,11 @@ function formatPrice(a,c){try{return new Intl.NumberFormat(undefined,{style:"cur
 function getPriceForCountry(cc){
 cc=(cc||"UG").toUpperCase();
 let lc=COUNTRY_CURRENCY[cc]||"USD";
-if(cc==="UG"){return{amount:700,currency:"UGX",label:"UGX 700",sub:"Uganda",country:cc,base:700,baseCur:"UGX"};}
-if(["KE","TZ","RW","BI","SS","ET"].includes(cc)){let conv=convert(1000,"UGX",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc),sub:"East Africa",country:cc,base:1000,baseCur:"UGX"};}
-if(["NG","GH","ZA","EG"].includes(cc)){let conv=convert(0.57,"USD",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc),sub:"Africa",country:cc,base:0.57,baseCur:"USD"};}
-if(["GB"].includes(cc)){return{amount:1,currency:"GBP",label:"GBP 1.00",sub:"UK",country:cc,base:1,baseCur:"GBP"};}
-return{amount:1,currency:"USD",label:"USD 1.00",sub:"Intl",country:cc,base:1,baseCur:"USD"};
+if(cc==="UG"){return{amount:700,currency:"UGX",label:"UGX 700",country:cc};}
+if(["KE","TZ","RW","BI","SS","ET"].includes(cc)){let conv=convert(1000,"UGX",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc),country:cc};}
+if(["NG","GH","ZA","EG"].includes(cc)){let conv=convert(0.57,"USD",lc);return{amount:conv,currency:lc,label:formatPrice(conv,lc),country:cc};}
+if(["GB"].includes(cc)){return{amount:1,currency:"GBP",label:"£1.00",country:cc};}
+return{amount:1,currency:"USD",label:"$1.00",country:cc};
 }
 
 async function detectPrice(){
@@ -95,8 +94,6 @@ await getRates();
 let country="UG";
 try{let r=await fetch("https://ipwho.is/");let j=await r.json();if(j.success)country=j.country_code;}catch(e){}
 currentPricing=getPriceForCountry(country);
-document.getElementById("pricePill").textContent=currentPricing.label+" "+currentPricing.sub;
-document.getElementById("yourPrice").textContent="Your price: "+currentPricing.label;
 render();
 }
 
@@ -114,7 +111,7 @@ return !query || txt.includes(query.toLowerCase());
 });
 let el=document.getElementById("songList");
 let count=document.getElementById("songCount");
-count.textContent=list.length+" songs "+currentPricing.label;
+count.textContent=list.length+" songs";
 if(!list.length){el.innerHTML='<div style="grid-column:1/-1;padding:20px;text-align:center;color:#777">No songs</div>';return;}
 el.innerHTML=list.map(s=>`
 <div class="card">
