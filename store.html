@@ -19,16 +19,6 @@ header{position:sticky;top:0;z-index:50;background:#000;border-bottom:1px solid 
 @media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr)}}
 .card{width:100%;cursor:pointer}.cover-wrap{position:relative;width:100%;aspect-ratio:1/1}.cover{width:100%;height:100%;border-radius:6px;object-fit:cover;background:#181818}.play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);border-radius:6px;display:grid;place-items:center;opacity:0;transition:.2s;font-size:22px}.card:hover .play-overlay{opacity:1}
 .info{padding:8px 0}.title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist{font-size:11px;color:#a7a7a7;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* FEATURED CHARTS - TOP EAST AFRICA STYLE */
-.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.chart-card{position:relative;background:linear-gradient(135deg,#1e1e1e,#121212);border-radius:8px;overflow:hidden;padding:0;cursor:pointer;border:1px solid #282828}
-.chart-cover{width:100%;aspect-ratio:1/1;object-fit:cover}
-.chart-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.9));padding:32px 8px 8px 8px}
-.chart-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chart-sub{font-size:10px;color:#a7a7a7;margin-top:2px}
-.chart-badge{position:absolute;top:8px;left:8px;background:#1DB954;color:#000;font-size:8px;font-weight:900;padding:3px 6px;border-radius:4px}
-
 .footer{margin-top:50px;padding:20px 0 30px;border-top:1px solid #1a1a1a}.foot-group{margin-bottom:28px}.foot-group h3{font-size:15px;font-weight:700;margin-bottom:10px}.foot-group a{display:block;font-size:14px;color:#a7a7a7;margin:10px 0;text-decoration:none}
 .player{position:fixed;left:0;right:0;bottom:0;z-index:100;background:#181818;border-top:1px solid #282828;padding:10px 4%;display:none;gap:10px;align-items:center}.player.show{display:flex}.player img{width:44px;height:44px;border-radius:4px}.p-info{flex:1}.p-title{font-size:12px;font-weight:700}.progress{position:absolute;top:0;left:0;height:2px;background:#1DB954;width:0%}
 </style>
@@ -43,18 +33,14 @@ header{position:sticky;top:0;z-index:50;background:#000;border-bottom:1px solid 
 <div class="top-producers" id="topProds"></div>
 
 <div class="section"><div class="section-head"><h2>Trending songs</h2><a href="charts.html">Show all</a></div><div class="grid" id="trendingGrid"></div></div>
-
 <div class="section"><div class="section-head"><h2>Popular artists</h2><a href="#">Show all</a></div><div class="grid" id="artistsGrid"></div></div>
-
 <div class="section"><div class="section-head"><h2>Latest Release</h2><a href="latest.html">Show all</a></div><div class="grid" id="latestGrid"></div></div>
-
 <div class="section"><div class="section-head"><h2>Popular albums and EPs</h2><a href="albums.html">Show all</a></div><div class="grid" id="albumsGrid"></div></div>
 
-<!-- FEATURED CHARTS = TOP EAST AFRICA SONGS -->
-<div class="section"><div class="section-head"><h2>Featured Charts</h2><a href="charts.html">Show all</a></div><div class="chart-grid" id="featuredChartsGrid"></div></div>
+<!-- FEATURED CHARTS SAME SIZE AS OTHERS -->
+<div class="section"><div class="section-head"><h2>Featured Charts</h2><a href="charts.html">Show all</a></div><div class="grid" id="featuredChartsGrid"></div></div>
 
 <div class="section"><div class="section-head"><h2>Producer Beats</h2><a href="beats.html">Show all</a></div><div class="grid" id="beatsGrid"></div></div>
-
 <div class="section"><div class="section-head"><h2>Free Beat of the Week</h2><a href="beats.html">Show all</a></div><div class="grid" id="freeGrid"></div></div>
 
 <div class="footer">
@@ -78,26 +64,7 @@ function getArtistRaw(s){return (s.artist_name||s.producer_name||s.producer||s.a
 function isRealArtist(a){if(!a) return false;let l=a.toLowerCase();return l!=="unknown" && l!=="pasong" && l!=="p" && l.length>1;}
 
 function songCard(s){return `<div class="card" onclick="previewSong('${esc(s.id)}')"><div class="cover-wrap"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/181818/fff?text=PASONG')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtistRaw(s)||"")}</div></div></div>`;}
-
-function albumCard(s){return `<div class="card" onclick="previewSong('${esc(s.id)}')"><div class="cover-wrap"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/282828/fff?text=ALBUM')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||s.album_name||"Album")}</div><div class="artist">EP • Album</div></div></div>`;}
-
-// TOP EAST AFRICA CHARTS LIKE SPOTIFY
-function eastAfricaChart(s,i){
-  let titles=["Top 50 - East Africa","Top Songs - Uganda","Top Hits - Kenya & TZ","Viral 50 - East Africa"];
-  let subs=["The most played in EA","Uganda's hottest now","Kenya & Tanzania hits","Viral in East Africa"];
-  let t=titles[i%titles.length];
-  let sub=subs[i%subs.length];
-  return `<div class="chart-card" onclick="previewSong('${esc(s.id)}')">
-    <span class="chart-badge">TOP EA</span>
-    <img class="chart-cover" src="${esc(cover(s)||'https://placehold.co/400x400/1DB954/000?text=TOP+EA')}">
-    <div class="chart-overlay">
-      <div class="chart-title">${esc(t)}</div>
-      <div class="chart-sub">${esc(sub)}</div>
-    </div>
-    <div class="play-overlay" style="display:grid;opacity:0">▶</div>
-  </div>`;
-}
-
+function albumCard(s){return `<div class="card" onclick="previewSong('${esc(s.id)}')"><div class="cover-wrap"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/282828/fff?text=ALBUM')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Album")}</div><div class="artist">EP • Album</div></div></div>`;}
 function artistCard(name){return `<div class="card"><div class="cover-wrap"><img class="cover" style="border-radius:999px" src="https://placehold.co/400x400/181818/fff?text=${esc(name[0])}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(name)}</div></div></div>`;}
 
 function renderAll(){
@@ -110,8 +77,18 @@ document.getElementById("trendingGrid").innerHTML=[...songsF].sort((a,b)=>(b.pla
 document.getElementById("latestGrid").innerHTML=[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,4).map(s=>songCard(s)).join("");
 document.getElementById("albumsGrid").innerHTML=albumsF.slice(0,4).map(s=>albumCard(s)).join("");
 
-// TOP EAST AFRICA IN FEATURED CHARTS
-document.getElementById("featuredChartsGrid").innerHTML=[...songsF].sort((a,b)=>(b.play_count||0)-(a.play_count||0)).slice(0,4).map((s,i)=>eastAfricaChart(s,i)).join("");
+// FEATURED CHARTS - SAME SMALL SIZE
+let charts=[
+  {title:"Top East Africa", sub:"East Africa hits", img:"https://placehold.co/400x400/1DB954/000?text=EAST+AFRICA", link:"charts.html?region=east"},
+  {title:"Top West Africa", sub:"West Africa hits", img:"https://placehold.co/400x400/FF6B00/fff?text=WEST+AFRICA", link:"charts.html?region=west"},
+  {title:"Top US", sub:"US Billboard", img:"https://placehold.co/400x400/1E90FF/fff?text=TOP+US", link:"charts.html?region=us"},
+  {title:"Top UK", sub:"UK Top Hits", img:"https://placehold.co/400x400/FF1744/fff?text=TOP+UK", link:"charts.html?region=uk"}
+];
+document.getElementById("featuredChartsGrid").innerHTML=charts.map(c=>`
+<div class="card" onclick="location.href='${c.link}'">
+  <div class="cover-wrap"><img class="cover" src="${c.img}"><div class="play-overlay">▶</div></div>
+  <div class="info"><div class="title">${c.title}</div><div class="artist">${c.sub}</div></div>
+</div>`).join("");
 
 document.getElementById("beatsGrid").innerHTML=beatsF.slice(0,4).map(s=>`<div class="card" onclick="previewBeat('${esc(s.id)}')"><div class="cover-wrap"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/181818/fff?text=BEAT')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Nyange")}</div></div></div>`).join("");
 document.getElementById("freeGrid").innerHTML=beatsF.slice(0,2).map(s=>`<div class="card" onclick="previewBeat('${esc(s.id)}')"><div class="cover-wrap"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/181818/fff?text=BEAT')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Nyange")}</div></div></div>`).join("");
