@@ -25,6 +25,8 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 .list{padding:0 5%;display:flex;flex-direction:column;gap:12px}.row{display:flex;align-items:center;gap:12px;background:#1A1A28;border:1px solid #2A2A42;border-radius:16px;padding:14px;cursor:pointer}.row .num{color:#7C4DFF;font-weight:900;width:22px}.row img{width:56px;height:56px;border-radius:10px;object-fit:cover}.row .rt{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .ra{font-size:13px;color:#9CA3AF;margin-top:3px}
 .grid{display:flex;gap:14px;overflow-x:auto;padding:0 5% 12px;scrollbar-width:none}.grid::-webkit-scrollbar{display:none}.card{flex:0 0 180px;background:#1A1A28;border:1px solid #2A2A42;border-radius:16px;overflow:hidden}.card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}.card-info{padding:10px 12px}.card .t{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card .a{font-size:13px;color:#9CA3AF;margin-top:2px}
 .comment-input{width:100%;height:48px;background:#0F0F14;border:1px solid #2A2A42;border-radius:12px;padding:0 14px;color:#fff;font-size:14px;margin-top:10px}.comment-row{padding:12px 0;border-bottom:1px solid #23233A;display:flex;gap:10px}
+/* ONLY ADDED FOR LIKES */
+.like-btn{font-size:12px;color:#9CA3AF;cursor:pointer;margin-top:6px;font-weight:700}.like-btn.liked{color:#FF2D55}
 </style>
 </head>
 <body>
@@ -50,7 +52,7 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 <div class="section"><div class="head"><h2>Albums & EPs</h2></div><div class="grid" id="albumGrid"></div></div>
 <div class="section"><div class="head"><h2 id="fansTitle">Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
 
-<div class="card-box"><h3>Comments</h3><input id="commentText" class="comment-input" placeholder="Add a comment..."><div id="commentsList"></div></div>
+<div class="card-box"><h3>Comments <span id="commentCount" style="color:#7C4DFF;font-size:13px"></span></h3><input id="commentText" class="comment-input" placeholder="Add a comment and press Enter..."><div id="commentsList"></div></div>
 
 <footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 90px;font-family:Arial;margin-top:30px">
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:1200px;margin:0 auto">
@@ -85,8 +87,54 @@ function buy(){location.href=(current.producer_id?"beats.html":"song.html")+"?id
 function shareLink(){navigator.clipboard.writeText(location.href); alert("Link copied!");}
 function shareWA(){window.open("https://wa.me/?text="+encodeURIComponent(location.href));}
 function downloadSong(){if(audio.src) window.open(audio.src,"_blank");}
-async function loadComments(){try{let {data}=await db.from("comments").select("*").eq("song_id", current.id).order("created_at",{ascending:false}).limit(20); let h=""; if(!data||!data.length) h="<div style='color:#666;font-size:13px;padding:10px 0'>No comments yet. Be first!</div>"; else data.forEach(c=>{h+=`<div class="comment-row"><div style="width:32px;height:32px;background:#7C4DFF;border-radius:50%;display:grid;place-items:center;font-weight:900">${(c.username||"U")[0]}</div><div><b>${c.username||"User"}</b><p style="font-size:13px;color:#9CA3AF;margin-top:4px">${c.text||c.comment||""}</p></div></div>`;}); document.getElementById("commentsList").innerHTML=h;}catch(e){}}
-document.getElementById("commentText").addEventListener("keydown", async (e)=>{if(e.key==="Enter"){let t=e.target.value.trim(); if(!t) return; let u=(await db.auth.getUser()).data.user; if(!u){alert("Login to comment"); return;} try{await db.from("comments").insert({song_id:current.id, user_id:u.id, text:t, comment:t, username:u.email.split("@")[0]}); e.target.value=""; loadComments();}catch(err){alert("Error: "+err.message);}}});
+
+// --- ONLY THIS PART FIXED: COMMUNITY/COMMENTS BOX ---
+async function loadComments(){
+  try{
+    let r=await db.from("comments").select("*").eq("song_id", current.id).order("created_at",{ascending:false}).limit(50);
+    let data=r.data||[];
+    document.getElementById("commentCount").textContent="("+data.length+")";
+    let h="";
+    if(!data.length) h="<div style='color:#666;font-size:13px;padding:10px 0'>No comments yet. Be first!</div>";
+    else data.forEach(c=>{
+      let name=c.username||c.user_name||"User";
+      let text=c.text||c.comment||c.content||"";
+      let likes=c.likes||c.likes_count||0;
+      let liked = localStorage.getItem('liked_'+c.id) ? 'liked' : '';
+      h+=`<div class="comment-row"><div style="width:32px;height:32px;background:#7C4DFF;border-radius:50%;display:grid;place-items:center;font-weight:900;flex-shrink:0">${name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:14px">${name}</b><p style="font-size:13px;color:#9CA3AF;margin-top:4px">${text}</p><div class="like-btn ${liked}" onclick="likeComment('${c.id}',${likes})">♥ ${likes} likes</div></div></div>`;
+    });
+    document.getElementById("commentsList").innerHTML=h;
+  }catch(e){console.log(e);}
+}
+
+async function likeComment(id,cur){
+  if(localStorage.getItem('liked_'+id)){alert("You already liked"); return;}
+  try{
+    await db.from("comments").update({likes:cur+1,likes_count:cur+1}).eq("id",id);
+    localStorage.setItem('liked_'+id,'1');
+    loadComments();
+  }catch(err){alert(err.message);}
+}
+
+document.getElementById("commentText").addEventListener("keydown", async (e)=>{
+  if(e.key==="Enter"){
+    let t=e.target.value.trim(); if(!t) return;
+    let input=e.target; input.disabled=true; input.placeholder="Posting...";
+    try{
+      let ud=await db.auth.getUser(); let user=ud.data.user;
+      let uname="Guest";
+      if(user){ uname=user.user_metadata?.full_name || user.email.split("@")[0] || "User"; }
+      else { uname="Guest"+Math.floor(Math.random()*900); }
+      let obj={song_id:current.id, text:t, comment:t, content:t, username:uname, user_name:uname, likes:0, likes_count:0};
+      if(user) obj.user_id=user.id;
+      let res=await db.from("comments").insert(obj).select();
+      if(res.error){ alert(res.error.message); }
+      else { e.target.value=""; loadComments(); }
+    }catch(err){ alert(err.message); }
+    input.disabled=false; input.placeholder="Add a comment and press Enter...";
+  }
+});
+
 init();
 </script>
 </body>
