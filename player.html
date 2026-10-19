@@ -41,8 +41,7 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 
 <div class="artist-box"><img id="artistImg"><div><div id="artistBoxName" class="name" style="font-size:20px;font-weight:900"></div><div id="artistBoxMeta" class="sub" style="font-size:14px;color:#A0A0B8;margin-top:6px"></div></div></div>
 
-<!-- KEEP ALL CARDS -->
-<div class="card-box"><h3>Credits</h3><div id="credits"></div></div>
+<div class="card-box"><h3>Credits</h3><div id="credits">Loading credits...</div></div>
 <div class="card-box"><h3>Lyrics</h3><div id="lyrics" class="lyrics">Lyrics not available yet.</div></div>
 
 <div class="section"><div class="head"><h2 id="popTitle">Popular</h2></div><div class="list" id="popularList"></div></div>
@@ -62,30 +61,86 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let list=[], idx=0, current=null; const audio=document.getElementById("audio");
 function qs(k){return new URLSearchParams(location.search).get(k);}
 function formatTime(t){if(!t||isNaN(t)) return "0:00"; let m=Math.floor(t/60); let s=Math.floor(t%60); return m+":"+String(s).padStart(2,"0");}
-async function getRealPlays(id){try{let r=await db.from("song_plays").select("id",{count:"exact",head:true}).eq("song_id", id); if(r.count) return r.count;}catch(e){} return 0;}
-async function init(){let id=qs("id"); let b=await db.from("beats").select("*").order("created_at",{ascending:false}).limit(80); let s=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(80); list=[...(b.data||[]),...(s.data||[])]; if(id){let f=list.findIndex(x=>String(x.id)===String(id)); if(f<0){let oneB=await db.from("beats").select("*").eq("id",id).maybeSingle(); if(oneB.data){list=[oneB.data,...list]; idx=0;} else{let oneS=await db.from("songs").select("*").eq("id",id).maybeSingle(); if(oneS.data){list=[oneS.data,...list]; idx=0;}}} else idx=f;} if(list.length) load(idx);}
+
+async function init(){
+  let id=qs("id");
+  console.log("Player ID:", id);
+  
+  // 1. If ID exists, load that specific song directly first (fixes Loading...)
+  if(id){
+    let direct = await db.from("beats").select("*").eq("id", id).maybeSingle();
+    if(!direct.data || direct.error){
+      direct = await db.from("songs").select("*").eq("id", id).maybeSingle();
+    }
+    if(direct.data){
+      list=[direct.data];
+      idx=0;
+      load(0);
+      // then load more for lists
+      let b=await db.from("beats").select("*").order("created_at",{ascending:false}).limit(50);
+      let s=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(50);
+      if(b.data) list=[...list, ...b.data.filter(x=>x.id!=id)];
+      if(s.data) list=[...list, ...s.data.filter(x=>x.id!=id)];
+      return;
+    }
+  }
+  
+  // 2. Fallback: load all
+  let b=await db.from("beats").select("*").order("created_at",{ascending:false}).limit(80);
+  let s=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(80);
+  console.log("beats:", b, "songs:", s);
+  list=[...(b.data||[]), ...(s.data||[])];
+  if(list.length) load(0);
+  else {
+    document.getElementById("title").textContent="No songs found - Check Supabase RLS";
+  }
+}
+
 async function load(i){
  current=list[i]; if(!current) return;
- document.getElementById("cover").src=current.cover_url||""; document.getElementById("artistImg").src=current.cover_url||""; document.getElementById("title").textContent=current.title||"Untitled"; audio.src=current.audio_url||current.preview_url||current.stream_url||"";
- let name="PASONG", img=current.cover_url, bio="", verified=false, genre=current.genre||"";
- let realPlays=await getRealPlays(current.id); if(!realPlays) realPlays=current.plays||0;
- if(current.producer_id){let p=await db.from("profiles").select("*").eq("id",current.producer_id).maybeSingle(); if(p.data){name=p.data.full_name||p.data.username||name; bio=p.data.bio||""; if(p.data.avatar_url) img=p.data.avatar_url;} let ap=await db.from("artist_profiles").select("*").eq("user_id",current.producer_id).maybeSingle(); if(ap.data){name=ap.data.artist_name||ap.data.stage_name||name; bio=ap.data.bio||bio; verified=ap.data.verified||false; if(ap.data.profile_image_url) img=ap.data.profile_image_url; else if(ap.data.profile_photo_url) img=ap.data.profile_photo_url;}}
- else {if(current.artist_id){let ap=await db.from("artist_profiles").select("*").eq("id",current.artist_id).maybeSingle(); if(ap.data){name=ap.data.artist_name||ap.data.stage_name||name; bio=ap.data.bio||""; verified=ap.data.verified||false; if(ap.data.profile_image_url) img=ap.data.profile_image_url; else if(ap.data.profile_photo_url) img=ap.data.profile_photo_url;}}}
- document.getElementById("artistName").textContent=name; document.getElementById("artistBoxName").textContent=name+(verified?" ✓":""); document.getElementById("artistImg").src=img; document.getElementById("meta").textContent=`${realPlays.toLocaleString()} plays • ${genre} • ${current.bpm||""} BPM`; document.getElementById("artistBoxMeta").textContent=(bio||genre).slice(0,120);
+ document.getElementById("cover").src=current.cover_url||"https://via.placeholder.com/400";
+ document.getElementById("artistImg").src=current.cover_url||"https://via.placeholder.com/100";
+ document.getElementById("title").textContent=current.title||"Untitled";
+ audio.src=current.audio_url||current.preview_url||current.stream_url||"";
+ let name=current.artist_name||current.producer_name||"PASONG Artist", img=current.cover_url, bio="", verified=false, genre=current.genre||"";
+ let realPlays=current.plays||current.play_count||0;
+ if(current.producer_id){
+   try{let p=await db.from("profiles").select("*").eq("id",current.producer_id).maybeSingle(); if(p.data){name=p.data.full_name||p.data.username||name; bio=p.data.bio||""; if(p.data.avatar_url) img=p.data.avatar_url;}}catch(e){}
+   try{let ap=await db.from("artist_profiles").select("*").eq("user_id",current.producer_id).maybeSingle(); if(ap.data){name=ap.data.artist_name||ap.data.stage_name||name; bio=ap.data.bio||bio; verified=ap.data.verified||false; if(ap.data.profile_image_url) img=ap.data.profile_image_url; else if(ap.data.profile_photo_url) img=ap.data.profile_photo_url;}}catch(e){}
+ }
+ document.getElementById("artistName").textContent=name;
+ document.getElementById("artistBoxName").textContent=name+(verified?" ✓":"");
+ document.getElementById("artistImg").src=img||current.cover_url;
+ document.getElementById("meta").textContent=`${realPlays.toLocaleString()} plays • ${genre} • ${current.bpm||""} BPM`;
+ document.getElementById("artistBoxMeta").textContent=(bio||genre||"Producer").slice(0,120);
  document.getElementById("credits").innerHTML=`<div class="credit"><span>Artist</span><b>${name}</b></div><div class="credit"><span>Genre</span><b>${genre||"-"}</b></div><div class="credit"><span>BPM</span><b>${current.bpm||"-"}</b></div><div class="credit"><span>Key</span><b>${current.key||current.music_key||"-"}</b></div><div class="credit"><span>Plays</span><b>${realPlays.toLocaleString()}</b></div><div class="credit"><span>Year</span><b>${current.created_at?new Date(current.created_at).getFullYear():"2026"}</b></div>`;
  document.getElementById("lyrics").textContent=current.lyrics||current.lyric||"Lyrics not available yet.";
- document.getElementById("popTitle").textContent="Popular by "+name; document.getElementById("fansTitle").textContent="Fans of "+name+" also like";
- let same=list.filter(x=>(current.producer_id?x.producer_id===current.producer_id:x.artist_id===current.artist_id)); if(same.length<2) same=list;
- let pop=""; for(let j=0;j<Math.min(6,same.length);j++){let x=same[j]; let rp=await getRealPlays(x.id); if(!rp) rp=x.plays||0; pop+=`<div class="row" onclick="location.href='player.html?id=${x.id}'"><div class="num">${j+1}</div><img src="${x.cover_url}"><div style="flex:1;overflow:hidden"><div class="rt">${x.title}</div><div class="ra">${rp.toLocaleString()} plays</div></div></div>`;} document.getElementById("popularList").innerHTML=pop;
- let alb=await db.from("albums").select("*").order("created_at",{ascending:false}).limit(20);
- let releaseHtml=""; if((alb.data||[]).length){(alb.data||[]).slice(0,10).forEach(a=>{releaseHtml+=`<div class="card" onclick="location.href='album.html?id=${a.id}'"><img src="${a.cover_url||current.cover_url}"><div class="card-info"><div class="t">${a.title||a.name||"Album"}</div><div class="a">${a.release_year||"Release"}</div></div></div>`;});} else {same.slice(0,8).forEach(x=>{releaseHtml+=`<div class="card" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}"><div class="card-info"><div class="t">${x.title}</div><div class="a">Single</div></div></div>`;});} document.getElementById("releaseGrid").innerHTML=releaseHtml;
- let albumHtml=""; if((alb.data||[]).length){(alb.data||[]).forEach(a=>{albumHtml+=`<div class="card" onclick="location.href='album.html?id=${a.id}'"><img src="${a.cover_url||current.cover_url}"><div class="card-info"><div class="t">${a.title||a.name||"Album"}</div><div class="a">${a.release_year||"Album"}</div></div></div>`;});} else {albumHtml=`<div style="padding:20px;color:#666;font-size:14px">No albums yet from this artist</div>`;} document.getElementById("albumGrid").innerHTML=albumHtml;
- let rec=list.filter(x=>x.id!==current.id).sort(()=>0.5-Math.random()).slice(0,12); let recHtml=""; rec.forEach(x=>{recHtml+=`<div class="card" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}"><div class="card-info"><div class="t">${x.title}</div><div class="a">${x.genre||"Recommended"}</div></div></div>`;}); document.getElementById("recommendedGrid").innerHTML=recHtml;
- let fansList=list.filter(x=>x.genre===current.genre&&x.id!==current.id).slice(0,8); if(fansList.length<2) fansList=list.slice(0,8); let fans=""; fansList.forEach(x=>{fans+=`<div class="card" style="padding:14px;text-align:center" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}" style="width:76px;height:76px;border-radius:50%;margin:0 auto;display:block;border:3px solid #7C4DFF"><div class="t" style="margin-top:10px">${x.title.slice(0,18)}</div></div>`;}); document.getElementById("fansGrid").innerHTML=fans;
+ document.getElementById("popTitle").textContent="Popular by "+name;
+ document.getElementById("fansTitle").textContent="Fans of "+name+" also like";
+
+ let same=list.filter(x=>(current.producer_id?x.producer_id===current.producer_id:true)).slice(0,10);
+ let pop=""; same.slice(0,6).forEach((x,j)=>{pop+=`<div class="row" onclick="location.href='player.html?id=${x.id}'"><div class="num">${j+1}</div><img src="${x.cover_url||''}"><div style="flex:1;overflow:hidden"><div class="rt">${x.title||'Untitled'}</div><div class="ra">${(x.plays||0).toLocaleString()} plays</div></div></div>`;});
+ document.getElementById("popularList").innerHTML=pop||"<div style='color:#666;padding:10px'>No popular tracks</div>";
+
+ try{
+   let alb=await db.from("albums").select("*").order("created_at",{ascending:false}).limit(20);
+   let releaseHtml=""; if((alb.data||[]).length){alb.data.slice(0,10).forEach(a=>{releaseHtml+=`<div class="card" onclick="location.href='album.html?id=${a.id}'"><img src="${a.cover_url||current.cover_url}"><div class="card-info"><div class="t">${a.title||a.name||"Album"}</div><div class="a">${a.release_year||"Release"}</div></div></div>`;});} else {same.slice(0,8).forEach(x=>{releaseHtml+=`<div class="card" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}"><div class="card-info"><div class="t">${x.title}</div><div class="a">Single</div></div></div>`;});}
+   document.getElementById("releaseGrid").innerHTML=releaseHtml;
+   let albumHtml=""; if((alb.data||[]).length){alb.data.forEach(a=>{albumHtml+=`<div class="card" onclick="location.href='album.html?id=${a.id}'"><img src="${a.cover_url||current.cover_url}"><div class="card-info"><div class="t">${a.title||a.name||"Album"}</div><div class="a">${a.release_year||"Album"}</div></div></div>`;});} else {albumHtml=`<div style="padding:20px;color:#666;font-size:14px">No albums yet</div>`;}
+   document.getElementById("albumGrid").innerHTML=albumHtml;
+ }catch(e){}
+
+ let rec=list.filter(x=>x.id!==current.id).slice(0,12); let recHtml=""; rec.forEach(x=>{recHtml+=`<div class="card" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}"><div class="card-info"><div class="t">${x.title}</div><div class="a">${x.genre||"Recommended"}</div></div></div>`;});
+ document.getElementById("recommendedGrid").innerHTML=recHtml||"<div style='color:#666'>No recommendations</div>";
+
+ let fansList=list.slice(0,8); let fans=""; fansList.forEach(x=>{fans+=`<div class="card" style="padding:14px;text-align:center" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}" style="width:76px;height:76px;border-radius:50%;margin:0 auto;display:block;border:3px solid #7C4DFF"><div class="t" style="margin-top:10px">${(x.title||'').slice(0,18)}</div></div>`;});
+ document.getElementById("fansGrid").innerHTML=fans;
+
  checkFav(); loadComments();
 }
+
 async function checkFav(){try{let {data}=await db.from("favorites").select("*").eq("song_id", current.id).limit(1); let b=document.getElementById("heart"); if(data&&data.length){b.classList.add("active"); b.textContent="♥ Favorited";} else{b.classList.remove("active"); b.textContent="♡ Favorite";}}catch(e){}}
-async function toggleFav(){let u=(await db.auth.getUser()).data.user; if(!u){alert("Login to favorite"); return;} let {data}=await db.from("favorites").select("*").eq("song_id", current.id).eq("user_id", u.id).limit(1); if(data&&data.length){await db.from("favorites").delete().eq("id", data[0].id);} else{await db.from("favorites").insert({song_id:current.id, user_id:u.id});} checkFav();}
+async function toggleFav(){try{let u=(await db.auth.getUser()).data.user; if(!u){alert("Login to favorite"); return;} let {data}=await db.from("favorites").select("*").eq("song_id", current.id).eq("user_id", u.id).limit(1); if(data&&data.length){await db.from("favorites").delete().eq("id", data[0].id);} else{await db.from("favorites").insert({song_id:current.id, user_id:u.id});} checkFav();}catch(e){alert(e.message);}}
 function toggle(){if(audio.paused){audio.play(); document.getElementById("playBtn").textContent="⏸";} else{audio.pause(); document.getElementById("playBtn").textContent="▶";}}
 audio.ontimeupdate=()=>{document.getElementById("fill").style.width=(audio.currentTime/(audio.duration||1)*100)+"%"; document.getElementById("cur").textContent=formatTime(audio.currentTime);}
 audio.onloadedmetadata=()=>{document.getElementById("dur").textContent=formatTime(audio.duration);}
@@ -94,4 +149,51 @@ function next(){idx=(idx+1)%list.length; load(idx); audio.play(); document.getEl
 function prev(){idx=(idx-1+list.length)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸";}
 function buy(){location.href=(current.producer_id?"beats.html":"song.html")+"?id="+current.id;}
 function shareLink(){navigator.clipboard.writeText(location.href); alert("Link copied!");}
-function shareWA(){window.open("https://wa.me
+function shareWA(){window.open("https://wa.me/?text="+encodeURIComponent(location.href));}
+function downloadSong(){if(audio.src) window.open(audio.src,"_blank");}
+
+async function loadComments(){
+  try{
+    let r=await db.from("comments").select("*").eq("song_id", current.id).order("created_at",{ascending:false}).limit(50);
+    let data=r.data||[];
+    document.getElementById("commentCount").textContent="("+data.length+")";
+    let h="";
+    if(!data.length) h="<div style='color:#666;font-size:13px;padding:12px 0'>No comments yet. Be first!</div>";
+    else data.forEach(c=>{
+      let name=c.username||c.user_name||"User";
+      let text=c.text||c.comment||c.content||"";
+      let likes=c.likes||c.likes_count||0;
+      h+=`<div class="comment-row"><div style="display:flex;gap:10px;flex:1"><div style="width:32px;height:32px;background:#7C4DFF;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;flex-shrink:0">${name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:14px">${name}</b><p style="font-size:13px;color:#9CA3AF;margin-top:4px">${text}</p><div class="like-btn ${localStorage.getItem('liked_'+c.id)?'liked':''}" onclick="likeComment('${c.id}', ${likes})">♥ ${likes} likes</div></div></div></div>`;
+    });
+    document.getElementById("commentsList").innerHTML=h;
+  }catch(e){console.log(e);}
+}
+async function likeComment(id, currentLikes){
+  if(localStorage.getItem('liked_'+id)){alert("Already liked"); return;}
+  try{
+    let newLikes=currentLikes+1;
+    await db.from("comments").update({likes: newLikes, likes_count: newLikes}).eq("id", id);
+    localStorage.setItem('liked_'+id, '1');
+    loadComments();
+  }catch(err){alert(err.message);}
+}
+document.getElementById("commentText").addEventListener("keydown", async (e)=>{
+  if(e.key==="Enter"){
+    let t=e.target.value.trim(); if(!t) return;
+    let input=e.target; input.disabled=true; input.placeholder="Posting...";
+    try{
+      let uData=await db.auth.getUser(); let user=uData.data.user;
+      let username="Guest"; if(user){username=user.user_metadata?.full_name||user.email?.split("@")[0]||"User";} else {username="Guest_"+Math.floor(Math.random()*999);}
+      let insertObj={song_id: current.id, text: t, comment: t, content: t, username: username, user_name: username, likes:0, likes_count:0};
+      if(user) insertObj.user_id=user.id;
+      let res=await db.from("comments").insert(insertObj).select();
+      if(res.error){alert("Error: "+res.error.message); input.disabled=false; return;}
+      e.target.value=""; loadComments();
+    }catch(err){alert(err.message);}
+    input.disabled=false; input.placeholder="Add a comment and press Enter...";
+  }
+});
+init();
+</script>
+</body>
+</html>
