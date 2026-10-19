@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Player - PASONG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -10,7 +10,7 @@ body{background:#000;color:#fff;font-family:Inter,sans-serif;padding-bottom:100p
 header{padding:14px 5%;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:20;border-bottom:1px solid #222}
 .hbtn{width:44px;height:44px;border-radius:999px;background:#222;display:grid;place-items:center;cursor:pointer;color:#fff;font-size:20px}
 .main{padding:12px 5% 0}
-.cover{width:100%;max-width:360px;aspect-ratio:1/1;border-radius:16px;object-fit:cover;display:block;margin:0 auto;box-shadow:0 10px 40px rgba(0,0,0,0.8)}
+.cover{width:100%;max-width:360px;aspect-ratio:1/1;border-radius:16px;object-fit:cover;display:block;margin:0 auto}
 .info{margin-top:16px}
 .title{font-size:24px;font-weight:900;color:#fff}.artist{font-size:14px;color:#aaa;margin-top:4px}
 .progress{margin-top:18px}
@@ -24,27 +24,22 @@ header{padding:14px 5%;display:flex;justify-content:space-between;align-items:ce
 .btn.buy{background:#1DB954;color:#000;border-color:#1DB954;font-weight:900}
 .btn.active{background:#ff1744;border-color:#ff1744}
 
-/* VISIBLE LIKE YOUR SCREENSHOT */
+/* ARTIST PROFILE BOX - PUT BACK BIG VISIBLE */
+.artist-profile{margin:24px 5% 0;background:#171717;border:1px solid #2a2a2a;border-radius:20px;padding:18px;display:flex;gap:16px;align-items:center}
+.artist-profile img{width:80px;height:80px;border-radius:999px;object-fit:cover;border:3px solid #1DB954;flex-shrink:0}
+.artist-profile .name{font-size:20px;font-weight:900;color:#fff}
+.artist-profile .sub{font-size:12px;color:#aaa;margin-top:4px;line-height:1.4}
+.artist-profile .follow{margin-top:10px;background:#1DB954;color:#000;padding:8px 20px;border-radius:999px;font-size:12px;font-weight:900;display:inline-block;cursor:pointer}
+
 .section{margin-top:28px}
 .head{padding:0 5%;margin-bottom:14px}
 .head h2{font-size:19px;font-weight:800;color:#fff}
-
-/* Artist Box - EXACT visible */
-.artist-box{margin:0 5%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center}
-.artist-box img{width:64px;height:64px;border-radius:999px;object-fit:cover;border:2px solid #333}
-.artist-box .name{font-size:17px;font-weight:800;color:#fff}
-.artist-box .sub{font-size:12px;color:#aaa;margin-top:3px}
-.follow{margin-top:8px;background:#1DB954;color:#000;padding:7px 18px;border-radius:999px;font-size:11px;font-weight:900;display:inline-block}
-
-/* Popular List - MAKE IT VISIBLE */
 .list{padding:0 5%;display:flex;flex-direction:column;gap:12px}
 .row{display:flex;align-items:center;gap:12px;background:#171717;border:1px solid #2a2a2a;border-radius:14px;padding:12px 14px}
 .row .num{color:#1DB954;font-weight:900;font-size:15px;width:18px}
 .row img{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#222;flex-shrink:0}
 .row .rt{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .ra{font-size:11px;color:#1DB954;margin-top:2px;font-weight:600}
-
-/* Popular releases - VISIBLE CARDS */
 .grid{display:flex;gap:12px;overflow-x:auto;padding:0 5% 10px;scrollbar-width:none}
 .grid::-webkit-scrollbar{display:none}
 .card{flex:0 0 auto;width:48%;max-width:185px;min-width:155px;background:#171717;border:1px solid #2a2a2a;border-radius:16px;overflow:hidden}
@@ -62,24 +57,28 @@ header{padding:14px 5%;display:flex;justify-content:space-between;align-items:ce
 </header>
 
 <div class="main">
-<img id="cover" class="cover" src="https://placehold.co/400x400/181818/fff?text=PASONG">
-<div class="info"><div id="title" class="title">KUBE</div><div id="artistName" class="artist">PASONG Artist</div></div>
+<img id="cover" class="cover" src="">
+<div class="info"><div id="title" class="title">Loading...</div><div id="artistName" class="artist">PASONG Artist</div></div>
 <div class="progress"><div class="bar"><div id="fill" class="fill"></div></div><div class="time"><span id="cur">0:00</span><span id="dur">0:15</span></div></div>
 <div class="controls"><div class="c" onclick="prev()">⏮</div><div id="playBtn" class="c play" onclick="toggle()">▶</div><div class="c" onclick="next()">⏭</div></div>
 <div class="actions"><div id="heart" class="btn" onclick="fav()">♡ Favorite</div><div class="btn buy" onclick="buy()">+ Buy</div></div>
 <audio id="audio"></audio>
 </div>
 
-<div class="section"><div class="artist-box"><img id="artistImg"><div><div id="artistBoxName" class="name">PASONG Artist</div><div id="artistBoxMeta" class="sub">244K monthly listeners • 2026 • Verified</div><div class="follow">FOLLOW</div></div></div></div>
+<!-- ARTIST PROFILE BOX UNDER PLAYER - NOW BACK -->
+<div class="artist-profile" id="artistProfileBox">
+<img id="artistImg" src="https://placehold.co/200x200/1DB954/000?text=A">
+<div>
+<div id="artistBoxName" class="name">PASONG Artist</div>
+<div id="artistBoxMeta" class="sub">244K monthly listeners • 2026 • Verified<br>Ugandan Artist • Follow to get new releases</div>
+<div class="follow">FOLLOW</div>
+</div>
+</div>
 
 <div class="section"><div class="head"><h2 id="popTitle">Popular by PASONG Artist</h2></div><div class="list" id="popularList"></div></div>
-
 <div class="section"><div class="head"><h2>Popular releases</h2></div><div class="grid" id="releaseGrid"></div></div>
-
 <div class="section"><div class="head"><h2>Albums & EPs</h2></div><div class="grid" id="albumGrid"></div></div>
-
 <div class="section"><div class="head"><h2 id="fansTitle">Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
-
 <div class="section"><div class="head"><h2>Recommended</h2></div><div class="grid" id="recGrid"></div></div>
 
 <script>
@@ -95,7 +94,7 @@ function smartArtist(s){
   if(a && a.toLowerCase()!=="pasong") return a;
   let t=(s.title||"").toLowerCase();
   if(t.includes("jokerman")) return "Triple Jokerman";
-  if(t.includes("woman")) return "Patel UG";
+  if(t.includes("woman")) return "Patel UG x Jonah Rable";
   if(t.includes("kwata")) return "Kwata Awo";
   if(t.includes("nyange")) return "Nyange";
   return "PASONG Artist";
@@ -109,16 +108,15 @@ async function init(){
   list=[...(r.data||[]),...(b.data||[])];
   let id=qs("id"); if(id){ let f=list.findIndex(x=>String(x.id)===String(id)); if(f>=0) idx=f; }
   if(list.length) load(idx);
-  else document.getElementById("popularList").innerHTML="<div style='padding:20px;color:#fff'>No data - check Supabase connection</div>";
 }
 function load(i){
   let s=list[i]; let art=smartArtist(s);
-  document.getElementById("cover").src=coverOf(s)||'https://placehold.co/400x400/222/fff?text=PASONG';
+  document.getElementById("cover").src=coverOf(s)||'';
   document.getElementById("title").textContent=s.title||"KUBE Triple Jokerman";
   document.getElementById("artistName").textContent=art;
   document.getElementById("artistBoxName").textContent=art;
   document.getElementById("artistImg").src=coverOf(s)||'';
-  document.getElementById("artistBoxMeta").textContent=`${Math.floor(Math.random()*500+100)}K monthly listeners • ${yearOf(s)} • Verified`;
+  document.getElementById("artistBoxMeta").innerHTML=`${Math.floor(Math.random()*900+100)}K monthly listeners • ${yearOf(s)} • Verified<br>${art} • ${yearOf(s)} releases`;
   document.getElementById("popTitle").textContent=`Popular by ${art}`;
   document.getElementById("fansTitle").textContent=`Fans of ${art} also like`;
   audio.src=s.audio_url||s.file_url||s.preview_url||"";
@@ -133,22 +131,19 @@ function build(){
   document.getElementById("popularList").innerHTML=ordered.slice(0,6).map((s,i)=>`
     <div class="row" onclick="location.href='player.html?id=${s.id}'">
       <div class="num">${i+1}</div>
-      <img src="${coverOf(s)||'https://placehold.co/100x100/222/fff?text=P'}">
+      <img src="${coverOf(s)||''}">
       <div style="flex:1;overflow:hidden"><div class="rt">${s.title||"Untitled"}</div><div class="ra">${playsOf(s)} plays • ${yearOf(s)}</div></div>
     </div>`).join("");
 
   document.getElementById("releaseGrid").innerHTML=ordered.slice(0,8).map(s=>`
-    <div class="card" onclick="location.href='player.html?id=${s.id}'">
-      <img src="${coverOf(s)||''}">
-      <div class="card-info"><div class="t">${s.title||"Release"}</div><div class="a">${yearOf(s)} • ${playsOf(s)} plays</div></div>
-    </div>`).join("");
+    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="card-info"><div class="t">${s.title||"Release"}</div><div class="a">${yearOf(s)} • ${playsOf(s)} plays</div></div></div>`).join("");
 
   document.getElementById("albumGrid").innerHTML=ordered.slice(0,6).map(s=>`
     <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="card-info"><div class="t">${s.title||"Album"}</div><div class="a">${yearOf(s)} • Album</div></div></div>`).join("");
 
   document.getElementById("fansGrid").innerHTML=ordered.slice(0,8).map(s=>`
     <div class="card" style="padding:14px;text-align:center" onclick="location.href='player.html?id=${s.id}'">
-      <img src="${coverOf(s)||''}" style="width:70px;height:70px;border-radius:999px;margin:0 auto;display:block">
+      <img src="${coverOf(s)||''}" style="width:70px;height:70px;border-radius:999px;margin:0 auto;display:block;border:2px solid #1DB954">
       <div class="t" style="margin-top:8px;text-align:center">${smartArtist(s)}</div>
     </div>`).join("");
 
