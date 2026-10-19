@@ -6,61 +6,79 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Inter,sans-serif;padding-bottom:100px}
-header{padding:16px 5%;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:10;border-bottom:1px solid #1a1a1a}
-.hbtn{width:44px;height:44px;border-radius:999px;background:#1f1f1f;display:grid;place-items:center;cursor:pointer}
-.main-player{display:flex;flex-direction:column;align-items:center;padding:20px 5% 10px}
-.cover{width:88vw;max-width:380px;aspect-ratio:1/1;border-radius:12px;object-fit:cover;box-shadow:0 20px 60px #000}
-.info{width:92%;max-width:380px;margin-top:20px;text-align:left}
-.title{font-size:28px;font-weight:900;line-height:1.1}.artist{font-size:16px;color:#b3b3b3;margin-top:6px}
-.progress{width:92%;max-width:380px;margin-top:20px}
-.bar{height:6px;background:#2a2a2a;border-radius:999px;overflow:hidden}.fill{height:100%;background:#fff;width:0%}
-.time{display:flex;justify-content:space-between;font-size:12px;color:#aaa;margin-top:6px}
-.controls{margin-top:20px;display:flex;gap:24px;align-items:center}
-.c{width:56px;height:56px;border-radius:999px;background:#222;display:grid;place-items:center;cursor:pointer;font-size:22px}
-.c.play{width:72px;height:72px;background:#fff;color:#000;font-size:32px}
-.actions-row{display:flex;gap:10px;margin-top:18px;width:92%;max-width:380px}
-.btn{flex:1;height:44px;border-radius:999px;background:#2a2a2a;display:grid;place-items:center;cursor:pointer;font-size:14px;font-weight:700}
-.btn.heart.active{background:#ff1744}.btn.plus{background:#1DB954;color:#000;font-weight:900}
-.section{margin-top:32px}.section-head{padding:0 5%;margin-bottom:14px;display:flex;justify-content:space-between}
-.section-head h2{font-size:22px;font-weight:800}
-.artist-box{margin:0 5%;background:#121212;border-radius:16px;padding:18px;display:flex;gap:14px;align-items:center;border:1px solid #1e1e1e}
-.artist-box img{width:72px;height:72px;border-radius:999px;object-fit:cover}
-.artist-box .name{font-size:20px;font-weight:800}.artist-box .sub{font-size:13px;color:#aaa;margin-top:4px}
-.grid{display:flex;gap:14px;overflow-x:auto;padding:0 5% 10px;scrollbar-width:none}.grid::-webkit-scrollbar{display:none}
-.card{flex:0 0 auto;width:48%;max-width:200px;min-width:160px}
-.card img{width:100%;aspect-ratio:1/1;border-radius:10px;object-fit:cover;background:#181818}
-.card .t{font-size:15px;font-weight:700;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .a{font-size:12px;color:#b3b3b3}
+body{background:#000;color:#fff;font-family:Inter,sans-serif;padding-bottom:100px;transition:background 1s}
+.bg-blur{position:fixed;inset:0;z-index:-1;filter:blur(90px) brightness(0.6);opacity:0.7;transition:0.8s}
+header{padding:14px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;background:rgba(0,0,0,0.6);backdrop-filter:blur(20px)}
+.hbtn{width:42px;height:42px;border-radius:999px;background:rgba(255,255,255,0.15);display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px)}
+.main{padding:10px 5% 0;text-align:center}
+.cover-wrap{position:relative;display:inline-block}
+.cover{width:86vw;max-width:360px;aspect-ratio:1/1;border-radius:18px;object-fit:cover;box-shadow:0 25px 80px rgba(0,0,0,0.8);border:2px solid rgba(29,185,84,0.3)}
+.live-dot{position:absolute;top:12px;left:12px;background:#1DB954;color:#000;font-size:11px;font-weight:900;padding:6px 12px;border-radius:999px;display:flex;gap:5px;align-items:center}
+.live-dot span{width:8px;height:8px;background:#000;border-radius:999px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.info{margin-top:20px;text-align:left;width:86vw;max-width:360px;margin-left:auto;margin-right:auto}
+.title{font-size:30px;font-weight:900;line-height:1.1}.artist{font-size:16px;color:#1DB954;margin-top:6px;font-weight:700}
+.progress{width:86vw;max-width:360px;margin:22px auto 0}
+.bar{height:6px;background:rgba(255,255,255,0.2);border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#1DB954,#fff);width:0%;transition:0.2s}
+.time{display:flex;justify-content:space-between;font-size:12px;color:#ccc;margin-top:6px}
+.controls{display:flex;justify-content:center;gap:28px;align-items:center;margin-top:22px}
+.c{width:58px;height:58px;border-radius:999px;background:rgba(255,255,255,0.12);display:grid;place-items:center;cursor:pointer;font-size:22px;border:1px solid rgba(255,255,255,0.1)}
+.c.play{width:72px;height:72px;background:#1DB954;color:#000;font-size:32px;border:0;box-shadow:0 8px 30px rgba(29,185,84,0.5)}
+.actions{width:86vw;max-width:360px;margin:20px auto 0;display:flex;gap:10px}
+.btn{flex:1;height:46px;border-radius:999px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);display:grid;place-items:center;cursor:pointer;font-weight:700;font-size:14px;backdrop-filter:blur(10px)}
+.btn.active{background:#ff1744;border-color:#ff1744;color:#fff}
+.btn.buy{background:#1DB954;color:#000;border-color:#1DB954;font-weight:900}
+
+/* SECTIONS - PASONG STYLE */
+.section{margin-top:36px;text-align:left}
+.section-head{padding:0 5%;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-head h2{font-size:22px;font-weight:900}
+.section-head span{color:#1DB954;font-size:13px;font-weight:700}
+.artist-box{margin:0 5%;background:linear-gradient(135deg,#121212,#1a2a1a);border:1px solid #1DB954;border-radius:20px;padding:20px;display:flex;gap:16px;align-items:center}
+.artist-box img{width:84px;height:84px;border-radius:999px;object-fit:cover;border:3px solid #1DB954}
+.artist-box .name{font-size:22px;font-weight:900}.artist-box .sub{font-size:13px;color:#b3b3b3;margin-top:4px}
+.grid{display:flex;gap:14px;overflow-x:auto;padding:0 5% 14px;scrollbar-width:none}.grid::-webkit-scrollbar{display:none}
+.card{flex:0 0 auto;width:50%;max-width:190px;min-width:160px;background:#121212;border-radius:14px;padding:10px;border:1px solid #1e1e1e}
+.card img{width:100%;aspect-ratio:1/1;border-radius:10px;object-fit:cover}
+.card .t{font-size:14px;font-weight:800;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .a{font-size:11px;color:#aaa;margin-top:2px}
 .list{padding:0 5%}
-.row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #151515;cursor:pointer}
-.row img{width:54px;height:54px;border-radius:6px;object-fit:cover}
-.row .rt{font-size:15px;font-weight:700}.row .ra{font-size:12px;color:#aaa;margin-top:2px}
-.row .play{margin-left:auto;width:34px;height:34px;border-radius:999px;background:#fff;color:#000;display:grid;place-items:center}
-.artist-circle{flex:0 0 auto;width:42%;max-width:170px;text-align:center}
-.artist-circle img{width:100%;aspect-ratio:1/1;border-radius:999px;object-fit:cover}
-.artist-circle .t{font-size:14px;font-weight:700;margin-top:8px}
+.row{display:flex;gap:12px;align-items:center;padding:12px 14px;background:#121212;border:1px solid #1e1e1e;border-radius:12px;margin-bottom:10px;cursor:pointer}
+.row img{width:52px;height:52px;border-radius:8px;object-fit:cover}
+.row .rt{font-size:15px;font-weight:800}.row .ra{font-size:12px;color:#1DB954;margin-top:2px;font-weight:600}
+.row .play{margin-left:auto;width:36px;height:36px;border-radius:999px;background:#1DB954;color:#000;display:grid;place-items:center}
+.circle-card{flex:0 0 auto;width:38%;max-width:150px;text-align:center}
+.circle-card img{width:100%;aspect-ratio:1/1;border-radius:999px;object-fit:cover;border:2px solid #1DB954}
+.circle-card .t{font-size:13px;font-weight:800;margin-top:8px}
 </style>
 </head>
 <body>
-<header><div class="hbtn" onclick="location.href='store.html'">‹</div><div style="font-weight:700;font-size:12px">PLAYING FROM PASONG</div><div class="hbtn" onclick="shareNow()">↗</div></header>
+<div id="bg" class="bg-blur"></div>
+<header>
+<div class="hbtn" onclick="location.href='store.html'">‹</div>
+<div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#1DB954">PASONG</div>
+<div class="hbtn" onclick="shareNow()">↗</div>
+</header>
 
-<div class="main-player">
+<div class="main">
+<div class="cover-wrap">
 <img id="cover" class="cover" src="">
-<div class="info"><div id="title" class="title">Loading</div><div id="artistName" class="artist"></div></div>
+<div class="live-dot"><span></span>LIVE</div>
+</div>
+<div class="info"><div id="title" class="title">KUBE</div><div id="artistName" class="artist">Triple Jokerman</div></div>
 <div class="progress"><div class="bar"><div id="fill" class="fill"></div></div><div class="time"><span id="cur">0:00</span><span id="dur">0:15</span></div></div>
 <div class="controls"><div class="c" onclick="prev()">⏮</div><div id="playBtn" class="c play" onclick="toggle()">▶</div><div class="c" onclick="next()">⏭</div></div>
-<div class="actions-row"><div id="heart" class="btn heart" onclick="fav()">♡ Favorite</div><div class="btn plus" onclick="buy()">+ Buy</div></div>
+<div class="actions"><div id="heart" class="btn" onclick="fav()">♡ Favorite</div><div class="btn buy" onclick="buy()">+ Buy</div></div>
 <audio id="audio"></audio>
 </div>
 
-<div class="section"><div class="artist-box" id="artistBox"><img id="artistImg"><div><div id="artistBoxName" class="name"></div><div id="artistBoxMeta" class="sub"></div></div></div></div>
+<div class="section"><div class="artist-box"><img id="artistImg"><div><div id="artistBoxName" class="name">Triple Jokerman</div><div id="artistBoxMeta" class="sub">Verified Artist • 2024</div><div style="margin-top:10px;background:#1DB954;color:#000;display:inline-block;padding:6px 16px;border-radius:999px;font-size:12px;font-weight:900">FOLLOW</div></div></div></div>
 
-<div class="section"><div class="section-head"><h2 id="popTitle">Popular</h2></div><div class="list" id="popularList"></div></div>
-<div class="section"><div class="section-head"><h2>Popular releases</h2></div><div class="grid" id="releaseGrid"></div></div>
-<div class="section"><div class="section-head"><h2>Albums and EPs</h2></div><div class="grid" id="albumGrid"></div></div>
-<div class="section"><div class="section-head"><h2 id="fansTitle">Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
-<div class="section"><div class="section-head"><h2>Recommended based on this song</h2></div><div class="grid" id="recGrid"></div></div>
+<div class="section"><div class="section-head"><h2 id="popTitle">Popular</h2><span>See all</span></div><div class="list" id="popularList"></div></div>
+<div class="section"><div class="section-head"><h2>Popular releases</h2><span>See all</span></div><div class="grid" id="releaseGrid"></div></div>
+<div class="section"><div class="section-head"><h2>Albums & EPs</h2><span>See all</span></div><div class="grid" id="albumGrid"></div></div>
+<div class="section"><div class="section-head"><h2 id="fansTitle">Fans also like</h2><span>See all</span></div><div class="grid" id="fansGrid"></div></div>
+<div class="section"><div class="section-head"><h2>Recommended</h2><span>See all</span></div><div class="grid" id="recGrid"></div></div>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
@@ -70,89 +88,73 @@ let list=[], idx=0;
 const audio=document.getElementById("audio");
 const qs=k=>new URLSearchParams(location.search).get(k);
 function coverOf(s){return s.cover_url||s.cover_image_url||s.image||"";}
-function isReal(a){ if(!a) return false; let l=a.toLowerCase().trim(); return l!=="pasong" && l!=="pasong artist" && l!=="p" && l!=="unknown" && l.length>1; }
 function smartArtist(s){
-  let a=(s.artist_name||s.producer_name||s.artist||s.producer||"").trim();
-  if(isReal(a)) return a;
-  // Try parse from title: "KUBE Triple Jokerman" => "Triple Jokerman"
-  let t=(s.title||s.beat_name||"").trim();
-  if(t){
-    if(t.includes(" - ")){ let p=t.split(" - "); if(isReal(p[0])||isReal(p[1])) return isReal(p[1])?p[1]:p[0]; }
-    let parts=t.split(" ");
-    if(parts.length>=2){ let maybe=parts.slice(1).join(" "); if(isReal(maybe) && maybe.length>=4) return maybe; }
-    if(t.toLowerCase().includes("jokerman")) return "Triple Jokerman";
-  }
-  return "Triple Jokerman";
+  let a=(s.artist_name||"").trim();
+  if(a && a.toLowerCase()!=="pasong" && a.length>1) return a;
+  let t=(s.title||"").trim();
+  if(t.toLowerCase().includes("jokerman")) return "Triple Jokerman";
+  if(t.includes(" ")){ let m=t.split(" ").slice(1).join(" "); if(m.length>3) return m; }
+  return s.producer_name||s.artist||"PASONG Artist";
 }
-function yearOf(s){ try{ let d=s.release_date||s.created_at; return d?new Date(d).getFullYear():2024; }catch{ return 2024; } }
-function playsOf(s){ let n=s.play_count||s.plays||0; if(!n) n=Math.floor(Math.random()*800000+50000); if(n>=1000000) return (n/1000000).toFixed(1)+"M"; if(n>=1000) return Math.floor(n/1000)+"K"; return String(n); }
-function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function yearOf(s){ try{ return new Date(s.created_at||Date.now()).getFullYear(); }catch{return 2024;} }
+function playsOf(s){ let n=s.play_count||Math.floor(Math.random()*900000+10000); return n>=1000000?(n/1000000).toFixed(1)+"M":Math.floor(n/1000)+"K"; }
 
 async function init(){
   let r=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(150);
-  let b=await db.from("beats").select("*").limit(100);
+  let b=await db.from("beats").select("*").limit(80);
   list=[...(r.data||[]),...(b.data||[])];
+  if(list.length===0){ document.getElementById("popularList").innerHTML="<div style='padding:20px;color:#777'>Loading failed - check Supabase</div>"; return; }
   let id=qs("id"); if(id){ let f=list.findIndex(x=>String(x.id)===String(id)); if(f>=0) idx=f; }
   load(idx);
 }
 function load(i){
-  if(i<0||i>=list.length) return;
   let s=list[i];
   let art=smartArtist(s);
-  document.getElementById("cover").src=coverOf(s)||'https://placehold.co/400x400/181818/fff?text=PASONG';
-  document.getElementById("title").textContent=s.title||s.beat_name||"KUBE";
+  document.getElementById("cover").src=coverOf(s)||'https://placehold.co/400x400/1DB954/000?text=PASONG';
+  document.getElementById("bg").style.background=`url(${coverOf(s)}) center/cover no-repeat`;
+  document.getElementById("title").textContent=s.title||"KUBE";
   document.getElementById("artistName").textContent=art;
-  audio.src=s.audio_url||s.file_url||s.preview_url||"";
-  buildSections(s, art);
-  updateHeart();
-}
-function buildSections(current, art){
   document.getElementById("artistBoxName").textContent=art;
-  document.getElementById("artistImg").src=coverOf(current)||'https://placehold.co/200x200/181818/fff?text='+encodeURIComponent(art[0]);
-  document.getElementById("artistBoxMeta").textContent=`${Math.floor(Math.random()*900+100)}K monthly listeners • ${yearOf(current)} • Verified Artist`;
+  document.getElementById("artistImg").src=coverOf(s)||'';
+  document.getElementById("artistBoxMeta").textContent=`${Math.floor(Math.random()*500+50)}K monthly listeners • ${yearOf(s)} • Verified`;
   document.getElementById("popTitle").textContent=`Popular by ${art}`;
   document.getElementById("fansTitle").textContent=`Fans of ${art} also like`;
-
-  // same artist OR fallback to all
-  let same=list.filter(x=>smartArtist(x).toLowerCase()===art.toLowerCase());
-  if(same.length<2) same=list.slice(0,12);
-
-  // POPULAR LIST - REAL PLAYS + REAL YEAR
-  document.getElementById("popularList").innerHTML=same.slice(0,8).map((s,i)=>`
+  audio.src=s.audio_url||s.file_url||s.preview_url||"";
+  build(s,art);
+  updateHeart();
+}
+function build(current, art){
+  let same=list.slice(0,15);
+  document.getElementById("popularList").innerHTML=same.slice(0,6).map((s,i)=>`
     <div class="row" onclick="location.href='player.html?id=${s.id}'">
-      <span style="width:18px;color:#777;font-weight:700">${i+1}</span>
-      <img src="${esc(coverOf(s)||'https://placehold.co/100x100/181818/fff?text=P')}">
-      <div style="flex:1;overflow:hidden"><div class="rt">${esc(s.title||"Untitled")}</div><div class="ra">▶ ${playsOf(s)} plays • ${yearOf(s)}</div></div>
+      <span style="color:#1DB954;font-weight:900;width:18px">${i+1}</span>
+      <img src="${coverOf(s)||''}">
+      <div style="flex:1"><div class="rt">${s.title||"Song"}</div><div class="ra">${playsOf(s)} plays • ${yearOf(s)}</div></div>
       <div class="play">▶</div>
-    </div>`).join("")||`<div style="padding:20px;color:#777">No songs found</div>`;
+    </div>`).join("");
 
   document.getElementById("releaseGrid").innerHTML=same.slice(0,10).map(s=>`
-    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${esc(coverOf(s)||'')}"><div class="t">${esc(s.title||"Untitled")}</div><div class="a">${yearOf(s)} • Single • ${playsOf(s)}</div></div>`).join("");
+    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="t">${s.title||"Release"}</div><div class="a">${yearOf(s)} • ${playsOf(s)} plays</div></div>`).join("");
 
   document.getElementById("albumGrid").innerHTML=same.slice(0,10).map(s=>`
-    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${esc(coverOf(s)||'')}"><div class="t">${esc(s.title||"Album")}</div><div class="a">${yearOf(s)} • Album</div></div>`).join("");
+    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="t">${s.title||"Album"}</div><div class="a">${yearOf(s)} • Album</div></div>`).join("");
 
-  // FANS ALSO LIKE - REAL ARTIST CIRCLES
-  let others=[...new Map(list.map(x=>[smartArtist(x), x])).values()].filter(x=>smartArtist(x)!==art && isReal(smartArtist(x))).slice(0,10);
-  document.getElementById("fansGrid").innerHTML=others.map(s=>{
-    let n=smartArtist(s);
-    return `<div class="artist-circle" onclick="location.href='player.html?id=${s.id}'"><img src="${esc(coverOf(s)||'')}"><div class="t">${esc(n)}</div><div class="a">Artist • ${yearOf(s)}</div></div>`;
-  }).join("");
+  let others=list.filter(x=>String(x.id)!==String(current.id)).slice(0,10);
+  document.getElementById("fansGrid").innerHTML=others.map(s=>`
+    <div class="circle-card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="t">${smartArtist(s)}</div></div>`).join("");
 
-  let rec=list.filter(x=>x.id!==current.id).sort(()=>0.5-Math.random()).slice(0,10);
-  document.getElementById("recGrid").innerHTML=rec.map(s=>`
-    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${esc(coverOf(s)||'')}"><div class="t">${esc(s.title||"Untitled")}</div><div class="a">${esc(smartArtist(s))} • ${yearOf(s)}</div></div>`).join("");
+  document.getElementById("recGrid").innerHTML=others.slice(0,10).map(s=>`
+    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="t">${s.title||"Recommended"}</div><div class="a">${smartArtist(s)}</div></div>`).join("");
 }
-
 function toggle(){ if(audio.paused){audio.play();document.getElementById("playBtn").textContent="⏸";} else{audio.pause();document.getElementById("playBtn").textContent="▶";} }
-audio.ontimeupdate=()=>{ let pct=(audio.currentTime/(audio.duration||15))*100; document.getElementById("fill").style.width=pct+"%"; document.getElementById("cur").textContent=Math.floor(audio.currentTime/60)+":"+String(Math.floor(audio.currentTime%60)).padStart(2,"0"); }
+audio.ontimeupdate=()=>{ document.getElementById("fill").style.width=(audio.currentTime/(audio.duration||15)*100)+"%"; document.getElementById("cur").textContent=`${Math.floor(audio.currentTime/60)}:${String(Math.floor(audio.currentTime%60)).padStart(2,"0")}`; }
 audio.onended=()=>next();
 function next(){ idx=(idx+1)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸"; }
 function prev(){ idx=(idx-1+list.length)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸"; }
 function updateHeart(){ let w=JSON.parse(localStorage.getItem('wishlist')||'[]'); let id=String(list[idx]?.id||""); let h=document.getElementById("heart"); if(w.includes(id)){h.classList.add("active");h.textContent="♥ Favorited";} else{h.classList.remove("active");h.textContent="♡ Favorite";} }
 function fav(){ let w=JSON.parse(localStorage.getItem('wishlist')||'[]'); let id=String(list[idx].id); if(w.includes(id)) w=w.filter(x=>x!==id); else w.push(id); localStorage.setItem('wishlist',JSON.stringify(w)); updateHeart(); }
-function buy(){ let s=list[idx]; if(s.beat_name||s.bpm) location.href="beats.html?id="+s.id; else location.href="song.html?id="+s.id; }
-function shareNow(){ if(navigator.share) navigator.share({title:document.getElementById("title").textContent,url:location.href}); else{ navigator.clipboard.writeText(location.href); alert("Link copied"); } }
+function buy(){ let s=list[idx]; location.href=(s.beat_name?"beats.html":"song.html")+`?id=${s.id}`; }
+function shareNow(){ navigator.clipboard.writeText(location.href); alert("Link copied - PASONG"); }
 init();
 </script>
 </body>
