@@ -16,19 +16,27 @@ header{position:sticky;top:0;z-index:50;background:#000;border-bottom:1px solid 
 .top-producers{width:92%;margin:14px auto;display:flex;gap:14px;overflow:auto;padding-bottom:6px;scrollbar-width:none}.top-producers::-webkit-scrollbar{display:none}.prod{flex:0 0 auto;text-align:center}.prod img{width:64px;height:64px;border-radius:999px;object-fit:cover}.prod div{font-size:11px;margin-top:4px}
 .section{margin-top:28px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 4%}.section-head h2{font-size:22px;font-weight:800}.section-head a{font-size:13px;color:#aaa;text-decoration:none}
 
-/* 2 COLUMNS BIG LIKE SPOTIFY SCREENSHOT */
+/* HORIZONTAL SCROLL LEFT TO RIGHT - BIG LIKE SPOTIFY */
 .grid,.chart-grid{
-  display:grid !important;
-  grid-template-columns:repeat(2,1fr) !important;
+  display:flex !important;
+  flex-wrap:nowrap !important;
   gap:14px !important;
-  padding:0 4% 16px 4% !important;
-  overflow:visible !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  scroll-snap-type:x mandatory !important;
+  padding:0 4% 18px 4% !important;
+  scrollbar-width:none !important;
+  -webkit-overflow-scrolling:touch !important;
+  grid-template-columns:unset !important;
 }
+.grid::-webkit-scrollbar,.chart-grid::-webkit-scrollbar{display:none !important}
+
 .card{
-  width:100% !important;
-  max-width:none !important;
-  min-width:0 !important;
-  cursor:pointer;
+  flex:0 0 auto !important;
+  width:46% !important;
+  max-width:195px !important;
+  min-width:165px !important;
+  scroll-snap-align:start !important;
   background:transparent !important;
   padding:0 !important;
 }
@@ -139,9 +147,9 @@ let q=query.toLowerCase();
 let songsF=allSongs.filter(s=>{let t=(s.title||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
 let beatsF=allBeats.filter(b=>{let t=(b.title||b.beat_name||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
 let albumsF=allAlbums.length?allAlbums:songsF.slice(0,12);
-document.getElementById("trendingGrid").innerHTML=[...songsF].sort((a,b)=>(b.play_count||0)-(a.play_count||0)).slice(0,4).map(s=>songCard(s)).join("");
-document.getElementById("latestGrid").innerHTML=[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,4).map(s=>songCard(s)).join("");
-document.getElementById("albumsGrid").innerHTML=albumsF.slice(0,4).map(s=>albumCard(s)).join("");
+document.getElementById("trendingGrid").innerHTML=[...songsF].sort((a,b)=>(b.play_count||0)-(a.play_count||0)).slice(0,10).map(s=>songCard(s)).join("");
+document.getElementById("latestGrid").innerHTML=[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10).map(s=>songCard(s)).join("");
+document.getElementById("albumsGrid").innerHTML=albumsF.slice(0,10).map(s=>albumCard(s)).join("");
 let charts=[
   {title:"Top East Africa", sub:"East Africa", img:"https://placehold.co/400x400/1DB954/000?text=EAST+AFRICA"},
   {title:"Top West Africa", sub:"West Africa", img:"https://placehold.co/400x400/FF6B00/fff?text=WEST+AFRICA"},
@@ -152,10 +160,10 @@ let charts=[
   {title:"Top Carolina", sub:"Carolina", img:"https://placehold.co/400x400/00BCD4/000?text=CAROLINA"}
 ];
 document.getElementById("featuredChartsGrid").innerHTML=charts.map(c=>chartCardSmall(c)).join("");
-document.getElementById("beatsGrid").innerHTML=beatsF.slice(0,4).map(s=>beatCard(s)).join("");
-document.getElementById("freeGrid").innerHTML=beatsF.slice(0,4).map(s=>beatCard(s)).join("");
+document.getElementById("beatsGrid").innerHTML=beatsF.slice(0,10).map(s=>beatCard(s)).join("");
+document.getElementById("freeGrid").innerHTML=beatsF.slice(0,10).map(s=>beatCard(s)).join("");
 let allArtists=[...allSongs.map(getArtistRaw),...allBeats.map(getArtistRaw)].filter(a=>isRealArtist(a));
-let prods=[...new Set(allArtists)].slice(0,4);
+let prods=[...new Set(allArtists)].slice(0,10);
 document.getElementById("artistsGrid").innerHTML=prods.map(n=>artistCard(n)).join("");
 document.getElementById("topProds").innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/200x200/181818/fff?text=${esc(n[0])}"><div>${esc(n)}</div></div>`).join("");
 }
