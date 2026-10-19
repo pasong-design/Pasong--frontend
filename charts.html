@@ -3,224 +3,144 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#8b5cf6">
-<link rel="manifest" href="manifest.json">
 <title>PASONG — Music Charts</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
 body{font-family:Arial,sans-serif;background:#09090f;color:#fff;min-height:100vh}
-button,select{font:inherit} button{cursor:pointer} a{text-decoration:none;color:inherit} img{max-width:100%;display:block}
 header{position:sticky;top:0;z-index:100;background:rgba(9,9,15,.94);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.08)}
 .header-inner{max-width:1200px;margin:auto;min-height:68px;display:flex;align-items:center;gap:18px;padding:10px 18px}
-.logo{font-size:22px;font-weight:900;letter-spacing:.5px;color:#fff;white-space:nowrap}
+.logo{font-size:22px;font-weight:900;color:#fff;white-space:nowrap}
 .logo span{color:#a78bfa}
-.nav{display:flex;align-items:center;gap:7px;flex:1;overflow-x:auto;scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{padding:9px 11px;border-radius:9px;color:#aaa;font-size:13px;white-space:nowrap}
-.nav a:hover,.nav a.active{color:#fff;background:rgba(139,92,246,.14)}
-.account{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:#15151f;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.nav{display:flex;gap:7px;flex:1;overflow-x:auto}
+.nav a{padding:9px 11px;border-radius:9px;color:#aaa;font-size:13px;white-space:nowrap;text-decoration:none}
+.nav a.active,.nav a:hover{color:#fff;background:rgba(139,92,246,.14)}
 main{max-width:1200px;margin:auto;padding:22px 18px 70px}
-.hero{position:relative;overflow:hidden;min-height:285px;border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:30px;background:radial-gradient(circle at 80% 20%,rgba(139,92,246,.22),transparent 32%),radial-gradient(circle at 15% 90%,rgba(236,72,153,.13),transparent 30%),linear-gradient(135deg,#11111a,#0c0c13);margin-bottom:22px}
-.hero-content{position:relative;z-index:2;max-width:720px}
-.eyebrow{color:#a78bfa;font-size:12px;font-weight:800;letter-spacing:1.5px;margin-bottom:10px}
-.hero h1{font-size:clamp(30px,6vw,56px);line-height:1;margin-bottom:12px}
-.hero p{color:#aaa;max-width:650px;line-height:1.6;font-size:14px}
-.hero-stats{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
-.hero-stat{min-width:115px;padding:12px 14px;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(10,10,16,.65);backdrop-filter:blur(10px);transition:.2s;cursor:pointer;text-align:left;color:#fff}
-.hero-stat:hover{transform:translateY(-3px);border-color:#8b5cf6;background:rgba(139,92,246,.12)}
-.hero-stat.active{border-color:#8b5cf6;background:rgba(139,92,246,.16);box-shadow:0 0 25px rgba(139,92,246,.12)}
-.hero-stat strong{display:block;font-size:20px;margin-bottom:5px}
-.hero-stat span{display:block;font-size:12px;color:#aaa;font-weight:700}
-.equalizer{position:absolute;right:35px;bottom:25px;display:flex;align-items:end;gap:6px;height:150px;opacity:.55}
-.equalizer i{display:block;width:7px;border-radius:8px;background:linear-gradient(#a78bfa,#ec4899);animation:eq 1.2s ease-in-out infinite alternate}
-.equalizer i:nth-child(1){height:35px;animation-delay:.1s}.equalizer i:nth-child(2){height:85px;animation-delay:.3s}.equalizer i:nth-child(3){height:55px;animation-delay:.2s}.equalizer i:nth-child(4){height:125px;animation-delay:.4s}.equalizer i:nth-child(5){height:75px;animation-delay:.1s}.equalizer i:nth-child(6){height:145px;animation-delay:.5s}.equalizer i:nth-child(7){height:90px;animation-delay:.2s}.equalizer i:nth-child(8){height:120px;animation-delay:.4s}.equalizer i:nth-child(9){height:60px;animation-delay:.1s}
-@keyframes eq{to{transform:scaleY(.45)}}
-.section{margin-top:22px}
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:12px}
-.section-head h2{font-size:20px}
-.section-head p{color:#777;font-size:12px;margin-top:5px}
-.chart-card{background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden}
-.chart-toolbar{padding:14px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.chart-tabs{display:flex;gap:7px;overflow-x:auto}
-.chart-btn,.period-btn{border:1px solid rgba(255,255,255,.08);background:#171720;color:#aaa;border-radius:9px;padding:8px 12px;font-size:12px;white-space:nowrap}
-.chart-btn:hover,.period-btn:hover{color:#fff;border-color:#8b5cf6}
-.chart-btn.active,.period-btn.active{color:#fff;background:#8b5cf6;border-color:#8b5cf6}
-.filters{display:flex;gap:7px;flex-wrap:wrap}
-.genre-select{background:#171720;color:#ddd;border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px 11px;outline:none}
-.periods{display:flex;gap:7px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto}
-.chart-description{padding:13px 14px;color:#888;font-size:12px;line-height:1.5}
-.song-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:13px;align-items:center;padding:12px 14px;border-top:1px solid rgba(255,255,255,.055);transition:.2s}
-.song-row:hover{background:rgba(139,92,246,.055)}
-.song-number{width:48px;height:48px;border-radius:10px;background:#191923;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;color:#888;font-size:13px;font-weight:800}
-.song-number span{position:relative;z-index:1}
-.song-number img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
-.song-main{min-width:0}.song-title{display:block;color:#fff;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-artist{color:#999;font-size:12px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-meta{display:flex;gap:9px;margin-top:5px;color:#666;font-size:10px}
-.song-actions{display:flex;align-items:center;gap:10px}.song-stat{color:#999;font-size:11px;white-space:nowrap}
-.listen-btn{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.1);color:#c4b5fd;padding:8px 11px;border-radius:8px;font-size:11px}
-.listen-btn:hover{background:#8b5cf6;color:#fff}
-.empty{padding:35px 15px;text-align:center;color:#777;font-size:13px}.loading{padding:35px 15px;text-align:center;color:#888;font-size:13px}
-.discover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.discover-card{position:relative;overflow:hidden;min-height:230px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:#101018}
-.discover-card.beats{cursor:pointer}
-.beat-feature-image{position:absolute;inset:0;background:#161620}
-.beat-feature-image img{width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity .45s,transform .6s}
-.discover-card.beats:hover .beat-feature-image img{transform:scale(1.04)}
-.beat-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.9))}
-.beat-info{position:absolute;left:18px;right:18px;bottom:17px;z-index:2}
-.beat-label{display:inline-block;background:#8b5cf6;color:#fff;padding:5px 8px;border-radius:7px;font-size:9px;font-weight:900;letter-spacing:.5px;margin-bottom:8px}
-.beat-info h3{font-size:21px;margin-bottom:5px}.beat-info p{color:#bbb;font-size:12px}
-.beat-dots{position:absolute;right:18px;top:18px;display:flex;gap:5px;z-index:3}
-.beat-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:.2s}.beat-dot.active{background:#fff;transform:scale(1.2)}
-.dj-card{padding:20px;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(circle at 90% 15%,rgba(236,72,153,.18),transparent 35%),#101018}
-.dj-card .small{color:#a78bfa;font-size:11px;font-weight:800;letter-spacing:1px}
-.dj-card h3{font-size:24px;margin:8px 0}.dj-card p{color:#999;font-size:13px;line-height:1.5}
-.discover-link{display:inline-block;margin-top:16px;width:max-content;padding:9px 13px;border-radius:9px;background:#8b5cf6;font-size:12px;font-weight:800}
-.news-section{margin-top:25px}
-.news-single{position:relative;display:grid;grid-template-columns:1.35fr 1fr;min-height:300px;background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;transition:opacity .35s,transform .35s}
-.news-single.changing{opacity:.2;transform:scale(.995)}
-.news-single-image{min-height:300px;background:#171720;overflow:hidden;position:relative}
+
+/* HERO BIG LIKE SPOTIFY */
+.hero{position:relative;overflow:hidden;min-height:340px;border-radius:24px;padding:34px;background:linear-gradient(135deg,#1a1033 0%,#11111a 50%,#0c0c13 100%);border:1px solid rgba(255,255,255,.08);margin-bottom:28px}
+.hero h1{font-size:clamp(34px,6vw,62px);line-height:.95;font-weight:900;letter-spacing:-1px}
+.hero p{color:#aaa;max-width:600px;line-height:1.6;font-size:15px;margin-top:12px}
+.hero-stats{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.hero-stat{min-width:130px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);cursor:pointer;color:#fff;text-align:left}
+.hero-stat.active{background:#8b5cf6;border-color:#8b5cf6}
+.hero-stat strong{font-size:22px;display:block}.hero-stat span{font-size:12px;color:#ccc}
+
+/* CHART BIG SPOTIFY STYLE */
+.section{margin-top:28px}
+.section-head h2{font-size:26px;font-weight:900;letter-spacing:-.5px}
+.section-head p{color:#777;font-size:13px;margin-top:6px}
+.chart-card{background:#12121a;border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden}
+.chart-toolbar{padding:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}
+.chart-btn,.period-btn{border:1px solid rgba(255,255,255,.1);background:#1e1e2a;color:#aaa;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700}
+.chart-btn.active,.period-btn.active{background:#8b5cf6;color:#fff;border-color:#8b5cf6}
+.periods{display:flex;gap:8px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto}
+.genre-select{background:#1e1e2a;color:#ddd;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
+.chart-description{padding:14px 18px;color:#888;font-size:13px}
+
+/* SPOTIFY BIG ROWS */
+.song-row{display:grid;grid-template-columns:72px 72px 1fr auto;gap:16px;align-items:center;padding:16px 18px;border-top:1px solid rgba(255,255,255,.05);transition:.2s;cursor:pointer}
+.song-row:hover{background:rgba(255,255,255,.06)}
+.song-row:hover .song-number img{filter:brightness(.6)}
+.song-row:hover .song-number::after{content:"▶";position:absolute;z-index:3;color:#fff;font-size:18px}
+.song-rank{font-size:22px;font-weight:900;color:#555;text-align:center}
+.song-number{width:72px;height:72px;border-radius:8px;background:#191923;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.song-number img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.song-main{min-width:0}
+.song-title{font-size:17px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-artist{color:#a78bfa;font-size:14px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.song-meta{display:flex;gap:10px;margin-top:6px;color:#666;font-size:12px}
+.song-actions{display:flex;align-items:center;gap:14px}
+.song-stat{color:#999;font-size:13px;font-weight:700}
+.listen-btn{border:none;background:#fff;color:#000;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:900;transition:.2s}
+.listen-btn:hover{background:#8b5cf6;color:#fff;transform:scale(1.05)}
+
+.discover-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.discover-card{border-radius:18px;overflow:hidden;min-height:240px;background:#101018;border:1px solid rgba(255,255,255,.08);position:relative}
+.news-single{display:grid;grid-template-columns:1.3fr 1fr;min-height:320px;background:#101018;border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden}
+.news-single-image{min-height:320px;background:#171720;position:relative;overflow:hidden}
 .news-single-image img{width:100%;height:100%;object-fit:cover}
-.news-single-image::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(16,16,24,.8));pointer-events:none}
-.news-image-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:25px;text-align:center;color:#777;font-size:12px;background:radial-gradient(circle at 30% 30%,rgba(139,92,246,.25),transparent 35%),#171720}
-.news-single-text{padding:28px;display:flex;flex-direction:column;justify-content:center}
-.news-source{color:#a78bfa;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}
-.news-single-text h3{font-size:clamp(22px,3vw,32px);line-height:1.2;margin:10px 0}
-.news-single-text p{color:#999;font-size:13px;line-height:1.6}
-.news-read{display:inline-block;margin-top:16px;color:#a78bfa;font-size:12px;font-weight:800}
-.news-progress{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.08);z-index:5}
-.news-progress-bar{width:0;height:100%;background:linear-gradient(90deg,#8b5cf6,#ec4899);animation:newsProgress 10s linear forwards}
-@keyframes newsProgress{from{width:0}to{width:100%}}
-.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);background:#171720;border:1px solid rgba(255,255,255,.1);color:#fff;padding:11px 15px;border-radius:10px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:300}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-@media(max-width:800px){.header-inner{gap:10px}.nav a{padding:8px 8px;font-size:11px}.hero{padding:23px;min-height:330px}.equalizer{right:18px;bottom:18px;opacity:.25}.discover-grid{grid-template-columns:1fr}.news-single{grid-template-columns:1fr}.news-single-image{height:230px;min-height:230px}.news-single-image::after{background:linear-gradient(180deg,transparent 60%,rgba(16,16,24,.7))}}
-@media(max-width:560px){main{padding:14px 11px 55px}.header-inner{padding:8px 11px}.logo{font-size:19px}.nav a:nth-child(n+4){display:none}.hero{border-radius:17px;padding:20px}.hero h1{font-size:34px}.hero-stats{display:grid;grid-template-columns:repeat(3,1fr)}.hero-stat{min-width:0;padding:10px}.hero-stat strong{font-size:17px}.hero-stat span{font-size:10px}.song-row{grid-template-columns:48px minmax(0,1fr);gap:10px}.song-actions{grid-column:2;margin-top:-3px}.song-stat{font-size:10px}.listen-btn{padding:7px 9px}.news-single-text{padding:21px}.news-single-text h3{font-size:22px}}
-@media(max-width:700px){.real-footer-grid{grid-template-columns:repeat(2,1fr)!important}}
-</style></head><body><header>
-<div class="header-inner">
-<a class="logo" href="index.html">◈ PASONG</a><nav class="nav">
-<a href="index.html">Home</a><a href="store.html">Music Store</a><a class="active" href="charts.html">Charts</a><a href="artists.html">Artists</a><a href="playlists.html">Playlists</a><a href="promotion.html">Promotion</a><a href="upload.html">Upload Music</a>
-</nav><a class="account" href="account.html">◉</a>
-</div></header><main>
-<section class="hero"><div class="hero-content"><div class="eyebrow">PASONG MUSIC CHARTS</div><h1>What's moving on PASONG?</h1><p>Discover songs with real plays and downloads, fresh releases, trending music and the latest stories around African music.</p>
-<div class="hero-stats"><button type="button" class="hero-stat active" data-hero-chart="top"><strong>🔥</strong><span>Top Songs</span></button><button type="button" class="hero-stat" data-hero-chart="trending"><strong>📈</strong><span>Trending</span></button><button type="button" class="hero-stat" data-hero-chart="latest"><strong>🆕</strong><span>Latest Music</span></button></div></div>
-<div class="equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div></section>
-<section class="section"><div class="section-head"><div><h2 id="chartHeading">Top Songs</h2><p id="chartSubheading">Songs ranked by actual plays and downloads across PASONG.</p></div></div>
-<div class="chart-card"><div class="chart-toolbar"><div class="chart-tabs">
-<button type="button" class="chart-btn active" data-chart="top">Top Songs</button><button type="button" class="chart-btn" data-chart="trending">Trending</button><button type="button" class="chart-btn" data-chart="latest">Latest</button>
-</div><div class="filters"><select id="genreSelect" class="genre-select"><option value="all">All Genres</option></select></div></div>
-<div class="periods"><button type="button" class="period-btn active" data-period="today">Today</button><button type="button" class="period-btn" data-period="week">This Week</button><button type="button" class="period-btn" data-period="month">This Month</button><button type="button" class="period-btn" data-period="all">All Time</button></div>
-<div class="chart-description" id="chartDescription">Top Songs uses the real play and download counters returned by PASONG. Songs do not disappear simply because they were uploaded earlier.</div><div id="chartsList"><div class="loading">Loading PASONG charts...</div></div></div></section>
-<section class="section"><div class="section-head"><div><h2>Discover</h2><p>More music and creators on PASONG.</p></div></div>
-<div class="discover-grid"><a class="discover-card beats" id="freeBeatsCard" href="beats.html">
-<div class="beat-feature-image"><img id="freeBeatCover" src="" alt="Free beat cover"></div><div class="beat-overlay"></div><div class="beat-dots" id="beatDots"></div><div class="beat-info"><span class="beat-label">FREE BEATS</span><h3 id="freeBeatTitle">Discover free beats</h3><p id="freeBeatProducer">Loading beats...</p></div></a>
-<div class="discover-card dj-card"><span class="small">PASONG DISCOVER</span><h3>Top DJs</h3><p>Discover DJs, mixes and creators bringing fresh sounds to the PASONG community.</p><a class="discover-link" href="djs.html">Explore DJs</a></div></div></section>
-<section class="news-section"><div class="section-head"><div><h2>Music News</h2><p>Latest music stories and entertainment updates.</p></div></div><div id="newsFeatured"></div></section>
+.news-single-text{padding:28px}
+@media(max-width:700px){.song-row{grid-template-columns:48px 56px 1fr;gap:10px;padding:12px}.song-number{width:56px;height:56px}.song-rank{font-size:18px}.song-title{font-size:15px}.discover-grid{grid-template-columns:1fr}.news-single{grid-template-columns:1fr}.real-footer-grid{grid-template-columns:repeat(2,1fr)!important}}
+.loading{padding:40px;text-align:center;color:#777}
+</style>
+</head>
+<body>
+<header><div class="header-inner">
+<a class="logo" href="index.html">◈ <span style="color:#a78bfa">PASONG</span></a>
+<nav class="nav"><a href="index.html">Home</a><a href="store.html">Music Store</a><a class="active" href="charts.html">Charts</a><a href="artists.html">Artists</a></nav>
+</div></header>
+<main>
+<section class="hero">
+<h1>What's moving on PASONG?</h1>
+<p>Biggest songs ranked by real plays and downloads — like Spotify Top 50.</p>
+<div class="hero-stats">
+<button class="hero-stat active" data-hero-chart="top"><strong>🔥 Top 50</strong><span>Most played</span></button>
+<button class="hero-stat" data-hero-chart="trending"><strong>📈 Trending</strong><span>Hot right now</span></button>
+<button class="hero-stat" data-hero-chart="latest"><strong>🆕 New</strong><span>Fresh drops</span></button>
+</div>
+</section>
+
+<section class="section">
+<div class="section-head"><div><h2 id="chartHeading">Top Songs - PASONG Top 50</h2><p id="chartSubheading">Big chart like Spotify — tap to play.</p></div></div>
+<div class="chart-card">
+<div class="chart-toolbar">
+<div style="display:flex;gap:8px"><button class="chart-btn active" data-chart="top">Top 50</button><button class="chart-btn" data-chart="trending">Trending</button><button class="chart-btn" data-chart="latest">Latest</button></div>
+<select id="genreSelect" class="genre-select"><option value="all">All Genres</option></select>
+</div>
+<div class="periods"><button class="period-btn active" data-period="today">Today</button><button class="period-btn" data-period="week">This Week</button><button class="period-btn" data-period="month">This Month</button><button class="period-btn" data-period="all">All Time</button></div>
+<div class="chart-description" id="chartDescription">Spotify-style big list — 72px cover art, big title, hover play button.</div>
+<div id="chartsList"><div class="loading">Loading big charts...</div></div>
+</div>
+</section>
+<div id="newsFeatured" style="margin-top:30px"></div>
 </main>
 
-<footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 36px;margin-top:30px">
+<footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 36px">
 <div class="real-footer-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:1200px;margin:0 auto">
-<div>
-<div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div>
-<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Company</div>
-<a href="about.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">About</a>
-<a href="jobs.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Jobs</a>
-<a href="for-the-record.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For the Record</a>
-</div>
-<div>
-<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Communities</div>
-<a href="for-artists.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Artists</a>
-<a href="for-creators.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Creators</a>
-<a href="for-authors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Authors</a>
-<a href="developers.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Developers</a>
-<a href="advertising.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Advertising</a>
-<a href="investors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Investors</a>
-<a href="vendors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Vendors</a>
-</div>
-<div>
-<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Useful links</div>
-<a href="support.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Support</a>
-<a href="free-mobile-app.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Free Mobile App</a>
-<a href="popular-by-country.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Popular by Country</a>
-<a href="top-song-lyrics.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Top Song Lyrics</a>
-<a href="import-your-music.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Import your music</a>
-</div>
-<div>
-<div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">PASONG Plans</div>
-<a href="store.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Music Store</a>
-<a href="charts.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Charts</a>
-<a href="beats.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Beats</a>
-</div>
+<div><div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div><div style="font-weight:800;font-size:14px;margin-bottom:12px">Company</div>
+<a href="about.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">About</a><a href="jobs.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Jobs</a><a href="for-the-record.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For the Record</a></div>
+<div><div style="font-weight:800;font-size:14px;margin-bottom:12px">Communities</div>
+<a href="for-artists.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Artists</a><a href="for-creators.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Creators</a><a href="for-authors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Authors</a><a href="developers.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Developers</a><a href="advertising.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Advertising</a><a href="investors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Investors</a><a href="vendors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Vendors</a></div>
+<div><div style="font-weight:800;font-size:14px;margin-bottom:12px">Useful links</div>
+<a href="support.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Support</a><a href="free-mobile-app.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Free Mobile App</a><a href="popular-by-country.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Popular by Country</a><a href="top-song-lyrics.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Top Song Lyrics</a><a href="import-your-music.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Import your music</a></div>
+<div><div style="font-weight:800;font-size:14px;margin-bottom:12px">PASONG Plans</div>
+<a href="store.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Music Store</a><a href="charts.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Charts</a><a href="beats.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Beats</a></div>
 </div>
 <div style="max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid #1A1A2E;display:flex;justify-content:center;color:#666;font-size:12px"><span>© <span id="year"></span> PASONG</span></div>
 </footer>
 
-<div id="toast" class="toast"></div>
 <script>
 const API_BASE="https://pasong-api.onrender.com";
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const MUSIC_AFRICA_NEWS_URL="https://musicinafrica.net/article-types/news/";
-const MICROLINK_BASE="https://api.microlink.io/";
-let songs=[],beats=[],currentChart="top",currentPeriod="today",currentGenre="all",newsItems=[],newsIndex=0,newsTimer=null,beatIndex=0,beatTimer=null,beatTransitionTimer=null;
+let songs=[],currentChart="top",currentPeriod="today",currentGenre="all";
 const $=id=>document.getElementById(id);
-function escapeHTML(value){return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
-function parseNumber(value){if(typeof value==="number"&&Number.isFinite(value))return value;if(typeof value==="string"){const n=Number(value.replace(/,/g,"").replace(/[^\d.-]/g,""));return Number.isFinite(n)?n:0;}return 0;}
-function getTitle(song){return song.title||song.name||"Untitled Song";}
-function getArtist(song){if(typeof song.artist==="string")return song.artist;const candidates=[song.performing_name,song.stage_name,song.artist_name,song.artistName,song.artist?.performing_name,song.artist?.stage_name,song.artist?.artist_name,song.artist?.name,song.artist_profile?.performing_name,song.artist_profile?.stage_name,song.artist_profile?.artist_name,song.artist_profile?.name,song.artist_profiles?.performing_name,song.artist_profiles?.stage_name,song.artist_profiles?.artist_name,song.artist_profiles?.name];const found=candidates.find(value=>typeof value==="string"&&value.trim());return found?found.trim():"PASONG Artist";}
-function getGenre(song){return song.genre||song.category||"Music";}
-function getPlays(song){if(Object.prototype.hasOwnProperty.call(song,"_pasongPlayCount"))return parseNumber(song._pasongPlayCount);return parseNumber(song.plays??song.play_count??song.playCount??song.streams??song.stream_count??song.streamCount??song.total_plays??song.total_streams??0);}
-function getDownloads(song){return parseNumber(song.downloads??song.download_count??song.downloadCount??song.total_downloads??song.totalDownloads??0);}
-function getDate(song){return song.created_at||song.release_date||song.released_at||song.published_at||song.date||"";}
-function getId(song){return song.id||song.song_id||song.songId||"";}
-function getSongCover(song){const candidates=[song.cover_url,song.cover_image_url,song.coverUrl,song.cover,song.cover_image,song.artwork_url,song.artworkUrl,song.artwork,song.image_url,song.imageUrl,song.image,song.thumbnail_url,song.thumbnail,song.cover?.url,song.artwork?.url];for(const value of candidates){if(typeof value==="string"&&value.trim()&&(/^https?:\/\//i.test(value.trim())||value.trim().startsWith("//")||value.trim().startsWith("/")))return value.trim();}return "";}
-function normalizeList(data,keyNames=[]){if(Array.isArray(data))return data;for(const key of keyNames){if(Array.isArray(data?.[key]))return data[key];}if(Array.isArray(data?.data))return data.data;if(Array.isArray(data?.results))return data.results;if(Array.isArray(data?.items))return data.items;return [];}
-function getBeatId(beat){return beat.id||beat.beat_id||beat.beatId||"";}
-function getBeatTitle(beat){return beat.title||beat.name||beat.beat_title||"Untitled Beat";}
-function getBeatProducer(beat){if(typeof beat.producer==="string")return beat.producer;return beat.producer_name||beat.performing_name||beat.stage_name||beat.producerName||beat.producer_profile?.performing_name||beat.producer_profile?.stage_name||"PASONG Producer";}
-function getBeatCover(beat){const candidates=[beat.cover_url,beat.cover_image_url,beat.coverUrl,beat.cover,beat.cover_image,beat.artwork_url,beat.artworkUrl,beat.artwork,beat.image_url,beat.imageUrl,beat.image,beat.thumbnail_url,beat.thumbnail,beat.cover?.url,beat.artwork?.url];for(const value of candidates){if(typeof value==="string"&&value.trim()&&(/^https?:\/\//i.test(value.trim())||value.trim().startsWith("//")||value.trim().startsWith("/")))return value.trim();}return "";}
-function getBeatLink(beat){return "beats.html";}
-function parseDate(value){if(!value)return null;const d=new Date(value);return Number.isNaN(d.getTime())?null:d;}
-async function getRealPlayCount(songId){if(!songId)return 0;try{const {data,error}=await supabaseClient.rpc("get_song_play_count",{p_song_id:songId});if(error){console.error("PASONG charts play count error:",error);return 0;}return Number(data||0);}catch(error){console.error("PASONG charts play count error:",error);return 0;}}
-async function loadRealPlayCounts(){if(!songs.length)return;await Promise.all(songs.map(async song=>{const songId=getId(song);if(!songId)return;song._pasongPlayCount=await getRealPlayCount(songId);}));}
-function scoreSong(song){return getPlays(song)+(getDownloads(song)*5);}
-function activityScore(song){const plays=getPlays(song),downloads=getDownloads(song),date=parseDate(getDate(song));let freshness=0;if(date){const days=Math.max(0,(Date.now()-date.getTime())/86400000);freshness=Math.max(0,30-days);}return plays+(downloads*5)+(freshness*0.01);}
-function isInPeriod(song){const date=parseDate(getDate(song));if(!date)return true;if(currentPeriod==="all")return true;const now=new Date(),start=new Date(now);if(currentPeriod==="today")start.setHours(0,0,0,0);if(currentPeriod==="week")start.setDate(now.getDate()-7);if(currentPeriod==="month")start.setMonth(now.getMonth()-1);return date>=start;}
-function getChartSongs(){let list=[...songs];if(currentGenre!=="all")list=list.filter(song=>getGenre(song).toLowerCase()===currentGenre.toLowerCase());if(currentChart==="latest"){list=list.filter(isInPeriod);list.sort((a,b)=>(parseDate(getDate(b))?.getTime()||0)-(parseDate(getDate(a))?.getTime()||0));if(!list.length)list=[...songs].sort((a,b)=>(parseDate(getDate(b))?.getTime()||0)-(parseDate(getDate(a))?.getTime()||0));return list.slice(0,30);}if(currentChart==="top"){list.sort((a,b)=>{const difference=scoreSong(b)-scoreSong(a);if(difference!==0)return difference;return (parseDate(getDate(b))?.getTime()||0)-(parseDate(getDate(a))?.getTime()||0);});return list.slice(0,30);}list.sort((a,b)=>{const difference=activityScore(b)-activityScore(a);if(difference!==0)return difference;return (parseDate(getDate(b))?.getTime()||0)-(parseDate(getDate(a))?.getTime()||0);});return list.slice(0,30);}
-function updateChartHeading(){const titleMap={top:"Top Songs",trending:"Trending Songs",latest:"Latest Music"},descriptionMap={top:"Songs ranked by actual 30-second plays and downloads across PASONG.",trending:"Songs with the strongest recorded activity, using real 30-second plays and downloads.",latest:"Recently added music on PASONG."};$("chartHeading").textContent=titleMap[currentChart];$("chartSubheading").textContent=descriptionMap[currentChart];$("chartDescription").textContent=descriptionMap[currentChart];}
-function renderCharts(){const list=getChartSongs(),container=$("chartsList");if(!list.length){container.innerHTML='<div class="empty">No songs found for this chart.</div>';return;}container.innerHTML=list.map((song,index)=>{const title=escapeHTML(getTitle(song)),artist=escapeHTML(getArtist(song)),genre=escapeHTML(getGenre(song)),plays=getPlays(song),downloads=getDownloads(song),id=getId(song),cover=escapeHTML(getSongCover(song));return `<article class="song-row"><div class="song-number"><span>${index+1}</span>${cover?`<img src="${cover}" alt="" loading="lazy" onerror="this.remove()">`:""}</div><div class="song-main"><a class="song-title" href="song.html?id=${encodeURIComponent(id)}">${title}</a><div class="song-artist">${artist}</div><div class="song-meta"><span>${genre}</span><span>▶ ${plays.toLocaleString()}</span><span>↓ ${downloads.toLocaleString()}</span></div></div><div class="song-actions"><span class="song-stat">▶ ${plays.toLocaleString()}</span><button type="button" class="listen-btn" data-song-id="${escapeHTML(id)}">Listen</button></div></article>`;}).join("");container.querySelectorAll(".listen-btn").forEach(button=>button.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();const id=button.dataset.songId;if(id)window.location.href="song.html?id="+encodeURIComponent(id);}));}
-function populateGenres(){const genres=new Set();songs.forEach(song=>{const genre=getGenre(song);if(genre&&genre!=="Music")genres.add(genre);});const select=$("genreSelect");select.innerHTML='<option value="all">All Genres</option>';[...genres].sort((a,b)=>a.localeCompare(b)).forEach(genre=>{const option=document.createElement("option");option.value=genre;option.textContent=genre;select.appendChild(option);});select.value=currentGenre;}
-async function loadSongs(){try{const response=await fetch(`${API_BASE}/api/songs`,{cache:"no-store"});if(!response.ok)throw new Error("Songs request failed");const data=await response.json();songs=normalizeList(data,["songs","results","items"]);populateGenres();await loadRealPlayCounts();renderCharts();}catch(error){console.error(error);$("chartsList").innerHTML='<div class="empty">Unable to load charts right now.</div>';}}
-async function loadBeats(){const endpoints=[`${API_BASE}/api/beats`,`${API_BASE}/api/producer-beats`,`${API_BASE}/api/beats/public`];let loaded=[];for(const endpoint of endpoints){try{const response=await fetch(endpoint,{cache:"no-store"});if(!response.ok)continue;const data=await response.json();const result=normalizeList(data,["beats","results","items"]);if(result.length){loaded=result;break;}}catch(error){console.error("Beat endpoint failed:",endpoint,error);}}beats=loaded.filter(beat=>Boolean(getBeatTitle(beat)));if(!beats.length){renderBeatFallback();return;}beatIndex=0;renderBeatDots();await showBeat(beatIndex);clearInterval(beatTimer);if(beats.length>1)beatTimer=setInterval(()=>{beatIndex=(beatIndex+1)%beats.length;showBeat(beatIndex);},5000);}
-function renderBeatFallback(){const image=$("freeBeatCover");image.removeAttribute("src");image.style.opacity="1";$("freeBeatTitle").textContent="Discover free beats";$("freeBeatProducer").textContent="Explore PASONG producers and beats";$("beatDots").innerHTML="";}
-function renderBeatDots(){$("beatDots").innerHTML=beats.map((_,index)=>`<span class="beat-dot ${index===0?"active":""}"></span>`).join("");}
-function preloadBeatImage(url){return new Promise(resolve=>{if(!url){resolve(false);return;}const image=new Image();image.onload=()=>resolve(true);image.onerror=()=>resolve(false);image.src=url;});}
-async function showBeat(index){if(!beats.length)return;const beat=beats[index],cover=getBeatCover(beat),title=getBeatTitle(beat),producer=getBeatProducer(beat),image=$("freeBeatCover"),titleElement=$("freeBeatTitle"),producerElement=$("freeBeatProducer");clearTimeout(beatTransitionTimer);const loaded=await preloadBeatImage(cover);if(index!==beatIndex)return;image.style.opacity="0";beatTransitionTimer=setTimeout(()=>{if(cover&&loaded){image.src=cover;image.alt=title+" cover";image.style.opacity="1";}else{image.removeAttribute("src");image.alt="Free beat cover";image.style.opacity="1";}titleElement.textContent=title;producerElement.textContent=producer;document.querySelectorAll(".beat-dot").forEach((dot,i)=>dot.classList.toggle("active",i===index));},120);}
-function cleanNewsText(value){if(!value)return "";const div=document.createElement("div");div.innerHTML=String(value);return (div.textContent||"").replace(/\s+/g," ").trim();}
-function normalizeNewsUrl(value){if(!value)return "";try{const url=new URL(value,MUSIC_AFRICA_NEWS_URL);if(url.protocol!=="http:"&&url.protocol!=="https:")return "";return url.href;}catch(error){return "";}}
-function normalizeNewsImage(value){if(!value)return "";if(typeof value==="object")value=value.url||value.src||value.href||value["data-src"]||value.content||"";if(typeof value!=="string")return "";value=value.trim();if(!value)return "";if(value.startsWith("//"))value="https:"+value;if(value.startsWith("/"))value="https://musicinafrica.net"+value;try{const url=new URL(value,MUSIC_AFRICA_NEWS_URL);if(url.protocol!=="http:"&&url.protocol!=="https:")return "";return url.href;}catch(error){return "";}}
-function extractSrcsetImage(element){if(!element)return "";for(const attribute of ["src","data-src","data-lazy-src","data-original","data-image","data-lazy","data-url","data-fallback-src"]){const image=normalizeNewsImage(element.getAttribute(attribute));if(image)return image;}for(const attribute of ["srcset","data-srcset","data-lazy-srcset"]){const value=element.getAttribute(attribute);if(!value)continue;const candidates=value.split(",").map(item=>item.trim().split(/\s+/)[0]).filter(Boolean);for(const candidate of candidates.reverse()){const image=normalizeNewsImage(candidate);if(image)return image;}}return "";}
-function findNewsImage(anchor){if(!anchor)return "";let image=extractSrcsetImage(anchor.querySelector("img"));if(image)return image;const picture=anchor.querySelector("picture");if(picture)for(const source of [...picture.querySelectorAll("source")]){image=extractSrcsetImage(source);if(image)return image;}const wrappers=[anchor.closest("article"),anchor.closest(".views-row"),anchor.closest(".node"),anchor.closest(".card"),anchor.closest(".item"),anchor.parentElement,anchor.parentElement?.parentElement,anchor.parentElement?.parentElement?.parentElement].filter(Boolean);for(const wrapper of wrappers)for(const element of [...wrapper.querySelectorAll("img,source")]){image=extractSrcsetImage(element);if(image)return image;}return "";}
-function findNewsDate(anchor){const wrappers=[anchor.closest("article"),anchor.closest(".views-row"),anchor.closest(".node"),anchor.closest(".card"),anchor.closest(".item"),anchor.parentElement,anchor.parentElement?.parentElement,anchor.parentElement?.parentElement?.parentElement].filter(Boolean);for(const wrapper of wrappers){const time=wrapper.querySelector("time");if(time){const datetime=time.getAttribute("datetime");if(datetime)return datetime;const text=cleanNewsText(time.textContent);if(text)return text;}const match=cleanNewsText(wrapper.textContent).match(/\b\d{1,2}\s+[A-Za-z]+\s+\d{4}\b/);if(match)return match[0];}return "";}
-function extractNewsArticlesFromHTML(html){const doc=new DOMParser().parseFromString(html,"text/html"),results=[],seen=new Set();for(const anchor of [...doc.querySelectorAll("a[href]")]){const href=normalizeNewsUrl(anchor.getAttribute("href")||"");if(!href||!href.includes("musicinafrica.net/magazine/")||href.endsWith("/magazine/")||href.includes("/magazine/news")||seen.has(href))continue;let title=cleanNewsText(anchor.textContent);if(!title){const heading=anchor.querySelector("h1,h2,h3,h4,h5");if(heading)title=cleanNewsText(heading.textContent);}if(!title||title.length<12){const aria=anchor.getAttribute("aria-label");if(aria)title=cleanNewsText(aria);}if(!title||title.length<12)continue;const image=findNewsImage(anchor),wrapper=anchor.closest("article,.views-row,.node,.card,.item"),wrapperText=cleanNewsText(wrapper?.textContent||"");seen.add(href);results.push({title,description:wrapperText&&wrapperText!==title?wrapperText:"Latest African music news from Music In Africa.",source:"Music In Africa",link:href,image,pubDate:findNewsDate(anchor)});}return results;}
-async function getMicrolinkPageHTML(url){const response=await fetch(MICROLINK_BASE+"?url="+encodeURIComponent(url)+"&data.html.attr=html&meta=false",{cache:"no-store"});if(!response.ok)throw new Error("Music In Africa page request failed");const data=await response.json();return data?.data?.html||data?.data?.html?.value||"";}
-function getNewsMetadataImageURL(articleUrl){const params=new URLSearchParams();params.set("url",articleUrl);params.set("meta","false");params.set("data.image.selector",'meta[property="og:image"]');params.set("data.image.attr","content");params.set("data.image.type","image");params.set("embed","image.url");return MICROLINK_BASE+"?"+params.toString();}
-function getNewsScreenshotURL(articleUrl){const params=new URLSearchParams();params.set("url",articleUrl);params.set("screenshot","true");params.set("meta","false");params.set("embed","screenshot.url");params.set("viewport.width","1200");params.set("viewport.height","630");return MICROLINK_BASE+"?"+params.toString();}
-function enrichNewsImages(items){return items.slice(0,12).map(item=>{const articleUrl=normalizeNewsUrl(item.link);return {...item,metadataImage:articleUrl?getNewsMetadataImageURL(articleUrl):"",screenshotImage:articleUrl?getNewsScreenshotURL(articleUrl):""};});}
-function formatNewsDate(value){if(!value)return "";const parsed=parseDate(value);if(parsed)return parsed.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});const cleaned=cleanNewsText(value);return cleaned.length>40?"":cleaned;}
-function createNewsFallbackHTML(){return `<div class="news-image-fallback"><div><div style="font-size:11px;color:#a78bfa;font-weight:900;letter-spacing:1.5px;margin-bottom:8px">PASONG MUSIC NEWS</div><div style="color:#777;font-size:12px">Music In Africa</div></div></div>`;}
-function renderNewsItem(item){const container=$("newsFeatured");if(!item)return;const title=escapeHTML(item.title||"Music News"),text=escapeHTML(cleanNewsText(item.description).slice(0,280)||"Read the latest African music story."),source=escapeHTML(item.source||"Music In Africa"),link=normalizeNewsUrl(item.link)||MUSIC_AFRICA_NEWS_URL,date=escapeHTML(formatNewsDate(item.pubDate)),primaryImage=normalizeNewsImage(item.image),metadataImage=normalizeNewsImage(item.metadataImage),screenshotImage=normalizeNewsImage(item.screenshotImage),initialImage=primaryImage||metadataImage,safeInitialImage=escapeHTML(initialImage),safeMetadataImage=escapeHTML(metadataImage),safeScreenshotImage=escapeHTML(screenshotImage);container.innerHTML=`<a class="news-single" id="newsSingle" href="${escapeHTML(link)}" target="_blank" rel="noopener noreferrer"><div class="news-single-image">${safeInitialImage?`<img src="${safeInitialImage}" alt="${title}" loading="eager" referrerpolicy="no-referrer">`:createNewsFallbackHTML()}</div><div class="news-single-text"><span class="news-source">${source}</span><h3>${title}</h3><p>${text}</p>${date?`<span class="news-source" style="margin-top:10px">${date}</span>`:""}<span class="news-read">Read story →</span></div><div class="news-progress"><div class="news-progress-bar"></div></div></a>`;const card=$("newsSingle");if(!card)return;const imageContainer=card.querySelector(".news-single-image"),imageElement=card.querySelector(".news-single-image img");function showFallback(){if(!imageContainer||!imageElement){if(imageContainer&&!imageContainer.querySelector(".news-image-fallback"))imageContainer.insertAdjacentHTML("beforeend",createNewsFallbackHTML());return;}imageElement.style.display="none";if(!imageContainer.querySelector(".news-image-fallback"))imageContainer.insertAdjacentHTML("beforeend",createNewsFallbackHTML());}function showImage(){const fallback=imageContainer?.querySelector(".news-image-fallback");if(fallback)fallback.remove();if(imageElement)imageElement.style.display="block";}if(imageElement){imageElement.addEventListener("load",showImage,{once:true});imageElement.addEventListener("error",()=>{if(safeMetadataImage&&imageElement.src!==safeMetadataImage){imageElement.src=safeMetadataImage;return;}if(safeScreenshotImage&&imageElement.src!==safeScreenshotImage){imageElement.src=safeScreenshotImage;return;}showFallback();});if(imageElement.complete&&imageElement.naturalWidth>0)showImage();}}
-function showNextNews(){if(!newsItems.length)return;const current=$("newsSingle");if(current){current.classList.add("changing");setTimeout(()=>{newsIndex=(newsIndex+1)%newsItems.length;renderNewsItem(newsItems[newsIndex]);},350);}else renderNewsItem(newsItems[newsIndex]);}
-function startNewsRotation(){clearInterval(newsTimer);if(newsItems.length<=1)return;newsTimer=setInterval(showNextNews,10000);}
-async function loadNews(){$("newsFeatured").innerHTML='<div class="loading">Loading music news...</div>';clearInterval(newsTimer);try{const html=await getMicrolinkPageHTML(MUSIC_AFRICA_NEWS_URL);let items=extractNewsArticlesFromHTML(html);const unique=[],seen=new Set();for(const item of items){const key=(item.title+"|"+item.link).toLowerCase();if(seen.has(key))continue;seen.add(key);unique.push(item);}items=unique.slice(0,12);if(!items.length)throw new Error("No Music In Africa articles found");newsItems=enrichNewsImages(items).filter(item=>item.title&&item.link);if(!newsItems.length)throw new Error("No usable news items found");newsIndex=0;renderNewsItem(newsItems[newsIndex]);startNewsRotation();}catch(error){console.error("Music news error:",error);clearInterval(newsTimer);const fallbackArticle={title:"Latest African music news",description:"Discover the latest music stories, artists, releases and industry updates from across Africa.",source:"Music In Africa",link:MUSIC_AFRICA_NEWS_URL,image:"",metadataImage:getNewsMetadataImageURL(MUSIC_AFRICA_NEWS_URL),screenshotImage:getNewsScreenshotURL(MUSIC_AFRICA_NEWS_URL),pubDate:""};newsItems=[fallbackArticle];newsIndex=0;renderNewsItem(fallbackArticle);}}
-document.querySelectorAll(".hero-stat").forEach(button=>button.addEventListener("click",()=>{currentChart=button.dataset.heroChart;document.querySelectorAll(".hero-stat").forEach(item=>item.classList.toggle("active",item===button));document.querySelectorAll(".chart-btn").forEach(item=>item.classList.toggle("active",item.dataset.chart===currentChart));updateChartHeading();renderCharts();document.querySelector(".chart-card")?.scrollIntoView({behavior:"smooth",block:"start"});}));
-document.querySelectorAll(".chart-btn").forEach(button=>button.addEventListener("click",()=>{currentChart=button.dataset.chart;document.querySelectorAll(".chart-btn").forEach(item=>item.classList.toggle("active",item===button));document.querySelectorAll(".hero-stat").forEach(item=>item.classList.toggle("active",item.dataset.heroChart===currentChart));updateChartHeading();renderCharts();}));
-document.querySelectorAll(".period-btn").forEach(button=>button.addEventListener("click",()=>{currentPeriod=button.dataset.period;document.querySelectorAll(".period-btn").forEach(item=>item.classList.toggle("active",item===button));renderCharts();}));
-$("genreSelect").addEventListener("change",event=>{currentGenre=event.target.value;renderCharts();});
-$("freeBeatsCard").addEventListener("click",event=>{event.preventDefault();window.location.href="beats.html";});
+function escapeHTML(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function parseNumber(v){if(typeof v==="number")return v;if(typeof v==="string"){let n=Number(v.replace(/,/g,"").replace(/[^\d.-]/g,""));return isFinite(n)?n:0}return 0}
+function getTitle(s){return s.title||s.name||"Untitled"}
+function getArtist(s){return s.artist||s.artist_name||s.performing_name||"PASONG Artist"}
+function getGenre(s){return s.genre||"Music"}
+function getPlays(s){return parseNumber(s.plays||s.play_count||s._pasongPlayCount||0)}
+function getDownloads(s){return parseNumber(s.downloads||0)}
+function getDate(s){return s.created_at||""}
+function getId(s){return s.id||""}
+function getCover(s){return s.cover_url||s.cover||""}
+function parseDate(v){let d=new Date(v);return isNaN(d.getTime())?null:d}
+async function getRealPlayCount(id){try{let {data}=await supabaseClient.rpc("get_song_play_count",{p_song_id:id});return Number(data||0)}catch(e){return 0}}
+async function loadRealPlayCounts(){await Promise.all(songs.map(async s=>{s._pasongPlayCount=await getRealPlayCount(getId(s))}))}
+function isInPeriod(s){let d=parseDate(getDate(s));if(!d)return true;if(currentPeriod==="all")return true;let now=new Date(),start=new Date(now);if(currentPeriod==="today")start.setHours(0,0,0,0);if(currentPeriod==="week")start.setDate(now.getDate()-7);if(currentPeriod==="month")start.setMonth(now.getMonth()-1);return d>=start}
+function getChartSongs(){let list=[...songs];if(currentGenre!=="all")list=list.filter(s=>getGenre(s).toLowerCase()===currentGenre.toLowerCase());list=list.filter(isInPeriod);if(currentChart==="latest"){list.sort((a,b)=>(parseDate(getDate(b))?.getTime()||0)-(parseDate(getDate(a))?.getTime()||0))}else{list.sort((a,b)=>getPlays(b)-getPlays(a))}return list.slice(0,50)}
+function updateHeading(){let m={top:"Top Songs - PASONG Top 50",trending:"Trending Now",latest:"New Releases"};$( "chartHeading").textContent=m[currentChart]}
+function renderCharts(){let list=getChartSongs(),c=$("chartsList");if(!list.length){c.innerHTML="<div class='loading'>No songs</div>";return}
+c.innerHTML=list.map((song,i)=>{let title=escapeHTML(getTitle(song)),artist=escapeHTML(getArtist(song)),cover=escapeHTML(getCover(song)),plays=getPlays(song),id=getId(song);return `<div class="song-row" onclick="location.href='player.html?id=${id}'"><div class="song-rank">${i+1}</div><div class="song-number">${cover?`<img src="${cover}" loading="lazy">`:""}</div><div class="song-main"><div class="song-title">${title}</div><div class="song-artist">${artist}</div><div class="song-meta"><span>▶ ${plays.toLocaleString()} plays</span><span>${getGenre(song)}</span></div></div><div class="song-actions"><button class="listen-btn">Play</button></div></div>`}).join("")}
+function populateGenres(){let set=new Set();songs.forEach(s=>{if(getGenre(s)!=="Music")set.add(getGenre(s))});let sel=$("genreSelect");sel.innerHTML='<option value="all">All Genres</option>';[...set].forEach(g=>{let o=document.createElement("option");o.value=g;o.textContent=g;sel.appendChild(o)})}
+async function loadSongs(){try{let r=await fetch(`${API_BASE}/api/songs`,{cache:"no-store"});let data=await r.json();songs=Array.isArray(data)?data:(data.data||data.songs||[]);populateGenres();await loadRealPlayCounts();renderCharts()}catch(e){$("chartsList").innerHTML="<div class='loading'>Failed to load</div>"}}
+document.querySelectorAll(".chart-btn,.hero-stat").forEach(b=>b.addEventListener("click",()=>{currentChart=b.dataset.chart||b.dataset.heroChart;document.querySelectorAll(".chart-btn,.hero-stat").forEach(x=>x.classList.remove("active"));document.querySelectorAll(`[data-chart="${currentChart}"],[data-hero-chart="${currentChart}"]`).forEach(x=>x.classList.add("active"));updateHeading();renderCharts()}))
+document.querySelectorAll(".period-btn").forEach(b=>b.addEventListener("click",()=>{currentPeriod=b.dataset.period;document.querySelectorAll(".period-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderCharts()}))
+$("genreSelect").addEventListener("change",e=>{currentGenre=e.target.value;renderCharts()})
 $("year").textContent=new Date().getFullYear();
-updateChartHeading();loadSongs();loadBeats();loadNews();
-</script></body></html>
+loadSongs();
+</script>
+</body></html>
