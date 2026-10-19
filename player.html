@@ -17,7 +17,7 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 .share-row{display:flex;gap:10px;margin-top:14px}.share-btn{flex:1;height:44px;border-radius:12px;background:#1A1A28;border:1px solid #2A2A42;color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center;cursor:pointer}
 .artist-box{margin:24px 5%;background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:18px;display:flex;gap:16px;align-items:center}
 .artist-box img{width:84px;height:84px;border-radius:50%;object-fit:cover;border:3px solid #7C4DFF;background:#23233A}
-.card-box{margin:16px 5%;background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:18px}.card-box h3{font-size:16px;font-weight:900;margin-bottom:12px}
+.card-box{margin:16px 5%;background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:18px}.card-box h3{font-size:16px;font-weight:900;margin-bottom:12px}.credit{font-size:14px;color:#9CA3AF;padding:8px 0;display:flex;justify-content:space-between;border-bottom:1px solid #23233A}.credit b{color:#fff}
 .lyrics{white-space:pre-wrap;font-size:15px;line-height:1.7;color:#D1D5DB}
 .section{margin-top:30px}.head{padding:0 5%;margin-bottom:14px}.head h2{font-size:19px;font-weight:800}
 .list{padding:0 5%;display:flex;flex-direction:column;gap:12px}.row{display:flex;align-items:center;gap:12px;background:#1A1A28;border:1px solid #2A2A42;border-radius:16px;padding:14px;cursor:pointer}.row .num{color:#7C4DFF;font-weight:900;width:22px}.row img{width:56px;height:56px;border-radius:10px;object-fit:cover}.row .rt{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .ra{font-size:13px;color:#9CA3AF;margin-top:3px}
@@ -28,6 +28,7 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 </head>
 <body>
 <header><div class="hbtn" onclick="history.back()">‹</div><div style="font-size:13px;color:#9CA3AF;font-weight:800">PASONG</div><div class="hbtn" onclick="shareLink()">↗</div></header>
+
 <div class="main">
 <img id="cover" class="cover">
 <div id="title" class="title">Loading...</div><div id="artistName" class="artist"></div><div id="meta" class="meta"></div>
@@ -37,16 +38,22 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 <div class="share-row"><div class="share-btn" onclick="shareWA()">WhatsApp</div><div class="share-btn" onclick="shareLink()">Copy Link</div><div class="share-btn" onclick="downloadSong()">Download</div></div>
 <audio id="audio"></audio>
 </div>
+
 <div class="artist-box"><img id="artistImg"><div><div id="artistBoxName" class="name" style="font-size:20px;font-weight:900"></div><div id="artistBoxMeta" class="sub" style="font-size:14px;color:#A0A0B8;margin-top:6px"></div></div></div>
+
+<!-- KEEP ALL CARDS -->
+<div class="card-box"><h3>Credits</h3><div id="credits"></div></div>
 <div class="card-box"><h3>Lyrics</h3><div id="lyrics" class="lyrics">Lyrics not available yet.</div></div>
+
 <div class="section"><div class="head"><h2 id="popTitle">Popular</h2></div><div class="list" id="popularList"></div></div>
 <div class="section"><div class="head"><h2>Popular releases</h2></div><div class="grid" id="releaseGrid"></div></div>
 <div class="section"><div class="head"><h2>Recommended for you</h2></div><div class="grid" id="recommendedGrid"></div></div>
 <div class="section"><div class="head"><h2>Albums & EPs</h2></div><div class="grid" id="albumGrid"></div></div>
 <div class="section"><div class="head"><h2 id="fansTitle">Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
+
 <div class="card-box"><h3>Comments <span id="commentCount" style="color:#7C4DFF;font-size:13px"></span></h3><input id="commentText" class="comment-input" placeholder="Add a comment and press Enter..."><div id="commentsList" style="margin-top:12px"></div></div>
 
-<footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 90px;margin-top:30px"><div style="text-align:center;color:#666;font-size:12px">© 2026 PASONG</div></footer>
+<footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 90px;margin-top:30px"><div style="text-align:center;color:#666;font-size:12px">© 2026 PASONG • Made in Uganda</div></footer>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
@@ -64,10 +71,12 @@ async function load(i){
  let realPlays=await getRealPlays(current.id); if(!realPlays) realPlays=current.plays||0;
  if(current.producer_id){let p=await db.from("profiles").select("*").eq("id",current.producer_id).maybeSingle(); if(p.data){name=p.data.full_name||p.data.username||name; bio=p.data.bio||""; if(p.data.avatar_url) img=p.data.avatar_url;} let ap=await db.from("artist_profiles").select("*").eq("user_id",current.producer_id).maybeSingle(); if(ap.data){name=ap.data.artist_name||ap.data.stage_name||name; bio=ap.data.bio||bio; verified=ap.data.verified||false; if(ap.data.profile_image_url) img=ap.data.profile_image_url; else if(ap.data.profile_photo_url) img=ap.data.profile_photo_url;}}
  else {if(current.artist_id){let ap=await db.from("artist_profiles").select("*").eq("id",current.artist_id).maybeSingle(); if(ap.data){name=ap.data.artist_name||ap.data.stage_name||name; bio=ap.data.bio||""; verified=ap.data.verified||false; if(ap.data.profile_image_url) img=ap.data.profile_image_url; else if(ap.data.profile_photo_url) img=ap.data.profile_photo_url;}}}
- document.getElementById("artistName").textContent=name; document.getElementById("artistBoxName").textContent=name+(verified?" ✓":""); document.getElementById("artistImg").src=img; document.getElementById("meta").textContent=`${realPlays.toLocaleString()} plays • ${genre}`; document.getElementById("artistBoxMeta").textContent=(bio||genre).slice(0,120);
- document.getElementById("lyrics").textContent=current.lyrics||"Lyrics not available yet."; document.getElementById("popTitle").textContent="Popular by "+name; document.getElementById("fansTitle").textContent="Fans of "+name+" also like";
+ document.getElementById("artistName").textContent=name; document.getElementById("artistBoxName").textContent=name+(verified?" ✓":""); document.getElementById("artistImg").src=img; document.getElementById("meta").textContent=`${realPlays.toLocaleString()} plays • ${genre} • ${current.bpm||""} BPM`; document.getElementById("artistBoxMeta").textContent=(bio||genre).slice(0,120);
+ document.getElementById("credits").innerHTML=`<div class="credit"><span>Artist</span><b>${name}</b></div><div class="credit"><span>Genre</span><b>${genre||"-"}</b></div><div class="credit"><span>BPM</span><b>${current.bpm||"-"}</b></div><div class="credit"><span>Key</span><b>${current.key||current.music_key||"-"}</b></div><div class="credit"><span>Plays</span><b>${realPlays.toLocaleString()}</b></div><div class="credit"><span>Year</span><b>${current.created_at?new Date(current.created_at).getFullYear():"2026"}</b></div>`;
+ document.getElementById("lyrics").textContent=current.lyrics||current.lyric||"Lyrics not available yet.";
+ document.getElementById("popTitle").textContent="Popular by "+name; document.getElementById("fansTitle").textContent="Fans of "+name+" also like";
  let same=list.filter(x=>(current.producer_id?x.producer_id===current.producer_id:x.artist_id===current.artist_id)); if(same.length<2) same=list;
- let pop=""; for(let j=0;j<Math.min(6,same.length);j++){let x=same[j]; pop+=`<div class="row" onclick="location.href='player.html?id=${x.id}'"><div class="num">${j+1}</div><img src="${x.cover_url}"><div style="flex:1;overflow:hidden"><div class="rt">${x.title}</div><div class="ra">${x.genre||""}</div></div></div>`;} document.getElementById("popularList").innerHTML=pop;
+ let pop=""; for(let j=0;j<Math.min(6,same.length);j++){let x=same[j]; let rp=await getRealPlays(x.id); if(!rp) rp=x.plays||0; pop+=`<div class="row" onclick="location.href='player.html?id=${x.id}'"><div class="num">${j+1}</div><img src="${x.cover_url}"><div style="flex:1;overflow:hidden"><div class="rt">${x.title}</div><div class="ra">${rp.toLocaleString()} plays</div></div></div>`;} document.getElementById("popularList").innerHTML=pop;
  let alb=await db.from("albums").select("*").order("created_at",{ascending:false}).limit(20);
  let releaseHtml=""; if((alb.data||[]).length){(alb.data||[]).slice(0,10).forEach(a=>{releaseHtml+=`<div class="card" onclick="location.href='album.html?id=${a.id}'"><img src="${a.cover_url||current.cover_url}"><div class="card-info"><div class="t">${a.title||a.name||"Album"}</div><div class="a">${a.release_year||"Release"}</div></div></div>`;});} else {same.slice(0,8).forEach(x=>{releaseHtml+=`<div class="card" onclick="location.href='player.html?id=${x.id}'"><img src="${x.cover_url}"><div class="card-info"><div class="t">${x.title}</div><div class="a">Single</div></div></div>`;});} document.getElementById("releaseGrid").innerHTML=releaseHtml;
  let albumHtml=""; if((alb.data||[]).length){(alb.data||[]).forEach(a=>{albumHtml+=`<div class="card" onclick="location.href='album.html?id=${a.id}'"><img src="${a.cover_url||current.cover_url}"><div class="card-info"><div class="t">${a.title||a.name||"Album"}</div><div class="a">${a.release_year||"Album"}</div></div></div>`;});} else {albumHtml=`<div style="padding:20px;color:#666;font-size:14px">No albums yet from this artist</div>`;} document.getElementById("albumGrid").innerHTML=albumHtml;
@@ -85,53 +94,4 @@ function next(){idx=(idx+1)%list.length; load(idx); audio.play(); document.getEl
 function prev(){idx=(idx-1+list.length)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸";}
 function buy(){location.href=(current.producer_id?"beats.html":"song.html")+"?id="+current.id;}
 function shareLink(){navigator.clipboard.writeText(location.href); alert("Link copied!");}
-function shareWA(){window.open("https://wa.me/?text="+encodeURIComponent(location.href));}
-function downloadSong(){if(audio.src) window.open(audio.src,"_blank");}
-
-async function loadComments(){
-  try{
-    let r=await db.from("comments").select("*").eq("song_id", current.id).order("created_at",{ascending:false}).limit(50);
-    let data=r.data||[];
-    document.getElementById("commentCount").textContent="("+data.length+")";
-    let h="";
-    if(!data.length) h="<div style='color:#666;font-size:13px;padding:12px 0'>No comments yet. Be first!</div>";
-    else data.forEach(c=>{
-      let name=c.username||c.user_name||"User";
-      let text=c.text||c.comment||c.content||"";
-      let likes=c.likes||c.likes_count||0;
-      h+=`<div class="comment-row"><div style="display:flex;gap:10px;flex:1"><div style="width:32px;height:32px;background:#7C4DFF;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;flex-shrink:0">${name[0].toUpperCase()}</div><div style="flex:1"><b style="font-size:14px">${name}</b><p style="font-size:13px;color:#9CA3AF;margin-top:4px">${text}</p><div class="like-btn ${localStorage.getItem('liked_'+c.id)?'liked':''}" onclick="likeComment('${c.id}', ${likes})">♥ ${likes} likes</div></div></div></div>`;
-    });
-    document.getElementById("commentsList").innerHTML=h;
-  }catch(e){console.log(e);}
-}
-
-async function likeComment(id, currentLikes){
-  if(localStorage.getItem('liked_'+id)){alert("Already liked"); return;}
-  try{
-    let newLikes=currentLikes+1;
-    await db.from("comments").update({likes: newLikes, likes_count: newLikes}).eq("id", id);
-    localStorage.setItem('liked_'+id, '1');
-    loadComments();
-  }catch(err){alert(err.message);}
-}
-
-document.getElementById("commentText").addEventListener("keydown", async (e)=>{
-  if(e.key==="Enter"){
-    let t=e.target.value.trim(); if(!t) return;
-    let input=e.target; input.disabled=true; input.placeholder="Posting...";
-    try{
-      let uData=await db.auth.getUser(); let user=uData.data.user;
-      let username="Guest"; if(user){username=user.user_metadata?.full_name||user.email?.split("@")[0]||"User";} else {username="Guest_"+Math.floor(Math.random()*999);}
-      let insertObj={song_id: current.id, text: t, comment: t, content: t, username: username, user_name: username, likes:0, likes_count:0};
-      if(user) insertObj.user_id=user.id;
-      let res=await db.from("comments").insert(insertObj).select();
-      if(res.error){alert("Error: "+res.error.message); input.disabled=false; input.placeholder="Add a comment..."; return;}
-      e.target.value=""; loadComments();
-    }catch(err){alert(err.message);}
-    input.disabled=false; input.placeholder="Add a comment and press Enter...";
-  }
-});
-init();
-</script>
-</body>
-</html>
+function shareWA(){window.open("https://wa.me
