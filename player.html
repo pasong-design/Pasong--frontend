@@ -59,20 +59,23 @@ header{padding:16px 5%;display:flex;justify-content:space-between;align-items:ce
 
 <footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 90px;font-family:Arial;margin-top:30px">
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:1200px;margin:0 auto">
-<div><div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Company</div><a href="about.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">About</a><a href="jobs.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Jobs</a><a href="for-the-record.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For the Record</a></div>
-<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Communities</div><a href="for-artists.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Artists</a><a href="developers.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Developers</a></div>
-<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Useful links</div><a href="support.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Support</a><a href="download-app.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Free Mobile App</a></div>
+<div><div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Company</div><a href="javascript:void(0)" onclick="openPage('about')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">About</a><a href="javascript:void(0)" onclick="openPage('jobs')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Jobs</a><a href="javascript:void(0)" onclick="openPage('record')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For the Record</a></div>
+<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Communities</div><a href="javascript:void(0)" onclick="openPage('artists')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Artists</a><a href="javascript:void(0)" onclick="openPage('devs')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Developers</a></div>
+<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">Useful links</div><a href="javascript:void(0)" onclick="openPage('support')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Support</a><a href="javascript:void(0)" onclick="openPage('app')" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Free Mobile App</a></div>
 <div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:12px">PASONG Plans</div><a href="store.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Music Store</a><a href="charts.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Charts</a></div>
 </div>
-<div style="max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid #1A1A2E;display:flex;justify-content:space-between;color:#666;font-size:12px"><span>© 2026 PASONG</span><span>UGX • English</span></div>
+<div style="max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid #1A1A2E;display:flex;justify-content:center;color:#666;font-size:12px"><span>© 2026 PASONG</span></div>
 </footer>
+
+<div id="footerModal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:200;padding:20px" onclick="if(event.target==this)closeFooter()"><div style="width:100%;max-width:500px;background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:24px;max-height:80vh;overflow:auto"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="footerTitle" style="font-weight:900;font-size:20px"></h3><div onclick="closeFooter()" style="cursor:pointer;font-size:22px">✕</div></div><div id="footerBody" style="margin-top:16px;color:#9CA3AF;font-size:14px;line-height:1.6"></div></div></div>
+
 <style>@media(max-width:700px){footer div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}}</style>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let list=[], idx=0, current=null, isShuffle=false, isRepeat=false, selectedPrice=10, playCounted=false, replyTo=null;
+let list=[], idx=0, current=null, isShuffle=false, isRepeat=false, selectedPrice=10, playCounted=false;
 const audio=document.getElementById("audio");
 function qs(k){return new URLSearchParams(location.search).get(k);}
 function formatTime(t){if(!t||isNaN(t)) return "0:00"; let m=Math.floor(t/60); let s=Math.floor(t%60); return m+":"+String(s).padStart(2,"0");}
@@ -105,6 +108,20 @@ async function loadComments(){try{let r=await db.from("comments").select("*").eq
 async function likeComment(id,cur){if(localStorage.getItem('liked_'+id)){alert("Already liked"); return;} try{await db.from("comments").update({likes:cur+1,likes_count:cur+1}).eq("id",id); localStorage.setItem('liked_'+id,'1'); loadComments();}catch(err){alert(err.message);}}
 function replyComment(name){let inp=document.getElementById("commentText"); inp.value="@"+name+" "; inp.focus();}
 document.getElementById("commentText").addEventListener("keydown", async (e)=>{if(e.key==="Enter"){let t=e.target.value.trim(); if(!t) return; let input=e.target; input.disabled=true; input.placeholder="Posting..."; try{let ud=await db.auth.getUser(); let user=ud.data.user; let uname=user? (user.user_metadata?.full_name||user.email.split("@")[0]) : "Guest"+Math.floor(Math.random()*900); let obj={song_id:current.id, text:t, comment:t, content:t, username:uname, user_name:uname, likes:0, likes_count:0}; if(user) obj.user_id=user.id; let res=await db.from("comments").insert(obj).select(); if(res.error) alert(res.error.message); else {e.target.value=""; loadComments();}}catch(err){alert(err.message);} input.disabled=false; input.placeholder="Add a comment and press Enter...";}});
+
+// Footer pages fix - no more 404
+const footerPages = {
+  about: ["About PASONG","PASONG is Uganda's #1 music platform for artists and producers. Stream, sell beats, and grow your fans. Built in Kampala."],
+  jobs: ["Jobs at PASONG","We are hiring! Developers, designers, A&Rs. Email: jobs@pasong.com"],
+  record: ["For The Record","News, updates and stories from PASONG community."],
+  artists: ["For Artists","Upload your music, sell beats, get paid via Mobile Money. Join 1000+ artists on PASONG."],
+  devs: ["Developers","PASONG API coming soon. Build with our music catalog."],
+  support: ["Support","Need help? Chat us on WhatsApp or email support@pasong.com - 24/7 support."],
+  app: ["Free Mobile App","PASONG app for Android coming soon on Play Store. Stay tuned!"]
+};
+function openPage(k){let p=footerPages[k]; if(!p) return; document.getElementById('footerTitle').textContent=p[0]; document.getElementById('footerBody').innerHTML="<p>"+p[1]+"</p><br><button onclick=\"closeFooter()\" style=\"width:100%;height:48px;background:#7C4DFF;border:none;border-radius:12px;color:#fff;font-weight:800\">Close</button>"; document.getElementById('footerModal').style.display='grid';}
+function closeFooter(){document.getElementById('footerModal').style.display='none';}
+
 init();
 </script>
 </body>
