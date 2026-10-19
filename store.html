@@ -6,54 +6,48 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:Inter,sans-serif;padding-bottom:110px;font-size:16px;line-height:1.5}
-header{position:sticky;top:0;z-index:50;background:#000;border-bottom:1px solid #1a1a1a;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:900;font-size:22px}.hdr-icons{display:flex;gap:12px}.icon-btn{background:#1f1f1f;border:1px solid #2a2a2a;width:42px;height:42px;border-radius:999px;display:grid;place-items:center;cursor:pointer;font-size:18px}
+body{background:#0F0F14;color:#fff;font-family:sans-serif;padding-bottom:110px;font-size:16px;line-height:1.5}
+header{position:sticky;top:0;z-index:50;background:#0F0F14;border-bottom:1px solid #23233A;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:22px}.logo span{color:#c084fc}
+.hdr-icons{display:flex;gap:12px}.icon-btn{background:#1A1A28;border:1px solid #2A2A42;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;cursor:pointer;font-size:18px;color:#fff}
 .wrap{width:100%;margin:auto}
-.promo{width:90%;margin:18px auto;background:#1DB954;border-radius:12px;padding:16px 18px;display:flex;justify-content:space-between;color:#000;font-size:14px;font-weight:800}
-.search{width:90%;margin:18px auto;background:#181818;border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:center}.search input{flex:1;background:transparent;border:0;outline:none;color:#fff;font-size:16px}
-.chips{width:90%;margin:16px auto;display:flex;gap:10px;overflow:auto;padding-bottom:8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap;background:#252525;padding:10px 18px;border-radius:999px;font-size:13px;cursor:pointer;color:#ddd}.chip.active{background:#fff;color:#000;font-weight:700}
-.top-producers{width:90%;margin:18px auto;display:flex;gap:18px;overflow:auto;padding-bottom:8px;scrollbar-width:none}.top-producers::-webkit-scrollbar{display:none}.prod{flex:0 0 auto;text-align:center}.prod img{width:76px;height:76px;border-radius:999px;object-fit:cover}.prod div{font-size:12px;margin-top:6px}
-.section{margin-top:36px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 5%}.section-head h2{font-size:26px;font-weight:900}.section-head a{font-size:15px;color:#aaa;text-decoration:none}
+.promo{width:90%;margin:18px auto;background:linear-gradient(90deg,#7C4DFF,#8B5CF6);border-radius:12px;padding:16px 18px;display:flex;justify-content:space-between;color:#fff;font-size:14px;font-weight:800}
+.search{width:90%;margin:18px auto;background:#1A1A28;border:1px solid #2A2A42;border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:center}.search input{flex:1;background:transparent;border:0;outline:none;color:#fff;font-size:16px}
+.chips{width:90%;margin:16px auto;display:flex;gap:10px;overflow:auto;padding-bottom:8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap;background:#1A1A28;border:1px solid #2A2A42;padding:10px 18px;border-radius:999px;font-size:13px;cursor:pointer;color:#9CA3AF;font-weight:700}.chip.active{background:#7C4DFF;border-color:#7C4DFF;color:#fff;font-weight:800}
+.top-producers{width:90%;margin:18px auto;display:flex;gap:18px;overflow:auto;padding-bottom:8px;scrollbar-width:none}.top-producers::-webkit-scrollbar{display:none}.prod{flex:0 0 auto;text-align:center}.prod img{width:76px;height:76px;border-radius:999px;object-fit:cover;border:2px solid #2A2A42}.prod div{font-size:12px;margin-top:6px;color:#9CA3AF}
+.section{margin-top:36px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:0 5%}.section-head h2{font-size:22px;font-weight:900}.section-head a{font-size:14px;color:#A78BFA;text-decoration:none;font-weight:700}
 
-/* EVERY SONG COLUMN HORIZONTAL SCROLL BIG */
+/* SAME AS PLAYER CARDS */
 .grid,.chart-grid,
 #trendingGrid,#artistsGrid,#latestGrid,#albumsGrid,#featuredChartsGrid,#beatsGrid,#freeGrid{
-  display:flex !important;
-  flex-wrap:nowrap !important;
-  gap:18px !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  scroll-snap-type:x mandatory !important;
-  padding:0 5% 22px 5% !important;
-  scrollbar-width:none !important;
-  -webkit-overflow-scrolling:touch !important;
-  grid-template-columns:unset !important;
+  display:flex !important;flex-wrap:nowrap !important;gap:14px !important;overflow-x:auto !important;overflow-y:hidden !important;scroll-snap-type:x mandatory !important;padding:0 5% 22px 5% !important;scrollbar-width:none !important;-webkit-overflow-scrolling:touch !important;grid-template-columns:unset !important;
 }
 .grid::-webkit-scrollbar,.chart-grid::-webkit-scrollbar{display:none !important}
-.card{flex:0 0 auto !important;width:52% !important;max-width:220px !important;min-width:175px !important;scroll-snap-align:start !important;background:transparent !important;padding:0 !important}
-.cover-wrap{position:relative;width:100%;aspect-ratio:1/1}.cover{width:100%;height:100%;border-radius:12px;object-fit:cover;background:#181818;display:block}
-.play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);border-radius:12px;display:grid;place-items:center;opacity:0;transition:.2s;font-size:30px}.card:hover .play-overlay{opacity:1}
-.info{padding:14px 4px 6px}.title{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist{font-size:14px;color:#b3b3b3;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card{flex:0 0 auto !important;width:52% !important;max-width:200px !important;min-width:170px !important;scroll-snap-align:start !important;background:#1A1A28 !important;border:1px solid #2A2A42 !important;border-radius:16px !important;overflow:hidden !important;padding:0 !important}
+.cover-wrap{position:relative;width:100%;aspect-ratio:1/1}.cover{width:100%;height:100%;object-fit:cover;background:#1A1A28;display:block}
+.play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:grid;place-items:center;opacity:0;transition:.2s;font-size:30px;color:#fff}.card:hover .play-overlay{opacity:1}
+.info{padding:12px}.title{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist{font-size:12px;color:#9CA3AF;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .actions{display:flex;gap:6px;margin-top:10px}
-.act-btn{flex:1;background:#2a2a2a;border:1px solid #2a2a2a;border-radius:999px;height:36px;display:grid;place-items:center;font-size:14px;cursor:pointer}
-.act-btn.play{background:#fff;color:#000;border-color:#fff;font-weight:900;font-size:16px}
-.act-btn.plus{background:#1DB954;color:#000;border-color:#1DB954;font-weight:900;font-size:20px}
-.act-btn.heart.active{background:#ff1744;color:#fff;border-color:#ff1744}
-.footer{margin-top:60px;padding:28px 5% 36px;border-top:1px solid #1a1a1a}.foot-group{margin-bottom:32px}.foot-group h3{font-size:17px;font-weight:700;margin-bottom:12px}.foot-group a{display:block;font-size:15px;color:#a7a7a7;margin:12px 0;text-decoration:none}
-.player{position:fixed;left:0;right:0;bottom:0;z-index:100;background:#181818;border-top:1px solid #282828;padding:14px 5%;display:none;gap:12px;align-items:center;cursor:pointer}.player.show{display:flex}.player img{width:52px;height:52px;border-radius:6px}.p-info{flex:1}.p-title{font-size:14px;font-weight:700}.p-sub{font-size:11px;color:#a7a7a7}.progress{position:absolute;top:0;left:0;height:3px;background:#1DB954;width:0%}
+.act-btn{flex:1;background:#0F0F14;border:1px solid #2A2A42;border-radius:10px;height:36px;display:grid;place-items:center;font-size:14px;cursor:pointer;color:#fff}
+.act-btn.play{background:#7C4DFF;color:#fff;border-color:#7C4DFF;font-weight:900;font-size:16px}
+.act-btn.plus{background:#7C4DFF;color:#fff;border-color:#7C4DFF;font-weight:900;font-size:20px}
+.act-btn.heart.active{background:#FF2D55;color:#fff;border-color:#FF2D55}
+
+.footer{margin-top:60px;background:#080810;border-top:1px solid #23233A;padding:32px 5% 36px}.foot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:1200px;margin:0 auto}.foot-group h3{font-size:14px;font-weight:800;color:#fff;margin-bottom:12px}.foot-group a{display:block;font-size:14px;color:#9CA3AF;margin:8px 0;text-decoration:none;cursor:pointer}.foot-group a:hover{color:#fff}
+.player{position:fixed;left:0;right:0;bottom:0;z-index:100;background:#1A1A28;border-top:1px solid #2A2A42;padding:14px 5%;display:none;gap:12px;align-items:center;cursor:pointer}.player.show{display:flex}.player img{width:52px;height:52px;border-radius:8px;object-fit:cover}.p-info{flex:1}.p-title{font-size:14px;font-weight:700}.p-sub{font-size:11px;color:#9CA3AF}.progress{position:absolute;top:0;left:0;height:3px;background:#7C4DFF;width:0%}
+@media(max-width:700px){.foot-grid{grid-template-columns:repeat(2,1fr)!important}}
 </style>
 </head>
 <body>
-<header><div class="logo">PASONG</div><div class="hdr-icons"><div class="icon-btn" onclick="location.href='favorites.html'">❤️</div><div class="icon-btn" onclick="location.href='cart.html'">🛒</div></div></header>
+<header><div class="logo">◈ <span style="color:#c084fc">PASONG</span></div><div class="hdr-icons"><div class="icon-btn" onclick="location.href='favorites.html'">❤️</div><div class="icon-btn" onclick="location.href='cart.html'">🛒</div></div></header>
 <main class="wrap">
-<div class="promo"><span>🔥 BUNDLE: Buy 3 Beats Get 1 FREE</span><span onclick="location.href='beats.html'" style="background:#000;color:#fff;padding:7px 14px;border-radius:999px;font-size:11px">CLAIM</span></div>
+<div class="promo"><span>🔥 BUNDLE: Buy 3 Beats Get 1 FREE</span><span onclick="location.href='beats.html'" style="background:#000;color:#fff;padding:7px 14px;border-radius:999px;font-size:11px;cursor:pointer">CLAIM</span></div>
 <div class="search">🔍<input id="searchInput" placeholder="What do you want to play?"></div>
 <div class="chips" id="chips"></div>
 <div class="top-producers" id="topProds"></div>
 
 <div class="section"><div class="section-head"><h2>Trending songs</h2><a href="charts.html">Show all</a></div><div class="grid" id="trendingGrid"></div></div>
-<div class="section"><div class="section-head"><h2>Popular artists</h2><a href="#">Show all</a></div><div class="grid" id="artistsGrid"></div></div>
+<div class="section"><div class="section-head"><h2>Popular artists</h2><a href="javascript:void(0)" onclick="openFooter('artists')">Show all</a></div><div class="grid" id="artistsGrid"></div></div>
 <div class="section"><div class="section-head"><h2>Latest Release</h2><a href="latest.html">Show all</a></div><div class="grid" id="latestGrid"></div></div>
 <div class="section"><div class="section-head"><h2>Popular albums and EPs</h2><a href="albums.html">Show all</a></div><div class="grid" id="albumsGrid"></div></div>
 <div class="section"><div class="section-head"><h2>Featured Charts</h2><a href="charts.html">Show all</a></div><div class="chart-grid" id="featuredChartsGrid"></div></div>
@@ -61,13 +55,19 @@ header{position:sticky;top:0;z-index:50;background:#000;border-bottom:1px solid 
 <div class="section"><div class="section-head"><h2>Free Beat of the Week</h2><a href="beats.html">Show all</a></div><div class="grid" id="freeGrid"></div></div>
 
 <div class="footer">
-<div class="foot-group"><h3>Company</h3><a>About</a><a>Jobs</a><a>For the Record</a></div>
-<div class="foot-group"><h3>Communities</h3><a>For Artists</a><a>For Creators</a><a>For Authors</a><a>Developers</a><a>Advertising</a><a>Investors</a><a>Vendors</a></div>
-<div class="foot-group"><h3>Useful links</h3><a>Support</a><a>Free Mobile App</a><a>Popular by Country</a><a>Top Song Lyrics</a><a>Import your music</a></div>
+<div class="foot-grid">
+<div><div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div><div class="foot-group"><h3>Company</h3><a onclick="openFooter('about')">About</a><a onclick="openFooter('jobs')">Jobs</a><a onclick="openFooter('record')">For the Record</a></div></div>
+<div><div class="foot-group"><h3>Communities</h3><a onclick="openFooter('artists')">For Artists</a><a onclick="openFooter('creators')">For Creators</a><a onclick="openFooter('devs')">Developers</a><a onclick="openFooter('ads')">Advertising</a><a onclick="openFooter('investors')">Investors</a></div></div>
+<div><div class="foot-group"><h3>Useful links</h3><a onclick="openFooter('support')">Support</a><a onclick="openFooter('app')">Free Mobile App</a><a onclick="openFooter('country')">Popular by Country</a><a onclick="openFooter('import')">Import your music</a></div></div>
+<div><div class="foot-group"><h3>PASONG Plans</h3><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="beats.html">Beats</a></div></div>
+</div>
+<div style="max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid #1A1A2E;display:flex;justify-content:center;color:#666;font-size:12px"><span>© 2026 PASONG</span></div>
 </div>
 </main>
 
 <div class="player" id="player" onclick="goToRealPlayer()"><div class="progress" id="progress"></div><img id="pCover"><div class="p-info"><div class="p-title" id="pTitle"></div><div class="p-sub" id="pSub">Tap to open full player</div></div><div class="act-btn plus" style="width:48px;height:48px;flex:0 0 48px" onclick="event.stopPropagation();goBuy()">+</div><button onclick="event.stopPropagation();closePlayer()" style="background:none;border:0;color:#fff;margin-left:8px;font-size:18px">✕</button><audio id="audio"></audio></div>
+
+<div id="footerModal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:200;padding:20px" onclick="if(event.target==this)closeFooter()"><div style="width:100%;max-width:500px;background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:24px;max-height:80vh;overflow:auto"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="footerTitle" style="font-weight:900;font-size:20px"></h3><div onclick="closeFooter()" style="cursor:pointer;font-size:22px">✕</div></div><div id="footerBody" style="margin-top:16px;color:#9CA3AF;font-size:14px;line-height:1.6"></div></div></div>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
@@ -80,11 +80,11 @@ function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
 function getArtistRaw(s){return (s.artist_name||s.producer_name||s.producer||s.artist||"").trim();}
 function isRealArtist(a){if(!a) return false;let l=a.toLowerCase();return l!=="unknown" && l!=="pasong" && l!=="p" && l.length>1;}
 function isLiked(id){return wishlist.includes(String(id));}
-function songCard(s){let liked=isLiked(s.id);return `<div class="card"><div class="cover-wrap" onclick="playPlus('${esc(s.id)}','song')"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/181818/fff?text=PASONG')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtistRaw(s)||"")}</div><div class="actions"><div class="act-btn play" onclick="event.stopPropagation();playPlus('${esc(s.id)}','song')">▶</div><div class="act-btn heart ${liked?'active':''}" onclick="event.stopPropagation();toggleHeart('${esc(s.id)}',this)">${liked?'♥':'♡'}</div><div class="act-btn" onclick="event.stopPropagation();shareItem('${esc(s.id)}','song')">↗</div><div class="act-btn plus" onclick="event.stopPropagation();playPlus('${esc(s.id)}','song')">+</div></div></div></div>`;}
-function albumCard(s){let liked=isLiked(s.id);return `<div class="card"><div class="cover-wrap" onclick="playPlus('${esc(s.id)}','album')"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/282828/fff?text=ALBUM')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Album")}</div><div class="artist">EP • Album</div><div class="actions"><div class="act-btn play" onclick="event.stopPropagation();playPlus('${esc(s.id)}','album')">▶</div><div class="act-btn heart ${liked?'active':''}" onclick="event.stopPropagation();toggleHeart('${esc(s.id)}',this)">${liked?'♥':'♡'}</div><div class="act-btn" onclick="event.stopPropagation();shareItem('${esc(s.id)}','album')">↗</div><div class="act-btn plus" onclick="event.stopPropagation();playPlus('${esc(s.id)}','album')">+</div></div></div></div>`;}
-function beatCard(s){let liked=isLiked(s.id);return `<div class="card"><div class="cover-wrap" onclick="playPlus('${esc(s.id)}','beat')"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/181818/fff?text=BEAT')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||s.beat_name||"Nyange")}</div><div class="actions"><div class="act-btn play" onclick="event.stopPropagation();playPlus('${esc(s.id)}','beat')">▶</div><div class="act-btn heart ${liked?'active':''}" onclick="event.stopPropagation();toggleHeart('${esc(s.id)}',this)">${liked?'♥':'♡'}</div><div class="act-btn" onclick="event.stopPropagation();shareItem('${esc(s.id)}','beat')">↗</div><div class="act-btn plus" onclick="event.stopPropagation();playPlus('${esc(s.id)}','beat')">+</div></div></div></div>`;}
+function songCard(s){let liked=isLiked(s.id);return `<div class="card"><div class="cover-wrap" onclick="playPlus('${esc(s.id)}','song')"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/1A1A28/fff?text=PASONG')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Untitled")}</div><div class="artist">${esc(getArtistRaw(s)||"")}</div><div class="actions"><div class="act-btn play" onclick="event.stopPropagation();playPlus('${esc(s.id)}','song')">▶</div><div class="act-btn heart ${liked?'active':''}" onclick="event.stopPropagation();toggleHeart('${esc(s.id)}',this)">${liked?'♥':'♡'}</div><div class="act-btn" onclick="event.stopPropagation();shareItem('${esc(s.id)}','song')">↗</div><div class="act-btn plus" onclick="event.stopPropagation();playPlus('${esc(s.id)}','song')">+</div></div></div></div>`;}
+function albumCard(s){let liked=isLiked(s.id);return `<div class="card"><div class="cover-wrap" onclick="playPlus('${esc(s.id)}','album')"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/1A1A28/fff?text=ALBUM')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||"Album")}</div><div class="artist">EP • Album</div><div class="actions"><div class="act-btn play" onclick="event.stopPropagation();playPlus('${esc(s.id)}','album')">▶</div><div class="act-btn heart ${liked?'active':''}" onclick="event.stopPropagation();toggleHeart('${esc(s.id)}',this)">${liked?'♥':'♡'}</div><div class="act-btn" onclick="event.stopPropagation();shareItem('${esc(s.id)}','album')">↗</div><div class="act-btn plus" onclick="event.stopPropagation();playPlus('${esc(s.id)}','album')">+</div></div></div></div>`;}
+function beatCard(s){let liked=isLiked(s.id);return `<div class="card"><div class="cover-wrap" onclick="playPlus('${esc(s.id)}','beat')"><img class="cover" src="${esc(cover(s)||'https://placehold.co/400x400/1A1A28/fff?text=BEAT')}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(s.title||s.beat_name||"Nyange")}</div><div class="actions"><div class="act-btn play" onclick="event.stopPropagation();playPlus('${esc(s.id)}','beat')">▶</div><div class="act-btn heart ${liked?'active':''}" onclick="event.stopPropagation();toggleHeart('${esc(s.id)}',this)">${liked?'♥':'♡'}</div><div class="act-btn" onclick="event.stopPropagation();shareItem('${esc(s.id)}','beat')">↗</div><div class="act-btn plus" onclick="event.stopPropagation();playPlus('${esc(s.id)}','beat')">+</div></div></div></div>`;}
 function chartCardSmall(c){return `<div class="card" onclick="location.href='charts.html?type=${encodeURIComponent(c.title)}'"><div class="cover-wrap"><img class="cover" src="${c.img}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${c.title}</div><div class="artist">${c.sub}</div></div></div>`;}
-function artistCard(name){return `<div class="card"><div class="cover-wrap"><img class="cover" style="border-radius:999px" src="https://placehold.co/400x400/181818/fff?text=${esc(name[0])}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(name)}</div></div></div>`;}
+function artistCard(name){return `<div class="card"><div class="cover-wrap"><img class="cover" style="border-radius:12px" src="https://placehold.co/400x400/1A1A28/fff?text=${esc(name[0])}"><div class="play-overlay">▶</div></div><div class="info"><div class="title">${esc(name)}</div></div></div>`;}
 function renderAll(){
 let q=query.toLowerCase();
 let songsF=allSongs.filter(s=>{let t=(s.title||"").toLowerCase();if(t.includes("unknown")) return false;return !q||t.includes(q);});
@@ -94,13 +94,13 @@ document.getElementById("trendingGrid").innerHTML=[...songsF].sort((a,b)=>(b.pla
 document.getElementById("latestGrid").innerHTML=[...songsF].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,10).map(s=>songCard(s)).join("");
 document.getElementById("albumsGrid").innerHTML=albumsF.slice(0,10).map(s=>albumCard(s)).join("");
 let charts=[
-  {title:"Top East Africa", sub:"East Africa", img:"https://placehold.co/400x400/1DB954/000?text=EAST+AFRICA"},
-  {title:"Top West Africa", sub:"West Africa", img:"https://placehold.co/400x400/FF6B00/fff?text=WEST+AFRICA"},
-  {title:"Top US", sub:"US Billboard", img:"https://placehold.co/400x400/1E90FF/fff?text=TOP+US"},
-  {title:"Top UK", sub:"UK Hits", img:"https://placehold.co/400x400/FF1744/fff?text=TOP+UK"},
-  {title:"Top 50 Global", sub:"Global Hits", img:"https://placehold.co/400x400/8E24AA/fff?text=TOP+50+GLOBAL"},
-  {title:"Asia Top", sub:"Asia", img:"https://placehold.co/400x400/FFC107/000?text=ASIA+TOP"},
-  {title:"Top Jamaican", sub:"Jamaica", img:"https://placehold.co/400x400/00C853/000?text=JAMAICAN"}
+  {title:"Top East Africa", sub:"East Africa", img:"https://placehold.co/400x400/7C4DFF/fff?text=EAST"},
+  {title:"Top West Africa", sub:"West Africa", img:"https://placehold.co/400x400/FF6B00/fff?text=WEST"},
+  {title:"Top US", sub:"US Billboard", img:"https://placehold.co/400x400/1E90FF/fff?text=US"},
+  {title:"Top UK", sub:"UK Hits", img:"https://placehold.co/400x400/FF1744/fff?text=UK"},
+  {title:"Top 50 Global", sub:"Global Hits", img:"https://placehold.co/400x400/8E24AA/fff?text=GLOBAL"},
+  {title:"Asia Top", sub:"Asia", img:"https://placehold.co/400x400/FFC107/000?text=ASIA"},
+  {title:"Top Jamaican", sub:"Jamaica", img:"https://placehold.co/400x400/00C853/fff?text=JM"}
 ];
 document.getElementById("featuredChartsGrid").innerHTML=charts.map(c=>chartCardSmall(c)).join("");
 document.getElementById("beatsGrid").innerHTML=beatsF.slice(0,10).map(s=>beatCard(s)).join("");
@@ -108,7 +108,7 @@ document.getElementById("freeGrid").innerHTML=beatsF.slice(0,10).map(s=>beatCard
 let allArtists=[...allSongs.map(getArtistRaw),...allBeats.map(getArtistRaw)].filter(a=>isRealArtist(a));
 let prods=[...new Set(allArtists)].slice(0,10);
 document.getElementById("artistsGrid").innerHTML=prods.map(n=>artistCard(n)).join("");
-document.getElementById("topProds").innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/200x200/181818/fff?text=${esc(n[0])}"><div>${esc(n)}</div></div>`).join("");
+document.getElementById("topProds").innerHTML=prods.map(n=>`<div class="prod"><img src="https://placehold.co/200x200/1A1A28/fff?text=${esc(n[0])}"><div>${esc(n)}</div></div>`).join("");
 }
 function toggleHeart(id,el){id=String(id);if(wishlist.includes(id)){wishlist=wishlist.filter(x=>x!==id);el.classList.remove('active');el.textContent='♡';}else{wishlist.push(id);el.classList.add('active');el.textContent='♥';}localStorage.setItem('wishlist',JSON.stringify(wishlist));}
 function shareItem(id,type){let url=location.origin+`/${type}.html?id=${id}`;if(navigator.share){navigator.share({title:'PASONG',url}).catch(()=>{});}else{navigator.clipboard.writeText(url);alert('Link copied: '+url);}}
@@ -141,6 +141,25 @@ renderAll();
 }
 function setGenre(g){activeGenre=g;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c.textContent===g));renderAll();}
 document.getElementById("searchInput").addEventListener("input",e=>{query=e.target.value;renderAll();});
+
+// FOOTER ACTIVE - NO 404
+const pages={
+  about:["About PASONG","PASONG is Uganda's #1 music platform. Built in Kampala for artists worldwide. Stream, sell beats, grow fans."],
+  jobs:["Jobs at PASONG","Join us: devs, designers, A&Rs. Email jobs@pasong.com"],
+  record:["For The Record","Latest news from PASONG community."],
+  artists:["For Artists","Upload music, sell beats, get paid via Mobile Money. Join 1000+ artists."],
+  creators:["For Creators","Tools for creators to monetize their sound."],
+  devs:["Developers","PASONG API coming soon."],
+  ads:["Advertising","Advertise your brand on PASONG. Email ads@pasong.com"],
+  investors:["Investors","Invest in the future of African music."],
+  support:["Support","Help? WhatsApp us or email support@pasong.com - 24/7."],
+  app:["Free Mobile App","PASONG Android app coming soon on Play Store."],
+  country:["Popular by Country","Top songs by country - Uganda, Nigeria, Kenya, SA."],
+  import:["Import your music","Import from Audiomack, SoundCloud easily."]
+};
+function openFooter(k){let p=pages[k]; if(!p) return; document.getElementById('footerTitle').textContent=p[0]; document.getElementById('footerBody').innerHTML="<p>"+p[1]+"</p><br><button onclick='closeFooter()' style='width:100%;height:48px;background:#7C4DFF;border:none;border-radius:12px;color:#fff;font-weight:800'>Close</button>"; document.getElementById('footerModal').style.display='grid';}
+function closeFooter(){document.getElementById('footerModal').style.display='none';}
+
 init();
 </script>
 </body>
