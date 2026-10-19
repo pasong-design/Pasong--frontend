@@ -6,42 +6,41 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0F0F14;color:#fff;font-family:sans-serif;min-height:100vh;display:flex;flex-direction:column}
+body{background:#0F0F14;color:#fff;font-family:sans-serif;padding-bottom:130px}
 header{position:sticky;top:0;z-index:50;background:#0F0F14;border-bottom:1px solid #23233A;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}
 .logo{font-weight:900;font-size:22px;text-decoration:none;color:#fff}.logo span{color:#c084fc}
-.icon-btn{background:#1A1A28;border:1px solid #2A2A42;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;cursor:pointer;color:#fff;font-size:18px}
-.main{flex:1;width:100%;max-width:1200px;margin:0 auto;padding:30px 5%;display:grid;grid-template-columns:380px 1fr;gap:40px}
-@media(max-width:900px){.main{grid-template-columns:1fr}}
-.left-card{background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:20px}
-.cover{width:100%;aspect-ratio:1/1;border-radius:16px;object-fit:cover;background:#0F0F14}
-.title{font-size:26px;font-weight:900;margin-top:18px}.artist{font-size:15px;color:#9CA3AF;margin-top:6px}
-.controls{margin-top:20px;display:flex;gap:10px}
-.btn{flex:1;height:48px;border-radius:12px;border:1px solid #2A2A42;display:grid;place-items:center;cursor:pointer;font-weight:800;font-size:15px}
-.btn-play{background:#7C4DFF;border-color:#7C4DFF;color:#fff;font-size:20px}
-.btn-sec{background:#0F0F14;color:#fff}
-.btn-heart.active{background:#FF2D55;border-color:#FF2D55;color:#fff}
-.right{background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:24px}
-.right h3{font-size:18px;font-weight:900;margin-bottom:16px}
-.song-row{display:flex;gap:12px;padding:12px;border-radius:12px;cursor:pointer;align-items:center}
-.song-row:hover{background:#0F0F14}.song-row img{width:48px;height:48px;border-radius:8px;object-fit:cover}
-.song-row .t{font-size:14px;font-weight:700}.song-row .a{font-size:12px;color:#9CA3AF}
-.player-bar{position:fixed;left:0;right:0;bottom:0;z-index:100;background:#1A1A28;border-top:1px solid #2A2A42;padding:14px 5%;display:flex;gap:12px;align-items:center}
-.player-bar img{width:52px;height:52px;border-radius:8px;object-fit:cover}.p-info{flex:1}.p-title{font-size:14px;font-weight:700}.p-sub{font-size:11px;color:#9CA3AF}
+.icon-btn{background:#1A1A28;border:1px solid #2A2A42;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;cursor:pointer;color:#fff}
+.main{width:100%;max-width:1200px;margin:0 auto;padding:20px 5%;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+@media(max-width:800px){.main{grid-template-columns:1fr}}
+.left-card{background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:16px;height:auto}
+.cover{width:100%;aspect-ratio:1/1;border-radius:16px;object-fit:cover;background:#0F0F14;display:block}
+.title{font-size:20px;font-weight:900;margin-top:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artist{font-size:13px;color:#9CA3AF;margin-top:4px}
+.range{width:100%;margin-top:12px;accent-color:#7C4DFF}
+.time{font-size:11px;color:#9CA3AF;display:flex;justify-content:space-between;margin-top:4px}
+.controls{margin-top:12px;display:flex;gap:8px}
+.btn{flex:1;height:42px;border-radius:10px;border:1px solid #2A2A42;display:grid;place-items:center;cursor:pointer;font-weight:800;font-size:13px}
+.btn-play{background:#7C4DFF;border-color:#7C4DFF;color:#fff;font-size:18px}
+.btn-sec{background:#0F0F14;color:#fff}.btn-heart.active{background:#FF2D55;border-color:#FF2D55}
+.right{background:#1A1A28;border:1px solid #2A2A42;border-radius:20px;padding:16px;height:auto;max-height:520px;overflow:auto}
+.right h3{font-size:16px;font-weight:900;margin-bottom:12px}
+.song-row{display:flex;gap:10px;padding:10px;border-radius:10px;cursor:pointer;align-items:center}.song-row:hover{background:#0F0F14}.song-row img{width:44px;height:44px;border-radius:8px;object-fit:cover}
+.song-row .t{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.song-row .a{font-size:11px;color:#9CA3AF}
+.player-bar{position:fixed;left:0;right:0;bottom:0;z-index:100;background:#1A1A28;border-top:1px solid #2A2A42;padding:10px 5%;display:flex;gap:10px;align-items:center}
+.player-bar img{width:48px;height:48px;border-radius:8px}.p-info{flex:1;min-width:0}.p-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.p-sub{font-size:10px;color:#9CA3AF}
 .progress{position:absolute;top:0;left:0;height:3px;background:#7C4DFF;width:0%}
-.range{width:100%;margin-top:14px;accent-color:#7C4DFF}
 @media(max-width:700px){footer div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}}
 </style>
 </head>
 <body>
-<header><a class="logo" href="store.html">◈ <span>PASONG</span></a><div style="display:flex;gap:12px"><div class="icon-btn" onclick="location.href='favorites.html'">❤️</div><div class="icon-btn" onclick="location.href='cart.html'">🛒</div></div></header>
+<header><a class="logo" href="store.html">◈ <span>PASONG</span></a><div style="display:flex;gap:10px"><div class="icon-btn" onclick="location.href='favorites.html'">❤️</div><div class="icon-btn" onclick="location.href='cart.html'">🛒</div></div></header>
 
 <div class="main">
 <div class="left-card">
-<img id="mainCover" class="cover" src="https://placehold.co/500x500/1A1A28/fff?text=PASONG">
+<img id="mainCover" class="cover" src="">
 <div class="title" id="mainTitle">Loading...</div>
 <div class="artist" id="mainArtist"></div>
 <input type="range" id="seek" class="range" value="0" min="0" max="100">
-<div style="display:flex;justify-content:space-between;font-size:12px;color:#9CA3AF;margin-top:6px"><span id="curTime">0:00</span><span id="durTime">0:00</span></div>
+<div class="time"><span id="curTime">0:00</span><span id="durTime">0:00</span></div>
 <div class="controls">
 <div class="btn btn-play" id="playBtn" onclick="togglePlay()">▶</div>
 <div class="btn btn-sec" onclick="shareCurrent()">↗ Share</div>
@@ -55,17 +54,15 @@ header{position:sticky;top:0;z-index:50;background:#0F0F14;border-bottom:1px sol
 </div>
 </div>
 
-<footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 36px;margin-top:30px">
+<footer style="background:#080810;border-top:1px solid #23233A;padding:32px 5% 36px;margin-top:10px">
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:28px;max-width:1200px;margin:0 auto">
-<div>
-<div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div>
+<div><div style="font-weight:900;font-size:22px;margin-bottom:18px">◈ <span style="color:#c084fc">PASONG</span></div>
 <h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">Company</h3>
 <a href="about.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">About</a>
 <a href="jobs.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Jobs</a>
 <a href="for-the-record.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For the Record</a>
 </div>
-<div>
-<h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">Communities</h3>
+<div><h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">Communities</h3>
 <a href="for-artists.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Artists</a>
 <a href="for-creators.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Creators</a>
 <a href="for-authors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">For Authors</a>
@@ -74,16 +71,14 @@ header{position:sticky;top:0;z-index:50;background:#0F0F14;border-bottom:1px sol
 <a href="investors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Investors</a>
 <a href="vendors.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Vendors</a>
 </div>
-<div>
-<h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">Useful links</h3>
+<div><h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">Useful links</h3>
 <a href="support.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Support</a>
 <a href="free-mobile-app.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Free Mobile App</a>
 <a href="popular-by-country.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Popular by Country</a>
 <a href="top-song-lyrics.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Top Song Lyrics</a>
 <a href="import-your-music.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Import your music</a>
 </div>
-<div>
-<h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">PASONG Plans</h3>
+<div><h3 style="font-size:14px;color:#fff;margin-bottom:12px;font-weight:800">PASONG Plans</h3>
 <a href="store.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Music Store</a>
 <a href="charts.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Charts</a>
 <a href="beats.html" style="display:block;color:#9CA3AF;font-size:14px;padding:6px 0;text-decoration:none">Beats</a>
@@ -92,13 +87,13 @@ header{position:sticky;top:0;z-index:50;background:#0F0F14;border-bottom:1px sol
 <div style="max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid #1A1A2E;display:flex;justify-content:center;color:#666;font-size:12px"><span>© 2026 PASONG</span></div>
 </footer>
 
-<div class="player-bar" id="playerBar"><div class="progress" id="progress"></div><img id="pCover"><div class="p-info"><div class="p-title" id="pTitle"></div><div class="p-sub">PASONG • Now Playing</div></div><div class="btn btn-play" style="width:48px;height:48px;flex:0 0 48px" onclick="togglePlay()">▶</div><audio id="audio"></audio></div>
+<div class="player-bar" id="playerBar"><div class="progress" id="progress"></div><img id="pCover"><div class="p-info"><div class="p-title" id="pTitle"></div><div class="p-sub">PASONG • Now Playing</div></div><div class="btn btn-play" style="width:44px;height:44px;flex:0 0 44px" onclick="togglePlay()">▶</div><audio id="audio"></audio></div>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-let current=null,all=[],wishlist=JSON.parse(localStorage.getItem('wishlist')||'[]'),isPlaying=false;
+let current=null,all=[],wishlist=JSON.parse(localStorage.getItem('wishlist')||'[]');
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||s.image||"";}
 function getArtist(s){return s.artist_name||s.producer_name||s.artist||"";}
@@ -107,36 +102,23 @@ async function init(){
  let id=new URLSearchParams(location.search).get('id');
  let res=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(100);
  all=res.data||[];
- if(id) current=all.find(x=>String(x.id)===String(id))||all[0];
- else current=all[0];
+ if(id) current=all.find(x=>String(x.id)===String(id))||all[0]; else current=all[0];
  if(!current) return;
- document.getElementById("mainCover").src=cover(current)||'https://placehold.co/500x500/1A1A28/fff?text=PASONG';
+ document.getElementById("mainCover").src=cover(current)||'';
  document.getElementById("mainTitle").textContent=current.title||"Untitled";
  document.getElementById("mainArtist").textContent=getArtist(current)||"";
- document.getElementById("pCover").src=cover(current)||'';
- document.getElementById("pTitle").textContent=current.title||"";
- let a=document.getElementById("audio");
- a.src=current.audio_url||current.file_url||current.preview_url||"";
- a.ontimeupdate=()=>{
-  let p=(a.currentTime/a.duration*100)||0;
-  document.getElementById("progress").style.width=p+"%";
-  document.getElementById("seek").value=p;
-  document.getElementById("curTime").textContent=fmt(a.currentTime);
-  document.getElementById("durTime").textContent=fmt(a.duration||0);
- };
- a.onended=()=>{isPlaying=false;document.getElementById("playBtn").textContent="▶";};
+ document.getElementById("pCover").src=cover(current)||''; document.getElementById("pTitle").textContent=current.title||"";
+ let a=document.getElementById("audio"); a.src=current.audio_url||current.file_url||current.preview_url||"";
+ a.ontimeupdate=()=>{let p=(a.currentTime/a.duration*100)||0; document.getElementById("progress").style.width=p+"%"; document.getElementById("seek").value=p; document.getElementById("curTime").textContent=fmt(a.currentTime); document.getElementById("durTime").textContent=fmt(a.duration||0);};
  document.getElementById("seek").addEventListener("input",e=>{a.currentTime=e.target.value/100*a.duration;});
- document.getElementById("upNext").innerHTML=all.slice(0,15).map(s=>`<div class="song-row" onclick="location.href='player.html?id=${esc(s.id)}'"><img src="${esc(cover(s)||'https://placehold.co/100x100/1A1A28/fff?text=P')}"><div><div class="t">${esc(s.title||"Untitled")}</div><div class="a">${esc(getArtist(s)||"")}</div></div></div>`).join("");
+ document.getElementById("upNext").innerHTML=all.slice(0,20).map(s=>`<div class="song-row" onclick="location.href='player.html?id=${esc(s.id)}'"><img src="${esc(cover(s)||'https://placehold.co/100x100/1A1A28/fff?text=P')}"><div style="min-width:0"><div class="t">${esc(s.title||"Untitled")}</div><div class="a">${esc(getArtist(s)||"")}</div></div></div>`).join("");
  updateHeart();
 }
-function togglePlay(){
- let a=document.getElementById("audio");
- if(a.paused){a.play();isPlaying=true;document.getElementById("playBtn").textContent="⏸";}else{a.pause();isPlaying=false;document.getElementById("playBtn").textContent="▶";}
-}
-function updateHeart(){let btn=document.getElementById("heartBtn");if(!current) return;if(wishlist.includes(String(current.id))){btn.classList.add("active");btn.textContent="♥";}else{btn.classList.remove("active");btn.textContent="♡";}}
-function toggleHeartCurrent(){if(!current) return;let id=String(current.id);if(wishlist.includes(id)) wishlist=wishlist.filter(x=>x!==id);else wishlist.push(id);localStorage.setItem('wishlist',JSON.stringify(wishlist));updateHeart();}
-function shareCurrent(){if(!current) return;let url=location.href;if(navigator.share){navigator.share({title:current.title,url}).catch(()=>{});}else{navigator.clipboard.writeText(url);alert("Link copied: "+url);}}
-function buyCurrent(){if(!current) return;location.href="song.html?id="+current.id;}
+function togglePlay(){let a=document.getElementById("audio"); if(a.paused){a.play();document.getElementById("playBtn").textContent="⏸";}else{a.pause();document.getElementById("playBtn").textContent="▶";}}
+function updateHeart(){let btn=document.getElementById("heartBtn"); if(!current) return; if(wishlist.includes(String(current.id))){btn.classList.add("active");btn.textContent="♥";}else{btn.classList.remove("active");btn.textContent="♡";}}
+function toggleHeartCurrent(){if(!current) return; let id=String(current.id); if(wishlist.includes(id)) wishlist=wishlist.filter(x=>x!==id); else wishlist.push(id); localStorage.setItem('wishlist',JSON.stringify(wishlist)); updateHeart();}
+function shareCurrent(){if(!current) return; let url=location.href; if(navigator.share){navigator.share({title:current.title,url}).catch(()=>{});}else{navigator.clipboard.writeText(url);alert("Link copied");}}
+function buyCurrent(){if(!current) return; location.href="song.html?id="+current.id;}
 init();
 </script>
 </body>
