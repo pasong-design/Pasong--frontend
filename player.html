@@ -1,83 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Player - PASONG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a0a;color:#fff;font-family:Inter,sans-serif;padding-bottom:100px}
-.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at top,#2a1a2a 0%,#0a0a0a 60%);filter:blur(30px)}
-header{padding:12px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;background:rgba(10,10,10,0.8);backdrop-filter:blur(20px)}
-.hbtn{width:40px;height:40px;border-radius:999px;background:#1e1e1e;display:grid;place-items:center;cursor:pointer}
-.main{padding:10px 5% 0;text-align:center}
-.cover{width:82vw;max-width:360px;aspect-ratio:1/1;border-radius:14px;object-fit:cover;box-shadow:0 20px 60px #000}
-.info{margin-top:16px;text-align:left;width:82vw;max-width:360px;margin-left:auto;margin-right:auto}
-.title{font-size:22px;font-weight:900}.artist{font-size:13px;color:#aaa;margin-top:4px}
-.progress{width:82vw;max-width:360px;margin:18px auto 0}
-.bar{height:4px;background:#2a2a2a;border-radius:999px;overflow:hidden}.fill{height:100%;background:#fff;width:0%}
-.time{display:flex;justify-content:space-between;font-size:11px;color:#777;margin-top:6px}
-.controls{display:flex;justify-content:center;gap:20px;align-items:center;margin-top:16px}
-.c{width:48px;height:48px;border-radius:999px;background:#1e1e1e;display:grid;place-items:center;cursor:pointer}
-.c.play{width:62px;height:62px;background:#fff;color:#000;font-size:28px}
-.actions{width:82vw;max-width:360px;margin:16px auto 0;display:flex;gap:8px}
-.btn{height:36px;padding:0 18px;border-radius:999px;background:#232323;display:grid;place-items:center;cursor:pointer;font-size:12px;font-weight:600;border:0}
-.btn.heart.active{background:#ff1744}.btn.buy{background:#1DB954;color:#000;font-weight:900}
+body{background:#000;color:#fff;font-family:Inter,sans-serif;padding-bottom:100px}
+header{padding:14px 5%;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:20;border-bottom:1px solid #222}
+.hbtn{width:44px;height:44px;border-radius:999px;background:#222;display:grid;place-items:center;cursor:pointer;color:#fff;font-size:20px}
+.main{padding:12px 5% 0}
+.cover{width:100%;max-width:360px;aspect-ratio:1/1;border-radius:16px;object-fit:cover;display:block;margin:0 auto;box-shadow:0 10px 40px rgba(0,0,0,0.8)}
+.info{margin-top:16px}
+.title{font-size:24px;font-weight:900;color:#fff}.artist{font-size:14px;color:#aaa;margin-top:4px}
+.progress{margin-top:18px}
+.bar{height:5px;background:#2a2a2a;border-radius:999px;overflow:hidden}.fill{height:100%;background:#fff;width:0%}
+.time{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:6px}
+.controls{display:flex;justify-content:center;gap:24px;align-items:center;margin-top:18px}
+.c{width:52px;height:52px;border-radius:999px;background:#222;display:grid;place-items:center;cursor:pointer;font-size:20px;color:#fff}
+.c.play{width:68px;height:68px;background:#fff;color:#000;font-size:30px}
+.actions{margin-top:18px;display:flex;gap:10px}
+.btn{flex:1;height:42px;border-radius:999px;background:#1e1e1e;border:1px solid #2a2a2a;display:grid;place-items:center;cursor:pointer;font-weight:700;font-size:13px;color:#fff}
+.btn.buy{background:#1DB954;color:#000;border-color:#1DB954;font-weight:900}
+.btn.active{background:#ff1744;border-color:#ff1744}
 
-/* YOUR SCREENSHOT STYLE */
-.section{margin-top:28px;text-align:left}
-.section-head{padding:0 5%;margin-bottom:14px}
-.section-head h2{font-size:18px;font-weight:800}
-.artist-box{margin:0 5%;background:#181818;border:1px solid #2a2a2a;border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center}
-.artist-box img{width:62px;height:62px;border-radius:999px;object-fit:cover}
-.artist-box .name{font-size:16px;font-weight:800}.artist-box .sub{font-size:12px;color:#aaa;margin-top:2px}
-.follow{margin-top:8px;background:#1DB954;color:#000;display:inline-block;padding:6px 16px;border-radius:999px;font-size:11px;font-weight:900;cursor:pointer}
+/* VISIBLE LIKE YOUR SCREENSHOT */
+.section{margin-top:28px}
+.head{padding:0 5%;margin-bottom:14px}
+.head h2{font-size:19px;font-weight:800;color:#fff}
 
-/* Popular list - EXACT like screenshot */
-.list{padding:0 5%;display:flex;flex-direction:column;gap:10px}
-.row{display:flex;gap:12px;align-items:center;background:#151515;border:1px solid #222;border-radius:12px;padding:10px 12px;cursor:pointer}
-.row .num{color:#1DB954;font-weight:900;font-size:14px;width:16px;text-align:center}
-.row img{width:48px;height:48px;border-radius:6px;object-fit:cover}
-.row .rt{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Artist Box - EXACT visible */
+.artist-box{margin:0 5%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center}
+.artist-box img{width:64px;height:64px;border-radius:999px;object-fit:cover;border:2px solid #333}
+.artist-box .name{font-size:17px;font-weight:800;color:#fff}
+.artist-box .sub{font-size:12px;color:#aaa;margin-top:3px}
+.follow{margin-top:8px;background:#1DB954;color:#000;padding:7px 18px;border-radius:999px;font-size:11px;font-weight:900;display:inline-block}
+
+/* Popular List - MAKE IT VISIBLE */
+.list{padding:0 5%;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;gap:12px;background:#171717;border:1px solid #2a2a2a;border-radius:14px;padding:12px 14px}
+.row .num{color:#1DB954;font-weight:900;font-size:15px;width:18px}
+.row img{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#222;flex-shrink:0}
+.row .rt{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .ra{font-size:11px;color:#1DB954;margin-top:2px;font-weight:600}
 
-/* Popular releases - EXACT cards */
-.grid{display:flex;gap:12px;overflow-x:auto;padding:0 5% 10px;scrollbar-width:none}.grid::-webkit-scrollbar{display:none}
-.card{flex:0 0 auto;width:46%;max-width:180px;min-width:150px;background:#151515;border:1px solid #222;border-radius:14px;overflow:hidden;padding:0}
-.card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
-.card-info{padding:10px}
-.card .t{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .a{font-size:11px;color:#aaa;margin-top:2px}
+/* Popular releases - VISIBLE CARDS */
+.grid{display:flex;gap:12px;overflow-x:auto;padding:0 5% 10px;scrollbar-width:none}
+.grid::-webkit-scrollbar{display:none}
+.card{flex:0 0 auto;width:48%;max-width:185px;min-width:155px;background:#171717;border:1px solid #2a2a2a;border-radius:16px;overflow:hidden}
+.card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#222}
+.card-info{padding:10px 12px 12px}
+.card .t{font-size:13px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .a{font-size:11px;color:#888;margin-top:3px}
 </style>
 </head>
 <body>
-<div class="bg"></div>
 <header>
 <div class="hbtn" onclick="location.href='store.html'">‹</div>
-<div style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:1px">PLAYING FROM PASONG</div>
+<div style="font-size:12px;font-weight:800;color:#888">PASONG</div>
 <div class="hbtn" onclick="shareNow()">↗</div>
 </header>
 
 <div class="main">
-<img id="cover" class="cover" src="">
-<div class="info"><div id="title" class="title">Loading...</div><div id="artistName" class="artist"></div></div>
+<img id="cover" class="cover" src="https://placehold.co/400x400/181818/fff?text=PASONG">
+<div class="info"><div id="title" class="title">KUBE</div><div id="artistName" class="artist">PASONG Artist</div></div>
 <div class="progress"><div class="bar"><div id="fill" class="fill"></div></div><div class="time"><span id="cur">0:00</span><span id="dur">0:15</span></div></div>
 <div class="controls"><div class="c" onclick="prev()">⏮</div><div id="playBtn" class="c play" onclick="toggle()">▶</div><div class="c" onclick="next()">⏭</div></div>
-<div class="actions"><div id="heart" class="btn heart" onclick="fav()">♡ Favorite</div><div class="btn buy" onclick="buy()">+ Buy</div></div>
+<div class="actions"><div id="heart" class="btn" onclick="fav()">♡ Favorite</div><div class="btn buy" onclick="buy()">+ Buy</div></div>
 <audio id="audio"></audio>
 </div>
 
 <div class="section"><div class="artist-box"><img id="artistImg"><div><div id="artistBoxName" class="name">PASONG Artist</div><div id="artistBoxMeta" class="sub">244K monthly listeners • 2026 • Verified</div><div class="follow">FOLLOW</div></div></div></div>
 
-<div class="section"><div class="section-head"><h2 id="popTitle">Popular by PASONG Artist</h2></div><div class="list" id="popularList"></div></div>
+<div class="section"><div class="head"><h2 id="popTitle">Popular by PASONG Artist</h2></div><div class="list" id="popularList"></div></div>
 
-<div class="section"><div class="section-head"><h2>Popular releases</h2></div><div class="grid" id="releaseGrid"></div></div>
+<div class="section"><div class="head"><h2>Popular releases</h2></div><div class="grid" id="releaseGrid"></div></div>
 
-<div class="section"><div class="section-head"><h2>Albums & EPs</h2></div><div class="grid" id="albumGrid"></div></div>
+<div class="section"><div class="head"><h2>Albums & EPs</h2></div><div class="grid" id="albumGrid"></div></div>
 
-<div class="section"><div class="section-head"><h2 id="fansTitle">Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
+<div class="section"><div class="head"><h2 id="fansTitle">Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
 
-<div class="section"><div class="section-head"><h2>Recommended based on this song</h2></div><div class="grid" id="recGrid"></div></div>
+<div class="section"><div class="head"><h2>Recommended</h2></div><div class="grid" id="recGrid"></div></div>
 
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
@@ -89,15 +92,15 @@ const qs=k=>new URLSearchParams(location.search).get(k);
 function coverOf(s){return s.cover_url||s.cover_image_url||s.image||"";}
 function smartArtist(s){
   let a=(s.artist_name||"").trim();
-  if(a && a.toLowerCase()!=="pasong" && a.length>1) return a;
-  let t=(s.title||"").trim();
-  if(t.toLowerCase().includes("jokerman")) return "Triple Jokerman";
-  if(t.includes("Woman")) return "Patel UG";
-  if(t.includes("Kwata")) return "Kwata Crew";
-  if(t.includes("Nyange")) return "Nyange";
+  if(a && a.toLowerCase()!=="pasong") return a;
+  let t=(s.title||"").toLowerCase();
+  if(t.includes("jokerman")) return "Triple Jokerman";
+  if(t.includes("woman")) return "Patel UG";
+  if(t.includes("kwata")) return "Kwata Awo";
+  if(t.includes("nyange")) return "Nyange";
   return "PASONG Artist";
 }
-function yearOf(s){ try{ return new Date(s.created_at||Date.now()).getFullYear(); }catch{return 2026;} }
+function yearOf(s){ try{return new Date(s.created_at||Date.now()).getFullYear();}catch{return 2026;} }
 function playsOf(s){ let n=s.play_count||Math.floor(Math.random()*900000+30000); return n>=1000000?(n/1000000).toFixed(0)+"M":Math.floor(n/1000)+"K"; }
 
 async function init(){
@@ -105,34 +108,32 @@ async function init(){
   let b=await db.from("beats").select("*").limit(100);
   list=[...(r.data||[]),...(b.data||[])];
   let id=qs("id"); if(id){ let f=list.findIndex(x=>String(x.id)===String(id)); if(f>=0) idx=f; }
-  load(idx);
+  if(list.length) load(idx);
+  else document.getElementById("popularList").innerHTML="<div style='padding:20px;color:#fff'>No data - check Supabase connection</div>";
 }
 function load(i){
-  let s=list[i];
-  let art=smartArtist(s);
-  document.getElementById("cover").src=coverOf(s)||'https://placehold.co/400x400/181818/fff?text=PASONG';
+  let s=list[i]; let art=smartArtist(s);
+  document.getElementById("cover").src=coverOf(s)||'https://placehold.co/400x400/222/fff?text=PASONG';
   document.getElementById("title").textContent=s.title||"KUBE Triple Jokerman";
   document.getElementById("artistName").textContent=art;
   document.getElementById("artistBoxName").textContent=art;
   document.getElementById("artistImg").src=coverOf(s)||'';
-  document.getElementById("artistBoxMeta").textContent=`${Math.floor(Math.random()*500+50)}K monthly listeners • ${yearOf(s)} • Verified`;
+  document.getElementById("artistBoxMeta").textContent=`${Math.floor(Math.random()*500+100)}K monthly listeners • ${yearOf(s)} • Verified`;
   document.getElementById("popTitle").textContent=`Popular by ${art}`;
   document.getElementById("fansTitle").textContent=`Fans of ${art} also like`;
   audio.src=s.audio_url||s.file_url||s.preview_url||"";
-  build(s);
+  build();
   updateHeart();
 }
-function build(current){
-  // Make same order as screenshot: KUBE, Woman, Kwata Awo, Nyange
+function build(){
   let ordered=[...list].sort((a,b)=>{
-    let score=(t)=>{ t=(t.title||"").toLowerCase(); if(t.includes("kube")) return 0; if(t.includes("woman")) return 1; if(t.includes("kwata")) return 2; if(t.includes("nyange")) return 3; return 10; };
-    return score(a)-score(b);
+    let v=t=>{ t=(t.title||"").toLowerCase(); if(t.includes("kube")) return 0; if(t.includes("woman")) return 1; if(t.includes("kwata")) return 2; if(t.includes("nyange")) return 3; return 10; };
+    return v(a)-v(b);
   });
-
   document.getElementById("popularList").innerHTML=ordered.slice(0,6).map((s,i)=>`
     <div class="row" onclick="location.href='player.html?id=${s.id}'">
-      <span class="num">${i+1}</span>
-      <img src="${coverOf(s)||'https://placehold.co/100x100/181818/fff?text=P'}">
+      <div class="num">${i+1}</div>
+      <img src="${coverOf(s)||'https://placehold.co/100x100/222/fff?text=P'}">
       <div style="flex:1;overflow:hidden"><div class="rt">${s.title||"Untitled"}</div><div class="ra">${playsOf(s)} plays • ${yearOf(s)}</div></div>
     </div>`).join("");
 
@@ -143,22 +144,19 @@ function build(current){
     </div>`).join("");
 
   document.getElementById("albumGrid").innerHTML=ordered.slice(0,6).map(s=>`
-    <div class="card" onclick="location.href='player.html?id=${s.id}'">
-      <img src="${coverOf(s)||''}">
-      <div class="card-info"><div class="t">${s.title||"Album"}</div><div class="a">${yearOf(s)} • Album</div></div>
-    </div>`).join("");
+    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="card-info"><div class="t">${s.title||"Album"}</div><div class="a">${yearOf(s)} • Album</div></div></div>`).join("");
 
   document.getElementById("fansGrid").innerHTML=ordered.slice(0,8).map(s=>`
-    <div class="card" style="background:#151515;border-radius:16px;padding:12px;text-align:center" onclick="location.href='player.html?id=${s.id}'">
-      <img src="${coverOf(s)||''}" style="border-radius:999px;width:80px;height:80px;margin:auto;display:block">
+    <div class="card" style="padding:14px;text-align:center" onclick="location.href='player.html?id=${s.id}'">
+      <img src="${coverOf(s)||''}" style="width:70px;height:70px;border-radius:999px;margin:0 auto;display:block">
       <div class="t" style="margin-top:8px;text-align:center">${smartArtist(s)}</div>
     </div>`).join("");
 
   document.getElementById("recGrid").innerHTML=ordered.slice(0,8).map(s=>`
-    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="card-info"><div class="t">${s.title||"Recommended"}</div><div class="a">${smartArtist(s)}</div></div></div>`).join("");
+    <div class="card" onclick="location.href='player.html?id=${s.id}'"><img src="${coverOf(s)||''}"><div class="card-info"><div class="t">${s.title||"Song"}</div><div class="a">${smartArtist(s)}</div></div></div>`).join("");
 }
 function toggle(){ if(audio.paused){audio.play();document.getElementById("playBtn").textContent="⏸";} else{audio.pause();document.getElementById("playBtn").textContent="▶";} }
-audio.ontimeupdate=()=>{ document.getElementById("fill").style.width=(audio.currentTime/(audio.duration||15)*100)+"%"; document.getElementById("cur").textContent=`${Math.floor(audio.currentTime/60)}:${String(Math.floor(audio.currentTime%60)).padStart(2,"0")}`; }
+audio.ontimeupdate=()=>{ document.getElementById("fill").style.width=(audio.currentTime/(audio.duration||15)*100)+"%"; document.getElementById("cur").textContent=`0:${String(Math.floor(audio.currentTime%60)).padStart(2,"0")}`; }
 audio.onended=()=>next();
 function next(){ idx=(idx+1)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸"; }
 function prev(){ idx=(idx-1+list.length)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸"; }
