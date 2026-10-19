@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player - PASONG</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:Inter,sans-serif;padding-bottom:90px}
+header{padding:16px 5%;display:flex;justify-content:space-between;align-items:center;background:#000;position:sticky;top:0;z-index:50;border-bottom:1px solid #1a1a1a}
+.hbtn{width:42px;height:42px;border-radius:999px;background:#1f1f1f;display:grid;place-items:center;cursor:pointer}
+.main-player{display:flex;flex-direction:column;align-items:center;padding:24px 5% 20px}
+.cover{width:82vw;max-width:360px;aspect-ratio:1/1;border-radius:12px;object-fit:cover;box-shadow:0 20px 60px rgba(0,0,0,.9)}
+.info{text-align:left;width:90%;max-width:380px;margin-top:20px}
+.title{font-size:28px;font-weight:900;line-height:1.2}.artist{font-size:16px;color:#b3b3b3;margin-top:6px}
+.progress{width:90%;max-width:380px;margin-top:20px}
+.bar{height:5px;background:#2a2a2a;border-radius:999px;overflow:hidden}
+.fill{height:100%;background:#fff;width:0%}
+.time{display:flex;justify-content:space-between;font-size:12px;color:#aaa;margin-top:6px}
+.controls{margin-top:20px;display:flex;gap:20px;align-items:center;width:90%;max-width:380px;justify-content:space-between}
+.c{width:54px;height:54px;border-radius:999px;background:#1f1f1f;display:grid;place-items:center;cursor:pointer;font-size:20px}
+.c.play{width:66px;height:66px;background:#fff;color:#000;font-size:28px;font-weight:900}
+.actions-row{display:flex;gap:10px;margin-top:18px;width:90%;max-width:380px}
+.btn{flex:1;height:44px;border-radius:999px;background:#2a2a2a;border:1px solid #2a2a2a;display:grid;place-items:center;cursor:pointer;font-size:14px}
+.btn.heart.active{background:#ff1744;border-color:#ff1744}
+.btn.plus{background:#1DB954;color:#000;border-color:#1DB954;font-weight:900}
+
+/* SPOTIFY STYLE SECTIONS */
+.section{margin-top:36px}
+.section-head{display:flex;justify-content:space-between;align-items:center;padding:0 5%;margin-bottom:14px}
+.section-head h2{font-size:20px;font-weight:800}
+.artist-box{margin:0 5%;background:#121212;border-radius:16px;padding:18px;display:flex;gap:14px;align-items:center}
+.artist-box img{width:80px;height:80px;border-radius:999px;object-fit:cover}
+.artist-box .name{font-size:20px;font-weight:800}
+.artist-box .sub{font-size:13px;color:#aaa;margin-top:4px}
+.grid{display:flex;gap:14px;overflow-x:auto;padding:0 5% 10px;scrollbar-width:none}
+.grid::-webkit-scrollbar{display:none}
+.card{flex:0 0 auto;width:46%;max-width:195px;min-width:160px;background:transparent}
+.card img{width:100%;aspect-ratio:1/1;border-radius:8px;object-fit:cover;background:#181818}
+.card .t{font-size:14px;font-weight:600;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .a{font-size:12px;color:#b3b3b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list{padding:0 5%;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:12px;align-items:center;background:transparent;padding:8px 0}
+.row img{width:52px;height:52px;border-radius:6px;object-fit:cover}
+.row .rt{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .ra{font-size:13px;color:#b3b3b3}
+.row .play{margin-left:auto;width:32px;height:32px;border-radius:999px;background:#fff;color:#000;display:grid;place-items:center;cursor:pointer;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<div class="hbtn" onclick="location.href='store.html'">‹</div>
+<div style="font-weight:700;font-size:14px">Playing from PASONG</div>
+<div class="hbtn" onclick="shareNow()">↗</div>
+</header>
+
+<div class="main-player">
+<img id="cover" class="cover" src="https://placehold.co/400x400/181818/fff?text=PASONG">
+<div class="info"><div id="title" class="title">Loading...</div><div id="artistName" class="artist"></div></div>
+<div class="progress"><div class="bar"><div id="fill" class="fill"></div></div><div class="time"><span id="cur">0:00</span><span id="dur">0:15</span></div></div>
+<div class="controls">
+<div class="c" onclick="prev()">⏮</div>
+<div id="playBtn" class="c play" onclick="toggle()">▶</div>
+<div class="c" onclick="next()">⏭</div>
+</div>
+<div class="actions-row">
+<div id="heart" class="btn heart" onclick="fav()">♡ Favorite</div>
+<div class="btn plus" onclick="buy()">+ Buy</div>
+</div>
+<audio id="audio"></audio>
+</div>
+
+<!-- ARTIST PROFILE BOX -->
+<div class="section">
+<div class="artist-box" id="artistBox">
+<img id="artistImg" src="https://placehold.co/200x200/181818/fff?text=A">
+<div><div id="artistBoxName" class="name">Artist</div><div class="sub">12,543,201 monthly listeners • Verified Artist</div><div style="margin-top:10px"><span style="background:#fff;color:#000;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700">Follow</span></div></div>
+</div>
+</div>
+
+<!-- POPULAR BY ARTIST -->
+<div class="section"><div class="section-head"><h2 id="popTitle">Popular</h2><a style="color:#aaa;font-size:13px">Show all</a></div><div class="list" id="popularList"></div></div>
+
+<!-- POPULAR RELEASES -->
+<div class="section"><div class="section-head"><h2>Popular releases</h2></div><div class="grid" id="releaseGrid"></div></div>
+
+<!-- ALBUMS / EP -->
+<div class="section"><div class="section-head"><h2>Popular albums and EPs</h2></div><div class="grid" id="albumGrid"></div></div>
+
+<!-- FANS ALSO LIKE -->
+<div class="section"><div class="section-head"><h2>Fans also like</h2></div><div class="grid" id="fansGrid"></div></div>
+
+<!-- RECOMMENDED BASED ON THIS SONG -->
+<div class="section"><div class="section-head"><h2>Recommended based on this song</h2></div><div class="grid" id="recGrid"></div></div>
+
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let list=[], idx=0;
+const audio=document.getElementById("audio");
+const qs=k=>new URLSearchParams(location.search).get(k);
+function coverOf(s){return s.cover_url||s.cover_image_url||s.image||"";}
+function artistOf(s){return s.artist_name||s.producer_name||s.artist||s.producer||"PASONG";}
+function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+async function init(){
+  let r=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(120);
+  let b=await db.from("beats").select("*").limit(80);
+  list=[...(r.data||[]),...(b.data||[])];
+  let id=qs("id");
+  if(id){ let f=list.findIndex(x=>String(x.id)===String(id)); if(f>=0) idx=f; }
+  load(idx);
+}
+function load(i){
+  if(i<0||i>=list.length) return;
+  let s=list[i];
+  document.getElementById("cover").src=coverOf(s)||'https://placehold.co/400x400/181818/fff?text=PASONG';
+  document.getElementById("title").textContent=s.title||s.beat_name||"Untitled";
+  document.getElementById("artistName").textContent=artistOf(s);
+  audio.src=s.audio_url||s.file_url||s.preview_url||"";
+  buildSections(s);
+  updateHeart();
+}
+function buildSections(current){
+  let art=artistOf(current);
+  document.getElementById("artistBoxName").textContent=art;
+  document.getElementById("artistImg").src=coverOf(current)||`https://placehold.co/200x200/181818/fff?text=${esc(art[0])}`;
+  document.getElementById("popTitle").textContent=`Popular by ${art}`;
+
+  let sameArtist=list.filter(x=>artistOf(x).toLowerCase()===art.toLowerCase());
+  if(sameArtist.length<5) sameArtist=list.filter(x=>artistOf(x).toLowerCase().includes(art.toLowerCase().split(" ")[0]) || Math.random()>0.5);
+  let otherArtist=[...new Set(list.map(x=>artistOf(x)))].filter(a=>a!==art).slice(0,8);
+
+  // Popular list
+  document.getElementById("popularList").innerHTML=sameArtist.slice(0,5).map((s,i)=>`
+    <div class="row" onclick="location.href='player.html?id=${s.id}'">
+      <span style="width:16px;color:#aaa;font-size:14px">${i+1}</span>
+      <img src="${esc(coverOf(s)||'https://placehold.co/100x100/181818/fff?text=P')}">
+      <div style="flex:1;overflow:hidden"><div class="rt">${esc(s.title||s.beat_name||"Untitled")}</div><div class="ra">12.4M plays</div></div>
+      <div class="play">▶</div>
+    </div>`).join("");
+
+  // Release Grid
+  document.getElementById("releaseGrid").innerHTML=sameArtist.slice(0,8).map(s=>`
+    <div class="card" onclick="location.href='player.html?id=${s.id}'">
+      <img src="${esc(coverOf(s)||'https://placehold.co/300x300/181818/fff?text=PASONG')}">
+      <div class="t">${esc(s.title||"Untitled")}</div><div class="a">2024 • Single</div>
+    </div>`).join("");
+
+  // Albums
+  document.getElementById("albumGrid").innerHTML=sameArtist.slice(0,8).map(s=>`
+    <div class="card" onclick="location.href='player.html?id=${s.id}'">
+      <img src="${esc(coverOf(s)||'https://placehold.co/300x300/282828/fff?text=ALBUM')}">
+      <div class="t">${esc(s.title||"Album")}</div><div class="a">Album • ${art}</div>
+    </div>`).join("");
+
+  // Fans also like
+  document.getElementById("fansGrid").innerHTML=otherArtist.map(name=>{
+    let img=list.find(x=>artistOf(x)===name);
+    return `<div class="card"><img style="border-radius:999px" src="${esc(coverOf(img||{})||'https://placehold.co/300x300/181818/fff?text='+name[0])}"><div class="t">${esc(name)}</div><div class="a">Artist</div></div>`;
+  }).join("");
+
+  // Recommended
+  let rec=list.filter(x=>x.id!==current.id).sort(()=>0.5-Math.random()).slice(0,10);
+  document.getElementById("recGrid").innerHTML=rec.map(s=>`
+    <div class="card" onclick="location.href='player.html?id=${s.id}'">
+      <img src="${esc(coverOf(s)||'https://placehold.co/300x300/181818/fff?text=PASONG')}">
+      <div class="t">${esc(s.title||"Untitled")}</div><div class="a">${esc(artistOf(s))}</div>
+    </div>`).join("");
+}
+
+function toggle(){ if(audio.paused){audio.play();document.getElementById("playBtn").textContent="⏸";} else{audio.pause();document.getElementById("playBtn").textContent="▶";} }
+audio.ontimeupdate=()=>{ let pct=(audio.currentTime/(audio.duration||15))*100; document.getElementById("fill").style.width=pct+"%"; document.getElementById("cur").textContent=Math.floor(audio.currentTime/60)+":"+String(Math.floor(audio.currentTime%60)).padStart(2,"0"); }
+audio.onended=()=>next();
+function next(){ idx=(idx+1)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸"; }
+function prev(){ idx=(idx-1+list.length)%list.length; load(idx); audio.play(); document.getElementById("playBtn").textContent="⏸"; }
+function updateHeart(){ let w=JSON.parse(localStorage.getItem('wishlist')||'[]'); let id=String(list[idx]?.id||""); let h=document.getElementById("heart"); if(w.includes(id)){h.classList.add("active");h.textContent="♥ Favorited";} else{h.classList.remove("active");h.textContent="♡ Favorite";} }
+function fav(){ let w=JSON.parse(localStorage.getItem('wishlist')||'[]'); let id=String(list[idx].id); if(w.includes(id)) w=w.filter(x=>x!==id); else w.push(id); localStorage.setItem('wishlist',JSON.stringify(w)); updateHeart(); }
+function buy(){ let s=list[idx]; if(s.beat_name||s.bpm) location.href="beats.html?id="+s.id; else location.href="song.html?id="+s.id; }
+function shareNow(){ if(navigator.share) navigator.share({title:document.getElementById("title").textContent,url:location.href}); else{ navigator.clipboard.writeText(location.href); alert("Link copied"); } }
+init();
+</script>
+</body>
+</html>
