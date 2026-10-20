@@ -40,14 +40,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
 .preview{border-radius:14px;overflow:hidden;background:#08050d;min-height:120px;display:flex;align-items:center;justify-content:center;margin-top:15px}
 .preview img,.preview video{width:100%;max-height:350px;object-fit:contain;display:block}.preview-empty{color:#756d7d;font-size:13px;padding:35px;text-align:center}
 .account-status{padding:13px 15px;border-radius:11px;background:#171022;border:1px solid rgba(255,255,255,.08);color:#aaa1b4;font-size:13px;margin-bottom:18px}
-.account-status.success{border-color:rgba(34,197,94,.35);color:#86efac}.account-status.error{border-color:rgba(239,68,68,.35);color:#fca5a5}
 .pay-area{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:8px}.total-box{font-size:13px;color:#aaa1b4}.total-box strong{display:block;color:#fff;font-size:24px;margin-top:3px}
 .pay-btn{min-width:180px;border:0;border-radius:12px;background:#8b5cf6;color:#fff;padding:14px 20px;font-weight:900}.pay-btn:hover{background:#7c3aed}.pay-btn:disabled{opacity:.5;cursor:not-allowed}
 .message{display:none;padding:13px 15px;border-radius:11px;margin-top:15px;font-size:13px;line-height:1.5}.message.show{display:block}
 .message.error{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.25);color:#fca5a5}.message.success{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.25);color:#86efac}.message.info{background:rgba(139,92,246,.09);border:1px solid rgba(139,92,246,.25);color:#c4b5fd}
 .loading{text-align:center;padding:20px;color:#91889b;font-size:13px}
 .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:30px;max-width:1200px;margin:0 auto}
-/* HIDE LOGGED IN BARS AS REQUESTED */
 #accountStatus,#countryPriceStatus{display:none!important}
 @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr!important}.promo-grid,.package-grid,.grid2,.hero-options{grid-template-columns:1fr}.grid2{gap:0}.pay-area{flex-direction:column;align-items:stretch}.pay-btn{width:100%}.card{padding:17px}}
 @media(max-width:500px){.footer-grid{grid-template-columns:1fr!important}}
@@ -70,56 +68,56 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
     <div class="step"><strong>3. Pay</strong>Securely</div>
     <div class="step"><strong>4. Go live</strong>After review</div>
   </div>
-  <div id="accountStatus" class="account-status">Checking your PASONG account…</div>
-  <div id="countryPriceStatus" class="account-status">Detecting your country for advertising prices…</div>
+  <div id="accountStatus" class="account-status"></div>
+  <div id="countryPriceStatus" class="account-status"></div>
 
   <section class="card">
     <h2>🚀 What do you want to promote?</h2>
-    <p class="card-sub">Choose one option. PASONG will only ask for the information needed for that type of promotion.</p>
+    <p class="card-sub">Choose one option.</p>
     <div class="promo-grid">
-      <button type="button" class="promo-type" id="promoSong" onclick="window.selectType('song')"><div class="promo-icon">🎵</div><strong>Promote a Song</strong><small>Promote one of your PASONG songs across the platform.</small></button>
-      <button type="button" class="promo-type" id="promoProfile" onclick="window.selectType('profile')"><div class="promo-icon">👤</div><strong>Promote My Profile</strong><small>Send listeners to your PASONG artist profile.</small></button>
-      <button type="button" class="promo-type" id="promoBusiness" onclick="window.selectType('business')"><div class="promo-icon">🏢</div><strong>Promote a Business</strong><small>Promote your business, brand, product or service.</small></button>
+      <button type="button" class="promo-type" id="promoSong" onclick="window.selectType('song')"><div class="promo-icon">🎵</div><strong>Promote a Song</strong><small>Promote one of your PASONG songs.</small></button>
+      <button type="button" class="promo-type" id="promoProfile" onclick="window.selectType('profile')"><div class="promo-icon">👤</div><strong>Promote My Profile</strong><small>Send listeners to your profile.</small></button>
+      <button type="button" class="promo-type" id="promoBusiness" onclick="window.selectType('business')"><div class="promo-icon">🏢</div><strong>Promote a Business</strong><small>Promote your brand or product.</small></button>
     </div>
   </section>
 
   <section class="card">
-    <h2>📦 Choose your advertising package</h2><p class="card-sub">Select where you want your promotion to appear.</p>
-    <div id="packageLoading" class="loading">Loading advertising packages…</div>
+    <h2>📦 Choose your advertising package</h2><p class="card-sub">Default is UGX. If your IP is not Uganda, price changes to your local currency.</p>
+    <div id="packageLoading" class="loading">Loading packages — showing UGX…</div>
     <div id="packageGrid" class="package-grid"></div>
     <div id="packageMessage" class="message"></div>
   </section>
 
   <section class="card">
-    <h2>📝 Create your advert</h2><p class="card-sub">Complete the information below.</p>
+    <h2>📝 Create your advert</h2>
     <div class="grid2">
-      <div class="field"><label for="advertiserName">Advertiser name</label><input id="advertiserName" type="text" placeholder="Your name or business name" autocomplete="name"></div>
-      <div class="field"><label for="advertiserEmail">Email</label><input id="advertiserEmail" type="email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="field"><label for="advertiserName">Advertiser name</label><input id="advertiserName" type="text" placeholder="Your name or business name"></div>
+      <div class="field"><label for="advertiserEmail">Email</label><input id="advertiserEmail" type="email" placeholder="your@email.com"></div>
     </div>
-    <div class="field"><label for="advertiserPhone">Phone / WhatsApp</label><input id="advertiserPhone" type="tel" placeholder="+256..." autocomplete="tel"></div>
-    <div id="songFields" class="hidden"><div class="field"><label for="songSelect">Select your song</label><select id="songSelect"><option value="">Select a song</option></select><div class="help">Only songs connected to your PASONG account are shown.</div></div></div>
+    <div class="field"><label for="advertiserPhone">Phone / WhatsApp</label><input id="advertiserPhone" type="tel" placeholder="+256..."></div>
+    <div id="songFields" class="hidden"><div class="field"><label for="songSelect">Select your song</label><select id="songSelect"><option value="">Select a song</option></select></div></div>
     <div id="profileFields" class="hidden"><div class="field"><label for="profileSelect">Select your PASONG profile</label><select id="profileSelect"><option value="">Select profile</option></select></div></div>
     <div id="businessFields" class="hidden"><div class="field"><label for="businessName">Business / brand name</label><input id="businessName" type="text" placeholder="Example: Kivumbi Fashion"></div></div>
     <input id="title" type="hidden"><input id="description" type="hidden"><input id="businessUrl" type="hidden">
   </section>
 
   <section id="heroSection" class="card hidden">
-    <h2>🏠 Home Hero advert</h2><p class="card-sub">Choose whether PASONG should use your selected song cover or a custom Hero flyer.</p>
+    <h2>🏠 Home Hero advert</h2>
     <div class="hero-options">
-      <label class="hero-option"><input type="radio" name="heroType" value="cover" checked><strong>Use song cover</strong><p>Your selected song cover will be displayed in the Home Hero.</p></label>
-      <label class="hero-option"><input type="radio" name="heroType" value="flyer"><strong>Upload Hero flyer</strong><p>Upload a custom image for your Home Hero.</p></label>
+      <label class="hero-option"><input type="radio" name="heroType" value="cover" checked><strong>Use song cover</strong></label>
+      <label class="hero-option"><input type="radio" name="heroType" value="flyer"><strong>Upload Hero flyer</strong></label>
     </div>
-    <div id="flyerField" class="field hidden" style="margin-top:16px"><label for="flyer">Hero flyer</label><div class="file-box"><input id="flyer" type="file" accept="image/jpeg,image/png,image/webp"></div><div class="help">Recommended: 1600 × 900 pixels. Maximum 5 MB.</div></div>
+    <div id="flyerField" class="field hidden" style="margin-top:16px"><label for="flyer">Hero flyer</label><div class="file-box"><input id="flyer" type="file" accept="image/jpeg,image/png,image/webp"></div></div>
   </section>
 
   <section id="mediaSection" class="card">
-    <h2>🖼️ Advert media</h2><p class="card-sub">Upload the image or video you want to advertise.</p>
-    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div class="help">Images: JPG, PNG or WEBP. Videos: MP4 or WEBM.</div></div>
+    <h2>🖼️ Advert media</h2>
+    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div></div>
     <div id="preview" class="preview"><div class="preview-empty">Your advert preview will appear here.</div></div>
   </section>
 
   <section class="card">
-    <h2>💳 Review & Pay</h2><p class="card-sub">Your advert will be submitted for PASONG Admin review after payment.</p>
+    <h2>💳 Review & Pay</h2>
     <div class="pay-area"><div class="total-box">Total advertising cost<strong id="totalPrice">—</strong></div><button type="button" class="pay-btn" id="payBtn">Continue to Payment</button></div>
     <div id="mainMessage" class="message"></div>
   </section>
@@ -127,13 +125,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;
 
 <footer style="background:#080810;border-top:1px solid #23233A;padding:40px 5% 30px;margin-top:10px">
 <div class="footer-grid">
-<div><div style="font-weight:900;font-size:24px;margin-bottom:14px">◈ <span style="color:#c084fc">PASONG</span></div><p style="color:#9CA3AF;font-size:13px;line-height:1.6;max-width:280px">PASONG is Uganda's home of hits. Discover, stream, and download African music.</p></div>
+<div><div style="font-weight:900;font-size:24px;margin-bottom:14px">◈ <span style="color:#c084fc">PASONG</span></div><p style="color:#9CA3AF;font-size:13px;line-height:1.6;max-width:280px">PASONG is Uganda's home of hits.</p></div>
 <div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">Company</div><a href="about.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">About</a><a href="contact.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Contact</a></div>
-<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">Communities</div><a href="for-artists.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">For Artists</a><a href="for-creators.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">For Creators</a></div>
-<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">Useful Links</div><a href="support.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Support</a><a href="privacy.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Privacy</a><a href="terms.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Terms</a></div>
-<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">PASONG Plans</div><a href="store.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Music Store</a><a href="charts.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Charts</a><a href="beats.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Free Beats</a></div>
+<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">Communities</div><a href="for-artists.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">For Artists</a></div>
+<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">Useful Links</div><a href="privacy.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Privacy</a><a href="terms.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Terms</a></div>
+<div><div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px">PASONG Plans</div><a href="store.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Music Store</a><a href="charts.html" style="display:block;color:#9CA3AF;font-size:14px;padding:5px 0">Charts</a></div>
 </div>
-<div style="max-width:1200px;margin:36px auto 0;padding-top:22px;border-top:1px solid #1A1A2E;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#666;font-size:12px"><span>© <span id="year"></span> PASONG. All rights reserved.</span></div>
+<div style="max-width:1200px;margin:36px auto 0;padding-top:22px;border-top:1px solid #1A1A2E;color:#666;font-size:12px"><span>© <span id="year"></span> PASONG. All rights reserved.</span></div>
 </footer>
 
 <script>
@@ -145,273 +143,293 @@ var SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 var CLOUDINARY_CLOUD_NAME="vuehnvkp";
 var CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD_NAME+"/auto/upload";
 var supabaseClient=null,selectedType="",packages=[],selectedPackage=null,songs=[],profiles=[],currentSession=null;
-var advertCountry={code:"",name:"",currency:"UGX",detected:false};
-var advertCurrencyRates={UGX:1,KES:26.5,TZS:700,RWF:360,BIF:780,SSP:1400,ETB:20,GBP:0.00021,USD:0.00027,EUR:0.00025};
+
+// DEFAULT = UGX ONLY. Changes ONLY if IP not Uganda
+var advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:false};
+// rates = how much 1 UGX equals in target currency
+var advertCurrencyRates={UGX:1,KES:0.035,TZS:0.70,RWF:0.35,USD:0.00027,EUR:0.00025,GBP:0.00021};
+
 function countryCurrency(code){
-  code=String(code||"").toUpperCase();
-  if(code==="UG")return "UGX";
-  if(code==="KE")return "KES";
-  if(code==="TZ")return "TZS";
-  if(code==="RW")return "RWF";
-  if(code==="BI")return "BIF";
-  if(code==="SS")return "SSP";
-  if(code==="ET")return "ETB";
-  if(code==="GB")return "GBP";
-  if(["DE","FR","IT","ES","NL","BE","PT","IE","AT","CH","SE","NO","DK","FI","PL"].indexOf(code)>=0)return "EUR";
-  return "USD";
+ code=String(code||"").toUpperCase();
+ if(code==="UG") return "UGX";
+ if(code==="KE") return "KES";
+ if(code==="TZ") return "TZS";
+ if(code==="RW") return "RWF";
+ if(code==="GB") return "GBP";
+ if(["DE","FR","IT","ES","NL","BE","AT","PT","IE","CH","SE","NO","DK","FI","PL"].indexOf(code)>=0) return "EUR";
+ return "USD"; // all other countries outside Uganda
 }
+
 async function detectAdvertCountry(){
-  try{
-    var r=await fetch("https://ipapi.co/json/",{cache:"no-store"});
-    if(r.ok){var d=await r.json(); if(d.country_code){advertCountry={code:String(d.country_code).toUpperCase(),name:d.country_name||d.country_code,currency:countryCurrency(d.country_code),detected:true}; return advertCountry;}}
-  }catch(e){}
-  try{
-    var r2=await fetch("https://ipwho.is/",{cache:"no-store"});
-    if(r2.ok){var d2=await r2.json(); if(d2.country_code){advertCountry={code:String(d2.country_code).toUpperCase(),name:d2.country||d2.country_code,currency:countryCurrency(d2.country_code),detected:true}; return advertCountry;}}
-  }catch(e){}
-  advertCountry={code:"",name:"",currency:"UGX",detected:false}; return advertCountry;
+ // keep UGX default while detecting
+ try{
+   var r=await fetch("https://ipapi.co/json/",{cache:"no-store"});
+   if(r.ok){
+     var d=await r.json();
+     if(d.country_code){
+       var cc=String(d.country_code).toUpperCase();
+       if(cc==="UG"){
+         advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:true};
+       }else{
+         advertCountry={code:cc,name:d.country_name||cc,currency:countryCurrency(cc),detected:true};
+       }
+       return advertCountry;
+     }
+   }
+ }catch(e){}
+ try{
+   var r2=await fetch("https://ipwho.is/",{cache:"no-store"});
+   if(r2.ok){
+     var d2=await r2.json();
+     if(d2.country_code){
+       var cc2=String(d2.country_code).toUpperCase();
+       if(cc2==="UG"){
+         advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:true};
+       }else{
+         advertCountry={code:cc2,name:d2.country||cc2,currency:countryCurrency(cc2),detected:true};
+       }
+       return advertCountry;
+     }
+   }
+ }catch(e){}
+ // fail = stay UGX
+ advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:false};
+ return advertCountry;
 }
+
 function convertedPackagePrice(p){
-  var base=Number(p&&(p.price!=null?p.price:p.amount!=null?p.amount:p.price_amount));
-  if(!Number.isFinite(base))return null;
-  var baseCurrency=String(p&&(p.currency||p.price_currency)||"UGX").toUpperCase();
-  var target=advertCountry.currency||baseCurrency||"UGX";
-  if(target===baseCurrency) return {amount:base,currency:target};
-  // Correct conversion: base -> UGX -> target
-  var rateBase = advertCurrencyRates[baseCurrency] || 1;
-  var rateTarget = advertCurrencyRates[target] || 1;
-  var ugxValue = baseCurrency==="UGX" ? base : base / rateBase * (baseCurrency==="UGX"?1:1); 
-  // Actually rates are: 1 UGX = X target. So to convert any currency to UGX: if base is UGX, ugx=base. If base is USD, ugx=base / 0.00027
-  var baseToUgx;
-  if(baseCurrency==="UGX") baseToUgx = base;
-  else baseToUgx = base / (advertCurrencyRates[baseCurrency]||0.00027);
-  var finalAmount;
-  if(target==="UGX") finalAmount = baseToUgx;
-  else finalAmount = baseToUgx * (advertCurrencyRates[target]||0.00027);
-  return {amount:finalAmount,currency:target};
+ var base=Number(p&&(p.price!=null?p.price:p.amount!=null?p.amount:p.price_amount));
+ if(!Number.isFinite(base)) return null;
+ var baseCurrency=String(p&&(p.currency||p.price_currency)||"UGX").toUpperCase();
+ var target=advertCountry.currency||"UGX";
+
+ if(target===baseCurrency) return {amount:base,currency:target};
+
+ // convert base -> UGX
+ var rateBase = advertCurrencyRates[baseCurrency];
+ if(rateBase===undefined) rateBase = baseCurrency==="UGX" ? 1 : 0.00027;
+ var baseToUGX;
+ if(baseCurrency==="UGX") baseToUGX = base;
+ else {
+   // base is e.g. USD: 1 USD = 1/0.00027 UGX
+   baseToUGX = base / rateBase;
+ }
+
+ var rateTarget = advertCurrencyRates[target] || 1;
+ var finalAmount;
+ if(target==="UGX") finalAmount = baseToUGX;
+ else finalAmount = baseToUGX * rateTarget;
+
+ return {amount:finalAmount,currency:target};
 }
+
 function $(id){return document.getElementById(id)}
-function showMessage(el,message,type){if(el){el.textContent=message||"";el.className="message show "+(type||"info")}}
+function showMessage(el,m,t){if(el){el.textContent=m||"";el.className="message show "+(t||"info")}}
 function hideMessage(el){if(el){el.textContent="";el.className="message"}}
-function escapeHtml(value){return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
-function money(value,currency){
-  if(value===null||value===undefined||value==="")return "-";
-  var n=Number(value);if(!Number.isFinite(n))return String(value);
-  var cur=String(currency||"UGX").toUpperCase();
-  if(cur==="UGX") return "UGX "+Math.round(n).toLocaleString();
-  if(cur==="USD") return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(cur==="EUR") return "€"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(cur==="GBP") return "£"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-  return cur+" "+Math.round(n).toLocaleString();
+function escapeHtml(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function money(v,c){
+ if(v==null||v==="") return "-";
+ var n=Number(v); if(!isFinite(n)) return String(v);
+ var cur=String(c||"UGX").toUpperCase();
+ if(cur==="UGX") return "UGX "+Math.round(n).toLocaleString();
+ if(cur==="USD") return "$"+n.toFixed(2);
+ if(cur==="EUR") return "€"+n.toFixed(2);
+ if(cur==="GBP") return "£"+n.toFixed(2);
+ if(cur==="KES") return "KES "+Math.round(n).toLocaleString();
+ if(cur==="TZS") return "TZS "+Math.round(n).toLocaleString();
+ return cur+" "+n.toLocaleString();
 }
 function getPackageKey(p){return p&&(p.key||p.package_key||p.slug||p.id)}
-function packageLabel(){var p=selectedPackage||{};return String([p.key,p.package_key,p.slug,p.name,p.title,p.display_name].filter(Boolean).join(" ")).toLowerCase().replace(/[_-]+/g," ").trim()}
+function packageLabel(){var p=selectedPackage||{};return String([p.key,p.package_key,p.slug,p.name,p.title,p.display_name].filter(Boolean).join(" ")).toLowerCase()}
 function isHomeVideoPackage(){var n=packageLabel();return n.indexOf("homepage video")>=0||n.indexOf("home video")>=0||n.indexOf("hero video")>=0}
 function isHomeImagePackage(){var n=packageLabel();return n.indexOf("homepage image")>=0||n.indexOf("home image")>=0||n.indexOf("home hero")>=0}
 function isHeroPackage(){return isHomeImagePackage()||isHomeVideoPackage()||packageLabel().indexOf("home hero")>=0}
-try{if(window.supabase&&typeof window.supabase.createClient==="function"){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);} }catch(e){}
+
+try{if(window.supabase&&window.supabase.createClient){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}}catch(e){}
+
 window.selectType=function(type){
-  if(["song","profile","business"].indexOf(type)<0)return;
-  selectedType=type;
-  ["promoSong","promoProfile","promoBusiness"].forEach(function(id){$(id).classList.remove("selected")});
-  $({song:"promoSong",profile:"promoProfile",business:"promoBusiness"}[type]).classList.add("selected");
-  $("songFields").classList.toggle("hidden",type!=="song");
-  $("profileFields").classList.toggle("hidden",type!=="profile");
-  $("businessFields").classList.toggle("hidden",type!=="business");
-  updateGeneratedFields();updatePreview();updateHeroFields();
+ if(["song","profile","business"].indexOf(type)<0) return;
+ selectedType=type;
+ ["promoSong","promoProfile","promoBusiness"].forEach(function(id){$(id).classList.remove("selected")});
+ $({song:"promoSong",profile:"promoProfile",business:"promoBusiness"}[type]).classList.add("selected");
+ $("songFields").classList.toggle("hidden",type!=="song");
+ $("profileFields").classList.toggle("hidden",type!=="profile");
+ $("businessFields").classList.toggle("hidden",type!=="business");
+ updateGeneratedFields();updatePreview();updateHeroFields();
 };
 window.selectPackageByIndex=function(index){
-  if(!packages[index])return;
-  selectedPackage=packages[index];
-  document.querySelectorAll(".package-card").forEach(function(c){c.classList.remove("selected")});
-  var card=$("package-"+index);if(card)card.classList.add("selected");
-  var chosenPrice=convertedPackagePrice(selectedPackage);$("totalPrice").textContent=chosenPrice?money(chosenPrice.amount,chosenPrice.currency):"-";
-  showMessage($("packageMessage"),"Package selected: "+(selectedPackage.name||selectedPackage.title||getPackageKey(selectedPackage)||"Advertising package"),"success");
-  updateHeroFields();
+ if(!packages[index]) return;
+ selectedPackage=packages[index];
+ document.querySelectorAll(".package-card").forEach(function(c){c.classList.remove("selected")});
+ var card=$("package-"+index); if(card) card.classList.add("selected");
+ var cp=convertedPackagePrice(selectedPackage);
+ $("totalPrice").textContent=cp?money(cp.amount,cp.currency):"-";
+ showMessage($("packageMessage"),"Package selected: "+(selectedPackage.name||getPackageKey(selectedPackage)),"success");
+ updateHeroFields();
 };
+
 function renderPackages(){
-  $("packageLoading").style.display="none";
-  var grid=$("packageGrid");grid.innerHTML="";
-  if(!packages.length){grid.innerHTML='<div class="loading" style="grid-column:1/-1">No advertising packages are currently available.</div>';return}
-  packages.forEach(function(p,i){
-    var card=document.createElement("div");card.className="package-card";card.id="package-"+i;
-    var name=p.name||p.title||p.display_name||getPackageKey(p)||"Advertising Package";
-    var description=p.description||p.details||p.summary||"Advertise on PASONG.";
-    var cp=convertedPackagePrice(p);
-    card.innerHTML='<div class="package-name">'+escapeHtml(name)+'</div><div class="package-description">'+escapeHtml(description)+'</div><div class="package-price">'+escapeHtml(cp?money(cp.amount,cp.currency):"-")+'</div><button type="button" class="package-select-btn">Select Package</button>';
-    card.addEventListener("click",function(){window.selectPackageByIndex(i)});
-    card.querySelector("button").addEventListener("click",function(e){e.stopPropagation();window.selectPackageByIndex(i)});
-    grid.appendChild(card);
-  });
+ $("packageLoading").style.display="none";
+ var grid=$("packageGrid"); grid.innerHTML="";
+ if(!packages.length){grid.innerHTML='<div class="loading">No packages available.</div>';return}
+ packages.forEach(function(p,i){
+   var name=p.name||p.title||getPackageKey(p)||"Package";
+   var desc=p.description||"Advertise on PASONG.";
+   var cp=convertedPackagePrice(p);
+   var card=document.createElement("div"); card.className="package-card"; card.id="package-"+i;
+   card.innerHTML='<div class="package-name">'+escapeHtml(name)+'</div><div class="package-description">'+escapeHtml(desc)+'</div><div class="package-price">'+escapeHtml(cp?money(cp.amount,cp.currency):"-")+'</div><button type="button" class="package-select-btn">Select Package</button>';
+   card.addEventListener("click",function(){window.selectPackageByIndex(i)});
+   card.querySelector("button").addEventListener("click",function(e){e.stopPropagation();window.selectPackageByIndex(i)});
+   grid.appendChild(card);
+ });
 }
+
 async function loadPackages(){
-  try{
-    await detectAdvertCountry();
-    var response=await fetch(API_BASE+"/api/advertising/packages",{cache:"no-store"});
-    var data=await response.json();
-    if(!response.ok)throw new Error(data.error||data.message||"Could not load advertising packages.");
-    packages=Array.isArray(data)?data:(data.packages||data.data||[]);
-    renderPackages();
-  }catch(e){
-    $("packageLoading").style.display="none";
-    $("packageGrid").innerHTML='<div class="loading" style="grid-column:1/-1">Could not load advertising packages. '+escapeHtml(e.message)+'</div>';
-    showMessage($("packageMessage"),"Advertising package prices could not be loaded from PASONG. Please try again later.","error");
-  }
+ try{
+   // FIRST show UGX immediately
+   advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:false};
+   var response=await fetch(API_BASE+"/api/advertising/packages",{cache:"no-store"});
+   var data=await response.json();
+   if(!response.ok) throw new Error(data.error||"Could not load");
+   packages=Array.isArray(data)?data:(data.packages||data.data||[]);
+   renderPackages();
+   // THEN detect IP — if not Uganda, re-render with new currency
+   await detectAdvertCountry();
+   if(advertCountry.code!=="UG"){
+     renderPackages();
+   }
+ }catch(e){
+   $("packageLoading").style.display="none";
+   $("packageGrid").innerHTML='<div class="loading">Could not load packages. '+escapeHtml(e.message)+'</div>';
+ }
 }
+
 async function loadSession(){
-  if(!supabaseClient)return;
-  try{
-    var result=await supabaseClient.auth.getSession();
-    currentSession=result&&result.data?result.data.session:null;
-    if(currentSession&&currentSession.user&&currentSession.user.email&&!$("advertiserEmail").value)$("advertiserEmail").value=currentSession.user.email;
-    await Promise.all([loadSongs(),loadProfiles()]);
-  }catch(e){}
+ if(!supabaseClient) return;
+ try{
+   var result=await supabaseClient.auth.getSession();
+   currentSession=result&&result.data?result.data.session:null;
+   if(currentSession&&currentSession.user&&currentSession.user.email&&!$("advertiserEmail").value) $("advertiserEmail").value=currentSession.user.email;
+   await Promise.all([loadSongs(),loadProfiles()]);
+ }catch(e){}
 }
 async function loadSongs(){
-  if(!supabaseClient||!currentSession)return;
-  try{
-    var user=currentSession.user;
-    var result=await supabaseClient.from("songs").select("id,title,uploader_user_id,artist_user_id,producer_user_id,writer_user_id,created_at,cover_url,preview_url").or("uploader_user_id.eq."+user.id+",artist_user_id.eq."+user.id+",producer_user_id.eq."+user.id+",writer_user_id.eq."+user.id).order("created_at",{ascending:false});
-    if(result.error)throw result.error;
-    songs=result.data||[];var select=$("songSelect");select.innerHTML='<option value="">Select a song</option>';
-    songs.forEach(function(song){var option=document.createElement("option");option.value=song.id;option.textContent=song.title||"Untitled song";select.appendChild(option)});
-    if(!songs.length)select.innerHTML='<option value="">No songs found for this account</option>';
-  }catch(e){$("songSelect").innerHTML='<option value="">Could not load songs</option>'}
+ if(!supabaseClient||!currentSession) return;
+ try{
+   var user=currentSession.user;
+   var result=await supabaseClient.from("songs").select("id,title,uploader_user_id,artist_user_id,producer_user_id,writer_user_id,created_at,cover_url").or("uploader_user_id.eq."+user.id+",artist_user_id.eq."+user.id+",producer_user_id.eq."+user.id+",writer_user_id.eq."+user.id).order("created_at",{ascending:false});
+   if(result.error) throw result.error;
+   songs=result.data||[]; var sel=$("songSelect"); sel.innerHTML='<option value="">Select a song</option>';
+   songs.forEach(function(s){var o=document.createElement("option"); o.value=s.id; o.textContent=s.title||"Untitled"; sel.appendChild(o)});
+ }catch(e){$("songSelect").innerHTML='<option value="">Could not load songs</option>'}
 }
 async function loadProfiles(){
-  if(!supabaseClient||!currentSession)return;
-  try{
-    var result=await supabaseClient.from("artist_profiles").select("*").eq("user_id",currentSession.user.id);
-    if(result.error)throw result.error;
-    profiles=result.data||[];var select=$("profileSelect");select.innerHTML='<option value="">Select profile</option>';
-    profiles.forEach(function(p){var option=document.createElement("option");option.value=p.id;option.textContent=p.stage_name||p.artist_name||p.performing_name||p.name||"PASONG Profile";select.appendChild(option)});
-    if(!profiles.length)select.innerHTML='<option value="">No profile found for this account</option>';
-  }catch(e){$("profileSelect").innerHTML='<option value="">Could not load profile</option>'}
+ if(!supabaseClient||!currentSession) return;
+ try{
+   var result=await supabaseClient.from("artist_profiles").select("*").eq("user_id",currentSession.user.id);
+   if(result.error) throw result.error;
+   profiles=result.data||[]; var sel=$("profileSelect"); sel.innerHTML='<option value="">Select profile</option>';
+   profiles.forEach(function(p){var o=document.createElement("option"); o.value=p.id; o.textContent=p.stage_name||p.artist_name||"Profile"; sel.appendChild(o)});
+ }catch(e){$("profileSelect").innerHTML='<option value="">Could not load profile</option>'}
 }
-function coverOf(song){return song?(song.cover_url||song.cover_image_url||song.cover||""):""}
-function selectedSong(){var id=$("songSelect").value;return songs.find(function(s){return String(s.id)===String(id)})||null}
-function selectedProfile(){var id=$("profileSelect").value;return profiles.find(function(p){return String(p.id)===String(id)})||null}
+function coverOf(s){return s?(s.cover_url||""):""}
+function selectedSong(){var id=$("songSelect").value; return songs.find(function(s){return String(s.id)===String(id)})||null}
+function selectedProfile(){var id=$("profileSelect").value; return profiles.find(function(p){return String(p.id)===String(id)})||null}
 function updateGeneratedFields(){
-  var title="",description="",targetUrl="";
-  if(selectedType==="song"){var song=selectedSong();if(song){title="Promote: "+(song.title||"PASONG Song");description="Listen to "+(song.title||"this song")+" on PASONG.";targetUrl="song.html?id="+encodeURIComponent(song.id)}}
-  else if(selectedType==="profile"){var p=selectedProfile();if(p){var name=p.stage_name||p.artist_name||p.performing_name||p.name||"PASONG Artist";title="Promote: "+name;description="Discover "+name+" on PASONG.";targetUrl="artist.html?id="+encodeURIComponent(p.id)}}
-  else if(selectedType==="business"){var b=$("businessName").value.trim();if(b){title="Promote: "+b;description="Discover "+b+" on PASONG.";targetUrl="#"}}
-  $("title").value=title;$("description").value=description;$("businessUrl").value=targetUrl;
+ var t="",d="",u="";
+ if(selectedType==="song"){var song=selectedSong(); if(song){t="Promote: "+(song.title||"Song"); d="Listen to "+(song.title||"this song")+" on PASONG."; u="song.html?id="+encodeURIComponent(song.id)}}
+ else if(selectedType==="profile"){var p=selectedProfile(); if(p){var name=p.stage_name||p.artist_name||"Artist"; t="Promote: "+name; d="Discover "+name+" on PASONG."; u="artist.html?id="+encodeURIComponent(p.id)}}
+ else if(selectedType==="business"){var b=$("businessName").value.trim(); if(b){t="Promote: "+b; d="Discover "+b+" on PASONG."; u="#"}}
+ $("title").value=t; $("description").value=d; $("businessUrl").value=u;
 }
-async function validateHero(file){if(!file)throw new Error("Please choose a Hero flyer.");if(["image/jpeg","image/png","image/webp"].indexOf(file.type)<0)throw new Error("Hero flyer must be JPG, PNG or WEBP.");if(file.size>5*1024*1024)throw new Error("Hero flyer must be 5 MB or smaller.");}
 async function uploadSigned(file,folder){
-  if(!file)throw new Error("No file selected.");
-  var sr=await supabaseClient.auth.getSession();var session=sr&&sr.data?sr.data.session:null;
-  if(!session)throw new Error("Please sign in again.");
-  var r=await fetch(API_BASE+"/api/cloudinary/signature",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({folder:folder})});
-  var sig=await r.json();if(!r.ok)throw new Error(sig.error||sig.message||"Could not prepare Cloudinary upload.");
-  var fd=new FormData();fd.append("file",file);fd.append("api_key",sig.api_key);fd.append("timestamp",sig.timestamp);fd.append("signature",sig.signature);fd.append("folder",sig.folder||folder);
-  var ur=await fetch(CLOUDINARY_UPLOAD_URL,{method:"POST",body:fd});var ud=await ur.json();
-  if(!ur.ok||!ud.secure_url)throw new Error(ud.error&&ud.error.message||"Cloudinary upload failed.");
-  return ud.secure_url;
+ var sr=await supabaseClient.auth.getSession(); var session=sr&&sr.data?sr.data.session:null;
+ if(!session) throw new Error("Please sign in again.");
+ var r=await fetch(API_BASE+"/api/cloudinary/signature",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({folder:folder})});
+ var sig=await r.json(); if(!r.ok) throw new Error(sig.error||"Could not prepare upload.");
+ var fd=new FormData(); fd.append("file",file); fd.append("api_key",sig.api_key); fd.append("timestamp",sig.timestamp); fd.append("signature",sig.signature); fd.append("folder",sig.folder||folder);
+ var ur=await fetch(CLOUDINARY_UPLOAD_URL,{method:"POST",body:fd}); var ud=await ur.json();
+ if(!ur.ok||!ud.secure_url) throw new Error(ud.error&&ud.error.message||"Upload failed.");
+ return ud.secure_url;
 }
 function updatePreview(){
-  var preview=$("preview");preview.innerHTML="";
-  var heroSelected=selectedPackage&&isHeroPackage();
-  var heroChoice=document.querySelector('input[name="heroType"]:checked');
-  if(heroSelected&&heroChoice&&heroChoice.value==="flyer"&&$("flyer").files[0]){showLocalPreview($("flyer").files[0],preview);return;}
-  if(selectedType==="song"){var cover=coverOf(selectedSong());if(cover){var img=document.createElement("img");img.src=cover;img.alt="Song cover preview";preview.appendChild(img);return}}
-  var file=$("media").files[0];if(file){showLocalPreview(file,preview);return}
-  preview.innerHTML='<div class="preview-empty">Your advert preview will appear here.</div>';
+ var preview=$("preview"); preview.innerHTML="";
+ var heroChoice=document.querySelector('input[name="heroType"]:checked');
+ if(selectedPackage&&isHeroPackage()&&heroChoice&&heroChoice.value==="flyer"&&$("flyer").files[0]){showLocalPreview($("flyer").files[0],preview);return;}
+ if(selectedType==="song"){var c=coverOf(selectedSong()); if(c){var img=document.createElement("img"); img.src=c; preview.appendChild(img);return;}}
+ var file=$("media").files[0]; if(file){showLocalPreview(file,preview);return;}
+ preview.innerHTML='<div class="preview-empty">Your advert preview will appear here.</div>';
 }
 function showLocalPreview(file,preview){
-  if(preview.dataset.objectUrl)URL.revokeObjectURL(preview.dataset.objectUrl);
-  var url=URL.createObjectURL(file);preview.dataset.objectUrl=url;
-  if(file.type.indexOf("video/")===0){var v=document.createElement("video");v.src=url;v.controls=true;v.playsInline=true;preview.appendChild(v)}
-  else{var img=document.createElement("img");img.src=url;img.alt="Advert preview";preview.appendChild(img)}
+ if(preview.dataset.objectUrl) URL.revokeObjectURL(preview.dataset.objectUrl);
+ var url=URL.createObjectURL(file); preview.dataset.objectUrl=url;
+ if(file.type.indexOf("video/")===0){var v=document.createElement("video"); v.src=url; v.controls=true; preview.appendChild(v)}
+ else{var img=document.createElement("img"); img.src=url; preview.appendChild(img)}
 }
 function updateHeroFields(){
-  var isHero=!!(selectedPackage&&isHeroPackage());
-  $("heroSection").classList.toggle("hidden",!isHero);
-  if(!isHero){$("mediaSection").classList.remove("hidden");updatePreview();return}
-  var choice=document.querySelector('input[name="heroType"]:checked');var type=choice?choice.value:"cover";
-  var videoPackage=isHomeVideoPackage();
-  $("flyerField").classList.toggle("hidden",type!=="flyer"||videoPackage);
-  $("mediaSection").classList.toggle("hidden",type==="flyer"&&!videoPackage);
-  if(videoPackage){$("mediaSection").classList.remove("hidden");$("flyerField").classList.add("hidden");$("media").setAttribute("accept","video/mp4,video/webm");}
-  else{$("media").setAttribute("accept","image/jpeg,image/png,image/webp,video/mp4,video/webm");}
-  updatePreview();
+ var isHero=!!(selectedPackage&&isHeroPackage());
+ $("heroSection").classList.toggle("hidden",!isHero);
+ if(!isHero){$("mediaSection").classList.remove("hidden");return;}
+ var choice=document.querySelector('input[name="heroType"]:checked'); var type=choice?choice.value:"cover";
+ var videoPackage=isHomeVideoPackage();
+ $("flyerField").classList.toggle("hidden",type!=="flyer"||videoPackage);
+ $("mediaSection").classList.toggle("hidden",type==="flyer"&&!videoPackage);
+ if(videoPackage){$("flyerField").classList.add("hidden");$("media").setAttribute("accept","video/mp4,video/webm");}
+ else{$("media").setAttribute("accept","image/jpeg,image/png,image/webp,video/mp4,video/webm");}
+ updatePreview();
 }
 async function startPayment(){
-  var message=$("mainMessage");hideMessage(message);
-  if(!currentSession)throw new Error("Please sign in to your PASONG account first.");
-  if(!selectedType)throw new Error("Choose what you want to promote.");
-  if(!selectedPackage)throw new Error("Choose an advertising package.");
-  updateGeneratedFields();
-  var advertiserName=$("advertiserName").value.trim(),advertiserEmail=$("advertiserEmail").value.trim(),advertiserPhone=$("advertiserPhone").value.trim();
-  if(!advertiserName)throw new Error("Enter your advertiser name.");
-  if(!advertiserEmail||!$("advertiserEmail").checkValidity())throw new Error("Enter a valid email address.");
-  var mediaUrl="",mediaType="image",songId=null,targetUrl=$("businessUrl").value.trim();
-  var selectedMedia=$("media").files[0]||null;
-  if(selectedType==="song"){
-    var song=selectedSong();if(!song)throw new Error("Select the song you want to promote.");
-    songId=song.id;mediaUrl=coverOf(song);targetUrl="song.html?id="+encodeURIComponent(song.id);
-  }else if(selectedType==="profile"){
-    var profile=selectedProfile();if(!profile)throw new Error("Select your PASONG profile.");
-    targetUrl="artist.html?id="+encodeURIComponent(profile.id);
-    mediaUrl=profile.profile_image_url||profile.avatar_url||profile.image_url||"";
-  }else{
-    if(!$("businessName").value.trim())throw new Error("Enter your business or brand name.");
-  }
-  var packageKey=getPackageKey(selectedPackage);if(!packageKey)throw new Error("The selected package has no package key.");
-  var heroTypeFinal=null;
-  var heroChoice=document.querySelector('input[name="heroType"]:checked');
-  var heroChoiceValue=heroChoice?heroChoice.value:"cover";
-  if(isHomeVideoPackage()){
-    if(!selectedMedia)throw new Error("Choose a video for the Homepage Video package.");
-    if(["video/mp4","video/webm"].indexOf(selectedMedia.type)<0)throw new Error("Homepage Video requires an MP4 or WEBM video.");
-    mediaType="video";
-  }else if(isHeroPackage()){
-    heroTypeFinal=heroChoiceValue;
-    if(heroChoiceValue==="flyer"){
-      var flyer=$("flyer").files[0];await validateHero(flyer);showMessage(message,"Uploading your Hero flyer...","info");mediaUrl=await uploadSigned(flyer,"pasong/heroes");mediaType="image";
-    }else if(!mediaUrl){
-      if(selectedMedia){mediaType=selectedMedia.type.indexOf("video/")===0?"video":"image";}
-      else throw new Error("Select a song with a cover image, or choose Upload Hero flyer.");
-    }
-  }
-  if(selectedMedia && !(isHeroPackage()&&!isHomeVideoPackage()&&heroChoiceValue==="flyer")){
-    var allowed=["image/jpeg","image/png","image/webp","video/mp4","video/webm"];
-    if(allowed.indexOf(selectedMedia.type)<0)throw new Error("Choose JPG, PNG, WEBP, MP4 or WEBM media.");
-    if(selectedMedia.size>100*1024*1024)throw new Error("Advert media must be 100 MB or smaller.");
-    if(isHomeVideoPackage()&&selectedMedia.type.indexOf("video/")!==0)throw new Error("Homepage Video requires a video file.");
-    showMessage(message,"Uploading your advert...","info");
-    mediaType=selectedMedia.type.indexOf("video/")===0?"video":"image";
-    mediaUrl=await uploadSigned(selectedMedia,"pasong/ads");
-  }
-  if(selectedType==="song"&&!mediaUrl)throw new Error("This song has no cover image. Upload advert media or choose a different song.");
-  if(selectedType==="business"&&!mediaUrl&&!selectedMedia)throw new Error("Choose an image or video for your business advert.");
-  var displayPrice=convertedPackagePrice(selectedPackage);
-  var payload={package_key:packageKey,advertiser_name:advertiserName,advertiser_email:advertiserEmail,advertiser_phone:advertiserPhone,title:$("title").value.trim(),description:$("description").value.trim(),target_url:targetUrl||"#",media_url:mediaUrl,media_type:mediaType,hero_type:heroTypeFinal,song_id:songId,country_code:advertCountry.code||null,country_name:advertCountry.name||null,display_currency:displayPrice?displayPrice.currency:"UGX",display_amount:displayPrice?displayPrice.amount:null};
-  showMessage(message,"Creating your advertising checkout...","info");
-  var response=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify(payload)});
-  var data=await response.json();if(!response.ok)throw new Error(data.error||data.message||"Could not create advertising checkout.");
-  var url=data.checkout_url||data.checkoutUrl||data.url||data.payment_url||data.redirect_url;
-  if(url){window.location.href=url;return}
-  showMessage(message,data.message||"Checkout response received, but no payment redirect URL was returned.","success");
+ var message=$("mainMessage"); hideMessage(message);
+ if(!currentSession) throw new Error("Please sign in first.");
+ if(!selectedType) throw new Error("Choose what you want to promote.");
+ if(!selectedPackage) throw new Error("Choose a package.");
+ updateGeneratedFields();
+ var advertiserName=$("advertiserName").value.trim(),advertiserEmail=$("advertiserEmail").value.trim();
+ if(!advertiserName) throw new Error("Enter your name.");
+ if(!advertiserEmail) throw new Error("Enter email.");
+ var mediaUrl="",mediaType="image",songId=null,targetUrl=$("businessUrl").value.trim();
+ var selectedMedia=$("media").files[0]||null;
+ if(selectedType==="song"){var song=selectedSong(); if(!song) throw new Error("Select song"); songId=song.id; mediaUrl=coverOf(song); targetUrl="song.html?id="+song.id;}
+ else if(selectedType==="profile"){var profile=selectedProfile(); if(!profile) throw new Error("Select profile"); targetUrl="artist.html?id="+profile.id; mediaUrl=profile.profile_image_url||"";}
+ else{if(!$("businessName").value.trim()) throw new Error("Enter business name");}
+ var packageKey=getPackageKey(selectedPackage);
+ var heroTypeFinal=null; var heroChoice=document.querySelector('input[name="heroType"]:checked'); var heroVal=heroChoice?heroChoice.value:"cover";
+ if(isHomeVideoPackage()){
+   if(!selectedMedia) throw new Error("Choose video for Homepage Video");
+   mediaType="video";
+ }else if(isHeroPackage()){
+   heroTypeFinal=heroVal;
+   if(heroVal==="flyer"){var flyer=$("flyer").files[0]; if(!flyer) throw new Error("Choose flyer"); mediaUrl=await uploadSigned(flyer,"pasong/heroes"); mediaType="image";}
+ }
+ if(selectedMedia && !(isHeroPackage()&&heroVal==="flyer"&&!isHomeVideoPackage())){
+   mediaType=selectedMedia.type.indexOf("video/")===0?"video":"image";
+   showMessage(message,"Uploading...","info");
+   mediaUrl=await uploadSigned(selectedMedia,"pasong/ads");
+ }
+ var displayPrice=convertedPackagePrice(selectedPackage);
+ var payload={package_key:packageKey,advertiser_name:advertiserName,advertiser_email:advertiserEmail,title:$("title").value,description:$("description").value,target_url:targetUrl||"#",media_url:mediaUrl,media_type:mediaType,hero_type:heroTypeFinal,song_id:songId,country_code:advertCountry.code,country_name:advertCountry.name,display_currency:displayPrice?displayPrice.currency:"UGX",display_amount:displayPrice?displayPrice.amount:null};
+ var response=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify(payload)});
+ var data=await response.json(); if(!response.ok) throw new Error(data.error||"Checkout failed");
+ var url=data.checkout_url||data.url; if(url){window.location.href=url;return;}
+ showMessage(message,"Checkout created","success");
 }
 function setup(){
-  $("accountBtn").addEventListener("click",function(){window.location.href="account.html"});
-  $("songSelect").addEventListener("change",function(){updateGeneratedFields();updatePreview()});
-  $("profileSelect").addEventListener("change",updateGeneratedFields);
-  $("businessName").addEventListener("input",updateGeneratedFields);
-  $("media").addEventListener("change",updatePreview);
-  $("flyer").addEventListener("change",updatePreview);
-  document.querySelectorAll('input[name="heroType"]').forEach(function(el){el.addEventListener("change",updateHeroFields)});
-  $("payBtn").addEventListener("click",async function(){
-    var btn=$("payBtn"),old=btn.textContent;btn.disabled=true;btn.textContent="Processing...";
-    try{await startPayment()}catch(e){showMessage($("mainMessage"),e.message||"Something went wrong.","error")}
-    finally{btn.disabled=false;btn.textContent=old}
-  });
-  document.getElementById("year").textContent=new Date().getFullYear();
-  window.selectType("song");loadPackages();loadSession();
+ $("accountBtn").addEventListener("click",function(){window.location.href="account.html"});
+ $("songSelect").addEventListener("change",function(){updateGeneratedFields();updatePreview()});
+ $("profileSelect").addEventListener("change",updateGeneratedFields);
+ $("businessName").addEventListener("input",updateGeneratedFields);
+ $("media").addEventListener("change",updatePreview);
+ $("flyer").addEventListener("change",updatePreview);
+ document.querySelectorAll('input[name="heroType"]').forEach(function(el){el.addEventListener("change",updateHeroFields)});
+ $("payBtn").addEventListener("click",async function(){
+   var btn=$("payBtn"),old=btn.textContent; btn.disabled=true; btn.textContent="Processing...";
+   try{await startPayment()}catch(e){showMessage($("mainMessage"),e.message,"error")}
+   finally{btn.disabled=false;btn.textContent=old}
+ });
+ document.getElementById("year").textContent=new Date().getFullYear();
+ window.selectType("song"); loadPackages(); loadSession();
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",setup); else setup();
 })();
 </script>
 </body>
