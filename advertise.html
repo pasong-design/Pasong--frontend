@@ -3,331 +3,252 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#8b5cf6">
 <title>PASONG — Advertise</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-  /* ---------- RESET ---------- */
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:Arial,sans-serif;background:#090611;color:#fff;overflow-x:hidden}
-  button,input,select{font:inherit} button{cursor:pointer} a{color:inherit;text-decoration:none}
-  .hidden{display:none!important}
+/* ===== BASE ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100vh}
+body{
+  font-family:Inter,Arial,sans-serif;
+  background:#090611;color:#fff;
+  overflow-x:hidden;
+  display:flex;flex-direction:column;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.hidden{display:none!important}
 
-  /* ---------- HEADER ---------- */
-  .header{
-    position:sticky;top:0;z-index:50;
-    display:flex;justify-content:space-between;align-items:center;
-    padding:14px 22px;background:#110a1d;border-bottom:1px solid #222;
-  }
-  .logo{font-weight:900;font-size:22px} .logo span{color:#a855f7}
-  .account-btn{background:#8b5cf6;border:0;border-radius:8px;padding:8px 14px;color:#fff;font-weight:700}
+/* ===== HEADER ===== */
+.header{
+  width:100%;height:72px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;background:#110a1d;border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;top:0;z-index:100;
+}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:24px}
+.logo span{color:#a855f7;font-size:26px}
+.header-links{display:flex;align-items:center;gap:12px}
+.header-link{padding:9px 14px;border-radius:10px;color:#bbb;font-size:14px}
+.header-link:hover{background:#1f1430;color:#fff}
+.account-btn{background:#8b5cf6;border:0;border-radius:10px;padding:10px 16px;color:#fff;font-weight:800}
 
-  /* ---------- LAYOUT ---------- */
-  .container{width:min(1000px, calc(100% - 24px));margin:24px auto 10px}
-  .hero{text-align:center;margin-bottom:22px}
-  .hero h1{font-size:34px} .hero h1 span{color:#a855f7}
-  .hero p{color:#9aa;font-size:13px;margin-top:8px}
+/* ===== CONTAINER - NOT SQUEEZED, USER WILL SCROLL ===== */
+.container{
+  width:min(1100px, calc(100% - 40px));
+  margin:40px auto 0;
+  flex:1;
+}
 
-  /* ---------- STEPS ---------- */
-  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
-  .step{background:#130c20;border:1px solid #222;border-radius:10px;padding:10px;text-align:center;font-size:11px;color:#888}
-  .step strong{display:block;color:#fff} .step.active{border-color:#8b5cf6}
+/* ===== HERO - INTERESTING ===== */
+.hero{text-align:center;padding:20px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,48px);line-height:1.1;font-weight:900}
+.hero h1 span{color:#a855f7}
+.hero p{max-width:720px;margin:14px auto 0;color:#b8a8c8;line-height:1.6;font-size:15px}
 
-  /* ---------- CARDS ---------- */
-  .card{background:#120b1d;border:1px solid #23233A;border-radius:16px;padding:18px;margin-bottom:16px}
-  .card h2{font-size:16px} .card-sub{color:#888;font-size:12px;margin:6px 0 14px}
+/* ===== STEPS ===== */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:30px}
+.step{
+  background:#130c20;border:1px solid rgba(255,255,255,.08);border-radius:14px;
+  padding:16px 10px;text-align:center;color:#8e86a0;font-size:12px
+}
+.step strong{display:block;color:#fff;font-size:13px;margin-bottom:4px}
+.step.active{border-color:#8b5cf6;background:#1c1230;color:#d8c6ff}
 
-  /* ---------- PROMO TYPES ---------- */
-  .promo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .promo-type{background:#171022;border:1px solid #2a2a40;border-radius:12px;padding:16px;text-align:left;color:#fff}
-  .promo-type.selected{border-color:#a855f7;background:#24133b}
+/* ===== CARDS ===== */
+.card{
+  background:#120b1d;border:1px solid rgba(255,255,255,.08);border-radius:20px;
+  padding:26px;margin-bottom:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)
+}
+.card h2{font-size:18px;margin-bottom:6px}
+.card-sub{color:#8f879d;font-size:13px;margin-bottom:20px;line-height:1.5}
 
-  /* ---------- PACKAGES ---------- */
-  .package-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .package-card{background:#171022;border:1px solid #2a2a40;border-radius:12px;padding:16px;cursor:pointer}
-  .package-card.selected{border-color:#a855f7;background:#1e1430}
-  .package-name{font-weight:800} .package-description{color:#9a9ab0;font-size:11px;margin-top:4px;min-height:28px}
-  .package-price{color:#c9a8ff;font-weight:900;margin:12px 0}
-  .package-select-btn{width:100%;background:#8b5cf6;border:0;border-radius:8px;padding:10px;color:#fff;font-weight:800}
+/* ===== PROMO TYPES - RICH ===== */
+.promo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.promo-type{
+  min-height:170px;text-align:left;
+  background:#171022;border:1px solid rgba(255,255,255,.1);border-radius:16px;
+  padding:22px 18px;transition:.2s;color:#fff
+}
+.promo-type:hover{transform:translateY(-3px);border-color:#8b5cf6;background:#1d1432}
+.promo-type.selected{border-color:#a855f7;background:linear-gradient(180deg,#24133b,#171022);box-shadow:0 0 0 3px rgba(168,85,247,.15)}
+.promo-icon{
+  width:48px;height:48px;display:flex;align-items:center;justify-content:center;
+  border-radius:12px;background:#241536;font-size:22px;margin-bottom:14px
+}
+.promo-type strong{display:block;font-size:16px;margin-bottom:6px}
+.promo-type small{color:#9d93ac;font-size:12px;line-height:1.5}
 
-  /* ---------- FIELDS ---------- */
-  .field{margin-bottom:12px} .field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}
-  .field input,.field select{width:100%;background:#0d0715;border:1px solid #333;border-radius:8px;padding:11px;color:#fff}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .file-box{border:1px dashed #444;border-radius:10px;padding:16px;text-align:center;background:#0d0715}
-  .preview{background:#08050d;min-height:90px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-top:10px}
-  .preview img,.preview video{width:100%;max-height:300px;object-fit:contain}
+/* ===== PACKAGES ===== */
+.package-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.package-card{
+  background:#171022;border:1px solid rgba(255,255,255,.09);border-radius:16px;
+  padding:20px;cursor:pointer;transition:.2s
+}
+.package-card:hover{transform:translateY(-2px);border-color:#8b5cf6}
+.package-card.selected{border-color:#a855f7;background:#1e1430;box-shadow:0 0 0 2px rgba(168,85,247,.15)}
+.package-name{font-size:17px;font-weight:800}
+.package-description{color:#9d94a8;font-size:12px;margin-top:6px;line-height:1.5;min-height:36px}
+.package-price{margin:16px 0;font-size:20px;font-weight:900;color:#d3b6ff}
+.package-select-btn{width:100%;border:0;border-radius:10px;padding:12px;background:#8b5cf6;color:#fff;font-weight:800}
 
-  /* ---------- PAY ---------- */
-  .pay-area{display:flex;justify-content:space-between;align-items:center;gap:12px}
-  .total-box{font-size:12px;color:#aaa} .total-box strong{display:block;font-size:22px;color:#fff}
-  .pay-btn{background:#8b5cf6;border:0;border-radius:10px;padding:12px 18px;color:#fff;font-weight:800}
-  .message{display:none;padding:10px;border-radius:8px;margin-top:10px;font-size:12px}
-  .message.show{display:block} .message.error{background:#2a1320;color:#fca5a5;border:1px solid #7a2a40}
-  .loading{text-align:center;padding:14px;color:#777;font-size:12px}
+/* ===== FIELDS ===== */
+.field{margin-bottom:16px}
+.field label{display:block;margin-bottom:8px;font-size:13px;font-weight:700}
+.field input,.field select{
+  width:100%;background:#0d0715;border:1px solid rgba(255,255,255,.12);
+  border-radius:11px;padding:13px;color:#fff;outline:none
+}
+.field input:focus,.field select:focus{border-color:#8b5cf6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.file-box{border:1.5px dashed rgba(255,255,255,.18);border-radius:12px;padding:20px;text-align:center;background:#0d0715}
+.preview{
+  border-radius:14px;background:#08050d;min-height:130px;
+  display:flex;align-items:center;justify-content:center;margin-top:14px;overflow:hidden
+}
+.preview img,.preview video{width:100%;max-height:380px;object-fit:contain}
+.preview-empty{color:#6f677a;font-size:13px;padding:30px}
 
-  /* ---------- FOOTER — FIXED, NOT CUT ---------- */
-  .site-footer{
-    width:100%;background:#080810;border-top:1px solid #23233A;
-    padding:40px 20px 110px; /* 110px = safe for Android nav */
-    margin-top:24px;
-  }
-  .footer-grid{
-    max-width:1200px;margin:0 auto;
-    display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr;gap:24px;
-  }
-  .footer-brand{font-weight:900;font-size:20px} .footer-brand span{color:#c084fc}
-  .footer-desc{color:#9CA3AF;font-size:12px;margin-top:8px;line-height:1.5}
-  .footer-col-title{font-weight:800;font-size:13px;margin-bottom:10px}
-  .footer-col a{display:block;color:#9CA3AF;font-size:12px;padding:5px 0}
-  .footer-bottom{
-    max-width:1200px;margin:32px auto 0;padding-top:20px;
-    border-top:1px solid #1A1A2E;display:flex;justify-content:space-between;
-    flex-wrap:wrap;gap:10px;color:#666;font-size:11px
-  }
+/* ===== PAY ===== */
+.pay-area{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:10px}
+.total-box{color:#9a93a6;font-size:13px}
+.total-box strong{display:block;color:#fff;font-size:26px;margin-top:4px}
+.pay-btn{border:0;border-radius:12px;background:#8b5cf6;color:#fff;padding:15px 22px;font-weight:900;min-width:190px}
+.pay-btn:hover{background:#7c3aed}
+.message{display:none;padding:14px;border-radius:11px;margin-top:14px;font-size:13px}
+.message.show{display:block}
+.message.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+.message.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#86efac}
+.loading{text-align:center;padding:20px;color:#888}
 
-  /* Hide logged-in bars */
-  #accountStatus,#countryPriceStatus{display:none!important}
+/* ===== FOOTER - FIXED, NOT CUT, SPACIOUS ===== */
+.site-footer{
+  width:100%;
+  background:#080810;
+  border-top:1px solid #23233A;
+  margin-top:40px;
+  padding:50px 28px 40px; /* NOT 110px anymore, normal scroll */
+  display:block;
+}
+.footer-inner{max-width:1240px;margin:0 auto}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.7fr 1fr 1fr 1fr 1fr;
+  gap:32px;
+}
+.footer-brand{font-weight:900;font-size:24px}
+.footer-brand span{color:#c084fc}
+.footer-desc{color:#9CA3AF;font-size:13px;line-height:1.6;margin-top:12px;max-width:320px}
+.footer-col-title{font-weight:800;color:#fff;font-size:14px;margin-bottom:16px}
+.footer-col a{display:block;color:#9CA3AF;font-size:13px;padding:6px 0}
+.footer-col a:hover{color:#fff}
+.footer-bottom{
+  max-width:1240px;margin:40px auto 0;padding-top:24px;
+  border-top:1px solid #1A1A2E;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  color:#666;font-size:12px
+}
 
-  /* ---------- MOBILE ---------- */
-  @media(max-width:800px){
-    .promo-grid,.package-grid,.grid2{grid-template-columns:1fr}
-    .pay-area{flex-direction:column;align-items:stretch}
-    .footer-grid{grid-template-columns:1fr 1fr}
-  }
-  @media(max-width:500px){
-    .footer-grid{grid-template-columns:1fr}
-    .site-footer{padding:30px 16px 120px}
-  }
+#accountStatus,#countryPriceStatus{display:none!important}
+
+@media(max-width:950px){
+  .footer-grid{grid-template-columns:1fr 1fr 1fr;gap:28px}
+  .promo-grid,.package-grid,.grid2{grid-template-columns:1fr}
+  .pay-area{flex-direction:column;align-items:stretch}
+  .pay-btn{width:100%}
+  .container{width:min(1000px, calc(100% - 20px));margin-top:20px}
+}
+@media(max-width:600px){
+  .footer-grid{grid-template-columns:1fr 1fr;gap:24px}
+  .steps{grid-template-columns:1fr 1fr}
+  .header{padding:0 16px}
+  .card{padding:18px}
+  .site-footer{padding:36px 18px 90px} /* extra bottom only on phone for Android nav */
+}
+@media(max-width:400px){
+  .footer-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
-
 <body>
+
 <header class="header">
-  <a class="logo" href="index.html">◈ <span>PASONG</span></a>
-  <button class="account-btn" id="accountBtn">Account</button>
+  <a class="logo" href="Pasong.html"><span>◈</span>PASONG</a>
+  <div class="header-links">
+    <a class="header-link" href="Pasong.html">Home</a>
+    <a class="header-link" href="account.html">Account</a>
+    <button class="account-btn" id="accountBtn">Account</button>
+  </div>
 </header>
 
 <main class="container">
   <div class="hero">
     <h1>Advertise on <span>PASONG</span></h1>
-    <p>Default is UGX. If your IP is not Uganda, price auto-changes to your currency.</p>
+    <p>Choose where you want your advert to appear, upload your advert, pay securely, and PASONG Admin will review it before it goes live. Default is UGX. If IP is not Uganda, price auto-switches.</p>
   </div>
 
   <div class="steps">
-    <div class="step active"><strong>1. Choose</strong>Package</div>
-    <div class="step"><strong>2. Create</strong>Advert</div>
-    <div class="step"><strong>3. Pay</strong>Secure</div>
-    <div class="step"><strong>4. Go live</strong>Review</div>
+    <div class="step active"><strong>1. Choose</strong>Your package</div>
+    <div class="step"><strong>2. Create</strong>Your advert</div>
+    <div class="step"><strong>3. Pay</strong>Securely</div>
+    <div class="step"><strong>4. Go live</strong>After review</div>
   </div>
 
-  <!-- Hidden status (we hide via CSS as you asked) -->
-  <div id="accountStatus"></div>
-  <div id="countryPriceStatus"></div>
+  <div id="accountStatus"></div><div id="countryPriceStatus"></div>
 
-  <div class="card">
+  <section class="card">
     <h2>🚀 What do you want to promote?</h2>
+    <p class="card-sub">Choose one option. This will be used to generate your advert.</p>
     <div class="promo-grid">
-      <button class="promo-type" id="promoSong" onclick="selectType('song')">🎵<br><strong>Promote a Song</strong></button>
-      <button class="promo-type" id="promoProfile" onclick="selectType('profile')">👤<br><strong>Promote My Profile</strong></button>
-      <button class="promo-type" id="promoBusiness" onclick="selectType('business')">🏢<br><strong>Promote a Business</strong></button>
+      <button class="promo-type" id="promoSong" onclick="selectType('song')">
+        <div class="promo-icon">🎵</div><strong>Promote a Song</strong><small>Promote one of your PASONG songs with cover art.</small>
+      </button>
+      <button class="promo-type" id="promoProfile" onclick="selectType('profile')">
+        <div class="promo-icon">👤</div><strong>Promote My Profile</strong><small>Drive followers to your artist profile page.</small>
+      </button>
+      <button class="promo-type" id="promoBusiness" onclick="selectType('business')">
+        <div class="promo-icon">🏢</div><strong>Promote a Business</strong><small>Promote your brand, shop, or product on PASONG.</small>
+      </button>
     </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h2>📦 Choose package</h2>
-    <p class="card-sub">Default UGX. Outside Uganda = EUR / USD / KES</p>
-    <div id="packageLoading" class="loading">Loading packages in UGX...</div>
+  <section class="card">
+    <h2>📦 Choose your advertising package</h2>
+    <p class="card-sub">Default is UGX. If outside Uganda, it changes to EUR / USD / KES automatically.</p>
+    <div id="packageLoading" class="loading">Loading packages — showing UGX first...</div>
     <div id="packageGrid" class="package-grid"></div>
     <div id="packageMessage" class="message"></div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h2>📝 Create advert</h2>
+  <section class="card">
+    <h2>📝 Create your advert</h2>
     <div class="grid2">
-      <div class="field"><label>Name</label><input id="advertiserName" placeholder="Your name"></div>
+      <div class="field"><label>Advertiser name</label><input id="advertiserName" placeholder="Your name or business"></div>
       <div class="field"><label>Email</label><input id="advertiserEmail" placeholder="you@email.com"></div>
     </div>
     <div class="field"><label>Phone / WhatsApp</label><input id="advertiserPhone" placeholder="+256..."></div>
-    <div id="songFields" class="hidden"><div class="field"><label>Select song</label><select id="songSelect"></select></div></div>
+    <div id="songFields" class="hidden"><div class="field"><label>Select your song</label><select id="songSelect"></select></div></div>
     <div id="profileFields" class="hidden"><div class="field"><label>Select profile</label><select id="profileSelect"></select></div></div>
-    <div id="businessFields" class="hidden"><div class="field"><label>Business name</label><input id="businessName"></div></div>
+    <div id="businessFields" class="hidden"><div class="field"><label>Business / brand name</label><input id="businessName" placeholder="e.g. Kivumbi Fashion"></div></div>
     <input id="title" type="hidden"><input id="description" type="hidden"><input id="businessUrl" type="hidden">
-  </div>
+  </section>
 
-  <div id="heroSection" class="card hidden">
-    <h2>🏠 Hero</h2>
+  <section id="heroSection" class="card hidden">
+    <h2>🏠 Home Hero Advert</h2>
     <div class="grid2">
-      <label style="border:1px solid #333;border-radius:8px;padding:10px"><input type="radio" name="heroType" value="cover" checked> Use cover</label>
-      <label style="border:1px solid #333;border-radius:8px;padding:10px"><input type="radio" name="heroType" value="flyer"> Upload flyer</label>
+      <label style="border:1px solid #333;border-radius:10px;padding:14px;background:#171022;display:flex;gap:8px"><input type="radio" name="heroType" value="cover" checked> Use song cover as hero</label>
+      <label style="border:1px solid #333;border-radius:10px;padding:14px;background:#171022;display:flex;gap:8px"><input type="radio" name="heroType" value="flyer"> Upload Hero flyer</label>
     </div>
-    <div id="flyerField" class="field hidden" style="margin-top:10px"><div class="file-box"><input id="flyer" type="file" accept="image/*"></div></div>
-  </div>
+    <div id="flyerField" class="field hidden" style="margin-top:14px"><label>Hero flyer</label><div class="file-box"><input id="flyer" type="file" accept="image/*"></div></div>
+  </section>
 
-  <div id="mediaSection" class="card">
-    <h2>🖼️ Media</h2>
-    <div class="file-box"><input id="media" type="file" accept="image/*,video/*"></div>
-    <div id="preview" class="preview"><span style="color:#666;font-size:12px">Preview here</span></div>
-  </div>
+  <section id="mediaSection" class="card">
+    <h2>🖼️ Advert media</h2>
+    <div class="field"><label>Image / Video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div></div>
+    <div id="preview" class="preview"><div class="preview-empty">Your advert preview will appear here — upload or select song.</div></div>
+  </section>
 
-  <div class="card">
+  <section class="card">
     <h2>💳 Review & Pay</h2>
-    <div class="pay-area">
-      <div class="total-box">Total<strong id="totalPrice">—</strong></div>
-      <button class="pay-btn" id="payBtn">Continue to Payment</button>
-    </div>
-    <div id="mainMessage" class="message"></div>
-  </div>
-</main>
-
-<!-- FOOTER - CLEAN AND NOT CUT -->
-<footer class="site-footer">
-  <div class="footer-grid">
-    <div><div class="footer-brand">◈ <span>PASONG</span></div><p class="footer-desc">Uganda's home of hits. Discover, stream, and download African music.</p></div>
-    <div class="footer-col"><div class="footer-col-title">Company</div><a href="about.html">About</a><a href="contact.html">Contact</a></div>
-    <div class="footer-col"><div class="footer-col-title">Community</div><a href="for-artists.html">For Artists</a><a href="developers.html">Developers</a></div>
-    <div class="footer-col"><div class="footer-col-title">Links</div><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
-    <div class="footer-col"><div class="footer-col-title">Plans</div><a href="store.html">Store</a><a href="charts.html">Charts</a></div>
-  </div>
-  <div class="footer-bottom"><span>© <span id="year"></span> PASONG</span><span>Built in Uganda</span></div>
-</footer>
-
-<script>
-// ================= CONFIG =================
-const API_BASE = "https://pasong-api.vercel.app";
-const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const CLOUDINARY_CLOUD = "vuehnvkp";
-const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/auto/upload`;
-
-let supabaseClient = null;
-let packages = [], selectedPackage = null, songs = [], profiles = [], currentSession = null;
-let selectedType = "";
-
-// DEFAULT = UGX. ONLY CHANGE IF NOT UGANDA
-let advertCountry = { code:"UG", name:"Uganda", currency:"UGX", detected:false };
-const RATES = { UGX:1, KES:0.035, TZS:0.70, RWF:0.35, USD:0.00027, EUR:0.00025, GBP:0.00021 };
-
-function countryCurrency(code){
-  code = (code||"").toUpperCase();
-  if(code==="UG") return "UGX";
-  if(code==="KE") return "KES";
-  if(code==="TZ") return "TZS";
-  if(code==="RW") return "RWF";
-  if(code==="GB") return "GBP";
-  if(["DE","FR","IT","ES","NL","BE","CH","SE","NO","DK","FI","AT","IE","PT","PL"].includes(code)) return "EUR";
-  return "USD";
-}
-
-// IMPROVED IP DETECTION - if ANY says UG, stay UGX
-async function detectCountry(){
-  try{
-    const r1 = await fetch("https://ipwho.is/",{cache:"no-store"}).then(r=>r.json()).catch(()=>null);
-    if(r1?.country_code && String(r1.country_code).toUpperCase()==="UG"){
-      advertCountry = {code:"UG",name:"Uganda",currency:"UGX",detected:true}; return advertCountry;
-    }
-    const r2 = await fetch("https://ipapi.co/json/",{cache:"no-store"}).then(r=>r.json()).catch(()=>null);
-    if(r2?.country_code && String(r2.country_code).toUpperCase()==="UG"){
-      advertCountry = {code:"UG",name:"Uganda",currency:"UGX",detected:true}; return advertCountry;
-    }
-    if(r1?.country_code){
-      const cc = String(r1.country_code).toUpperCase();
-      advertCountry = {code:cc,name:r1.country||cc,currency:countryCurrency(cc),detected:true}; return advertCountry;
-    }
-    if(r2?.country_code){
-      const cc = String(r2.country_code).toUpperCase();
-      advertCountry = {code:cc,name:r2.country_name||cc,currency:countryCurrency(cc),detected:true}; return advertCountry;
-    }
-  }catch(e){}
-  advertCountry = {code:"UG",name:"Uganda",currency:"UGX",detected:false};
-  return advertCountry;
-}
-
-function convertedPrice(p){
-  const base = Number(p.price ?? p.amount ?? p.price_amount);
-  if(!isFinite(base)) return null;
-  const baseCur = String(p.currency || "UGX").toUpperCase();
-  const target = advertCountry.currency || "UGX";
-  if(baseCur===target) return {amount:base,currency:target};
-  const rateBase = RATES[baseCur] ?? (baseCur==="UGX"?1:0.00027);
-  const toUGX = baseCur==="UGX" ? base : base/rateBase;
-  const rateTarget = RATES[target] ?? 1;
-  const final = target==="UGX" ? toUGX : toUGX*rateTarget;
-  return {amount:final,currency:target};
-}
-
-// HELPERS
-const $ = id => document.getElementById(id);
-const esc = v => String(v??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));
-const money = (v,c) => {
-  const n=Number(v); if(!isFinite(n)) return "-";
-  c=(c||"UGX").toUpperCase();
-  if(c==="UGX") return `UGX ${Math.round(n).toLocaleString()}`;
-  if(c==="EUR") return `€${n.toFixed(2)}`;
-  if(c==="USD") return `$${n.toFixed(2)}`;
-  if(c==="GBP") return `£${n.toFixed(2)}`;
-  return `${c} ${Math.round(n).toLocaleString()}`;
-};
-const getKey = p => p.key || p.package_key || p.slug || p.id;
-const showMsg = (el,msg,type) => { if(el){el.textContent=msg; el.className=`message show ${type||"info"}`} };
-
-// SELECT TYPE
-window.selectType = (type) => {
-  selectedType = type;
-  ["promoSong","promoProfile","promoBusiness"].forEach(id=>$(id).classList.remove("selected"));
-  const map={song:"promoSong",profile:"promoProfile",business:"promoBusiness"};
-  $(map[type]).classList.add("selected");
-  $("songFields").classList.toggle("hidden",type!=="song");
-  $("profileFields").classList.toggle("hidden",type!=="profile");
-  $("businessFields").classList.toggle("hidden",type!=="business");
-};
-
-window.selectPackageByIndex = (i) => {
-  selectedPackage = packages[i];
-  document.querySelectorAll(".package-card").forEach(c=>c.classList.remove("selected"));
-  $(`package-${i}`).classList.add("selected");
-  const cp = convertedPrice(selectedPackage);
-  $("totalPrice").textContent = cp ? money(cp.amount, cp.currency) : "-";
-  showMsg($("packageMessage"), `Selected: ${selectedPackage.name||getKey(selectedPackage)}`, "success");
-};
-
-function renderPackages(){
-  $("packageLoading").style.display="none";
-  const grid=$("packageGrid"); grid.innerHTML="";
-  packages.forEach((p,i)=>{
-    const cp = convertedPrice(p);
-    const card=document.createElement("div");
-    card.className="package-card"; card.id=`package-${i}`;
-    card.innerHTML=`
-      <div class="package-name">${esc(p.name||getKey(p))}</div>
-      <div class="package-description">${esc(p.description||"Advertise on PASONG")}</div>
-      <div class="package-price">${esc(cp?money(cp.amount,cp.currency):"-")}</div>
-      <button class="package-select-btn">Select Package</button>
-    `;
-    card.addEventListener("click",()=>window.selectPackageByIndex(i));
-    card.querySelector("button").addEventListener("click",e=>{e.stopPropagation();window.selectPackageByIndex(i)});
-    grid.appendChild(card);
-  });
-}
-
-async function loadPackages(){
-  advertCountry = {code:"UG",name:"Uganda",currency:"UGX",detected:false};
-  const res = await fetch(`${API_BASE}/api/advertising/packages`,{cache:"no-store"});
-  const data = await res.json();
-  packages = Array.isArray(data)?data:(data.packages||data.data||[]);
-  renderPackages();
-  await detectCountry();
-  if(advertCountry.code!=="UG") renderPackages();
-}
-
-// INIT
-(async()=>{
-  try{ supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }catch(e){}
-  $("year").textContent = new Date().getFullYear();
-  $("accountBtn").onclick = () => location.href="account.html";
-  window.selectType("song");
-  await loadPackages();
-})();
-</script>
-</body>
-</html>
+    <div class="pay-area"><div class="total-box">Total advertising cost<strong id="totalPrice">—</strong></div><button class="pay-btn" id="payBtn">Continue to Payment</button></div>
