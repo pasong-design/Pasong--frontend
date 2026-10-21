@@ -2,431 +2,140 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#8b5cf6">
-<title>PASONG &#8212; Advertise</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090611">
+<title>PASONG â€” Advertise</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;min-height:100%}
-body{font-family:Arial,Helvetica,sans-serif;background:#090611;color:#fff;overflow-x:hidden}
-button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.hidden{display:none!important}
-.header{width:100%;min-height:70px;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:#110a1d;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:1000}
-.logo{display:flex;align-items:center;gap:9px;font-size:22px;font-weight:900;color:#fff}.logo-mark{color:#a855f7;font-size:25px}
-.header-links{display:flex;align-items:center;gap:10px}.header-link{padding:9px 13px;border-radius:10px;color:#ddd;font-size:14px}.header-link:hover{background:#21132f;color:#fff}
-.account-btn{background:#8b5cf6;color:#fff;border:0;border-radius:10px;padding:10px 15px;font-weight:700}
-.container{width:min(1000px,calc(100% - 28px));margin:30px auto 30px}.hero{text-align:center;margin-bottom:28px}
-.hero h1{font-size:clamp(28px,5vw,45px);line-height:1.1;margin-bottom:10px}.hero h1 span{color:#a855f7}
-.hero p{color:#bcb3c8;max-width:700px;margin:auto;line-height:1.6;font-size:15px}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:25px}.step{background:#130c20;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:13px 8px;text-align:center;color:#91889b;font-size:12px}
-.step strong{display:block;color:#fff;margin-bottom:4px;font-size:13px}.step.active{border-color:#8b5cf6;background:#1b102a;color:#cbb5ff}
-.card{background:#120b1d;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 15px 45px rgba(0,0,0,.18)}
-.card h2{font-size:19px;margin-bottom:7px}.card-sub{color:#91889b;font-size:13px;line-height:1.5;margin-bottom:18px}
-.promo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.promo-type{width:100%;min-height:145px;position:relative;z-index:5;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:#171022;color:#fff;padding:20px 15px;text-align:left;transition:.18s}
-.promo-type:hover{transform:translateY(-2px);border-color:#8b5cf6;background:#1e1430}.promo-type.selected{border-color:#a855f7;background:linear-gradient(145deg,#24133b,#171022);box-shadow:0 0 0 2px rgba(168,85,247,.16)}
-.promo-icon{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#241536;margin-bottom:12px;font-size:21px}
-.promo-type strong{display:block;font-size:16px;margin-bottom:5px}.promo-type small{color:#9d94a8;line-height:1.45;font-size:12px}
-.package-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.package-card{position:relative;background:#171022;border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:18px;transition:.18s;cursor:pointer}
-.package-card:hover{border-color:#8b5cf6;transform:translateY(-2px)}.package-card.selected{border-color:#a855f7;box-shadow:0 0 0 2px rgba(168,85,247,.15);background:#1e1430}
-.package-name{font-size:17px;font-weight:800;margin-bottom:7px}.package-description{color:#9d94a8;font-size:12px;line-height:1.5;min-height:38px}
-.package-price{margin:14px 0;font-size:20px;font-weight:900;color:#c9a8ff}.package-select-btn{width:100%;position:relative;z-index:10;border:0;border-radius:10px;padding:11px;background:#8b5cf6;color:#fff;font-weight:800}.package-select-btn:hover{background:#7c3aed}
-.field{margin-bottom:16px}.field label{display:block;margin-bottom:7px;font-size:13px;font-weight:700}
-.field input,.field select,.field textarea{width:100%;background:#0d0715;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:#fff;padding:12px 13px;outline:none}
-.field select option{background:#120b1d;color:#fff}.field input:focus,.field select:focus,.field textarea:focus{border-color:#8b5cf6}.field textarea{min-height:95px;resize:vertical}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.help{color:#8f8798;font-size:11px;margin-top:6px;line-height:1.4}
-.hero-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.hero-option{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px;background:#171022;cursor:pointer}
-.hero-option input{margin-right:7px;width:auto}.hero-option strong{font-size:13px}.hero-option p{color:#91889b;font-size:11px;margin-top:5px;line-height:1.4}
-.file-box{border:1px dashed rgba(255,255,255,.18);border-radius:12px;padding:18px;text-align:center;background:#0d0715}.file-box input{border:0;background:transparent;padding:0}
-.preview{border-radius:14px;overflow:hidden;background:#08050d;min-height:120px;display:flex;align-items:center;justify-content:center;margin-top:15px}
-.preview img,.preview video{width:100%;max-height:350px;object-fit:contain;display:block}.preview-empty{color:#756d7d;font-size:13px;padding:35px;text-align:center}
-.account-status{padding:13px 15px;border-radius:11px;background:#171022;border:1px solid rgba(255,255,255,.08);color:#aaa1b4;font-size:13px;margin-bottom:18px}
-.account-status.success{border-color:rgba(34,197,94,.35);color:#86efac}.account-status.error{border-color:rgba(239,68,68,.35);color:#fca5a5}
-.pay-area{display:flex;align-items:center;justify-content:space-between;gap:15px;padding-top:8px}.total-box{font-size:13px;color:#aaa1b4}.total-box strong{display:block;color:#fff;font-size:24px;margin-top:3px}
-.pay-btn{min-width:180px;border:0;border-radius:12px;background:#8b5cf6;color:#fff;padding:14px 20px;font-weight:900}.pay-btn:hover{background:#7c3aed}.pay-btn:disabled{opacity:.5;cursor:not-allowed}
-.message{display:none;padding:13px 15px;border-radius:11px;margin-top:15px;font-size:13px;line-height:1.5}.message.show{display:block}
-.message.error{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.25);color:#fca5a5}.message.success{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.25);color:#86efac}.message.info{background:rgba(139,92,246,.09);border:1px solid rgba(139,92,246,.25);color:#c4b5fd}
-.loading{text-align:center;padding:20px;color:#91889b;font-size:13px}
-
-/* ===== FOOTER FIXED ===== */
-.footer{width:100%;background:#080810;border-top:1px solid #23233A;padding:40px 20px 120px;margin-top:24px;display:block;overflow:visible}
-.footer-inner{max-width:1200px;margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1fr;gap:28px;width:100%}
-.footer-brand{font-weight:900;font-size:20px;margin-bottom:10px} .footer-brand span{color:#c084fc}
-.footer-desc{color:#9CA3AF;font-size:13px;line-height:1.6;max-width:300px}
-.footer-col-title{font-weight:800;font-size:14px;margin-bottom:12px;color:#fff}
-.footer-col a{display:block;color:#9CA3AF;font-size:13.5px;line-height:1.9;padding:4px 0}
-.footer-col a:hover{color:#fff}
-.footer-bottom{max-width:1200px;margin:32px auto 0;padding-top:20px;border-top:1px solid #1A1A2E;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;color:#777;font-size:12px}
-@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:30px 20px}.footer-grid>div:first-child{grid-column:1/-1}}
-@media(max-width:550px){.footer{padding:28px 18px 125px}.footer-grid{grid-template-columns:1fr 1fr;gap:24px 16px}.footer-grid>div:first-child{grid-column:1/-1}.footer-brand{font-size:22px}.footer-desc{font-size:14px;max-width:100%}.footer-col-title{font-size:15px}.footer-col a{font-size:14px;line-height:1.9}}
-
-@media(max-width:720px){.header{padding:12px 14px}.header-links{gap:3px}.header-link{padding:8px 7px;font-size:12px}.account-btn{padding:8px 10px;font-size:12px}.container{width:calc(100% - 20px);margin-top:20px}.steps{grid-template-columns:repeat(2,1fr)}.promo-grid,.package-grid,.grid2,.hero-options{grid-template-columns:1fr}.grid2{gap:0}.pay-area{flex-direction:column;align-items:stretch}.pay-btn{width:100%}.card{padding:17px}}
+:root{--bg:#090611;--panel:#120b1d;--field:#0d0715;--line:#2a2037;--purple:#8b5cf6;--muted:#a49aad;--text:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,Helvetica,sans-serif}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}.header{position:sticky;top:0;z-index:10;background:#110a1d;border-bottom:1px solid var(--line);padding:13px 16px;display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:19px}.logo span{color:#c084fc}.nav{display:flex;gap:8px;align-items:center}.nav a,.nav button{font-size:12px;padding:9px 11px;border:0;border-radius:9px;background:transparent;color:#ddd}.nav button{background:var(--purple);font-weight:bold;color:white}.wrap{max-width:760px;width:calc(100% - 24px);margin:22px auto 34px}.hero{text-align:center;margin:8px 0 18px}.hero h1{font-size:clamp(26px,5vw,36px);margin:0 0 8px}.hero h1 span{color:#a855f7}.hero p{color:var(--muted);font-size:13px;line-height:1.5;margin:0 auto;max-width:520px}.status{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#171022;color:var(--muted);font-size:12px;margin:9px 0}.status.ok{color:#86efac;border-color:#245b3a}.status.bad{color:#fca5a5;border-color:#653030}.section{background:var(--panel);border:1px solid #251a31;border-radius:15px;padding:17px;margin:13px 0}.section h2{font-size:16px;margin:0 0 5px}.hint{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 14px}.types,.packages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.type,.package{border:1px solid var(--line);border-radius:12px;background:#171022;padding:13px;text-align:left;color:white;min-width:0}.type.selected,.package.selected{border-color:#a855f7;background:#211432;box-shadow:0 0 0 1px #a855f7}.type .icon{font-size:20px;margin-bottom:8px}.type strong,.package strong{display:block;font-size:13px;margin-bottom:5px}.type small{font-size:11px;color:var(--muted);line-height:1.4;display:block}.price{color:#d0b5ff;font-size:17px;font-weight:800;margin:13px 0}.choose{width:100%;background:var(--purple);color:white;border:0;border-radius:8px;padding:10px 6px;font-size:12px;font-weight:800}.package .desc{color:var(--muted);font-size:11px;line-height:1.4;min-height:30px}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:6px}.field input,.field select{display:block;width:100%;background:var(--field);color:white;border:1px solid var(--line);border-radius:9px;padding:12px;outline:none}.field input:focus,.field select:focus{border-color:var(--purple)}.field input[type=file]{font-size:12px}.field option{background:#120b1d}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.help{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}.preview{margin-top:12px;min-height:95px;border-radius:10px;background:#08050d;display:flex;justify-content:center;align-items:center;overflow:hidden;color:#756d7d;font-size:12px;text-align:center}.preview img,.preview video{display:block;max-width:100%;max-height:280px;object-fit:contain}.payrow{display:flex;align-items:center;justify-content:space-between;gap:12px}.total{font-size:12px;color:var(--muted)}.total strong{display:block;color:white;font-size:22px;margin-top:4px}.pay{background:var(--purple);color:white;border:0;border-radius:10px;padding:13px 16px;font-weight:800}.pay:disabled{opacity:.55}.message{display:none;padding:11px;border-radius:9px;margin-top:12px;font-size:12px;line-height:1.5}.message.show{display:block}.message.error{color:#fca5a5;background:#32131a}.message.success{color:#86efac;background:#10271a}.message.info{color:#c4b5fd;background:#211432}.hidden{display:none!important}.footer{border-top:1px solid var(--line);background:#080810;padding:25px 18px 45px;color:var(--muted);font-size:12px}.footer-inner{max-width:760px;margin:auto;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.footer strong{color:#c084fc}.footer-links{display:flex;gap:14px;flex-wrap:wrap}
+@media(max-width:560px){.wrap{width:calc(100% - 18px);margin-top:14px}.section{padding:14px}.types{grid-template-columns:1fr 1fr}.type:last-child{grid-column:1/-1}.packages{grid-template-columns:1fr 1fr}.package:last-child{grid-column:1/-1}.grid2{grid-template-columns:1fr;gap:0}.payrow{align-items:stretch;flex-direction:column}.pay{width:100%}.nav a{display:none}}
+@media(max-width:360px){.packages{grid-template-columns:1fr}.package:last-child{grid-column:auto}.types{grid-template-columns:1fr}.type:last-child{grid-column:auto}}
 </style>
 </head>
 <body>
 <header class="header">
-  <a href="Pasong.html" class="logo"><span class="logo-mark">&#9672;</span>PASONG</a>
-  <div class="header-links">
-    <a href="Pasong.html" class="header-link">Home</a>
-    <a href="account.html" class="header-link">Account</a>
-    <button type="button" class="account-btn" id="accountBtn">Account</button>
-  </div>
+  <a class="logo" href="Pasong.html">â—ˆ <span>PASONG</span></a>
+  <nav class="nav"><a href="Pasong.html">Home</a><a href="account.html">Account</a><button id="accountBtn" type="button">Account</button></nav>
 </header>
-<main class="container">
-  <section class="hero"><h1>Advertise on <span>PASONG</span></h1><p>Choose where you want your advert to appear, upload your advert, pay securely, and PASONG Admin will review it before it goes live.</p></section>
-  <div class="steps">
-    <div class="step active"><strong>1. Choose</strong>Your package</div>
-    <div class="step"><strong>2. Create</strong>Your advert</div>
-    <div class="step"><strong>3. Pay</strong>Securely</div>
-    <div class="step"><strong>4. Go live</strong>After review</div>
-  </div>
-  <div id="accountStatus" class="account-status">Checking your PASONG account&#8230;</div>
-  <div id="countryPriceStatus" class="account-status">Detecting your country for advertising prices&#8230;</div>
+<main class="wrap">
+  <div class="hero"><h1>Advertise on <span>PASONG</span></h1><p>Choose what to promote, select a package, add your advert, and pay securely. PASONG Admin reviews adverts before they go live.</p></div>
+  <div id="accountStatus" class="status">Checking your accountâ€¦</div>
+  <div id="countryPriceStatus" class="status">Checking local pricesâ€¦</div>
 
-  <section class="card">
-    <h2>&#128640; What do you want to promote?</h2>
-    <p class="card-sub">Choose one option. PASONG will only ask for the information needed for that type of promotion.</p>
-    <div class="promo-grid">
-      <button type="button" class="promo-type" id="promoSong" onclick="window.selectType('song')"><div class="promo-icon">&#127925;</div><strong>Promote a Song</strong><small>Promote one of your PASONG songs across the platform.</small></button>
-      <button type="button" class="promo-type" id="promoProfile" onclick="window.selectType('profile')"><div class="promo-icon">&#128100;</div><strong>Promote My Profile</strong><small>Send listeners to your PASONG artist profile.</small></button>
-      <button type="button" class="promo-type" id="promoBusiness" onclick="window.selectType('business')"><div class="promo-icon">&#127970;</div><strong>Promote a Business</strong><small>Promote your business, brand, product or service.</small></button>
+  <section class="section">
+    <h2>1. What do you want to promote?</h2><p class="hint">Choose one option.</p>
+    <div class="types">
+      <button class="type" id="promoSong" type="button" onclick="selectType('song')"><div class="icon">ðŸŽµ</div><strong>A Song</strong><small>Promote one of your songs.</small></button>
+      <button class="type" id="promoProfile" type="button" onclick="selectType('profile')"><div class="icon">ðŸ‘¤</div><strong>My Profile</strong><small>Reach more listeners.</small></button>
+      <button class="type" id="promoBusiness" type="button" onclick="selectType('business')"><div class="icon">ðŸª</div><strong>A Business</strong><small>Promote your brand or service.</small></button>
     </div>
   </section>
 
-  <section class="card">
-    <h2>&#128230; Choose your advertising package</h2><p class="card-sub">Select where you want your promotion to appear.</p>
-    <div id="packageLoading" class="loading">Loading advertising packages&#8230;</div>
-    <div id="packageGrid" class="package-grid"></div>
+  <section class="section">
+    <h2>2. Choose a package</h2><p class="hint">Pick where your advert should appear.</p>
+    <div id="packageLoading" class="hint">Loading packagesâ€¦</div>
+    <div id="packageGrid" class="packages"></div>
     <div id="packageMessage" class="message"></div>
   </section>
 
-  <section class="card">
-    <h2>&#128221; Create your advert</h2><p class="card-sub">Complete the information below.</p>
+  <section class="section">
+    <h2>3. Add your details</h2><p class="hint">Only the relevant fields are shown.</p>
     <div class="grid2">
-      <div class="field"><label for="advertiserName">Advertiser name</label><input id="advertiserName" type="text" placeholder="Your name or business name" autocomplete="name"></div>
-      <div class="field"><label for="advertiserEmail">Email</label><input id="advertiserEmail" type="email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="field"><label for="advertiserName">Your name / business name</label><input id="advertiserName" placeholder="Enter name" autocomplete="name"></div>
+      <div class="field"><label for="advertiserEmail">Email</label><input id="advertiserEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
     </div>
-    <div class="field"><label for="advertiserPhone">Phone / WhatsApp</label><input id="advertiserPhone" type="tel" placeholder="+256..." autocomplete="tel"></div>
-    <div id="songFields" class="hidden"><div class="field"><label for="songSelect">Select your song</label><select id="songSelect"><option value="">Select a song</option></select><div class="help">Only songs connected to your PASONG account are shown.</div></div></div>
-    <div id="profileFields" class="hidden"><div class="field"><label for="profileSelect">Select your PASONG profile</label><select id="profileSelect"><option value="">Select profile</option></select></div></div>
-    <div id="businessFields" class="hidden"><div class="field"><label for="businessName">Business / brand name</label><input id="businessName" type="text" placeholder="Example: Kivumbi Fashion"></div></div>
-    <input id="title" type="hidden"><input id="description" type="hidden"><input id="businessUrl" type="hidden">
+    <div class="field"><label for="advertiserPhone">Phone / WhatsApp (optional)</label><input id="advertiserPhone" type="tel" placeholder="+256â€¦" autocomplete="tel"></div>
+    <div id="songFields" class="field hidden"><label for="songSelect">Choose your song</label><select id="songSelect"><option value="">Select a song</option></select></div>
+    <div id="profileFields" class="field hidden"><label for="profileSelect">Choose your profile</label><select id="profileSelect"><option value="">Select profile</option></select></div>
+    <div id="businessFields" class="field hidden"><label for="businessName">Business / brand name</label><input id="businessName" placeholder="Enter business name"></div>
   </section>
 
-  <section id="heroSection" class="card hidden">
-    <h2>&#127968; Home Hero advert</h2><p class="card-sub">Choose whether PASONG should use your selected song cover or a custom Hero flyer.</p>
-    <div class="hero-options">
-      <label class="hero-option"><input type="radio" name="heroType" value="cover" checked><strong>Use song cover</strong><p>Your selected song cover will be displayed in the Home Hero.</p></label>
-      <label class="hero-option"><input type="radio" name="heroType" value="flyer"><strong>Upload Hero flyer</strong><p>Upload a custom image for your Home Hero.</p></label>
-    </div>
-    <div id="flyerField" class="field hidden" style="margin-top:16px"><label for="flyer">Hero flyer</label><div class="file-box"><input id="flyer" type="file" accept="image/jpeg,image/png,image/webp"></div><div class="help">Recommended: 1600 &#215; 900 pixels. Maximum 5 MB.</div></div>
+  <section class="section" id="mediaSection">
+    <h2>4. Add your advert media</h2><p class="hint">Upload a clear image or video. You can preview it below.</p>
+    <div class="field"><label for="media">Image or video</label><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"><div class="help">Images: JPG, PNG, WEBP. Videos: MP4 or WEBM.</div></div>
+    <div id="preview" class="preview">Your preview will appear here.</div>
   </section>
 
-  <section id="mediaSection" class="card">
-    <h2>&#128444; Advert media</h2><p class="card-sub">Upload the image or video you want to advertise.</p>
-    <div class="field"><label for="media">Advert image / video</label><div class="file-box"><input id="media" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"></div><div class="help">Images: JPG, PNG or WEBP. Videos: MP4 or WEBM.</div></div>
-    <div id="preview" class="preview"><div class="preview-empty">Your advert preview will appear here.</div></div>
-  </section>
-
-  <section class="card">
-    <h2>&#128179; Review &amp; Pay</h2><p class="card-sub">Your advert will be submitted for PASONG Admin review after payment.</p>
-    <div class="pay-area"><div class="total-box">Total advertising cost<strong id="totalPrice">&#8212;</strong></div><button type="button" class="pay-btn" id="payBtn">Continue to Payment</button></div>
+  <section class="section">
+    <h2>5. Review and pay</h2><p class="hint">Your advert goes live after payment and admin approval.</p>
+    <div class="payrow"><div class="total">Total cost<strong id="totalPrice">Choose a package</strong></div><button class="pay" id="payBtn" type="button">Continue to Payment</button></div>
     <div id="mainMessage" class="message"></div>
   </section>
 </main>
-
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-brand">◈ <span>PASONG</span></div>
-        <p class="footer-desc">PASONG is Uganda's home of hits. Discover, stream, and download African music — beats, DJs, artists, and charts.</p>
-      </div>
-      <div class="footer-col"><div class="footer-col-title">Company</div><a href="about.html">About</a><a href="contact.html">Contact</a></div>
-      <div class="footer-col"><div class="footer-col-title">Communities</div><a href="for-artists.html">For Artists</a><a href="developers.html">Developers</a></div>
-      <div class="footer-col"><div class="footer-col-title">Useful Links</div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms</a></div>
-      <div class="footer-col"><div class="footer-col-title">PASONG Plans</div><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="beats.html">Free Beats</a></div>
-    </div>
-    <div class="footer-bottom"><span>© <span id="year"></span> PASONG. All rights reserved.</span><span>Made in Uganda 🇺🇬</span></div>
-  </div>
-</footer>
+<footer class="footer"><div class="footer-inner"><div><strong>â—ˆ PASONG</strong><p style="margin-top:7px">Uganda's home of hits. Music, artists, beats and more.</p></div><div class="footer-links"><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div><div>Â© <span id="year"></span> PASONG Â· Made in Uganda ðŸ‡ºðŸ‡¬</div></div></footer>
 
 <script>
 (function(){
 "use strict";
-var API_BASE="https://pasong-api.vercel.app";
-var SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-var SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-var CLOUDINARY_CLOUD_NAME="vuehnvkp";
-var CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD_NAME+"/auto/upload";
-var supabaseClient=null,selectedType="",packages=[],selectedPackage=null,songs=[],profiles=[],currentSession=null;
-var advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:false,source:"default"};
-
-// === FIXED RATES: 1 UGX = how much in target ===
-var advertCurrencyRates={UGX:1, KES:0.035, TZS:0.70, RWF:0.35, USD:0.00027, EUR:0.00025, GBP:0.00021};
-function countryCurrency(code){
-  code=String(code||"").toUpperCase();
-  if(code==="UG")return "UGX";
-  if(code==="KE")return "KES";
-  if(code==="TZ")return "TZS";
-  if(code==="RW")return "RWF";
-  if(code==="GB")return "GBP";
-  if(["DE","FR","IT","ES","NL","BE","CH","SE","NO","DK","FI","AT","IE","PT","PL"].indexOf(code)>=0)return "EUR";
-  return "USD";
+const API_BASE="https://pasong-api.vercel.app";
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+const CLOUDINARY_CLOUD_NAME="vuehnvkp";
+const CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD_NAME+"/auto/upload";
+let db=null,session=null,selectedType="",packages=[],selectedPackage=null,songs=[],profiles=[];
+let country={code:"UG",name:"Uganda",currency:"UGX",detected:false};
+const $=id=>document.getElementById(id);
+const rates={UGX:1,KES:.035,TZS:.70,RWF:.35,USD:.00027,EUR:.00025,GBP:.00021};
+function currencyFor(code){code=(code||"").toUpperCase();if(code==="UG")return"UGX";if(code==="KE")return"KES";if(code==="TZ")return"TZS";if(code==="RW")return"RWF";if(code==="GB")return"GBP";if(["DE","FR","IT","ES","NL","BE","CH","SE","NO","DK","FI","AT","IE","PT","PL"].includes(code))return"EUR";return"USD"}
+function money(n,c){n=Number(n);if(!Number.isFinite(n))return"â€”";c=(c||"UGX").toUpperCase();if(c==="UGX"||c==="KES"||c==="TZS"||c==="RWF")return c+" "+Math.round(n).toLocaleString();return({USD:"$",EUR:"â‚¬",GBP:"Â£"}[c]||c+" ")+(c==="USD"||c==="EUR"||c==="GBP"?n.toFixed(2):n.toFixed(2))}
+function msg(id,text,type){const el=$(id);el.textContent=text;el.className="message show "+(type||"info")}
+function hideMsg(id){$(id).className="message"}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function detectCountry(){
+ try{
+  let cached=JSON.parse(sessionStorage.getItem("pasong_advert_country")||"null");
+  if(cached&&cached.code&&cached.currency){country=cached;showCountry();return}
+ }catch(e){}
+ for(const url of ["https://ipapi.co/json/","https://ipwho.is/"]){
+  try{const r=await fetch(url,{cache:"no-store"});const d=await r.json();const code=(d.country_code||"").toUpperCase();if(!code)continue;if(url.includes("ipwho")&&d.success===false)continue;country={code,name:d.country_name||d.country||code,currency:currencyFor(code),detected:true};sessionStorage.setItem("pasong_advert_country",JSON.stringify(country));showCountry();return}catch(e){}
+ }
+ showCountry()
 }
-async function detectAdvertCountry(){
-  var cached=null;
-  try{cached=JSON.parse(sessionStorage.getItem("pasong_advert_country")||"null")}catch(e){}
-  if(cached&&cached.code&&cached.currency){advertCountry=cached;updateCountryPriceStatus();return advertCountry}
-  var sources=[
-    async function(){var r=await fetch("https://ipapi.co/json/",{cache:"no-store"});if(!r.ok)throw Error("IP lookup failed");var d=await r.json();if(!d.country_code)throw Error("Country unavailable");return {code:d.country_code,name:d.country_name||d.country_code}},
-    async function(){var r=await fetch("https://ipwho.is/",{cache:"no-store"});if(!r.ok)throw Error("IP lookup failed");var d=await r.json();if(!d.success||!d.country_code)throw Error("Country unavailable");return {code:d.country_code,name:d.country||d.country_code}}
-  ];
-  for(var i=0;i<sources.length;i++){
-    try{
-      var found=await sources[i]();
-      var cc=String(found.code).toUpperCase();
-      advertCountry={code:cc,name:found.name,currency:countryCurrency(cc),detected:true,source:"ip"};
-      sessionStorage.setItem("pasong_advert_country",JSON.stringify(advertCountry));
-      updateCountryPriceStatus();
-      return advertCountry;
-    }catch(e){}
-  }
-  advertCountry={code:"UG",name:"Uganda",currency:"UGX",detected:false,source:"default"};
-  updateCountryPriceStatus();
-  return advertCountry;
+function showCountry(){$("countryPriceStatus").textContent=country.detected?"Prices shown in "+country.currency+" for "+country.name+".":"Showing default prices in UGX."; $("countryPriceStatus").className="status"+(country.detected?" ok":"")}
+function priceOf(p){
+ const n=Number(p.price??p.amount??p.price_amount);if(!Number.isFinite(n))return null;
+ const from=String(p.currency||p.price_currency||"UGX").toUpperCase(),to=country.currency;
+ if(from===to)return{amount:n,currency:to};
+ const ugx=from==="UGX"?n:n/(rates[from]||.00027);
+ return{amount:to==="UGX"?ugx:ugx*(rates[to]||.00027),currency:to}
 }
-function updateCountryPriceStatus(){
-  var el=$("countryPriceStatus");if(!el)return;
-  if(advertCountry.detected){
-    el.className="account-status success";
-    el.textContent="Advertising prices localized for "+(advertCountry.name||advertCountry.code)+" ("+advertCountry.currency+").";
-  }else{
-    el.className="account-status";
-    el.textContent="Showing default pricing in UGX. Will auto-localize if you are outside Uganda.";
-  }
-}
-// === FIXED CONVERSION - NO MORE $89M ===
-function convertedPackagePrice(p){
-  var base=Number(p&&(p.price!=null?p.price:p.amount!=null?p.amount:p.price_amount));
-  if(!Number.isFinite(base))return null;
-  var baseCurrency=String(p&&(p.currency||p.price_currency)||"UGX").toUpperCase();
-  var target=(advertCountry.currency||"UGX").toUpperCase();
-  if(target===baseCurrency) return {amount:base,currency:target};
-
-  var rateBase = advertCurrencyRates[baseCurrency];
-  if(rateBase===undefined) rateBase = baseCurrency==="UGX" ? 1 : 0.00027;
-  var rateTarget = advertCurrencyRates[target];
-  if(rateTarget===undefined) rateTarget = target==="UGX" ? 1 : 0.00027;
-
-  var toUGX = baseCurrency==="UGX" ? base : base / rateBase;
-  var finalAmount = target==="UGX" ? toUGX : toUGX * rateTarget;
-  return {amount:finalAmount,currency:target};
-}
-
-function $(id){return document.getElementById(id)}
-function showMessage(el,message,type){if(el){el.textContent=message||"";el.className="message show "+(type||"info")}}
-function hideMessage(el){if(el){el.textContent="";el.className="message"}}
-function escapeHtml(value){return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
-function money(value,currency){
-  if(value===null||value===undefined||value==="")return "-";
-  var n=Number(value);if(!Number.isFinite(n))return String(value);
-  var cur=String(currency||"UGX").toUpperCase();
-  if(cur==="UGX") return "UGX "+Math.round(n).toLocaleString();
-  if(cur==="KES") return "KES "+Math.round(n).toLocaleString();
-  if(cur==="TZS") return "TZS "+Math.round(n).toLocaleString();
-  if(cur==="RWF") return "RWF "+Math.round(n).toLocaleString();
-  if(cur==="USD") return "$"+n.toFixed(2);
-  if(cur==="EUR") return "€"+n.toFixed(2);
-  if(cur==="GBP") return "£"+n.toFixed(2);
-  return cur+" "+n.toFixed(2);
-}
-function getPackageKey(p){return p&&(p.key||p.package_key||p.slug||p.id)}
-function getPackageCurrency(p){return p&&(p.currency||p.price_currency)||"UGX"}
-function packageLabel(){var p=selectedPackage||{};return String([p.key,p.package_key,p.slug,p.name,p.title,p.display_name].filter(Boolean).join(" ")).toLowerCase().replace(/[_-]+/g," ").trim()}
-function isHomeVideoPackage(){var n=packageLabel();return n.indexOf("homepage video")>=0||n.indexOf("home video")>=0||n.indexOf("hero video")>=0}
-function isHomeImagePackage(){var n=packageLabel();return n.indexOf("homepage image")>=0||n.indexOf("home image")>=0||n.indexOf("home hero")>=0}
-function isHeroPackage(){return isHomeImagePackage()||isHomeVideoPackage()||packageLabel().indexOf("home hero")>=0}
-
-try{
-  if(window.supabase&&typeof window.supabase.createClient==="function"){
-    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-  }
-}catch(e){console.error(e)}
-
-window.selectType=function(type){
-  if(["song","profile","business"].indexOf(type)<0)return;
-  selectedType=type;
-  ["promoSong","promoProfile","promoBusiness"].forEach(function(id){$(id).classList.remove("selected")});
-  $({song:"promoSong",profile:"promoProfile",business:"promoBusiness"}[type]).classList.add("selected");
-  $("songFields").classList.toggle("hidden",type!=="song");
-  $("profileFields").classList.toggle("hidden",type!=="profile");
-  $("businessFields").classList.toggle("hidden",type!=="business");
-  updateGeneratedFields();updatePreview();updateHeroFields();
-};
-window.selectPackageByIndex=function(index){
-  if(!packages[index])return;
-  selectedPackage=packages[index];
-  document.querySelectorAll(".package-card").forEach(function(c){c.classList.remove("selected")});
-  var card=$("package-"+index);if(card)card.classList.add("selected");
-  var chosenPrice=convertedPackagePrice(selectedPackage);
-  $("totalPrice").textContent=chosenPrice?money(chosenPrice.amount,chosenPrice.currency):"-";
-  showMessage($("packageMessage"),"Package selected: "+(selectedPackage.name||selectedPackage.title||getPackageKey(selectedPackage)||"Advertising package"),"success");
-  updateHeroFields();
-};
-
+function keyOf(p){return p.key||p.package_key||p.slug||p.id}
+function labelOf(p){return[p.key,p.package_key,p.slug,p.name,p.title,p.display_name].filter(Boolean).join(" ").toLowerCase().replace(/[_-]+/g," ")}
+function isVideo(p){return labelOf(p).includes("homepage video")||labelOf(p).includes("home video")||labelOf(p).includes("hero video")}
 function renderPackages(){
-  $("packageLoading").style.display="none";
-  var grid=$("packageGrid");grid.innerHTML="";
-  if(!packages.length){grid.innerHTML='<div class="loading" style="grid-column:1/-1">No advertising packages are currently available.</div>';return}
-  packages.forEach(function(p,i){
-    var card=document.createElement("div");card.className="package-card";card.id="package-"+i;
-    var name=p.name||p.title||p.display_name||getPackageKey(p)||"Advertising Package";
-    var description=p.description||p.details||p.summary||"Advertise on PASONG.";
-    var cp=convertedPackagePrice(p);
-    card.innerHTML='<div class="package-name">'+escapeHtml(name)+'</div><div class="package-description">'+escapeHtml(description)+'</div><div class="package-price">'+escapeHtml(cp?money(cp.amount,cp.currency):"-")+'</div><button type="button" class="package-select-btn">Select Package</button>';
-    card.addEventListener("click",function(){window.selectPackageByIndex(i)});
-    card.querySelector("button").addEventListener("click",function(e){e.stopPropagation();window.selectPackageByIndex(i)});
-    grid.appendChild(card);
-  });
+ $("packageLoading").classList.add("hidden");const grid=$("packageGrid");grid.innerHTML="";
+ if(!packages.length){grid.innerHTML='<p class="hint">No advertising packages are available right now.</p>';return}
+ packages.forEach((p,i)=>{const price=priceOf(p),card=document.createElement("div");card.className="package";card.id="package"+i;
+ card.innerHTML='<strong>'+esc(p.name||p.title||p.display_name||keyOf(p)||"Advertising package")+'</strong><div class="desc">'+esc(p.description||p.details||"Advertise on PASONG.")+'</div><div class="price">'+esc(price?money(price.amount,price.currency):"â€”")+'</div><button class="choose" type="button">Select</button>';
+ card.addEventListener("click",()=>choosePackage(i));card.querySelector("button").addEventListener("click",e=>{e.stopPropagation();choosePackage(i)});grid.appendChild(card)})
 }
-async function loadPackages(){
-  try{
-    await detectAdvertCountry();
-    var response=await fetch(API_BASE+"/api/advertising/packages",{cache:"no-store"});
-    var data=await response.json();
-    if(!response.ok)throw new Error(data.error||data.message||"Could not load advertising packages.");
-    packages=Array.isArray(data)?data:(data.packages||data.data||[]);
-    renderPackages();
-  }catch(e){
-    console.error(e);$("packageLoading").style.display="none";
-    $("packageGrid").innerHTML='<div class="loading" style="grid-column:1/-1">Could not load packages. '+escapeHtml(e.message)+'</div>';
-  }
+function choosePackage(i){selectedPackage=packages[i];document.querySelectorAll(".package").forEach(x=>x.classList.remove("selected"));$("package"+i)?.classList.add("selected");const p=priceOf(selectedPackage);$("totalPrice").textContent=p?money(p.amount,p.currency):"â€”";msg("packageMessage","Selected: "+(selectedPackage.name||selectedPackage.title||keyOf(selectedPackage)),"success");hideMsg("mainMessage")}
+async function loadPackages(){await detectCountry();try{const r=await fetch(API_BASE+"/api/advertising/packages",{cache:"no-store"});const d=await r.json();if(!r.ok)throw Error(d.error||d.message||"Could not load packages");packages=Array.isArray(d)?d:(d.packages||d.data||[]);renderPackages()}catch(e){$("packageLoading").classList.add("hidden");$("packageGrid").innerHTML='<p class="hint">Could not load packages. Please refresh and try again.</p>';console.error(e)}}
+async function loadSongs(){try{const u=session.user;const r=await db.from("songs").select("id,title,cover_url").or("uploader_user_id.eq."+u.id+",artist_user_id.eq."+u.id).order("created_at",{ascending:false});songs=r.data||[];$("songSelect").innerHTML='<option value="">Select a song</option>';songs.forEach(s=>{const o=document.createElement("option");o.value=s.id;o.textContent=s.title||"Untitled song";$("songSelect").appendChild(o)})}catch(e){console.error(e)}}
+async function loadProfiles(){try{const r=await db.from("artist_profiles").select("*").eq("user_id",session.user.id);profiles=r.data||[];$("profileSelect").innerHTML='<option value="">Select profile</option>';profiles.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.stage_name||p.artist_name||"PASONG Profile";$("profileSelect").appendChild(o)})}catch(e){console.error(e)}}
+async function loadSession(){if(!db){$("accountStatus").textContent="Account service could not initialize."; $("accountStatus").className="status bad";return}try{const r=await db.auth.getSession();session=r.data?.session;if(!session){$("accountStatus").textContent="Please sign in to your PASONG account before advertising."; $("accountStatus").className="status bad";return}$("accountStatus").textContent="Signed in: "+(session.user.email||"PASONG user");$("accountStatus").className="status ok";if(session.user.email)$("advertiserEmail").value=session.user.email;await Promise.all([loadSongs(),loadProfiles()])}catch(e){$("accountStatus").textContent="Could not verify your account.";}}
+function selectType(type){selectedType=type;["song","profile","business"].forEach(t=>$("promo"+t[0].toUpperCase()+t.slice(1)).classList.toggle("selected",t===type));$("songFields").classList.toggle("hidden",type!=="song");$("profileFields").classList.toggle("hidden",type!=="profile");$("businessFields").classList.toggle("hidden",type!=="business");}
+window.selectType=selectType;
+function selectedSong(){return songs.find(s=>s.id===$("songSelect").value)||null}
+function selectedProfile(){return profiles.find(p=>p.id===$("profileSelect").value)||null}
+function preview(){const box=$("preview"),file=$("media").files[0];if(box.dataset.url)URL.revokeObjectURL(box.dataset.url);box.innerHTML="";if(!file){if(selectedType==="song"&&selectedSong()?.cover_url){const im=document.createElement("img");im.src=selectedSong().cover_url;box.appendChild(im)}else box.textContent="Your preview will appear here.";return}const url=URL.createObjectURL(file);box.dataset.url=url;const el=document.createElement(file.type.startsWith("video/")?"video":"img");el.src=url;if(el.tagName==="VIDEO")el.controls=true;box.appendChild(el)}
+async function upload(file,folder){const sr=await db.auth.getSession(),s=sr.data?.session;if(!s)throw Error("Please sign in again.");const r=await fetch(API_BASE+"/api/cloudinary/signature",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+s.access_token},body:JSON.stringify({folder})});const sig=await r.json();if(!r.ok)throw Error(sig.error||"Could not prepare upload");const fd=new FormData();fd.append("file",file);fd.append("api_key",sig.api_key);fd.append("timestamp",sig.timestamp);fd.append("signature",sig.signature);fd.append("folder",sig.folder||folder);const ur=await fetch(CLOUDINARY_UPLOAD_URL,{method:"POST",body:fd}),ud=await ur.json();if(!ur.ok||!ud.secure_url)throw Error(ud.error?.message||"Upload failed");return ud.secure_url}
+async function pay(){
+ if(!session)throw Error("Please sign in first.");if(!selectedType)throw Error("Choose what you want to promote.");if(!selectedPackage)throw Error("Choose an advertising package.");
+ const name=$("advertiserName").value.trim(),email=$("advertiserEmail").value.trim();if(!name)throw Error("Enter your name or business name.");if(!email)throw Error("Enter your email address.");
+ let songId=null,target="#",title="",description="",mediaUrl="",mediaType="image";
+ if(selectedType==="song"){const s=selectedSong();if(!s)throw Error("Select the song you want to promote.");songId=s.id;target="song.html?id="+encodeURIComponent(s.id);title="Promote: "+s.title;description="Listen on PASONG";mediaUrl=s.cover_url||""}
+ if(selectedType==="profile"){const p=selectedProfile();if(!p)throw Error("Select your PASONG profile.");const n=p.stage_name||p.artist_name||"Artist";target="artist.html?id="+encodeURIComponent(p.id);title="Promote: "+n;description="Discover "+n+" on PASONG"}
+ if(selectedType==="business"){const n=$("businessName").value.trim();if(!n)throw Error("Enter your business name.");title="Promote: "+n;description="Discover "+n+" on PASONG"}
+ const file=$("media").files[0];if(file){mediaUrl=await upload(file,"pasong/ads");mediaType=file.type.startsWith("video/")?"video":"image"}
+ if(isVideo(selectedPackage)){if(!file||!file.type.startsWith("video/"))throw Error("Please upload a video for the Homepage Video package.");mediaType="video"}
+ if(!mediaUrl&&selectedType==="song")throw Error("This song has no cover. Please upload advert media.");
+ const price=priceOf(selectedPackage),payload={package_key:keyOf(selectedPackage),advertiser_name:name,advertiser_email:email,advertiser_phone:$("advertiserPhone").value.trim(),title,description,target_url:target,media_url:mediaUrl,media_type:mediaType,song_id:songId,country_code:country.code,country_name:country.name,display_currency:price?.currency||selectedPackage.currency||"UGX",display_amount:price?.amount??null};
+ msg("mainMessage","Creating secure checkoutâ€¦","info");
+ const r=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw Error(d.error||d.message||"Checkout failed");const url=d.checkout_url||d.url;if(url){location.href=url;return}msg("mainMessage","Checkout was created, but no payment link was returned. Please contact PASONG support.","error")
 }
-async function loadSession(){
-  if(!supabaseClient){$("accountStatus").className="account-status error";$("accountStatus").textContent="Account service could not initialize.";return}
-  try{
-    var result=await supabaseClient.auth.getSession();
-    currentSession=result&&result.data?result.data.session:null;
-    if(!currentSession){$("accountStatus").className="account-status error";$("accountStatus").textContent="Please sign in to your PASONG account before creating an advert.";return}
-    $("accountStatus").className="account-status success";$("accountStatus").textContent="Signed in: "+(currentSession.user.email||"PASONG user");
-    if(currentSession.user&&currentSession.user.email&&!$("advertiserEmail").value)$("advertiserEmail").value=currentSession.user.email;
-    await Promise.all([loadSongs(),loadProfiles()]);
-  }catch(e){$("accountStatus").className="account-status error";$("accountStatus").textContent="Could not verify account."}
-}
-async function loadSongs(){
-  if(!supabaseClient||!currentSession)return;
-  try{
-    var user=currentSession.user;
-    var result=await supabaseClient.from("songs").select("id,title,cover_url").or("uploader_user_id.eq."+user.id+",artist_user_id.eq."+user.id).order("created_at",{ascending:false});
-    songs=result.data||[];var select=$("songSelect");select.innerHTML='<option value="">Select a song</option>';
-    songs.forEach(function(song){var o=document.createElement("option");o.value=song.id;o.textContent=song.title||"Untitled";select.appendChild(o)});
-  }catch(e){$("songSelect").innerHTML='<option value="">Could not load songs</option>'}
-}
-async function loadProfiles(){
-  if(!supabaseClient||!currentSession)return;
-  try{
-    var result=await supabaseClient.from("artist_profiles").select("*").eq("user_id",currentSession.user.id);
-    profiles=result.data||[];var select=$("profileSelect");select.innerHTML='<option value="">Select profile</option>';
-    profiles.forEach(function(p){var o=document.createElement("option");o.value=p.id;o.textContent=p.stage_name||p.artist_name||"PASONG Profile";select.appendChild(o)});
-  }catch(e){$("profileSelect").innerHTML='<option value="">Could not load profile</option>'}
-}
-function coverOf(song){return song?(song.cover_url||""):""}
-function selectedSong(){var id=$("songSelect").value;return songs.find(function(s){return String(s.id)===String(id)})||null}
-function selectedProfile(){var id=$("profileSelect").value;return profiles.find(function(p){return String(p.id)===String(id)})||null}
-function updateGeneratedFields(){
-  var title="",desc="",url="";
-  if(selectedType==="song"){var s=selectedSong();if(s){title="Promote: "+(s.title||"Song");desc="Listen on PASONG";url="song.html?id="+encodeURIComponent(s.id)}}
-  else if(selectedType==="profile"){var pr=selectedProfile();if(pr){var nm=pr.stage_name||"Artist";title="Promote: "+nm;desc="Discover "+nm+" on PASONG";url="artist.html?id="+encodeURIComponent(pr.id)}}
-  else if(selectedType==="business"){var b=$("businessName").value.trim();if(b){title="Promote: "+b;desc="Discover "+b;url="#"}}
-  $("title").value=title;$("description").value=desc;$("businessUrl").value=url;
-}
-async function uploadSigned(file,folder){
-  if(!file)throw new Error("No file selected.");
-  var sr=await supabaseClient.auth.getSession();var session=sr&&sr.data?sr.data.session:null;
-  if(!session)throw new Error("Please sign in again.");
-  var r=await fetch(API_BASE+"/api/cloudinary/signature",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({folder:folder})});
-  var sig=await r.json();if(!r.ok)throw new Error(sig.error||"Cloudinary signature failed");
-  var fd=new FormData();fd.append("file",file);fd.append("api_key",sig.api_key);fd.append("timestamp",sig.timestamp);fd.append("signature",sig.signature);fd.append("folder",sig.folder||folder);
-  var ur=await fetch(CLOUDINARY_UPLOAD_URL,{method:"POST",body:fd});var ud=await ur.json();
-  if(!ur.ok||!ud.secure_url)throw new Error(ud.error?.message||"Upload failed");
-  return ud.secure_url;
-}
-function updatePreview(){
-  var preview=$("preview");preview.innerHTML="";
-  var heroChoice=document.querySelector('input[name="heroType"]:checked');
-  if(selectedPackage&&isHeroPackage()&&heroChoice&&heroChoice.value==="flyer"&&$("flyer").files[0]){showLocalPreview($("flyer").files[0],preview);return}
-  if(selectedType==="song"){var c=coverOf(selectedSong());if(c){var img=document.createElement("img");img.src=c;preview.appendChild(img);return}}
-  var file=$("media").files[0];if(file){showLocalPreview(file,preview);return}
-  preview.innerHTML='<div class="preview-empty">Your advert preview will appear here.</div>';
-}
-function showLocalPreview(file,preview){
-  if(preview.dataset.objectUrl)URL.revokeObjectURL(preview.dataset.objectUrl);
-  var url=URL.createObjectURL(file);preview.dataset.objectUrl=url;
-  if(file.type.indexOf("video/")===0){var v=document.createElement("video");v.src=url;v.controls=true;preview.appendChild(v)}
-  else{var img=document.createElement("img");img.src=url;preview.appendChild(img)}
-}
-function updateHeroFields(){
-  var isHero=!!(selectedPackage&&isHeroPackage());
-  $("heroSection").classList.toggle("hidden",!isHero);
-  if(!isHero){$("mediaSection").classList.remove("hidden");return}
-  var choice=document.querySelector('input[name="heroType"]:checked');var type=choice?choice.value:"cover";
-  $("flyerField").classList.toggle("hidden",type!=="flyer"||isHomeVideoPackage());
-  $("mediaSection").classList.toggle("hidden",type==="flyer"&&!isHomeVideoPackage());
-  updatePreview();
-}
-async function startPayment(){
-  var message=$("mainMessage");hideMessage(message);
-  if(!currentSession)throw new Error("Please sign in first.");
-  if(!selectedType)throw new Error("Choose what to promote.");
-  if(!selectedPackage)throw new Error("Choose a package.");
-  updateGeneratedFields();
-  var advertiserName=$("advertiserName").value.trim(),advertiserEmail=$("advertiserEmail").value.trim();
-  if(!advertiserName)throw new Error("Enter advertiser name.");
-  var mediaUrl="",mediaType="image",songId=null,targetUrl=$("businessUrl").value.trim();
-  var selectedMedia=$("media").files[0]||null;
-  if(selectedType==="song"){
-    var song=selectedSong();if(!song)throw new Error("Select song.");songId=song.id;mediaUrl=coverOf(song);targetUrl="song.html?id="+encodeURIComponent(song.id);
-  }else if(selectedType==="profile"){
-    var profile=selectedProfile();if(!profile)throw new Error("Select profile.");targetUrl="artist.html?id="+encodeURIComponent(profile.id);
-  }else{if(!$("businessName").value.trim())throw new Error("Enter business name.");}
-  var packageKey=getPackageKey(selectedPackage);
-  var heroChoice=document.querySelector('input[name="heroType"]:checked');
-  if(isHomeVideoPackage()){
-    if(!selectedMedia)throw new Error("Choose video for Homepage Video.");
-    mediaType="video";
-  }else if(isHeroPackage()&&heroChoice&&heroChoice.value==="flyer"){
-    var flyer=$("flyer").files[0];if(!flyer)throw new Error("Choose Hero flyer.");mediaUrl=await uploadSigned(flyer,"pasong/heroes");
-  }
-  if(selectedMedia && !(isHeroPackage()&&heroChoice&&heroChoice.value==="flyer"&&!isHomeVideoPackage())){
-    mediaUrl=await uploadSigned(selectedMedia,"pasong/ads");
-    mediaType=selectedMedia.type.indexOf("video/")===0?"video":"image";
-  }
-  if(!mediaUrl&&selectedType==="song")throw new Error("Song has no cover. Upload media.");
-  var displayPrice=convertedPackagePrice(selectedPackage);
-  var payload={package_key:packageKey,advertiser_name:advertiserName,advertiser_email:advertiserEmail,advertiser_phone:$("advertiserPhone").value.trim(),title:$("title").value.trim(),description:$("description").value.trim(),target_url:targetUrl||"#",media_url:mediaUrl,media_type:mediaType,song_id:songId,country_code:advertCountry.code,country_name:advertCountry.name,display_currency:displayPrice?displayPrice.currency:getPackageCurrency(selectedPackage),display_amount:displayPrice?displayPrice.amount:null};
-  showMessage(message,"Creating checkout...","info");
-  var response=await fetch(API_BASE+"/api/advertising/checkout",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify(payload)});
-  var data=await response.json();if(!response.ok)throw new Error(data.error||"Checkout failed");
-  var url=data.checkout_url||data.url;if(url){window.location.href=url;return}
-  showMessage(message,"Checkout created","success");
-}
-function setup(){
-  $("accountBtn").addEventListener("click",function(){window.location.href="account.html"});
-  $("songSelect").addEventListener("change",function(){updateGeneratedFields();updatePreview()});
-  $("profileSelect").addEventListener("change",updateGeneratedFields);
-  $("businessName").addEventListener("input",updateGeneratedFields);
-  $("media").addEventListener("change",updatePreview);
-  $("flyer").addEventListener("change",updatePreview);
-  document.querySelectorAll('input[name="heroType"]').forEach(function(el){el.addEventListener("change",updateHeroFields)});
-  $("payBtn").addEventListener("click",async function(){
-    var btn=$("payBtn"),old=btn.textContent;btn.disabled=true;btn.textContent="Processing...";
-    try{await startPayment()}catch(e){showMessage($("mainMessage"),e.message,"error")}
-    finally{btn.disabled=false;btn.textContent=old}
-  });
-  if($("year")) $("year").textContent=new Date().getFullYear();
-  window.selectType("song");loadPackages();loadSession();
-}
+function setup(){try{if(window.supabase?.createClient)db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}catch(e){}$("accountBtn").onclick=()=>location.href="account.html";$("media").addEventListener("change",preview);$("songSelect").addEventListener("change",preview);$("payBtn").addEventListener("click",async()=>{const b=$("payBtn");b.disabled=true;b.textContent="Please waitâ€¦";hideMsg("mainMessage");try{await pay()}catch(e){msg("mainMessage",e.message||"Something went wrong.","error")}finally{b.disabled=false;b.textContent="Continue to Payment"}});$("year").textContent=new Date().getFullYear();selectType("song");loadPackages();loadSession()}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup);else setup();
 })();
 </script>
