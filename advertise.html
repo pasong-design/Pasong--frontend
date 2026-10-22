@@ -17,6 +17,7 @@
 <h1 class="text-[36px] font-black leading-none mt-4">Promote on PASONG</h1>
 <p class="text-white/50 mt-2 text-sm">Pick a promotion to grow your audience</p>
 
+<!-- HIDDEN BUT CONNECTED - IP DETECTOR -->
 <span id="locationBadge" style="display:none"></span>
 
 <div class="grid grid-cols-1 gap-4 mt-8">
@@ -53,7 +54,7 @@
 <script src="pasong-footer-loader.js"></script>
 
 <script>
-let currentCurrency='UGX'; // DEFAULT UGX FOR KAMPALA - NO FLICKER
+let currentCurrency='UGX';
 
 function updatePrices(currency){
   currentCurrency=currency;
@@ -64,67 +65,47 @@ function updatePrices(currency){
   });
 }
 
-// 1. INSTANT CHECK - no waiting
+// INSTANT - No delay, shows UGX immediately in Kampala
 (function instantDetect(){
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const cached = localStorage.getItem('pasong_country');
   const cachedTime = localStorage.getItem('pasong_country_time');
   const now = Date.now();
   
-  // If cached and less than 24h, use it instantly
   if(cached && cachedTime && (now - parseInt(cachedTime) < 86400000)){
-    if(cached==='UG'){ updatePrices('UGX'); } else { updatePrices('USD'); }
-    console.log('Using cached:', cached);
+    updatePrices(cached==='UG' ? 'UGX' : 'USD');
     return;
   }
-
-  // If timezone is Kampala, show UGX instantly
-  if(tz==='Africa/Kampala' || tz.includes('Kampala')){
-    updatePrices('UGX');
-    console.log('Instant: Kampala timezone -> UGX');
-  } else if(cached==='UG'){
+  if(tz==='Africa/Kampala' || tz.includes('Kampala') || cached==='UG'){
     updatePrices('UGX');
   } else {
-    // Default to UGX for Uganda users, USD only confirmed outside
-    // Check browser language
-    if(navigator.language==='en-UG' || cached==='UG'){ updatePrices('UGX'); }
-    else { updatePrices('UGX'); } // Start with UGX, will switch to USD if IP proves outside
+    updatePrices('UGX'); // Start UGX, background will switch to USD if outside
   }
 })();
 
-// 2. BACKGROUND IP CHECK - confirms location
+// BACKGROUND - Confirms IP after load, stays UGX if UG
 async function backgroundCheck(){
   let country='';
-  const apis=[
-    'https://ipwho.is/',
-    'https://ipapi.co/json/',
-    'https://freeipapi.com/api/json'
-  ];
-  
+  const apis=['https://ipwho.is/','https://ipapi.co/json/','https://freeipapi.com/api/json'];
   for(let api of apis){
     try{
       const r=await fetch(api);
       const d=await r.json();
-      const code = d.country_code || d.countryCode || d.country_code2;
+      const code = d.country_code || d.countryCode;
       if(code){ country=code; break; }
     }catch(e){ continue; }
   }
-  
   if(country){
     localStorage.setItem('pasong_country',country);
     localStorage.setItem('pasong_country_time',Date.now().toString());
-    
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if(country==='UG' || tz==='Africa/Kampala'){
       updatePrices('UGX');
     } else {
       updatePrices('USD');
     }
-    console.log('Background confirmed:', country, '->', currentCurrency);
   }
 }
-
-// Run background check after 1 second
 setTimeout(backgroundCheck, 1000);
 
 function show(type){
