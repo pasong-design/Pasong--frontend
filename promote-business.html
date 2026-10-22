@@ -3,552 +3,625 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0a0a0f">
-<title>My Business - PASONG</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
-<script src="pasong-global-price-controller.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b1d">
+<title>My Business — PASONG</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+:root{
+  --bg:#080b1d;
+  --panel:#11162c;
+  --panel2:#171d38;
+  --line:#2b3355;
+  --text:#f7f8ff;
+  --muted:#a9b1cf;
+  --purple:#8b5cf6;
+  --pink:#ec4899;
+  --green:#34d399;
+}
 *{box-sizing:border-box}
-body{margin:0}
-.field{width:100%;background:#0a0a0f;border:1px solid #343440;border-radius:12px;padding:13px;color:white}
-.field:focus{outline:none;border-color:#fb923c}
-.package-card{transition:.2s}
-.package-card:hover{transform:translateY(-2px)}
-.package-card.selected{border-color:#fb923c!important;box-shadow:0 0 0 1px #fb923c}
-.dropzone{border:1px dashed rgba(251,146,60,.7);background:rgba(251,146,60,.05)}
-button:disabled{opacity:.55;cursor:not-allowed}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:16px max(16px,calc((100% - 1050px)/2));
+  border-bottom:1px solid var(--line);background:#090c20;
+}
+.logo{font-weight:900;font-size:23px;letter-spacing:1px}
+.logo span{color:#a78bfa}
+.navlink{
+  background:#171d38;border:1px solid var(--line);
+  padding:10px 14px;border-radius:10px;font-size:13px;
+}
+main{max-width:850px;margin:auto;padding:24px 15px 55px}
+.hero{margin:4px 0 22px}
+.eyebrow{
+  color:#c4b5fd;font-size:12px;font-weight:bold;
+  letter-spacing:2px;text-transform:uppercase;
+}
+h1{font-size:clamp(27px,6vw,40px);margin:10px 0}
+.subtitle{color:var(--muted);line-height:1.6;font-size:15px}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:18px;padding:20px;margin:16px 0;
+}
+h2{font-size:19px;margin:0 0 8px}
+.help{color:var(--muted);font-size:13px;line-height:1.55;margin:6px 0 15px}
+.status{
+  padding:12px 14px;border-radius:10px;margin:15px 0;
+  font-size:13px;line-height:1.5;overflow-wrap:anywhere;
+  background:#171d38;border:1px solid var(--line);
+}
+.status.good{border-color:#167b59;color:#a7f3d0}
+.status.bad{border-color:#a83d5b;color:#fecdd3}
+.status.info{border-color:#6150a6;color:#ddd6fe}
+.hidden{display:none!important}
+label{display:block;font-size:13px;font-weight:bold;margin:14px 0 7px}
+input,select,textarea{
+  width:100%;padding:13px;border-radius:10px;
+  border:1px solid var(--line);background:#0a0f24;
+  color:var(--text);font-size:15px;outline:none;
+}
+input:focus,select:focus{border-color:var(--purple)}
+input[type=file]{font-size:13px;padding:12px}
+input[type=radio]{width:auto;accent-color:var(--purple)}
+button{
+  border:0;cursor:pointer;font-weight:bold;border-radius:11px;
+  padding:14px 17px;font-size:14px;
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primary{
+  color:white;background:linear-gradient(100deg,var(--purple),var(--pink));
+}
+.secondary{background:#202747;color:white;border:1px solid var(--line)}
+.full{width:100%}
+.package-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;
+  margin-top:16px;
+}
+.package{
+  text-align:left;background:var(--panel2);color:white;
+  border:1px solid var(--line);padding:15px;border-radius:14px;
+  min-width:0;
+}
+.package.selected{border:2px solid #a78bfa;background:#211b46}
+.package .name{font-weight:bold;font-size:15px}
+.package .price{display:block;font-size:21px;font-weight:900;margin:12px 0 7px}
+.package .reach{display:block;color:#c4b5fd;font-size:12px;line-height:1.5}
+.package .duration{display:block;color:var(--muted);font-size:12px;margin-top:9px}
+.package .tick{display:block;color:#c4b5fd;font-size:12px;margin-top:9px}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+.type-option{
+  display:block;border:1px solid var(--line);background:var(--panel2);
+  padding:15px;border-radius:13px;cursor:pointer;
+}
+.type-option:has(input:checked){border:2px solid #a78bfa;background:#211b46}
+.type-option input{margin:0 0 10px}
+.type-option strong{display:block;margin-bottom:6px}
+.type-option small{color:var(--muted);line-height:1.5}
+.ad-box{
+  width:100%;aspect-ratio:2/1;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  background:#080b18;border:1px dashed #4a5278;border-radius:12px;
+  margin-top:14px;position:relative;
+}
+.ad-box img,.ad-box video{
+  width:100%;height:100%;object-fit:contain;display:block;
+}
+.preview-placeholder{padding:12px;text-align:center;color:var(--muted);font-size:13px}
+.dimensions{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:11px 0;border-bottom:1px solid var(--line);
+  font-size:13px;line-height:1.5;
+}
+.dimensions:last-child{border-bottom:0}
+.dimensions span{color:var(--muted)}
+.small{font-size:12px;color:var(--muted);line-height:1.6}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+@media(max-width:650px){
+  main{padding:19px 12px 40px}
+  .card{padding:16px}
+  .package-grid{grid-template-columns:1fr}
+  .package{padding:16px}
+  .package .price{font-size:23px}
+  header{padding:13px}
+}
 </style>
 </head>
-<body class="bg-[#0a0a0f] text-white min-h-screen flex flex-col">
 
-<header class="p-5 flex justify-between items-center max-w-[1000px] mx-auto w-full">
-  <a href="Pasong.html" class="font-black text-xl tracking-widest">◈ PASONG</a>
-  <a href="advertise.html" class="text-xs bg-white/10 border border-white/10 px-4 py-2 rounded-full">← Advertise</a>
+<body>
+<header>
+  <a class="logo" href="Pasong.html">◈ <span>PASONG</span></a>
+  <a class="navlink" href="Pasong.html">← Back Home</a>
 </header>
 
-<main class="flex-1 max-w-[850px] mx-auto w-full px-5 pb-10">
-  <h1 class="text-3xl sm:text-4xl font-black">Promote My Business</h1>
-  <p class="text-white/55 mt-2 text-sm">Show your business to people on PASONG with a flyer or promotional video.</p>
+<main>
+  <section class="hero">
+    <div class="eyebrow">PASONG Business Advertising</div>
+    <h1>Put Your Business in the Spotlight.</h1>
+    <p class="subtitle">
+      Upload your flyer or video, choose an advertising package,
+      and submit your advert for PASONG review.
+    </p>
+  </section>
 
-  <div class="mt-6 rounded-2xl border border-white/10 bg-[#14141c] p-4 flex gap-3 items-center">
-    <div class="w-12 h-12 shrink-0 rounded-xl bg-[#fb923c] text-black flex items-center justify-center text-2xl">🏪</div>
-    <div>
-      <p id="businessHeading" class="font-black">My Business</p>
-      <p class="text-white/50 text-xs mt-1">Business advertising · 30 days</p>
-    </div>
-  </div>
+  <div id="accountStatus" class="status info">Checking your PASONG account…</div>
 
-  <div id="authNotice" class="hidden mt-5 rounded-xl border border-orange-400/20 bg-orange-400/10 p-4">
-    <p class="font-bold">Sign in to continue</p>
-    <p class="text-white/60 text-xs mt-1">Sign in to the PASONG account that will own this promotion.</p>
-    <a href="account.html" class="inline-block mt-3 bg-[#fb923c] text-black font-bold px-5 py-2 rounded-full">Go to Account</a>
-  </div>
+  <section class="card">
+    <h2>1. Choose your advertising package</h2>
+    <p class="help">Each package runs for 30 days. Choose the reach that suits your business.</p>
 
-  <section class="mt-7">
-    <h2 class="text-lg font-black">1. Choose your advert</h2>
-    <p class="text-white/50 text-xs mt-1">Choose one flyer image or one promotional video.</p>
-
-    <div class="grid grid-cols-2 gap-3 mt-4">
-      <button type="button" id="imageMode" onclick="setMediaMode('image')" class="border border-orange-400 bg-orange-400/10 rounded-xl p-4 text-left">
-        <span class="text-3xl">🖼️</span>
-        <span class="block font-black mt-2">Flyer Image</span>
-        <span class="block text-white/50 text-xs mt-1">JPG, PNG, WEBP · Max 5 MB</span>
+    <div class="package-grid" id="packageGrid">
+      <button type="button" class="package selected" data-package="biz-starter">
+        <span class="name">🚀 Starter</span>
+        <span class="price">UGX 105,000</span>
+        <span class="reach">Estimated reach: 5K–10K</span>
+        <span class="duration">30 days</span>
+        <span class="tick">✓ Business promotion</span>
       </button>
-      <button type="button" id="videoMode" onclick="setMediaMode('video')" class="border border-white/10 bg-[#14141c] rounded-xl p-4 text-left">
-        <span class="text-3xl">🎬</span>
-        <span class="block font-black mt-2">Promo Video</span>
-        <span class="block text-white/50 text-xs mt-1">MP4, WEBM, MOV · Max 50 MB</span>
+
+      <button type="button" class="package" data-package="biz-growth">
+        <span class="name">📢 Growth</span>
+        <span class="price">UGX 220,000</span>
+        <span class="reach">Estimated reach: 20K–50K</span>
+        <span class="duration">30 days</span>
+        <span class="tick">✓ Includes Homepage placement</span>
+      </button>
+
+      <button type="button" class="package" data-package="biz-pro">
+        <span class="name">👑 Pro Brand</span>
+        <span class="price">UGX 450,000</span>
+        <span class="reach">Estimated reach: 100K+</span>
+        <span class="duration">30 days</span>
+        <span class="tick">✓ Includes Hero slider</span>
       </button>
     </div>
+    <p class="small">Reach figures are estimates, not guaranteed views or sales.</p>
+  </section>
 
-    <label for="mediaFile" class="dropzone block rounded-2xl p-6 mt-4 text-center cursor-pointer">
-      <span class="text-4xl block">⬆️</span>
-      <span class="block font-black mt-3">Tap to choose a file</span>
-      <span id="fileHint" class="block text-white/50 text-xs mt-2">Choose a flyer from your phone.</span>
-      <input id="mediaFile" type="file" accept="image/jpeg,image/png,image/webp" class="hidden">
+  <section class="card">
+    <h2>2. Upload your advert</h2>
+    <p class="help">
+      Choose a flyer image or a video. Your advert preview uses PASONG's
+      2:1 advertising box so you can check how it fits before continuing.
+    </p>
+
+    <div class="type-grid">
+      <label class="type-option">
+        <input type="radio" name="mediaType" value="image" checked>
+        <strong>🖼️ Business Flyer</strong>
+        <small>JPG, PNG or WEBP. Recommended: 600 × 300 px or 1200 × 600 px.</small>
+      </label>
+      <label class="type-option">
+        <input type="radio" name="mediaType" value="video">
+        <strong>🎬 Business Video</strong>
+        <small>MP4, WEBM or MOV. Keep important content within the 2:1 frame.</small>
+      </label>
+    </div>
+
+    <label for="advertFile" id="fileLabel">Select your flyer</label>
+    <input id="advertFile" type="file" accept="image/jpeg,image/png,image/webp" required>
+    <p class="small" id="fileHelp">Image maximum size: 5 MB. Use a 2:1 image for best results.</p>
+
+    <div class="ad-box" id="previewBox">
+      <div class="preview-placeholder">
+        <div style="font-size:30px;margin-bottom:8px">◈</div>
+        Your 2:1 PASONG advert preview appears here
+      </div>
+    </div>
+
+    <div class="dimensions">
+      <span>Advert box ratio</span>
+      <strong>2:1</strong>
+    </div>
+    <div class="dimensions">
+      <span>Mobile source</span>
+      <strong>600 × 300 px</strong>
+    </div>
+    <div class="dimensions">
+      <span>Retina source</span>
+      <strong>1200 × 600 px</strong>
+    </div>
+    <p class="small">
+      The preview uses “contain” so the complete image is visible without cropping
+      or stretching. Images with a different ratio may show empty space around them.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>3. Confirm your advertising</h2>
+    <p class="help">Review your selection before submitting it for checkout.</p>
+
+    <div class="dimensions">
+      <span>Selected package</span>
+      <strong id="summaryPackage">Starter</strong>
+    </div>
+    <div class="dimensions">
+      <span>Advertising fee</span>
+      <strong id="summaryPrice">UGX 105,000</strong>
+    </div>
+    <div class="dimensions">
+      <span>Duration</span>
+      <strong>30 days</strong>
+    </div>
+
+    <label style="display:flex;gap:10px;align-items:flex-start;font-weight:normal;line-height:1.5">
+      <input type="checkbox" id="agree" style="width:auto;margin-top:3px">
+      <span>I confirm I have permission to advertise this content and agree to PASONG's advertising review.</span>
     </label>
 
-    <div id="previewWrap" class="hidden mt-4 rounded-2xl overflow-hidden border border-white/10 bg-[#14141c]">
-      <div class="p-3 flex justify-between items-center gap-3">
-        <div class="min-w-0">
-          <p class="font-bold text-sm">Advert preview</p>
-          <p id="fileInfo" class="text-xs text-white/50 break-all"></p>
-        </div>
-        <button type="button" onclick="clearMedia()" class="text-xs rounded-full border border-white/15 px-3 py-2">Remove</button>
-      </div>
-      <img id="imagePreview" alt="Business flyer preview" class="hidden w-full max-h-[440px] object-contain bg-black">
-      <video id="videoPreview" controls playsinline class="hidden w-full max-h-[440px] bg-black"></video>
-    </div>
-  </section>
+    <div id="message" class="status hidden"></div>
 
-  <section class="mt-7">
-    <h2 class="text-lg font-black">2. Business details</h2>
-    <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label for="bizName" class="block text-sm font-bold mb-2">Business name *</label>
-        <input id="bizName" class="field" type="text" maxlength="100" autocomplete="organization" placeholder="e.g. KV Fashion House">
-      </div>
-      <div>
-        <label for="bizLink" class="block text-sm font-bold mb-2">Website or social link</label>
-        <input id="bizLink" class="field" type="url" maxlength="500" placeholder="https://yourwebsite.com">
-        <p class="text-white/40 text-xs mt-2">Optional. Include https://</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="mt-7">
-    <h2 class="text-lg font-black">3. Choose your package</h2>
-    <p class="text-white/50 text-xs mt-1">All packages last 30 days.</p>
-
-    <div class="grid grid-cols-1 gap-3 mt-4">
-      <button type="button" data-package="biz-starter" onclick="choose('biz-starter')" class="package-card text-left bg-[#14141c] border border-white/10 rounded-2xl p-5">
-        <div class="flex justify-between items-center gap-3">
-          <h3 class="font-black">🚀 Starter</h3><span class="text-xs text-white/50">30 days</span>
-        </div>
-        <p class="text-white/50 text-xs mt-2">5K–10K estimated reach</p>
-        <p class="font-bold mt-3 text-[#fb923c]">UGX 105,000</p>
-      </button>
-
-      <button type="button" data-package="biz-growth" onclick="choose('biz-growth')" class="package-card text-left bg-[#1c1c28] border border-orange-400/30 rounded-2xl p-5 relative">
-        <span class="absolute -top-2 right-4 bg-[#fb923c] text-black text-[9px] font-black px-3 py-1 rounded-full">POPULAR</span>
-        <div class="flex justify-between items-center gap-3">
-          <h3 class="font-black">📢 Growth</h3><span class="text-xs text-white/50">30 days</span>
-        </div>
-        <p class="text-white/50 text-xs mt-2">20K–50K estimated reach + Homepage</p>
-        <p class="font-bold mt-3 text-[#fb923c]">UGX 220,000</p>
-      </button>
-
-      <button type="button" data-package="biz-pro" onclick="choose('biz-pro')" class="package-card text-left bg-[#14141c] border border-white/10 rounded-2xl p-5">
-        <div class="flex justify-between items-center gap-3">
-          <h3 class="font-black">⭐ Pro Brand</h3><span class="text-xs text-white/50">30 days</span>
-        </div>
-        <p class="text-white/50 text-xs mt-2">100K+ estimated reach + Hero slider</p>
-        <p class="font-bold mt-3 text-[#fb923c]">UGX 450,000</p>
-      </button>
-    </div>
-  </section>
-
-  <section class="mt-6 bg-[#1c1c28] border border-white/10 rounded-2xl p-5 sm:p-6">
-    <p class="text-xs text-white/50">Your selection</p>
-    <p id="chosenB" class="font-black mt-1">Starter — UGX 105,000 / 30 days</p>
-    <p class="text-xs text-white/40 mt-3">Reach is estimated, not guaranteed. PASONG Admin may review your advert before it goes live.</p>
-    <button id="btnB" type="button" onclick="payB()" class="mt-5 w-full bg-[#fb923c] text-black font-black py-4 rounded-full">Upload Advert & Continue to Checkout</button>
-    <p id="msgB" role="status" aria-live="polite" class="hidden mt-3 text-sm p-3 rounded-xl"></p>
-    <p class="text-white/40 text-xs mt-4 text-center">Your advert should go live only after payment is verified.</p>
+    <button type="button" id="submitBtn" class="primary full" style="margin-top:17px">
+      Continue to Checkout →
+    </button>
+    <p class="small" style="margin-top:12px">
+      Your advert must be reviewed before it goes live. This page creates a pending
+      advertising request and sends you to PASONG checkout; payment confirmation
+      depends on the existing checkout integration.
+    </p>
   </section>
 </main>
 
-<div id="pasong-footer"></div>
-<script src="pasong-footer-loader.js"></script>
+<footer>© PASONG — Music. Opportunity. Support.</footer>
 
 <script>
 (() => {
-"use strict";
+  "use strict";
 
-/* PASONG CONNECTIONS */
-const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_BASE = "https://pasong-api.vercel.app";
+  const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+  const API_BASE = "https://pasong-api.vercel.app";
 
-const PACKAGES = {
-  "biz-starter": {name:"Starter", amount:105000},
-  "biz-growth":  {name:"Growth", amount:220000},
-  "biz-pro":     {name:"Pro Brand", amount:450000}
-};
+  const PACKAGES = {
+    "biz-starter": { name: "Starter", amount: 105000 },
+    "biz-growth":  { name: "Growth", amount: 220000 },
+    "biz-pro":     { name: "Pro Brand", amount: 450000 }
+  };
 
-let sb = null;
-let user = null;
-let selectedPackage = "biz-starter";
-let mediaMode = "image";
-let selectedFile = null;
-let previewUrl = null;
-let busy = false;
+  const $ = id => document.getElementById(id);
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const $ = id => document.getElementById(id);
-const formatUGX = amount => "UGX " + Number(amount).toLocaleString("en-UG");
+  let session = null;
+  let selectedPackage = "biz-starter";
+  let uploadedPreviewUrl = null;
+  let busy = false;
 
-function showMessage(text, type="info") {
-  const el = $("msgB");
-  el.textContent = text;
-  el.className = "mt-3 text-sm p-3 rounded-xl block";
-
-  if (type === "error") {
-    el.classList.add("bg-red-500/10","border","border-red-500/20","text-red-200");
-  } else if (type === "success") {
-    el.classList.add("bg-green-500/10","border","border-green-500/20","text-green-200");
-  } else {
-    el.classList.add("bg-white/5","border","border-white/10","text-white/80");
+  function money(value) {
+    return "UGX " + Number(value).toLocaleString("en-UG");
   }
-}
 
-function clearMessage() {
-  $("msgB").textContent = "";
-  $("msgB").className = "hidden mt-3 text-sm p-3 rounded-xl";
-}
+  function showMessage(message, type = "info") {
+    const el = $("message");
+    el.textContent = message;
+    el.className = "status " + type;
+  }
 
-function updateButton() {
-  $("authNotice").classList.toggle("hidden", !!user);
-  $("btnB").disabled = busy || !user;
-  $("btnB").textContent = busy
-    ? "Please wait..."
-    : user
-      ? "Upload Advert & Continue to Checkout"
-      : "Sign in to Continue";
-}
+  function clearMessage() {
+    $("message").className = "status hidden";
+    $("message").textContent = "";
+  }
 
-/* SELECT PACKAGE */
-window.choose = function(id) {
-  if (!PACKAGES[id]) return;
+  function choosePackage(code) {
+    if (!PACKAGES[code]) return;
+    selectedPackage = code;
 
-  selectedPackage = id;
+    document.querySelectorAll(".package").forEach(button => {
+      button.classList.toggle("selected", button.dataset.package === code);
+    });
 
-  document.querySelectorAll("[data-package]").forEach(card => {
-    const active = card.dataset.package === id;
-    card.classList.toggle("selected", active);
-    card.setAttribute("aria-pressed", String(active));
+    $("summaryPackage").textContent = PACKAGES[code].name;
+    $("summaryPrice").textContent = money(PACKAGES[code].amount);
+  }
+
+  document.querySelectorAll(".package").forEach(button => {
+    button.addEventListener("click", () => choosePackage(button.dataset.package));
   });
 
-  const pack = PACKAGES[id];
-  $("chosenB").textContent =
-    pack.name + " — " + formatUGX(pack.amount) + " / 30 days";
+  function selectedMediaType() {
+    return document.querySelector('input[name="mediaType"]:checked').value;
+  }
 
-  clearMessage();
-};
+  function configureFileInput() {
+    const type = selectedMediaType();
+    const input = $("advertFile");
 
-/* SELECT FLYER OR VIDEO */
-window.setMediaMode = function(mode) {
-  if (mode !== "image" && mode !== "video") return;
+    input.value = "";
+    input.accept = type === "image"
+      ? "image/jpeg,image/png,image/webp"
+      : "video/mp4,video/webm,video/quicktime";
 
-  mediaMode = mode;
+    $("fileLabel").textContent = type === "image"
+      ? "Select your flyer"
+      : "Select your business video";
 
-  $("imageMode").className = mode === "image"
-    ? "border border-orange-400 bg-orange-400/10 rounded-xl p-4 text-left"
-    : "border border-white/10 bg-[#14141c] rounded-xl p-4 text-left";
+    $("fileHelp").textContent = type === "image"
+      ? "JPG, PNG or WEBP. Maximum 5 MB. Recommended dimensions: 600 × 300 or 1200 × 600."
+      : "MP4, WEBM or MOV. Maximum 50 MB. A 2:1 video is recommended.";
 
-  $("videoMode").className = mode === "video"
-    ? "border border-orange-400 bg-orange-400/10 rounded-xl p-4 text-left"
-    : "border border-white/10 bg-[#14141c] rounded-xl p-4 text-left";
+    renderPreview(null);
+    clearMessage();
+  }
 
-  $("mediaFile").accept = mode === "image"
-    ? "image/jpeg,image/png,image/webp"
-    : "video/mp4,video/webm,video/quicktime";
+  document.querySelectorAll('input[name="mediaType"]').forEach(input => {
+    input.addEventListener("change", configureFileInput);
+  });
 
-  $("fileHint").textContent = mode === "image"
-    ? "Choose a JPG, PNG or WEBP flyer · Maximum 5 MB"
-    : "Choose an MP4, WEBM or MOV video · Maximum 50 MB";
+  function renderPreview(file) {
+    const box = $("previewBox");
+    if (uploadedPreviewUrl) {
+      URL.revokeObjectURL(uploadedPreviewUrl);
+      uploadedPreviewUrl = null;
+    }
 
-  window.clearMedia();
-  clearMessage();
-};
+    box.replaceChildren();
 
-/* CLEAR PREVIEW */
-window.clearMedia = function() {
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (!file) {
+      const placeholder = document.createElement("div");
+      placeholder.className = "preview-placeholder";
+      placeholder.textContent = "Your 2:1 PASONG advert preview appears here";
+      box.appendChild(placeholder);
+      return;
+    }
 
-  previewUrl = null;
-  selectedFile = null;
+    uploadedPreviewUrl = URL.createObjectURL(file);
 
-  $("mediaFile").value = "";
-  $("previewWrap").classList.add("hidden");
-  $("imagePreview").classList.add("hidden");
-  $("videoPreview").classList.add("hidden");
-  $("imagePreview").removeAttribute("src");
-  $("videoPreview").pause();
-  $("videoPreview").removeAttribute("src");
-  $("videoPreview").load();
-  $("fileInfo").textContent = "";
-};
-
-/* VALIDATE AND PREVIEW SELECTED FILE */
-$("mediaFile").addEventListener("change", function() {
-  clearMessage();
-
-  const file = this.files && this.files[0];
-  if (!file) return;
-
-  const allowedTypes = mediaMode === "image"
-    ? ["image/jpeg","image/png","image/webp"]
-    : ["video/mp4","video/webm","video/quicktime"];
-
-  const maxSize = mediaMode === "image"
-    ? 5 * 1024 * 1024
-    : 50 * 1024 * 1024;
-
-  if (!allowedTypes.includes(file.type)) {
-    window.clearMedia();
-    showMessage(
-      mediaMode === "image"
-        ? "Choose a JPG, PNG or WEBP flyer."
-        : "Choose an MP4, WEBM or MOV video.",
-      "error"
+    const media = document.createElement(
+      file.type.startsWith("video/") ? "video" : "img"
     );
-    return;
+
+    media.src = uploadedPreviewUrl;
+
+    if (media.tagName === "VIDEO") {
+      media.controls = true;
+      media.muted = true;
+      media.playsInline = true;
+    } else {
+      media.alt = "Preview of your business flyer";
+    }
+
+    box.appendChild(media);
   }
 
-  if (file.size > maxSize) {
-    window.clearMedia();
-    showMessage(
-      mediaMode === "image"
-        ? "Your flyer must be 5 MB or smaller."
-        : "Your video must be 50 MB or smaller.",
-      "error"
-    );
-    return;
-  }
+  $("advertFile").addEventListener("change", () => {
+    const file = $("advertFile").files[0];
+    clearMessage();
 
-  window.clearMedia();
-  selectedFile = file;
-  previewUrl = URL.createObjectURL(file);
+    if (!file) {
+      renderPreview(null);
+      return;
+    }
 
-  $("fileInfo").textContent =
-    file.name + " · " + (file.size / (1024 * 1024)).toFixed(2) + " MB";
+    const type = selectedMediaType();
+    const maxBytes = type === "image" ? 5 * 1024 * 1024 : 50 * 1024 * 1024;
+    const validImage = ["image/jpeg", "image/png", "image/webp"].includes(file.type);
+    const validVideo = ["video/mp4", "video/webm", "video/quicktime"].includes(file.type);
 
-  $("previewWrap").classList.remove("hidden");
+    if (file.size > maxBytes) {
+      $("advertFile").value = "";
+      renderPreview(null);
+      showMessage(
+        type === "image" ? "Your flyer must be 5 MB or smaller." :
+          "Your video must be 50 MB or smaller.",
+        "bad"
+      );
+      return;
+    }
 
-  if (mediaMode === "image") {
-    $("imagePreview").src = previewUrl;
-    $("imagePreview").classList.remove("hidden");
-  } else {
-    $("videoPreview").src = previewUrl;
-    $("videoPreview").classList.remove("hidden");
-  }
-});
+    if ((type === "image" && !validImage) || (type === "video" && !validVideo)) {
+      $("advertFile").value = "";
+      renderPreview(null);
+      showMessage("Please select a supported " + type + " file.", "bad");
+      return;
+    }
 
-$("bizName").addEventListener("input", function() {
-  $("businessHeading").textContent = this.value.trim() || "My Business";
-});
+    renderPreview(file);
 
-function validateLink(raw) {
-  if (!raw) return "";
+    if (type === "image") {
+      const probe = new Image();
+      probe.onload = () => {
+        const ratio = probe.naturalWidth / probe.naturalHeight;
+        if (Math.abs(ratio - 2) > 0.03) {
+          showMessage(
+            "Your image is " + probe.naturalWidth + " × " + probe.naturalHeight +
+            " px. PASONG recommends a 2:1 flyer such as 600 × 300 or 1200 × 600. " +
+            "You can continue, but the preview may show empty space around it.",
+            "info"
+          );
+        }
+      };
+      probe.onerror = () => showMessage("Could not read this image. Try another file.", "bad");
+      probe.src = uploadedPreviewUrl;
+    } else {
+      showMessage("Video selected. Check the preview before continuing.", "good");
+    }
+  });
 
-  let url;
-  try {
-    url = new URL(raw);
-  } catch (_) {
-    throw new Error("Enter a valid website or social media link.");
-  }
+  async function uploadToCloudinary(file, resourceType) {
+    const result = await db.auth.getSession();
+    const currentSession = result.data && result.data.session;
 
-  if (!["https:","http:"].includes(url.protocol) ||
-      !url.hostname.includes(".")) {
-    throw new Error("Your link must start with https:// or http://.");
-  }
+    if (result.error || !currentSession) {
+      throw new Error("Your login session expired. Please sign in again.");
+    }
 
-  return url.href;
-}
+    const folder = "pasong/ads";
 
-/*
- * Upload through PASONG's existing authenticated Cloudinary signature route.
- * No Cloudinary API secret or unsigned preset is exposed in this page.
- */
-async function uploadMedia(file, mode) {
-  const {data, error} = await sb.auth.getSession();
-  if (error) throw error;
-
-  const session = data && data.session;
-  if (!session || !session.access_token) {
-    throw new Error("Please sign in again before uploading.");
-  }
-
-  const folder = "pasong/ads";
-  const resourceType = mode === "video" ? "video" : "image";
-
-  const signResponse = await fetch(
-    API_BASE + "/api/cloudinary/signature",
-    {
+    const response = await fetch(API_BASE + "/api/cloudinary/signature", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + session.access_token
+        "Authorization": "Bearer " + currentSession.access_token
       },
-      body: JSON.stringify({folder})
-    }
-  );
-
-  const signature = await signResponse.json().catch(() => ({}));
-
-  if (!signResponse.ok) {
-    throw new Error(
-      signature.error || "PASONG could not authorize this upload."
-    );
-  }
-
-  if (!signature.cloud_name || !signature.api_key ||
-      !signature.timestamp || !signature.signature) {
-    throw new Error("PASONG returned incomplete Cloudinary upload details.");
-  }
-
-  const form = new FormData();
-  form.append("file", file);
-  form.append("api_key", signature.api_key);
-  form.append("timestamp", String(signature.timestamp));
-  form.append("signature", signature.signature);
-  form.append("folder", signature.folder || folder);
-
-  const uploadResponse = await fetch(
-    "https://api.cloudinary.com/v1_1/" +
-      encodeURIComponent(signature.cloud_name) +
-      "/" + resourceType + "/upload",
-    {method:"POST", body:form}
-  );
-
-  const uploaded = await uploadResponse.json().catch(() => ({}));
-
-  if (!uploadResponse.ok || !uploaded.secure_url) {
-    throw new Error(
-      uploaded.error?.message || "Cloudinary could not upload your advert."
-    );
-  }
-
-  return uploaded.secure_url;
-}
-
-/* INITIALIZE SUPABASE */
-async function init() {
-  try {
-    if (!window.supabase || !window.supabase.createClient) {
-      throw new Error("PASONG sign-in service failed to load. Refresh the page.");
-    }
-
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    const {data, error} = await sb.auth.getSession();
-    if (error) throw error;
-
-    user = data && data.session ? data.session.user : null;
-    updateButton();
-
-    sb.auth.onAuthStateChange((_event, session) => {
-      user = session ? session.user : null;
-      updateButton();
+      body: JSON.stringify({ folder })
     });
-  } catch (error) {
-    user = null;
-    updateButton();
-    showMessage(error.message || "Could not check sign-in.", "error");
-  }
-}
 
-/* SUBMIT BUSINESS PROMOTION */
-window.payB = async function() {
-  if (busy) return;
-  clearMessage();
+    const signature = await response.json().catch(() => ({}));
 
-  if (!sb) {
-    showMessage("Sign-in service is unavailable. Refresh and try again.", "error");
-    return;
-  }
-
-  try {
-    const {data, error} = await sb.auth.getSession();
-    if (error) throw error;
-
-    user = data && data.session ? data.session.user : null;
-    updateButton();
-
-    if (!user) {
-      showMessage("Please sign in before creating your advert.", "error");
-      return;
-    }
-  } catch (error) {
-    showMessage(error.message || "Unable to verify sign-in.", "error");
-    return;
-  }
-
-  const name = $("bizName").value.trim();
-
-  if (name.length < 2 || name.length > 100) {
-    showMessage("Enter a business name between 2 and 100 characters.", "error");
-    $("bizName").focus();
-    return;
-  }
-
-  if (!selectedFile) {
-    showMessage("Please select a flyer or promotional video first.", "error");
-    $("mediaFile").click();
-    return;
-  }
-
-  let website = "";
-  try {
-    website = validateLink($("bizLink").value.trim());
-  } catch (error) {
-    showMessage(error.message, "error");
-    $("bizLink").focus();
-    return;
-  }
-
-  const pack = PACKAGES[selectedPackage];
-  if (!pack) {
-    showMessage("Please choose a package.", "error");
-    return;
-  }
-
-  busy = true;
-  updateButton();
-
-  try {
-    showMessage("Uploading your advert. Please wait...");
-
-    const mediaUrl = await uploadMedia(selectedFile, mediaMode);
-
-    const start = new Date();
-    const end = new Date(start);
-    end.setDate(end.getDate() + 30);
-
-    const promotion = {
-      user_id: user.id,
-      amount: pack.amount,
-      currency: "UGX",
-      status: "pending",
-      payment_status: "pending",
-      package_code: selectedPackage,
-      start_date: start.toISOString(),
-      end_date: end.toISOString(),
-      content_type: "Business",
-      song_title: name,
-      tiktok_url: website || null,
-      advert_media_url: mediaUrl,
-      advert_media_type: mediaMode,
-      business_website: website || null
-    };
-
-    showMessage("Saving your business promotion...");
-
-    const {data, error} = await sb
-      .from("promotions")
-      .insert([promotion])
-      .select("id")
-      .single();
-
-    if (error) throw error;
-
-    if (!data || !data.id) {
-      throw new Error("Promotion ID was not returned by Supabase.");
+    if (!response.ok) {
+      throw new Error(signature.error || "Could not prepare your media upload.");
     }
 
-    const checkout = new URL("pasong_checkout.html", window.location.href);
-    checkout.searchParams.set("promotion_id", data.id);
-    checkout.searchParams.set("type", "business");
-    checkout.searchParams.set("package", selectedPackage);
+    if (!signature.cloud_name || !signature.api_key ||
+        !signature.timestamp || !signature.signature) {
+      throw new Error("The upload service returned incomplete signing information.");
+    }
 
-    window.location.assign(checkout.href);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", signature.api_key);
+    formData.append("timestamp", String(signature.timestamp));
+    formData.append("signature", signature.signature);
+    formData.append("folder", signature.folder || folder);
 
-  } catch (error) {
-    console.error("PASONG business promotion error:", error);
-    showMessage(
-      error.message || "Could not submit the advert. Please try again.",
-      "error"
+    const uploadResponse = await fetch(
+      "https://api.cloudinary.com/v1_1/" +
+      encodeURIComponent(signature.cloud_name) + "/" + resourceType + "/upload",
+      { method: "POST", body: formData }
     );
-    busy = false;
-    updateButton();
+
+    const uploadResult = await uploadResponse.json().catch(() => ({}));
+
+    if (!uploadResponse.ok || !uploadResult.secure_url) {
+      throw new Error(
+        uploadResult.error?.message || "Your advert upload failed. Please try again."
+      );
+    }
+
+    return uploadResult.secure_url;
   }
-};
 
-window.choose("biz-starter");
-init();
+  async function submitAdvert() {
+    if (busy) return;
+    clearMessage();
 
+    try {
+      if (!session) {
+        throw new Error("Please sign in to PASONG before advertising.");
+      }
+
+      if (!$("agree").checked) {
+        throw new Error("Please confirm the advertising terms first.");
+      }
+
+      const file = $("advertFile").files[0];
+      if (!file) throw new Error("Please choose a flyer or video to upload.");
+
+      const mediaType = selectedMediaType();
+      const packageInfo = PACKAGES[selectedPackage];
+
+      if (!packageInfo) throw new Error("Please select an advertising package.");
+
+      busy = true;
+      $("submitBtn").disabled = true;
+      $("submitBtn").textContent = "Uploading advert…";
+
+      const mediaUrl = await uploadToCloudinary(
+        file,
+        mediaType === "video" ? "video" : "image"
+      );
+
+      $("submitBtn").textContent = "Saving advertising request…";
+
+      const now = new Date();
+      const startDate = now.toISOString().slice(0, 10);
+      const end = new Date(now);
+      end.setDate(end.getDate() + 30);
+      const endDate = end.toISOString().slice(0, 10);
+
+      /*
+       * Uses the existing promotions table and the business-advertising
+       * columns added for PASONG:
+       * advert_media_type, advert_media_url, business_website.
+       */
+      const row = {
+        user_id: session.user.id,
+        amount: packageInfo.amount,
+        currency: "UGX",
+        status: "pending",
+        payment_status: "pending",
+        package_code: selectedPackage,
+        start_date: startDate,
+        end_date: endDate,
+        content_type: "Business",
+        song_title: "Business Advertisement",
+        advert_media_type: mediaType,
+        advert_media_url: mediaUrl,
+        business_website: null
+      };
+
+      const saved = await db
+        .from("promotions")
+        .insert(row)
+        .select("id")
+        .single();
+
+      if (saved.error) {
+        console.error("Promotion insert failed:", saved.error);
+        throw new Error(
+          "Your media uploaded, but PASONG could not save the advertising request: " +
+          saved.error.message
+        );
+      }
+
+      if (!saved.data || !saved.data.id) {
+        throw new Error("The advertising request was saved without a returned ID.");
+      }
+
+      const checkout = new URL("pasong_checkout.html", window.location.href);
+      checkout.searchParams.set("promotion_id", saved.data.id);
+      checkout.searchParams.set("type", "business");
+      checkout.searchParams.set("package", selectedPackage);
+
+      $("submitBtn").textContent = "Opening checkout…";
+      window.location.assign(checkout.toString());
+
+    } catch (error) {
+      console.error("Business advert error:", error);
+      showMessage(error.message || "Something went wrong. Please try again.", "bad");
+      busy = false;
+      $("submitBtn").disabled = false;
+      $("submitBtn").textContent = "Continue to Checkout →";
+    }
+  }
+
+  $("submitBtn").addEventListener("click", submitAdvert);
+
+  async function init() {
+    try {
+      const result = await db.auth.getSession();
+
+      if (result.error) throw result.error;
+      session = result.data?.session || null;
+
+      if (!session) {
+        $("accountStatus").className = "status bad";
+        $("accountStatus").textContent =
+          "Please sign in to PASONG, then return to this page.";
+        $("submitBtn").disabled = true;
+        return;
+      }
+
+      $("accountStatus").className = "status good";
+      $("accountStatus").textContent =
+        "✓ Signed in as " + (session.user.email || "PASONG user");
+
+    } catch (error) {
+      console.error(error);
+      $("accountStatus").className = "status bad";
+      $("accountStatus").textContent =
+        "Could not verify your account. Refresh the page or sign in again.";
+      $("submitBtn").disabled = true;
+    }
+  }
+
+  choosePackage("biz-starter");
+  init();
 })();
 </script>
 </body>
