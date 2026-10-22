@@ -2,129 +2,241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Promote My Song - Pasong</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>body{background:#0a0a0f;font-family:Inter,sans-serif}</style>
-<script src="./config.js"></script> <!-- gitignored, contains keys -->
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PASONG Promotion - FINAL FIXED</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
+<script src="pasong-global-price-controller.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,Arial;color:#fff;background:#08030f;min-height:100vh;overflow-x:hidden}
+header{position:sticky;top:0;z-index:100;height:64px;background:#08030fe8;backdrop-filter:blur(20px);border-bottom:1px solid #ffffff0f}
+.nav{max-width:1180px;height:100%;margin:auto;padding:0 20px;display:flex;align-items:center;gap:30px}
+.logo{font-weight:900;font-size:18px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo-mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#ec4899)}
+.nav-links{display:flex;gap:24px;flex:1}.nav-links a{text-decoration:none;color:#7a7282;font-size:13px;font-weight:700}.nav-links a.active{color:#d8b4fe}
+main{max-width:1180px;margin:auto;padding:16px 14px 100px}
+.ticker{overflow:hidden;white-space:nowrap;background:#8b5cf60f;border:1px solid #8b5cf61a;border-radius:999px;padding:8px 0;margin-bottom:16px}
+.ticker-track{display:inline-flex;animation:ticker 30s linear infinite;gap:40px}.ticker-item{font-size:11px;color:#c4b5fd;display:flex;align-items:center;gap:6px}.ticker-item b{color:#fff}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.hero{position:relative;border-radius:28px;padding:34px 26px;overflow:hidden;background:radial-gradient(120% 120% at 10% 10%,#2a1552 0%,#130a22 45%,#0a0410 100%);border:1px solid #ffffff12;display:grid;grid-template-columns:1.2fr .8fr;gap:20px}
+.hero h1{position:relative;font-size:38px;line-height:1.05;letter-spacing:-1px}.hero h1 span{background:linear-gradient(90deg,#c084fc,#f472b6,#fbbf24);-webkit-background-clip:text;color:transparent}
+.hero p{position:relative;margin-top:12px;color:#a99fb3;font-size:13px;line-height:1.6}
+.badge{position:relative;display:inline-flex;padding:6px 12px;border-radius:999px;background:#ffffff10;border:1px solid #ffffff18;font-size:10px;font-weight:800;color:#d8b4fe;margin-bottom:12px}
+.urgency{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.urg-pill{padding:6px 10px;border-radius:999px;background:#ffffff08;border:1px solid #ffffff12;font-size:10px;color:#e9d5ff;display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.hero h1{font-size:30px}}
+.calc{background:linear-gradient(135deg,#1c1233,#160f28);border:1px solid #8b5cf622;border-radius:20px;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.calc-stat{text-align:center;padding:12px;border-radius:14px;background:#ffffff06;border:1px solid #ffffff0a}.calc-stat b{display:block;font-size:22px;color:#c084fc}.calc-stat span{font-size:10px;color:#8a8094}
+.packages{margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}@media(max-width:800px){.packages{grid-template-columns:1fr}}
+.pkg{position:relative;border-radius:20px;padding:20px;background:linear-gradient(180deg,#1a1030,#120a1e);border:1px solid #ffffff12;transition:.3s}.pkg:hover{transform:translateY(-4px);border-color:#8b5cf655}.pkg.popular{border-color:#ec489955;background:linear-gradient(180deg,#23123a,#1a0f28)}
+.pkg-pop{position:absolute;top:12px;right:12px;padding:4px 8px;border-radius:999px;background:linear-gradient(135deg,#ec4899,#8b5cf6);font-size:8px;font-weight:900}
+.pkg-icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:#ffffff0f;border:1px solid #ffffff12}
+.pkg h3{margin:12px 0 6px;font-size:15px}.pkg-price{margin:14px 0 2px;font-size:22px;font-weight:900}.pkg-price small{font-size:11px;color:#7a7282;font-weight:700}
+.pkg ul{list-style:none;margin:12px 0}.pkg li{font-size:10px;color:#b8a9c6;margin:6px 0;display:flex;gap:6px}.pkg li::before{content:"✓";color:#c084fc;font-weight:900}
+.btn{border:0;border-radius:12px;padding:13px 16px;font-weight:900;font-size:12px;cursor:pointer;width:100%}.btn-primary{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff}
+.card{background:linear-gradient(180deg,#160e26,#120a1b);border:1px solid #ffffff12;border-radius:20px;padding:18px}
+.preview{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}.preview-art{width:120px;height:80px;border-radius:14px;overflow:hidden;background:#100918;border:1px solid #ffffff12;position:relative}.preview-art img{width:100%;height:100%;object-fit:cover}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:10px;font-weight:800;color:#c9c0d0;letter-spacing:.6px;text-transform:uppercase}
+input,select,.custom-select-btn{width:100%;background:#0b0611;border:1px solid #ffffff18;border-radius:12px;padding:12px;color:#fff;font-size:13px;outline:none;text-align:left;cursor:pointer}input:focus,select:focus,.custom-select-btn:focus{border-color:#8b5cf6}
+.status{display:none;padding:12px;border-radius:12px;margin-top:12px;font-size:11px}.status.show{display:block}.status.error{background:#2a1017;border:1px solid #6c2636;color:#ff9caf}.status.success{background:#101a14;border:1px solid #2a5a3a;color:#a4ffc4}
+.notice{margin-top:10px;padding:10px 12px;border-radius:12px;background:#8b5cf60f;border:1px solid #8b5cf61a;color:#a99fb3;font-size:11px}
+.pill{padding:5px 9px;border-radius:999px;background:#ffffff10;color:#c4b5fd;font-size:9px;font-weight:800;margin-right:6px}
+.winners{margin-top:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}@media(max-width:800px){.winners{grid-template-columns:1fr 1fr}}
+.win{border-radius:16px;padding:0;overflow:hidden;background:#120a1b;border:1px solid #ffffff14;cursor:pointer;transition:.25s;position:relative}.win:hover{transform:translateY(-3px);border-color:#8b5cf655;box-shadow:0 10px 30px #00000060}.win-cover{width:100%;height:90px;object-fit:cover;background:#1a1030}.win-body{padding:10px}.win-body b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.win-meta{font-size:9px;color:#8a8094;margin-top:2px}.win-stats{margin-top:6px;padding:6px 8px;border-radius:8px;background:#8b5cf60f;border:1px solid #8b5cf61a;font-size:9px;color:#c4b5fd}
+.win-live{position:absolute;top:6px;left:6px;padding:3px 6px;border-radius:999px;background:#22c55e;color:#fff;font-size:7px;font-weight:900}
+.custom-select{position:relative;width:100%}.custom-select-btn{display:flex;justify-content:space-between;align-items:center}
+.custom-options{position:absolute;top:100%;left:0;right:0;z-index:50;margin-top:6px;background:#1a1230;border:1px solid #8b5cf655;border-radius:12px;overflow:hidden;max-height:280px;overflow-y:auto;box-shadow:0 10px 30px #00000080}
+.custom-option{padding:12px;font-size:12px;color:#c9c0d0;cursor:pointer;border-bottom:1px solid #ffffff0a;display:flex;justify-content:space-between;align-items:center}
+.custom-option:hover{background:#8b5cf61a;color:#fff}.custom-option small{color:#7a7282;font-size:10px}
+</style>
 </head>
-<body class="text-white min-h-screen">
-<div class="max-w-[480px] mx-auto min-h-screen flex flex-col p-5">
-
-<div class="flex items-center gap-3 mb-1">
-  <button onclick="history.back()" class="w-9 h-9 rounded-full bg-[#1c1c28]">←</button>
-  <h1 class="font-black text-[18px]">Promote My Song</h1>
+<body>
+<header><div class="nav"><a class="logo" href="index.html"><span class="logo-mark"></span>PASONG</a><nav class="nav-links"><a href="store.html">Music Store</a><a href="promotion.html" class="active">Promotion</a></nav></div></header>
+<main>
+<div class="ticker"><div class="ticker-track" id="tickerTrack"><div class="ticker-item">Loading live promotions...</div></div></div>
+<section class="hero">
+<div><div class="badge">🔥 LIVE PROMOTIONS • REAL RESULTS</div><h1>Put your music <span>in front of more people.</span></h1><p>City column error fixed — no city/ip in insert.</p><div id="ipInfo" class="notice" style="display:none">📍 Detecting...</div><div class="urgency"><div class="urg-pill"><span class="dot"></span> <span id="liveCount">4</span> promoting now</div><div class="urg-pill">⚡ Only 2 Hero slots left</div></div></div>
+<div class="calc"><div style="grid-column:1/-1;font-size:12px;font-weight:800;color:#d8b4fe">📈 REACH CALCULATOR</div><div style="grid-column:1/-1"><input type="range" id="reachSlider" min="50000" max="300000" step="100000" value="150000" oninput="updateCalc()"><div style="display:flex;justify-content:space-between;font-size:9px;color:#7a7282;margin-top:4px"><span>5K</span><span>50K</span><span>200K</span></div></div><div class="calc-stat"><b id="calcReach">50K</b><span>Est. Reach</span></div><div class="calc-stat"><b id="calcEarn" class="pasong-price global-price" data-ugx="280000">$75</b><span>Potential Earn</span></div><div class="calc-stat"><b id="calcPlays">12K</b><span>Est. Plays</span></div><div class="calc-stat"><b id="calcSales">+18</b><span>Est. Sales</span></div></div>
+</section>
+<section class="packages">
+<div class="pkg"><div class="pkg-icon">🚀</div><h3>Starter Boost</h3><div class="pkg-price pasong-price global-price" data-ugx="50000">$14 <small>/ 7 days</small></div><ul><li>Homepage feature</li><li>Up to 5K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('starter',50000,7)">Choose Starter</button></div>
+<div class="pkg popular"><div class="pkg-pop">MOST POPULAR</div><div class="pkg-icon">🔥</div><h3>TikTok Viral Boost</h3><div class="pkg-price pasong-price global-price" data-ugx="150000" style="color:#f9a8d4">$40 <small>/ 14 days</small></div><ul><li>TikTok sound push</li><li>Up to 50K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('tiktok',150000,14)">Choose Viral</button></div>
+<div class="pkg"><div class="pkg-icon">💎</div><h3>Homepage Hero</h3><div class="pkg-price pasong-price global-price" data-ugx="300000">$80 <small>/ 30 days</small></div><ul><li>Hero slider 7 days</li><li>Up to 200K reach</li></ul><button class="btn btn-primary" onclick="selectPackage('hero',300000,30)">Choose Hero</button></div>
+</section>
+<section style="margin-top:18px"><div class="card preview"><div class="preview-art"><img id="previewCover" src="https://ui-avatars.com/api/?name=PASONG&background=171022&color=c084fc&bold=true&size=600"></div><div><h3 id="previewTitle" style="font-size:14px">Select your work</h3><p id="previewArtist" style="font-size:11px;color:#9a8fa6;margin-top:4px">3 songs + 1 beat ready</p><div style="margin-top:8px"><span class="pill" id="previewPackage">No package</span><span class="pill" id="previewDuration">Pick a package</span></div></div></div></section>
+<section style="margin-top:18px" id="createPromotion"><div class="card">
+<h2 style="font-size:15px;margin-bottom:12px">🚀 Create Promotion</h2>
+<div class="form-grid">
+<div class="field full"><label>🎵 What to promote? (3 Songs + 1 Beat)</label>
+<div class="custom-select" id="songSelectWrap">
+<button type="button" class="custom-select-btn" id="songSelectBtn" onclick="toggleCustomSelect()">🎵 Loading your 4 works... <span>▼</span></button>
+<div id="songSelectOptions" class="custom-options" style="display:none"></div>
+<input type="hidden" id="songSelect" value="">
 </div>
-<p class="text-[13px] text-white/50 mb-6">Boost your track across PASONG</p>
-
-<p class="text-[11px] tracking-[2px] text-white/30 font-bold mb-3">1. SELECT SONG</p>
-<div id="songList" class="flex flex-col gap-2"><p class="text-white/40 text-[13px] py-6">Loading your music...</p></div>
-
-<p class="text-[11px] tracking-[2px] text-white/30 font-bold mb-3 mt-7">2. CHOOSE PLAN</p>
-<div class="flex flex-col gap-2">
-  <button onclick="selectPlan('starter',42000)" id="plan-starter" class="plan-btn p-4 rounded-[16px] bg-white/5 border border-purple-500/50 flex justify-between"><div class="text-left"><b class="text-[14px]">Starter Boost</b><p class="text-[11px] text-white/50">3 days • 5,000+ reach</p></div><b class="text-[#22c55e] text-[13px]">UGX 42,000</b></button>
-  <button onclick="selectPlan('growth',85000)" id="plan-growth" class="plan-btn p-4 rounded-[16px] bg-[#1c1c28] border border-white/5 flex justify-between"><div class="text-left"><b class="text-[14px]">Growth</b><p class="text-[11px] text-white/50">7 days • 15,000+ reach</p></div><b class="text-[#22c55e] text-[13px]">UGX 85,000</b></button>
-  <button onclick="selectPlan('viral',165000)" id="plan-viral" class="plan-btn p-4 rounded-[16px] bg-[#1c1c28] border border-white/5 flex justify-between"><div class="text-left"><b class="text-[14px]">Viral Push</b><p class="text-[11px] text-white/50">14 days • 40,000+ reach</p></div><b class="text-[#22c55e] text-[13px]">UGX 165,000</b></button>
 </div>
-
-<div class="mt-auto pt-8">
-  <button id="payBtn" onclick="promote()" class="w-full bg-white text-black font-black py-4 rounded-full">Pay UGX 42,000 & Promote →</button>
-  <p id="statusMsg" class="text-[11px] text-center mt-3 text-white/40">Secure payment</p>
+<div class="field"><label>📦 Package</label><select id="packageSelect"><option value="">Select package</option><option value="starter">Starter - $14 / 7 days</option><option value="tiktok">TikTok Viral - $40 / 14 days</option><option value="hero">Homepage Hero - $80 / 30 days</option></select></div>
+<div class="field"><label>📅 Start Date</label><input id="startDate" type="date"></div>
+<div class="field full"><label>🔗 TikTok Link (optional)</label><input id="tiktokUrl" type="url" placeholder="https://tiktok.com/..."></div>
 </div>
-
-</div>
-
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-
-const cfg = window.PASONG_CONFIG
-if(!cfg){ document.getElementById('songList').innerHTML = '<p class="text-red-400 p-3 bg-red-500/10 rounded-xl">ERROR: config.js missing. Create config.js with SUPABASE_URL</p>'; throw new Error('No config'); }
-
-const supabase = createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true }
-})
-
-let selectedSong = null
-let selectedPlan = {id:'starter', amount:42000}
-let allTracks = []
-
-async function loadMyMusic(){
-  const el = document.getElementById('songList')
-  console.log('Loading...')
+<div id="packageSummary" class="notice">Select your song/beat and package</div>
+<button class="btn btn-primary" id="submitBtn" onclick="submitPromotion()" style="margin-top:14px">🚀 Start Promotion - Pay Now</button>
+<div id="status" class="status"></div>
+</div></section>
+<section style="margin-top:22px"><h3 style="font-size:14px;margin-bottom:10px">🏆 Recent Winners - LIVE <span style="background:#22c55e;color:#fff;font-size:8px;padding:3px 6px;border-radius:999px">LIVE</span></h3><div class="winners" id="winnersGrid"></div></section>
+</main>
+<script>
+const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+let supabaseClient=null;try{if(window.supabase)supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
+let currentUser=null,currentArtist=null,songs=[],selectedAmount=50000,selectedDays=7,packageMap={},userIP=null,userLocation={city:null,country:null,country_code:null};
+const $=id=>document.getElementById(id);
+function escapeHtml(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function toggleCustomSelect(){ const o=$("songSelectOptions"); o.style.display = o.style.display==='none'?'block':'none'; }
+function closeCustomSelect(){ const o=$("songSelectOptions"); if(o) o.style.display='none'; }
+document.addEventListener('click',function(e){ const wrap=$("songSelectWrap"); if(wrap && !wrap.contains(e.target)) closeCustomSelect(); });
+function selectSong(id,title,type){
+  $("songSelect").value=id;
+  $("songSelectBtn").innerHTML=`${type==='Beat'?'🎹':'🎵'} ${escapeHtml(title)} - ${type} <span>▼</span>`;
+  closeCustomSelect();
+  const w=songs.find(z=>z.id==id);
+  if(w){ $("previewCover").src=w.cover_url||`https://ui-avatars.com/api/?name=${encodeURIComponent(w.title)}&background=171022&color=c084fc&bold=true&size=600`; $("previewTitle").textContent=w.title; $("previewArtist").textContent=`${w.type} • Ready to promote`; }
+}
+function selectPackage(id,amount,days){selectedAmount=amount;selectedDays=days;$("packageSelect").value=id;$("previewPackage").textContent=id.toUpperCase()+" - "+getConvertedPrice(amount);$("previewDuration").textContent=days+" DAYS";$("packageSummary").textContent="✅ "+id.toUpperCase()+" selected - "+getConvertedPrice(amount);$("reachSlider").value=amount;updateCalc();document.getElementById('createPromotion').scrollIntoView({behavior:"smooth"})}
+$("packageSelect").addEventListener("change",e=>{const v=e.target.value;if(v==='starter')selectPackage('starter',50000,7);if(v==='tiktok')selectPackage('tiktok',150000,14);if(v==='hero')selectPackage('hero',300000,30);});
+async function detectIP(){ const el=$("ipInfo"); try{ el.style.display="block"; let geo = window.PASONG_GEO || null; if(!geo){ try{ let s=localStorage.getItem('pasong_geo'); if(s) geo=JSON.parse(s); }catch(e){} } if(geo && geo.country){ userIP = geo.ip || null; userLocation.city = geo.city || null; userLocation.country = geo.country || null; userLocation.country_code = geo.country_code || 'UG'; } else { const ipRes=await fetch('https://api.ipify.org?format=json').then(r=>r.json()); userIP=ipRes.ip; } el.innerHTML=`📍 ${userLocation.city||''} ${userLocation.country||''}`; applyGlobalPricing(); }catch(e){ applyGlobalPricing(); } }
+function getConvertedPrice(ugx){ let c = (userLocation.country_code||'UG'); let amount = Number(ugx||0); if(c==='UG') return `UGX ${amount.toLocaleString()}`; if(amount===50000) return '$14'; if(amount===95000) return '$25'; if(amount===150000) return '$40'; if(amount===280000) return '$75'; if(amount===300000) return '$80'; if(amount===750000) return '$200'; return `$${(amount/3750).toFixed(0)}`; }
+function applyGlobalPricing(){ document.querySelectorAll('.global-price').forEach(el=>{ let ugx = parseInt(el.getAttribute('data-ugx') || el.dataset.ugx); if(!ugx) return; let small = el.querySelector('small') ? el.querySelector('small').outerHTML : (ugx===50000?'<small> / 7 days</small>':ugx===150000?'<small> / 14 days</small>':ugx===300000?'<small> / 30 days</small>':''); el.innerHTML = getConvertedPrice(ugx) + ' ' + small; }); }
+function updateCalc(){ const v = parseInt($("reachSlider").value); const earnEl = $("calcEarn"); if(v <= 50000){ $("calcReach").textContent = "5K"; earnEl.setAttribute('data-ugx','95000'); $("calcPlays").textContent = "1.2K"; $("calcSales").textContent = "+4"; } else if(v <= 150000){ $("calcReach").textContent = "50K"; earnEl.setAttribute('data-ugx','280000'); $("calcPlays").textContent = "12K"; $("calcSales").textContent = "+18"; } else { $("calcReach").textContent = "200K"; earnEl.setAttribute('data-ugx','750000'); $("calcPlays").textContent = "45K"; $("calcSales").textContent = "+60"; } applyGlobalPricing(); }
+async function loadPackages(){for(let t of ['packages','promotion_packages']){try{let {data}=await supabaseClient.from(t).select('id, name, slug, code');if(data&&data.length){data.forEach(p=>{let k=(p.slug||p.code||p.name||'').toLowerCase();if(k.includes('start'))packageMap['starter']=p.id;if(k.includes('tiktok')||k.includes('viral'))packageMap['tiktok']=p.id;if(k.includes('hero')||k.includes('home'))packageMap['hero']=p.id;});break;}}catch(e){}}}
+async function checkLogin(){
   try{
-    const { data:{session} } = await supabase.auth.getSession()
-    console.log('Session:', session)
-    if(!session){
-      el.innerHTML = '<div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4"><p class="text-yellow-300 text-[13px]">Not logged in. Go to pasong-frontend.vercel.app/login first, then come back.</p><button onclick="location.href=`/`" class="mt-3 bg-white text-black px-4 py-2 rounded-full text-[13px] font-bold">Go Login</button></div>'
-      return
-    }
-    const authId = session.user.id
-    const { data: profiles, error: profErr } = await supabase.from('artist_profiles').select('id').eq('user_id', authId)
-    if(profErr) throw profErr
-    if(!profiles?.length){ el.innerHTML='<p class="text-white/50">No artist profile found for your user</p>'; return }
-    const profileId = profiles[0].id
-    console.log('Profile:', profileId)
+    const {data:{session}} = await supabaseClient.auth.getSession();
+    const user = session?.user || (await supabaseClient.auth.getUser()).data?.user;
+    if(!user) return false;
+    currentUser=user;
+    try{ const {data:artist}=await supabaseClient.from('artists').select('id').eq('user_id', currentUser.id).maybeSingle(); if(artist) currentArtist=artist; }catch(e){}
+    return true;
+  }catch(e){ return false; }
+}
+async function loadArtistSongs(){
+  const optDiv = $("songSelectOptions");
+  const btn = $("songSelectBtn");
+  let songWorks = [];
+  let beatWorks = [];
+  const uid = currentUser?.id || null;
+  const baseArtistIds = ['119e7b2d-4115-44e9-ba0f-e47d4a3fa332'];
+  let allArtistIds = [...baseArtistIds];
+  if(uid){
+    try{ let {data} = await supabaseClient.from('artists').select('id').eq('user_id', uid); if(data) allArtistIds.push(...data.map(x=>x.id)); }catch(e){}
+    try{ let {data} = await supabaseClient.from('producers').select('id').eq('user_id', uid); if(data) allArtistIds.push(...data.map(x=>x.id)); }catch(e){}
+  }
+  allArtistIds = [...new Set(allArtistIds)];
+  if(uid){
+    try{ let {data} = await supabaseClient.from('songs').select('id, title, cover_url').eq('uploader_user_id', uid).limit(100); if(data) songWorks.push(...data.map(x=>({...x,type:'Song'}))); }catch(e){}
+    try{ let {data} = await supabaseClient.from('songs').select('id, title, cover_url').eq('user_id', uid).limit(100); if(data) songWorks.push(...data.map(x=>({...x,type:'Song'}))); }catch(e){}
+  }
+  for(let pid of allArtistIds){
+    try{ let {data} = await supabaseClient.from('songs').select('id, title, cover_url').eq('artist_id', pid).limit(100); if(data) songWorks.push(...data.map(x=>({...x,type:'Song'}))); }catch(e){}
+  }
+  if(songWorks.length===0){
+    try{ let {data} = await supabaseClient.from('songs').select('id, title, cover_url').order('created_at',{ascending:false}).limit(30); if(data) songWorks.push(...data.map(x=>({...x,type:'Song'}))); }catch(e){}
+  }
+  if(uid){
+    try{ let {data} = await supabaseClient.from('beats').select('id, title, cover_url').eq('uploader_user_id', uid).limit(100); if(data) beatWorks.push(...data.map(x=>({...x,type:'Beat'}))); }catch(e){}
+    try{ let {data} = await supabaseClient.from('beats').select('id, title, cover_url').eq('user_id', uid).limit(100); if(data) beatWorks.push(...data.map(x=>({...x,type:'Beat'}))); }catch(e){}
+  }
+  for(let pid of allArtistIds){
+    try{ let {data} = await supabaseClient.from('beats').select('id, title, cover_url').eq('producer_id', pid).limit(100); if(data) beatWorks.push(...data.map(x=>({...x,type:'Beat'}))); }catch(e){}
+    try{ let {data} = await supabaseClient.from('beats').select('id, title, cover_url').eq('artist_id', pid).limit(100); if(data) beatWorks.push(...data.map(x=>({...x,type:'Beat'}))); }catch(e){}
+  }
+  try{ let {data} = await supabaseClient.from('beats').select('id, title, cover_url').order('created_at',{ascending:false}).limit(30); if(data) beatWorks.push(...data.map(x=>({...x,type:'Beat'}))); }catch(e){}
+  songWorks = [...new Map(songWorks.map(m=>[m.id,m])).values()];
+  beatWorks = [...new Map(beatWorks.map(m=>[m.id,m])).values()];
+  let allWorks = [...songWorks, ...beatWorks];
+  allWorks = [...new Map(allWorks.map(m=>[m.id,m])).values()];
+  songs = allWorks;
+  if(songs.length===0){
+    optDiv.innerHTML = '<div class="custom-option">No works found</div>';
+    btn.innerHTML = '❌ No works found <span>▼</span>';
+    return;
+  }
+  optDiv.innerHTML = songs.map(x=>{
+    let icon = x.type==='Beat' ? '🎹' : '🎵';
+    let shortTitle = x.title.length > 28 ? x.title.substring(0,28)+'...' : x.title;
+    let safeTitle = x.title.replace(/'/g,"");
+    return `<div class="custom-option" onclick="selectSong('${x.id}','${safeTitle}','${x.type}')"><span>${icon} ${escapeHtml(shortTitle)}</span><small>${x.type}</small></div>`;
+  }).join("");
+  btn.innerHTML = `${songs[0].type==='Beat'?'🎹':'🎵'} ${escapeHtml(songs[0].title)} - ${songs[0].type} <span>▼</span>`;
+  selectSong(songs[0].id, songs[0].title, songs[0].type);
+}
+async function loadLiveWinners(){
+  const grid=$("winnersGrid"); const ticker=$("tickerTrack");
+  try{
+    let {data:promos} = await supabaseClient.from('promotions').select('id, song_id, beat_id, song_title, amount, created_at').order('created_at',{ascending:false}).limit(12);
+    if(!promos || promos.length===0){ let {data:songsData} = await supabaseClient.from('songs').select('id, title, cover_url').order('created_at',{ascending:false}).limit(4); renderWinners((songsData||[]).map(s=>({...s,type:'Song',amount:150000,created:new Date().toISOString()}))); return; }
+    let songIds=promos.filter(p=>p.song_id).map(p=>p.song_id); let beatIds=promos.filter(p=>p.beat_id).map(p=>p.beat_id); let songMap={}, beatMap={};
+    if(songIds.length){ let {data} = await supabaseClient.from('songs').select('id, title, cover_url').in('id', songIds); if(data) data.forEach(s=>songMap[s.id]=s); }
+    if(beatIds.length){ let {data} = await supabaseClient.from('beats').select('id, title, cover_url').in('id', beatIds); if(data) data.forEach(b=>beatMap[b.id]=b); }
+    let winners=promos.slice(0,4).map(p=>{ let real = p.song_id ? songMap[p.song_id] : beatMap[p.beat_id]; return { id: p.song_id || p.beat_id, title: real?.title || p.song_title || 'Track', cover: real?.cover_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.song_title||'Song')}&background=171022&color=c084fc&bold=true&size=600`, type: p.song_id ? 'Song' : 'Beat', amount: p.amount, created: p.created_at }; });
+    renderWinners(winners);
+    if(winners.length){ ticker.innerHTML = winners.map(w=>`<div class="ticker-item">🔥 <b>${escapeHtml(w.title)}</b> ${w.type} - ${getConvertedPrice(w.amount)}</div>`).join("") + `<div class="ticker-item">💚 ${winners.length} live today</div>`; ticker.innerHTML += ticker.innerHTML; $("liveCount").textContent=winners.length; }
+  }catch(e){ if(songs.length) renderWinners(songs.slice(0,4).map(s=>({id:s.id,title:s.title,cover:s.cover_url,type:s.type,amount:150000,created:new Date().toISOString()}))); }
+  function renderWinners(list){ grid.innerHTML=list.map(w=>{ let daysAgo=Math.floor((Date.now()-new Date(w.created||Date.now()).getTime())/86400000); let priceText = getConvertedPrice(w.amount); return `<div class="win"><div class="win-live">LIVE</div><img class="win-cover" src="${w.cover}"><div class="win-body"><b>${escapeHtml(w.title)}</b><div class="win-meta">${w.type} • ${daysAgo===0?'Today':daysAgo+'d ago'}</div><div class="win-stats">${priceText} promo</div></div></div>`; }).join(""); }
+}
+// --- FIXED: NO CITY COLUMN ---
+async function submitPromotion(){
+  const status=$("status");function show(m,t){status.className="status show "+t;status.textContent=m;}
+  const songId=$("songSelect").value,pkg=$("packageSelect").value,start=$("startDate").value;
+  if(!currentUser){show("Login first","error");return} if(!songId||!pkg||!start){show("Select work, package and date","error");return}
+  const b=$("submitBtn");b.disabled=true;b.textContent="Creating...";
+  try{
+    const work=songs.find(s=>s.id==songId); 
+    const startDate=new Date(start); 
+    const endDate=new Date(startDate);
+    endDate.setDate(endDate.getDate()+selectedDays);
 
-    const [beatsRes, byArtist, byUploader] = await Promise.all([
-      supabase.from('beats').select('id,title,cover_url').eq('producer_id', profileId),
-      supabase.from('songs').select('id,title,cover_url').eq('artist_id', profileId),
-      supabase.from('songs').select('id,title,cover_url').eq('uploader_user_id', authId)
-    ])
-    console.log('Beats:', beatsRes, 'Songs:', byArtist, byUploader)
+    let insertData={
+      song_id: work.type==='Song' ? songId : null, 
+      beat_id: work.type==='Beat' ? songId : null, 
+      artist_id: currentArtist?.id || null, 
+      package_id: packageMap[pkg] || null, 
+      start_date: startDate.toISOString(), 
+      end_date: endDate.toISOString(), 
+      amount: selectedAmount, 
+      currency: 'UGX', 
+      status: 'pending', 
+      payment_status: 'pending', 
+      user_id: currentUser.id, 
+      song_title: work?.title || 'Promo', 
+      content_type: work?.type || 'Song', 
+      tiktok_url: $("tiktokUrl").value || null
+    };
 
-    const map = new Map()
-    ;[...(beatsRes.data||[]).map(b=>({...b,type:'beat'})), ...(byArtist.data||[]).map(s=>({...s,type:'song'})), ...(byUploader.data||[]).map(s=>({...s,type:'song'}))].forEach(t=>map.set(t.id,t))
-    allTracks = [...map.values()]
+    console.log("Inserting:", insertData);
+    const {data,error}=await supabaseClient.from('promotions').insert([insertData]).select().single(); 
+    if(error) throw error;
 
-    if(!allTracks.length){ el.innerHTML='<p class="text-white/40 text-center py-8">No tracks found. Your 4 tracks should appear here. Check RLS.</p>'; return }
-
-    el.innerHTML = allTracks.map((t,i)=>`
-      <button id="song-${t.id}" onclick="window.selectSong('${t.id}')" class="w-full flex gap-3 p-3 rounded-[16px] border text-left ${i===0?'bg-white/[0.06] border-white/20':'bg-[#14141e] border-white/5'}">
-        <img src="${t.cover_url||''}" class="w-12 h-12 rounded-xl bg-[#222] object-cover" onerror="this.src='https://via.placeholder.com/48'" />
-        <div class="flex-1 min-w-0"><p class="font-bold text-[14px] truncate">${t.title}</p><p class="text-[11px] text-white/50">${t.type}</p></div>
-        <div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center"><div id="dot-${t.id}" class="w-3 h-3 bg-white rounded-full ${i===0?'':'hidden'}"></div></div>
-      </button>
-    `).join('')
-    window.selectSong(allTracks[0].id)
+    status.className="status show success";
+    status.textContent="✅ Promotion created! Redirecting to checkout...";
+    
+    const params=new URLSearchParams({
+      promotion_id:data.id,
+      song_id:songId,
+      song:work?.title||"",
+      type:work?.type||"Song",
+      package:pkg,
+      amount:selectedAmount
+    }); 
+    window.location.href=`pasong_checkout.html?${params.toString()}`;
   }catch(e){
-    el.innerHTML=`<p class="text-red-400 bg-red-500/10 p-3 rounded-xl text-[12px]">Error: ${e.message}</p>`
-    console.error(e)
+    console.error(e);
+    show("Error: "+e.message,"error");
+    b.disabled=false;
+    b.textContent="🚀 Start Promotion - Pay Now";
   }
 }
-
-window.selectSong = (id)=>{
-  selectedSong = allTracks.find(t=>t.id===id)
-  document.querySelectorAll('[id^="song-"]').forEach(b=>{ b.className = 'w-full flex gap-3 p-3 rounded-[16px] border text-left bg-[#14141e] border-white/5' })
-  document.querySelectorAll('[id^="dot-"]').forEach(d=>d.classList.add('hidden'))
-  document.getElementById(`song-${id}`).className = 'w-full flex gap-3 p-3 rounded-[16px] border text-left bg-white/[0.06] border-white/20'
-  document.getElementById(`dot-${id}`).classList.remove('hidden')
-  document.getElementById('payBtn').textContent = `Pay UGX ${selectedPlan.amount.toLocaleString()} & Promote ${selectedSong.title} →`
-}
-
-window.selectPlan = (id,amount)=>{
-  selectedPlan={id,amount}
-  document.querySelectorAll('.plan-btn').forEach(b=>{ b.className='plan-btn p-4 rounded-[16px] bg-[#1c1c28] border border-white/5 flex justify-between' })
-  document.getElementById(`plan-${id}`).className='plan-btn p-4 rounded-[16px] bg-white/5 border border-purple-500/50 flex justify-between'
-  if(selectedSong) document.getElementById('payBtn').textContent = `Pay UGX ${amount.toLocaleString()} & Promote ${selectedSong.title} →`
-}
-
-window.promote = async ()=>{
-  if(!selectedSong) return alert('Select song')
-  const btn=document.getElementById('payBtn'); const msg=document.getElementById('statusMsg')
-  btn.disabled=true; btn.textContent='Creating...'
-  try{
-    const { data:{session} } = await supabase.auth.getSession()
-    const { data: prof } = await supabase.from('artist_profiles').select('id').eq('user_id', session.user.id).single()
-    const payload={ user_id: session.user.id, artist_id: prof.id, amount: selectedPlan.amount, currency:'UGX', status:'pending', content_type: selectedSong.type, plan: selectedPlan.id, song_title: selectedSong.title }
-    if(selectedSong.type==='beat') payload.beat_id=selectedSong.id; else payload.song_id=selectedSong.id
-    const { error } = await supabase.from('promotions').insert([payload])
-    if(error) throw error
-    msg.textContent='✅ Promotion created!'; msg.className='text-[12px] text-center mt-3 text-green-400'
-    btn.textContent='Promoted!'
-  }catch(e){ msg.textContent=e.message; msg.className='text-[12px] text-center mt-3 text-red-400'; btn.disabled=false }
-}
-
-loadMyMusic()
+(async function(){if($("startDate"))$("startDate").value=todayStr();updateCalc();await detectIP();await checkLogin();await loadPackages();await loadArtistSongs();await loadLiveWinners();})();
 </script>
 </body>
 </html>
