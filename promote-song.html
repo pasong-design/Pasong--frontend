@@ -1,179 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Promote My Song - PASONG</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promote My Song - Pasong</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-(function () {
-  "use strict";
-  if (window.PASONGGlobalPriceController) return;
-  const API_BASE = "https://pasong-api.vercel.app";
-  const COUNTRY_CURRENCY = { UG: "UGX", US: "USD", GB: "GBP" };
-  const state = { country: null, currency: null };
-  let initPromise=null;
-  function safeJSON(r){ if(!r.ok) throw new Error(); return r.json(); }
-  async function fetchCountry(){
-    try{ const res=await fetch(API_BASE+"/api/pricing",{mode:"cors",cache:"no-store"}); const d=await safeJSON(res); const c=String(d.country||"").toUpperCase(); if(/^[A-Z]{2}$/.test(c)){ state.country=c; state.currency=COUNTRY_CURRENCY[c]||"USD"; return; } }catch(e){}
-    try{ const res=await fetch("https://ipwho.is/",{mode:"cors"}); const d=await safeJSON(res); if(d.success){ state.country=String(d.country_code).toUpperCase(); state.currency=COUNTRY_CURRENCY[state.country]||"USD"; return; } }catch(e){}
-    state.country=null; state.currency="USD";
-  }
-  async function init(){ if(initPromise) return initPromise; initPromise=(async()=>{ await fetchCountry(); window.dispatchEvent(new CustomEvent("pasong:currency-ready",{detail:state})); return state; })(); return initPromise; }
-  window.PASONGGlobalPriceController={ init, getInfo:()=>state };
-  init();
-})();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-[#0a0a0f] text-white min-h-screen flex flex-col">
+<body class="bg-[#0a0a0f] text-white min-h-screen font-sans">
+<div class="max-w-[720px] mx-auto p-4 pb-[120px]">
+  <div class="flex items-center justify-between mt-2">
+    <h1 class="font-black text-[22px] tracking-tight">Promote My Music</h1>
+    <div class="text-[11px] text-white/40">4 tracks found</div>
+  </div>
 
-<header class="p-5 flex items-center gap-4 max-w-[700px] mx-auto w-full sticky top-0 bg-[#0a0a0f]/90 backdrop-blur z-10">
-<a href="/advertise.html" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center">←</a>
-<h1 class="font-black">Promote My Song</h1>
-</header>
+  <div id="trackList" class="mt-6 flex flex-col gap-3">
+    <p class="text-white/40 text-[13px]">Loading your music...</p>
+  </div>
 
-<main class="flex-1 max-w-[700px] mx-auto w-full px-5 pb-[100px]">
-
-<p class="text-white/50 text-[13px]">Boost your track to more listeners across PASONG</p>
-
-<h2 class="text-[11px] font-bold tracking-[0.2em] text-white/30 mt-6">1. SELECT SONG</h2>
-<div id="songList" class="mt-3 flex flex-col gap-2">
-<!-- Will be filled by JS, fallback below -->
-</div>
-
-<h2 class="text-[11px] font-bold tracking-[0.2em] text-white/30 mt-8">2. CHOOSE PLAN</h2>
-<div class="mt-3 flex flex-col gap-3">
-
-<div onclick="selectPlan(this,42000,9.99,'Starter',3)" class="plan-card cursor-pointer bg-[#14141c] border-2 border-[#8b5cf6] rounded-[16px] p-4 flex justify-between items-center transition-all">
-<div>
-<div class="flex items-center gap-2"><p class="font-black text-[15px]">Starter Boost</p><span class="text-[9px] bg-white/10 px-2 py-0.5 rounded-full">POPULAR</span></div>
-<p class="text-[11px] text-white/50 mt-0.5">3 days • 5,000+ reach • Feed + Search</p>
-</div>
-<p class="price font-black text-[14px] text-[#4ade80]" data-usd="9.99" data-ugx="42000">UGX 42,000</p>
-</div>
-
-<div onclick="selectPlan(this,85000,19.99,'Growth',7)" class="plan-card cursor-pointer bg-[#14141c] border border-white/10 rounded-[16px] p-4 flex justify-between items-center">
-<div><p class="font-black text-[15px]">Growth</p><p class="text-[11px] text-white/50 mt-0.5">7 days • 15,000+ reach • Homepage feature</p></div>
-<p class="price font-black text-[14px] text-[#4ade80]" data-usd="19.99" data-ugx="85000">UGX 85,000</p>
-</div>
-
-<div onclick="selectPlan(this,165000,39.99,'Viral',14)" class="plan-card cursor-pointer bg-[#14141c] border border-white/10 rounded-[16px] p-4 flex justify-between items-center">
-<div><p class="font-black text-[15px]">Viral Push</p><p class="text-[11px] text-white/50 mt-0.5">14 days • 40,000+ reach • All placements</p></div>
-<p class="price font-black text-[14px] text-[#4ade80]" data-usd="39.99" data-ugx="165000">UGX 165,000</p>
-</div>
-
-</div>
-
-<h2 class="text-[11px] font-bold tracking-[0.2em] text-white/30 mt-8">3. TARGET AUDIENCE</h2>
-<div class="flex gap-2 mt-3 flex-wrap" id="audienceGroup">
-<button data-aud="UG" class="aud-btn bg-white text-black px-4 py-2 rounded-full text-[12px] font-bold">Uganda</button>
-<button data-aud="EA" class="aud-btn bg-white/10 px-4 py-2 rounded-full text-[12px] font-bold">East Africa</button>
-<button data-aud="WW" class="aud-btn bg-white/10 px-4 py-2 rounded-full text-[12px] font-bold">Worldwide</button>
-</div>
-
-<div class="mt-8 bg-[#1c1c28] border border-white/10 rounded-[20px] p-5">
-<div class="flex justify-between text-[12px] text-white/50"><span>Song</span><span id="sumSong" class="text-white font-bold">Select a song</span></div>
-<div class="flex justify-between text-[12px] text-white/50 mt-2"><span>Plan</span><span id="sumPlan" class="text-white font-bold">Starter Boost (3 days)</span></div>
-<div class="flex justify-between text-[12px] text-white/50 mt-2"><span>Audience</span><span id="sumAud" class="text-white font-bold">Uganda</span></div>
-<div class="h-[1px] bg-white/10 my-4"></div>
-<div class="flex justify-between items-center">
-<p class="text-white/50 text-[12px]">Total to pay</p>
-<p class="font-black text-[22px]" id="totalPrice">UGX 42,000</p>
-</div>
-<p class="text-[10px] text-white/30 mt-2 text-center" id="payHint">MTN MoMo & Airtel Money • Instant approval</p>
-</div>
-
-</main>
-
-<!-- STICKY PAY BUTTON -->
-<div class="fixed bottom-0 left-0 right-0 p-4 bg-[#0a0a0f]/90 backdrop-blur border-t border-white/10">
-<div class="max-w-[700px] mx-auto">
-<button id="payBtn" onclick="pay()" class="w-full bg-white text-black font-black py-4 rounded-full text-[15px] flex items-center justify-center gap-2">Pay <span id="payTotal">UGX 42,000</span> & Promote →</button>
-<p class="text-[10px] text-white/30 text-center mt-2">Secure payment • Promotion starts immediately after payment</p>
-</div>
+  <div id="summaryBox" class="mt-8 hidden bg-[#1a1a24] border border-white/10 p-5 rounded-[24px]">
+    <div class="flex items-center gap-3">
+      <img id="sumCover" src="" class="w-[56px] h-[56px] rounded-[14px] object-cover bg-[#222]" />
+      <div>
+        <p id="sumTitle" class="font-bold text-[15px]"></p>
+        <p id="sumType" class="text-[12px] text-white/50"></p>
+      </div>
+    </div>
+    <button onclick="createPromotion()" id="promoBtn" class="mt-5 w-full bg-white text-black font-black text-[14px] py-[16px] rounded-full">Promote for UGX 42,000</button>
+    <p id="promoMsg" class="mt-3 text-[12px] text-center"></p>
+  </div>
 </div>
 
 <script>
-let currentCurrency='UGX', curUGX=42000, curUSD=9.99, curPlan='Starter', curDays=3, curSong=null, curAud='Uganda';
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON = "YOUR_ANON_KEY";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-const demoSongs=[
- {id:1,title:'Blessings',artist:'Eddy Kenzo',plays:'2.3M'},
- {id:2,title:'Weekend',artist:'Spice Diana',plays:'890K'},
- {id:3,title:'Tumbiza Sound',artist:'Eezzy',plays:'1.1M'}
-];
+let selectedTrack = null;
+let allTracks = [];
 
-function renderSongs(){
- const list=document.getElementById('songList');
- list.innerHTML=demoSongs.map((s,i)=>`
-  <button onclick="selectSong(${s.id},'${s.title} - ${s.artist}')" data-id="${s.id}" class="song-btn ${i==0?'bg-white/5 border-white/10':'border-transparent'} text-left flex items-center gap-3 p-3 rounded-[12px] border w-full">
-   <div class="w-12 h-12 bg-[#8b5cf6] rounded-[10px] flex items-center justify-center">🎵</div>
-   <div class="flex-1"><p class="font-bold text-[14px]">${s.title}</p><p class="text-[11px] text-white/40">${s.artist} • ${s.plays} plays</p></div>
-   <div class="w-5 h-5 rounded-full border border-white/20 flex items-center justify-center"><div class="check w-2.5 h-2.5 bg-white rounded-full ${i==0?'':'hidden'}"></div></div>
-  </button>
- `).join('');
- curSong=demoSongs[0].title+' - '+demoSongs[0].artist;
- document.getElementById('sumSong').textContent=curSong;
+async function loadMyMusic(){
+  const { data:{session} } = await supabase.auth.getSession();
+  if(!session){
+    document.getElementById('trackList').innerHTML = '<p class="text-white/60 text-[13px]">Please login first</p>';
+    return;
+  }
+  const authId = session.user.id;
+
+  // 1. Get ALL my profile IDs (you have 1 now, but supports 3)
+  const { data: profiles } = await supabase.from('artist_profiles').select('id').eq('user_id', authId);
+  const profileIds = (profiles||[]).map(p=>p.id);
+  if(profileIds.length===0){ document.getElementById('trackList').innerHTML='No profile found'; return; }
+
+  // 2. Load beats + songs - EXACT query that worked for you in SQL Editor
+  const [beatsRes, songsRes] = await Promise.all([
+    supabase.from('beats').select('id,title,cover_url,producer_id').in('producer_id', profileIds),
+    supabase.from('songs').select('id,title,cover_url,artist_id,uploader_user_id').or(`artist_id.in.(${profileIds.join(',')}),uploader_user_id.eq.${authId}`)
+  ]);
+
+  const beats = (beatsRes.data||[]).map(b=>({...b, content_type:'beat'}));
+  const songs = (songsRes.data||[]).map(s=>({...s, content_type:'song'}));
+
+  // Deduplicate songs (same song may match both conditions)
+  const map = new Map();
+  [...beats, ...songs].forEach(t=> map.set(t.id, t));
+  allTracks = [...map.values()];
+
+  if(allTracks.length===0){
+    document.getElementById('trackList').innerHTML='<p class="text-white/60">No tracks found</p>'; return;
+  }
+
+  document.getElementById('trackList').innerHTML = allTracks.map((t, idx)=>`
+    <button onclick="selectTrack('${t.id}')" id="btn-${t.id}" class="group text-left flex items-center gap-3 p-3 rounded-[16px] border transition-all ${idx===0?'bg-white/10 border-white/20':'bg-[#14141c] border-white/5 hover:border-white/15'}">
+      <img src="${t.cover_url}" class="w-[52px] h-[52px] rounded-[12px] object-cover bg-[#222] flex-shrink-0" onerror="this.src='https://via.placeholder.com/52'" />
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-[14px] truncate">${t.title}</p>
+        <p class="text-[11px] text-white/50 capitalize">${t.content_type} • ${t.cover_url ? 'cover ready' : 'no cover'}</p>
+      </div>
+      <div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center flex-shrink-0"><div id="dot-${t.id}" class="w-3 h-3 bg-white rounded-full ${idx===0?'':'hidden'}"></div></div>
+    </button>
+  `).join('');
+
+  selectTrack(allTracks[0].id);
 }
 
-function selectSong(id,name){
- curSong=name;
- document.querySelectorAll('.song-btn').forEach(b=>{
-   const check=b.querySelector('.check');
-   if(Number(b.dataset.id)===id){ b.classList.add('bg-white/5','border-white/10'); b.classList.remove('border-transparent'); check.classList.remove('hidden'); }
-   else{ b.classList.remove('bg-white/5','border-white/10'); b.classList.add('border-transparent'); check.classList.add('hidden'); }
- });
- document.getElementById('sumSong').textContent=name;
+function selectTrack(id){
+  const t = allTracks.find(x=>x.id===id);
+  if(!t) return;
+  selectedTrack = t;
+
+  document.querySelectorAll('[id^="btn-"]').forEach(b=>{
+    b.classList.remove('bg-white/10','border-white/20'); b.classList.add('bg-[#14141c]','border-white/5');
+  });
+  document.querySelectorAll('[id^="dot-"]').forEach(d=>d.classList.add('hidden'));
+  
+  document.getElementById(`btn-${id}`)?.classList.add('bg-white/10','border-white/20');
+  document.getElementById(`btn-${id}`)?.classList.remove('bg-[#14141c]','border-white/5');
+  document.getElementById(`dot-${id}`)?.classList.remove('hidden');
+
+  document.getElementById('sumCover').src = t.cover_url;
+  document.getElementById('sumTitle').textContent = t.title;
+  document.getElementById('sumType').textContent = t.content_type;
+  document.getElementById('summaryBox').classList.remove('hidden');
 }
 
-function selectPlan(card,ugx,usd,name,days){
- document.querySelectorAll('.plan-card').forEach(c=>{ c.classList.remove('border-2','border-[#8b5cf6]'); c.classList.add('border','border-white/10'); });
- card.classList.remove('border','border-white/10'); card.classList.add('border-2','border-[#8b5cf6]');
- curUGX=ugx; curUSD=usd; curPlan=name; curDays=days;
- document.getElementById('sumPlan').textContent=`${name} (${days} days)`;
- updateTotal();
+async function createPromotion(){
+  if(!selectedTrack) return;
+  const btn = document.getElementById('promoBtn');
+  const msg = document.getElementById('promoMsg');
+  btn.disabled=true; btn.textContent='Creating...';
+  
+  const { data:{session} } = await supabase.auth.getSession();
+  const { data: profile } = await supabase.from('artist_profiles').select('id').eq('user_id', session.user.id).limit(1).single();
+
+  const payload = {
+    user_id: session.user.id,
+    artist_id: profile?.id || selectedTrack.producer_id || selectedTrack.artist_id,
+    amount: 42000,
+    currency: 'UGX',
+    status: 'pending',
+    content_type: selectedTrack.content_type,
+    song_title: selectedTrack.title
+  };
+  if(selectedTrack.content_type==='beat') payload.beat_id = selectedTrack.id;
+  else payload.song_id = selectedTrack.id;
+
+  const { error } = await supabase.from('promotions').insert([payload]);
+  if(error){ msg.textContent=error.message; msg.className='mt-3 text-[12px] text-center text-red-400'; }
+  else { msg.textContent='Promotion created for '+selectedTrack.title; msg.className='mt-3 text-[12px] text-center text-green-400'; }
+  btn.disabled=false; btn.textContent='Promote for UGX 42,000';
 }
 
-function updatePrices(currency){
- currentCurrency=currency;
- document.querySelectorAll('.price').forEach(el=>{
-  const usd=el.dataset.usd, ugx=el.dataset.ugx;
-  el.textContent=currency==='UGX'?`UGX ${Number(ugx).toLocaleString()}`:`$${usd}`;
- });
- updateTotal();
-}
-
-function updateTotal(){
- const totalEl=document.getElementById('totalPrice');
- const payTotalEl=document.getElementById('payTotal');
- const hint=document.getElementById('payHint');
- if(currentCurrency==='UGX'){ totalEl.textContent=`UGX ${curUGX.toLocaleString()}`; payTotalEl.textContent=`UGX ${curUGX.toLocaleString()}`; hint.textContent='MTN MoMo & Airtel Money • Instant approval'; }
- else{ totalEl.textContent=`$${curUSD}`; payTotalEl.textContent=`$${curUSD}`; hint.textContent='Card / Stripe • Instant approval'; }
-}
-
-window.addEventListener('pasong:currency-ready',(e)=>{
- if(e.detail.country==='UG') updatePrices('UGX'); else updatePrices('USD');
-});
-
-document.querySelectorAll('.aud-btn').forEach(btn=>{
- btn.addEventListener('click',()=>{
-  document.querySelectorAll('.aud-btn').forEach(b=>b.className='aud-btn bg-white/10 px-4 py-2 rounded-full text-[12px] font-bold');
-  btn.className='aud-btn bg-white text-black px-4 py-2 rounded-full text-[12px] font-bold';
-  curAud=btn.textContent; document.getElementById('sumAud').textContent=curAud;
- });
-});
-
-function pay(){
- if(!curSong){ alert('Select a song first'); return; }
- const payload={song:curSong,plan:curPlan,days:curDays,amount:currentCurrency==='UGX'?curUGX:curUSD,currency:currentCurrency,audience:curAud};
- console.log('PAY',payload);
- // TODO: Connect to your backend
- // fetch('https://pasong-api.vercel.app/api/promote/song',{method:'POST',body:JSON.stringify(payload)})
- alert(`Promoting ${curSong} - ${curPlan} for ${currentCurrency==='UGX'?'UGX '+curUGX.toLocaleString():'$'+curUSD}\n\nConnect this to your /api/promote endpoint`);
- window.location.href='/ads-manager.html';
-}
-
-renderSongs();
-updateTotal();
+loadMyMusic();
 </script>
 </body>
 </html>
