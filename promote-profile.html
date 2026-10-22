@@ -1,94 +1,836 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Profile - PASONG</title>
+<meta name="theme-color" content="#0a0a0f">
+<title>Promote My Profile - PASONG</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
 <script src="pasong-global-price-controller.js"></script>
+
+<style>
+*{box-sizing:border-box}
+.pkg-active{border-color:#3b82f6!important;background:#1e293b!important}
+button:focus-visible,input:focus-visible{outline:2px solid #60a5fa;outline-offset:3px}
+button:disabled{opacity:.45;cursor:not-allowed}
+</style>
 </head>
+
 <body class="bg-[#0a0a0f] text-white min-h-screen flex flex-col">
 
 <header class="p-5 flex justify-between items-center max-w-[1100px] mx-auto w-full">
-<a href="/index.html" class="font-black text-xl tracking-widest">PASONG</a>
-<a href="/advertise.html" class="text-xs bg-white/10 border border-white/10 px-4 py-2 rounded-full">← Advertise</a>
+  <a href="/index.html" class="font-black text-xl tracking-widest">PASONG</a>
+  <a href="/advertise.html" class="text-xs bg-white/10 border border-white/10 px-4 py-2 rounded-full">← Advertise</a>
 </header>
 
 <main class="flex-1 max-w-[1100px] mx-auto w-full px-5 pb-10">
-<h1 class="text-[32px] font-black leading-none">My Profile</h1>
-<p class="text-white/50 mt-2 text-sm">Promote your profile to get real followers</p>
 
-<!-- PROFILE PREVIEW - SAME STYLE AS YOUR CARDS -->
-<div class="mt-6 bg-[#14141c] border border-white/10 rounded-[20px] p-5 flex gap-4 items-center" id="profileBox">
-<img id="pAvatar" src="https://ui-avatars.com/api/?name=P&background=3b82f6&color=fff" class="w-14 h-14 rounded-full bg-[#0a0a0f]">
-<div>
-<h3 id="pName" class="font-black">Loading...</h3>
-<p id="pHandle" class="text-white/50 text-xs">@...</p>
-<p id="pFollowers" class="price text-[#60a5fa] text-xs font-bold mt-1">0 followers</p>
-</div>
-</div>
+<h1 class="text-[32px] font-black leading-tight">Promote My Profile</h1>
+<p class="text-white/50 text-[13px] mt-2">30 days • Estimated reach only — not guaranteed</p>
 
-<!-- PACKAGES - 30 DAYS FIXED -->
-<div class="grid grid-cols-1 gap-3 mt-6">
-<button onclick="choose('starter',55000)" class="text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5">
-<h4 class="font-black text-[15px]">Starter Growth</h4>
-<p class="text-white/50 text-xs">2K - 5K profile visits</p>
-<p class="price text-[#60a5fa] font-bold mt-2 text-[14px] global-price" data-ugx="55000">From UGX 55,000 <small class="text-white/40">/ 30 days</small></p>
-</button>
+<!-- PROFILE SELECTION -->
+<section class="mt-6 bg-[#14141c] border border-white/10 rounded-[20px] p-5">
+  <h2 class="font-black text-[12px]">1. SELECT YOUR PROFILE</h2>
 
-<button onclick="choose('growth',120000)" class="text-left bg-[#1c1c28] border border-blue-500/30 rounded-[20px] p-5 relative">
-<span class="absolute -top-2 right-4 bg-blue-500 text-black text-[9px] font-black px-3 py-1 rounded-full">POPULAR</span>
-<h4 class="font-black text-[15px]">Viral Growth</h4>
-<p class="text-white/50 text-xs">10K - 25K profile visits</p>
-<p class="price text-[#60a5fa] font-bold mt-2 text-[14px] global-price" data-ugx="120000">From UGX 120,000 <small class="text-white/40">/ 30 days</small></p>
-</button>
+  <div id="profilesList" class="mt-3 text-[12px] text-white/50" aria-live="polite">
+    Checking your account...
+  </div>
 
-<button onclick="choose('pro',250000)" class="text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5">
-<h4 class="font-black text-[15px]">Pro Artist</h4>
-<p class="text-white/50 text-xs">50K+ profile visits + Homepage feature</p>
-<p class="price text-[#60a5fa] font-bold mt-2 text-[14px] global-price" data-ugx="250000">From UGX 250,000 <small class="text-white/40">/ 30 days</small></p>
-</button>
-</div>
+  <div id="dbError" role="alert"
+       class="hidden mt-3 text-[11px] p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-200 break-words"></div>
 
-<!-- PAY PANEL -->
-<div class="mt-6 bg-[#1c1c28] border border-white/10 rounded-[20px] p-6">
-<p id="chosen" class="text-xs text-white/50">Select a package</p>
-<button id="btnPay" onclick="pay()" class="mt-4 w-full bg-[#3b82f6] font-black py-4 rounded-full">Continue → Pay Now</button>
-<p id="msg" class="hidden mt-3 text-xs p-3 rounded-xl"></p>
-</div>
+  <div class="mt-4 border-t border-white/5 pt-4">
+    <label for="manualLink" class="text-[10px] font-bold text-white/50 uppercase">
+      Or paste your PASONG profile link
+    </label>
+
+    <div class="flex flex-col sm:flex-row gap-2 mt-2">
+      <input id="manualLink" type="url"
+        placeholder="https://pasong-frontend.vercel.app/artist/your-stage-name"
+        class="min-w-0 flex-1 bg-[#0a0a0f] border border-white/10 rounded-xl p-3 text-sm">
+
+      <button id="verifyBtn" type="button"
+        class="bg-white text-black font-black px-5 py-3 rounded-xl text-xs">
+        Verify
+      </button>
+    </div>
+
+    <p class="text-[10px] text-white/40 mt-2">
+      Sign in with the account that owns the profile.
+    </p>
+
+    <p id="linkError" role="alert"
+      class="hidden mt-2 text-[11px] p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 break-words"></p>
+
+    <p id="linkSuccess" role="status"
+      class="hidden mt-2 text-[11px] p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-300 break-words"></p>
+  </div>
+</section>
+
+<!-- PROFILE PREVIEW -->
+<section class="mt-4 bg-[#14141c] border border-white/10 rounded-[20px] p-5 flex gap-4 items-center">
+  <img id="prevAvatar" alt="Profile picture"
+    class="w-14 h-14 rounded-full object-cover bg-white/10 hidden">
+
+  <div id="prevAvatarFallback"
+    class="w-14 h-14 shrink-0 rounded-full bg-[#3b82f6] flex items-center justify-center font-black">P</div>
+
+  <div class="min-w-0">
+    <h2 id="prevName" class="font-black break-words">Select profile</h2>
+    <p id="prevHandle" class="text-white/50 text-xs break-words">@artist</p>
+    <p id="prevStatus" class="text-white/40 text-[11px] mt-1" aria-live="polite">No profile selected</p>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="mt-6">
+  <h2 class="font-black text-[12px]">2. CHOOSE PACKAGE</h2>
+
+  <div class="grid gap-3 mt-3">
+
+    <button id="pkg-starter" type="button" data-package="starter"
+      aria-pressed="true"
+      class="pkg pkg-active text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5">
+      <h3 class="font-black text-[15px]">Starter Growth</h3>
+      <p class="text-white/50 text-xs mt-1">Est. 2K–5K visits • 30 days</p>
+      <p class="price global-price font-black mt-2 text-[#60a5fa]"
+        data-ugx="55000" data-usd="12.99" data-kes="1600"
+        data-tzs="34000" data-gbp="10.99" data-eur="11.99"></p>
+    </button>
+
+    <button id="pkg-growth" type="button" data-package="growth"
+      aria-pressed="false"
+      class="pkg text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5">
+      <h3 class="font-black text-[15px]">
+        Viral Growth
+        <span class="bg-blue-500 text-[9px] px-2 py-0.5 rounded-full ml-2">POPULAR</span>
+      </h3>
+      <p class="text-white/50 text-xs mt-1">Est. 10K–25K visits • 30 days</p>
+      <p class="price global-price font-black mt-2 text-[#60a5fa]"
+        data-ugx="120000" data-usd="28.99" data-kes="3800"
+        data-tzs="75000" data-gbp="22.99" data-eur="26.99"></p>
+    </button>
+
+    <button id="pkg-pro" type="button" data-package="pro"
+      aria-pressed="false"
+      class="pkg text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5">
+      <h3 class="font-black text-[15px]">Pro Artist</h3>
+      <p class="text-white/50 text-xs mt-1">Est. 50K+ visits + Homepage mention • 30 days</p>
+      <p class="price global-price font-black mt-2 text-[#60a5fa]"
+        data-ugx="250000" data-usd="59.99" data-kes="7800"
+        data-tzs="155000" data-gbp="47.99" data-eur="55.99"></p>
+    </button>
+
+  </div>
+
+  <p class="text-[10px] text-white/40 mt-3">
+    Displayed local prices are estimates. The payment server must determine the actual charge.
+  </p>
+</section>
+
+<!-- SUMMARY -->
+<section class="mt-6 bg-[#1c1c28] border border-white/10 rounded-[20px] p-6">
+  <h2 class="font-black text-sm">Summary</h2>
+
+  <div id="summary"
+    class="mt-3 bg-[#0a0a0f] border border-white/5 rounded-xl p-4 text-xs text-white/60 leading-[1.8]"
+    aria-live="polite">
+    Select a profile you own.
+  </div>
+
+  <button id="payBtn" type="button"
+    class="mt-4 w-full bg-[#3b82f6] font-black py-4 rounded-full disabled:pointer-events-none"
+    disabled>
+    Continue → Checkout
+  </button>
+
+  <p class="text-[10px] text-white/30 mt-3 text-center">
+    Your checkout server must verify ownership and calculate the approved price before charging.
+  </p>
+</section>
 
 </main>
 
-<!-- YOUR FOOTER - SAME AS ADVERTISE PAGE -->
 <div id="pasong-footer"></div>
 <script src="pasong-footer-loader.js"></script>
 
 <script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let user=null, artist=null, amount=55000, pkg='starter';
-function choose(id,ugx){ pkg=id; amount=ugx; document.getElementById('chosen').textContent='✅ '+id.toUpperCase()+' selected — UGX '+ugx.toLocaleString()+' / 30 days'; }
-async function load(){
-  const {data:{session}}=await supabaseClient.auth.getSession();
-  if(!session){ document.getElementById('pName').textContent='Please login to promote'; return; }
-  user=session.user;
-  let {data}=await supabaseClient.from('artists').select('id, name, handle, avatar_url, followers_count').eq('user_id', user.id).maybeSingle();
-  if(!data){ let r=await supabaseClient.from('artists').select('id, name, handle, avatar_url').limit(1).maybeSingle(); data=r.data; }
-  if(data){ artist=data; document.getElementById('pName').textContent=data.name; document.getElementById('pHandle').textContent='@'+(data.handle||'artist'); if(data.avatar_url) document.getElementById('pAvatar').src=data.avatar_url; document.getElementById('pFollowers').textContent=(data.followers_count||0)+' followers'; }
+'use strict';
+
+/* PASONG CONFIGURATION */
+const SUPABASE_URL = 'https://mtufczmjlkvycarxylgh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+
+const PACKAGE_PRICES = {
+  starter: 55000,
+  growth: 120000,
+  pro: 250000
+};
+
+const PACKAGE_REACH = {
+  starter: '2K–5K visits',
+  growth: '10K–25K visits',
+  pro: '50K+ visits'
+};
+
+const SYMBOLS = {
+  UGX: 'UGX ',
+  USD: '$',
+  KES: 'KSh ',
+  TZS: 'TSh ',
+  GBP: '£',
+  EUR: '€'
+};
+
+/*
+ * Only include real, controlled PASONG domains here.
+ * Remove any domain that is not owned or controlled by PASONG.
+ */
+const ALLOWED_DOMAINS = [
+  'pasong-frontend.vercel.app',
+  'pasong.com',
+  'www.pasong.com'
+];
+
+let db = null;
+let currentUser = null;
+let selectedProfile = null;
+let selectedPackage = 'starter';
+let currency = 'UGX';
+let isLoading = false;
+let isCheckingOut = false;
+
+/* HELPERS */
+const $ = id => document.getElementById(id);
+
+function setText(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value == null ? '' : String(value);
 }
-async function pay(){
-  if(!artist){ alert('Login first'); return; }
-  const b=document.getElementById('btnPay'); b.disabled=true; b.textContent='Creating...';
-  try{
-    const start=new Date(); const end=new Date(); end.setDate(end.getDate()+30);
-    const {data,error}=await supabaseClient.from('promotions').insert([{artist_id:artist.id, user_id:user.id, amount:amount, currency:'UGX', status:'pending', payment_status:'pending', package_code:pkg, start_date:start.toISOString(), end_date:end.toISOString(), content_type:'Profile', song_title:artist.name}]).select().single();
-    if(error) throw error;
-    location.href=`pasong_checkout.html?promotion_id=${data.id}&type=profile&package=${pkg}&amount=${amount}`;
-  }catch(e){ const m=document.getElementById('msg'); m.className='mt-3 text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 block'; m.textContent=e.message; b.disabled=false; b.textContent='Continue → Pay Now'; }
+
+function showMessage(id, message) {
+  setText(id, message);
+  $(id).classList.remove('hidden');
 }
-load();
+
+function hideMessage(id) {
+  $(id).classList.add('hidden');
+  setText(id, '');
+}
+
+function getName(profile) {
+  return profile.stage_name ||
+    profile.performing_name ||
+    profile.artist_name ||
+    profile.real_name ||
+    profile.name ||
+    'Artist';
+}
+
+function getHandle(profile) {
+  return profile.handle ||
+    profile.slug ||
+    profile.username ||
+    profile.stage_name ||
+    profile.artist_name ||
+    profile.performing_name ||
+    '';
+}
+
+function getAvatar(profile) {
+  return profile.profile_image_url ||
+    profile.profile_photo_url ||
+    profile.avatar_url ||
+    '';
+}
+
+function isUUID(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+async function getUser() {
+  if (!db) throw new Error('Supabase failed to load. Refresh the page.');
+
+  const { data, error } = await db.auth.getSession();
+
+  if (error) throw error;
+
+  currentUser = data?.session?.user || null;
+  return currentUser;
+}
+
+/* CURRENCY DISPLAY */
+function getDisplayPrice(packageId) {
+  const card = document.querySelector('#pkg-' + packageId + ' .price');
+  const key = 'data-' + currency.toLowerCase();
+  const raw = card?.getAttribute(key);
+
+  if (raw !== null && raw !== undefined && raw !== '' &&
+      Number.isFinite(Number(raw))) {
+    const symbol = SYMBOLS[currency] || currency + ' ';
+    const amount = Number(raw);
+
+    return symbol + (
+      currency === 'UGX'
+        ? amount.toLocaleString()
+        : amount.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          })
+    );
+  }
+
+  return 'UGX ' + PACKAGE_PRICES[packageId].toLocaleString();
+}
+
+function updatePrices() {
+  try {
+    const info = window.PASONGGlobalPriceController?.getInfo?.();
+    const detected = String(
+      info?.currency || info?.currency_code || 'UGX'
+    ).toUpperCase();
+
+    if (SYMBOLS[detected]) currency = detected;
+  } catch (error) {
+    console.warn('Global price controller unavailable:', error);
+  }
+
+  document.querySelectorAll('.pkg').forEach(button => {
+    const id = button.dataset.package;
+    const price = button.querySelector('.price');
+
+    if (price && PACKAGE_PRICES[id]) {
+      price.textContent = 'From ' + getDisplayPrice(id) + ' / 30 days (est.)';
+    }
+  });
+
+  updateSummary();
+}
+
+window.addEventListener('pasong:currency-ready', event => {
+  const detected = String(
+    event.detail?.currency ||
+    event.detail?.currency_code ||
+    'UGX'
+  ).toUpperCase();
+
+  if (SYMBOLS[detected]) currency = detected;
+  updatePrices();
+});
+
+/* PACKAGE SELECTION */
+function selectPkg(id) {
+  if (!PACKAGE_PRICES[id]) return;
+
+  selectedPackage = id;
+
+  document.querySelectorAll('.pkg').forEach(button => {
+    const active = button.dataset.package === id;
+    button.classList.toggle('pkg-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+
+  updateSummary();
+}
+
+/* PROFILE PREVIEW */
+function clearSelection(message = 'No profile selected') {
+  selectedProfile = null;
+  $('payBtn').disabled = true;
+
+  setText('prevName', 'Select a profile');
+  setText('prevHandle', '@artist');
+  setText('prevStatus', message);
+
+  $('prevAvatar').classList.add('hidden');
+  $('prevAvatar').removeAttribute('src');
+
+  $('prevAvatarFallback').classList.remove('hidden');
+  $('prevAvatarFallback').textContent = 'P';
+
+  updateSummary();
+}
+
+function setPreview(profile) {
+  /*
+   * A profile is eligible for selection only when its user_id
+   * matches the currently authenticated Supabase user.
+   */
+  if (!profile || !profile.id || !currentUser ||
+      !profile.user_id ||
+      String(profile.user_id) !== String(currentUser.id)) {
+    clearSelection('Ownership could not be verified.');
+    return false;
+  }
+
+  selectedProfile = {
+    id: String(profile.id),
+    user_id: String(profile.user_id),
+    name: getName(profile),
+    handle: getHandle(profile),
+    avatar: getAvatar(profile)
+  };
+
+  setText('prevName', selectedProfile.name);
+  setText('prevHandle', '@' + selectedProfile.handle);
+  setText(
+    'prevStatus',
+    'Account match found. Checkout must verify ownership again.'
+  );
+
+  const avatar = $('prevAvatar');
+  const fallback = $('prevAvatarFallback');
+
+  if (selectedProfile.avatar) {
+    avatar.src = selectedProfile.avatar;
+    avatar.classList.remove('hidden');
+    fallback.classList.add('hidden');
+
+    avatar.onerror = () => {
+      avatar.classList.add('hidden');
+      fallback.classList.remove('hidden');
+      fallback.textContent =
+        selectedProfile?.name?.charAt(0)?.toUpperCase() || 'P';
+    };
+  } else {
+    avatar.classList.add('hidden');
+    fallback.classList.remove('hidden');
+    fallback.textContent =
+      selectedProfile.name.charAt(0).toUpperCase() || 'P';
+  }
+
+  $('payBtn').disabled = false;
+  updateSummary();
+  return true;
+}
+
+/* SUMMARY */
+function updateSummary() {
+  const box = $('summary');
+  box.replaceChildren();
+
+  if (!selectedProfile) {
+    box.textContent = 'Select a profile you own.';
+    return;
+  }
+
+  const name = document.createElement('b');
+  name.className = 'text-white';
+  name.textContent = selectedProfile.name;
+
+  const reach = document.createElement('i');
+  reach.textContent = 'Estimated reach only — not guaranteed.';
+
+  box.append(
+    name,
+    document.createTextNode(' @' + selectedProfile.handle),
+    document.createElement('br'),
+    document.createTextNode(
+      'Package: ' + selectedPackage.toUpperCase() +
+      ' — ' + getDisplayPrice(selectedPackage) + ' / 30 days'
+    ),
+    document.createElement('br'),
+    document.createTextNode('Reach: ' + PACKAGE_REACH[selectedPackage]),
+    document.createElement('br'),
+    reach
+  );
+}
+
+/*
+ * DATABASE LOOKUP
+ *
+ * Try the known columns first. If some optional columns do not
+ * exist, retry with a smaller selection.
+ */
+async function loadOwnProfiles() {
+  const selections = [
+    'id,user_id,artist_name,stage_name,performing_name,real_name,profile_image_url,profile_photo_url,avatar_url,handle,slug,username,bio',
+    'id,user_id,artist_name,stage_name,performing_name,real_name,profile_image_url,profile_photo_url,bio',
+    'id,user_id,artist_name,stage_name,performing_name,profile_image_url,profile_photo_url',
+    'id,user_id'
+  ];
+
+  let lastError = null;
+
+  for (const columns of selections) {
+    const result = await db
+      .from('artist_profiles')
+      .select(columns)
+      .eq('user_id', currentUser.id)
+      .limit(100);
+
+    if (!result.error) return result.data || [];
+
+    lastError = result.error;
+    console.warn('Profile query failed:', columns, result.error.message);
+  }
+
+  throw lastError || new Error('Unable to load your profiles.');
+}
+
+/* BUILD PROFILE LIST SAFELY */
+function renderProfileList(profiles) {
+  const box = $('profilesList');
+  box.replaceChildren();
+
+  if (!profiles.length) {
+    box.textContent =
+      'No profiles were found for this account. Check that your profile exists in artist_profiles and belongs to your login.';
+    return;
+  }
+
+  profiles.forEach(profile => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className =
+      'w-full text-left bg-[#0a0a0f] border border-white/10 ' +
+      'rounded-xl p-3 flex gap-3 items-center mt-2 hover:bg-[#1c1c28]';
+
+    const image = document.createElement('img');
+    image.alt = '';
+    image.className =
+      'w-10 h-10 shrink-0 rounded-full object-cover bg-white/10';
+
+    image.src = getAvatar(profile) ||
+      'https://ui-avatars.com/api/?name=' +
+      encodeURIComponent(getName(profile));
+
+    image.onerror = () => {
+      image.onerror = null;
+      image.src = 'https://ui-avatars.com/api/?name=Artist';
+    };
+
+    const details = document.createElement('div');
+    details.className = 'min-w-0';
+
+    const name = document.createElement('div');
+    name.className = 'font-bold text-[13px] break-words';
+    name.textContent = getName(profile);
+
+    const handle = document.createElement('div');
+    handle.className = 'text-[11px] text-white/50 break-words';
+    handle.textContent = '@' + getHandle(profile);
+
+    details.append(name, handle);
+    button.append(image, details);
+
+    button.addEventListener('click', () => {
+      hideMessage('linkError');
+      hideMessage('linkSuccess');
+
+      if (setPreview(profile)) {
+        showMessage(
+          'linkSuccess',
+          'Profile selected. Checkout must verify ownership again.'
+        );
+      }
+    });
+
+    box.appendChild(button);
+  });
+
+  if (profiles.length === 1) {
+    setPreview(profiles[0]);
+  } else {
+    clearSelection('Choose your profile above.');
+  }
+}
+
+/* LOAD PROFILES */
+async function loadProfiles() {
+  if (isLoading) return;
+  isLoading = true;
+
+  const box = $('profilesList');
+  hideMessage('dbError');
+  box.textContent = 'Checking your account...';
+
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      box.replaceChildren();
+
+      const message = document.createElement('span');
+      message.textContent = 'You are not signed in. ';
+
+      const link = document.createElement('a');
+      link.href = '/login.html';
+      link.className = 'text-blue-400 underline font-bold';
+      link.textContent = 'Log in';
+
+      box.append(message, link);
+      clearSelection('Please log in first.');
+      return;
+    }
+
+    const profiles = await loadOwnProfiles();
+    renderProfileList(profiles);
+
+  } catch (error) {
+    console.error('Unable to load profiles:', error);
+
+    box.textContent = 'Unable to load profiles. Check the message below.';
+
+    showMessage(
+      'dbError',
+      'Database error: ' + (error?.message || 'Unknown error') +
+      '. Confirm the artist_profiles table, its user_id column, and its RLS policies in Supabase.'
+    );
+
+    clearSelection('Profiles could not be loaded.');
+  } finally {
+    isLoading = false;
+  }
+}
+
+/* VALIDATE PASTED PROFILE URL */
+function validatePasongDomain(value) {
+  try {
+    const url = new URL(value);
+
+    if (url.protocol !== 'https:') {
+      return { ok: false, reason: 'Use a secure HTTPS PASONG link.' };
+    }
+
+    if (!ALLOWED_DOMAINS.includes(url.hostname.toLowerCase())) {
+      return {
+        ok: false,
+        reason: 'This domain is not on the approved PASONG domain list.'
+      };
+    }
+
+    if (url.username || url.password || url.port) {
+      return { ok: false, reason: 'This profile URL is not accepted.' };
+    }
+
+    const parts = url.pathname.split('/').filter(Boolean);
+
+    if (parts.length < 2) {
+      return {
+        ok: false,
+        reason: 'Use a profile link such as /artist/stage-name.'
+      };
+    }
+
+    const route = parts[parts.length - 2].toLowerCase();
+    const supportedRoutes = [
+      'artist', 'artists', 'profile', 'profiles', 'artist_profiles'
+    ];
+
+    if (!supportedRoutes.includes(route)) {
+      return {
+        ok: false,
+        reason: 'The URL must point to a recognized profile route.'
+      };
+    }
+
+    let slug;
+
+    try {
+      slug = decodeURIComponent(parts[parts.length - 1]);
+    } catch {
+      return { ok: false, reason: 'The profile URL is malformed.' };
+    }
+
+    if (!slug || slug === '.' || slug === '..') {
+      return { ok: false, reason: 'The profile URL is incomplete.' };
+    }
+
+    return { ok: true, host: url.hostname, route, slug };
+  } catch {
+    return { ok: false, reason: 'Enter a valid profile URL.' };
+  }
+}
+
+/*
+ * Match the pasted URL against profiles already fetched for the
+ * signed-in user. A link alone never proves profile ownership.
+ */
+function findOwnProfileFromSlug(slug) {
+  const normalizedSlug = slug.trim().toLowerCase();
+  const normalizedName = normalizedSlug.replace(/-/g, ' ');
+
+  return cachedProfiles.find(profile => {
+    const candidates = [
+      profile.id,
+      profile.handle,
+      profile.slug,
+      profile.username,
+      profile.stage_name,
+      profile.artist_name,
+      profile.performing_name
+    ].filter(Boolean).map(value => String(value).toLowerCase());
+
+    return candidates.includes(normalizedSlug) ||
+      candidates.includes(normalizedName);
+  }) || null;
+}
+
+let cachedProfiles = [];
+
+/* MANUAL LINK VERIFICATION */
+async function useManual() {
+  hideMessage('linkError');
+  hideMessage('linkSuccess');
+
+  const value = $('manualLink').value.trim();
+  const parsed = validatePasongDomain(value);
+
+  if (!parsed.ok) {
+    showMessage('linkError', parsed.reason);
+    return;
+  }
+
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      showMessage('linkError', 'Please log in first.');
+      return;
+    }
+
+    showMessage('linkSuccess', 'Checking the profile against your account...');
+
+    cachedProfiles = await loadOwnProfiles();
+
+    const profile = findOwnProfileFromSlug(parsed.slug);
+
+    if (!profile) {
+      clearSelection('No matching profile was found for your account.');
+      hideMessage('linkSuccess');
+
+      showMessage(
+        'linkError',
+        'No matching profile belonging to your account was found. Select a profile from the list or check the link and database schema.'
+      );
+      return;
+    }
+
+    if (!setPreview(profile)) {
+      hideMessage('linkSuccess');
+      showMessage('linkError', 'Could not match the profile to your account.');
+      return;
+    }
+
+    showMessage(
+      'linkSuccess',
+      'Profile matched to your signed-in account. The server must verify ownership again at checkout.'
+    );
+
+  } catch (error) {
+    console.error('Manual profile verification failed:', error);
+
+    hideMessage('linkSuccess');
+    showMessage(
+      'linkError',
+      'Could not verify the profile: ' +
+      (error?.message || 'Database error')
+    );
+  }
+}
+
+/* CHECKOUT */
+async function continueToPay() {
+  if (isCheckingOut) return;
+
+  if (!selectedProfile || !currentUser) {
+    alert('Please log in and select your own profile first.');
+    return;
+  }
+
+  /*
+   * This is navigation data, not payment authorization.
+   * The server must independently authenticate the user, confirm
+   * ownership, map the package to its trusted price, and validate
+   * the payment result before activating any promotion.
+   */
+  isCheckingOut = true;
+  $('payBtn').disabled = true;
+  $('payBtn').textContent = 'Opening checkout...';
+
+  try {
+    const params = new URLSearchParams({
+      type: 'profile',
+      artist_profile_id: selectedProfile.id,
+      profile_id: selectedProfile.id,
+      package: selectedPackage
+    });
+
+    window.location.href = 'pasong_checkout.html?' + params.toString();
+
+  } catch (error) {
+    console.error('Checkout navigation failed:', error);
+    alert('Could not open checkout. Please try again.');
+
+    isCheckingOut = false;
+    $('payBtn').disabled = false;
+    $('payBtn').textContent = 'Continue → Checkout';
+  }
+}
+
+/* EVENTS */
+document.querySelectorAll('.pkg').forEach(button => {
+  button.addEventListener('click', () => {
+    selectPkg(button.dataset.package);
+  });
+});
+
+$('verifyBtn').addEventListener('click', useManual);
+$('payBtn').addEventListener('click', continueToPay);
+
+$('manualLink').addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    useManual();
+  }
+});
+
+/* INITIALIZE */
+async function init() {
+  try {
+    if (!window.supabase?.createClient) {
+      throw new Error('Supabase library did not load.');
+    }
+
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    try {
+      const info = window.PASONGGlobalPriceController?.getInfo?.();
+      const detected = String(
+        info?.currency || info?.currency_code || 'UGX'
+      ).toUpperCase();
+
+      if (SYMBOLS[detected]) currency = detected;
+    } catch (error) {
+      console.warn('Using default display currency:', error);
+    }
+
+    selectPkg('starter');
+    updatePrices();
+
+    await loadProfiles();
+
+  } catch (error) {
+    console.error('PASONG page initialization failed:', error);
+
+    $('profilesList').textContent =
+      'The page could not initialize. Refresh and try again.';
+
+    showMessage(
+      'dbError',
+      error?.message || 'Initialization failed.'
+    );
+
+    clearSelection('Initialization failed.');
+  }
+}
+
+init();
 </script>
+
 </body>
 </html>
