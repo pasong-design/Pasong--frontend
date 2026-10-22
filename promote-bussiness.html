@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Business - PASONG</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
+<script src="pasong-global-price-controller.js"></script>
+</head>
+<body class="bg-[#0a0a0f] text-white min-h-screen flex flex-col">
+<header class="p-5 flex justify-between items-center max-w-[1100px] mx-auto w-full">
+<a href="/index.html" class="font-black text-xl tracking-widest">PASONG</a>
+<a href="/advertise.html" class="text-xs bg-white/10 border border-white/10 px-4 py-2 rounded-full">← Advertise</a>
+</header>
+<main class="flex-1 max-w-[1100px] mx-auto w-full px-5 pb-10">
+<h1 class="text-[32px] font-black leading-none">My Business</h1>
+<p class="text-white/50 mt-2 text-sm">Promote your brand to music fans</p>
+<div class="mt-6 bg-[#14141c] border border-white/10 rounded-[20px] p-5 flex gap-4 items-center">
+<div class="w-14 h-14 rounded-full bg-[#fb923c] flex items-center justify-center text-xl">🏪</div>
+<div><h3 class="font-black" id="bName">My Business</h3><p class="text-white/50 text-xs">Reach fans who love music</p></div>
+</div>
+<div class="grid grid-cols-1 gap-3 mt-6">
+<button onclick="choose('biz-starter',105000)" class="text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5"><h4 class="font-black">Starter</h4><p class="text-white/50 text-xs">5K - 10K reach</p><p class="global-price font-bold mt-2 text-[#fb923c]" data-ugx="105000">From UGX 105,000 <small class="text-white/40">/ 30 days</small></p></button>
+<button onclick="choose('biz-growth',220000)" class="text-left bg-[#1c1c28] border border-orange-400/30 rounded-[20px] p-5 relative"><span class="absolute -top-2 right-4 bg-[#fb923c] text-black text-[9px] font-black px-3 py-1 rounded-full">POPULAR</span><h4 class="font-black">Growth</h4><p class="text-white/50 text-xs">20K - 50K reach + Homepage</p><p class="global-price font-bold mt-2 text-[#fb923c]" data-ugx="220000">From UGX 220,000 <small class="text-white/40">/ 30 days</small></p></button>
+<button onclick="choose('biz-pro',450000)" class="text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5"><h4 class="font-black">Pro Brand</h4><p class="text-white/50 text-xs">100K+ reach + Hero slider</p><p class="global-price font-bold mt-2 text-[#fb923c]" data-ugx="450000">From UGX 450,000 <small class="text-white/40">/ 30 days</small></p></button>
+</div>
+<div class="mt-6 bg-[#1c1c28] border border-white/10 rounded-[20px] p-6">
+<p id="chosenB" class="text-xs text-white/50">Select a package</p>
+<div class="mt-3 grid grid-cols-2 gap-3"><input id="bizName" placeholder="Business name" class="bg-[#0a0a0f] border border-white/10 rounded-xl p-3 text-sm"><input id="bizLink" placeholder="Instagram / Website link" class="bg-[#0a0a0f] border border-white/10 rounded-xl p-3 text-sm"></div>
+<button id="btnB" onclick="payB()" class="mt-4 w-full bg-[#fb923c] text-black font-black py-4 rounded-full">Promote Business — Pay Now</button><p id="msgB" class="hidden mt-3 text-xs p-3 rounded-xl"></p>
+</div>
+</main>
+<div id="pasong-footer"></div><script src="pasong-footer-loader.js"></script>
+<script>
+const supabaseClient=supabase.createClient("https://mtufczmjlkvycarxylgh.supabase.co","sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP");
+let user=null, pkg='biz-starter', amount=105000;
+function choose(id,ugx){ pkg=id; amount=ugx; document.getElementById('chosenB').textContent='✅ '+id+' — UGX '+ugx.toLocaleString()+' / 30 days'; }
+async function init(){ const {data:{session}}=await supabaseClient.auth.getSession(); if(session) user=session.user; }
+async function payB(){
+  const name=document.getElementById('bizName').value; if(!name){ alert('Enter business name'); return; }
+  const b=document.getElementById('btnB'); b.disabled=true; b.textContent='Creating...';
+  try{
+    const start=new Date(); const end=new Date(); end.setDate(end.getDate()+30);
+    const {data,error}=await supabaseClient.from('promotions').insert([{user_id:user?.id||null, amount:amount, currency:'UGX', status:'pending', payment_status:'pending', package_code:pkg, start_date:start.toISOString(), end_date:end.toISOString(), content_type:'Business', song_title:name, tiktok_url:document.getElementById('bizLink').value}]).select().single();
+    if(error) throw error; location.href=`pasong_checkout.html?promotion_id=${data.id}&type=business&package=${pkg}&amount=${amount}`;
+  }catch(e){ const m=document.getElementById('msgB'); m.className='mt-3 text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 block'; m.textContent=e.message; b.disabled=false; b.textContent='Promote Business — Pay Now'; }
+}
+init();
+</script>
+</body>
+</html>
