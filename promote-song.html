@@ -1,136 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Promote My Song - Pasong</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>body{background:#0a0a0f;font-family:Inter,sans-serif}</style>
+<script src="./config.js"></script> <!-- gitignored, contains keys -->
 </head>
-<body class="bg-[#0a0a0f] text-white min-h-screen font-sans">
-<div class="max-w-[720px] mx-auto p-4 pb-[120px]">
-  <div class="flex items-center justify-between mt-2">
-    <h1 class="font-black text-[22px] tracking-tight">Promote My Music</h1>
-    <div class="text-[11px] text-white/40">4 tracks found</div>
-  </div>
+<body class="text-white min-h-screen">
+<div class="max-w-[480px] mx-auto min-h-screen flex flex-col p-5">
 
-  <div id="trackList" class="mt-6 flex flex-col gap-3">
-    <p class="text-white/40 text-[13px]">Loading your music...</p>
-  </div>
+<div class="flex items-center gap-3 mb-1">
+  <button onclick="history.back()" class="w-9 h-9 rounded-full bg-[#1c1c28]">←</button>
+  <h1 class="font-black text-[18px]">Promote My Song</h1>
+</div>
+<p class="text-[13px] text-white/50 mb-6">Boost your track across PASONG</p>
 
-  <div id="summaryBox" class="mt-8 hidden bg-[#1a1a24] border border-white/10 p-5 rounded-[24px]">
-    <div class="flex items-center gap-3">
-      <img id="sumCover" src="" class="w-[56px] h-[56px] rounded-[14px] object-cover bg-[#222]" />
-      <div>
-        <p id="sumTitle" class="font-bold text-[15px]"></p>
-        <p id="sumType" class="text-[12px] text-white/50"></p>
-      </div>
-    </div>
-    <button onclick="createPromotion()" id="promoBtn" class="mt-5 w-full bg-white text-black font-black text-[14px] py-[16px] rounded-full">Promote for UGX 42,000</button>
-    <p id="promoMsg" class="mt-3 text-[12px] text-center"></p>
-  </div>
+<p class="text-[11px] tracking-[2px] text-white/30 font-bold mb-3">1. SELECT SONG</p>
+<div id="songList" class="flex flex-col gap-2"><p class="text-white/40 text-[13px] py-6">Loading your music...</p></div>
+
+<p class="text-[11px] tracking-[2px] text-white/30 font-bold mb-3 mt-7">2. CHOOSE PLAN</p>
+<div class="flex flex-col gap-2">
+  <button onclick="selectPlan('starter',42000)" id="plan-starter" class="plan-btn p-4 rounded-[16px] bg-white/5 border border-purple-500/50 flex justify-between"><div class="text-left"><b class="text-[14px]">Starter Boost</b><p class="text-[11px] text-white/50">3 days • 5,000+ reach</p></div><b class="text-[#22c55e] text-[13px]">UGX 42,000</b></button>
+  <button onclick="selectPlan('growth',85000)" id="plan-growth" class="plan-btn p-4 rounded-[16px] bg-[#1c1c28] border border-white/5 flex justify-between"><div class="text-left"><b class="text-[14px]">Growth</b><p class="text-[11px] text-white/50">7 days • 15,000+ reach</p></div><b class="text-[#22c55e] text-[13px]">UGX 85,000</b></button>
+  <button onclick="selectPlan('viral',165000)" id="plan-viral" class="plan-btn p-4 rounded-[16px] bg-[#1c1c28] border border-white/5 flex justify-between"><div class="text-left"><b class="text-[14px]">Viral Push</b><p class="text-[11px] text-white/50">14 days • 40,000+ reach</p></div><b class="text-[#22c55e] text-[13px]">UGX 165,000</b></button>
 </div>
 
-<script>
-const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
-const SUPABASE_ANON = "YOUR_ANON_KEY";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+<div class="mt-auto pt-8">
+  <button id="payBtn" onclick="promote()" class="w-full bg-white text-black font-black py-4 rounded-full">Pay UGX 42,000 & Promote →</button>
+  <p id="statusMsg" class="text-[11px] text-center mt-3 text-white/40">Secure payment</p>
+</div>
 
-let selectedTrack = null;
-let allTracks = [];
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+const cfg = window.PASONG_CONFIG
+if(!cfg){ document.getElementById('songList').innerHTML = '<p class="text-red-400 p-3 bg-red-500/10 rounded-xl">ERROR: config.js missing. Create config.js with SUPABASE_URL</p>'; throw new Error('No config'); }
+
+const supabase = createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true }
+})
+
+let selectedSong = null
+let selectedPlan = {id:'starter', amount:42000}
+let allTracks = []
 
 async function loadMyMusic(){
-  const { data:{session} } = await supabase.auth.getSession();
-  if(!session){
-    document.getElementById('trackList').innerHTML = '<p class="text-white/60 text-[13px]">Please login first</p>';
-    return;
+  const el = document.getElementById('songList')
+  console.log('Loading...')
+  try{
+    const { data:{session} } = await supabase.auth.getSession()
+    console.log('Session:', session)
+    if(!session){
+      el.innerHTML = '<div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4"><p class="text-yellow-300 text-[13px]">Not logged in. Go to pasong-frontend.vercel.app/login first, then come back.</p><button onclick="location.href=`/`" class="mt-3 bg-white text-black px-4 py-2 rounded-full text-[13px] font-bold">Go Login</button></div>'
+      return
+    }
+    const authId = session.user.id
+    const { data: profiles, error: profErr } = await supabase.from('artist_profiles').select('id').eq('user_id', authId)
+    if(profErr) throw profErr
+    if(!profiles?.length){ el.innerHTML='<p class="text-white/50">No artist profile found for your user</p>'; return }
+    const profileId = profiles[0].id
+    console.log('Profile:', profileId)
+
+    const [beatsRes, byArtist, byUploader] = await Promise.all([
+      supabase.from('beats').select('id,title,cover_url').eq('producer_id', profileId),
+      supabase.from('songs').select('id,title,cover_url').eq('artist_id', profileId),
+      supabase.from('songs').select('id,title,cover_url').eq('uploader_user_id', authId)
+    ])
+    console.log('Beats:', beatsRes, 'Songs:', byArtist, byUploader)
+
+    const map = new Map()
+    ;[...(beatsRes.data||[]).map(b=>({...b,type:'beat'})), ...(byArtist.data||[]).map(s=>({...s,type:'song'})), ...(byUploader.data||[]).map(s=>({...s,type:'song'}))].forEach(t=>map.set(t.id,t))
+    allTracks = [...map.values()]
+
+    if(!allTracks.length){ el.innerHTML='<p class="text-white/40 text-center py-8">No tracks found. Your 4 tracks should appear here. Check RLS.</p>'; return }
+
+    el.innerHTML = allTracks.map((t,i)=>`
+      <button id="song-${t.id}" onclick="window.selectSong('${t.id}')" class="w-full flex gap-3 p-3 rounded-[16px] border text-left ${i===0?'bg-white/[0.06] border-white/20':'bg-[#14141e] border-white/5'}">
+        <img src="${t.cover_url||''}" class="w-12 h-12 rounded-xl bg-[#222] object-cover" onerror="this.src='https://via.placeholder.com/48'" />
+        <div class="flex-1 min-w-0"><p class="font-bold text-[14px] truncate">${t.title}</p><p class="text-[11px] text-white/50">${t.type}</p></div>
+        <div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center"><div id="dot-${t.id}" class="w-3 h-3 bg-white rounded-full ${i===0?'':'hidden'}"></div></div>
+      </button>
+    `).join('')
+    window.selectSong(allTracks[0].id)
+  }catch(e){
+    el.innerHTML=`<p class="text-red-400 bg-red-500/10 p-3 rounded-xl text-[12px]">Error: ${e.message}</p>`
+    console.error(e)
   }
-  const authId = session.user.id;
-
-  // 1. Get ALL my profile IDs (you have 1 now, but supports 3)
-  const { data: profiles } = await supabase.from('artist_profiles').select('id').eq('user_id', authId);
-  const profileIds = (profiles||[]).map(p=>p.id);
-  if(profileIds.length===0){ document.getElementById('trackList').innerHTML='No profile found'; return; }
-
-  // 2. Load beats + songs - EXACT query that worked for you in SQL Editor
-  const [beatsRes, songsRes] = await Promise.all([
-    supabase.from('beats').select('id,title,cover_url,producer_id').in('producer_id', profileIds),
-    supabase.from('songs').select('id,title,cover_url,artist_id,uploader_user_id').or(`artist_id.in.(${profileIds.join(',')}),uploader_user_id.eq.${authId}`)
-  ]);
-
-  const beats = (beatsRes.data||[]).map(b=>({...b, content_type:'beat'}));
-  const songs = (songsRes.data||[]).map(s=>({...s, content_type:'song'}));
-
-  // Deduplicate songs (same song may match both conditions)
-  const map = new Map();
-  [...beats, ...songs].forEach(t=> map.set(t.id, t));
-  allTracks = [...map.values()];
-
-  if(allTracks.length===0){
-    document.getElementById('trackList').innerHTML='<p class="text-white/60">No tracks found</p>'; return;
-  }
-
-  document.getElementById('trackList').innerHTML = allTracks.map((t, idx)=>`
-    <button onclick="selectTrack('${t.id}')" id="btn-${t.id}" class="group text-left flex items-center gap-3 p-3 rounded-[16px] border transition-all ${idx===0?'bg-white/10 border-white/20':'bg-[#14141c] border-white/5 hover:border-white/15'}">
-      <img src="${t.cover_url}" class="w-[52px] h-[52px] rounded-[12px] object-cover bg-[#222] flex-shrink-0" onerror="this.src='https://via.placeholder.com/52'" />
-      <div class="flex-1 min-w-0">
-        <p class="font-bold text-[14px] truncate">${t.title}</p>
-        <p class="text-[11px] text-white/50 capitalize">${t.content_type} • ${t.cover_url ? 'cover ready' : 'no cover'}</p>
-      </div>
-      <div class="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center flex-shrink-0"><div id="dot-${t.id}" class="w-3 h-3 bg-white rounded-full ${idx===0?'':'hidden'}"></div></div>
-    </button>
-  `).join('');
-
-  selectTrack(allTracks[0].id);
 }
 
-function selectTrack(id){
-  const t = allTracks.find(x=>x.id===id);
-  if(!t) return;
-  selectedTrack = t;
-
-  document.querySelectorAll('[id^="btn-"]').forEach(b=>{
-    b.classList.remove('bg-white/10','border-white/20'); b.classList.add('bg-[#14141c]','border-white/5');
-  });
-  document.querySelectorAll('[id^="dot-"]').forEach(d=>d.classList.add('hidden'));
-  
-  document.getElementById(`btn-${id}`)?.classList.add('bg-white/10','border-white/20');
-  document.getElementById(`btn-${id}`)?.classList.remove('bg-[#14141c]','border-white/5');
-  document.getElementById(`dot-${id}`)?.classList.remove('hidden');
-
-  document.getElementById('sumCover').src = t.cover_url;
-  document.getElementById('sumTitle').textContent = t.title;
-  document.getElementById('sumType').textContent = t.content_type;
-  document.getElementById('summaryBox').classList.remove('hidden');
+window.selectSong = (id)=>{
+  selectedSong = allTracks.find(t=>t.id===id)
+  document.querySelectorAll('[id^="song-"]').forEach(b=>{ b.className = 'w-full flex gap-3 p-3 rounded-[16px] border text-left bg-[#14141e] border-white/5' })
+  document.querySelectorAll('[id^="dot-"]').forEach(d=>d.classList.add('hidden'))
+  document.getElementById(`song-${id}`).className = 'w-full flex gap-3 p-3 rounded-[16px] border text-left bg-white/[0.06] border-white/20'
+  document.getElementById(`dot-${id}`).classList.remove('hidden')
+  document.getElementById('payBtn').textContent = `Pay UGX ${selectedPlan.amount.toLocaleString()} & Promote ${selectedSong.title} →`
 }
 
-async function createPromotion(){
-  if(!selectedTrack) return;
-  const btn = document.getElementById('promoBtn');
-  const msg = document.getElementById('promoMsg');
-  btn.disabled=true; btn.textContent='Creating...';
-  
-  const { data:{session} } = await supabase.auth.getSession();
-  const { data: profile } = await supabase.from('artist_profiles').select('id').eq('user_id', session.user.id).limit(1).single();
-
-  const payload = {
-    user_id: session.user.id,
-    artist_id: profile?.id || selectedTrack.producer_id || selectedTrack.artist_id,
-    amount: 42000,
-    currency: 'UGX',
-    status: 'pending',
-    content_type: selectedTrack.content_type,
-    song_title: selectedTrack.title
-  };
-  if(selectedTrack.content_type==='beat') payload.beat_id = selectedTrack.id;
-  else payload.song_id = selectedTrack.id;
-
-  const { error } = await supabase.from('promotions').insert([payload]);
-  if(error){ msg.textContent=error.message; msg.className='mt-3 text-[12px] text-center text-red-400'; }
-  else { msg.textContent='Promotion created for '+selectedTrack.title; msg.className='mt-3 text-[12px] text-center text-green-400'; }
-  btn.disabled=false; btn.textContent='Promote for UGX 42,000';
+window.selectPlan = (id,amount)=>{
+  selectedPlan={id,amount}
+  document.querySelectorAll('.plan-btn').forEach(b=>{ b.className='plan-btn p-4 rounded-[16px] bg-[#1c1c28] border border-white/5 flex justify-between' })
+  document.getElementById(`plan-${id}`).className='plan-btn p-4 rounded-[16px] bg-white/5 border border-purple-500/50 flex justify-between'
+  if(selectedSong) document.getElementById('payBtn').textContent = `Pay UGX ${amount.toLocaleString()} & Promote ${selectedSong.title} →`
 }
 
-loadMyMusic();
+window.promote = async ()=>{
+  if(!selectedSong) return alert('Select song')
+  const btn=document.getElementById('payBtn'); const msg=document.getElementById('statusMsg')
+  btn.disabled=true; btn.textContent='Creating...'
+  try{
+    const { data:{session} } = await supabase.auth.getSession()
+    const { data: prof } = await supabase.from('artist_profiles').select('id').eq('user_id', session.user.id).single()
+    const payload={ user_id: session.user.id, artist_id: prof.id, amount: selectedPlan.amount, currency:'UGX', status:'pending', content_type: selectedSong.type, plan: selectedPlan.id, song_title: selectedSong.title }
+    if(selectedSong.type==='beat') payload.beat_id=selectedSong.id; else payload.song_id=selectedSong.id
+    const { error } = await supabase.from('promotions').insert([payload])
+    if(error) throw error
+    msg.textContent='✅ Promotion created!'; msg.className='text-[12px] text-center mt-3 text-green-400'
+    btn.textContent='Promoted!'
+  }catch(e){ msg.textContent=e.message; msg.className='text-[12px] text-center mt-3 text-red-400'; btn.disabled=false }
+}
+
+loadMyMusic()
 </script>
 </body>
 </html>
