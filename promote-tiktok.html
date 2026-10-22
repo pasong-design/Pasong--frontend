@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Promo - PASONG</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
+<script src="pasong-global-price-controller.js"></script>
+</head>
+<body class="bg-[#0a0a0f] text-white min-h-screen flex flex-col">
+<header class="p-5 flex justify-between items-center max-w-[1100px] mx-auto w-full">
+<a href="/index.html" class="font-black text-xl tracking-widest">PASONG</a>
+<a href="/advertise.html" class="text-xs bg-white/10 border border-white/10 px-4 py-2 rounded-full">← Advertise</a>
+</header>
+<main class="flex-1 max-w-[1100px] mx-auto w-full px-5 pb-10">
+<div class="flex items-center gap-3"><h1 class="text-[32px] font-black leading-none">TikTok Promo</h1><span class="bg-gradient-to-r from-cyan-400 to-pink-500 text-black text-[10px] font-black px-3 py-1 rounded-full">VIRAL</span></div>
+<p class="text-white/50 mt-2 text-sm">Push your sound to viral TikTok creators</p>
+<div class="mt-6 bg-[#14141c] border border-white/10 rounded-[20px] p-5">
+<label class="text-[10px] font-bold text-white/50 uppercase">TikTok Sound Link</label>
+<input id="tiktokLink" placeholder="https://tiktok.com/..." class="w-full mt-2 bg-[#0a0a0f] border border-white/10 rounded-xl p-3 text-sm">
+</div>
+<div class="grid grid-cols-1 gap-3 mt-6">
+<button onclick="choose('tiktok-starter',84000)" class="text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5"><h4 class="font-black">Starter Viral</h4><p class="text-white/50 text-xs">1K - 3K video uses</p><p class="global-price font-bold mt-2 text-[#f472b6]" data-ugx="84000">From UGX 84,000 <small class="text-white/40">/ 30 days</small></p></button>
+<button onclick="choose('tiktok-growth',180000)" class="text-left bg-[#1c1c28] border border-pink-500/30 rounded-[20px] p-5 relative"><span class="absolute -top-2 right-4 bg-gradient-to-r from-cyan-400 to-pink-500 text-black text-[9px] font-black px-3 py-1 rounded-full">POPULAR</span><h4 class="font-black">Viral Push</h4><p class="text-white/50 text-xs">5K - 15K video uses + Influencers</p><p class="global-price font-bold mt-2 text-[#f472b6]" data-ugx="180000">From UGX 180,000 <small class="text-white/40">/ 30 days</small></p></button>
+<button onclick="choose('tiktok-pro',350000)" class="text-left bg-[#14141c] border border-white/10 rounded-[20px] p-5"><h4 class="font-black">Super Viral</h4><p class="text-white/50 text-xs">30K+ uses + Top creators</p><p class="global-price font-bold mt-2 text-[#f472b6]" data-ugx="350000">From UGX 350,000 <small class="text-white/40">/ 30 days</small></p></button>
+</div>
+<div class="mt-6 bg-[#1c1c28] border border-white/10 rounded-[20px] p-6">
+<p id="chosenT" class="text-xs text-white/50">Select a package</p>
+<button id="btnT" onclick="payT()" class="mt-4 w-full bg-gradient-to-r from-cyan-400 to-pink-500 text-black font-black py-4 rounded-full">Send to TikTok → Pay Now</button><p id="msgT" class="hidden mt-3 text-xs p-3 rounded-xl"></p>
+</div>
+</main>
+<div id="pasong-footer"></div><script src="pasong-footer-loader.js"></script>
+<script>
+const supabaseClient=supabase.createClient("https://mtufczmjlkvycarxylgh.supabase.co","sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP");
+let user=null, pkg='tiktok-starter', amount=84000;
+function choose(id,ugx){ pkg=id; amount=ugx; document.getElementById('chosenT').textContent='✅ '+id+' — UGX '+ugx.toLocaleString()+' / 30 days'; }
+async function init(){ const {data:{session}}=await supabaseClient.auth.getSession(); if(session) user=session.user; }
+async function payT(){
+  const link=document.getElementById('tiktokLink').value; if(!link){ alert('Paste TikTok link'); return; }
+  const b=document.getElementById('btnT'); b.disabled=true; b.textContent='Creating...';
+  try{
+    const start=new Date(); const end=new Date(); end.setDate(end.getDate()+30);
+    const {data,error}=await supabaseClient.from('promotions').insert([{user_id:user?.id||null, amount:amount, currency:'UGX', status:'pending', payment_status:'pending', package_code:pkg, start_date:start.toISOString(), end_date:end.toISOString(), content_type:'TikTok', song_title:link, tiktok_url:link}]).select().single();
+    if(error) throw error; location.href=`pasong_checkout.html?promotion_id=${data.id}&type=tiktok&package=${pkg}&amount=${amount}`;
+  }catch(e){ const m=document.getElementById('msgT'); m.className='mt-3 text-xs p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 block'; m.textContent=e.message; b.disabled=false; b.textContent='Send to TikTok → Pay Now'; }
+}
+init();
+</script>
+</body>
+</html>
