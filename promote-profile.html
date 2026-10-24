@@ -1,85 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Promotion Checkout - PASONG</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Promote My Profile - PASONG</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
 <script src="pasong-global-price-controller.js"></script>
-<style>body{background:#08030f;color:#fff;font-family:Inter,Arial}</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Inter',sans-serif;box-sizing:border-box}
+body{background:#0f1219;color:#e5e7eb}
+.card{background:#171e2e;border:1px solid #243045}
+.pkg-active{border-color:#3b82f6!important;background:linear-gradient(135deg,#1e3a8a20,#1e293b)!important;box-shadow:0 0 0 2px #3b82f6 inset}
+.professional-shadow{box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.03) inset}
+</style>
 </head>
 <body class="min-h-screen flex flex-col">
-<header class="sticky top-0 z-20 bg-[#08030f]/90 backdrop-blur border-b border-white/10 p-4">
-<div class="max-w-[900px] mx-auto flex justify-between"><b>PASONG</b><a href="promotion.html" class="text-xs bg-white text-black px-4 py-2 rounded-full">← Back</a></div>
-</header>
-<main class="max-w-[900px] mx-auto w-full p-5">
-<h1 class="text-[32px] font-black">Checkout</h1>
-<p class="text-slate-400 text-sm mt-2">Secure promotion payment via PesaPal</p>
 
-<div class="mt-6 grid md:grid-cols-[1fr_340px] gap-6">
-<div class="bg-[#171122] border border-white/10 rounded-[20px] p-6">
-<h2 class="font-black text-xs tracking-widest text-purple-300">PROMOTION SUMMARY</h2>
-<div id="summary" class="mt-4 text-sm text-slate-300">Loading...</div>
-<div id="priceBox" class="mt-6 text-3xl font-black text-white">UGX 0</div>
-<p id="packageInfo" class="text-xs text-slate-500 mt-1"></p>
+<header class="sticky top-0 z-20 bg-[#0f1219]/90 backdrop-blur-2xl border-b border-white/5">
+<div class="max-w-[1120px] mx-auto w-full px-5 py-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white">P</div>
+<div><div class="font-black tracking-widest text-white text-[15px]">PASONG</div><div class="text-[10px] text-slate-400 -mt-1">PROFILE PROMOTION</div></div>
+</div>
+<div class="flex gap-2"><span class="hidden sm:flex items-center gap-2 text-[11px] bg-green-500/10 border border-green-500/20 text-green-300 px-3 py-1.5 rounded-full">● Secure Checkout</span><a href="/advertise.html" class="text-[11px] bg-white text-slate-900 font-bold px-4 py-2 rounded-full">← Back</a></div>
+</div>
+</header>
+
+<main class="flex-1 max-w-[1120px] mx-auto w-full px-5 pb-20">
+<div class="mt-8 grid lg:grid-cols-[1fr_360px] gap-8">
+<div>
+<h1 class="text-[36px] font-black text-white leading-[0.9] tracking-tight">Promote your<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">PASONG profile.</span></h1>
+<p class="text-slate-400 text-[13px] mt-3">Get real visits for 30 days. Estimated reach only. Verified profiles only.</p>
+
+<section class="mt-6 card professional-shadow rounded-[24px] p-6">
+<div class="flex justify-between items-center"><h2 class="font-black text-[11px] tracking-widest text-slate-300">01 — SELECT YOUR PROFILE</h2><span class="text-[10px] text-slate-500">Owned by you</span></div>
+<div id="profilesList" class="mt-4 text-[12px] text-slate-400">Checking your account...</div>
+<div id="dbError" class="hidden mt-3 text-[11px] p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200"></div>
+<div class="mt-5 border-t border-white/5 pt-5">
+<label for="manualLink" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or paste PASONG link</label>
+<div class="flex gap-2 mt-2"><input id="manualLink" type="url" placeholder="https://pasong-frontend.vercel.app/artist/your-stage-name" class="flex-1 bg-[#0f1219] border border-slate-700 rounded-xl p-3.5 text-sm text-white placeholder:text-slate-600"><button id="verifyBtn" type="button" class="bg-white text-slate-900 font-black px-6 rounded-xl text-xs">Verify</button></div>
+<p id="linkError" class="hidden mt-2 text-[11px] p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300"></p>
+<p id="linkSuccess" class="hidden mt-2 text-[11px] p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-300"></p>
+</div>
+</section>
+
+<section class="mt-4 card rounded-[20px] p-5 flex gap-4 items-center">
+<img id="prevAvatar" class="w-[56px] h-[56px] rounded-full object-cover hidden"><div id="prevAvatarFallback" class="w-[56px] h-[56px] rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white text-[18px]">P</div>
+<div><h2 id="prevName" class="font-black text-white">Select profile</h2><p id="prevHandle" class="text-slate-500 text-xs">@artist</p><div id="prevStatus" class="mt-1 inline-flex text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400">No profile selected</div></div>
+</section>
+
+<section class="mt-8">
+<h2 class="font-black text-[11px] tracking-widest text-slate-300">02 — CHOOSE PACKAGE • 30 DAYS</h2>
+<div class="grid gap-3 mt-4">
+<button data-package="starter" type="button" class="pkg pkg-active text-left card rounded-[20px] p-5"><h3 class="font-black text-white">Starter Growth</h3><p class="text-slate-400 text-[11px] mt-1">Est. 2K–5K visits • Search boost</p><p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="55000" data-usd="12.99" data-kes="1600" data-tzs="34000" data-gbp="10.99" data-eur="11.99"></p></button>
+<button data-package="growth" type="button" class="pkg text-left card rounded-[20px] p-5 relative"><span class="absolute -top-3 right-6 bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full">MOST POPULAR</span><h3 class="font-black text-white">Viral Growth</h3><p class="text-slate-400 text-[11px] mt-1">Est. 10K–25K visits • Homepage 7 days</p><p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="120000" data-usd="28.99" data-kes="3800" data-tzs="75000" data-gbp="22.99" data-eur="26.99"></p></button>
+<button data-package="pro" type="button" class="pkg text-left card rounded-[20px] p-5"><h3 class="font-black text-white">Pro Artist</h3><p class="text-slate-400 text-[11px] mt-1">Est. 50K+ visits • Homepage 30 days + IG</p><p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="250000" data-usd="59.99" data-kes="7800" data-tzs="155000" data-gbp="47.99" data-eur="55.99"></p></button>
+</div>
+</section>
 </div>
 
-<div class="bg-[#171122] border border-white/10 rounded-[20px] p-6 h-fit">
-<h2 class="font-black text-xs">PAY NOW</h2>
-<button id="payBtn" class="mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black py-4 rounded-xl">Pay UGX 0 with PesaPal →</button>
-<p class="text-[10px] text-slate-500 mt-3 text-center">Amount comes from your selected package. No more UGX 700.</p>
-<div id="status" class="hidden mt-3 p-3 rounded-xl text-xs"></div>
+<div class="lg:sticky lg:top-[84px] h-fit">
+<section class="card professional-shadow rounded-[24px] p-6 bg-gradient-to-b from-[#1c2539] to-[#171e2e]">
+<h2 class="font-black text-[11px] tracking-widest text-slate-300">SUMMARY</h2>
+<div id="summary" class="mt-4 bg-[#0f1219] border border-white/5 rounded-xl p-4 text-xs text-slate-400 leading-[1.8]">Select a profile you own.</div>
+<button id="payBtn" type="button" class="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-full disabled:opacity-50 disabled:pointer-events-none" disabled>Continue → Secure Checkout</button>
+<p class="text-[10px] text-slate-500 mt-3 text-center">Server must verify ownership + approved price.</p>
+</section>
 </div>
 </div>
 </main>
 
+<!-- FOOTER RESTORED -->
+<div id="pasong-footer"></div>
+<script src="pasong-footer-loader.js"></script>
+
 <script>
-const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co';
-const SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
-let db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
-const params=new URLSearchParams(window.location.search);
-const promotion_id=params.get('promotion_id');
-const song=params.get('song')||params.get('song_title')||'Your Track';
-const amount=params.get('amount')||'50000';
-const pkg=params.get('package')||'starter';
-const type=params.get('type')||'Song';
-
-document.getElementById('summary').innerHTML=`
-<b class="text-white">${song}</b> • ${type}<br>
-Package: ${pkg.toUpperCase()}<br>
-Promotion ID: ${promotion_id||'N/A'}<br>
-Duration: 30 days
-`;
-
-function formatUGX(n){return 'UGX '+Number(n).toLocaleString();}
-document.getElementById('priceBox').textContent=formatUGX(amount);
-document.getElementById('packageInfo').textContent=pkg.toUpperCase()+' • 30 DAYS';
-document.getElementById('payBtn').textContent=`Pay ${formatUGX(amount)} with PesaPal →`;
-
-document.getElementById('payBtn').onclick=async()=>{
-  const btn=document.getElementById('payBtn');
-  const status=document.getElementById('status');
-  btn.disabled=true; btn.textContent='Creating PesaPal order...';
-  try{
-    // CALL YOUR SERVER.JS / PESAPAL ENDPOINT HERE
-    // Example: POST to your backend with amount and promotion_id
-    const res=await fetch('/api/pesapal/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({promotion_id, amount:Number(amount), package:pkg})});
-    // If you use direct Supabase function, replace above
-    
-    status.className='mt-3 p-3 rounded-xl text-xs bg-green-500/10 border border-green-500/20 text-green-300 block';
-    status.textContent='✅ Redirecting to PesaPal...';
-    // window.location.href = (await res.json()).redirect_url;
-    
-    // TEMP FOR TESTING - remove when backend ready:
-    alert(`Ready to pay ${formatUGX(amount)} for ${pkg} package. Connect your server.js PesaPal here.`);
-    btn.disabled=false; btn.textContent=`Pay ${formatUGX(amount)} with PesaPal →`;
-  }catch(e){
-    status.className='mt-3 p-3 rounded-xl text-xs bg-red-500/10 border border-red-500/20 text-red-300 block';
-    status.textContent='Error: '+e.message;
-    btn.disabled=false;
-  }
-};
+'use strict';
+const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co'; const SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+const PACKAGE_PRICES={starter:55000,growth:120000,pro:250000}; const SYMBOLS={UGX:'UGX ',USD:'$',KES:'KSh ',TZS:'TSh ',GBP:'£',EUR:'€'}; const ALLOWED_DOMAINS=['pasong-frontend.vercel.app','pasong.com','www.pasong.com'];
+let db=null,currentUser=null,selectedProfile=null,selectedPackage='starter',currency='UGX',isLoading=false,isCheckingOut=false,cachedProfiles=[];
+const $=id=>document.getElementById(id);
+function setText(id,v){ const el=$(id); if(el) el.textContent=v==null?'':String(v); }
+function showMessage(id,m){ setText(id,m); $(id).classList.remove('hidden'); }
+function hideMessage(id){ $(id).classList.add('hidden'); setText(id,''); }
+function getName(p){ return p.stage_name||p.performing_name||p.artist_name||p.real_name||'Artist'; }
+function getHandle(p){ return p.stage_name||p.artist_name||p.performing_name||''; }
+function getAvatar(p){ return p.profile_image_url||p.profile_photo_url||''; }
+async function getUser(){ if(!db) throw new Error('Supabase failed'); const {data,error}=await db.auth.getSession(); if(error) throw error; currentUser=data?.session?.user||null; return currentUser; }
+function getDisplayPrice(pid){ const c=document.querySelector(`[data-package="${pid}"] .price`); const k='data-'+currency.toLowerCase(); const r=c?.getAttribute(k); if(r!=null&&r!==''&&Number.isFinite(Number(r))){ const s=SYMBOLS[currency]||currency+' '; const a=Number(r); return s+(currency==='UGX'?a.toLocaleString():a.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2})); } return 'UGX '+PACKAGE_PRICES[pid].toLocaleString(); }
+function updatePrices(){ try{ const i=window.PASONGGlobalPriceController?.getInfo?.(); const d=String(i?.currency||i?.currency_code||'UGX').toUpperCase(); if(SYMBOLS[d]) currency=d; }catch{} document.querySelectorAll('.price').forEach(el=>{ const id=el.closest('.pkg')?.dataset.package; if(id) el.textContent='From '+getDisplayPrice(id)+' / 30 days (est.)'; }); updateSummary(); }
+window.addEventListener('pasong:currency-ready',e=>{ const d=String(e.detail?.currency||e.detail?.currency_code||'UGX').toUpperCase(); if(SYMBOLS[d]) currency=d; updatePrices(); });
+function selectPkg(id){ if(!PACKAGE_PRICES[id]) return; selectedPackage=id; document.querySelectorAll('.pkg').forEach(b=>{ b.classList.toggle('pkg-active',b.dataset.package===id); }); updateSummary(); }
+function clearSelection(m='No profile selected'){ selectedProfile=null; $('payBtn').disabled=true; setText('prevName','Select profile'); setText('prevHandle','@artist'); setText('prevStatus',m); $('prevAvatar').classList.add('hidden'); $('prevAvatarFallback').classList.remove('hidden'); updateSummary(); }
+function setPreview(p){ if(!p||!p.id||!currentUser||!p.user_id||String(p.user_id)!==String(currentUser.id)){ clearSelection('Ownership could not be verified.'); return false; } selectedProfile={id:String(p.id),user_id:String(p.user_id),name:getName(p),handle:getHandle(p),avatar:getAvatar(p)}; setText('prevName',selectedProfile.name); setText('prevHandle','@'+selectedProfile.handle); setText('prevStatus','✓ Account match — server must re-verify'); const av=$('prevAvatar'),fb=$('prevAvatarFallback'); if(selectedProfile.avatar){ av.src=selectedProfile.avatar; av.classList.remove('hidden'); fb.classList.add('hidden'); }else{ fb.textContent=selectedProfile.name.charAt(0).toUpperCase(); fb.classList.remove('hidden'); av.classList.add('hidden'); } $('payBtn').disabled=false; updateSummary(); return true; }
+function updateSummary(){ const box=$('summary'); box.replaceChildren(); if(!selectedProfile){ box.textContent='Select a profile you own.'; return; } const b=document.createElement('b'); b.className='text-white'; b.textContent=selectedProfile.name; box.append(b,document.createTextNode(' @'+selectedProfile.handle),document.createElement('br'),document.createTextNode('Package: '+selectedPackage.toUpperCase()+' — '+getDisplayPrice(selectedPackage)),document.createElement('br'),document.createTextNode('Est. only — not guaranteed.')); }
+async function loadOwnProfiles(){ const sels=["id,user_id,artist_name,stage_name,performing_name,real_name,profile_image_url,profile_photo_url,bio,verified","id,user_id,artist_name,stage_name,performing_name,profile_image_url,profile_photo_url","id,user_id"]; let last=null; for(const c of sels){ const r=await db.from('artist_profiles').select(c).eq('user_id',currentUser.id).limit(50); if(!r.error) return r.data||[]; last=r.error; } throw last; }
+function renderProfileList(profiles){ const box=$('profilesList'); box.replaceChildren(); if(!profiles.length){ box.textContent='No profiles for this account.'; return; } profiles.forEach(p=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='w-full text-left bg-[#0f1219] border border-slate-700 rounded-xl p-3 flex gap-3 items-center mt-2 hover:bg-[#151d2e]'; const img=document.createElement('img'); img.className='w-10 h-10 rounded-full object-cover bg-slate-800'; img.src=getAvatar(p)||'https://ui-avatars.com/api/?name='+encodeURIComponent(getName(p)); const d=document.createElement('div'); const n=document.createElement('div'); n.className='font-bold text-[13px] text-white'; n.textContent=getName(p); const h=document.createElement('div'); h.className='text-[11px] text-slate-500'; h.textContent='@'+getHandle(p); d.append(n,h); btn.append(img,d); btn.addEventListener('click',()=>{ hideMessage('linkError'); hideMessage('linkSuccess'); if(setPreview(p)) showMessage('linkSuccess','✓ Profile selected — server must verify again.'); }); box.appendChild(btn); }); if(profiles.length===1) setPreview(profiles[0]); }
+async function loadProfiles(){ if(isLoading) return; isLoading=true; const box=$('profilesList'); box.textContent='Checking...'; try{ const u=await getUser(); if(!u){ box.textContent='Please log in.'; return; } const pr=await loadOwnProfiles(); cachedProfiles=pr; renderProfileList(pr); }catch(e){ box.textContent='Unable to load.'; showMessage('dbError',e.message); }finally{ isLoading=false; } }
+function validatePasongDomain(v){ try{ const url=new URL(v); if(url.protocol!=='https:') return{ok:false,reason:'Use HTTPS PASONG link.'}; if(!ALLOWED_DOMAINS.includes(url.hostname.toLowerCase())) return{ok:false,reason:'Domain not on approved list.'}; const parts=url.pathname.split('/').filter(Boolean); if(parts.length<2) return{ok:false,reason:'Use /artist/stage-name'}; return{ok:true,slug:parts[parts.length-1]}; }catch{ return{ok:false,reason:'Enter valid URL.'}; } }
+function findOwnProfileFromSlug(slug){ const n=slug.trim().toLowerCase(); const nn=n.replace(/-/g,' '); return cachedProfiles.find(p=>{ const c=[p.id,p.stage_name,p.artist_name,p.performing_name,p.real_name].filter(Boolean).map(v=>String(v).toLowerCase()); return c.includes(n)||c.includes(nn); })||null; }
+async function useManual(){ hideMessage('linkError'); hideMessage('linkSuccess'); const val=$('manualLink').value.trim(); const parsed=validatePasongDomain(val); if(!parsed.ok){ showMessage('linkError',parsed.reason); return; } try{ const u=await getUser(); if(!u){ showMessage('linkError','Please log in first.'); return; } if(!cachedProfiles.length) cachedProfiles=await loadOwnProfiles(); const pr=findOwnProfileFromSlug(parsed.slug); if(!pr){ clearSelection('No matching profile.'); showMessage('linkError','No matching profile owned by your account.'); return; } if(setPreview(pr)) showMessage('linkSuccess','✓ Profile matched — server must verify again.'); }catch(e){ showMessage('linkError',e.message); } }
+async function continueToPay(){ if(isCheckingOut) return; if(!selectedProfile||!currentUser){ alert('Select your own profile first.'); return; } isCheckingOut=true; $('payBtn').disabled=true; $('payBtn').textContent='Opening checkout...'; try{ const params=new URLSearchParams({type:'profile',artist_profile_id:selectedProfile.id,profile_id:selectedProfile.id,package:selectedPackage}); window.location.href='pasong_checkout.html?'+params.toString(); }catch(e){ alert('Checkout failed'); isCheckingOut=false; $('payBtn').disabled=false; $('payBtn').textContent='Continue → Secure Checkout'; } }
+document.querySelectorAll('.pkg').forEach(b=>b.addEventListener('click',()=>selectPkg(b.dataset.package)));
+$('verifyBtn').addEventListener('click',useManual); $('payBtn').addEventListener('click',continueToPay);
+$('manualLink').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); useManual(); } });
+async function init(){ try{ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); selectPkg('starter'); updatePrices(); await loadProfiles(); }catch(e){ showMessage('dbError',e.message); } }
+init();
 </script>
 </body>
 </html>
