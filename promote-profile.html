@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#111827">
 <title>Promote My Profile - PASONG</title>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -16,89 +16,538 @@ body{background:#0f1219;color:#e5e7eb}
 .professional-shadow{box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.03) inset}
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
-<header class="sticky top-0 z-20 bg-[#0f1219]/90 backdrop-blur-2xl border-b border-white/5">
-<div class="max-w-[1120px] mx-auto w-full px-5 py-4 flex justify-between items-center">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white">P</div>
-<div><div class="font-black tracking-widest text-white text-[15px]">PASONG</div><div class="text-[10px] text-slate-400 -mt-1">PROFILE PROMOTION</div></div>
+<body class="min-h-screen flex flex-col"><header class="sticky top-0 z-20 bg-[#0f1219]/90 backdrop-blur-2xl border-b border-white/5">
+  <div class="max-w-[1120px] mx-auto w-full px-5 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white">P</div>
+      <div>
+        <div class="font-black tracking-widest text-white text-[15px]">PASONG</div>
+        <div class="text-[10px] text-slate-400 -mt-1">PROFILE PROMOTION</div>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <span class="hidden sm:flex items-center gap-2 text-[11px] bg-green-500/10 border border-green-500/20 text-green-300 px-3 py-1.5 rounded-full">● Secure Checkout</span>
+      <a href="/advertise.html" class="text-[11px] bg-white text-slate-900 font-bold px-4 py-2 rounded-full">← Back</a>
+    </div>
+  </div>
+</header><main class="flex-1 max-w-[1120px] mx-auto w-full px-5 pb-20">
+  <div class="mt-8 grid lg:grid-cols-[1fr_360px] gap-8">
+    <div>
+      <h1 class="text-[36px] font-black text-white leading-[0.9] tracking-tight">
+        Promote your<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">PASONG profile.</span>
+      </h1>
+      <p class="text-slate-400 text-[13px] mt-3">Get real visits for 30 days. Estimated reach only. Verified profiles only.</p>  <section class="mt-6 card professional-shadow rounded-[24px] p-6">
+    <div class="flex justify-between items-center">
+      <h2 class="font-black text-[11px] tracking-widest text-slate-300">01 — SELECT YOUR PROFILE</h2>
+      <span class="text-[10px] text-slate-500">Owned by you</span>
+    </div>
+
+    <div id="profilesList" class="mt-4 text-[12px] text-slate-400">Checking your account...</div>
+    <div id="dbError" class="hidden mt-3 text-[11px] p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200"></div>
+
+    <div class="mt-5 border-t border-white/5 pt-5">
+      <label for="manualLink" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or paste PASONG link</label>
+      <div class="flex gap-2 mt-2">
+        <input id="manualLink" type="url" placeholder="https://pasong-frontend.vercel.app/artist/your-stage-name" class="min-w-0 flex-1 bg-[#0f1219] border border-slate-700 rounded-xl p-3.5 text-sm text-white placeholder:text-slate-600">
+        <button id="verifyBtn" type="button" class="bg-white text-slate-900 font-black px-6 rounded-xl text-xs">Verify</button>
+      </div>
+      <p id="linkError" class="hidden mt-2 text-[11px] p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300"></p>
+      <p id="linkSuccess" class="hidden mt-2 text-[11px] p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-300"></p>
+    </div>
+  </section>
+
+  <section class="mt-4 card rounded-[20px] p-5 flex gap-4 items-center">
+    <img id="prevAvatar" alt="Profile picture" class="w-[56px] h-[56px] rounded-full object-cover hidden">
+    <div id="prevAvatarFallback" class="w-[56px] h-[56px] rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white text-[18px]">P</div>
+    <div class="min-w-0">
+      <h2 id="prevName" class="font-black text-white">Select profile</h2>
+      <p id="prevHandle" class="text-slate-500 text-xs">@artist</p>
+      <div id="prevStatus" class="mt-1 inline-flex text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400">No profile selected</div>
+    </div>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="font-black text-[11px] tracking-widest text-slate-300">02 — CHOOSE PACKAGE • 30 DAYS</h2>
+    <div class="grid gap-3 mt-4">
+      <button data-package="starter" type="button" class="pkg pkg-active text-left card rounded-[20px] p-5">
+        <h3 class="font-black text-white">Starter Growth</h3>
+        <p class="text-slate-400 text-[11px] mt-1">Est. 2K–5K visits • Search boost</p>
+        <p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="55000" data-usd="12.99" data-kes="1600" data-tzs="34000" data-gbp="10.99" data-eur="11.99"></p>
+      </button>
+
+      <button data-package="growth" type="button" class="pkg text-left card rounded-[20px] p-5 relative">
+        <span class="absolute -top-3 right-6 bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full">MOST POPULAR</span>
+        <h3 class="font-black text-white">Viral Growth</h3>
+        <p class="text-slate-400 text-[11px] mt-1">Est. 10K–25K visits • Homepage 7 days</p>
+        <p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="120000" data-usd="28.99" data-kes="3800" data-tzs="75000" data-gbp="22.99" data-eur="26.99"></p>
+      </button>
+
+      <button data-package="pro" type="button" class="pkg text-left card rounded-[20px] p-5">
+        <h3 class="font-black text-white">Pro Artist</h3>
+        <p class="text-slate-400 text-[11px] mt-1">Est. 50K+ visits • Homepage 30 days + IG</p>
+        <p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="250000" data-usd="59.99" data-kes="7800" data-tzs="155000" data-gbp="47.99" data-eur="55.99"></p>
+      </button>
+    </div>
+  </section>
 </div>
-<div class="flex gap-2"><span class="hidden sm:flex items-center gap-2 text-[11px] bg-green-500/10 border border-green-500/20 text-green-300 px-3 py-1.5 rounded-full">● Secure Checkout</span><a href="/advertise.html" class="text-[11px] bg-white text-slate-900 font-bold px-4 py-2 rounded-full">← Back</a></div>
-</div>
-</header>
-<main class="flex-1 max-w-[1120px] mx-auto w-full px-5 pb-20">
-<div class="mt-8 grid lg:grid-cols-[1fr_360px] gap-8">
-<div>
-<h1 class="text-[36px] font-black text-white leading-[0.9] tracking-tight">Promote your<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">PASONG profile.</span></h1>
-<p class="text-slate-400 text-[13px] mt-3">Get real visits for 30 days. Estimated reach only. Verified profiles only.</p>
-<section class="mt-6 card professional-shadow rounded-[24px] p-6">
-<div class="flex justify-between items-center"><h2 class="font-black text-[11px] tracking-widest text-slate-300">01 — SELECT YOUR PROFILE</h2><span class="text-[10px] text-slate-500">Owned by you</span></div>
-<div id="profilesList" class="mt-4 text-[12px] text-slate-400">Checking your account...</div>
-<div id="dbError" class="hidden mt-3 text-[11px] p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200"></div>
-<div class="mt-5 border-t border-white/5 pt-5">
-<label for="manualLink" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or paste PASONG link</label>
-<div class="flex gap-2 mt-2"><input id="manualLink" type="url" placeholder="https://pasong-frontend.vercel.app/artist/your-stage-name" class="flex-1 bg-[#0f1219] border border-slate-700 rounded-xl p-3.5 text-sm text-white placeholder:text-slate-600"><button id="verifyBtn" type="button" class="bg-white text-slate-900 font-black px-6 rounded-xl text-xs">Verify</button></div>
-<p id="linkError" class="hidden mt-2 text-[11px] p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300"></p>
-<p id="linkSuccess" class="hidden mt-2 text-[11px] p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-green-300"></p>
-</div>
-</section>
-<section class="mt-4 card rounded-[20px] p-5 flex gap-4 items-center">
-<img id="prevAvatar" class="w-[56px] h-[56px] rounded-full object-cover hidden"><div id="prevAvatarFallback" class="w-[56px] h-[56px] rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white text-[18px]">P</div>
-<div><h2 id="prevName" class="font-black text-white">Select profile</h2><p id="prevHandle" class="text-slate-500 text-xs">@artist</p><div id="prevStatus" class="mt-1 inline-flex text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400">No profile selected</div></div>
-</section>
-<section class="mt-8">
-<h2 class="font-black text-[11px] tracking-widest text-slate-300">02 — CHOOSE PACKAGE • 30 DAYS</h2>
-<div class="grid gap-3 mt-4">
-<button data-package="starter" type="button" class="pkg pkg-active text-left card rounded-[20px] p-5"><h3 class="font-black text-white">Starter Growth</h3><p class="text-slate-400 text-[11px] mt-1">Est. 2K–5K visits • Search boost</p><p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="55000" data-usd="12.99" data-kes="1600" data-tzs="34000" data-gbp="10.99" data-eur="11.99"></p></button>
-<button data-package="growth" type="button" class="pkg text-left card rounded-[20px] p-5 relative"><span class="absolute -top-3 right-6 bg-blue-600 text-white text-[9px] font-black px-3 py-1 rounded-full">MOST POPULAR</span><h3 class="font-black text-white">Viral Growth</h3><p class="text-slate-400 text-[11px] mt-1">Est. 10K–25K visits • Homepage 7 days</p><p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="120000" data-usd="28.99" data-kes="3800" data-tzs="75000" data-gbp="22.99" data-eur="26.99"></p></button>
-<button data-package="pro" type="button" class="pkg text-left card rounded-[20px] p-5"><h3 class="font-black text-white">Pro Artist</h3><p class="text-slate-400 text-[11px] mt-1">Est. 50K+ visits • Homepage 30 days + IG</p><p class="price font-black mt-3 text-blue-400 text-[14px]" data-ugx="250000" data-usd="59.99" data-kes="7800" data-tzs="155000" data-gbp="47.99" data-eur="55.99"></p></button>
-</div>
-</section>
-</div>
+
 <div class="lg:sticky lg:top-[84px] h-fit">
-<section class="card professional-shadow rounded-[24px] p-6 bg-gradient-to-b from-[#1c2539] to-[#171e2e]">
-<h2 class="font-black text-[11px] tracking-widest text-slate-300">SUMMARY</h2>
-<div id="summary" class="mt-4 bg-[#0f1219] border border-white/5 rounded-xl p-4 text-xs text-slate-400 leading-[1.8]">Select a profile you own.</div>
-<button id="payBtn" type="button" class="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-full disabled:opacity-50 disabled:pointer-events-none" disabled>Continue → Secure Checkout</button>
-<p class="text-[10px] text-slate-500 mt-3 text-center">Server must verify ownership + approved price.</p>
-</section>
+  <section class="card professional-shadow rounded-[24px] p-6 bg-gradient-to-b from-[#1c2539] to-[#171e2e]">
+    <h2 class="font-black text-[11px] tracking-widest text-slate-300">SUMMARY</h2>
+    <div id="summary" class="mt-4 bg-[#0f1219] border border-white/5 rounded-xl p-4 text-xs text-slate-400 leading-[1.8]">Select a profile you own.</div>
+    <button id="payBtn" type="button" class="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-full disabled:opacity-50 disabled:pointer-events-none" disabled>Continue → Secure Checkout</button>
+    <p class="text-[10px] text-slate-500 mt-3 text-center">Server must verify ownership + approved price.</p>
+  </section>
 </div>
-</div>
-</main>
-<div id="pasong-footer"></div>
-<script src="pasong-footer-loader.js"></script>
-<script>
+
+  </div>
+</main><div id="pasong-footer"></div>
+<script src="pasong-footer-loader.js"></script><script>
 'use strict';
-const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co'; const SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
-const PACKAGE_PRICES={starter:55000,growth:120000,pro:250000}; const SYMBOLS={UGX:'UGX ',USD:'$',KES:'KSh ',TZS:'TSh ',GBP:'£',EUR:'€'}; const ALLOWED_DOMAINS=['pasong-frontend.vercel.app','pasong.com','www.pasong.com'];
-let db=null,currentUser=null,selectedProfile=null,selectedPackage='starter',currency='UGX',isLoading=false,isCheckingOut=false,cachedProfiles=[];
-const $=id=>document.getElementById(id);
-function setText(id,v){ const el=$(id); if(el) el.textContent=v==null?'':String(v); }
-function showMessage(id,m){ setText(id,m); $(id).classList.remove('hidden'); }
-function hideMessage(id){ $(id).classList.add('hidden'); setText(id,''); }
-function getName(p){ return p.stage_name||p.performing_name||p.artist_name||p.real_name||'Artist'; }
-function getHandle(p){ return p.stage_name||p.artist_name||p.performing_name||''; }
-function getAvatar(p){ return p.profile_image_url||p.profile_photo_url||''; }
-async function getUser(){ if(!db) throw new Error('Supabase failed'); const {data,error}=await db.auth.getSession(); if(error) throw error; currentUser=data?.session?.user||null; return currentUser; }
-function getDisplayPrice(pid){ const c=document.querySelector(`[data-package="${pid}"] .price`); const k='data-'+currency.toLowerCase(); const r=c?.getAttribute(k); if(r!=null&&r!==''&&Number.isFinite(Number(r))){ const s=SYMBOLS[currency]||currency+' '; const a=Number(r); return s+(currency==='UGX'?a.toLocaleString():a.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2})); } return 'UGX '+PACKAGE_PRICES[pid].toLocaleString(); }
-function updatePrices(){ try{ const i=window.PASONGGlobalPriceController?.getInfo?.(); const d=String(i?.currency||i?.currency_code||'UGX').toUpperCase(); if(SYMBOLS[d]) currency=d; }catch{} document.querySelectorAll('.price').forEach(el=>{ const id=el.closest('.pkg')?.dataset.package; if(id) el.textContent='From '+getDisplayPrice(id)+' / 30 days (est.)'; }); updateSummary(); }
-window.addEventListener('pasong:currency-ready',e=>{ const d=String(e.detail?.currency||e.detail?.currency_code||'UGX').toUpperCase(); if(SYMBOLS[d]) currency=d; updatePrices(); });
-function selectPkg(id){ if(!PACKAGE_PRICES[id]) return; selectedPackage=id; document.querySelectorAll('.pkg').forEach(b=>{ b.classList.toggle('pkg-active',b.dataset.package===id); }); updateSummary(); }
-function clearSelection(m='No profile selected'){ selectedProfile=null; $('payBtn').disabled=true; setText('prevName','Select profile'); setText('prevHandle','@artist'); setText('prevStatus',m); $('prevAvatar').classList.add('hidden'); $('prevAvatarFallback').classList.remove('hidden'); updateSummary(); }
-function setPreview(p){ if(!p||!p.id||!currentUser||!p.user_id||String(p.user_id)!==String(currentUser.id)){ clearSelection('Ownership could not be verified.'); return false; } selectedProfile={id:String(p.id),user_id:String(p.user_id),name:getName(p),handle:getHandle(p),avatar:getAvatar(p)}; setText('prevName',selectedProfile.name); setText('prevHandle','@'+selectedProfile.handle); setText('prevStatus','✓ Account match — server must re-verify'); const av=$('prevAvatar'),fb=$('prevAvatarFallback'); if(selectedProfile.avatar){ av.src=selectedProfile.avatar; av.classList.remove('hidden'); fb.classList.add('hidden'); }else{ fb.textContent=selectedProfile.name.charAt(0).toUpperCase(); fb.classList.remove('hidden'); av.classList.add('hidden'); } $('payBtn').disabled=false; updateSummary(); return true; }
-function updateSummary(){ const box=$('summary'); box.replaceChildren(); if(!selectedProfile){ box.textContent='Select a profile you own.'; return; } const b=document.createElement('b'); b.className='text-white'; b.textContent=selectedProfile.name; box.append(b,document.createTextNode(' @'+selectedProfile.handle),document.createElement('br'),document.createTextNode('Package: '+selectedPackage.toUpperCase()+' — '+getDisplayPrice(selectedPackage)),document.createElement('br'),document.createTextNode('Est. only — not guaranteed.')); }
-async function loadOwnProfiles(){ const sels=["id,user_id,artist_name,stage_name,performing_name,real_name,profile_image_url,profile_photo_url,bio,verified","id,user_id,artist_name,stage_name,performing_name,profile_image_url,profile_photo_url","id,user_id"]; let last=null; for(const c of sels){ const r=await db.from('artist_profiles').select(c).eq('user_id',currentUser.id).limit(50); if(!r.error) return r.data||[]; last=r.error; } throw last; }
-function renderProfileList(profiles){ const box=$('profilesList'); box.replaceChildren(); if(!profiles.length){ box.textContent='No profiles for this account.'; return; } profiles.forEach(p=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='w-full text-left bg-[#0f1219] border border-slate-700 rounded-xl p-3 flex gap-3 items-center mt-2 hover:bg-[#151d2e]'; const img=document.createElement('img'); img.className='w-10 h-10 rounded-full object-cover bg-slate-800'; img.src=getAvatar(p)||'https://ui-avatars.com/api/?name='+encodeURIComponent(getName(p)); const d=document.createElement('div'); const n=document.createElement('div'); n.className='font-bold text-[13px] text-white'; n.textContent=getName(p); const h=document.createElement('div'); h.className='text-[11px] text-slate-500'; h.textContent='@'+getHandle(p); d.append(n,h); btn.append(img,d); btn.addEventListener('click',()=>{ hideMessage('linkError'); hideMessage('linkSuccess'); if(setPreview(p)) showMessage('linkSuccess','✓ Profile selected — server must verify again.'); }); box.appendChild(btn); }); if(profiles.length===1) setPreview(profiles[0]); }
-async function loadProfiles(){ if(isLoading) return; isLoading=true; const box=$('profilesList'); box.textContent='Checking...'; try{ const u=await getUser(); if(!u){ box.textContent='Please log in.'; return; } const pr=await loadOwnProfiles(); cachedProfiles=pr; renderProfileList(pr); }catch(e){ box.textContent='Unable to load.'; showMessage('dbError',e.message); }finally{ isLoading=false; } }
-function validatePasongDomain(v){ try{ const url=new URL(v); if(url.protocol!=='https:') return{ok:false,reason:'Use HTTPS PASONG link.'}; if(!ALLOWED_DOMAINS.includes(url.hostname.toLowerCase())) return{ok:false,reason:'Domain not on approved list.'}; const parts=url.pathname.split('/').filter(Boolean); if(parts.length<2) return{ok:false,reason:'Use /artist/stage-name'}; return{ok:true,slug:parts[parts.length-1]}; }catch{ return{ok:false,reason:'Enter valid URL.'}; } }
-function findOwnProfileFromSlug(slug){ const n=slug.trim().toLowerCase(); const nn=n.replace(/-/g,' '); return cachedProfiles.find(p=>{ const c=[p.id,p.stage_name,p.artist_name,p.performing_name,p.real_name].filter(Boolean).map(v=>String(v).toLowerCase()); return c.includes(n)||c.includes(nn); })||null; }
-async function useManual(){ hideMessage('linkError'); hideMessage('linkSuccess'); const val=$('manualLink').value.trim(); const parsed=validatePasongDomain(val); if(!parsed.ok){ showMessage('linkError',parsed.reason); return; } try{ const u=await getUser(); if(!u){ showMessage('linkError','Please log in first.'); return; } if(!cachedProfiles.length) cachedProfiles=await loadOwnProfiles(); const pr=findOwnProfileFromSlug(parsed.slug); if(!pr){ clearSelection('No matching profile.'); showMessage('linkError','No matching profile owned by your account.'); return; } if(setPreview(pr)) showMessage('linkSuccess','✓ Profile matched — server must verify again.'); }catch(e){ showMessage('linkError',e.message); } }
-async function continueToPay(){ if(isCheckingOut) return; if(!selectedProfile||!currentUser){ alert('Select your own profile first.'); return; } isCheckingOut=true; $('payBtn').disabled=true; $('payBtn').textContent='Opening checkout...'; try{ const params=new URLSearchParams({type:'profile',artist_profile_id:selectedProfile.id,profile_id:selectedProfile.id,package:selectedPackage}); window.location.href='promotion-checkout.html?'+params.toString(); }catch(e){ alert('Checkout failed'); isCheckingOut=false; $('payBtn').disabled=false; $('payBtn').textContent='Continue → Secure Checkout'; } }
-document.querySelectorAll('.pkg').forEach(b=>b.addEventListener('click',()=>selectPkg(b.dataset.package)));
-$('verifyBtn').addEventListener('click',useManual); $('payBtn').addEventListener('click',continueToPay);
-$('manualLink').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); useManual(); } });
-async function init(){ try{ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); selectPkg('starter'); updatePrices(); await loadProfiles(); }catch(e){ showMessage('dbError',e.message); } }
+
+const SUPABASE_URL = 'https://mtufczmjlkvycarxylgh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+
+const PACKAGE_PRICES = { starter: 55000, growth: 120000, pro: 250000 };
+const CHECKOUT_PACKAGE_KEYS = {
+  starter: 'profile-starter',
+  growth: 'profile-viral',
+  pro: 'profile-pro'
+};
+
+const SYMBOLS = { UGX:'UGX ', USD:'$', KES:'KSh ', TZS:'TSh ', GBP:'£', EUR:'€' };
+const ALLOWED_DOMAINS = ['pasong-frontend.vercel.app', 'pasong.com', 'www.pasong.com'];
+
+let db = null;
+let currentUser = null;
+let selectedProfile = null;
+let selectedPackage = 'starter';
+let currency = 'UGX';
+let isLoading = false;
+let isCheckingOut = false;
+let cachedProfiles = [];
+
+const $ = id => document.getElementById(id);
+
+function setText(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value == null ? '' : String(value);
+}
+
+function showMessage(id, message) {
+  setText(id, message);
+  $(id).classList.remove('hidden');
+}
+
+function hideMessage(id) {
+  $(id).classList.add('hidden');
+  setText(id, '');
+}
+
+function getName(p) {
+  return p.stage_name || p.performing_name || p.artist_name || p.real_name || 'Artist';
+}
+
+function getHandle(p) {
+  return p.stage_name || p.artist_name || p.performing_name || '';
+}
+
+function getAvatar(p) {
+  return p.profile_image_url || p.profile_photo_url || '';
+}
+
+async function getUser() {
+  if (!db) throw new Error('Supabase failed to initialize.');
+  const { data, error } = await db.auth.getSession();
+  if (error) throw error;
+  currentUser = data?.session?.user || null;
+  return currentUser;
+}
+
+function getDisplayPrice(packageId) {
+  const element = document.querySelector(`[data-package="${packageId}"] .price`);
+  const raw = element?.getAttribute('data-' + currency.toLowerCase());
+
+  if (raw != null && raw !== '' && Number.isFinite(Number(raw))) {
+    const amount = Number(raw);
+    const symbol = SYMBOLS[currency] || currency + ' ';
+    return symbol + (currency === 'UGX'
+      ? amount.toLocaleString()
+      : amount.toLocaleString(undefined, { maximumFractionDigits: 2 }));
+  }
+
+  return 'UGX ' + PACKAGE_PRICES[packageId].toLocaleString();
+}
+
+function updatePrices() {
+  try {
+    const info = window.PASONGGlobalPriceController?.getInfo?.();
+    const code = String(info?.currency || info?.currency_code || 'UGX').toUpperCase();
+    if (SYMBOLS[code]) currency = code;
+  } catch (error) {
+    console.warn('Price controller is not ready:', error);
+  }
+
+  document.querySelectorAll('.price').forEach(element => {
+    const packageId = element.closest('.pkg')?.dataset.package;
+    if (packageId) {
+      element.textContent = 'From ' + getDisplayPrice(packageId) + ' / 30 days (est.)';
+    }
+  });
+
+  updateSummary();
+}
+
+window.addEventListener('pasong:currency-ready', event => {
+  const code = String(event.detail?.currency || event.detail?.currency_code || 'UGX').toUpperCase();
+  if (SYMBOLS[code]) currency = code;
+  updatePrices();
+});
+
+function selectPkg(id) {
+  if (!PACKAGE_PRICES[id]) return;
+  selectedPackage = id;
+
+  document.querySelectorAll('.pkg').forEach(button => {
+    button.classList.toggle('pkg-active', button.dataset.package === id);
+  });
+
+  updateSummary();
+}
+
+function clearSelection(message = 'No profile selected') {
+  selectedProfile = null;
+  $('payBtn').disabled = true;
+
+  setText('prevName', 'Select profile');
+  setText('prevHandle', '@artist');
+  setText('prevStatus', message);
+
+  $('prevAvatar').classList.add('hidden');
+  $('prevAvatarFallback').classList.remove('hidden');
+
+  updateSummary();
+}
+
+function setPreview(profile) {
+  if (
+    !profile ||
+    !profile.id ||
+    !currentUser ||
+    !profile.user_id ||
+    String(profile.user_id) !== String(currentUser.id)
+  ) {
+    clearSelection('Ownership could not be verified.');
+    return false;
+  }
+
+  selectedProfile = {
+    id: String(profile.id),
+    user_id: String(profile.user_id),
+    name: getName(profile),
+    handle: getHandle(profile),
+    avatar: getAvatar(profile)
+  };
+
+  setText('prevName', selectedProfile.name);
+  setText('prevHandle', '@' + selectedProfile.handle);
+  setText('prevStatus', '✓ Account match — server must re-verify');
+
+  const avatar = $('prevAvatar');
+  const fallback = $('prevAvatarFallback');
+
+  if (selectedProfile.avatar) {
+    avatar.onerror = () => {
+      avatar.classList.add('hidden');
+      fallback.textContent = selectedProfile.name.charAt(0).toUpperCase();
+      fallback.classList.remove('hidden');
+    };
+    avatar.src = selectedProfile.avatar;
+    avatar.classList.remove('hidden');
+    fallback.classList.add('hidden');
+  } else {
+    fallback.textContent = selectedProfile.name.charAt(0).toUpperCase();
+    fallback.classList.remove('hidden');
+    avatar.classList.add('hidden');
+  }
+
+  $('payBtn').disabled = false;
+  updateSummary();
+  return true;
+}
+
+function updateSummary() {
+  const box = $('summary');
+  box.replaceChildren();
+
+  if (!selectedProfile) {
+    box.textContent = 'Select a profile you own.';
+    return;
+  }
+
+  const name = document.createElement('b');
+  name.className = 'text-white';
+  name.textContent = selectedProfile.name;
+
+  box.append(
+    name,
+    document.createTextNode(' @' + selectedProfile.handle),
+    document.createElement('br'),
+    document.createTextNode('Package: ' + selectedPackage.toUpperCase() + ' — ' + getDisplayPrice(selectedPackage)),
+    document.createElement('br'),
+    document.createTextNode('30 days • Estimated reach only — not guaranteed.')
+  );
+}
+
+async function loadOwnProfiles() {
+  const selections = [
+    'id,user_id,artist_name,stage_name,performing_name,real_name,profile_image_url,profile_photo_url,bio,verified',
+    'id,user_id,artist_name,stage_name,performing_name,profile_image_url,profile_photo_url',
+    'id,user_id'
+  ];
+
+  let lastError = null;
+
+  for (const columns of selections) {
+    const result = await db
+      .from('artist_profiles')
+      .select(columns)
+      .eq('user_id', currentUser.id)
+      .limit(50);
+
+    if (!result.error) return result.data || [];
+    lastError = result.error;
+  }
+
+  throw lastError || new Error('Could not load your profiles.');
+}
+
+function renderProfileList(profiles) {
+  const box = $('profilesList');
+  box.replaceChildren();
+
+  if (!profiles.length) {
+    box.textContent = 'No profiles found for this account. Make sure you are signed in to the correct PASONG account.';
+    return;
+  }
+
+  profiles.forEach(profile => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'w-full text-left bg-[#0f1219] border border-slate-700 rounded-xl p-3 flex gap-3 items-center mt-2 hover:bg-[#151d2e]';
+
+    const image = document.createElement('img');
+    image.className = 'w-10 h-10 rounded-full object-cover bg-slate-800';
+    image.alt = getName(profile);
+    image.src = getAvatar(profile) || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(getName(profile));
+
+    const details = document.createElement('div');
+    const name = document.createElement('div');
+    name.className = 'font-bold text-[13px] text-white';
+    name.textContent = getName(profile);
+
+    const handle = document.createElement('div');
+    handle.className = 'text-[11px] text-slate-500';
+    handle.textContent = '@' + getHandle(profile);
+
+    details.append(name, handle);
+    button.append(image, details);
+
+    button.addEventListener('click', () => {
+      hideMessage('linkError');
+      hideMessage('linkSuccess');
+
+      if (setPreview(profile)) {
+        showMessage('linkSuccess', '✓ Profile selected — the server must verify ownership again.');
+      }
+    });
+
+    box.appendChild(button);
+  });
+
+  if (profiles.length === 1) setPreview(profiles[0]);
+}
+
+async function loadProfiles() {
+  if (isLoading) return;
+
+  isLoading = true;
+  const box = $('profilesList');
+  box.textContent = 'Checking your account...';
+
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      box.textContent = 'Please log in to PASONG, then return to this page.';
+      return;
+    }
+
+    const profiles = await loadOwnProfiles();
+    cachedProfiles = profiles;
+    renderProfileList(profiles);
+  } catch (error) {
+    box.textContent = 'Unable to load your profiles. Check your connection and try again.';
+    showMessage('dbError', error?.message || 'Unable to load profiles.');
+  } finally {
+    isLoading = false;
+  }
+}
+
+function validatePasongDomain(value) {
+  try {
+    const url = new URL(value);
+
+    if (url.protocol !== 'https:') {
+      return { ok: false, reason: 'Use an HTTPS PASONG profile link.' };
+    }
+
+    if (!ALLOWED_DOMAINS.includes(url.hostname.toLowerCase())) {
+      return { ok: false, reason: 'This domain is not on the approved PASONG list.' };
+    }
+
+    const parts = url.pathname.split('/').filter(Boolean);
+
+    if (parts.length < 2 || parts[0].toLowerCase() !== 'artist') {
+      return { ok: false, reason: 'Use a profile link like /artist/stage-name.' };
+    }
+
+    return { ok: true, slug: decodeURIComponent(parts[parts.length - 1]) };
+  } catch {
+    return { ok: false, reason: 'Enter a valid PASONG profile URL.' };
+  }
+}
+
+function findOwnProfileFromSlug(slug) {
+  const normalized = slug.trim().toLowerCase();
+  const normalizedName = normalized.replace(/-/g, ' ');
+
+  return cachedProfiles.find(profile => {
+    const candidates = [
+      profile.id,
+      profile.stage_name,
+      profile.artist_name,
+      profile.performing_name,
+      profile.real_name
+    ].filter(Boolean).map(value => String(value).toLowerCase());
+
+    return candidates.includes(normalized) || candidates.includes(normalizedName);
+  }) || null;
+}
+
+async function useManual() {
+  hideMessage('linkError');
+  hideMessage('linkSuccess');
+
+  const value = $('manualLink').value.trim();
+  const parsed = validatePasongDomain(value);
+
+  if (!parsed.ok) {
+    showMessage('linkError', parsed.reason);
+    return;
+  }
+
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      showMessage('linkError', 'Please log in to PASONG first.');
+      return;
+    }
+
+    if (!cachedProfiles.length) {
+      cachedProfiles = await loadOwnProfiles();
+    }
+
+    const profile = findOwnProfileFromSlug(parsed.slug);
+
+    if (!profile) {
+      clearSelection('No matching profile.');
+      showMessage('linkError', 'No matching profile owned by your account was found. Select it from the profile list instead.');
+      return;
+    }
+
+    if (setPreview(profile)) {
+      showMessage('linkSuccess', '✓ Profile matched — the server must verify ownership again.');
+    }
+  } catch (error) {
+    showMessage('linkError', error?.message || 'Unable to verify this profile.');
+  }
+}
+
+async function continueToPay() {
+  if (isCheckingOut) return;
+
+  if (!selectedProfile || !currentUser) {
+    alert('Select your own profile first.');
+    return;
+  }
+
+  if (String(selectedProfile.user_id) !== String(currentUser.id)) {
+    alert('You can only promote a profile owned by your account.');
+    return;
+  }
+
+  const packageKey = CHECKOUT_PACKAGE_KEYS[selectedPackage];
+
+  if (!packageKey) {
+    alert('Please select a valid profile promotion package.');
+    return;
+  }
+
+  isCheckingOut = true;
+  $('payBtn').disabled = true;
+  $('payBtn').textContent = 'Opening checkout...';
+
+  try {
+    const params = new URLSearchParams({
+      type: 'profile',
+      promotion_type: 'profile',
+      profile_id: selectedProfile.id,
+      artist_profile_id: selectedProfile.id,
+      package: packageKey,
+      package_key: packageKey
+    });
+
+    window.location.href = 'promotion-checkout.html?' + params.toString();
+  } catch (error) {
+    console.error('Unable to open checkout:', error);
+    alert('Could not open checkout. Please try again.');
+    isCheckingOut = false;
+    $('payBtn').disabled = false;
+    $('payBtn').textContent = 'Continue → Secure Checkout';
+  }
+}
+
+document.querySelectorAll('.pkg').forEach(button => {
+  button.addEventListener('click', () => selectPkg(button.dataset.package));
+});
+
+$('verifyBtn').addEventListener('click', useManual);
+$('payBtn').addEventListener('click', continueToPay);
+
+$('manualLink').addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    useManual();
+  }
+});
+
+async function init() {
+  try {
+    if (!window.supabase) throw new Error('Supabase library did not load.');
+
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    selectPkg('starter');
+    updatePrices();
+    await loadProfiles();
+  } catch (error) {
+    showMessage('dbError', error?.message || 'Page initialization failed.');
+  }
+}
+
 init();
-</script>
-</body>
+</script></body>
 </html>
