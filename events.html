@@ -1,370 +1,83 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#090b16">
-<meta name="description" content="Discover concerts, producer meetups and music events on PASONG.">
+<meta name="description" content="Discover live shows, artist meetups, tickets and music experiences with PASONG.">
 <title>Events | PASONG</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#090b16;--muted:#9aa5bd}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(ellipse at 12% 0%,#241744 0,transparent 35%),radial-gradient(ellipse at 95% 20%,#10273a 0,transparent 32%),var(--bg);color:#f8fafc;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
-a,button,input,select,textarea{-webkit-tap-highlight-color:transparent}
-button,a{transition:transform .18s ease,filter .18s ease}
-button:hover,a:hover{filter:brightness(1.08)}
-button:active,a:active{transform:scale(.98)}
-.glass{background:rgba(18,23,41,.84);border:1px solid rgba(148,163,184,.16);box-shadow:0 18px 50px rgba(0,0,0,.18);backdrop-filter:blur(14px)}
-.muted{color:var(--muted)}
-.eyebrow{letter-spacing:.16em;text-transform:uppercase;font-size:.7rem;font-weight:800;color:#c4b5fd}
-.primary{background:linear-gradient(110deg,#a78bfa,#67e8f9);color:#080b16;font-weight:900}
-.outline{border:1px solid #38415e;background:#171d31;color:#fff}
-.event-image{height:210px;width:100%;object-fit:cover;display:block}
-.pill{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #3b315e;background:#211a39;color:#ddd6fe;padding:.38rem .7rem;border-radius:999px;font-size:.7rem;font-weight:800}
-.field{width:100%;border:1px solid #343d59;background:#0b1020;color:#fff;border-radius:12px;padding:.8rem .9rem;outline:none}
-.field:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #a78bfa22}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;background:#eff6ff;color:#111827;border-radius:14px;padding:12px 16px;box-shadow:0 10px 35px #0008;max-width:calc(100vw - 28px);font-size:14px;font-weight:700;display:none}
-.toast.show{display:block}
-[hidden]{display:none!important}
-@media(max-width:640px){.event-image{height:175px}}
+:root{color-scheme:dark;--bg:#090b16;--panel:#121729;--line:#303651;--muted:#a5aec4;--purple:#a78bfa;--cyan:#67e8f9}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:20px}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#35205b 0,transparent 34%),radial-gradient(ellipse at 95% 20%,#103347 0,transparent 32%),var(--bg);color:#f8fafc;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}a,button,input,select,textarea{-webkit-tap-highlight-color:transparent}a,button{transition:transform .2s ease,filter .2s ease,border-color .2s ease}a:hover,button:hover{filter:brightness(1.1)}a:active,button:active{transform:scale(.98)}.glass{background:rgba(18,23,41,.86);border:1px solid rgba(148,163,184,.18);box-shadow:0 20px 60px rgba(0,0,0,.24);backdrop-filter:blur(15px)}.muted{color:var(--muted)}.eyebrow{letter-spacing:.17em;text-transform:uppercase;font-size:.7rem;font-weight:900;color:#c4b5fd}.primary{background:linear-gradient(110deg,#c4b5fd,#a78bfa 45%,#67e8f9);color:#080b16;font-weight:900;box-shadow:0 8px 26px #8b5cf633}.outline{border:1px solid #414966;background:#171d31;color:#fff}.pill{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #514075;background:#251b40;color:#e9ddff;padding:.42rem .75rem;border-radius:999px;font-size:.7rem;font-weight:850}.field{width:100%;border:1px solid #343d59;background:#0b1020;color:#fff;border-radius:12px;padding:.8rem .9rem;outline:none}.field:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #a78bfa22}.hero-glow{position:absolute;border-radius:999px;filter:blur(70px);pointer-events:none;animation:floatGlow 8s ease-in-out infinite alternate}@keyframes floatGlow{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-20px,18px,0) scale(1.15)}}@keyframes riseIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}.hero-content{animation:riseIn .7s ease both}.feature-card{transition:transform .25s ease,border-color .25s ease,background .25s ease}.feature-card:hover{transform:translateY(-4px);border-color:#9b8af4;background:rgba(139,92,246,.09)}.event-card{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}.event-card:hover{transform:translateY(-5px);border-color:#8b78d9;box-shadow:0 24px 65px #0005}.event-image{height:220px;width:100%;object-fit:cover;display:block;transition:transform .6s ease}.event-card:hover .event-image{transform:scale(1.035)}.event-image-wrap{overflow:hidden;position:relative}.section-rule{height:1px;background:linear-gradient(90deg,transparent,#6550a5,#3e9fb0,transparent)}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:#eff6ff;color:#111827;border-radius:14px;padding:12px 16px;box-shadow:0 10px 35px #0008;max-width:calc(100vw - 28px);font-size:14px;font-weight:700;display:none}.toast.show{display:block;animation:riseIn .2s ease}[hidden]{display:none!important}@media(max-width:640px){.event-image{height:185px}.hero-title{font-size:2.65rem}.feature-card{padding:12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <header class="max-w-6xl mx-auto px-5 sm:px-7 py-5 flex items-center justify-between gap-4">
-<a href="Pasong.html" class="flex items-center gap-2 font-black tracking-tight text-xl" aria-label="PASONG home">
-<span class="grid place-items-center rounded-xl w-10 h-10 primary text-xl">♪</span>
-<span>PASONG<span class="text-violet-300">.</span><span class="block text-[9px] muted font-bold tracking-[.25em] -mt-1">MUSIC • CULTURE • COMMUNITY</span></span>
-</a>
-<a href="Pasong.html" class="outline rounded-full px-4 py-2.5 text-sm font-extrabold">← Home</a>
+<a href="index.html" class="flex items-center gap-2 font-black tracking-tight text-xl" aria-label="PASONG home"><span class="grid place-items-center rounded-xl w-10 h-10 primary text-xl">♪</span><span>PASONG<span class="text-violet-300">.</span><span class="block text-[9px] muted font-bold tracking-[.25em] -mt-1">MUSIC • CULTURE • COMMUNITY</span></span></a>
+<a href="index.html" class="outline rounded-full px-4 py-2.5 text-sm font-extrabold">← Home</a>
 </header>
-
 <main class="max-w-6xl mx-auto px-5 sm:px-7 pb-16">
 <section class="relative overflow-hidden rounded-[28px] sm:rounded-[36px] glass p-6 sm:p-10 lg:p-14">
-<div class="absolute -right-16 -top-20 w-64 h-64 rounded-full bg-violet-500/15 blur-3xl pointer-events-none"></div>
-<div class="relative max-w-3xl">
-<span class="pill">✦ THE PASONG COMMUNITY</span>
-<p class="eyebrow mt-6">Find your next experience</p>
-<h1 class="text-4xl sm:text-6xl font-black leading-[1.02] tracking-tight mt-3">Music brings us <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300">together.</span></h1>
-<p class="muted text-sm sm:text-base leading-7 mt-5 max-w-2xl">Explore live shows, artist meetups and community events. Browse listings, check the details and contact organisers through PASONG.</p>
-<div class="flex flex-wrap gap-3 mt-7">
-<a href="#upcoming" class="primary rounded-full px-6 py-3 text-sm">Explore events ↓</a>
-<a href="#organiser" class="outline rounded-full px-6 py-3 text-sm font-bold">Promote your event ↗</a>
-</div>
-</div>
-<div class="relative grid grid-cols-3 gap-3 max-w-xl mt-10">
-<div class="rounded-2xl bg-white/[.04] border border-white/10 p-4"><div class="text-xl sm:text-2xl">🎤</div><div class="font-black text-sm mt-2">Live shows</div><div class="text-xs muted mt-1">Feel the energy</div></div>
-<div class="rounded-2xl bg-white/[.04] border border-white/10 p-4"><div class="text-xl sm:text-2xl">🎹</div><div class="font-black text-sm mt-2">Producer meets</div><div class="text-xs muted mt-1">Build connections</div></div>
-<div class="rounded-2xl bg-white/[.04] border border-white/10 p-4"><div class="text-xl sm:text-2xl">🤝</div><div class="font-black text-sm mt-2">Community</div><div class="text-xs muted mt-1">Meet your people</div></div>
-</div>
+<div class="hero-glow w-64 h-64 bg-violet-600/30 -right-12 -top-14"></div><div class="hero-glow w-52 h-52 bg-cyan-500/20 right-1/4 bottom-0"></div>
+<div class="relative hero-content max-w-3xl"><span class="pill">✦ THE PASONG COMMUNITY</span><p class="eyebrow mt-6">FIND YOUR NEXT EXPERIENCE</p><h1 class="hero-title text-4xl sm:text-6xl font-black leading-[1.04] tracking-tight mt-3">Music brings us <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300">together.</span></h1><p class="muted text-sm sm:text-base leading-7 mt-5 max-w-2xl">Discover live shows, artist meetups and music experiences. Find ticket options, support your favourite artists and promote your own event with PASONG.</p><div class="flex flex-wrap gap-3 mt-7"><a href="#upcoming" class="primary rounded-full px-6 py-3 text-sm">Explore events ↓</a><a href="#organisers" class="outline rounded-full px-6 py-3 text-sm font-bold">Promote your event ↗</a></div></div>
+<div class="relative grid grid-cols-3 gap-3 max-w-xl mt-10"><div class="feature-card rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4"><div class="text-2xl sm:text-3xl">🎤</div><div class="font-black text-sm mt-2">Live shows</div><div class="text-xs muted mt-1">Feel the energy</div></div><div class="feature-card rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4"><div class="text-2xl sm:text-3xl">🎧</div><div class="font-black text-sm mt-2">Artist Meetups</div><div class="text-xs muted mt-1">Meet your favourites</div></div><div class="feature-card rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4"><div class="text-2xl sm:text-3xl">🎟️</div><div class="font-black text-sm mt-2">Tickets</div><div class="text-xs muted mt-1">Book your place</div></div></div>
+<p id="countryStatus" class="relative muted text-xs mt-5" aria-live="polite">🇺🇬 Prices default to UGX for Uganda.</p>
 </section>
-
-<section id="upcoming" class="pt-12 sm:pt-16">
-<div id="countryStatus" class="pill mb-5" role="status">🇺🇬 Prices shown in UGX (Uganda shillings)</div>
-<div id="eventsLoadStatus" class="muted text-xs mb-4" role="status">Loading approved PASONG events…</div>
-<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-<div><p class="eyebrow">Mark your calendar</p><h2 class="text-2xl sm:text-3xl font-black mt-2">Upcoming <span class="text-violet-300">events</span></h2><p class="muted text-sm mt-2">Choose an event to view details or register your interest.</p></div>
-<label class="text-sm muted flex items-center gap-3">Filter
-<select id="eventFilter" class="field !w-auto !py-2">
-<option value="all">All events</option><option value="concert">Live shows</option><option value="producer">Producer events</option>
-</select></label>
-</div>
-
+<section id="upcoming" class="pt-12 sm:pt-16"><div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6"><div><p class="eyebrow">MARK YOUR CALENDAR</p><h2 class="text-2xl sm:text-3xl font-black mt-2">Upcoming <span class="text-violet-300">events</span></h2><p class="muted text-sm mt-2">Choose an event to explore its details and ticket information.</p></div><label class="text-sm muted flex items-center gap-3">Filter events<select id="eventFilter" class="field !w-auto !py-2"><option value="all">All events</option><option value="concert">Live shows</option><option value="meetup">Artist meetups</option></select></label></div>
+<p id="eventsLoadStatus" class="muted text-xs mb-4" role="status">Example listings shown until Supabase is configured.</p>
 <div id="eventGrid" class="grid md:grid-cols-2 gap-5">
-<article class="event-card sample-event glass rounded-[26px] overflow-hidden" data-type="concert">
-<div class="relative"><img class="event-image" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1000&auto=format&fit=crop&q=85" alt="Concert crowd under stage lights" loading="lazy"><span class="absolute top-4 left-4 pill">LIVE MUSIC</span></div>
-<div class="p-5 sm:p-6">
-<div class="flex items-start justify-between gap-3"><div><p class="text-xs font-black tracking-wider text-cyan-300">DATE TO CONFIRM · KAMPALA</p><h3 class="font-black text-xl mt-2">PASONG Live Fest</h3></div><span class="text-2xl">🎤</span></div>
-<p class="muted text-sm mt-3 leading-6">Example listing only. Confirm organiser, venue, date and performers before publishing or paying.</p>
-<div class="flex flex-wrap gap-2 mt-4"><span class="pill">📍 Kampala</span><span class="pill event-price" data-ugx="20000" data-usd="20">🎟 <span class="price-value">UGX 20,000</span></span></div>
-<div class="flex flex-wrap gap-3 mt-6"><button class="primary rounded-full px-5 py-3 text-xs flex-1" data-action="ticket" data-event="PASONG Live Fest">Get ticket information ↗</button><button class="outline rounded-full px-5 py-3 text-xs font-extrabold" data-action="details" data-event="PASONG Live Fest">Details</button></div>
-</div></article>
-
-<article class="event-card sample-event glass rounded-[26px] overflow-hidden" data-type="producer">
-<div class="relative"><img class="event-image" src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1000&auto=format&fit=crop&q=85" alt="Audience at a music event" loading="lazy"><span class="absolute top-4 left-4 pill">CREATOR MEETUP</span></div>
-<div class="p-5 sm:p-6">
-<div class="flex items-start justify-between gap-3"><div><p class="text-xs font-black tracking-wider text-violet-300">DATE TO CONFIRM · MUKONO</p><h3 class="font-black text-xl mt-2">Producer Connect</h3></div><span class="text-2xl">🎹</span></div>
-<p class="muted text-sm mt-3 leading-6">Example listing only. Confirm organiser, venue and date before publishing or travelling.</p>
-<div class="flex flex-wrap gap-2 mt-4"><span class="pill">📍 Mukono</span><span class="pill">✓ Free entry</span></div>
-<div class="flex flex-wrap gap-3 mt-6"><button class="primary rounded-full px-5 py-3 text-xs flex-1" data-action="register" data-event="Producer Connect">Register interest ↗</button><button class="outline rounded-full px-5 py-3 text-xs font-extrabold" data-action="details" data-event="Producer Connect">Details</button></div>
-</div></article>
-</div>
-<p class="muted text-xs mt-4">Event dates, venues and prices should be confirmed with the organiser before travelling or paying.</p>
+<article class="event-card sample-event glass rounded-[26px] overflow-hidden" data-type="concert"><div class="event-image-wrap"><img class="event-image" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1000&auto=format&fit=crop&q=85" alt="Concert crowd under stage lights" loading="lazy"><span class="absolute top-4 left-4 pill">SAMPLE · LIVE MUSIC</span></div><div class="p-5 sm:p-6"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-black tracking-wider text-cyan-300">DATE TO CONFIRM · KAMPALA</p><h3 class="font-black text-xl mt-2">PASONG Live Fest</h3></div><span class="text-2xl">🎤</span></div><p class="muted text-sm mt-3 leading-6">Example listing only. Confirm the organiser, date, venue and performers before publishing or paying.</p><div class="flex flex-wrap gap-2 mt-4"><span class="pill">📍 Kampala</span><span class="pill">🎟 Ticket price to confirm</span></div><div class="flex flex-wrap gap-3 mt-6"><button class="primary rounded-full px-5 py-3 text-xs flex-1" data-action="ticket" data-event="PASONG Live Fest">Ask about this event ↗</button></div></div></article>
+<article class="event-card sample-event glass rounded-[26px] overflow-hidden" data-type="meetup"><div class="event-image-wrap"><img class="event-image" src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1000&auto=format&fit=crop&q=85" alt="Audience enjoying a live event" loading="lazy"><span class="absolute top-4 left-4 pill">SAMPLE · ARTIST COMMUNITY</span></div><div class="p-5 sm:p-6"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-black tracking-wider text-violet-300">DATE TO CONFIRM</p><h3 class="font-black text-xl mt-2">Artist Meetups</h3></div><span class="text-2xl">🎧</span></div><p class="muted text-sm mt-3 leading-6">Example listing only. Ask PASONG about upcoming artist meetups, fan experiences and creator opportunities.</p><div class="flex flex-wrap gap-2 mt-4"><span class="pill">🤝 Community</span><span class="pill">📩 Details on request</span></div><div class="flex flex-wrap gap-3 mt-6"><button class="primary rounded-full px-5 py-3 text-xs flex-1" data-action="register" data-event="Artist Meetups">Ask about meetups ↗</button></div></div></article>
+</div><p class="muted text-xs mt-4">Sample listings are not confirmed events. Verify event details with the organiser before buying tickets or travelling.</p>
 </section>
-
-<section id="organiser" class="grid md:grid-cols-2 gap-5 mt-12">
-<div class="glass rounded-[26px] p-6 sm:p-8">
-<p class="eyebrow">For artists & organisers</p><h2 class="text-2xl font-black mt-2">Have an event coming up?</h2>
-<p class="muted text-sm leading-6 mt-3">Let the PASONG community know about your next show, launch or creator meetup.</p>
-<a class="primary inline-flex rounded-full px-5 py-3 text-sm mt-5" href="mailto:pasong.ug@gmail.com?subject=Submit%20an%20event%20to%20PASONG">Submit an event ↗</a>
-<p class="muted text-xs mt-3">Email opens your mail app. Replace the contact address if your official inbox differs.</p>
-</div>
-<div class="glass rounded-[26px] p-6 sm:p-8">
-<p class="eyebrow">Stay connected</p><h2 class="text-2xl font-black mt-2">Catch the highlights.</h2>
-<p class="muted text-sm leading-6 mt-3">Follow PASONG for music updates, community moments and event highlights.</p>
-<div class="grid grid-cols-2 gap-3 mt-5">
-<a href="https://www.tiktok.com/@pasong.ug" target="_blank" rel="noopener noreferrer" class="outline rounded-2xl p-4 text-center"><span class="text-2xl">♪</span><span class="block font-black text-sm mt-2">TikTok</span><span class="block muted text-xs mt-1">Follow PASONG ↗</span></a>
-<a href="https://www.tiktok.com/@pasong.ug" target="_blank" rel="noopener noreferrer" class="outline rounded-2xl p-4 text-center"><span class="text-2xl">▶</span><span class="block font-black text-sm mt-2">Highlights</span><span class="block muted text-xs mt-1">Watch videos ↗</span></a>
-</div></div>
+<div class="section-rule my-12"></div>
+<section id="services"><div class="mb-6"><p class="eyebrow">MORE THAN TICKET SALES</p><h2 class="text-2xl sm:text-3xl font-black mt-2">Grow your event <span class="text-violet-300">with PASONG</span></h2><p class="muted text-sm leading-6 mt-3 max-w-2xl">Event organisers can request extra visibility and services. Any paid services should have clear prices and terms before purchase.</p></div>
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<article class="feature-card glass rounded-3xl p-5"><div class="text-3xl">⭐</div><h3 class="font-black text-lg mt-3">Featured events</h3><p class="muted text-sm leading-6 mt-2">Organisers can request a featured position on the events page or homepage for extra visibility.</p><a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Featured%20event%20placement">Request featured placement ↗</a></article>
+<article class="feature-card glass rounded-3xl p-5"><div class="text-3xl">🚀</div><h3 class="font-black text-lg mt-3">Event promotion</h3><p class="muted text-sm leading-6 mt-2">Ask about promotional campaigns to help organisers reach music fans through available PASONG promotional spaces.</p><a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Event%20promotion%20options">Ask for promotion options ↗</a></article>
+<article class="feature-card glass rounded-3xl p-5"><div class="text-3xl">🤝</div><h3 class="font-black text-lg mt-3">Sponsorship opportunities</h3><p class="muted text-sm leading-6 mt-2">Connect event organisers with brands interested in sponsorships, logo placement and event partnerships.</p><a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Event%20sponsorship">Discuss sponsorship ↗</a></article>
+<article class="feature-card glass rounded-3xl p-5"><div class="text-3xl">🥂</div><h3 class="font-black text-lg mt-3">VIP, VVIP & tables</h3><p class="muted text-sm leading-6 mt-2">Organisers can request ordinary, VIP, VVIP and table packages. Each event needs its own ticket types and prices.</p><a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Premium%20ticket%20setup">Request premium ticket setup ↗</a></article>
+<article class="feature-card glass rounded-3xl p-5"><div class="text-3xl">📣</div><h3 class="font-black text-lg mt-3">Event listing service</h3><p class="muted text-sm leading-6 mt-2">Organisers submit event details for review. Any paid listing upgrades should be explained before an order is placed.</p><a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="#organisers">Submit an event ↓</a></article>
+<article class="feature-card glass rounded-3xl p-5"><div class="text-3xl">👕</div><h3 class="font-black text-lg mt-3">Event merchandise</h3><p class="muted text-sm leading-6 mt-2">Discuss event shirts, artist merchandise and approved products with fulfilment arrangements agreed in advance.</p><a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Event%20merchandise">Discuss merchandise ↗</a></article>
+</div></section>
+<section id="organisers" class="mt-12 grid md:grid-cols-2 gap-5">
+<div class="glass rounded-[26px] p-6 sm:p-8 relative overflow-hidden"><div class="hero-glow w-40 h-40 bg-violet-600/20 -right-10 -top-10"></div><div class="relative"><p class="eyebrow">FOR ARTISTS & ORGANISERS</p><h2 class="text-2xl sm:text-3xl font-black mt-2">Have an event coming up?</h2><p class="muted text-sm leading-6 mt-3">Send PASONG your event information to request a listing, ticket setup, featured placement or promotional support. Events should be reviewed before publication.</p><div class="grid grid-cols-2 gap-3 mt-5"><div class="rounded-2xl border border-white/10 bg-white/[.03] p-3"><span class="text-2xl">🎟️</span><p class="font-black text-sm mt-2">Ticketing</p><p class="muted text-xs mt-1">Request ordinary, VIP and other ticket options.</p></div><div class="rounded-2xl border border-white/10 bg-white/[.03] p-3"><span class="text-2xl">📈</span><p class="font-black text-sm mt-2">Promotion</p><p class="muted text-xs mt-1">Ask about featured placement and campaign options.</p></div></div><a class="primary inline-flex rounded-full px-5 py-3 text-sm mt-5" href="mailto:pasong.ug@gmail.com?subject=Submit%20an%20event%20to%20PASONG">Submit an event ↗</a></div></div>
+<div class="glass rounded-[26px] p-6 sm:p-8"><p class="eyebrow">CLEAR & TRANSPARENT</p><h2 class="text-2xl font-black mt-2">How PASONG ticket commission works</h2><p class="muted text-sm leading-6 mt-3">PASONG's proposed platform commission is 5% of successfully paid ticket sales, deducted from the organiser's ticket revenue. It is not an extra PASONG fee added to the buyer's ticket price.</p><div class="rounded-2xl border border-white/10 bg-white/[.03] p-4 mt-5"><p class="muted text-xs font-bold">Example ticket price</p><p class="text-2xl font-black mt-1" data-price-ugx="20000" data-price-usd="20">UGX 20,000</p><div class="h-px bg-white/10 my-4"></div><p class="muted text-xs font-bold">PASONG 5% commission</p><p class="text-xl font-black text-cyan-300 mt-1" data-price-ugx="1000" data-price-usd="1">UGX 1,000</p><p class="muted text-xs mt-3">Example only. Actual commission must be calculated from verified paid ticket orders.</p></div><p class="muted text-xs leading-5 mt-4">Payment verification, refunds, provider fees, ticket issuance and organiser payouts must be handled securely by the backend. This page does not process ticket payments.</p></div>
 </section>
 </main>
-
-<footer class="border-t border-white/10 mt-5">
-<div class="max-w-6xl mx-auto px-5 sm:px-7 py-7 flex flex-col sm:flex-row gap-3 justify-between text-sm">
-<a href="Pasong.html" class="font-black">◈ PASONG</a>
-<div class="flex flex-wrap gap-4 muted"><a href="Pasong.html">Home</a><a href="store.html">Music Store</a><a href="account.html">Account</a><a href="#organiser">Submit an event</a></div>
-<p class="muted text-xs">© <span id="year"></span> PASONG</p>
-</div>
-</footer>
-
-<div id="interestModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-<div class="glass w-full max-w-lg rounded-3xl p-6 sm:p-8 relative">
-<button id="closeModal" type="button" class="outline rounded-full w-10 h-10 absolute right-4 top-4" aria-label="Close">✕</button>
-<p class="eyebrow">PASONG Events</p>
-<h2 id="modalTitle" class="text-2xl font-black mt-2 pr-10">Event information</h2>
-<p id="modalDescription" class="muted text-sm leading-6 mt-3"></p>
-<form id="interestForm" class="mt-5 space-y-3">
-<label class="block text-sm">Your name<input class="field mt-1" name="name" autocomplete="name" required maxlength="100" placeholder="Enter your name"></label>
-<label class="block text-sm">Phone or email<input class="field mt-1" name="contact" autocomplete="email" required maxlength="160" placeholder="How can PASONG contact you?"></label>
-<label class="block text-sm">Message (optional)<textarea class="field mt-1" name="message" rows="3" maxlength="1000" placeholder="What would you like to know?"></textarea></label>
-<button type="submit" class="primary w-full rounded-full px-5 py-3 text-sm">Continue by email ↗</button>
-<p class="muted text-xs">This form sends an enquiry by email. It does not purchase a ticket or confirm a booking.</p>
-</form>
-</div></div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-
+<footer class="border-t border-white/10 mt-5"><div class="max-w-6xl mx-auto px-5 sm:px-7 py-7 flex flex-col sm:flex-row gap-3 items-center justify-between text-xs muted"><a href="index.html" class="font-black text-white text-base">♪ PASONG</a><span>Music. Opportunity. Support.</span><div class="flex gap-4"><a href="index.html">Home</a><a href="store.html">Music Store</a><a href="account.html">Account</a></div></div></footer>
+<div id="eventToast" class="toast" role="status" aria-live="polite"></div>
+<div id="eventModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="glass w-full max-w-md rounded-3xl p-6 relative"><button id="closeModal" type="button" class="outline rounded-full w-9 h-9 absolute top-4 right-4" aria-label="Close">✕</button><p class="eyebrow">PASONG events</p><h2 id="modalTitle" class="text-2xl font-black mt-2 pr-8">Event details</h2><p id="modalDescription" class="muted text-sm leading-6 mt-3"></p><form id="interestForm" class="mt-5 space-y-3"><label class="block text-sm font-bold">Your name<input class="field mt-2" name="name" autocomplete="name" required maxlength="100" placeholder="Enter your name"></label><label class="block text-sm font-bold">Email or phone<input class="field mt-2" name="contact" required maxlength="150" placeholder="How can we contact you?"></label><label class="block text-sm font-bold">Message (optional)<textarea class="field mt-2" name="message" rows="3" maxlength="500" placeholder="Any questions?"></textarea></label><button class="primary rounded-full w-full py-3 text-sm" type="submit">Prepare enquiry email</button><p class="muted text-xs">This prepares an email enquiry. It does not purchase a ticket or confirm a booking.</p></form></div></div>
+<div id="pasong-footer"></div><script src="pasong-footer-loader.js"></script>
 <script>
-(() => {
+(function(){
 'use strict';
-const $ = (selector) => document.querySelector(selector);
-const modal = $('#interestModal');
-const title = $('#modalTitle');
-const description = $('#modalDescription');
-const form = $('#interestForm');
-const filter = $('#eventFilter');
-const grid = $('#eventGrid');
-const countryStatus = $('#countryStatus');
-const eventsLoadStatus = $('#eventsLoadStatus');
-const toast = $('#toast');
-let activeEvent = '';
-let activeAction = 'register';
-let visitorCountry = 'UG';
-let visitorCurrency = 'UGX';
-
-const eventInfo = {
- 'PASONG Live Fest': {date:'Date to confirm',venue:'Kampala',price:'UGX 20,000',description:'Example listing only. Confirm event details and ticket availability with PASONG before travelling or paying.'},
- 'Producer Connect': {date:'Date to confirm',venue:'Mukono',price:'Free entry',description:'Example listing only. Confirm event details with PASONG before travelling.'}
+const toast=document.getElementById('eventToast');let toastTimer;
+function notify(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),4200)}
+const filter=document.getElementById('eventFilter');
+function applyFilter(){document.querySelectorAll('.event-card').forEach(card=>{card.hidden=filter.value!=='all'&&card.dataset.type!==filter.value})}
+filter.addEventListener('change',applyFilter);
+const modal=document.getElementById('eventModal'),title=document.getElementById('modalTitle'),description=document.getElementById('modalDescription'),form=document.getElementById('interestForm');let activeEvent='',activeAction='register';
+const eventInfo={
+'PASONG Live Fest':{date:'Date to be confirmed',venue:'Kampala',price:'Ticket price to be confirmed',description:'This is a sample listing, not a confirmed event. Ask PASONG to confirm the date, venue, performers and official ticket details.'},
+'Artist Meetups':{date:'Date to be confirmed',venue:'To be announced',price:'Entry details to be confirmed',description:'Ask PASONG about upcoming artist meetups and opportunities to connect with performers.'}
 };
-
-function notify(message) {
- toast.textContent = message;
- toast.classList.add('show');
- window.setTimeout(() => toast.classList.remove('show'), 3500);
-}
-function formatMoney(amount, currency) {
- const number = Number(amount);
- if (!Number.isFinite(number)) return 'Price to confirm';
- try {
-  return new Intl.NumberFormat('en', {style:'currency',currency,maximumFractionDigits:currency === 'UGX' ? 0 : 2}).format(number);
- } catch (_) { return currency + ' ' + number.toLocaleString(); }
-}
-function applyCurrency() {
- document.querySelectorAll('.event-price').forEach(el => {
-  const amount = visitorCurrency === 'UGX' ? el.dataset.ugx : el.dataset.usd;
-  const target = el.querySelector('.price-value');
-  if (target && amount) target.textContent = formatMoney(amount, visitorCurrency);
- });
- countryStatus.textContent = visitorCountry === 'UG'
-  ? '🇺🇬 Prices shown in UGX (Uganda shillings)'
-  : 'Prices shown in USD · country ' + visitorCountry;
-}
-async function detectCountry() {
- applyCurrency();
- try {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 3500);
-  const response = await fetch('https://ipapi.co/json/', {signal:controller.signal,cache:'no-store'});
-  clearTimeout(timer);
-  if (!response.ok) throw new Error('Country lookup unavailable');
-  const data = await response.json();
-  const code = String(data.country_code || '').toUpperCase();
-  if (code) {
-   visitorCountry = code;
-   visitorCurrency = code === 'UG' ? 'UGX' : 'USD';
-  }
- } catch (_) {
-  visitorCountry = 'UG';
-  visitorCurrency = 'UGX';
- }
- applyCurrency();
-}
-filter.addEventListener('change', () => {
- document.querySelectorAll('.event-card').forEach(card => {
-  card.hidden = filter.value !== 'all' && card.dataset.type !== filter.value;
- });
-});
-function openModal(eventName, action) {
- activeEvent = eventName;
- activeAction = action;
- const info = eventInfo[eventName] || {date:'Details to confirm',venue:'Contact PASONG',price:'Price to confirm',description:'Contact the organiser to confirm event information.'};
- title.textContent = action === 'ticket' ? 'Ticket information' : action === 'details' ? 'Event details' : 'Register interest';
- description.textContent = [info.date,info.venue,info.price,info.description].filter(Boolean).join(' · ');
- form.reset();
- modal.classList.remove('hidden');
- modal.classList.add('flex');
- document.body.style.overflow = 'hidden';
- const nameInput = form.querySelector('input[name="name"]');
- if (nameInput) nameInput.focus();
-}
-function closeModal() {
- modal.classList.add('hidden');
- modal.classList.remove('flex');
- document.body.style.overflow = '';
-}
-document.addEventListener('click', e => {
- const button = e.target.closest('[data-action]');
- if (!button) return;
- if (button.dataset.event) openModal(button.dataset.event, button.dataset.action || 'details');
-});
-$('#closeModal').addEventListener('click', closeModal);
-modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
-
-form.addEventListener('submit', e => {
- e.preventDefault();
- const data = new FormData(form);
- const name = String(data.get('name') || '').trim();
- const contact = String(data.get('contact') || '').trim();
- const message = String(data.get('message') || '').trim();
- if (!name || !contact) { notify('Please enter your name and contact details.'); return; }
- const info = eventInfo[activeEvent] || {};
- const subject = encodeURIComponent((activeAction === 'ticket' ? 'Ticket enquiry: ' : activeAction === 'details' ? 'Event details: ' : 'Registration interest: ') + activeEvent);
- const body = encodeURIComponent('Hello PASONG,\n\nI am contacting you about ' + activeEvent + '.\nName: ' + name + '\nContact: ' + contact + '\nEvent: ' + (info.date || 'To confirm') + ' at ' + (info.venue || 'To confirm') + '\nRequest: ' + (activeAction === 'ticket' ? 'Please share official ticket options and payment instructions.' : 'Please confirm event details and availability.') + '\nMessage: ' + (message || 'N/A') + '\n\nSent from PASONG Events.');
- window.location.href = 'mailto:pasong.ug@gmail.com?subject=' + subject + '&body=' + body;
- notify('Your email app should open with the enquiry ready.');
- closeModal();
-});
-
-document.querySelectorAll('a[target="_blank"]').forEach(a => a.setAttribute('rel','noopener noreferrer'));
-$('#year').textContent = new Date().getFullYear();
-
-/* Add the PUBLIC Supabase project URL and anon/publishable key below.
-   Never put the service-role key or payment secrets in frontend HTML. */
-const SUPABASE_URL = '';
-const SUPABASE_ANON_KEY = '';
-
-async function loadApprovedEvents() {
- if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  eventsLoadStatus.textContent = 'Showing example listings. Add your Supabase project URL and anon/publishable key to load approved events.';
-  return;
- }
- try {
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const {data:events,error} = await client.from('events')
-   .select('id,title,description,category,cover_url,venue_name,address,city,country,starts_at,currency,status,event_ticket_types(id,name,price,currency,is_active,quantity_total,quantity_sold)')
-   .eq('status','approved')
-   .gte('starts_at',new Date(Date.now()-86400000).toISOString())
-   .order('starts_at',{ascending:true});
-  if (error) throw error;
-
-  if (Array.isArray(events) && events.length) {
-   document.querySelectorAll('.sample-event').forEach(card => card.remove());
-   events.forEach(ev => {
-    const card = document.createElement('article');
-    card.className = 'event-card glass rounded-[26px] overflow-hidden';
-    card.dataset.type = String(ev.category || '').toLowerCase().includes('producer') ? 'producer' : 'concert';
-
-    const tickets = Array.isArray(ev.event_ticket_types)
-      ? ev.event_ticket_types.filter(t => t.is_active && Number(t.quantity_total) > Number(t.quantity_sold))
-      : [];
-    const ticket = tickets[0];
-    const currency = (ticket && ticket.currency) || ev.currency || (visitorCountry === 'UG' ? 'UGX' : 'USD');
-    const price = ticket ? formatMoney(ticket.price,currency) : 'Price to confirm';
-    const date = ev.starts_at ? new Date(ev.starts_at).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : 'Date to confirm';
-    const venue = [ev.venue_name,ev.city,ev.country].filter(Boolean).join(' · ') || 'Venue to confirm';
-
-    const imageWrap = document.createElement('div');
-    imageWrap.className = 'relative';
-    const image = document.createElement('img');
-    image.className = 'event-image';
-    image.src = ev.cover_url || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1000&auto=format&fit=crop&q=85';
-    image.alt = 'Event cover';
-    image.loading = 'lazy';
-    imageWrap.appendChild(image);
-    const badge = document.createElement('span');
-    badge.className = 'absolute top-4 left-4 pill';
-    badge.textContent = card.dataset.type === 'producer' ? 'CREATOR EVENT' : 'LIVE EVENT';
-    imageWrap.appendChild(badge);
-    card.appendChild(imageWrap);
-
-    const content = document.createElement('div');
-    content.className = 'p-5 sm:p-6';
-    const meta = document.createElement('p');
-    meta.className = 'text-xs font-black tracking-wider text-cyan-300';
-    meta.textContent = date + ' · ' + (ev.city || '');
-    content.appendChild(meta);
-
-    const heading = document.createElement('h3');
-    heading.className = 'font-black text-xl mt-2';
-    heading.textContent = ev.title || 'PASONG Event';
-    content.appendChild(heading);
-
-    const desc = document.createElement('p');
-    desc.className = 'muted text-sm mt-3 leading-6';
-    desc.textContent = ev.description || 'Event details from the organiser.';
-    content.appendChild(desc);
-
-    const pills = document.createElement('div');
-    pills.className = 'flex flex-wrap gap-2 mt-4';
-    ['📍 ' + venue,'🎟 ' + price].forEach(value => {
-     const span = document.createElement('span');
-     span.className = 'pill';
-     span.textContent = value;
-     pills.appendChild(span);
-    });
-    content.appendChild(pills);
-
-    const actions = document.createElement('div');
-    actions.className = 'flex flex-wrap gap-3 mt-6';
-    const ticketButton = document.createElement('button');
-    ticketButton.className = 'primary rounded-full px-5 py-3 text-xs flex-1';
-    ticketButton.dataset.action = 'ticket';
-    ticketButton.dataset.event = ev.title || 'PASONG Event';
-    ticketButton.textContent = 'Ticket information ↗';
-    actions.appendChild(ticketButton);
-
-    const detailsButton = document.createElement('button');
-    detailsButton.className = 'outline rounded-full px-5 py-3 text-xs font-extrabold';
-    detailsButton.dataset.action = 'details';
-    detailsButton.dataset.event = ev.title || 'PASONG Event';
-    detailsButton.textContent = 'Details';
-    actions.appendChild(detailsButton);
-
-    content.appendChild(actions);
-    card.appendChild(content);
-    grid.appendChild(card);
-
-    eventInfo[ev.title] = {
-     date,venue,price,
-     description:(ev.description || '') + ' Ticket checkout is not enabled on this page yet.'
-    };
-   });
-   eventsLoadStatus.textContent = events.length + ' approved event(s) loaded from PASONG.';
-  } else {
-   document.querySelectorAll('.sample-event').forEach(card => card.remove());
-   eventsLoadStatus.textContent = 'No approved upcoming events yet. Events appear after PASONG Admin approves them.';
-  }
-  filter.dispatchEvent(new Event('change'));
- } catch (error) {
-  console.error('PASONG events load error:',error);
-  eventsLoadStatus.textContent = 'Could not load live events. Check Supabase URL/key and table policies; example listings remain visible.';
- }
-}
-detectCountry();
-loadApprovedEvents();
+function openModal(eventName,action){activeEvent=eventName;activeAction=action;const info=eventInfo[eventName]||{date:'To be confirmed',venue:'To be confirmed',price:'To be confirmed',description:'Please contact PASONG for details.'};title.textContent=action==='ticket'?'Ticket information':action==='details'?'Event details':'Register interest';description.textContent=[info.date,info.venue,info.price,info.description].join(' · ');form.reset();modal.classList.remove('hidden');modal.classList.add('flex');document.body.style.overflow='hidden';form.querySelector('input[name="name"]').focus()}
+function closeModal(){modal.classList.add('hidden');modal.classList.remove('flex');document.body.style.overflow=''}
+document.addEventListener('click',e=>{const button=e.target.closest('[data-action]');if(button)openModal(button.dataset.event,button.dataset.action)});
+document.getElementById('closeModal').addEventListener('click',closeModal);modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.classList.contains('hidden'))closeModal()});
+form.addEventListener('submit',e=>{e.preventDefault();const data=new FormData(form),name=String(data.get('name')||'').trim(),contact=String(data.get('contact')||'').trim(),message=String(data.get('message')||'').trim();if(!name||!contact){notify('Please enter your name and contact details.');return}const info=eventInfo[activeEvent]||{};const subject=encodeURIComponent((activeAction==='ticket'?'Ticket enquiry: ':'Event enquiry: ')+activeEvent);const body=encodeURIComponent('Hello PASONG,\n\nI am contacting you about '+activeEvent+'.\nName: '+name+'\nContact: '+contact+'\nEvent date: '+(info.date||'To be confirmed')+'\nVenue: '+(info.venue||'To be confirmed')+'\nRequest: Please confirm event details and ticket availability.\nMessage: '+(message||'N/A')+'\n');closeModal();window.location.href='mailto:pasong.ug@gmail.com?subject='+subject+'&body='+body;notify('Your email app should open with the enquiry ready.')});
+/* Uganda-first pricing: never switch to USD just because IP lookup fails. This display is informational, not an FX conversion or payment quote. */
+const countryStatus=document.getElementById('countryStatus');function showPrices(isUganda){document.querySelectorAll('[data-price-ugx][data-price-usd]').forEach(el=>{const value=Number(isUganda?el.dataset.priceUgx:el.dataset.priceUsd);el.textContent=(isUganda?'UGX ':'USD ')+value.toLocaleString(isUganda?'en-UG':'en-US',{maximumFractionDigits:2})});countryStatus.textContent=isUganda?'🇺🇬 Prices shown in UGX (Uganda shillings).':'International example prices shown in USD.'}
+showPrices(true);const controller=new AbortController(),countryTimer=setTimeout(()=>controller.abort(),3500);fetch('https://ipapi.co/json/',{headers:{Accept:'application/json'},signal:controller.signal,cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Country lookup failed');return r.json()}).then(data=>{clearTimeout(countryTimer);if(data&&data.country_code){showPrices(String(data.country_code).toUpperCase()==='UG')}else{showPrices(true);countryStatus.textContent='Country detection unavailable · Keeping Uganda pricing (UGX).'}}).catch(()=>{clearTimeout(countryTimer);showPrices(true);countryStatus.textContent='Country detection unavailable · Keeping Uganda pricing (UGX).'});
+/* Add the Supabase project URL and PUBLIC anon/publishable key below to load approved database events. Never use a service-role key in browser code. */
+const SUPABASE_URL='';const SUPABASE_ANON_KEY='';const eventsLoadStatus=document.getElementById('eventsLoadStatus'),eventGrid=document.getElementById('eventGrid');
+function formatEventDate(value){if(!value)return 'Date to confirm';const date=new Date(value);return Number.isNaN(date.getTime())?'Date to confirm':date.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}
+function safeText(tag,className,value){const el=document.createElement(tag);if(className)el.className=className;el.textContent=value==null?'':String(value);return el}
+function createEventCard(ev){const card=document.createElement('article');card.className='event-card glass rounded-[26px] overflow-hidden';card.dataset.type=String(ev.category||'').toLowerCase().includes('meet')||String(ev.category||'').toLowerCase().includes('producer')?'meetup':'concert';const wrap=document.createElement('div');wrap.className='event-image-wrap';const img=document.createElement('img');img.className='event-image';img.loading='lazy';img.alt='Event cover';img.src=ev.cover_url||'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1000&auto=format&fit=crop&q=85';wrap.appendChild(img);wrap.appendChild(safeText('span','absolute top-4 left-4 pill',card.dataset.type==='meetup'?'ARTIST MEETUP':'LIVE EVENT'));card.appendChild(wrap);const body=document.createElement('div');body.className='p-5 sm:p-6';body.appendChild(safeText('p','text-xs font-black tracking-wider text-cyan-300',formatEventDate(ev.starts_at)+' · '+(ev.city||'Venue to confirm')));body.appendChild(safeText('h3','font-black text-xl mt-2',ev.title||'PASONG Event'));body.appendChild(safeText('p','muted text-sm mt-3 leading-6',ev.description||'Contact the organiser for event details.'));const pills=document.createElement('div');pills.className='flex flex-wrap gap-2 mt-4';pills.appendChild(safeText('span','pill','📍 '+[ev.venue,ev.city,ev.country].filter(Boolean).join(' · ')||'Venue to confirm'));const tickets=Array.isArray(ev.event_ticket_types)?ev.event_ticket_types.filter(t=>t.is_active&&Number(t.quantity_total)>Number(t.quantity_sold)):[];const ticket=tickets[0];let price='Ticket price to confirm';if(ticket){const currency=ticket.currency||ev.currency||'UGX';try{price=new Intl.NumberFormat(undefined,{style:'currency',currency,maximumFractionDigits:currency==='UGX'?0:2}).format(Number(ticket.price))}catch(_){price=currency+' '+ticket.price}}pills.appendChild(safeText('span','pill','🎟 '+price));body.appendChild(pills);const actions=document.createElement('div');actions.className='flex flex-wrap gap-3 mt-6';const btn=safeText('button','primary rounded-full px-5 py-3 text-xs flex-1','Ask about this event ↗');btn.type='button';btn.dataset.action='ticket';btn.dataset.event=ev.title||'PASONG Event';actions.appendChild(btn);body.appendChild(actions);card.appendChild(body);eventInfo[ev.title||'PASONG Event']={date:formatEventDate(ev.starts_at),venue:[ev.venue,ev.city,ev.country].filter(Boolean).join(', ')||'Venue to confirm',price,description:(ev.description||'')+' Please confirm availability and official ticket details. Ticket checkout is not enabled on this page.'};return card}
+async function loadEvents(){if(!SUPABASE_URL||!SUPABASE_ANON_KEY){eventsLoadStatus.textContent='Showing sample listings. Add your Supabase project URL and public anon/publishable key to load approved database events.';return}try{if(!window.supabase)throw new Error('Supabase library did not load');const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);const {data,error}=await client.from('events').select('id,title,description,category,cover_url,venue,address,city,country,starts_at,currency,event_ticket_types(id,name,price,currency,is_active,quantity_total,quantity_sold)').eq('status','approved').order('starts_at',{ascending:true});if(error)throw error;const future=(data||[]).filter(ev=>!ev.starts_at||new Date(ev.starts_at)>=new Date());if(!future.length){document.querySelectorAll('.sample-event').forEach(el=>el.remove());eventsLoadStatus.textContent='No approved upcoming events found. Submit an event for review.';return}document.querySelectorAll('.sample-event').forEach(el=>el.remove());future.forEach(ev=>eventGrid.appendChild(createEventCard(ev)));eventsLoadStatus.textContent=future.length+' approved event(s) loaded from PASONG.';applyFilter()}catch(err){console.error('PASONG event loading error:',err);eventsLoadStatus.textContent='Live events could not load. Check the Supabase URL/key, table columns and read policies. Sample listings remain visible.'}}
+loadEvents();document.querySelectorAll('a[target="_blank"]').forEach(a=>a.setAttribute('rel','noopener noreferrer'));
 })();
 </script>
 </body>
