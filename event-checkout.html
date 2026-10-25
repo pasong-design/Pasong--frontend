@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b16">
+<title>Event Checkout | PASONG</title>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 10% 0%,#302052,transparent 38%),radial-gradient(ellipse at 90% 20%,#103346,transparent 35%),#090b16;color:#f8fafc;font:16px system-ui,sans-serif}
+header,main,footer{width:min(100% - 32px,1000px);margin:auto}
+header{padding:22px 0;display:flex;align-items:center;justify-content:space-between}
+a{color:inherit;text-decoration:none}
+.brand{font-size:22px;font-weight:900}
+.back{border:1px solid #ffffff28;border-radius:30px;padding:10px 16px}
+.intro{padding:24px 0}
+.eyebrow{color:#c4b5fd;font-size:12px;font-weight:900;letter-spacing:2px}
+h1{font-size:clamp(32px,6vw,52px);line-height:1.08;margin:12px 0}
+.muted{color:#aab4ca;line-height:1.6}
+.layout{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;padding-bottom:50px}
+.panel{background:#121729ed;border:1px solid #ffffff18;border-radius:24px;padding:24px;box-shadow:0 20px 60px #0004}
+h2{margin:0 0 20px;font-size:21px}
+label{display:block;font-size:14px;font-weight:750;margin:16px 0}
+input,select{display:block;width:100%;margin-top:8px;padding:14px;border:1px solid #39435e;border-radius:12px;background:#0b1020;color:white;font:inherit}
+input:focus,select:focus{outline:2px solid #a78bfa}
+.methods{display:grid;gap:10px}
+.method{display:flex;gap:12px;align-items:center;border:1px solid #39435e;border-radius:14px;padding:14px;cursor:pointer}
+.method input{width:auto;margin:0;accent-color:#a78bfa}
+.method span{display:block}
+.method small{display:block;color:#aab4ca;font-weight:400;margin-top:3px}
+.primary{display:block;width:100%;border:0;border-radius:30px;padding:16px;background:linear-gradient(110deg,#c4b5fd,#67e8f9);color:#090b16;font-weight:900;font-size:15px;cursor:pointer;margin-top:22px}
+.primary:disabled{opacity:.55;cursor:wait}
+.line{display:flex;justify-content:space-between;gap:16px;margin:16px 0}
+.total{border-top:1px solid #ffffff1b;padding-top:18px;font-size:18px}
+.note{font-size:12px;color:#aab4ca;line-height:1.6}
+#message{display:none;padding:15px;border-radius:12px;margin:0 0 18px;line-height:1.5;overflow-wrap:anywhere}
+#message.show{display:block}
+#message.ok{background:#064e3b55;border:1px solid #34d39955}
+#message.err{background:#78350f55;border:1px solid #fbbf2455}
+footer{border-top:1px solid #ffffff17;padding:24px 0 35px;color:#aab4ca;font-size:13px}
+@media(max-width:700px){.layout{grid-template-columns:1fr}.panel{padding:19px}.intro{padding-top:14px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="Pasong.html">◈ PASONG</a>
+  <a class="back" href="events.html">← Events</a>
+</header>
+<main>
+  <section class="intro">
+    <div class="eyebrow">SECURE EVENT TICKETS</div>
+    <h1>Event checkout</h1>
+    <p class="muted">Choose your tickets and pay securely through Pesapal. PASONG's 5% commission is deducted from the organiser's ticket revenue; it is not an extra buyer fee.</p>
+  </section>
+  <div id="message" role="status" aria-live="polite"></div>
+  <div class="layout">
+    <section class="panel">
+      <h2>Buyer details</h2>
+      <form id="checkoutForm">
+        <label>Event
+          <select id="eventKey" required>
+            <option value="pasong-live-fest">PASONG Live Fest</option>
+          </select>
+        </label>
+        <label>Ticket type
+          <select id="ticketType" required>
+            <option value="ordinary">Ordinary — UGX 20,000</option>
+            <option value="vip">VIP — UGX 50,000</option>
+          </select>
+        </label>
+        <label>Quantity
+          <select id="quantity">
+            <option value="1">1 ticket</option><option value="2">2 tickets</option>
+            <option value="3">3 tickets</option><option value="4">4 tickets</option>
+            <option value="5">5 tickets</option><option value="6">6 tickets</option>
+            <option value="7">7 tickets</option><option value="8">8 tickets</option>
+            <option value="9">9 tickets</option><option value="10">10 tickets</option>
+          </select>
+        </label>
+        <label>Full name
+          <input id="customerName" autocomplete="name" maxlength="120" required placeholder="Your full name">
+        </label>
+        <label>Email address
+          <input id="customerEmail" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com">
+        </label>
+        <label>Phone number
+          <input id="customerPhone" type="tel" autocomplete="tel" maxlength="40" placeholder="+256...">
+        </label>
+        <label>Preferred payment method</label>
+        <div class="methods">
+          <label class="method">
+            <input type="radio" name="paymentMethod" value="mobile_money" checked>
+            <span><strong>Mobile Money</strong><small>Use a mobile-money option offered by Pesapal.</small></span>
+          </label>
+          <label class="method">
+            <input type="radio" name="paymentMethod" value="card">
+            <span><strong>Visa / Mastercard</strong><small>Pay with a supported debit or credit card.</small></span>
+          </label>
+        </div>
+        <p class="note">Pesapal displays the payment methods enabled for your account. Your selected preference is recorded with the order; the provider's hosted checkout remains responsible for collecting payment details.</p>
+        <button class="primary" id="payButton" type="submit">Continue to Pesapal</button>
+      </form>
+    </section>
+    <aside class="panel">
+      <h2>Order summary</h2>
+      <div class="line"><span class="muted">Event</span><strong id="eventSummary">PASONG Live Fest</strong></div>
+      <div class="line"><span class="muted">Ticket</span><strong id="ticketSummary">Ordinary</strong></div>
+      <div class="line"><span class="muted">Price per ticket</span><strong id="unitPrice">UGX 20,000</strong></div>
+      <div class="line"><span class="muted">Quantity</span><strong id="qtySummary">1</strong></div>
+      <div class="line total"><strong>Total to pay</strong><strong id="totalPrice">UGX 20,000</strong></div>
+      <div style="background:#ffffff09;padding:15px;border-radius:14px;margin-top:20px">
+        <strong>No extra PASONG buyer fee</strong>
+        <p class="note">For a UGX 20,000 order, PASONG's commission is UGX 1,000 and the organiser's share is UGX 19,000, before any separately applicable payment-provider charges.</p>
+      </div>
+      <p class="note">Tickets are issued only after the server verifies the payment status directly with Pesapal.</p>
+    </aside>
+  </div>
+</main>
+<footer>© <span id="year"></span> PASONG · Event ticket checkout</footer>
+<script>
+(() => {
+  const API = "https://pasong-api.vercel.app";
+  const prices = { ordinary: 20000, vip: 50000 };
+  const $ = id => document.getElementById(id);
+  const form = $("checkoutForm");
+  const button = $("payButton");
+  const message = $("message");
+  $("year").textContent = new Date().getFullYear();
+
+  function money(n) { return "UGX " + Number(n).toLocaleString("en-UG"); }
+  function render() {
+    const type = $("ticketType").value;
+    const qty = Number($("quantity").value);
+    const price = prices[type] || prices.ordinary;
+    $("ticketSummary").textContent = type === "vip" ? "VIP" : "Ordinary";
+    $("unitPrice").textContent = money(price);
+    $("qtySummary").textContent = qty;
+    $("totalPrice").textContent = money(price * qty);
+  }
+  function show(text, good = false) {
+    message.textContent = text;
+    message.className = "show " + (good ? "ok" : "err");
+    message.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+  $("ticketType").addEventListener("change", render);
+  $("quantity").addEventListener("change", render);
+  render();
+
+  async function checkOrder(id) {
+    try {
+      const r = await fetch(API + "/api/events/checkout/order/" + encodeURIComponent(id));
+      const j = await r.json();
+      if (!r.ok || !j.order) throw new Error(j.error || "Order not found.");
+      const o = j.order;
+      if (o.payment_status === "paid" && o.ticket_status === "issued") {
+        show("Payment verified! Your ticket order is confirmed. Reference: " + o.merchant_reference + ". Keep this reference for event entry.", true);
+      } else {
+        show("Payment status: " + o.payment_status + ". Your ticket has not been issued yet. If you just paid by Mobile Money, allow time for Pesapal to confirm it. Reference: " + o.merchant_reference);
+      }
+    } catch (e) {
+      show(e.message || "Could not check payment status. Please try again.");
+    }
+  }
+
+  const query = new URLSearchParams(location.search);
+  if (query.get("order_id")) checkOrder(query.get("order_id"));
+  else if (query.get("payment") === "pending") show("Payment is pending. A ticket will be issued only after Pesapal confirms payment.");
+  else if (query.get("payment") === "failed") show("Payment was not confirmed. If money was deducted, contact PASONG support before trying again.");
+
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    button.disabled = true;
+    button.textContent = "Preparing Pesapal checkout…";
+    try {
+      const response = await fetch(API + "/api/events/checkout", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          event_key: $("eventKey").value,
+          ticket_type: $("ticketType").value,
+          quantity: Number($("quantity").value),
+          customer_name: $("customerName").value.trim(),
+          customer_email: $("customerEmail").value.trim(),
+          customer_phone: $("customerPhone").value.trim(),
+          preferred_payment_method: document.querySelector('input[name="paymentMethod"]:checked').value
+        })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.checkout_url) throw new Error(data.error || "Pesapal checkout could not be started.");
+      location.href = data.checkout_url;
+    } catch (e) {
+      show(e.message || "Could not start checkout. No payment has been confirmed.");
+      button.disabled = false;
+      button.textContent = "Continue to Pesapal";
+    }
+  });
+})();
+</script>
+</body>
+</html>
