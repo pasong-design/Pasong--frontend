@@ -2,474 +2,363 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#090b16">
-<meta name="description" content="Discover events, buy tickets and promote music events on PASONG.">
+<meta name="description" content="Discover live shows, artist meetups, tickets and music experiences with PASONG.">
 <title>Events | PASONG</title>
 <script src="https://cdn.tailwindcss.com"></script>
-
 <style>
-:root{
-  color-scheme:dark;
-  --bg:#090b16;
-  --panel:#121729;
-  --muted:#9aa5bd;
-}
+:root{color-scheme:dark;--bg:#090b16;--panel:#121729;--line:#303651;--muted:#a5aec4;--purple:#a78bfa;--cyan:#67e8f9}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  background:
-    radial-gradient(ellipse at 12% 0%,#241744 0,transparent 35%),
-    radial-gradient(ellipse at 95% 20%,#10273a 0,transparent 32%),
-    var(--bg);
-  color:#f8fafc;
-  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-  min-height:100vh;
-}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:radial-gradient(ellipse at 10% 0%,#35205b 0,transparent 34%),radial-gradient(ellipse at 95% 20%,#103347 0,transparent 32%),var(--bg);color:#f8fafc;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+a,button,input,select,textarea{-webkit-tap-highlight-color:transparent}
+a,button{transition:transform .2s ease,filter .2s ease,border-color .2s ease}
+a:hover,button:hover{filter:brightness(1.1)}
+a:active,button:active{transform:scale(.98)}
+.glass{background:rgba(18,23,41,.86);border:1px solid rgba(148,163,184,.18);box-shadow:0 20px 60px rgba(0,0,0,.24);backdrop-filter:blur(15px)}
 .muted{color:var(--muted)}
-.glass{
-  background:rgba(18,23,41,.88);
-  border:1px solid #ffffff18;
-  box-shadow:0 18px 50px #0003;
-  backdrop-filter:blur(12px);
-}
-.primary{
-  background:linear-gradient(110deg,#a78bfa,#67e8f9);
-  color:#080b16;
-  font-weight:900;
-}
-.outline{
-  border:1px solid #38415e;
-  background:#171d31;
-  color:#fff;
-}
-.pill{
-  display:inline-flex;
-  align-items:center;
-  border:1px solid #3b315e;
-  background:#211a39;
-  color:#ddd6fe;
-  padding:.4rem .75rem;
-  border-radius:999px;
-  font-size:.72rem;
-  font-weight:800;
-}
-.event-image{
-  height:210px;
-  width:100%;
-  object-fit:cover;
-  display:block;
-}
-button,a{transition:filter .18s,transform .18s}
-button:hover,a:hover{filter:brightness(1.08)}
-button:active,a:active{transform:scale(.98)}
+.eyebrow{letter-spacing:.17em;text-transform:uppercase;font-size:.7rem;font-weight:900;color:#c4b5fd}
+.primary{background:linear-gradient(110deg,#c4b5fd,#a78bfa 45%,#67e8f9);color:#080b16;font-weight:900;box-shadow:0 8px 26px #8b5cf633}
+.outline{border:1px solid #414966;background:#171d31;color:#fff}
+.pill{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #514075;background:#251b40;color:#e9ddff;padding:.42rem .75rem;border-radius:999px;font-size:.7rem;font-weight:850}
+.field{width:100%;border:1px solid #343d59;background:#0b1020;color:#fff;border-radius:12px;padding:.8rem .9rem;outline:none}
+.field:focus{border-color:#a78bfa;box-shadow:0 0 0 3px #a78bfa22}
+.hero-glow{position:absolute;border-radius:999px;filter:blur(70px);pointer-events:none;animation:floatGlow 8s ease-in-out infinite alternate}
+@keyframes floatGlow{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-20px,18px,0) scale(1.15)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.hero-content{animation:riseIn .7s ease both}
+.feature-card{transition:transform .25s ease,border-color .25s ease,background .25s ease}
+.feature-card:hover{transform:translateY(-4px);border-color:#9b8af4;background:rgba(139,92,246,.09)}
+.event-card{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.event-card:hover{transform:translateY(-5px);border-color:#8b78d9;box-shadow:0 24px 65px #0005}
+.event-image{height:220px;width:100%;object-fit:cover;display:block;transition:transform .6s ease}
+.event-card:hover .event-image{transform:scale(1.035)}
+.event-image-wrap{overflow:hidden;position:relative}
+.section-rule{height:1px;background:linear-gradient(90deg,transparent,#6550a5, #3e9fb0,transparent)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:#eff6ff;color:#111827;border-radius:14px;padding:12px 16px;box-shadow:0 10px 35px #0008;max-width:calc(100vw - 28px);font-size:14px;font-weight:700;display:none}
+.toast.show{display:block;animation:riseIn .2s ease}
 [hidden]{display:none!important}
-input,select,textarea{color:#fff}
-:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
-@media(max-width:640px){
-  .event-image{height:175px}
-}
+@media(max-width:640px){.event-image{height:185px}.hero-title{font-size:2.65rem}.feature-card{padding:12px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
 <header class="max-w-6xl mx-auto px-5 sm:px-7 py-5 flex items-center justify-between gap-4">
-  <a href="index.html" class="flex items-center gap-3 font-black text-xl" aria-label="PASONG homepage">
-    <span class="grid place-items-center rounded-xl w-10 h-10 primary text-xl">♪</span>
-    <span>
-      PASONG<span class="text-violet-300">.</span>
-      <small class="block text-[9px] muted tracking-[.2em]">MUSIC • CULTURE • COMMUNITY</small>
-    </span>
-  </a>
-  <a href="index.html" class="outline rounded-full px-4 py-3 text-sm font-bold">← Home</a>
+<a href="index.html" class="flex items-center gap-2 font-black tracking-tight text-xl" aria-label="PASONG home">
+<span class="grid place-items-center rounded-xl w-10 h-10 primary text-xl">♪</span>
+<span>PASONG<span class="text-violet-300">.</span><span class="block text-[9px] muted font-bold tracking-[.25em] -mt-1">MUSIC • CULTURE • COMMUNITY</span></span>
+</a>
+<a href="index.html" class="outline rounded-full px-4 py-2.5 text-sm font-extrabold">← Home</a>
 </header>
 
 <main class="max-w-6xl mx-auto px-5 sm:px-7 pb-16">
 
-  <!-- HERO -->
-  <section class="glass rounded-[28px] sm:rounded-[36px] p-6 sm:p-10 lg:p-14">
-    <span class="pill">✦ THE PASONG COMMUNITY</span>
+<section class="relative overflow-hidden rounded-[28px] sm:rounded-[36px] glass p-6 sm:p-10 lg:p-14">
+<div class="hero-glow w-64 h-64 bg-violet-600/30 -right-12 -top-14"></div>
+<div class="hero-glow w-52 h-52 bg-cyan-500/20 right-1/4 bottom-0"></div>
 
-    <p class="text-xs font-black tracking-[.2em] text-violet-300 mt-7">
-      FIND YOUR NEXT EXPERIENCE
-    </p>
+<div class="relative hero-content max-w-3xl">
+<span class="pill">✦ THE PASONG COMMUNITY</span>
+<p class="eyebrow mt-6">FIND YOUR NEXT EXPERIENCE</p>
+<h1 class="hero-title text-4xl sm:text-6xl font-black leading-[1.04] tracking-tight mt-3">
+Music brings us <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300">together.</span>
+</h1>
+<p class="muted text-sm sm:text-base leading-7 mt-5 max-w-2xl">Discover live shows, artist meetups and music experiences. Find ticket options, support your favourite artists and promote your own event with PASONG.</p>
+<div class="flex flex-wrap gap-3 mt-7">
+<a href="#upcoming" class="primary rounded-full px-6 py-3 text-sm">Explore events ↓</a>
+<a href="#organisers" class="outline rounded-full px-6 py-3 text-sm font-bold">Promote your event ↗</a>
+</div>
+</div>
 
-    <h1 class="text-4xl sm:text-6xl font-black leading-tight mt-3">
-      Music brings us
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300">
-        together.
-      </span>
-    </h1>
+<div class="relative grid grid-cols-3 gap-3 max-w-xl mt-10">
+<div class="feature-card rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4">
+<div class="text-2xl sm:text-3xl">🎤</div><div class="font-black text-sm mt-2">Live shows</div><div class="text-xs muted mt-1">Feel the energy</div>
+</div>
+<div class="feature-card rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4">
+<div class="text-2xl sm:text-3xl">🎧</div><div class="font-black text-sm mt-2">Artist Meetups</div><div class="text-xs muted mt-1">Meet your favourites</div>
+</div>
+<div class="feature-card rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4">
+<div class="text-2xl sm:text-3xl">🎟️</div><div class="font-black text-sm mt-2">Tickets</div><div class="text-xs muted mt-1">Book your place</div>
+</div>
+</div>
+<p id="countryStatus" class="relative muted text-xs mt-5" aria-live="polite">Detecting your country for local prices…</p>
+</section>
 
-    <p class="muted text-sm sm:text-base leading-7 mt-5 max-w-2xl">
-      Discover live shows, artist meetups and producer sessions.
-      Find ticket options, support your favourite artists and promote your own event with PASONG.
-    </p>
+<section id="upcoming" class="pt-12 sm:pt-16">
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+<div>
+<p class="eyebrow">MARK YOUR CALENDAR</p>
+<h2 class="text-2xl sm:text-3xl font-black mt-2">Upcoming <span class="text-violet-300">events</span></h2>
+<p class="muted text-sm mt-2">Choose an event to explore its ticket options.</p>
+</div>
+<label class="text-sm muted flex items-center gap-3">Filter events
+<select id="eventFilter" class="field !w-auto !py-2">
+<option value="all">All events</option>
+<option value="concert">Live shows</option>
+<option value="meetup">Artist meetups</option>
+</select>
+</label>
+</div>
 
-    <div class="flex flex-wrap gap-3 mt-7">
-      <a href="#upcoming" class="primary inline-flex rounded-full px-6 py-3 text-sm">
-        Explore events ↓
-      </a>
-      <a href="#organisers" class="outline inline-flex rounded-full px-6 py-3 text-sm font-bold">
-        Promote your event
-      </a>
-    </div>
+<div class="grid md:grid-cols-2 gap-5">
+<article class="event-card glass rounded-[26px] overflow-hidden" data-type="concert">
+<div class="event-image-wrap">
+<img class="event-image" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1000&auto=format&fit=crop&q=85" alt="Concert crowd under stage lights" loading="lazy">
+<span class="absolute top-4 left-4 pill">LIVE MUSIC</span>
+</div>
+<div class="p-5 sm:p-6">
+<div class="flex items-start justify-between gap-3">
+<div><p class="text-xs font-black tracking-wider text-cyan-300">SAMPLE LISTING · KAMPALA</p><h3 class="font-black text-xl mt-2">PASONG Live Fest</h3></div>
+<span class="text-2xl">🎤</span>
+</div>
+<p class="muted text-sm mt-3 leading-6">Proposed live music experience for the PASONG community. Confirm the organiser, date, venue and performers before publishing.</p>
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="pill">📍 Kampala</span><span class="pill">🎟 Ticket options to confirm</span>
+</div>
+<div class="flex flex-wrap gap-3 mt-6">
+<button class="primary rounded-full px-5 py-3 text-xs flex-1" data-action="ticket" data-event="PASONG Live Fest">Ask about this event ↗</button>
+</div>
+<p class="muted text-xs mt-4">Ticket checkout should be enabled only after the event and ticket prices are confirmed.</p>
+</div>
+</article>
 
-    <div class="grid grid-cols-3 gap-3 max-w-xl mt-10">
-      <div class="rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4">
-        <div class="text-2xl">🎤</div>
-        <b class="block text-sm mt-2">Live shows</b>
-        <small class="muted">Feel the energy</small>
-      </div>
-      <div class="rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4">
-        <div class="text-2xl">🎹</div>
-        <b class="block text-sm mt-2">Producers</b>
-        <small class="muted">Build connections</small>
-      </div>
-      <div class="rounded-2xl bg-white/[.04] border border-white/10 p-3 sm:p-4">
-        <div class="text-2xl">🎟️</div>
-        <b class="block text-sm mt-2">Tickets</b>
-        <small class="muted">Book your place</small>
-      </div>
-    </div>
+<article class="event-card glass rounded-[26px] overflow-hidden" data-type="meetup">
+<div class="event-image-wrap">
+<img class="event-image" src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1000&auto=format&fit=crop&q=85" alt="Audience enjoying a live event" loading="lazy">
+<span class="absolute top-4 left-4 pill">ARTIST COMMUNITY</span>
+</div>
+<div class="p-5 sm:p-6">
+<div class="flex items-start justify-between gap-3">
+<div><p class="text-xs font-black tracking-wider text-violet-300">COMMUNITY EXPERIENCE</p><h3 class="font-black text-xl mt-2">Artist Meetups</h3></div>
+<span class="text-2xl">🎧</span>
+</div>
+<p class="muted text-sm mt-3 leading-6">Discover artist meetups, fan experiences and opportunities to connect with your favourite performers.</p>
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="pill">🤝 Community</span><span class="pill">📩 Details on request</span>
+</div>
+<div class="flex flex-wrap gap-3 mt-6">
+<button class="primary rounded-full px-5 py-3 text-xs flex-1" data-action="register" data-event="Artist Meetups">Ask about meetups ↗</button>
+</div>
+</div>
+</article>
+</div>
 
-    <p id="countryStatus" class="muted text-xs mt-6" aria-live="polite">
-      Detecting your country and currency…
-    </p>
-  </section>
+<p class="muted text-xs mt-4">Example listings are not confirmed events. Verify event details with the organiser before buying tickets or travelling.</p>
+</section>
 
-  <!-- EVENTS -->
-  <section id="upcoming" class="pt-12 sm:pt-16">
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-      <div>
-        <p class="text-xs font-black tracking-[.2em] text-violet-300">MARK YOUR CALENDAR</p>
-        <h2 class="text-3xl font-black mt-2">
-          Upcoming <span class="text-violet-300">events</span>
-        </h2>
-        <p class="muted text-sm mt-2">Choose an event to explore its ticket options.</p>
-      </div>
+<div class="section-rule my-12"></div>
 
-      <label class="muted text-sm">
-        Filter events
-        <select id="eventFilter" class="outline rounded-xl px-3 py-2 ml-2">
-          <option value="all">All events</option>
-          <option value="concert">Live shows</option>
-          <option value="producer">Producer events</option>
-        </select>
-      </label>
-    </div>
+<section id="services">
+<div class="mb-6">
+<p class="eyebrow">MORE THAN TICKET SALES</p>
+<h2 class="text-2xl sm:text-3xl font-black mt-2">Grow your event <span class="text-violet-300">with PASONG</span></h2>
+<p class="muted text-sm leading-6 mt-3 max-w-2xl">Event organisers can request extra visibility and services. PASONG can earn from these services in addition to its ticket commission.</p>
+</div>
 
-    <!-- Confirm event details before publishing as a real event. -->
-    <div id="eventGrid" class="grid md:grid-cols-2 gap-5">
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<article class="feature-card glass rounded-3xl p-5">
+<div class="text-3xl">⭐</div><h3 class="font-black text-lg mt-3">Featured events</h3>
+<p class="muted text-sm leading-6 mt-2">Organisers can request a featured position on the events page or homepage for extra visibility.</p>
+<a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Featured%20event%20placement">Request featured placement ↗</a>
+</article>
+<article class="feature-card glass rounded-3xl p-5">
+<div class="text-3xl">🚀</div><h3 class="font-black text-lg mt-3">Event promotion</h3>
+<p class="muted text-sm leading-6 mt-2">Offer promotional campaigns to help organisers reach music fans through PASONG's available promotional spaces.</p>
+<a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Event%20promotion%20options">Ask for promotion options ↗</a>
+</article>
+<article class="feature-card glass rounded-3xl p-5">
+<div class="text-3xl">🤝</div><h3 class="font-black text-lg mt-3">Sponsorship opportunities</h3>
+<p class="muted text-sm leading-6 mt-2">Connect event organisers with brands interested in sponsorships, logo placement and event partnerships.</p>
+<a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Event%20sponsorship">Discuss sponsorship ↗</a>
+</article>
+<article class="feature-card glass rounded-3xl p-5">
+<div class="text-3xl">🥂</div><h3 class="font-black text-lg mt-3">VIP, VVIP & tables</h3>
+<p class="muted text-sm leading-6 mt-2">Let organisers offer premium tickets, reserved tables and group packages. These options need to be configured for each event.</p>
+<a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Premium%20ticket%20setup">Request premium ticket setup ↗</a>
+</article>
+<article class="feature-card glass rounded-3xl p-5">
+<div class="text-3xl">📣</div><h3 class="font-black text-lg mt-3">Event listing service</h3>
+<p class="muted text-sm leading-6 mt-2">Organisers submit their event details for review. PASONG can introduce paid listing upgrades while keeping the terms clear.</p>
+<a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="#organisers">Submit an event ↓</a>
+</article>
+<article class="feature-card glass rounded-3xl p-5">
+<div class="text-3xl">👕</div><h3 class="font-black text-lg mt-3">Event merchandise</h3>
+<p class="muted text-sm leading-6 mt-2">A future add-on for event shirts, artist merchandise and other approved products, with sales and fulfilment arrangements agreed in advance.</p>
+<a class="inline-flex text-sm font-extrabold text-violet-300 mt-4" href="mailto:pasong.ug@gmail.com?subject=Event%20merchandise">Discuss merchandise ↗</a>
+</article>
+</div>
+</section>
 
-      <!-- ORIGINAL CONCERT CARD RETAINED -->
-      <article class="event-card glass rounded-[26px] overflow-hidden" data-type="concert">
-        <img
-          class="event-image"
-          src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1000&auto=format&fit=crop&q=85"
-          alt="Concert crowd under stage lights"
-          loading="lazy">
+<section id="organisers" class="mt-12 grid md:grid-cols-2 gap-5">
+<div class="glass rounded-[26px] p-6 sm:p-8 relative overflow-hidden">
+<div class="hero-glow w-40 h-40 bg-violet-600/20 -right-10 -top-10"></div>
+<div class="relative">
+<p class="eyebrow">FOR ARTISTS & ORGANISERS</p>
+<h2 class="text-2xl sm:text-3xl font-black mt-2">Have an event coming up?</h2>
+<p class="muted text-sm leading-6 mt-3">Send PASONG your event information to request a listing, ticket setup, featured placement or promotional support. Your event should be reviewed before being published.</p>
+<div class="grid grid-cols-2 gap-3 mt-5">
+<div class="rounded-2xl border border-white/10 bg-white/[.03] p-3"><span class="text-2xl">🎟️</span><p class="font-black text-sm mt-2">Ticketing</p><p class="muted text-xs mt-1">Request ordinary, VIP and other ticket options.</p></div>
+<div class="rounded-2xl border border-white/10 bg-white/[.03] p-3"><span class="text-2xl">📈</span><p class="font-black text-sm mt-2">Promotion</p><p class="muted text-xs mt-1">Ask about featured placement and campaign options.</p></div>
+</div>
+<a class="primary inline-flex rounded-full px-5 py-3 text-sm mt-5" href="mailto:pasong.ug@gmail.com?subject=Submit%20an%20event%20to%20PASONG">Submit an event ↗</a>
+</div>
+</div>
 
-        <div class="p-5 sm:p-6">
-          <span class="pill">LIVE MUSIC</span>
-
-          <p class="text-xs font-black tracking-wider text-cyan-300 mt-4">
-            SAMPLE LISTING · KAMPALA
-          </p>
-
-          <h3 class="font-black text-2xl mt-2">PASONG Live Fest</h3>
-
-          <p class="muted text-sm mt-3 leading-6">
-            Proposed live music experience for the PASONG community.
-            Confirm the organiser, date, venue and performers before publishing.
-          </p>
-
-          <div class="flex flex-wrap gap-2 mt-4">
-            <span class="pill">📍 Kampala</span>
-            <span class="pill">🎟 Ticket options to confirm</span>
-          </div>
-
-          <a
-            href="mailto:pasong.ug@gmail.com?subject=Confirm%20PASONG%20Live%20Fest%20listing"
-            class="primary rounded-full px-5 py-3 text-sm text-center block mt-6">
-            Ask about this event ↗
-          </a>
-
-          <p class="muted text-xs mt-3">
-            Ticket checkout should be enabled only after the event and ticket prices are confirmed.
-          </p>
-        </div>
-      </article>
-
-    </div>
-
-    <div id="noEvents" class="glass rounded-2xl p-6 text-center mt-5" hidden>
-      <p class="font-bold">No events in this category.</p>
-      <p class="muted text-sm mt-2">Choose another filter to see more events.</p>
-    </div>
-
-    <p class="muted text-xs mt-4">
-      Example listings are not confirmed events. Verify event details with the organiser before buying tickets or travelling.
-    </p>
-  </section>
-
-  <!-- MORE WAYS PASONG CAN EARN -->
-  <section id="event-services" class="pt-14 sm:pt-16">
-    <div class="mb-7">
-      <p class="text-xs font-black tracking-[.2em] text-violet-300">MORE THAN TICKET SALES</p>
-      <h2 class="text-3xl sm:text-4xl font-black mt-2">
-        Grow your event with <span class="text-violet-300">PASONG</span>
-      </h2>
-      <p class="muted text-sm leading-6 mt-3 max-w-2xl">
-        Event organisers can request extra visibility and services. PASONG can earn from these services in addition to its ticket commission.
-      </p>
-    </div>
-
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-      <article class="glass rounded-3xl p-6">
-        <div class="text-3xl">⭐</div>
-        <h3 class="font-black text-xl mt-4">Featured events</h3>
-        <p class="muted text-sm leading-6 mt-3">
-          Organisers can request a featured position on the events page or homepage for extra visibility.
-        </p>
-        <a
-          href="mailto:pasong.ug@gmail.com?subject=Featured%20event%20promotion"
-          class="outline rounded-full px-4 py-3 text-sm font-bold inline-flex mt-5">
-          Request featured placement ↗
-        </a>
-      </article>
-
-      <article class="glass rounded-3xl p-6">
-        <div class="text-3xl">🚀</div>
-        <h3 class="font-black text-xl mt-4">Event promotion</h3>
-        <p class="muted text-sm leading-6 mt-3">
-          Offer promotional campaigns to help organisers reach music fans through PASONG's available promotional spaces.
-        </p>
-        <a
-          href="mailto:pasong.ug@gmail.com?subject=PASONG%20event%20promotion%20packages"
-          class="outline rounded-full px-4 py-3 text-sm font-bold inline-flex mt-5">
-          Ask for promotion options ↗
-        </a>
-      </article>
-
-      <article class="glass rounded-3xl p-6">
-        <div class="text-3xl">🤝</div>
-        <h3 class="font-black text-xl mt-4">Sponsorship opportunities</h3>
-        <p class="muted text-sm leading-6 mt-3">
-          Connect event organisers with brands interested in sponsorships, logo placement and event partnerships.
-        </p>
-        <a
-          href="mailto:pasong.ug@gmail.com?subject=Event%20sponsorship%20opportunities"
-          class="outline rounded-full px-4 py-3 text-sm font-bold inline-flex mt-5">
-          Discuss sponsorship ↗
-        </a>
-      </article>
-
-      <article class="glass rounded-3xl p-6">
-        <div class="text-3xl">🥂</div>
-        <h3 class="font-black text-xl mt-4">VIP, VVIP & tables</h3>
-        <p class="muted text-sm leading-6 mt-3">
-          Let organisers offer premium tickets, reserved tables and group packages. These options need to be configured for each event.
-        </p>
-        <a
-          href="mailto:pasong.ug@gmail.com?subject=VIP%20and%20table%20booking%20setup"
-          class="outline rounded-full px-4 py-3 text-sm font-bold inline-flex mt-5">
-          Request premium ticket setup ↗
-        </a>
-      </article>
-
-      <article class="glass rounded-3xl p-6">
-        <div class="text-3xl">📣</div>
-        <h3 class="font-black text-xl mt-4">Event listing service</h3>
-        <p class="muted text-sm leading-6 mt-3">
-          Organisers submit their event details for review. PASONG can introduce paid listing upgrades while keeping the terms clear.
-        </p>
-        <a
-          href="#organisers"
-          class="outline rounded-full px-4 py-3 text-sm font-bold inline-flex mt-5">
-          Submit an event ↓
-        </a>
-      </article>
-
-      <article class="glass rounded-3xl p-6">
-        <div class="text-3xl">👕</div>
-        <h3 class="font-black text-xl mt-4">Event merchandise</h3>
-        <p class="muted text-sm leading-6 mt-3">
-          A future add-on for event shirts, artist merchandise and other approved products, with sales and fulfilment arrangements agreed in advance.
-        </p>
-        <a
-          href="mailto:pasong.ug@gmail.com?subject=PASONG%20event%20merchandise"
-          class="outline rounded-full px-4 py-3 text-sm font-bold inline-flex mt-5">
-          Discuss merchandise ↗
-        </a>
-      </article>
-
-    </div>
-  </section>
-
-  <!-- ORGANISER SECTION -->
-  <section id="organisers" class="glass rounded-[26px] p-6 sm:p-8 mt-14">
-    <p class="text-xs font-black tracking-[.2em] text-violet-300">FOR ARTISTS & ORGANISERS</p>
-    <h2 class="text-2xl sm:text-3xl font-black mt-2">Have an event coming up?</h2>
-
-    <p class="muted text-sm leading-6 mt-3 max-w-2xl">
-      Send PASONG your event information to request a listing, ticket setup, featured placement or promotional support.
-      Your event should be reviewed before being published.
-    </p>
-
-    <div class="grid sm:grid-cols-2 gap-3 mt-6">
-      <div class="rounded-2xl bg-white/[.04] border border-white/10 p-4">
-        <p class="font-bold">🎟️ Ticketing</p>
-        <p class="muted text-sm mt-2">Request ordinary, VIP and other ticket options.</p>
-      </div>
-      <div class="rounded-2xl bg-white/[.04] border border-white/10 p-4">
-        <p class="font-bold">📈 Promotion</p>
-        <p class="muted text-sm mt-2">Ask about featured placement and campaign options.</p>
-      </div>
-    </div>
-
-    <a
-      class="primary inline-flex rounded-full px-5 py-3 text-sm mt-6"
-      href="mailto:pasong.ug@gmail.com?subject=Submit%20an%20event%20to%20PASONG&body=Event%20name%3A%0AOrganiser%3A%0AContact%20number%3A%0ADate%3A%0AVenue%3A%0ATicket%20types%20and%20prices%3A%0AExpected%20capacity%3A%0APromotion%20requested%3A">
-      Submit an event ↗
-    </a>
-  </section>
-
-  <!-- TICKET COMMISSION TRANSPARENCY -->
-  <section class="mt-8 rounded-3xl border border-violet-400/20 bg-violet-400/[.06] p-5 sm:p-7">
-    <h2 class="font-black text-lg">How PASONG ticket commission works</h2>
-    <p class="muted text-sm leading-6 mt-3">
-      The proposed platform fee is 5% of successfully paid ticket sales, deducted from the organiser's ticket revenue.
-      The buyer does not pay an additional PASONG commission on top of the displayed ticket price.
-    </p>
-
-    <div class="grid grid-cols-2 gap-3 mt-5">
-      <div class="rounded-2xl bg-black/20 p-4">
-        <p class="muted text-xs">Example ticket price</p>
-        <p class="text-xl font-black mt-1"
-           data-price-ugx="20000"
-           data-price-usd="20">UGX 20,000</p>
-      </div>
-      <div class="rounded-2xl bg-black/20 p-4">
-        <p class="muted text-xs">PASONG 5% commission</p>
-        <p class="text-xl font-black text-cyan-300 mt-1"
-           data-price-ugx="1000"
-           data-price-usd="1">UGX 1,000</p>
-      </div>
-    </div>
-
-    <p class="muted text-xs leading-5 mt-4">
-      Example only. Actual settlement must be handled by the backend after Pesapal payment verification, with refunds, payment-provider fees and organiser payouts handled under the applicable terms.
-    </p>
-  </section>
+<div class="glass rounded-[26px] p-6 sm:p-8">
+<p class="eyebrow">CLEAR & TRANSPARENT</p>
+<h2 class="text-2xl font-black mt-2">How PASONG ticket commission works</h2>
+<p class="muted text-sm leading-6 mt-3">The proposed platform fee is 5% of successfully paid ticket sales, deducted from the organiser's ticket revenue. The buyer does not pay an additional PASONG commission on top of the displayed ticket price.</p>
+<div class="rounded-2xl border border-white/10 bg-white/[.03] p-4 mt-5">
+<p class="muted text-xs font-bold">Example ticket price</p>
+<p class="text-2xl font-black mt-1" data-price-ugx="20000" data-price-usd="20">USD 20</p>
+<div class="h-px bg-white/10 my-4"></div>
+<p class="muted text-xs font-bold">PASONG 5% commission</p>
+<p class="text-xl font-black text-cyan-300 mt-1" data-price-ugx="1000" data-price-usd="1">USD 1</p>
+<p class="muted text-xs mt-3">The organiser receives the ticket revenue after the platform commission, subject to applicable fees and settlement terms.</p>
+</div>
+<p class="muted text-xs leading-5 mt-4">Example only. Actual settlement must be handled by the backend after Pesapal payment verification, with refunds, payment-provider fees and organiser payouts handled under the applicable terms.</p>
+</div>
+</section>
 
 </main>
 
-<!-- FOOTER -->
 <footer class="border-t border-white/10 mt-5">
-  <div class="max-w-6xl mx-auto px-5 sm:px-7 py-7 flex flex-col sm:flex-row gap-3 items-center justify-between text-xs muted">
-    <a href="index.html" class="font-black text-white text-base">♪ PASONG</a>
-    <span>Music. Opportunity. Support.</span>
-    <a href="index.html">Back to homepage ↑</a>
-  </div>
+<div class="max-w-6xl mx-auto px-5 sm:px-7 py-7 flex flex-col sm:flex-row gap-3 items-center justify-between text-xs muted">
+<a href="index.html" class="font-black text-white text-base">♪ PASONG</a>
+<span>Music. Opportunity. Support.</span>
+<a href="index.html" class="hover:text-white">Back to homepage ↑</a>
+</div>
 </footer>
 
+<div id="eventToast" class="toast" role="status" aria-live="polite"></div>
+<div id="eventModal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="glass w-full max-w-md rounded-3xl p-6 relative">
+<button id="closeModal" class="outline rounded-full w-9 h-9 absolute top-4 right-4" aria-label="Close">✕</button>
+<p class="eyebrow">PASONG events</p>
+<h2 id="modalTitle" class="text-2xl font-black mt-2 pr-8">Event details</h2>
+<p id="modalDescription" class="muted text-sm leading-6 mt-3"></p>
+<form id="interestForm" class="mt-5 space-y-3">
+<label class="block text-sm font-bold">Your name<input class="field mt-2" name="name" autocomplete="name" required maxlength="100" placeholder="Enter your name"></label>
+<label class="block text-sm font-bold">Email or phone<input class="field mt-2" name="contact" required maxlength="150" placeholder="How can the organiser contact you?"></label>
+<label class="block text-sm font-bold">Message (optional)<textarea class="field mt-2" name="message" rows="3" maxlength="500" placeholder="Any questions for the organiser?"></textarea></label>
+<button class="primary rounded-full w-full py-3 text-sm" type="submit">Prepare registration message</button>
+<p class="muted text-xs">This prepares an email to the organiser; it does not charge you or confirm a booking.</p>
+</form>
+</div>
+</div>
+
+<div id="pasong-footer"></div>
+<script src="pasong-footer-loader.js"></script>
+
 <script>
 (function(){
-  const filter = document.getElementById("eventFilter");
-  const cards = Array.from(document.querySelectorAll(".event-card"));
-  const emptyMessage = document.getElementById("noEvents");
+const toast=document.getElementById('eventToast');
+let toastTimer;
+function notify(message){
+toast.textContent=message;
+toast.classList.add('show');
+clearTimeout(toastTimer);
+toastTimer=setTimeout(()=>toast.classList.remove('show'),4200);
+}
 
-  function filterEvents(){
-    const selected = filter.value;
-    let visibleCount = 0;
+const filter=document.getElementById('eventFilter');
+filter.addEventListener('change',()=>{
+document.querySelectorAll('.event-card').forEach(card=>{
+card.hidden=filter.value!=='all'&&card.dataset.type!==filter.value;
+});
+});
 
-    cards.forEach(function(card){
-      const matches = selected === "all" || card.dataset.type === selected;
-      card.hidden = !matches;
-      if(matches) visibleCount++;
-    });
+const modal=document.getElementById('eventModal');
+const title=document.getElementById('modalTitle');
+const description=document.getElementById('modalDescription');
+const form=document.getElementById('interestForm');
+let activeEvent='',activeAction='register';
 
-    emptyMessage.hidden = visibleCount > 0;
-  }
+const eventInfo={
+'PASONG Live Fest':{
+date:'Date to be confirmed',
+venue:'Kampala',
+price:'Ticket price to be confirmed',
+description:'This is an example listing, not a confirmed event. Please ask the organiser to confirm the date, venue, performers and official ticket details.'
+},
+'Artist Meetups':{
+date:'Date to be confirmed',
+venue:'To be announced',
+price:'Entry details to be confirmed',
+description:'Ask PASONG about upcoming artist meetups, fan experiences and opportunities to connect with performers.'
+}
+};
 
-  filter.addEventListener("change", filterEvents);
-  filterEvents();
+function openModal(eventName,action){
+activeEvent=eventName;
+activeAction=action;
+const info=eventInfo[eventName];
+title.textContent=action==='ticket'?'Ticket information':action==='details'?'Event details':'Register interest';
+description.textContent=info.date+' · '+info.venue+' · '+info.price+'. '+info.description;
+form.reset();
+modal.classList.remove('hidden');
+modal.classList.add('flex');
+document.body.style.overflow='hidden';
+document.querySelector('#interestForm input[name="name"]').focus();
+}
+function closeModal(){
+modal.classList.add('hidden');
+modal.classList.remove('flex');
+document.body.style.overflow='';
+}
+
+document.querySelectorAll('[data-action]').forEach(button=>{
+button.addEventListener('click',()=>{
+openModal(button.dataset.event,button.dataset.action);
+});
+});
+document.getElementById('closeModal').addEventListener('click',closeModal);
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+document.addEventListener('keydown',e=>{
+if(e.key==='Escape'&&!modal.classList.contains('hidden'))closeModal();
+});
+
+form.addEventListener('submit',e=>{
+e.preventDefault();
+const data=new FormData(form);
+const name=String(data.get('name')||'').trim();
+const contact=String(data.get('contact')||'').trim();
+const message=String(data.get('message')||'').trim();
+if(!name||!contact){notify('Please enter your name and contact details.');return}
+const info=eventInfo[activeEvent];
+const subject=encodeURIComponent((activeAction==='ticket'?'Ticket enquiry: ':activeAction==='details'?'Event details: ':'Registration interest: ')+activeEvent);
+const body=encodeURIComponent('Hello PASONG organiser,\n\nI am contacting you about '+activeEvent+'.\nName: '+name+'\nContact: '+contact+'\nEvent: '+info.date+' at '+info.venue+'\nRequest: Please confirm availability and official event details.\nMessage: '+(message||'N/A')+'\n\nSent from the PASONG Events page.');
+window.location.href='mailto:pasong.ug@gmail.com?subject='+subject+'&body='+body;
+notify('Your email app should open with the enquiry ready.');
+closeModal();
+});
+
+/* Country-based display: Uganda uses UGX; other countries use USD. */
+const countryStatus=document.getElementById('countryStatus');
+function showPrices(countryCode){
+const isUganda=countryCode==='UG';
+document.querySelectorAll('[data-price-ugx][data-price-usd]').forEach(el=>{
+const value=isUganda?el.dataset.priceUgx:el.dataset.priceUsd;
+const amount=Number(value);
+el.textContent=(isUganda?'UGX ':'USD ')+amount.toLocaleString(isUganda?'en-UG':'en-US',{maximumFractionDigits:2});
+});
+countryStatus.textContent=isUganda?'✓ Country detected: Uganda · Prices shown in UGX.':'✓ International display · Prices shown in USD.';
+}
+fetch('https://ipapi.co/json/',{headers:{Accept:'application/json'}})
+.then(response=>{if(!response.ok)throw new Error('Country lookup failed');return response.json()})
+.then(data=>{
+if(data&&data.country_code){showPrices(data.country_code)}
+else{showPrices('');countryStatus.textContent='Country detection unavailable · Showing USD prices.'}
+})
+.catch(()=>{
+showPrices('');
+countryStatus.textContent='Country detection unavailable · Showing USD prices.';
+});
+
+document.querySelectorAll('a[target="_blank"]').forEach(a=>a.setAttribute('rel','noopener noreferrer'));
 })();
 </script>
-
-<!-- AUTOMATIC IP COUNTRY DETECTION -->
-<script>
-(function(){
-  const status = document.getElementById("countryStatus");
-  let completed = false;
-
-  function applyCountry(countryCode, countryName){
-    if(completed) return;
-    completed = true;
-
-    const isUganda = String(countryCode || "").toUpperCase() === "UG";
-    const currency = isUganda ? "UGX" : "USD";
-
-    document.querySelectorAll("[data-price-ugx][data-price-usd]")
-      .forEach(function(element){
-        const amount = Number(
-          isUganda
-            ? element.dataset.priceUgx
-            : element.dataset.priceUsd
-        );
-
-        if(!Number.isFinite(amount)) return;
-
-        element.textContent = currency + " " +
-          new Intl.NumberFormat(
-            isUganda ? "en-UG" : "en-US",
-            {maximumFractionDigits:2}
-          ).format(amount);
-      });
-
-    if(status){
-      if(countryCode){
-        status.textContent = "Country detected: " +
-          (countryName || countryCode) +
-          " · Prices displayed in " + currency + ".";
-      }else{
-        status.textContent =
-          "Country detection unavailable · Showing USD prices.";
-      }
-    }
-  }
-
-  const controller = new AbortController();
-
-  const timeout = setTimeout(function(){
-    controller.abort();
-    applyCountry("", "");
-  }, 5000);
-
-  fetch("https://ipapi.co/json/", {
-    method:"GET",
-    headers:{Accept:"application/json"},
-    signal:controller.signal
-  })
-  .then(function(response){
-    if(!response.ok) throw new Error("Country detection failed");
-    return response.json();
-  })
-  .then(function(data){
-    clearTimeout(timeout);
-    applyCountry(data.country_code, data.country_name);
-  })
-  .catch(function(){
-    clearTimeout(timeout);
-    applyCountry("", "");
-  });
-})();
-</script>
-
 </body>
 </html>
