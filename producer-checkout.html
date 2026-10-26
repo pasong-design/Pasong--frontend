@@ -2,209 +2,129 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#050b18">
-<title>PASONG Studio — Direct Booking</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PASONG Studio</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root{--bg:#050b18;--line:#173455;--muted:#a4b4cc}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:85px}
-body{margin:0;background:var(--bg);color:#f8fafc;font-family:Inter,sans-serif}
-.wrap{width:min(1180px,calc(100% - 32px));margin:auto}
-header{position:sticky;top:0;z-index:30;background:#050b18f5;backdrop-filter:blur(15px);border-bottom:1px solid var(--line)}
-.navbar{min-height:70px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:23px;color:white;text-decoration:none}
-.logo-mark{font-size:32px;color:#c084fc}.logo-sub{display:block;font-size:8px;letter-spacing:1px;color:#a9bad1}
-.navlinks{display:flex;gap:20px;font-size:12px;color:#d5deec}.navlinks a{color:#d5deec;text-decoration:none}.navlinks a.active{color:#d28bff}
-.signin{border-radius:999px;padding:10px 17px;background:#fff;color:#0a1020;font-weight:800;font-size:12px;text-decoration:none}
-.hero{border-bottom:1px solid var(--line);background:linear-gradient(90deg,#050b18 0%,#050b18ed 40%,#050b1870 100%),url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1800&q=85') center/cover}
-.hero-inner{min-height:420px;display:flex;align-items:center;padding:45px 0}
-.hero-copy{max-width:650px}
-.eyebrow,.kicker{display:inline-block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:900;color:#d9a0ff}
-.eyebrow{border:1px solid #9145c5;border-radius:99px;padding:8px 12px;background:#3b07642b}
-h1{font-size:clamp(37px,6vw,65px);line-height:1.04;letter-spacing:-2.5px;font-weight:900;margin:18px 0}
-.gradient{background:linear-gradient(90deg,#df9bff,#9b35ff 48%,#22b9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{max-width:550px;color:#d0d9e8;font-size:14px;line-height:1.8}
-.actions,.feature-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.feature{display:flex;align-items:center;gap:8px;padding-right:12px;border-right:1px solid #29405b;font-size:11px;color:#dce6f6}
-.feature:last-child{border:0}
-.feature-icon{width:35px;height:35px;border-radius:12px;display:grid;place-items:center;background:#4c1d954d;color:#d58bff;border:1px solid #6826a466;font-size:19px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 19px;font-size:12px;font-weight:800;cursor:pointer}
-.btn-grad{background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:#fff}
-.btn-outline{background:#050b18bd;border:1px solid #5c7fa8;color:white}
-.section{padding:34px 0;border-bottom:1px solid var(--line)}
-.section-top{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:20px}
-h2{font-size:clamp(24px,3.5vw,32px);letter-spacing:-.9px;line-height:1.2;font-weight:900;margin:7px 0}
-.sub{font-size:12px;color:var(--muted);line-height:1.75;max-width:700px}
-.studios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.studio-card{overflow:hidden;border:1px solid #24517a;border-radius:16px;background:linear-gradient(150deg,#081426,#020916)}
-.studio-art{height:145px;position:relative;display:flex;align-items:center;justify-content:center}
-.studio-art:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#020916,transparent 75%),var(--studio-image) center/cover}
-.studio-brand{position:relative;z-index:1;width:90px;height:90px;border-radius:14px;background:#020713ed;border:1px solid var(--brand-color);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:8px}
-.brand-symbol{font-size:28px;font-weight:900;color:var(--brand-color)}
-.brand-name{font-size:10px;line-height:1.2;font-weight:900;margin-top:6px}
-.studio-body{padding:16px}
-.tag{display:inline-block;padding:5px 9px;border-radius:99px;font-size:9px;font-weight:800;background:#064e3b;color:#a7f3d0;border:1px solid #059669}
-.tag.blue{background:#082f75;color:#bfdbfe;border-color:#2563eb}
-.location{font-size:11px;color:#c2d1e5}
-.description{font-size:11px;color:#aebed2;line-height:1.7;min-height:40px;margin-top:10px}
-.price{font-size:14px;font-weight:900;margin-top:12px}
-.book-btn{width:100%;margin-top:13px;padding:12px;border-radius:999px;background:linear-gradient(100deg,#b10cff,#5651ff,#00b8f5);color:white;font-size:11px;font-weight:900;border:0;cursor:pointer}
-.owner-banner{margin-top:22px;padding:24px;border:1px solid #7140ac;border-radius:18px;background:linear-gradient(110deg,#24104a,#0b2342)}
-.form-card{border:1px solid #17416a;border-radius:15px;padding:17px;background:#061225;margin-top:16px}
-input,select,textarea{width:100%;background:#071326;border:1px solid #24466b;border-radius:9px;color:white;padding:12px;font-size:12px;outline:none}
-label{display:block;font-size:11px;color:#d7e2f1;font-weight:700;margin:8px 0 4px}
-footer{padding:23px 0 15px;background:#030814}
-.footer-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:13px;font-size:10px;color:#9fb1c8}
-@media(max-width:700px){.wrap{width:calc(100% - 28px)}.navlinks{display:none}.studios{grid-template-columns:1fr}.studio-card{display:grid;grid-template-columns:115px 1fr}}
+body{margin:0;background:#050b18;color:#f8fafc;font-family:Inter,sans-serif}
+.wrap{width:min(1180px,calc(100% - 28px));margin:auto}
+header{position:sticky;top:0;z-index:10;background:#050b18;border-bottom:1px solid #173455;padding:12px 0}
+.card{border:1px solid #24517a;border-radius:16px;background:#081426;padding:16px;margin-bottom:16px}
+.btn{border:0;border-radius:999px;padding:12px 19px;font-weight:800;cursor:pointer;width:100%;background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:white}
+input,select,textarea{width:100%;background:#071326;border:1px solid #24466b;border-radius:9px;color:white;padding:12px;font-size:12px}
+label{font-size:11px;font-weight:700;margin:8px 0 4px;display:block}
+#registerMap{height:320px;border-radius:12px;border:1px solid #24466b;z-index:1;margin:10px 0}
+.studios{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:700px){.studios{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header><div class="wrap navbar"><a class="logo" href="/Pasong.html"><span class="logo-mark">♫</span><span>PASONG<span class="logo-sub">MUSIC · CREATORS · OPPORTUNITY</span></span></a><nav class="navlinks"><a href="/Pasong.html">Home</a><a href="/studio.html" class="active">Studio</a><a href="/beats.html">Beats</a><a href="/events.html">Events</a></nav><a class="signin" href="/account.html">Sign In</a></div></header>
-
-<section class="hero"><div class="wrap hero-inner"><div class="hero-copy"><span class="eyebrow">A GLOBAL HOME FOR CREATORS</span><h1>Book a Studio.<br><span class="gradient">Bring Your Sound<br>to Life.</span></h1><p class="lead">Discover studios by IP location. Pin your studio on map. All payments via producer-checkout.html to unlock contact.</p><div class="feature-row"><div class="feature"><span class="feature-icon">♫</span><span>Recording<br>Studios</span></div><div class="feature"><span class="feature-icon">≋</span><span>Beat<br>Production</span></div><div class="feature"><span class="feature-icon">🎚</span><span>Mix &<br>Mastering</span></div><div class="feature"><span class="feature-icon">♙</span><span>Studio<br>Discovery</span></div></div><div class="actions"><a class="btn btn-grad" href="#studios">Explore Studios →</a></div></div></div></section>
-
-<section class="section" id="studios"><div class="wrap">
-<div class="section-top"><div><div class="kicker">Studio Directory</div><h2>Find Your <span class="gradient">Sound</span></h2><p id="nearYouText" class="sub" style="color:#d9a0ff;font-weight:800">📍 Detecting your location by IP...</p><div style="display:flex;gap:10px;margin-top:14px"><input id="studioSearch" placeholder="Search studio name, city, country..." style="flex:1;padding:11px 14px;border-radius:99px;background:#071326;border:1px solid #24466b;color:white;font-size:11px"><button onclick="detectLocation()" class="btn btn-outline" style="border-radius:99px">📍 Near Me</button></div></div></div>
+<header><div class="wrap"><b>PASONG</b> MUSIC · CREATORS · OPPORTUNITY</div></header>
+<div class="wrap" style="padding:20px 0">
+<h1>Book a Studio. Bring Your Sound to Life.</h1>
+<p id="nearYouText" style="color:#d9a0ff;font-size:11px">📍 Detecting your location by IP...</p>
 
 <div class="studios" id="studiosGrid">
-<article class="studio-card" data-location="London United Kingdom" data-lat="51.5074" data-lng="-0.1278"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">NS</span><span class="brand-name">NORTHSTAR<br>RECORDING</span></div></div><div class="studio-body"><span class="tag">Recording + Beats</span><h3>Northstar Recording</h3><p class="location">📍 London, UK</p><p class="description">Professional recording and vocal sessions.</p><p class="price">£100 / session <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="Northstar Recording" data-producer="John Smith" data-phone="+44 7700 900123" data-service="Recording + Beats">Book → Pay on Checkout</button></div></article>
-
-<article class="studio-card" data-location="Lagos Nigeria" data-lat="6.5244" data-lng="3.3792"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=85');--brand-color:#21dcff"><div class="studio-brand"><span class="brand-symbol">LS</span><span class="brand-name">LAGOS<br>SOUND LAB</span></div></div><div class="studio-body"><span class="tag blue">Mix & Master</span><h3>Lagos Sound Lab</h3><p class="location">📍 Lagos, Nigeria</p><p class="description">Mixing and mastering.</p><p class="price">₦30,000 / song <small> + UGX 5k</small></p><button class="book-btn" data-studio="Lagos Sound Lab" data-producer="Femi Beats" data-phone="+234 800 123 4567" data-service="Mix & Master">Book → Pay on Checkout</button></div></article>
-
-<article class="studio-card" data-location="Kampala Uganda Kawempe" data-lat="0.3476" data-lng="32.5825"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">KV</span><span class="brand-name">KV BEATS<br>STUDIO</span></div></div><div class="studio-body"><span class="tag">Recording + Beats</span><h3>KV Beats Studio</h3><p class="location">📍 Kawempe, Kampala</p><p class="description">Beats, vocals, full package.</p><p class="price">UGX 50,000 / day <small> + UGX 5k</small></p><button class="book-btn" data-studio="KV Beats Studio - Kawempe" data-producer="Kato V" data-phone="0700471406" data-service="Recording + Beats">Book → Pay on Checkout</button></div></article>
+<div class="card" data-location="Kampala Uganda" data-lat="0.3476" data-lng="32.5825"><h3>KV Beats Studio - Kawempe</h3><p>📍 Kawempe, Kampala</p><p>UGX 50,000 / day + 5k</p><button class="book-btn btn" data-studio="KV Beats Studio - Kawempe" data-producer="Kato V" data-phone="0700471406" data-service="Recording + Beats">Book Now</button></div>
+<div class="card" data-location="London UK" data-lat="51.5074" data-lng="-0.1278"><h3>Northstar Recording</h3><p>📍 London, UK</p><button class="book-btn btn" data-studio="Northstar Recording" data-producer="John Smith" data-phone="+447700900123" data-service="Recording">Book Now</button></div>
 </div>
 
-<div class="owner-banner" id="studio-owner">
-<div class="kicker">FOR PRODUCERS - GOOGLE PIN</div>
+<div class="card" style="margin-top:30px;border-color:#7140ac;background:linear-gradient(110deg,#24104a,#0b2342)">
 <h2>Register Your Studio - Pin Location on Map</h2>
-<p class="sub">Click map to pin your studio. Drag pin to adjust. Visitors near your pin will see you first. All bookings pay via producer-checkout.html</p>
-<form id="producerRegisterForm" class="form-card">
-<label>Studio Name *</label><input id="regStudioName" required placeholder="e.g. KV Beats Studio">
+<p style="font-size:11px;color:#a4b4cc">Your location is detected automatically. Drag pin to adjust.</p>
+<form id="producerRegisterForm">
+<label>Studio Name *</label><input id="regStudioName" required>
 <label>Owner Name *</label><input id="regOwnerName" required>
-<label>Phone *</label><input id="regPhone" required placeholder="070...">
-<label>City *</label><input id="regLocation" required placeholder="Kawempe, Kampala">
-<label>Google Location Pin * — Click map to pin</label>
-<div style="display:flex;gap:8px;margin-bottom:8px">
-<input id="regLatLngDisplay" readonly placeholder="Click map to pin location" style="flex:1">
-<button type="button" onclick="getCurrentLocationPin()" class="btn btn-outline" style="width:auto;white-space:nowrap">📍 My Location</button>
-</div>
-<div id="registerMap" style="height:280px;border-radius:12px;border:1px solid #24466b;margin-bottom:10px;z-index:1"></div>
-<p style="font-size:10px;color:#a4b4cc">Click map to drop pin. Drag to adjust. Auto-fills city name.</p>
+<label>Phone *</label><input id="regPhone" required>
+<label>City *</label><input id="regLocation" required placeholder="Kampala, Uganda">
+<label>Location Pin * - Auto detected</label>
+<input id="regLatLngDisplay" readonly placeholder="Auto detecting..." style="margin-bottom:8px">
+<div id="registerMap"></div>
 <input type="hidden" id="regLat"><input type="hidden" id="regLng">
-<label>Service *</label><select id="regService" required><option value="">Choose</option><option>Recording + Beats</option><option>Mix & Master</option><option>Full Package</option><option>Vocal Recording</option><option>Beat Production</option></select>
+<label>Service *</label><select id="regService" required><option value="">Choose</option><option>Recording + Beats</option><option>Mix & Master</option><option>Full Package</option></select>
 <label>Price *</label><input id="regPrice" required placeholder="UGX 50,000 / day">
-<label>Description *</label><textarea id="regDesc" required placeholder="Describe studio..."></textarea>
-<button type="submit" class="btn btn-grad" style="width:100%;margin-top:12px">Register Studio with Map Pin →</button>
+<label>Description *</label><textarea id="regDesc" required></textarea>
+<button type="submit" class="btn" style="margin-top:12px">Register Studio on Site →</button>
 </form>
-<p id="regNotice" style="font-size:12px;color:#22c55e;margin-top:8px"></p>
+<p id="regNotice" style="color:#22c55e;font-size:12px"></p>
+</div>
 </div>
 
-</div></section>
-
-<footer><div class="wrap"><div class="footer-bottom"><span>© <span id="year"></span> PASONG - Checkout: producer-checkout.html</span><span>pasong.ug@gmail.com</span></div></div></footer>
+<footer style="padding:20px 0;border-top:1px solid #173455"><div class="wrap" style="display:flex;justify-content:space-between;font-size:10px;color:#9fb1c8"><span>© 2026 PASONG</span><span>Contact: pasong.ug@gmail.com</span></div></footer>
 
 <script>
-(function(){
-document.getElementById('year').textContent = new Date().getFullYear();
-
+// AUTOMATIC LOCATION - No popup
 let regMap, regMarker;
+function setPin(lat,lng){
+ document.getElementById('regLat').value=lat;
+ document.getElementById('regLng').value=lng;
+ document.getElementById('regLatLngDisplay').value=lat.toFixed(6)+', '+lng.toFixed(6);
+ if(regMarker){regMap.removeLayer(regMarker);}
+ regMarker=L.marker([lat,lng],{draggable:true}).addTo(regMap);
+ regMarker.on('dragend',()=>{
+   const p=regMarker.getLatLng();
+   document.getElementById('regLat').value=p.lat;
+   document.getElementById('regLng').value=p.lng;
+   document.getElementById('regLatLngDisplay').value=p.lat.toFixed(6)+', '+p.lng.toFixed(6);
+ });
+ regMap.setView([lat,lng],14);
+}
+
 setTimeout(()=>{
-  regMap = L.map('registerMap').setView([0.3476, 32.5825], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(regMap);
-  regMap.on('click', function(e){ setPin(e.latlng.lat, e.latlng.lng); });
-  setPin(0.3476, 32.5825);
-}, 600);
+ regMap=L.map('registerMap').setView([0.3476,32.5825],12);
+ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(regMap);
+ regMap.on('click',e=>setPin(e.latlng.lat,e.latlng.lng));
+ // AUTO DETECT - Silent, no alert
+ if(navigator.geolocation){
+   navigator.geolocation.getCurrentPosition(
+     pos=>setPin(pos.coords.latitude,pos.coords.longitude),
+     ()=>setPin(0.3476,32.5825),
+     {enableHighAccuracy:true,timeout:10000}
+   );
+ } else { setPin(0.3476,32.5825); }
+},500);
 
-function setPin(lat, lng){
-  document.getElementById('regLat').value = lat;
-  document.getElementById('regLng').value = lng;
-  document.getElementById('regLatLngDisplay').value = lat.toFixed(6) + ', ' + lng.toFixed(6);
-  if(regMarker){ regMap.removeLayer(regMarker); }
-  regMarker = L.marker([lat, lng], {draggable:true}).addTo(regMap);
-  regMarker.on('dragend', function(){
-    const p = regMarker.getLatLng();
-    document.getElementById('regLat').value = p.lat;
-    document.getElementById('regLng').value = p.lng;
-    document.getElementById('regLatLngDisplay').value = p.lat.toFixed(6) + ', ' + p.lng.toFixed(6);
-  });
-  regMap.setView([lat, lng], 13);
-  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-    .then(r=>r.json()).then(d=>{
-      if(d.display_name && !document.getElementById('regLocation').value){
-        document.getElementById('regLocation').value = d.address.city||d.address.town||d.address.village||'' + ', ' + (d.address.country||'');
-      }
-    }).catch(()=>{});
-}
-window.getCurrentLocationPin = function(){
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(pos=>{ setPin(pos.coords.latitude, pos.coords.longitude); },
-    ()=>{alert('Could not get location. Click map manually.');});
-  }
-}
-window.setPin = setPin;
-
-window.detectLocation = function(){
-  const txt = document.getElementById('nearYouText');
-  txt.textContent = '📍 Detecting...';
-  fetch('https://ipapi.co/json/').then(r=>r.json()).then(data=>{
-    const city = data.city || 'Your area'; const country = data.country_name || '';
-    txt.innerHTML = `📍 Studios near you in <b style="color:#fff">${city}, ${country}</b> - IP: ${data.ip}`;
-    const cards = Array.from(document.querySelectorAll('.studio-card'));
-    cards.sort((a,b)=>{
-      const aL = (a.dataset.location||'').toLowerCase(); const bL = (b.dataset.location||'').toLowerCase();
-      return (aL.includes(city.toLowerCase())||aL.includes(country.toLowerCase())?0:1) - (bL.includes(city.toLowerCase())||bL.includes(country.toLowerCase())?0:1);
-    });
-    const grid = document.getElementById('studiosGrid');
-    cards.forEach(c=>{grid.appendChild(c); if((c.dataset.location||'').toLowerCase().includes(city.toLowerCase())){c.style.borderColor='#22c55e';}});
-  }).catch(()=>{txt.textContent='📍 Could not detect IP. Showing all studios.';});
-};
-detectLocation();
-
-document.getElementById('studioSearch').addEventListener('input', function(){
-  const q = this.value.toLowerCase();
-  document.querySelectorAll('.studio-card').forEach(card=>{card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';});
-});
-
-// FIXED - SINGLE L: producer-checkout.html
+// FIXED CHECKOUT - Relative path, works on Vercel
 document.querySelectorAll('.book-btn').forEach(btn=>{
-  btn.addEventListener('click', function(){
-    const studio = this.dataset.studio; const producer = this.dataset.producer || studio;
-    const phone = this.dataset.phone || '0700471406'; const service = this.dataset.service || '';
-    const loc = this.closest('.studio-card')?.dataset.location || '';
-    const lat = this.closest('.studio-card')?.dataset.lat || ''; const lng = this.closest('.studio-card')?.dataset.lng || '';
-    const price = this.closest('.studio-body')?.querySelector('.price')?.innerText || '';
-    window.location.href = `/producer-checkout.html?studio=${encodeURIComponent(studio)}&producer=${encodeURIComponent(producer)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(service)}&lat=${lat}&lng=${lng}`;
-  });
+ btn.addEventListener('click',function(){
+   const studio=this.dataset.studio;
+   const producer=this.dataset.producer;
+   const phone=this.dataset.phone;
+   const service=this.dataset.service;
+   const card=this.closest('.card');
+   const loc=card?.dataset.location||'';
+   const lat=card?.dataset.lat||document.getElementById('regLat').value||'0.3476';
+   const lng=card?.dataset.lng||document.getElementById('regLng').value||'32.5825';
+   const price=card?.querySelector('p')?.innerText||'';
+   // SINGLE L, RELATIVE PATH - FIXES CHECKOUT
+   window.location.href=`producer-checkout.html?studio=${encodeURIComponent(studio)}&producer=${encodeURIComponent(producer)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(service)}&lat=${lat}&lng=${lng}`;
+ });
 });
 
-document.getElementById('producerRegisterForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const sName = document.getElementById('regStudioName').value;
-  const oName = document.getElementById('regOwnerName').value;
-  const phone = document.getElementById('regPhone').value;
-  const loc = document.getElementById('regLocation').value;
-  const lat = document.getElementById('regLat').value;
-  const lng = document.getElementById('regLng').value;
-  const svc = document.getElementById('regService').value;
-  const price = document.getElementById('regPrice').value;
-  const desc = document.getElementById('regDesc').value;
-  if(!lat || !lng){ alert('Please pin your studio location on map! Click map to set pin.'); return; }
-  const grid = document.getElementById('studiosGrid');
-  const card = document.createElement('article');
-  card.className = 'studio-card'; card.dataset.location = loc; card.dataset.lat = lat; card.dataset.lng = lng;
-  card.innerHTML = `<div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">${sName.substring(0,2).toUpperCase()}</span><span class="brand-name">${sName.toUpperCase()}</span></div></div><div class="studio-body"><span class="tag">${svc}</span><h3>${sName}</h3><p class="location">📍 ${loc}<br><small style="color:#22c55e">📌 Pinned: ${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}</small></p><p class="description">${desc}</p><p class="price">${price} <small> + UGX 5k</small></p><button class="book-btn" data-studio="${sName}" data-producer="${oName}" data-phone="${phone}" data-service="${svc}">Book → Pay on Checkout</button></div>`;
-  grid.prepend(card);
-  card.querySelector('.book-btn').addEventListener('click', function(){
-    window.location.href = `/producer-checkout.html?studio=${encodeURIComponent(sName)}&producer=${encodeURIComponent(oName)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(svc)}&lat=${lat}&lng=${lng}`;
-  });
-  document.getElementById('regNotice').textContent = `✅ ${sName} registered with pin ${lat}, ${lng}! Visitors near ${loc} will see it first.`;
-  this.reset(); setPin(0.3476, 32.5825);
+document.getElementById('producerRegisterForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const sName=document.getElementById('regStudioName').value;
+ const oName=document.getElementById('regOwnerName').value;
+ const phone=document.getElementById('regPhone').value;
+ const loc=document.getElementById('regLocation').value;
+ const lat=document.getElementById('regLat').value||'0.3476';
+ const lng=document.getElementById('regLng').value||'32.5825';
+ const svc=document.getElementById('regService').value;
+ const price=document.getElementById('regPrice').value;
+ const desc=document.getElementById('regDesc').value;
+ const grid=document.getElementById('studiosGrid');
+ const card=document.createElement('div');
+ card.className='card'; card.dataset.location=loc; card.dataset.lat=lat; card.dataset.lng=lng;
+ card.innerHTML=`<h3>${sName}</h3><p>📍 ${loc}<br><small style="color:#22c55e">📌 ${lat}, ${lng}</small></p><p>${price}</p><button class="book-btn btn" data-studio="${sName}" data-producer="${oName}" data-phone="${phone}" data-service="${svc}">Book Now</button>`;
+ grid.prepend(card);
+ card.querySelector('.book-btn').addEventListener('click',function(){
+   window.location.href=`producer-checkout.html?studio=${encodeURIComponent(sName)}&producer=${encodeURIComponent(oName)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(svc)}&lat=${lat}&lng=${lng}`;
+ });
+ document.getElementById('regNotice').textContent=`✅ ${sName} registered with auto pin!`;
+ e.target.reset();
+ setPin(0.3476,32.5825);
 });
-})();
 </script>
 </body>
 </html>
