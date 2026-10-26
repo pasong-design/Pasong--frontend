@@ -146,6 +146,16 @@
     "Zambia","Zimbabwe"
   ];
 
+  // Common studio services stay available even when the database has no approved listings.
+  // Live listing values are merged into this catalogue so custom services remain searchable.
+  const COMMON_SERVICES = [
+    "Audio Engineering", "Beat Making", "DJ Services", "Live Sound",
+    "Mastering", "Mixing", "Mixing & Mastering", "Music Lessons",
+    "Music Production", "Podcast Recording", "Rehearsal Space",
+    "Recording", "Songwriting", "Vocal Recording", "Voice-over",
+    "Video Production", "Photography", "Other"
+  ];
+
   function fillOptions() {
     const selectedCountry = countryFilter.value;
     const selectedService = serviceFilter.value;
@@ -156,8 +166,10 @@
       ...allStudios.map(s => clean(s.country)).filter(Boolean)
     ])].sort((a, b) => a.localeCompare(b));
 
-    const services = [...new Set(allStudios.flatMap(servicesOf))]
-      .sort((a, b) => a.localeCompare(b));
+    const services = [...new Set([
+      ...COMMON_SERVICES,
+      ...allStudios.flatMap(studio => [...servicesOf(studio), clean(studio.studio_type)].filter(Boolean))
+    ])].sort((a, b) => a.localeCompare(b));
 
     countryFilter.replaceChildren();
     serviceFilter.replaceChildren();
@@ -178,7 +190,13 @@
     const q = search.value.trim().toLowerCase(), country = countryFilter.value, service = serviceFilter.value;
     const filtered = allStudios.filter(s => {
       const searchable = [s.studio_name,s.studio_type,s.city,s.country,s.address,s.description,...servicesOf(s),...(Array.isArray(s.equipment)?s.equipment:[])].join(' ').toLowerCase();
-      return (!q || searchable.includes(q)) && (!country || clean(s.country)===country) && (!service || servicesOf(s).includes(service));
+      const listedServices = [...servicesOf(s), clean(s.studio_type)].filter(Boolean);
+      const hasService = !service || listedServices.some(item =>
+        item.toLocaleLowerCase() === service.toLocaleLowerCase() ||
+        item.toLocaleLowerCase().includes(service.toLocaleLowerCase()) ||
+        service.toLocaleLowerCase().includes(item.toLocaleLowerCase())
+      );
+      return (!q || searchable.includes(q)) && (!country || clean(s.country)===country) && hasService;
     });
     grid.replaceChildren(); filtered.forEach(s=>grid.appendChild(studioCard(s)));
     empty.hidden = filtered.length > 0;
