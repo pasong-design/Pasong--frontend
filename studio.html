@@ -3,26 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PASONG Studio - Professional</title>
+<title>PASONG Studio - All Countries</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 body{font-family:Inter,sans-serif;background:#050b18;color:#f8fafc;margin:0}
 .wrap{width:min(1180px,calc(100% - 32px));margin:auto}
-.hero{background:linear-gradient(90deg,#050b18 0%,#050b18ee 45%,#050b1880 100%),url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1800&q=80') center/cover}
+.hero{background:linear-gradient(90deg,#050b18 0%,#050b18ee 45%,#050b1880 100%),url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1800&q=80') center/cover;border-bottom:1px solid #173455}
 .filter-bar{display:flex;gap:10px;flex-wrap:wrap;background:#0a1930;border:1px solid #1e3a5f;border-radius:14px;padding:12px}
-.filter-bar input,.filter-bar select{background:#071326;border:1px solid #24466b;border-radius:10px;color:white;padding:11px 14px;font-size:12px;outline:none;flex:1;min-width:140px}
-.filter-bar input:focus,.filter-bar select:focus{border-color:#a855f7}
+.filter-bar input,.filter-bar select{background:#071326;border:1px solid #24466b;border-radius:10px;color:white;padding:11px 14px;font-size:12px;outline:none;flex:1;min-width:140px;max-height:200px}
 .studio-card{overflow:hidden;border:1px solid #24517a;border-radius:16px;background:linear-gradient(150deg,#0a1a33,#020916);transition:.2s}
 .studio-card:hover{border-color:#a855f7;transform:translateY(-3px)}
 .studio-art{height:150px;position:relative;display:flex;align-items:center;justify-content:center}
 .studio-art:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#020916,transparent 70%),var(--img) center/cover;pointer-events:none}
 .studio-brand{position:relative;z-index:1;width:90px;height:90px;border-radius:14px;background:#020713ee;border:1px solid var(--brand);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
 .book-btn{width:100%;margin-top:12px;padding:11px;border-radius:999px;background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:white;font-weight:800;font-size:11px;border:0;cursor:pointer}
-#registerMap{height:340px;border-radius:12px;border:1px solid #24466b;margin:10px 0}
-.tag{padding:5px 10px;border-radius:99px;font-size:9px;font-weight:800}
 </style>
 </head>
 <body>
@@ -30,111 +25,44 @@ body{font-family:Inter,sans-serif;background:#050b18;color:#f8fafc;margin:0}
 <header style="position:sticky;top:0;z-index:30;background:#050b18f5;backdrop-filter:blur(12px);border-bottom:1px solid #173455;padding:14px 0">
 <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
 <b style="font-size:20px">♫ PASONG</b>
-<div style="display:flex;gap:12px;font-size:12px"><a href="/" style="color:#a4b4cc;text-decoration:none">Home</a><a href="studio.html" style="color:#d28bff;text-decoration:none">Studios</a></div>
+<div style="display:flex;gap:14px;font-size:12px"><a href="/" style="color:#a4b4cc;text-decoration:none">Home</a><a href="studio.html" style="color:#d28bff;text-decoration:none;font-weight:800">Studios</a><a href="/dashboard.html" style="background:white;color:#0a1020;padding:8px 14px;border-radius:99px;font-weight:800;text-decoration:none">Dashboard</a></div>
 </div>
 </header>
 
-<section class="hero"><div class="wrap" style="padding:60px 0"><span style="display:inline-block;border:1px solid #9145c5;border-radius:99px;padding:7px 12px;font-size:10px;letter-spacing:1px;color:#d9a0ff;font-weight:800">A GLOBAL HOME FOR CREATORS</span><h1 style="font-size:clamp(36px,6vw,60px);line-height:1.05;font-weight:900;margin:16px 0;letter-spacing:-2px">Find a Studio.<br><span style="background:linear-gradient(90deg,#df9bff,#9b35ff,#22b9ff);-webkit-background-clip:text;color:transparent">Create Anywhere.</span></h1><p style="max-width:550px;color:#cbd5e1;font-size:13px;line-height:1.7">Discover PASONG approved studios worldwide. Your location is detected automatically.</p></div></section>
+<section class="hero"><div class="wrap" style="padding:60px 0 45px"><h1 style="font-size:clamp(36px,6vw,60px);line-height:1.05;font-weight:900;margin:0;letter-spacing:-2px">Find a Studio.<br><span style="background:linear-gradient(90deg,#df9bff,#9b35ff,#22b9ff);-webkit-background-clip:text;color:transparent">Create Anywhere.</span></h1><p id="nearYouText" style="font-size:12px;color:#d9a0ff;font-weight:700;margin-top:12px">📍 Detecting your location...</p></div></section>
 
-<section style="padding:30px 0"><div class="wrap">
-<h2 style="font-size:28px;font-weight:900;margin-bottom:4px">Find a place to <span style="color:#a855f7">create.</span></h2>
-<p id="nearYouText" style="font-size:12px;color:#d9a0ff;font-weight:700;margin-bottom:14px">📍 Detecting your location...</p>
-
-<!-- PROFESSIONAL FILTER BAR - FIXED -->
+<section style="padding:28px 0 60px"><div class="wrap">
 <div class="filter-bar">
 <input id="searchInput" placeholder="🔍 Search studio, city..." oninput="filterStudios()">
 <select id="countryFilter" onchange="filterStudios()">
 <option value="all">🌍 All Countries</option>
-<option value="uganda">🇺🇬 Uganda</option>
-<option value="nigeria">🇳🇬 Nigeria</option>
-<option value="kenya">🇰🇪 Kenya</option>
-<option value="uk">🇬🇧 UK</option>
-<option value="usa">🇺🇸 USA</option>
-<option value="south africa">🇿🇦 South Africa</option>
+<option value="afghanistan">Afghanistan</option><option value="albania">Albania</option><option value="algeria">Algeria</option><option value="andorra">Andorra</option><option value="angola">Angola</option><option value="antigua and barbuda">Antigua and Barbuda</option><option value="argentina">Argentina</option><option value="armenia">Armenia</option><option value="australia">Australia</option><option value="austria">Austria</option><option value="azerbaijan">Azerbaijan</option><option value="bahamas">Bahamas</option><option value="bahrain">Bahrain</option><option value="bangladesh">Bangladesh</option><option value="barbados">Barbados</option><option value="belarus">Belarus</option><option value="belgium">Belgium</option><option value="belize">Belize</option><option value="benin">Benin</option><option value="bhutan">Bhutan</option><option value="bolivia">Bolivia</option><option value="bosnia and herzegovina">Bosnia and Herzegovina</option><option value="botswana">Botswana</option><option value="brazil">Brazil</option><option value="brunei">Brunei</option><option value="bulgaria">Bulgaria</option><option value="burkina faso">Burkina Faso</option><option value="burundi">Burundi</option><option value="cambodia">Cambodia</option><option value="cameroon">Cameroon</option><option value="canada">Canada</option><option value="cape verde">Cape Verde</option><option value="central african republic">Central African Republic</option><option value="chad">Chad</option><option value="chile">Chile</option><option value="china">China</option><option value="colombia">Colombia</option><option value="comoros">Comoros</option><option value="congo">Congo</option><option value="costa rica">Costa Rica</option><option value="croatia">Croatia</option><option value="cuba">Cuba</option><option value="cyprus">Cyprus</option><option value="czech republic">Czech Republic</option><option value="denmark">Denmark</option><option value="djibouti">Djibouti</option><option value="dominica">Dominica</option><option value="dominican republic">Dominican Republic</option><option value="ecuador">Ecuador</option><option value="egypt">Egypt</option><option value="el salvador">El Salvador</option><option value="equatorial guinea">Equatorial Guinea</option><option value="eritrea">Eritrea</option><option value="estonia">Estonia</option><option value="eswatini">Eswatini</option><option value="ethiopia">Ethiopia</option><option value="fiji">Fiji</option><option value="finland">Finland</option><option value="france">France</option><option value="gabon">Gabon</option><option value="gambia">Gambia</option><option value="georgia">Georgia</option><option value="germany">Germany</option><option value="ghana">Ghana</option><option value="greece">Greece</option><option value="grenada">Grenada</option><option value="guatemala">Guatemala</option><option value="guinea">Guinea</option><option value="guinea-bissau">Guinea-Bissau</option><option value="guyana">Guyana</option><option value="haiti">Haiti</option><option value="honduras">Honduras</option><option value="hungary">Hungary</option><option value="iceland">Iceland</option><option value="india">India</option><option value="indonesia">Indonesia</option><option value="iran">Iran</option><option value="iraq">Iraq</option><option value="ireland">Ireland</option><option value="israel">Israel</option><option value="italy">Italy</option><option value="jamaica">Jamaica</option><option value="japan">Japan</option><option value="jordan">Jordan</option><option value="kazakhstan">Kazakhstan</option><option value="kenya">Kenya</option><option value="kiribati">Kiribati</option><option value="kuwait">Kuwait</option><option value="kyrgyzstan">Kyrgyzstan</option><option value="laos">Laos</option><option value="latvia">Latvia</option><option value="lebanon">Lebanon</option><option value="lesotho">Lesotho</option><option value="liberia">Liberia</option><option value="libya">Libya</option><option value="liechtenstein">Liechtenstein</option><option value="lithuania">Lithuania</option><option value="luxembourg">Luxembourg</option><option value="madagascar">Madagascar</option><option value="malawi">Malawi</option><option value="malaysia">Malaysia</option><option value="maldives">Maldives</option><option value="mali">Mali</option><option value="malta">Malta</option><option value="mauritania">Mauritania</option><option value="mauritius">Mauritius</option><option value="mexico">Mexico</option><option value="moldova">Moldova</option><option value="monaco">Monaco</option><option value="mongolia">Mongolia</option><option value="montenegro">Montenegro</option><option value="morocco">Morocco</option><option value="mozambique">Mozambique</option><option value="myanmar">Myanmar</option><option value="namibia">Namibia</option><option value="nepal">Nepal</option><option value="netherlands">Netherlands</option><option value="new zealand">New Zealand</option><option value="nicaragua">Nicaragua</option><option value="niger">Niger</option><option value="nigeria">Nigeria</option><option value="north korea">North Korea</option><option value="north macedonia">North Macedonia</option><option value="norway">Norway</option><option value="oman">Oman</option><option value="pakistan">Pakistan</option><option value="palestine">Palestine</option><option value="panama">Panama</option><option value="papua new guinea">Papua New Guinea</option><option value="paraguay">Paraguay</option><option value="peru">Peru</option><option value="philippines">Philippines</option><option value="poland">Poland</option><option value="portugal">Portugal</option><option value="qatar">Qatar</option><option value="romania">Romania</option><option value="russia">Russia</option><option value="rwanda">Rwanda</option><option value="saint kitts and nevis">Saint Kitts and Nevis</option><option value="saint lucia">Saint Lucia</option><option value="samoa">Samoa</option><option value="saudi arabia">Saudi Arabia</option><option value="senegal">Senegal</option><option value="serbia">Serbia</option><option value="seychelles">Seychelles</option><option value="sierra leone">Sierra Leone</option><option value="singapore">Singapore</option><option value="slovakia">Slovakia</option><option value="slovenia">Slovenia</option><option value="somalia">Somalia</option><option value="south africa">South Africa</option><option value="south korea">South Korea</option><option value="south sudan">South Sudan</option><option value="spain">Spain</option><option value="sri lanka">Sri Lanka</option><option value="sudan">Sudan</option><option value="sweden">Sweden</option><option value="switzerland">Switzerland</option><option value="syria">Syria</option><option value="taiwan">Taiwan</option><option value="tajikistan">Tajikistan</option><option value="tanzania">Tanzania</option><option value="thailand">Thailand</option><option value="togo">Togo</option><option value="trinidad and tobago">Trinidad and Tobago</option><option value="tunisia">Tunisia</option><option value="turkey">Turkey</option><option value="uganda">Uganda</option><option value="ukraine">Ukraine</option><option value="united arab emirates">United Arab Emirates</option><option value="united kingdom">United Kingdom</option><option value="united states">United States</option><option value="uruguay">Uruguay</option><option value="uzbekistan">Uzbekistan</option><option value="venezuela">Venezuela</option><option value="vietnam">Vietnam</option><option value="yemen">Yemen</option><option value="zambia">Zambia</option><option value="zimbabwe">Zimbabwe</option>
 </select>
 <select id="serviceFilter" onchange="filterStudios()">
-<option value="all">🎚 All Services</option>
-<option value="recording">Recording</option>
-<option value="beats">Beats</option>
-<option value="mix">Mix & Master</option>
-<option value="full">Full Package</option>
+<option value="all">🎚 All Services</option><option value="recording">Recording</option><option value="beats">Beats</option><option value="mix">Mix & Master</option><option value="full">Full Package</option>
 </select>
 <button onclick="detectLocation()" style="background:#111e38;border:1px solid #3b5a84;color:white;border-radius:10px;padding:11px 16px;font-size:12px;font-weight:700;cursor:pointer">📍 Near Me</button>
 </div>
 
-<p id="filterCount" style="font-size:11px;color:#94a3b8;margin:12px 0">Showing all studios</p>
+<p id="filterCount" style="font-size:11px;color:#94a3b8;margin:14px 0 12px">Showing all studios</p>
 
-<!-- STUDIOS GRID -->
-<div id="studiosGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:12px">
-<!-- UGANDA -->
-<article class="studio-card" data-country="uganda" data-location="kawempe kampala uganda" data-service="recording beats" data-lat="0.3476" data-lng="32.5825">
-<div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80');--brand:#12d8ff"><div class="studio-brand"><b style="font-size:26px;color:#12d8ff">KV</b><span style="font-size:9px;font-weight:800">KV BEATS</span></div></div>
-<div style="padding:16px"><span class="tag" style="background:#064e3b;color:#a7f3d0;border:1px solid #059669">Recording + Beats</span><h3 style="margin:8px 0 4px">KV Beats Studio</h3><p style="font-size:11px;color:#a4b4cc">📍 Kawempe, Kampala • UGX 50k/day</p><button class="book-btn" data-studio="KV Beats Studio - Kawempe" data-producer="Kato V" data-phone="0700471406" data-service="Recording + Beats">Book Now</button></div>
-</article>
+<div id="studiosGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+<article class="studio-card" data-country="uganda" data-location="kawempe kampala uganda" data-service="recording beats" data-lat="0.3476" data-lng="32.5825"><div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80');--brand:#12d8ff"><div class="studio-brand"><b style="font-size:26px;color:#12d8ff">KV</b><span style="font-size:9px;font-weight:800">KV BEATS</span></div></div><div style="padding:16px"><span style="padding:5px 10px;border-radius:99px;font-size:9px;font-weight:800;background:#064e3b;color:#a7f3d0;border:1px solid #059669;display:inline-block">Recording + Beats</span><h3 style="margin:8px 0 4px;font-weight:800">KV Beats Studio</h3><p style="font-size:11px;color:#a4b4cc">📍 Kawempe, Kampala • UGX 50k/day</p><button class="book-btn" data-studio="KV Beats Studio - Kawempe" data-producer="Kato V" data-phone="0700471406" data-service="Recording + Beats">Book Now</button></div></article>
 
-<!-- NIGERIA -->
-<article class="studio-card" data-country="nigeria" data-location="lagos nigeria" data-service="mix master" data-lat="6.5244" data-lng="3.3792">
-<div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=80');--brand:#21dcff"><div class="studio-brand"><b style="font-size:26px;color:#21dcff">LS</b><span style="font-size:9px;font-weight:800">LAGOS SOUND</span></div></div>
-<div style="padding:16px"><span class="tag" style="background:#082f75;color:#bfdbfe;border:1px solid #2563eb">Mix & Master</span><h3 style="margin:8px 0 4px">Lagos Sound Lab</h3><p style="font-size:11px;color:#a4b4cc">📍 Lagos, Nigeria • ₦30k/song</p><button class="book-btn" data-studio="Lagos Sound Lab" data-producer="Femi Beats" data-phone="+2348001234567" data-service="Mix & Master">Book Now</button></div>
-</article>
+<article class="studio-card" data-country="nigeria" data-location="lagos nigeria" data-service="mix master" data-lat="6.5244" data-lng="3.3792"><div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=80');--brand:#21dcff"><div class="studio-brand"><b style="font-size:26px;color:#21dcff">LS</b><span style="font-size:9px;font-weight:800">LAGOS SOUND</span></div></div><div style="padding:16px"><span style="padding:5px 10px;border-radius:99px;font-size:9px;font-weight:800;background:#082f75;color:#bfdbfe;border:1px solid #2563eb;display:inline-block">Mix & Master</span><h3 style="margin:8px 0 4px;font-weight:800">Lagos Sound Lab</h3><p style="font-size:11px;color:#a4b4cc">📍 Lagos, Nigeria • ₦30k/song</p><button class="book-btn" data-studio="Lagos Sound Lab" data-producer="Femi Beats" data-phone="+2348001234567" data-service="Mix & Master">Book Now</button></div></article>
 
-<!-- UK -->
-<article class="studio-card" data-country="uk united kingdom" data-location="london uk" data-service="recording beats" data-lat="51.5074" data-lng="-0.1278">
-<div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80');--brand:#12d8ff"><div class="studio-brand"><b style="font-size:26px;color:#12d8ff">NS</b><span style="font-size:9px;font-weight:800">NORTHSTAR</span></div></div>
-<div style="padding:16px"><span class="tag" style="background:#064e3b;color:#a7f3d0;border:1px solid #059669">Recording + Beats</span><h3 style="margin:8px 0 4px">Northstar Recording</h3><p style="font-size:11px;color:#a4b4cc">📍 London, UK • £100/session</p><button class="book-btn" data-studio="Northstar Recording" data-producer="John Smith" data-phone="+447700900123" data-service="Recording">Book Now</button></div>
-</article>
+<article class="studio-card" data-country="united kingdom" data-location="london united kingdom uk" data-service="recording beats" data-lat="51.5074" data-lng="-0.1278"><div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80');--brand:#12d8ff"><div class="studio-brand"><b style="font-size:26px;color:#12d8ff">NS</b><span style="font-size:9px;font-weight:800">NORTHSTAR</span></div></div><div style="padding:16px"><span style="padding:5px 10px;border-radius:99px;font-size:9px;font-weight:800;background:#064e3b;color:#a7f3d0;border:1px solid #059669;display:inline-block">Recording + Beats</span><h3 style="margin:8px 0 4px;font-weight:800">Northstar Recording</h3><p style="font-size:11px;color:#a4b4cc">📍 London, UK • £100/session</p><button class="book-btn" data-studio="Northstar Recording" data-producer="John Smith" data-phone="+447700900123" data-service="Recording">Book Now</button></div></article>
 </div>
 
-<!-- NO RESULTS MESSAGE -->
-<div id="noResults" style="display:none;text-align:center;padding:40px 20px;background:#0a1930;border:1px dashed #24466b;border-radius:14px;margin-top:20px">
-<p style="font-size:14px;font-weight:800">No studios found in this country</p><p style="font-size:11px;color:#94a3b8">Try All Countries or register your studio below.</p>
-<button onclick="resetFilters()" style="margin-top:10px;background:white;color:#0a1020;border:0;border-radius:99px;padding:10px 18px;font-weight:800;font-size:12px;cursor:pointer">Show All Studios</button>
+<div id="noResults" style="display:none;text-align:center;padding:50px 20px;background:#0a1930;border:1px dashed #24466b;border-radius:14px;margin-top:20px">
+<p style="font-size:15px;font-weight:800">No studios in this country yet</p><p style="font-size:11px;color:#94a3b8;margin-top:6px">Be the first to register from Producer Dashboard.</p>
+<button onclick="resetFilters()" style="margin-top:14px;background:white;color:#0a1020;border:0;border-radius:99px;padding:10px 18px;font-weight:800;font-size:12px;cursor:pointer">Show All Studios</button>
 </div>
-
-<!-- REGISTER -->
-<div style="margin-top:30px;padding:24px;border:1px solid #7140ac;border-radius:18px;background:linear-gradient(110deg,#24104a,#0b2342)">
-<h2 style="font-size:22px;font-weight:900">Register Your Studio - Pin Location on Map</h2>
-<p style="font-size:11px;color:#a4b4cc;margin-top:6px">Auto-detected from IP. No popup. Drag pin to adjust.</p>
-<form id="producerRegisterForm" style="margin-top:16px;background:#061225;border:1px solid #17416a;border-radius:12px;padding:16px">
-<input id="regStudioName" required placeholder="Studio Name *" style="width:100%;background:#071326;border:1px solid #24466b;border-radius:8px;color:white;padding:12px;margin-bottom:8px">
-<input id="regLocation" required placeholder="City, Country * e.g. Kampala, Uganda" style="width:100%;background:#071326;border:1px solid #24466b;border-radius:8px;color:white;padding:12px;margin-bottom:8px">
-<input id="regLatLngDisplay" readonly placeholder="Auto detecting via IP..." style="width:100%;background:#071326;border:1px solid #24466b;border-radius:8px;color:#22c55e;padding:12px;margin-bottom:8px">
-<div id="registerMap"></div>
-<input type="hidden" id="regLat"><input type="hidden" id="regLng">
-<input id="regPhone" required placeholder="Phone *" style="width:100%;background:#071326;border:1px solid #24466b;border-radius:8px;color:white;padding:12px;margin:8px 0">
-<select id="regService" required style="width:100%;background:#071326;border:1px solid #24466b;border-radius:8px;color:white;padding:12px"><option value="">Service *</option><option>Recording + Beats</option><option>Mix & Master</option><option>Full Package</option></select>
-<input id="regPrice" required placeholder="Price e.g. UGX 50k / day" style="width:100%;background:#071326;border:1px solid #24466b;border-radius:8px;color:white;padding:12px;margin:8px 0">
-<button type="submit" style="width:100%;background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:white;border:0;border-radius:99px;padding:12px;font-weight:800;cursor:pointer">Register Studio →</button>
-</form>
-<p id="regNotice" style="color:#22c55e;font-size:12px;margin-top:8px"></p>
-</div>
-
 </div></section>
 
-<footer style="padding:20px 0;border-top:1px solid #173455"><div class="wrap" style="display:flex;justify-content:space-between;font-size:10px;color:#9fb1c8"><span>© 2026 PASONG</span><span>pasong.ug@gmail.com</span></div></footer>
+<footer style="padding:22px 0;border-top:1px solid #173455;background:#030814"><div class="wrap" style="display:flex;justify-content:space-between;font-size:10px;color:#9fb1c8"><span>© 2026 PASONG</span><span>pasong.ug@gmail.com</span></div></footer>
 
 <script>
-let regMap,regMarker;
-function setPin(lat,lng){
- if(!regMap) return;
- document.getElementById('regLat').value=lat;
- document.getElementById('regLng').value=lng;
- document.getElementById('regLatLngDisplay').value=lat.toFixed(6)+', '+lng.toFixed(6);
- if(regMarker) regMap.removeLayer(regMarker);
- regMarker=L.marker([lat,lng],{draggable:true}).addTo(regMap);
- regMarker.on('dragend',()=>{const p=regMarker.getLatLng();document.getElementById('regLat').value=p.lat;document.getElementById('regLng').value=p.lng;document.getElementById('regLatLngDisplay').value=p.lat.toFixed(6)+', '+p.lng.toFixed(6);});
- regMap.setView([lat,lng],13);
-}
-setTimeout(()=>{
- regMap=L.map('registerMap').setView([0.3476,32.5825],11);
- L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(regMap);
- regMap.on('click',e=>setPin(e.latlng.lat,e.latlng.lng));
- fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
-  if(d.latitude&&d.longitude){setPin(d.latitude,d.longitude);document.getElementById('regLocation').value=(d.city||'')+', '+(d.country_name||'');document.getElementById('nearYouText').innerHTML=`📍 Studios near you in <b style="color:#fff">${d.city}, ${d.country_name}</b>`;}
- });
-},700);
-
-// PROFESSIONAL COUNTRY FILTER - FIXED
 function filterStudios(){
  const q=document.getElementById('searchInput').value.toLowerCase();
  const country=document.getElementById('countryFilter').value.toLowerCase();
@@ -146,42 +74,32 @@ function filterStudios(){
   const c=(card.dataset.country||'').toLowerCase();
   const s=(card.dataset.service||'').toLowerCase();
   const text=card.innerText.toLowerCase();
-  const matchSearch = q==='' || text.includes(q) || loc.includes(q);
+  const matchSearch = !q || text.includes(q) || loc.includes(q);
   const matchCountry = country==='all' || c.includes(country) || loc.includes(country);
   const matchService = service==='all' || s.includes(service);
   if(matchSearch && matchCountry && matchService){card.style.display='';visible++;} else {card.style.display='none';}
  });
- document.getElementById('filterCount').textContent=`Showing ${visible} studio${visible!==1?'s':''} ${country!=='all'?'in '+country:''}`;
- document.getElementById('noResults').style.display=visible===0?'block':'none';
+ document.getElementById('filterCount').textContent = visible>0 ? `Showing ${visible} studio${visible!==1?'s':''}` : '';
+ document.getElementById('noResults').style.display = visible===0 ? 'block' : 'none';
 }
 function resetFilters(){document.getElementById('searchInput').value='';document.getElementById('countryFilter').value='all';document.getElementById('serviceFilter').value='all';filterStudios();}
-function detectLocation(){fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{document.getElementById('countryFilter').value=d.country_name?d.country_name.toLowerCase():'all';filterStudios();document.getElementById('nearYouText').innerHTML=`📍 Near you: ${d.city}, ${d.country_name}`;});}
-
+function detectLocation(){
+ fetch('https://ipapi.co/json/').then(r=>r.json()).then(d=>{
+  document.getElementById('nearYouText').innerHTML=`📍 Near you: <b style="color:#fff">${d.city}, ${d.country_name}</b>`;
+  const cVal=(d.country_name||'').toLowerCase();
+  const sel=document.getElementById('countryFilter');
+  for(let o of sel.options){ if(o.value===cVal){ sel.value=o.value; break; } }
+  filterStudios();
+ });
+}
+detectLocation();
 document.addEventListener('click',e=>{
  if(e.target.classList.contains('book-btn')){
   const b=e.target;const card=b.closest('.studio-card');
   const studio=b.dataset.studio;const producer=b.dataset.producer;const phone=b.dataset.phone;const service=b.dataset.service;
-  const loc=card?.dataset.location||'';const lat=card?.dataset.lat||'';const lng=card?.dataset.lng||'';const price=card?.innerText.match(/UGX|£|₦|\$.*/)?.[0]||'';
-  window.location.href=`producer-checkout.html?studio=${encodeURIComponent(studio)}&producer=${encodeURIComponent(producer)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(service)}&lat=${lat}&lng=${lng}`;
+  const loc=card?.dataset.location||'';const lat=card?.dataset.lat||'';const lng=card?.dataset.lng||'';
+  window.location.href=`producer-checkout.html?studio=${encodeURIComponent(studio)}&producer=${encodeURIComponent(producer)}&phone=${encodeURIComponent(phone)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(service)}&lat=${lat}&lng=${lng}`;
  }
-});
-document.getElementById('producerRegisterForm').addEventListener('submit',e=>{
- e.preventDefault();
- const name=document.getElementById('regStudioName').value;
- const loc=document.getElementById('regLocation').value;
- const lat=document.getElementById('regLat').value||'0.3476';
- const lng=document.getElementById('regLng').value||'32.5825';
- const phone=document.getElementById('regPhone').value||'0700000000';
- const svc=document.getElementById('regService').value||'Recording';
- const price=document.getElementById('regPrice').value||'UGX 50k/day';
- const country=loc.toLowerCase().includes('uganda')?'uganda':loc.toLowerCase().includes('nigeria')?'nigeria':loc.toLowerCase().includes('kenya')?'kenya':loc.toLowerCase().includes('uk')||loc.toLowerCase().includes('london')?'uk':'uganda';
- const grid=document.getElementById('studiosGrid');
- const card=document.createElement('article');
- card.className='studio-card';card.dataset.country=country;card.dataset.location=loc.toLowerCase();card.dataset.service=svc.toLowerCase();card.dataset.lat=lat;card.dataset.lng=lng;
- card.innerHTML=`<div class="studio-art" style="--img:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80');--brand:#12d8ff"><div class="studio-brand"><b style="font-size:22px;color:#12d8ff">${name.substring(0,2).toUpperCase()}</b><span style="font-size:8px;font-weight:800">${name.toUpperCase()}</span></div></div><div style="padding:16px"><span class="tag" style="background:#064e3b;color:#a7f3d0;border:1px solid #059669">${svc}</span><h3 style="margin:8px 0 4px">${name}</h3><p style="font-size:11px;color:#a4b4cc">📍 ${loc}<br><small style="color:#22c55e">📌 ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</small></p><p style="font-size:12px;font-weight:800;margin-top:6px">${price}</p><button class="book-btn" data-studio="${name}" data-producer="${name}" data-phone="${phone}" data-service="${svc}">Book Now</button></div>`;
- grid.prepend(card);
- document.getElementById('regNotice').textContent=`✅ ${name} registered in ${country} with auto pin!`;
- e.target.reset();setPin(0.3476,32.5825);filterStudios();
 });
 </script>
 </body>
