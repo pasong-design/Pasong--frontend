@@ -1,159 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#050b18">
-<title>PASONG Studio — Direct Booking</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050b18">
+<title>Find a Studio Worldwide | PASONG</title>
+<meta name="description" content="Discover approved recording studios, beat producers, and mixing engineers worldwide with PASONG.">
+<script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050b18;--line:#173455;--muted:#a4b4cc}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:85px}
-body{margin:0;background:var(--bg);color:#f8fafc;font-family:Inter,sans-serif}
-.wrap{width:min(1180px,calc(100% - 32px));margin:auto}
-header{position:sticky;top:0;z-index:30;background:#050b18f5;backdrop-filter:blur(15px);border-bottom:1px solid var(--line)}
-.navbar{min-height:70px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:23px}
-.logo-mark{font-size:32px;color:#c084fc}.logo-sub{display:block;font-size:8px;letter-spacing:1px;color:#a9bad1}
-.navlinks{display:flex;gap:20px;font-size:12px;color:#d5deec}.navlinks a.active{color:#d28bff}
-.signin{border-radius:999px;padding:10px 17px;background:#fff;color:#0a1020;font-weight:800;font-size:12px}
-.hero{border-bottom:1px solid var(--line);background:linear-gradient(90deg,#050b18 0%,#050b18ed 40%,#050b1870 100%),url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1800&q=85') center/cover}
-.hero-inner{min-height:420px;display:flex;align-items:center;padding:45px 0}
-.hero-copy{max-width:650px}
-.eyebrow,.kicker{display:inline-block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:900;color:#d9a0ff}
-.eyebrow{border:1px solid #9145c5;border-radius:99px;padding:8px 12px;background:#3b07642b}
-h1{font-size:clamp(37px,6vw,65px);line-height:1.04;letter-spacing:-2.5px;font-weight:900;margin:18px 0}
-.gradient{background:linear-gradient(90deg,#df9bff,#9b35ff 48%,#22b9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{max-width:550px;color:#d0d9e8;font-size:14px;line-height:1.8}
-.actions,.feature-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
-.feature{display:flex;align-items:center;gap:8px;padding-right:12px;border-right:1px solid #29405b;font-size:11px;color:#dce6f6}
-.feature:last-child{border:0}
-.feature-icon{width:35px;height:35px;border-radius:12px;display:grid;place-items:center;background:#4c1d954d;color:#d58bff;border:1px solid #6826a466;font-size:19px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 19px;font-size:12px;font-weight:800;cursor:pointer}
-.btn-grad{background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:#fff}
-.btn-outline{background:#050b18bd;border:1px solid #5c7fa8;color:white}
-.section{padding:34px 0;border-bottom:1px solid var(--line)}
-.section-top{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:20px}
-h2{font-size:clamp(24px,3.5vw,32px);letter-spacing:-.9px;line-height:1.2;font-weight:900;margin:7px 0}
-.sub{font-size:12px;color:var(--muted);line-height:1.75;max-width:700px}
-.studios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.studio-card{overflow:hidden;border:1px solid #24517a;border-radius:16px;background:linear-gradient(150deg,#081426,#020916)}
-.studio-art{height:145px;position:relative;display:flex;align-items:center;justify-content:center}
-.studio-art:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#020916,transparent 75%),var(--studio-image) center/cover}
-.studio-brand{position:relative;z-index:1;width:90px;height:90px;border-radius:14px;background:#020713ed;border:1px solid var(--brand-color);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:8px}
-.brand-symbol{font-size:28px;font-weight:900;color:var(--brand-color)}
-.brand-name{font-size:10px;line-height:1.2;font-weight:900;margin-top:6px}
-.studio-body{padding:16px}
-.tag{display:inline-block;padding:5px 9px;border-radius:99px;font-size:9px;font-weight:800;background:#064e3b;color:#a7f3d0;border:1px solid #059669}
-.tag.blue{background:#082f75;color:#bfdbfe;border-color:#2563eb}
-.tag.pink{background:#831843;color:#fbcfe8;border-color:#db2777}
-.location{font-size:11px;color:#c2d1e5}
-.description{font-size:11px;color:#aebed2;line-height:1.7;min-height:40px;margin-top:10px}
-.price{font-size:14px;font-weight:900;margin-top:12px}
-.book-btn{width:100%;margin-top:13px;padding:12px;border-radius:999px;background:linear-gradient(100deg,#b10cff,#5651ff,#00b8f5);color:white;font-size:11px;font-weight:900;border:0;cursor:pointer}
-.features-section{background:linear-gradient(180deg,#071226,#050b18)}
-.feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-.feature-card{overflow:hidden;border:1px solid #24517a;border-radius:16px;background:linear-gradient(150deg,#081426,#020916);padding:20px}
-.owner-banner{margin-top:22px;padding:24px;border:1px solid #7140ac;border-radius:18px;background:linear-gradient(110deg,#24104a,#0b2342)}
-.form-card{border:1px solid #17416a;border-radius:15px;padding:17px;background:#061225;margin-top:16px}
-input,select,textarea{width:100%;background:#071326;border:1px solid #24466b;border-radius:9px;color:white;padding:12px;font-size:12px;outline:none}
-label{display:block;font-size:11px;color:#d7e2f1;font-weight:700;margin:8px 0 4px}
-footer{padding:23px 0 15px;background:#030814}
-.footer-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:13px;font-size:10px;color:#9fb1c8}
-@media(max-width:700px){.wrap{width:calc(100% - 28px)}.navlinks{display:none}.studios{grid-template-columns:1fr}.studio-card{display:grid;grid-template-columns:115px 1fr}.feature-grid{grid-template-columns:1fr}}
+:root{--bg:#050b18;--panel:#09162a;--line:#1c3859;--muted:#9fb1c9;--purple:#b42dff;--cyan:#00c4ff}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:85px}body{margin:0;background:var(--bg);color:#f8fafc;font-family:Inter,system-ui,sans-serif}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}header{position:sticky;top:0;z-index:20;background:#050b18ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:15px}.logo{display:flex;align-items:center;gap:9px;font-weight:900;font-size:22px;color:white;text-decoration:none}.logo-mark{font-size:30px;color:#d28bff}.logo-sub{display:block;font-size:8px;letter-spacing:1.2px;color:#9fb1c9}.navlinks{display:flex;align-items:center;gap:20px;font-size:12px;color:#d5deec}.navlinks a:hover{color:#d28bff}.pillbtn{border-radius:999px;padding:10px 16px;background:#fff;color:#071020;font-size:12px;font-weight:800;text-decoration:none}.hero{background:linear-gradient(90deg,#050b18 0%,#050b18e8 55%,#050b1870 100%),url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1800&q=85') center/cover;border-bottom:1px solid var(--line)}.hero-inner{min-height:380px;display:flex;align-items:center;padding:48px 0}.hero-copy{max-width:680px}.eyebrow,.kicker{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;font-weight:900;color:#dda2ff}.eyebrow{display:inline-block;padding:8px 12px;border:1px solid #8542b6;border-radius:99px;background:#3b07642b}h1{font-size:clamp(38px,6vw,65px);line-height:1.04;letter-spacing:-2.6px;font-weight:900;margin:18px 0}.gradient{background:linear-gradient(90deg,#e4a2ff,#a33dff 48%,#1fcaff);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{font-size:14px;line-height:1.8;color:#d0d9e8;max-width:570px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 18px;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer}.btn-grad{background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:white}.btn-outline{background:#071326;border:1px solid #355779;color:white}.section{padding:34px 0;border-bottom:1px solid var(--line)}.section-top{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:20px}h2{font-size:clamp(25px,3.6vw,34px);letter-spacing:-1px;line-height:1.2;font-weight:900;margin:7px 0}.sub{font-size:12px;color:var(--muted);line-height:1.7;max-width:680px}.filters{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(150px,.8fr) minmax(150px,.8fr) auto;gap:10px;margin:20px 0 12px}.field{width:100%;background:#071326;border:1px solid #24466b;border-radius:12px;color:white;padding:13px 14px;font-size:12px;outline:none;min-width:0}.field:focus{border-color:#b65cff;box-shadow:0 0 0 3px #a855f71c}.field option{background:#071326}.statusline{font-size:11px;color:#d9a0ff;min-height:22px;margin:10px 0 15px}.studios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.studio-card{overflow:hidden;border:1px solid #21476c;border-radius:17px;background:linear-gradient(150deg,#0a192d,#030a15);transition:transform .18s,border-color .18s,box-shadow .18s}.studio-card:hover{transform:translateY(-3px);border-color:#8a49c7;box-shadow:0 12px 35px #0004}.studio-art{height:165px;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,#263a77,#071326 65%);overflow:hidden}.studio-art img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}.studio-art:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#030a15,transparent 80%)}.studio-mark{position:relative;z-index:1;width:70px;height:70px;border-radius:18px;background:#020713e8;border:1px solid #b65cff;display:grid;place-items:center;font-size:24px;font-weight:900;color:#dba3ff;box-shadow:0 0 35px #9d4edd33}.studio-body{padding:16px}.tag{display:inline-block;padding:5px 9px;border-radius:99px;font-size:9px;font-weight:800;background:#102b4c;color:#bfe8ff;border:1px solid #285a8b}.studio-title{font-size:17px;line-height:1.3;font-weight:900;margin:11px 0 7px;overflow-wrap:anywhere}.location{font-size:11px;color:#c2d1e5}.description{font-size:11px;color:#aebed2;line-height:1.7;margin-top:10px;min-height:38px;overflow-wrap:anywhere}.price{font-size:14px;font-weight:900;margin-top:13px}.price small{font-size:10px;color:#9fb1c9;font-weight:500}.services{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.service-chip{font-size:9px;color:#c6d6e9;border:1px solid #243d5b;border-radius:99px;padding:4px 7px}.book-btn{width:100%;margin-top:15px;padding:12px;border-radius:999px;background:linear-gradient(100deg,#b10cff,#5651ff,#00b8f5);color:white;font-size:11px;font-weight:900;border:0;cursor:pointer}.book-btn:disabled{opacity:.45;cursor:not-allowed}.empty{border:1px dashed #315172;border-radius:18px;padding:34px 20px;text-align:center;background:#071326}.empty-icon{font-size:35px;margin-bottom:8px}.owner-banner{margin-top:24px;padding:22px;border:1px solid #64418d;border-radius:18px;background:linear-gradient(110deg,#24104a,#0b2342);display:flex;align-items:center;justify-content:space-between;gap:18px}.owner-banner p{font-size:12px;color:#d0d9e8;line-height:1.7;margin:8px 0 0}footer{padding:22px 0;background:#030814}.footer-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:12px;font-size:10px;color:#9fb1c8}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:850px){.studios{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:1fr 1fr}.filters #studioSearch{grid-column:1/-1}.filters button{width:100%}}
+@media(max-width:600px){.wrap{width:calc(100% - 26px)}.navlinks{display:none}.hero-inner{min-height:350px;padding:38px 0}.studios{grid-template-columns:1fr}.studio-art{height:175px}.section-top{align-items:start;flex-direction:column}.filters{grid-template-columns:1fr 1fr}.owner-banner{align-items:flex-start;flex-direction:column}.owner-banner .btn{width:100%}.studio-body{padding:15px}}
 </style>
 </head>
 <body>
-<header><div class="wrap navbar"><a class="logo" href="/Pasong.html"><span class="logo-mark">♫</span><span>PASONG<span class="logo-sub">MUSIC · CREATORS · OPPORTUNITY</span></span></a><nav class="navlinks"><a href="/Pasong.html">Home</a><a href="/studio.html" class="active">Studio</a><a href="/beats.html">Beats</a><a href="/events.html">Events</a></nav><a class="signin" href="/account.html">Sign In</a></div></header>
-
-<section class="hero"><div class="wrap hero-inner"><div class="hero-copy"><span class="eyebrow">A GLOBAL HOME FOR CREATORS</span><h1>Book a Studio.<br><span class="gradient">Bring Your Sound<br>to Life.</span></h1><p class="lead">Discover recording studios by IP location. Pay commission on site via producer-checkout.html to unlock producer contact. No WhatsApp.</p><div class="feature-row"><div class="feature"><span class="feature-icon">♫</span><span>Recording<br>Studios</span></div><div class="feature"><span class="feature-icon">≋</span><span>Beat<br>Production</span></div><div class="feature"><span class="feature-icon">🎚</span><span>Mix &<br>Mastering</span></div><div class="feature"><span class="feature-icon">♙</span><span>Studio<br>Discovery</span></div></div><div class="actions"><a class="btn btn-grad" href="#studios">Explore Studios →</a></div></div></div></section>
-
-<section class="section" id="studios"><div class="wrap">
-<div class="section-top"><div><div class="kicker">Studio Directory</div><h2>Find Your <span class="gradient">Sound</span></h2><p id="nearYouText" class="sub" style="color:#d9a0ff;font-weight:800">📍 Detecting your location by IP...</p><div style="display:flex;gap:10px;margin-top:14px"><input id="studioSearch" placeholder="Search studio name, city, country..." style="flex:1;padding:11px 14px;border-radius:99px;background:#071326;border:1px solid #24466b;color:white;font-size:11px"><button onclick="detectLocation()" class="btn btn-outline" style="border-radius:99px">📍 Near Me</button></div></div></div>
-
-<div class="studios" id="studiosGrid">
-<article class="studio-card" data-location="London United Kingdom"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">NS</span><span class="brand-name">NORTHSTAR<br>RECORDING</span></div></div><div class="studio-body"><span class="tag">Recording + Beats</span><h3>Northstar Recording</h3><p class="location">📍 London, United Kingdom</p><p class="description">Professional recording and vocal sessions.</p><p class="price">£100 / session <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="Northstar Recording" data-producer="John Smith" data-phone="+44 7700 900123" data-service="Recording + Beats">Book → Pay on Checkout Page</button></div></article>
-
-<article class="studio-card" data-location="Lagos Nigeria"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=85');--brand-color:#21dcff"><div class="studio-brand"><span class="brand-symbol">LS</span><span class="brand-name">LAGOS<br>SOUND LAB</span></div></div><div class="studio-body"><span class="tag blue">Mix & Master</span><h3>Lagos Sound Lab</h3><p class="location">📍 Lagos, Nigeria</p><p class="description">Mixing and mastering to help your music sound polished.</p><p class="price">₦30,000 / song <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="Lagos Sound Lab" data-producer="Femi Beats" data-phone="+234 800 123 4567" data-service="Mix & Master">Book → Pay on Checkout Page</button></div></article>
-
-<article class="studio-card" data-location="Los Angeles United States"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=800&q=85');--brand-color:#ff2bb5"><div class="studio-brand"><span class="brand-symbol">WC</span><span class="brand-name">WESTSIDE<br>CREATIVE</span></div></div><div class="studio-body"><span class="tag pink">Full Package</span><h3>Westside Creative Studio</h3><p class="location">📍 Los Angeles, United States</p><p class="description">Beat production, recording and full-project support.</p><p class="price">$120 / day <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="Westside Creative Studio" data-producer="Mike West" data-phone="+1 213 555 0199" data-service="Full Package">Book → Pay on Checkout Page</button></div></article>
-
-<article class="studio-card" data-location="Kampala Uganda Kawempe"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">KV</span><span class="brand-name">KV BEATS<br>STUDIO</span></div></div><div class="studio-body"><span class="tag">Recording + Beats</span><h3>KV Beats Studio</h3><p class="location">📍 Kawempe, Kampala, Uganda</p><p class="description">Beats, vocals, full package in Kampala.</p><p class="price">UGX 50,000 / day <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="KV Beats Studio - Kawempe" data-producer="Kato V" data-phone="0700471406" data-service="Recording + Beats">Book → Pay on Checkout Page</button></div></article>
-</div>
-
-<div class="owner-banner" id="studio-owner"><div class="kicker">FOR PRODUCERS</div><h2>Register Your Studio - Appear Near Visitors by IP</h2><p class="sub">Visitor IP detected. If visitor is in Kampala, Kampala studios show first. You keep studio fee, PASONG keeps UGX 5k commission paid via producer-checkout.html</p><form id="producerRegisterForm" class="form-card"><label>Studio Name *</label><input id="regStudioName" required placeholder="e.g. KV Beats Studio"><label>Owner Name *</label><input id="regOwnerName" required><label>Phone *</label><input id="regPhone" required placeholder="070..."><label>City *</label><input id="regLocation" required placeholder="Kampala, Uganda"><label>Service *</label><select id="regService" required><option value="">Choose</option><option>Recording + Beats</option><option>Mix & Master</option><option>Full Package</option><option>Vocal Recording</option><option>Beat Production</option></select><label>Price *</label><input id="regPrice" required placeholder="UGX 50,000 / day"><label>Description *</label><textarea id="regDesc" required placeholder="Describe studio..."></textarea><button type="submit" class="btn btn-grad" style="width:100%;margin-top:12px">Register Studio on Site →</button></form><p id="regNotice" style="font-size:12px;color:#22c55e;margin-top:8px"></p></div>
-
+<header><div class="wrap nav"><a class="logo" href="/Pasong.html" aria-label="PASONG home"><span class="logo-mark">♫</span><span>PASONG<span class="logo-sub">MUSIC · CREATORS · OPPORTUNITY</span></span></a><nav class="navlinks" aria-label="Main navigation"><a href="/Pasong.html">Home</a><a href="/studio.html" aria-current="page">Studios</a><a href="/beats.html">Beats</a><a href="/events.html">Events</a></nav><a class="pillbtn" href="/account.html">Sign In</a></div></header>
+<main>
+<section class="hero"><div class="wrap hero-inner"><div class="hero-copy"><span class="eyebrow">A GLOBAL HOME FOR CREATORS</span><h1>Find Your Studio.<br><span class="gradient">Make Your Sound.</span></h1><p class="lead">Explore PASONG-approved recording studios, beat producers and mixing engineers around the world. Compare services and rates, then continue to secure booking checkout.</p><div class="flex flex-wrap gap-3 mt-6"><a class="btn btn-grad" href="#studios">Explore Studios <span aria-hidden="true">→</span></a><a class="btn btn-outline" href="/producer.html">List Your Studio</a></div></div></div></section>
+<section class="section" id="studios"><div class="wrap"><div class="section-top"><div><div class="kicker">PASONG Studio Directory</div><h2>Find a place to <span class="gradient">create.</span></h2><p class="sub">Search approved listings by studio, service, city or country. Location matching is approximate and based on your IP address; it does not track your precise GPS location.</p></div></div>
+<div class="filters"><label class="sr-only" for="studioSearch">Search studios</label><input class="field" id="studioSearch" placeholder="Search studio, city, country or service…" autocomplete="off"><label class="sr-only" for="countryFilter">Filter by country</label><select class="field" id="countryFilter"><option value="">All countries</option></select><label class="sr-only" for="serviceFilter">Filter by service</label><select class="field" id="serviceFilter"><option value="">All services</option></select><button type="button" class="btn btn-outline" id="nearMeBtn">📍 Near me</button></div>
+<p id="nearYouText" class="statusline" role="status" aria-live="polite">Loading approved studios…</p><div class="studios" id="studiosGrid" aria-live="polite"></div><div id="emptyState" class="empty" hidden><div class="empty-icon">🎙️</div><h3 class="font-extrabold text-lg" id="emptyTitle">No studios found yet</h3><p class="sub mx-auto mt-2" id="emptyText">Approved studios will appear here when they are available.</p><a class="btn btn-outline mt-4" href="/producer.html">Register a studio</a></div>
+<div class="owner-banner"><div><div class="kicker">FOR PRODUCERS & STUDIO OWNERS</div><h2 class="text-xl md:text-2xl">Want more people to discover your studio?</h2><p>Register from your PASONG Producer Dashboard. Listings appear here after PASONG Admin approves them.</p></div><a class="btn btn-grad shrink-0" href="/producer.html">Register Your Studio →</a></div>
 </div></section>
-
-<footer><div class="wrap"><div class="footer-bottom"><span>© <span id="year"></span> PASONG - Payments via producer-checkout.html</span><span>Contact: pasong.ug@gmail.com</span></div></div></footer>
-
+</main><footer><div class="wrap"><div class="footer-bottom"><span>© <span id="year"></span> PASONG · Music, creators & opportunity</span><span><a href="mailto:pasong.ug@gmail.com" class="hover:text-white">Contact PASONG</a></span></div></div></footer>
 <script>
-(function(){
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// IP DETECTOR - Show near studios first
-window.detectLocation = function(){
-  const txt = document.getElementById('nearYouText');
-  txt.textContent = '📍 Detecting your location...';
-  fetch('https://ipapi.co/json/').then(r=>r.json()).then(data=>{
-    const city = data.city || 'Your area'; const country = data.country_name || '';
-    txt.innerHTML = `📍 Studios near you in <b style="color:#fff">${city}, ${country}</b> - IP: ${data.ip} - Closest first`;
-    const cards = Array.from(document.querySelectorAll('.studio-card'));
-    cards.sort((a,b)=>{
-      const aL = (a.dataset.location||'').toLowerCase(); const bL = (b.dataset.location||'').toLowerCase();
-      const cL = city.toLowerCase(); const coL = country.toLowerCase();
-      const aScore = aL.includes(cL) || aL.includes(coL) ? 0 : 1;
-      const bScore = bL.includes(cL) || bL.includes(coL) ? 0 : 1;
-      return aScore - bScore;
-    });
-    const grid = document.getElementById('studiosGrid');
-    cards.forEach(c=>{grid.appendChild(c); const loc=(c.dataset.location||'').toLowerCase(); if(loc.includes(city.toLowerCase())||loc.includes(country.toLowerCase())){c.style.borderColor='#22c55e'; c.style.boxShadow='0 0 15px rgba(34,197,94,0.2)';}});
-  }).catch(()=>{txt.textContent='📍 Could not detect IP. Showing all studios.';});
-};
-detectLocation();
-
-// SEARCH
-document.getElementById('studioSearch').addEventListener('input', function(){
-  const q = this.value.toLowerCase();
-  document.querySelectorAll('.studio-card').forEach(card=>{card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';});
-});
-
-// SEND TO producer-checkout.html - NO WHATSAPP
-document.querySelectorAll('.book-btn').forEach(btn=>{
-  btn.addEventListener('click', function(){
-    const studio = this.dataset.studio;
-    const producer = this.dataset.producer || studio;
-    const phone = this.dataset.phone || '0700471406';
-    const service = this.dataset.service || '';
-    const loc = this.closest('.studio-card')?.dataset.location || '';
-    const price = this.closest('.studio-body')?.querySelector('.price')?.innerText || '';
-    window.location.href = `producer-checkout.html?studio=${encodeURIComponent(studio)}&producer=${encodeURIComponent(producer)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(service)}`;
-  });
-});
-
-// PRODUCER REGISTRATION - Adds to page
-document.getElementById('producerRegisterForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  const sName = document.getElementById('regStudioName').value;
-  const oName = document.getElementById('regOwnerName').value;
-  const phone = document.getElementById('regPhone').value;
-  const loc = document.getElementById('regLocation').value;
-  const svc = document.getElementById('regService').value;
-  const price = document.getElementById('regPrice').value;
-  const desc = document.getElementById('regDesc').value;
+(() => {
+  'use strict';
+  document.getElementById('year').textContent = new Date().getFullYear();
+  // Configure with your project's PUBLIC Supabase URL and anon/publishable key.
+  // Never put a service-role key or payment secret in frontend code.
+  const SUPABASE_URL = window.PASONG_SUPABASE_URL || '';
+  const SUPABASE_ANON_KEY = window.PASONG_SUPABASE_ANON_KEY || '';
   const grid = document.getElementById('studiosGrid');
-  const card = document.createElement('article');
-  card.className = 'studio-card'; card.dataset.location = loc;
-  card.innerHTML = `<div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">${sName.substring(0,2).toUpperCase()}</span><span class="brand-name">${sName.toUpperCase()}</span></div></div><div class="studio-body"><span class="tag">${svc}</span><h3>${sName}</h3><p class="location">📍 ${loc} (NEW)</p><p class="description">${desc}</p><p class="price">${price} <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="${sName}" data-producer="${oName}" data-phone="${phone}" data-service="${svc}">Book → Pay on Checkout Page</button></div>`;
-  grid.prepend(card);
-  card.querySelector('.book-btn').addEventListener('click', function(){
-    window.location.href = `producer-checkout.html?studio=${encodeURIComponent(sName)}&producer=${encodeURIComponent(oName)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(svc)}`;
-  });
-  document.getElementById('regNotice').textContent = `✅ ${sName} registered! Visitors near ${loc} will see it first. They will pay via producer-checkout.html`;
-  this.reset();
-});
+  const status = document.getElementById('nearYouText');
+  const empty = document.getElementById('emptyState');
+  const emptyTitle = document.getElementById('emptyTitle');
+  const emptyText = document.getElementById('emptyText');
+  const search = document.getElementById('studioSearch');
+  const countryFilter = document.getElementById('countryFilter');
+  const serviceFilter = document.getElementById('serviceFilter');
+  let allStudios = [];
+  let visitor = { city: '', country: '' };
+  const clean = v => String(v ?? '').trim();
+  const esc = v => clean(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function money(amount, currency) {
+    if (amount === null || amount === undefined || amount === '') return 'Rate on request';
+    const cur = clean(currency).toUpperCase() || 'USD';
+    const n = Number(amount);
+    if (!Number.isFinite(n)) return `${esc(cur)} ${esc(amount)}`;
+    try { return new Intl.NumberFormat(undefined, {style:'currency', currency:cur, maximumFractionDigits:cur==='UGX'||cur==='KES'||cur==='TZS'||cur==='RWF'||cur==='NGN'?0:2}).format(n); }
+    catch (_) { return `${esc(cur)} ${n.toLocaleString()}`; }
+  }
+  function servicesOf(studio) {
+    let values = studio.services;
+    if (!Array.isArray(values)) values = values ? String(values).split(/[\n,]/) : [];
+    return values.map(clean).filter(Boolean).slice(0,5);
+  }
+  function getLocation(studio) { return [studio.city, studio.country].map(clean).filter(Boolean).join(', ') || 'Location not specified'; }
+  function studioCard(studio) {
+    const article = document.createElement('article'); article.className = 'studio-card';
+    const art = document.createElement('div'); art.className = 'studio-art';
+    const photos = Array.isArray(studio.photos) ? studio.photos : [];
+    const photo = photos.find(p => typeof p === 'string' && /^https:\/\//i.test(p));
+    if (photo) { const img = document.createElement('img'); img.src = photo; img.alt = `${clean(studio.studio_name) || 'Studio'} photo`; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; img.onerror = () => img.remove(); art.appendChild(img); }
+    const mark = document.createElement('div'); mark.className = 'studio-mark'; mark.textContent = (clean(studio.studio_name).split(/\s+/).map(x=>x[0]).join('').slice(0,2) || '♫').toUpperCase(); art.appendChild(mark); article.appendChild(art);
+    const body = document.createElement('div'); body.className = 'studio-body';
+    const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = clean(studio.studio_type) || servicesOf(studio)[0] || 'Recording studio'; body.appendChild(tag);
+    const title = document.createElement('h3'); title.className = 'studio-title'; title.textContent = clean(studio.studio_name) || 'Studio'; body.appendChild(title);
+    const loc = document.createElement('p'); loc.className = 'location'; loc.textContent = '📍 ' + getLocation(studio); body.appendChild(loc);
+    const desc = document.createElement('p'); desc.className = 'description'; desc.textContent = clean(studio.description) || 'Contact the studio through the booking process to learn more.'; body.appendChild(desc);
+    const price = document.createElement('p'); price.className = 'price'; price.textContent = money(studio.hourly_rate, studio.currency_code); const small = document.createElement('small'); small.textContent = studio.hourly_rate === null || studio.hourly_rate === undefined || studio.hourly_rate === '' ? ' · Ask the studio for pricing' : ' · Rate listed by studio'; price.appendChild(small); body.appendChild(price);
+    const serviceList = servicesOf(studio); if (serviceList.length) { const chips = document.createElement('div'); chips.className = 'services'; serviceList.forEach(s => { const chip = document.createElement('span'); chip.className = 'service-chip'; chip.textContent = s; chips.appendChild(chip); }); body.appendChild(chips); }
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'book-btn'; btn.textContent = 'Continue to booking checkout →';
+    btn.addEventListener('click', () => {
+      if (!studio.id) { status.textContent = 'This studio does not have a valid listing ID. Please choose another studio.'; return; }
+      const params = new URLSearchParams({studio_id:String(studio.id), studio:clean(studio.studio_name), location:getLocation(studio), price:studio.hourly_rate == null ? '' : String(studio.hourly_rate), currency:clean(studio.currency_code).toUpperCase(), service:serviceList.join(', ')});
+      window.location.href = 'producer-checkout.html?' + params.toString();
+    }); body.appendChild(btn); article.appendChild(body); return article;
+  }
+  function fillOptions() {
+    const selectedCountry = countryFilter.value, selectedService = serviceFilter.value;
+    const countries = [...new Set(allStudios.map(s=>clean(s.country)).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    const services = [...new Set(allStudios.flatMap(servicesOf))].sort((a,b)=>a.localeCompare(b));
+    countryFilter.innerHTML = '<option value="">All countries</option>';
+    serviceFilter.innerHTML = '<option value="">All services</option>';
+    countries.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;countryFilter.appendChild(o)});
+    services.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;serviceFilter.appendChild(o)});
+    countryFilter.value = countries.includes(selectedCountry) ? selectedCountry : '';
+    serviceFilter.value = services.includes(selectedService) ? selectedService : '';
+  }
+  function applyFilters() {
+    const q = search.value.trim().toLowerCase(), country = countryFilter.value, service = serviceFilter.value;
+    const filtered = allStudios.filter(s => {
+      const searchable = [s.studio_name,s.studio_type,s.city,s.country,s.address,s.description,...servicesOf(s),...(Array.isArray(s.equipment)?s.equipment:[])].join(' ').toLowerCase();
+      return (!q || searchable.includes(q)) && (!country || clean(s.country)===country) && (!service || servicesOf(s).includes(service));
+    });
+    grid.replaceChildren(); filtered.forEach(s=>grid.appendChild(studioCard(s)));
+    empty.hidden = filtered.length > 0;
+    if (!filtered.length) { emptyTitle.textContent = allStudios.length ? 'No matching studios' : 'No approved studios available yet'; emptyText.textContent = allStudios.length ? 'Try a different search or remove one of the filters.' : 'PASONG only shows approved listings here. Please check back soon, or register a studio from the Producer Dashboard.'; }
+    if (allStudios.length) status.textContent = `${filtered.length} of ${allStudios.length} approved studio${allStudios.length===1?'':'s'}${visitor.city ? ` · Your approximate IP area: ${visitor.city}${visitor.country?', '+visitor.country:''}` : ''}.`;
+  }
+  async function detectLocation() {
+    status.textContent = 'Checking approximate location…';
+    try {
+      const r = await fetch('https://ipapi.co/json/', {headers:{'Accept':'application/json'}}); if (!r.ok) throw new Error('Location lookup failed');
+      const data = await r.json(); visitor.city = clean(data.city); visitor.country = clean(data.country_name);
+      // Sort only by matching city/country labels. This is not distance or GPS.
+      allStudios.sort((a,b) => {
+        const score = s => { const city=clean(s.city).toLowerCase(), country=clean(s.country).toLowerCase(); let n=0; if(visitor.city && city===visitor.city.toLowerCase()) n+=2; if(visitor.country && country===visitor.country.toLowerCase()) n+=1; return n; };
+        return score(b)-score(a);
+      });
+      applyFilters();
+    } catch (_) { status.textContent = allStudios.length ? `${allStudios.length} approved studio${allStudios.length===1?'':'s'} loaded. Location detection is unavailable.` : 'Location detection is unavailable.'; }
+  }
+  async function loadStudios() {
+    if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      status.textContent = 'Studio directory is not connected yet. Add PASONG’s public Supabase URL and anon/publishable key to this page to load approved studios.';
+      empty.hidden = false; emptyTitle.textContent = 'Studio directory connection needed'; emptyText.textContent = 'This page intentionally does not show made-up studios. Once the public Supabase configuration is added, approved producer_studios listings will appear here.'; return;
+    }
+    try {
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const {data,error} = await client.from('producer_studios').select('id,studio_name,description,studio_type,country,city,address,services,equipment,hourly_rate,currency_code,photos,status').eq('status','approved').order('created_at',{ascending:false});
+      if (error) throw error;
+      allStudios = Array.isArray(data) ? data : [];
+      fillOptions(); applyFilters();
+      if (!allStudios.length) { status.textContent = 'No approved studios have been published yet.'; }
+      detectLocation();
+    } catch (error) {
+      console.error('PASONG studio directory error:', error);
+      status.textContent = 'Could not load approved studios. Check the Supabase public URL/key, producer_studios columns and public SELECT policy.';
+      empty.hidden = false; emptyTitle.textContent = 'Studios could not load'; emptyText.textContent = 'Please try again later. The page only displays approved database listings and does not invent studio details.';
+    }
+  }
+  search.addEventListener('input', applyFilters); countryFilter.addEventListener('change', applyFilters); serviceFilter.addEventListener('change', applyFilters);
+  document.getElementById('nearMeBtn').addEventListener('click', detectLocation);
+  loadStudios();
 })();
 </script>
-</body>
-</html>
+</body></html>
