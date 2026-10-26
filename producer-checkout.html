@@ -1,75 +1,210 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#8b5cf6">
-<title>PASONG Secure Checkout</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
+<title>PASONG Studio — Direct Booking</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#080810;color:#fff;font-family:Arial,Helvetica,sans-serif}.wrap{max-width:980px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.logo{font-size:24px;font-weight:900;color:#fff;text-decoration:none}.logo b{color:#c084fc}.back{color:#aaa;text-decoration:none}.card{background:#11111b;border:1px solid #2a2a3a;border-radius:24px;overflow:hidden;box-shadow:0 24px 80px #0008}.hero{padding:25px;background:radial-gradient(circle at 90% 10%,#ec489933,transparent 35%),radial-gradient(circle at 10% 90%,#8b5cf633,transparent 40%)}.tag{font-size:11px;letter-spacing:2px;color:#c084fc;font-weight:900}.hero h1{margin:8px 0;font-size:32px}.muted{color:#9b9bab;line-height:1.6}.grid{display:grid;grid-template-columns:280px 1fr;gap:25px;padding:25px}.cover{width:100%;aspect-ratio:1;object-fit:cover;border-radius:18px;background:#191923;border:1px solid #303044}.title{font-size:25px;font-weight:900}.meta{color:#aaaabd;line-height:1.8;margin:8px 0 18px}.plans{display:grid;grid-template-columns:1fr 1fr;gap:12px}.plan{padding:17px;border:1px solid #34344a;background:#0b0b14;border-radius:14px;cursor:pointer;color:#fff;text-align:left}.plan:disabled{opacity:.45;cursor:not-allowed}.plan.active{border-color:#8b5cf6;box-shadow:0 0 0 1px #8b5cf6}.plan small{display:block;color:#999;margin-bottom:6px}.plan strong{font-size:19px;color:#c084fc}.section{border-top:1px solid #2a2a3a;padding:25px}.section h2{font-size:19px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin:12px 0}.field label{display:block;color:#d9d9e5;font-size:13px;font-weight:700;margin-bottom:7px}.field input,.field textarea{width:100%;padding:13px;border-radius:11px;border:1px solid #38384c;background:#090912;color:#fff;outline:0}.field textarea{min-height:85px;resize:vertical}.summary{background:#090912;border:1px solid #34344a;border-radius:14px;padding:16px;margin-bottom:18px}.sum{display:flex;justify-content:space-between;gap:12px;padding:7px 0;color:#aaa}.total{border-top:1px solid #2a2a3a;margin-top:8px;padding-top:13px;color:#fff;font-size:19px;font-weight:900}.total strong{color:#c084fc}.methods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.method{min-width:0;min-height:118px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;border:1px solid #37374b;background:linear-gradient(145deg,#191923,#0c0c15);border-radius:16px;padding:14px;color:#fff;cursor:pointer;text-align:left}.method.active{border-color:#c084fc;background:#20132f;box-shadow:0 0 0 2px #8b5cf655}.method .icon{height:34px;min-width:68px;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:900}.method img{height:22px;max-width:75px;object-fit:contain}.method strong{font-size:13px}.method small{font-size:11px;color:#aaaabd}.paylogo{height:34px;min-width:68px;display:flex;align-items:center;justify-content:center;padding:0 9px;border-radius:8px;font-size:16px;font-weight:900}.mtn-logo{background:#ffcc00;color:#111;border-radius:50%}.airtel-logo{background:#ed1c24;color:#fff;font-style:italic}.card-logo{background:#fff;color:#16234a;font-size:13px}.pay{width:100%;border:0;border-radius:14px;padding:15px;margin-top:14px;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-weight:900;font-size:16px}.pay:disabled{opacity:.5}.status{display:none;padding:13px;border-radius:12px;margin-top:12px;line-height:1.5}.status.show{display:block}.ok{background:#12321f;border:1px solid #2c6945;color:#9be7bb}.bad{background:#351719;border:1px solid #713236;color:#ffb1b1}.info{background:#19142b;border:1px solid #3a2b5b;color:#cdb9ff}.hidden{display:none!important}footer{text-align:center;color:#777789;padding:25px;font-size:12px}@media(max-width:700px){.grid{grid-template-columns:1fr;padding:18px}.cover{max-width:300px;margin:auto}.row,.plans{grid-template-columns:1fr}.hero{padding:20px}.hero h1{font-size:27px}.section{padding:20px}}@media(max-width:520px){.methods{grid-template-columns:1fr}.method{min-height:78px;display:grid;grid-template-columns:78px 1fr;gap:5px 10px}.method .icon{grid-row:span 2}}
+:root{--bg:#050b18;--line:#173455;--muted:#a4b4cc}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:85px}
+body{margin:0;background:var(--bg);color:#f8fafc;font-family:Inter,sans-serif}
+.wrap{width:min(1180px,calc(100% - 32px));margin:auto}
+header{position:sticky;top:0;z-index:30;background:#050b18f5;backdrop-filter:blur(15px);border-bottom:1px solid var(--line)}
+.navbar{min-height:70px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:23px;color:white;text-decoration:none}
+.logo-mark{font-size:32px;color:#c084fc}.logo-sub{display:block;font-size:8px;letter-spacing:1px;color:#a9bad1}
+.navlinks{display:flex;gap:20px;font-size:12px;color:#d5deec}.navlinks a{color:#d5deec;text-decoration:none}.navlinks a.active{color:#d28bff}
+.signin{border-radius:999px;padding:10px 17px;background:#fff;color:#0a1020;font-weight:800;font-size:12px;text-decoration:none}
+.hero{border-bottom:1px solid var(--line);background:linear-gradient(90deg,#050b18 0%,#050b18ed 40%,#050b1870 100%),url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1800&q=85') center/cover}
+.hero-inner{min-height:420px;display:flex;align-items:center;padding:45px 0}
+.hero-copy{max-width:650px}
+.eyebrow,.kicker{display:inline-block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:900;color:#d9a0ff}
+.eyebrow{border:1px solid #9145c5;border-radius:99px;padding:8px 12px;background:#3b07642b}
+h1{font-size:clamp(37px,6vw,65px);line-height:1.04;letter-spacing:-2.5px;font-weight:900;margin:18px 0}
+.gradient{background:linear-gradient(90deg,#df9bff,#9b35ff 48%,#22b9ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:550px;color:#d0d9e8;font-size:14px;line-height:1.8}
+.actions,.feature-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.feature{display:flex;align-items:center;gap:8px;padding-right:12px;border-right:1px solid #29405b;font-size:11px;color:#dce6f6}
+.feature:last-child{border:0}
+.feature-icon{width:35px;height:35px;border-radius:12px;display:grid;place-items:center;background:#4c1d954d;color:#d58bff;border:1px solid #6826a466;font-size:19px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;padding:12px 19px;font-size:12px;font-weight:800;cursor:pointer}
+.btn-grad{background:linear-gradient(100deg,#b10cff,#4e4dff,#00b8f5);color:#fff}
+.btn-outline{background:#050b18bd;border:1px solid #5c7fa8;color:white}
+.section{padding:34px 0;border-bottom:1px solid var(--line)}
+.section-top{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:20px}
+h2{font-size:clamp(24px,3.5vw,32px);letter-spacing:-.9px;line-height:1.2;font-weight:900;margin:7px 0}
+.sub{font-size:12px;color:var(--muted);line-height:1.75;max-width:700px}
+.studios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.studio-card{overflow:hidden;border:1px solid #24517a;border-radius:16px;background:linear-gradient(150deg,#081426,#020916)}
+.studio-art{height:145px;position:relative;display:flex;align-items:center;justify-content:center}
+.studio-art:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#020916,transparent 75%),var(--studio-image) center/cover}
+.studio-brand{position:relative;z-index:1;width:90px;height:90px;border-radius:14px;background:#020713ed;border:1px solid var(--brand-color);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:8px}
+.brand-symbol{font-size:28px;font-weight:900;color:var(--brand-color)}
+.brand-name{font-size:10px;line-height:1.2;font-weight:900;margin-top:6px}
+.studio-body{padding:16px}
+.tag{display:inline-block;padding:5px 9px;border-radius:99px;font-size:9px;font-weight:800;background:#064e3b;color:#a7f3d0;border:1px solid #059669}
+.tag.blue{background:#082f75;color:#bfdbfe;border-color:#2563eb}
+.location{font-size:11px;color:#c2d1e5}
+.description{font-size:11px;color:#aebed2;line-height:1.7;min-height:40px;margin-top:10px}
+.price{font-size:14px;font-weight:900;margin-top:12px}
+.book-btn{width:100%;margin-top:13px;padding:12px;border-radius:999px;background:linear-gradient(100deg,#b10cff,#5651ff,#00b8f5);color:white;font-size:11px;font-weight:900;border:0;cursor:pointer}
+.owner-banner{margin-top:22px;padding:24px;border:1px solid #7140ac;border-radius:18px;background:linear-gradient(110deg,#24104a,#0b2342)}
+.form-card{border:1px solid #17416a;border-radius:15px;padding:17px;background:#061225;margin-top:16px}
+input,select,textarea{width:100%;background:#071326;border:1px solid #24466b;border-radius:9px;color:white;padding:12px;font-size:12px;outline:none}
+label{display:block;font-size:11px;color:#d7e2f1;font-weight:700;margin:8px 0 4px}
+footer{padding:23px 0 15px;background:#030814}
+.footer-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:13px;font-size:10px;color:#9fb1c8}
+@media(max-width:700px){.wrap{width:calc(100% - 28px)}.navlinks{display:none}.studios{grid-template-columns:1fr}.studio-card{display:grid;grid-template-columns:115px 1fr}}
 </style>
 </head>
-<body><div class="wrap">
-<div class="top"><a class="logo" href="index.html">◈ <b>PASONG</b></a><a class="back" href="javascript:history.back()">← Back</a></div>
-<div id="loading" class="card hero">Loading secure checkout…</div>
-<div id="checkout" class="card hidden">
-<div class="hero"><div class="tag">PASONG SECURE CHECKOUT</div><h1>Secure Checkout</h1><div id="heroDescription" class="muted">Choose a beat licence. Local prices are estimates for display only. The payment backend charges the saved listing price and currency.</div></div>
-<div class="grid"><img id="cover" class="cover" alt="Beat cover"><div><div id="title" class="title">Beat</div><div id="meta" class="meta">Loading…</div><div class="plans" id="plans"></div><div class="muted" id="fxNote" style="font-size:12px;margin-top:12px"></div></div></div>
-<div class="section"><h2>Customer details</h2><div class="row"><div class="field"><label>Name</label><input id="name" autocomplete="name" placeholder="Your full name"></div><div class="field"><label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div></div><div class="field"><label>Phone / WhatsApp</label><input id="phone" autocomplete="tel" placeholder="+256 701 234 567"></div><div class="field"><label>Message to producer (optional)</label><textarea id="message" placeholder="Any instructions for the producer…"></textarea></div></div>
-<div class="section"><h2>Payment method</h2><div class="summary"><div class="sum"><span>Beat</span><span id="sTitle">—</span></div><div class="sum"><span>Licence</span><span id="sPackage">MP3 Lease</span></div><div class="sum"><span>Original listing price</span><span id="original">—</span></div><div class="sum"><span>Local currency estimate</span><span id="estimate">—</span></div><div class="sum total"><span>Amount sent to backend</span><strong id="total">—</strong></div></div>
-<div class="methods"><button type="button" class="method active" data-method="MTN"><div class="icon"><span class="paylogo mtn-logo">MTN</span></div><strong>MTN MoMo</strong><small>Mobile Money</small></button><button type="button" class="method" data-method="AIRTEL"><div class="icon"><span class="paylogo airtel-logo">airtel</span></div><strong>Airtel Money</strong><small>Mobile Money</small></button><button type="button" class="method" data-method="FLUTTERWAVE"><div class="icon"><span class="paylogo card-logo">VISA · MC</span></div><strong>Debit / Credit Card</strong><small>Visa and Mastercard</small></button></div>
-<div id="mobileBox" class="field"><label>Mobile Money number</label><input id="mobile" type="tel" autocomplete="tel" placeholder="07XX XXX XXX"></div><button id="pay" class="pay">Pay with MTN MoMo</button><div id="status" class="status" role="status"></div></div></div>
-<footer>© 2026 PASONG — Music. Opportunity. Support.</footer></div>
+<body>
+<header><div class="wrap navbar"><a class="logo" href="/Pasong.html"><span class="logo-mark">♫</span><span>PASONG<span class="logo-sub">MUSIC · CREATORS · OPPORTUNITY</span></span></a><nav class="navlinks"><a href="/Pasong.html">Home</a><a href="/studio.html" class="active">Studio</a><a href="/beats.html">Beats</a><a href="/events.html">Events</a></nav><a class="signin" href="/account.html">Sign In</a></div></header>
+
+<section class="hero"><div class="wrap hero-inner"><div class="hero-copy"><span class="eyebrow">A GLOBAL HOME FOR CREATORS</span><h1>Book a Studio.<br><span class="gradient">Bring Your Sound<br>to Life.</span></h1><p class="lead">Discover studios by IP location. Pin your studio on map. All payments via producer-checkout.html to unlock contact.</p><div class="feature-row"><div class="feature"><span class="feature-icon">♫</span><span>Recording<br>Studios</span></div><div class="feature"><span class="feature-icon">≋</span><span>Beat<br>Production</span></div><div class="feature"><span class="feature-icon">🎚</span><span>Mix &<br>Mastering</span></div><div class="feature"><span class="feature-icon">♙</span><span>Studio<br>Discovery</span></div></div><div class="actions"><a class="btn btn-grad" href="#studios">Explore Studios →</a></div></div></div></section>
+
+<section class="section" id="studios"><div class="wrap">
+<div class="section-top"><div><div class="kicker">Studio Directory</div><h2>Find Your <span class="gradient">Sound</span></h2><p id="nearYouText" class="sub" style="color:#d9a0ff;font-weight:800">📍 Detecting your location by IP...</p><div style="display:flex;gap:10px;margin-top:14px"><input id="studioSearch" placeholder="Search studio name, city, country..." style="flex:1;padding:11px 14px;border-radius:99px;background:#071326;border:1px solid #24466b;color:white;font-size:11px"><button onclick="detectLocation()" class="btn btn-outline" style="border-radius:99px">📍 Near Me</button></div></div></div>
+
+<div class="studios" id="studiosGrid">
+<article class="studio-card" data-location="London United Kingdom" data-lat="51.5074" data-lng="-0.1278"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">NS</span><span class="brand-name">NORTHSTAR<br>RECORDING</span></div></div><div class="studio-body"><span class="tag">Recording + Beats</span><h3>Northstar Recording</h3><p class="location">📍 London, UK</p><p class="description">Professional recording and vocal sessions.</p><p class="price">£100 / session <small> + UGX 5k commission</small></p><button class="book-btn" data-studio="Northstar Recording" data-producer="John Smith" data-phone="+44 7700 900123" data-service="Recording + Beats">Book → Pay on Checkout</button></div></article>
+
+<article class="studio-card" data-location="Lagos Nigeria" data-lat="6.5244" data-lng="3.3792"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=800&q=85');--brand-color:#21dcff"><div class="studio-brand"><span class="brand-symbol">LS</span><span class="brand-name">LAGOS<br>SOUND LAB</span></div></div><div class="studio-body"><span class="tag blue">Mix & Master</span><h3>Lagos Sound Lab</h3><p class="location">📍 Lagos, Nigeria</p><p class="description">Mixing and mastering.</p><p class="price">₦30,000 / song <small> + UGX 5k</small></p><button class="book-btn" data-studio="Lagos Sound Lab" data-producer="Femi Beats" data-phone="+234 800 123 4567" data-service="Mix & Master">Book → Pay on Checkout</button></div></article>
+
+<article class="studio-card" data-location="Kampala Uganda Kawempe" data-lat="0.3476" data-lng="32.5825"><div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">KV</span><span class="brand-name">KV BEATS<br>STUDIO</span></div></div><div class="studio-body"><span class="tag">Recording + Beats</span><h3>KV Beats Studio</h3><p class="location">📍 Kawempe, Kampala</p><p class="description">Beats, vocals, full package.</p><p class="price">UGX 50,000 / day <small> + UGX 5k</small></p><button class="book-btn" data-studio="KV Beats Studio - Kawempe" data-producer="Kato V" data-phone="0700471406" data-service="Recording + Beats">Book → Pay on Checkout</button></div></article>
+</div>
+
+<div class="owner-banner" id="studio-owner">
+<div class="kicker">FOR PRODUCERS - GOOGLE PIN</div>
+<h2>Register Your Studio - Pin Location on Map</h2>
+<p class="sub">Click map to pin your studio. Drag pin to adjust. Visitors near your pin will see you first. All bookings pay via producer-checkout.html</p>
+<form id="producerRegisterForm" class="form-card">
+<label>Studio Name *</label><input id="regStudioName" required placeholder="e.g. KV Beats Studio">
+<label>Owner Name *</label><input id="regOwnerName" required>
+<label>Phone *</label><input id="regPhone" required placeholder="070...">
+<label>City *</label><input id="regLocation" required placeholder="Kawempe, Kampala">
+<label>Google Location Pin * — Click map to pin</label>
+<div style="display:flex;gap:8px;margin-bottom:8px">
+<input id="regLatLngDisplay" readonly placeholder="Click map to pin location" style="flex:1">
+<button type="button" onclick="getCurrentLocationPin()" class="btn btn-outline" style="width:auto;white-space:nowrap">📍 My Location</button>
+</div>
+<div id="registerMap" style="height:280px;border-radius:12px;border:1px solid #24466b;margin-bottom:10px;z-index:1"></div>
+<p style="font-size:10px;color:#a4b4cc">Click map to drop pin. Drag to adjust. Auto-fills city name.</p>
+<input type="hidden" id="regLat"><input type="hidden" id="regLng">
+<label>Service *</label><select id="regService" required><option value="">Choose</option><option>Recording + Beats</option><option>Mix & Master</option><option>Full Package</option><option>Vocal Recording</option><option>Beat Production</option></select>
+<label>Price *</label><input id="regPrice" required placeholder="UGX 50,000 / day">
+<label>Description *</label><textarea id="regDesc" required placeholder="Describe studio..."></textarea>
+<button type="submit" class="btn btn-grad" style="width:100%;margin-top:12px">Register Studio with Map Pin →</button>
+</form>
+<p id="regNotice" style="font-size:12px;color:#22c55e;margin-top:8px"></p>
+</div>
+
+</div></section>
+
+<footer><div class="wrap"><div class="footer-bottom"><span>© <span id="year"></span> PASONG - Checkout: producer-checkout.html</span><span>pasong.ug@gmail.com</span></div></div></footer>
+
 <script>
-'use strict';
-const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co',SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP',API='https://pasong-api.onrender.com';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),q=new URLSearchParams(location.search),beatId=q.get('beat')||q.get('id'),promotionId=q.get('promotion_id');
-const isBusinessCheckout=q.get('type')==='business'||!!promotionId;
-const BUSINESS_PACKAGES={
- 'biz-starter':{name:'Starter',amount:105000,reach:'5K–10K estimated reach'},
- 'biz-growth':{name:'Growth',amount:220000,reach:'20K–50K estimated reach + Homepage'},
- 'biz-pro':{name:'Pro Brand',amount:450000,reach:'100K+ estimated reach + Hero slider'}
+(function(){
+document.getElementById('year').textContent = new Date().getFullYear();
+
+let regMap, regMarker;
+setTimeout(()=>{
+  regMap = L.map('registerMap').setView([0.3476, 32.5825], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(regMap);
+  regMap.on('click', function(e){ setPin(e.latlng.lat, e.latlng.lng); });
+  setPin(0.3476, 32.5825);
+}, 600);
+
+function setPin(lat, lng){
+  document.getElementById('regLat').value = lat;
+  document.getElementById('regLng').value = lng;
+  document.getElementById('regLatLngDisplay').value = lat.toFixed(6) + ', ' + lng.toFixed(6);
+  if(regMarker){ regMap.removeLayer(regMarker); }
+  regMarker = L.marker([lat, lng], {draggable:true}).addTo(regMap);
+  regMarker.on('dragend', function(){
+    const p = regMarker.getLatLng();
+    document.getElementById('regLat').value = p.lat;
+    document.getElementById('regLng').value = p.lng;
+    document.getElementById('regLatLngDisplay').value = p.lat.toFixed(6) + ', ' + p.lng.toFixed(6);
+  });
+  regMap.setView([lat, lng], 13);
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+    .then(r=>r.json()).then(d=>{
+      if(d.display_name && !document.getElementById('regLocation').value){
+        document.getElementById('regLocation').value = d.address.city||d.address.town||d.address.village||'' + ', ' + (d.address.country||'');
+      }
+    }).catch(()=>{});
+}
+window.getCurrentLocationPin = function(){
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(pos=>{ setPin(pos.coords.latitude, pos.coords.longitude); },
+    ()=>{alert('Could not get location. Click map manually.');});
+  }
+}
+window.setPin = setPin;
+
+window.detectLocation = function(){
+  const txt = document.getElementById('nearYouText');
+  txt.textContent = '📍 Detecting...';
+  fetch('https://ipapi.co/json/').then(r=>r.json()).then(data=>{
+    const city = data.city || 'Your area'; const country = data.country_name || '';
+    txt.innerHTML = `📍 Studios near you in <b style="color:#fff">${city}, ${country}</b> - IP: ${data.ip}`;
+    const cards = Array.from(document.querySelectorAll('.studio-card'));
+    cards.sort((a,b)=>{
+      const aL = (a.dataset.location||'').toLowerCase(); const bL = (b.dataset.location||'').toLowerCase();
+      return (aL.includes(city.toLowerCase())||aL.includes(country.toLowerCase())?0:1) - (bL.includes(city.toLowerCase())||bL.includes(country.toLowerCase())?0:1);
+    });
+    const grid = document.getElementById('studiosGrid');
+    cards.forEach(c=>{grid.appendChild(c); if((c.dataset.location||'').toLowerCase().includes(city.toLowerCase())){c.style.borderColor='#22c55e';}});
+  }).catch(()=>{txt.textContent='📍 Could not detect IP. Showing all studios.';});
 };
-let businessPackage=null,businessPromotion=null;
-let beat=null,producer=null,license=(q.get('license')||q.get('package')||'lease').toLowerCase(),method='MTN',displayCurrency='USD',rates={USD:1},country='',countryName='',fxAvailable=false;
-const $=id=>document.getElementById(id);
-const first=(o,keys,d='')=>{for(const k of keys)if(o&&o[k]!=null&&String(o[k]).trim()!=='')return o[k];return d};
-const cur=b=>String(first(b,['price_currency','currency'],'UGX')).toUpperCase();
-const prices={mp3:b=>Number(first(b,['lease_mp3_price','lease_price','beat_lease_price'],0)),wav:b=>Number(first(b,['lease_wav_price'],0)),stems:b=>Number(first(b,['stems_price'],0)),exclusive:b=>Number(first(b,['exclusive_price','beat_exclusive_price','exclusive_rights_price'],0))};
-const COUNTRY_CURRENCY={UG:'UGX',KE:'KES',TZ:'TZS',RW:'RWF',BI:'BIF',SS:'SSP',ET:'ETB',NG:'NGN',GH:'GHS',ZA:'ZAR',EG:'EGP',MA:'MAD',DZ:'DZD',TN:'TND',ZM:'ZMW',MW:'MWK',MZ:'MZN',BW:'BWP',NA:'NAD',SZ:'SZL',LS:'LSL',AO:'AOA',CM:'XAF',SN:'XOF',CI:'XOF',BF:'XOF',ML:'XOF',NE:'XOF',TG:'XOF',BJ:'XOF',GN:'GNF',LR:'LRD',SL:'SLE',GM:'GMD',MR:'MRU',CV:'CVE',MU:'MUR',SC:'SCR',KM:'KMF',DJ:'DJF',ER:'ERN',US:'USD',GB:'GBP',FR:'EUR',DE:'EUR',IT:'EUR',ES:'EUR',PT:'EUR',NL:'EUR',BE:'EUR',IE:'EUR',AT:'EUR',FI:'EUR',GR:'EUR',LU:'EUR',CY:'EUR',MT:'EUR',SK:'EUR',SI:'EUR',EE:'EUR',LV:'EUR',LT:'EUR',AU:'AUD',NZ:'NZD',CA:'CAD',CH:'CHF',SE:'SEK',NO:'NOK',DK:'DKK',PL:'PLN',CZ:'CZK',HU:'HUF',RO:'RON',BG:'BGN',TR:'TRY',IN:'INR',PK:'PKR',BD:'BDT',LK:'LKR',NP:'NPR',CN:'CNY',JP:'JPY',KR:'KRW',SG:'SGD',MY:'MYR',ID:'IDR',PH:'PHP',TH:'THB',VN:'VND',HK:'HKD',TW:'TWD',AE:'AED',SA:'SAR',QA:'QAR',KW:'KWD',BH:'BHD',OM:'OMR',IL:'ILS',JO:'JOD',MX:'MXN',BR:'BRL',AR:'ARS',CL:'CLP',CO:'COP',PE:'PEN',UY:'UYU',PA:'PAB',CR:'CRC',DO:'DOP',JM:'JMD',TT:'TTD',BS:'BSD',BB:'BBD',GD:'XCD',AG:'XCD',DM:'XCD',LC:'XCD',VC:'XCD',KN:'XCD'};
-function money(n,c){const v=Number(n);if(!Number.isFinite(v))return '—';try{return new Intl.NumberFormat(undefined,{style:'currency',currency:c,maximumFractionDigits:['UGX','JPY','KRW','RWF','BIF','XAF','XOF'].includes(c)?0:2}).format(v)}catch{return c+' '+v.toLocaleString()}}
-function originalPrice(){return beat?prices[license](beat):0}
-function convert(amount,from,to){amount=Number(amount);from=String(from||'').toUpperCase();to=String(to||'').toUpperCase();if(!Number.isFinite(amount)||!from||!to)return null;if(from===to)return amount;if(!fxAvailable)return null;const fr=from==='USD'?1:Number(rates[from]),tr=to==='USD'?1:Number(rates[to]);if(!Number.isFinite(fr)||fr<=0||!Number.isFinite(tr)||tr<=0)return null;return amount/fr*tr}
-function msg(t,c='info'){const x=$('status');x.textContent=t;x.className='status show '+c}
-async function detectCurrency(){
- try{const r=await fetch('https://ipwho.is/',{cache:'no-store'}),d=await r.json();if(d&&d.success!==false&&d.country_code){country=String(d.country_code).toUpperCase();countryName=d.country||country;displayCurrency=COUNTRY_CURRENCY[country]||'USD'}else throw Error('No country returned')}
- catch(e){console.warn('PASONG country detection failed',e);country='';countryName='';displayCurrency='USD'}
- try{const r=await fetch('https://open.er-api.com/v6/latest/USD',{cache:'no-store'}),d=await r.json();if(d&&d.result==='success'&&d.rates&&Number(d.rates.USD)===1){rates=d.rates;fxAvailable=true}else throw Error('Invalid rates')}
- catch(e){console.warn('PASONG exchange rates unavailable',e);rates={USD:1};fxAvailable=false}
-}
-async function session(){const r=await sb.auth.getSession();return r.data.session}
-async function auth(){const s=await session();if(!s){msg('Please log in to your PASONG account first.','bad');setTimeout(()=>location.href='login.html?redirect='+encodeURIComponent(location.href),800);return null}return s}
-function renderPlans(){const c=cur(beat),items=[['mp3','MP3 Lease'],['wav','WAV Lease'],['stems','Stems'],['exclusive','Exclusive Rights']];$('plans').innerHTML=items.map(([k,label])=>{const p=prices[k](beat),sold=k==='exclusive'&&(beat.is_exclusive_sold||beat.status==='sold_exclusive'),converted=convert(p,c,displayCurrency);return `<button type="button" class="plan ${license===k?'active':''}" data-license="${k}" ${!p||sold?'disabled':''}><small>${label}${sold?' · SOLD':''}</small><strong>${p?(converted===null?'FX unavailable':money(converted,displayCurrency)):'Price not set'}</strong><div class="muted" style="font-size:11px;margin-top:6px">Listing: ${p?money(p,c):'Not set'}</div></button>`}).join('');document.querySelectorAll('[data-license]').forEach(b=>b.onclick=()=>{license=b.dataset.license;renderPlans();updateSummary()})}
-function updateSummary(){const c=cur(beat),p=originalPrice(),converted=convert(p,c,displayCurrency);$('sPackage').textContent=({mp3:'MP3 Lease',wav:'WAV Lease',stems:'Stems',exclusive:'Exclusive Rights'})[license]||license;$('original').textContent=money(p,c);$('estimate').textContent=converted===null?'Unavailable':money(converted,displayCurrency);
- // Existing payment routes receive the listing price. Do not pretend the converted estimate is charged.
- $('total').textContent=money(p,c);$('fxNote').textContent=`Buyer location: ${countryName||country||'not detected'} · Local display currency: ${displayCurrency}. ${fxAvailable?'Exchange rates loaded.':'Exchange rates unavailable.'} Payment backend still uses the saved listing price and currency.`;document.querySelectorAll('[data-license]').forEach(b=>b.classList.toggle('active',b.dataset.license===license))}
-function updateButton(){$('pay').textContent=({MTN:'Pay with MTN MoMo',AIRTEL:'Pay with Airtel Money',FLUTTERWAVE:'Pay with Visa / Mastercard'})[method]}
-async function load(){try{const s=await session();if(s){$('name').value=first(s.user.user_metadata,['full_name','name','display_name'],'');$('email').value=s.user.email||''}if(isBusinessCheckout){await loadBusinessCheckout(s);return}if(!beatId){$('loading').textContent='No beat was selected.';return}await detectCurrency();const r=await sb.from('beats').select('*').eq('id',beatId).maybeSingle();if(r.error||!r.data)throw Error('Beat not found');beat=r.data;const pid=first(beat,['producer_id','artist_id'],'');if(pid){const p=await sb.from('artist_profiles').select('*').eq('id',pid).maybeSingle();producer=p.data||null}const title=first(beat,['title','beat_title','beat_name','name'],'Untitled Beat');$('title').textContent=title;$('sTitle').textContent=title;$('cover').src=first(beat,['cover_url','beat_cover_url','cover_image_url','artwork_url','image_url'],'https://ui-avatars.com/api/?name=Beat&background=171722&color=c084fc&bold=true');$('meta').textContent=`${first(producer,['performing_name','stage_name','artist_name','name'],'Producer')} · ${first(beat,['genre','music_genre'],'Beat')}${beat.bpm?' · '+beat.bpm+' BPM':''}${beat.key?' · Key: '+beat.key:''}`;if(license==='lease')license='mp3';if(!['mp3','wav','stems','exclusive'].includes(license))license='mp3';renderPlans();updateSummary();$('loading').classList.add('hidden');$('checkout').classList.remove('hidden')}catch(e){console.error(e);$('loading').textContent=e.message||'Unable to load checkout.'}}
-async function loadBusinessCheckout(s){
- if(!s){$('loading').textContent='Please log in to your PASONG account first.';setTimeout(()=>location.href='login.html?redirect='+encodeURIComponent(location.href),800);return}
- const packageKey=q.get('package')||'';businessPackage=BUSINESS_PACKAGES[packageKey];
- if(!businessPackage){$('loading').textContent='Unknown business advert package. Go back to My Business and select a package again.';return}
- if(promotionId){const result=await sb.from('promotions').select('*').eq('id',promotionId).eq('user_id',s.user.id).maybeSingle();if(result.error)console.warn('Could not load saved promotion record:',result.error);businessPromotion=result.data||null;if(!businessPromotion){$('loading').textContent='We could not verify this advert request. Go back to My Business and try again.';return}}
- $('heroDescription').textContent='Review your business advertisement package and the fixed Ugandan Shilling price before payment.';
- $('title').textContent='Business Advertisement';$('sTitle').textContent='Business Advertisement';$('meta').textContent=businessPackage.name+' · '+businessPackage.reach;
- $('cover').classList.add('hidden');$('plans').classList.add('hidden');$('fxNote').textContent='Fixed business package price. No exchange-rate estimate is applied.';
- $('sPackage').textContent=businessPackage.name;$('original').textContent=money(businessPackage.amount,'UGX');$('estimate').textContent=money(businessPackage.amount,'UGX');$('total').textContent=money(businessPackage.amount,'UGX');
- document.querySelectorAll('.summary .sum').forEach((el,i)=>{const label=el.querySelector('span');if(!label)return;if(i===0)label.textContent='Advert';if(i===1)label.textContent='Package';if(i===2)label.textContent='Package price';if(i===3)label.textContent='Currency';if(i===4)label.textContent='Total due'});$('estimate').textContent='UGX';
- $('message').closest('.field').classList.add('hidden');$('pay').textContent='Business payment setup required';$('pay').disabled=true;
- msg('Correct package price shown. Business packages still need their own server-side payment route before a charge can be taken. No payment has been made.', 'info');
- $('loading').classList.add('hidden');$('checkout').classList.remove('hidden');
-}
-async function pay(){const s=await auth();if(!s)return;const name=$('name').value.trim(),email=$('email').value.trim(),mobile=$('mobile').value.trim();if(!name||!email){msg('Enter your name and email.','bad');return}if(method!=='FLUTTERWAVE'&&!/^(?:\+256|256|0)7\d{8}$/.test(mobile.replace(/\s+/g,''))){msg('Enter a valid Uganda mobile-money number.','bad');return}if(!beat){msg('Invalid beat.','bad');return}if(!Number.isFinite(originalPrice())||originalPrice()<=0){msg('This licence has no valid price set.','bad');return}if(license==='exclusive'&&(beat.is_exclusive_sold||beat.status==='sold_exclusive')){msg('This beat is already exclusively sold.','bad');return}$('pay').disabled=true;msg('Creating secure payment…');try{const r=await fetch(`${API}/api/beats/${beat.id}/pay`,{method:'POST',headers:{Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:JSON.stringify({package_type:license,provider:method,customer_name:name,customer_email:email,customer_phone:mobile,message:$('message').value.trim()})});const d=await r.json();if(!r.ok)throw Error(d.error||'Could not create payment order');const order=d.order;if(!order||!order.id)throw Error('Server did not return a payment order.');if(method==='FLUTTERWAVE'){const cr=await fetch(`${API}/api/beats/${beat.id}/card-checkout`,{method:'POST',headers:{Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:JSON.stringify({order_id:order.id,package_type:license})});const cd=await cr.json();if(!cr.ok)throw Error(cd.error||'Card checkout route is not available on the current backend.');if(!cd.checkout_url)throw Error('Card provider did not return a checkout link.');location.href=cd.checkout_url;return}const mr=await fetch(`${API}/api/beats/${beat.id}/mobile-money-checkout`,{method:'POST',headers:{Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:JSON.stringify({order_id:order.id,package_type:license,network:method,phone:mobile})});const md=await mr.json();if(!mr.ok)throw Error(md.error||'Mobile-money checkout route is not available on the current backend.');if(md.authorization_url)window.open(md.authorization_url,'_blank');msg('Payment request sent. Approve it on your phone, then keep this page open.');poll(order.id,s)}catch(e){console.error(e);msg(e.message||'Payment failed. No payment was confirmed.','bad');$('pay').disabled=false}}
-function poll(orderId,s){let n=0;const timer=setInterval(async()=>{n++;try{const r=await fetch(`${API}/api/beats/mobile-money/status?order_id=${encodeURIComponent(orderId)}`,{headers:{Authorization:'Bearer '+s.access_token}}),d=await r.json();if(d.paid){clearInterval(timer);msg('Payment verified. Your beat purchase is complete.','ok');$('pay').textContent='✓ Payment Successful';return}if(n>=60){clearInterval(timer);msg('Payment is still pending. Check your PASONG account before trying again.');$('pay').disabled=false}}catch(e){if(n>=60){clearInterval(timer);msg('Could not confirm payment status. Check your PASONG account before trying again.');$('pay').disabled=false}}},5000)}
-document.querySelectorAll('.method').forEach(b=>b.onclick=()=>{document.querySelectorAll('.method').forEach(x=>x.classList.remove('active'));b.classList.add('active');method=b.dataset.method;$('mobileBox').classList.toggle('hidden',method==='FLUTTERWAVE');updateButton()});
-$('pay').onclick=pay;load();const payment=q.get('payment');if(payment==='success')msg('Payment callback received. Check your order status for verified completion.','ok');if(payment==='failed')msg('Payment was not completed.','bad');if(payment==='error')msg(q.get('message')||'Payment could not be completed.','bad');
-</script></body></html>
+detectLocation();
+
+document.getElementById('studioSearch').addEventListener('input', function(){
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.studio-card').forEach(card=>{card.style.display = card.innerText.toLowerCase().includes(q) ? '' : 'none';});
+});
+
+// FIXED - SINGLE L: producer-checkout.html
+document.querySelectorAll('.book-btn').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    const studio = this.dataset.studio; const producer = this.dataset.producer || studio;
+    const phone = this.dataset.phone || '0700471406'; const service = this.dataset.service || '';
+    const loc = this.closest('.studio-card')?.dataset.location || '';
+    const lat = this.closest('.studio-card')?.dataset.lat || ''; const lng = this.closest('.studio-card')?.dataset.lng || '';
+    const price = this.closest('.studio-body')?.querySelector('.price')?.innerText || '';
+    window.location.href = `/producer-checkout.html?studio=${encodeURIComponent(studio)}&producer=${encodeURIComponent(producer)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(service)}&lat=${lat}&lng=${lng}`;
+  });
+});
+
+document.getElementById('producerRegisterForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const sName = document.getElementById('regStudioName').value;
+  const oName = document.getElementById('regOwnerName').value;
+  const phone = document.getElementById('regPhone').value;
+  const loc = document.getElementById('regLocation').value;
+  const lat = document.getElementById('regLat').value;
+  const lng = document.getElementById('regLng').value;
+  const svc = document.getElementById('regService').value;
+  const price = document.getElementById('regPrice').value;
+  const desc = document.getElementById('regDesc').value;
+  if(!lat || !lng){ alert('Please pin your studio location on map! Click map to set pin.'); return; }
+  const grid = document.getElementById('studiosGrid');
+  const card = document.createElement('article');
+  card.className = 'studio-card'; card.dataset.location = loc; card.dataset.lat = lat; card.dataset.lng = lng;
+  card.innerHTML = `<div class="studio-art" style="--studio-image:url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=85');--brand-color:#12d8ff"><div class="studio-brand"><span class="brand-symbol">${sName.substring(0,2).toUpperCase()}</span><span class="brand-name">${sName.toUpperCase()}</span></div></div><div class="studio-body"><span class="tag">${svc}</span><h3>${sName}</h3><p class="location">📍 ${loc}<br><small style="color:#22c55e">📌 Pinned: ${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}</small></p><p class="description">${desc}</p><p class="price">${price} <small> + UGX 5k</small></p><button class="book-btn" data-studio="${sName}" data-producer="${oName}" data-phone="${phone}" data-service="${svc}">Book → Pay on Checkout</button></div>`;
+  grid.prepend(card);
+  card.querySelector('.book-btn').addEventListener('click', function(){
+    window.location.href = `/producer-checkout.html?studio=${encodeURIComponent(sName)}&producer=${encodeURIComponent(oName)}&phone=${encodeURIComponent(phone)}&price=${encodeURIComponent(price)}&location=${encodeURIComponent(loc)}&service=${encodeURIComponent(svc)}&lat=${lat}&lng=${lng}`;
+  });
+  document.getElementById('regNotice').textContent = `✅ ${sName} registered with pin ${lat}, ${lng}! Visitors near ${loc} will see it first.`;
+  this.reset(); setPin(0.3476, 32.5825);
+});
+})();
+</script>
+</body>
+</html>
