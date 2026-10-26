@@ -116,6 +116,21 @@ input[type="file"]{padding:10px}
 .delivery-upload-grid .field:last-child{grid-column:1/-1}
 .delivery-empty{padding:15px;background:#160d24;border:1px dashed #38204f;border-radius:10px;color:#888;font-size:12px}
 .delivery-note{color:#777;font-size:11px;line-height:1.5;margin-bottom:12px}
+
+.studio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.studio-card{background:#160d24;border:1px solid #2d1944;border-radius:14px;padding:16px;min-width:0}
+.studio-card h3{font-size:16px;margin-bottom:7px;overflow-wrap:anywhere}
+.studio-card p{font-size:12px;color:#aaa;line-height:1.55;overflow-wrap:anywhere;margin:5px 0}
+.studio-status{display:inline-block;border-radius:20px;padding:5px 9px;font-size:11px;background:#241238;color:#d8c6ff;margin:5px 0 8px}
+.studio-status.approved{background:#12301d;color:#9ae6a8}
+.studio-status.rejected{background:#35151d;color:#ff9caf}
+.studio-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.studio-booking{background:#160d24;border:1px solid #2d1944;border-radius:12px;padding:14px;margin-bottom:10px}
+.studio-booking h4{font-size:14px;margin-bottom:8px}
+.studio-booking p{font-size:12px;line-height:1.6;color:#bbb;margin:4px 0;overflow-wrap:anywhere}
+.studio-photo-list{font-size:12px;color:#aaa;line-height:1.6;margin-top:8px;overflow-wrap:anywhere}
+.studio-help{color:#999;font-size:12px;line-height:1.6;margin:0 0 15px}
+@media(max-width:800px){.studio-grid{grid-template-columns:1fr}}
 .loading{padding:25px;text-align:center;color:#999}
 footer{text-align:center;color:#666;padding:25px;border-top:1px solid #20132e;font-size:12px}
 .hidden{display:none}
@@ -172,6 +187,7 @@ Paid licences provide the downloadable files and usage rights attached to each p
 <button data-section="my-beats">🎵 My Beats</button>
 <button data-section="covers">🎨 Cover Design</button>
 <button data-section="orders">📦 Orders & Deliveries</button>
+<button data-section="studio">🎙️ My Studio</button>
 <button data-section="rules">📜 Beat Rules</button>
 </aside>
 
@@ -650,6 +666,55 @@ Manage paid beat orders and deliver the files purchased by buyers.
 
 </div>
 
+<div id="section-studio" class="hidden">
+
+<div class="card">
+<h2>🎙️ My Studio</h2>
+<div class="card-subtitle">Register and manage your recording studio on PASONG. Listings are reviewed by PASONG Admin before appearing in the worldwide Studio Directory.</div>
+<div id="studioMessage" class="message"></div>
+
+<form id="studioForm">
+<input type="hidden" id="studioRecordId" value="">
+<div class="form-grid">
+<div class="field"><label for="studioName">Studio name *</label><input id="studioName" required maxlength="120" placeholder="e.g. Wonder Sound Studio"></div>
+<div class="field"><label for="studioType">Studio type</label><select id="studioType"><option value="">Choose studio type</option><option>Recording Studio</option><option>Mixing & Mastering</option><option>Rehearsal Studio</option><option>Podcast Studio</option><option>Live Room</option><option>Home Studio</option><option>Music Production Studio</option><option>Other</option></select></div>
+<div class="field"><label for="studioCountry">Country *</label><input id="studioCountry" required maxlength="100" placeholder="Country"></div>
+<div class="field"><label for="studioCity">City *</label><input id="studioCity" required maxlength="100" placeholder="City or region"></div>
+<div class="field full"><label for="studioAddress">Address / area</label><input id="studioAddress" maxlength="240" placeholder="Street, neighbourhood or directions"></div>
+<div class="field"><label for="studioEmail">Contact email</label><input id="studioEmail" type="email" maxlength="180" placeholder="studio@example.com"></div>
+<div class="field"><label for="studioPhone">Contact phone</label><input id="studioPhone" type="tel" maxlength="60" placeholder="International phone number"></div>
+<div class="field"><label for="studioWhatsapp">WhatsApp number</label><input id="studioWhatsapp" type="tel" maxlength="60" placeholder="Include country code"></div>
+<div class="field"><label for="studioWebsite">Website</label><input id="studioWebsite" type="url" maxlength="500" placeholder="https://"></div>
+<div class="field"><label for="studioHourlyRate">Hourly rate</label><input id="studioHourlyRate" type="number" min="0" step="0.01" placeholder="e.g. 50000"></div>
+<div class="field"><label for="studioCurrency">Price currency</label><input id="studioCurrency" maxlength="8" placeholder="e.g. UGX, USD, EUR"></div>
+<div class="field full"><label for="studioDescription">Studio description</label><textarea id="studioDescription" maxlength="4000" placeholder="Describe your studio, room, sound, experience and what makes it special."></textarea></div>
+<div class="field"><label for="studioServices">Services</label><textarea id="studioServices" placeholder="Recording, mixing, mastering — separate with commas or new lines"></textarea></div>
+<div class="field"><label for="studioEquipment">Equipment</label><textarea id="studioEquipment" placeholder="Microphones, interfaces, monitors, instruments — separate with commas or new lines"></textarea></div>
+<div class="field"><label for="studioOpeningHours">Opening hours (optional JSON)</label><textarea id="studioOpeningHours" placeholder='{"Monday":"09:00-18:00","Tuesday":"09:00-18:00"}'></textarea><span class="price-help">Leave blank if you do not want to specify hours.</span></div>
+<div class="field"><label for="studioPhotos">Studio photos (JPG, PNG or WEBP; max 5MB each)</label><input id="studioPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="price-help">New photos are added to the listing's existing photos.</span></div>
+</div>
+<div id="studioExistingPhotos" class="studio-photo-list"></div>
+<div class="form-actions">
+<button class="btn btn-primary" type="submit" id="studioSaveButton">Submit Studio for Review</button>
+<button class="btn btn-secondary" type="button" id="studioResetButton">Clear Form</button>
+</div>
+</form>
+</div>
+
+<div class="card">
+<h2>My Studio Listings</h2>
+<div class="card-subtitle">Manage your listings. Approved listings are public; edits are resubmitted for admin review.</div>
+<div id="myStudiosList" class="studio-grid"><div class="empty">Open My Studio to load your listings.</div></div>
+</div>
+
+<div class="card">
+<h2>Studio Booking Requests</h2>
+<div class="card-subtitle">Review booking requests for your studios. Confirm availability with the customer before making commitments. Payments are not connected here.</div>
+<div id="myStudioBookings"><div class="empty">Booking requests will appear here.</div></div>
+</div>
+
+</div>
+
 <div id="section-rules" class="hidden">
 
 <div class="card">
@@ -713,6 +778,7 @@ const sections=[
 "my-beats",
 "covers",
 "orders",
+"studio",
 "rules"
 ];
 
@@ -848,6 +914,213 @@ document.getElementById("producerCoverForm")?.addEventListener("submit",async e=
  }catch(err){producerCoverMsg(err?.message||"Unable to save cover request.","error");}finally{btn.disabled=false;btn.textContent="🎨 Submit Cover Request";}
 });
 
+/* ============================================================
+   MY STUDIO — uses existing producer_studios and studio_bookings
+   ============================================================ */
+let editingStudioPhotos=[];
+
+function studioMessage(type,message){
+ const el=document.getElementById("studioMessage");
+ if(!el)return;
+ el.className="message "+type;
+ el.textContent=message;
+}
+
+function studioSplitList(value){
+ return String(value||"").split(/[\n,;]/).map(x=>x.trim()).filter(Boolean);
+}
+
+function studioStatusLabel(status){
+ const s=String(status||"pending").toLowerCase();
+ return s.charAt(0).toUpperCase()+s.slice(1);
+}
+
+function studioFormReset(){
+ const form=document.getElementById("studioForm");
+ if(form)form.reset();
+ document.getElementById("studioRecordId").value="";
+ editingStudioPhotos=[];
+ document.getElementById("studioExistingPhotos").textContent="";
+ document.getElementById("studioSaveButton").textContent="Submit Studio for Review";
+ studioMessage("info","Fill in your studio details. New listings are submitted as pending for admin review.");
+}
+
+function fillStudioForm(studio){
+ document.getElementById("studioRecordId").value=studio.id||"";
+ document.getElementById("studioName").value=studio.studio_name||"";
+ document.getElementById("studioType").value=studio.studio_type||"";
+ document.getElementById("studioCountry").value=studio.country||"";
+ document.getElementById("studioCity").value=studio.city||"";
+ document.getElementById("studioAddress").value=studio.address||"";
+ document.getElementById("studioEmail").value=studio.contact_email||"";
+ document.getElementById("studioPhone").value=studio.contact_phone||"";
+ document.getElementById("studioWhatsapp").value=studio.whatsapp_number||"";
+ document.getElementById("studioWebsite").value=studio.website_url||"";
+ document.getElementById("studioHourlyRate").value=studio.hourly_rate??"";
+ document.getElementById("studioCurrency").value=studio.currency_code||"";
+ document.getElementById("studioDescription").value=studio.description||"";
+ document.getElementById("studioServices").value=Array.isArray(studio.services)?studio.services.join(", "):"";
+ document.getElementById("studioEquipment").value=Array.isArray(studio.equipment)?studio.equipment.join(", "):"";
+ document.getElementById("studioOpeningHours").value=studio.opening_hours&&Object.keys(studio.opening_hours).length?JSON.stringify(studio.opening_hours,null,2):"";
+ editingStudioPhotos=Array.isArray(studio.photos)?[...studio.photos]:[];
+ document.getElementById("studioExistingPhotos").textContent=editingStudioPhotos.length?"Existing photos: "+editingStudioPhotos.length+" (kept when you save).":"No existing photos.";
+ document.getElementById("studioSaveButton").textContent="Save and Submit for Review";
+ studioMessage("info",String(studio.status)==="approved"?"This listing is approved. Saving changes will resubmit it for admin review.":"Editing this listing. Saving will submit it for admin review.");
+ document.getElementById("studioForm").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+async function getStudioSession(){
+ const session=await getCurrentSession();
+ if(!session?.user)throw new Error("Please log in to manage your studio.");
+ return session;
+}
+
+async function loadMyStudios(){
+ const list=document.getElementById("myStudiosList");
+ if(!list)return;
+ list.innerHTML='<div class="empty">Loading your studios…</div>';
+ try{
+  const session=await getStudioSession();
+  const {data,error}=await supabaseClient.from("producer_studios").select("*").eq("owner_id",session.user.id).order("created_at",{ascending:false});
+  if(error)throw error;
+  if(!data?.length){list.innerHTML='<div class="empty">You have not registered a studio yet. Use the form above to add your first studio.</div>';return;}
+  list.innerHTML=data.map(studio=>{
+   const status=String(studio.status||"pending").toLowerCase();
+   const canEdit=["pending","hidden"].includes(status);
+   const services=Array.isArray(studio.services)?studio.services.join(", "):"";
+   const price=studio.hourly_rate!==null&&studio.hourly_rate!==undefined?(escapeHtml(studio.currency_code||"")+" "+Number(studio.hourly_rate).toLocaleString()):"Price not set";
+   const photos=Array.isArray(studio.photos)?studio.photos:[];
+   const image=photos[0]?'<img src="'+escapeHtml(photos[0])+'" alt="Studio photo" style="width:100%;max-height:180px;object-fit:cover;border-radius:9px;margin-bottom:10px">':'';
+   const adminNotes=studio.admin_notes?'<p><strong>Admin note:</strong> '+escapeHtml(studio.admin_notes)+'</p>':'';
+   return '<article class="studio-card">'+image+'<h3>'+escapeHtml(studio.studio_name)+'</h3><span class="studio-status '+escapeHtml(status)+'">'+escapeHtml(studioStatusLabel(status))+'</span><p>📍 '+escapeHtml([studio.city,studio.country].filter(Boolean).join(", "))+'</p><p>💰 '+price+' / hour</p><p>🎚️ '+escapeHtml(services||"Services not listed")+'</p><p>'+escapeHtml(studio.description||"No description added.")+'</p>'+adminNotes+'<div class="studio-actions">'+(canEdit?'<button type="button" class="btn btn-secondary" data-studio-edit="'+escapeHtml(studio.id)+'">Edit listing</button>':'<button type="button" class="btn btn-secondary" data-studio-hide="'+escapeHtml(studio.id)+'">Hide listing</button>')+'</div></article>';
+  }).join("");
+  list.querySelectorAll("[data-studio-edit]").forEach(btn=>btn.addEventListener("click",()=>{const row=data.find(x=>x.id===btn.dataset.studioEdit);if(row)fillStudioForm(row);}));
+  list.querySelectorAll("[data-studio-hide]").forEach(btn=>btn.addEventListener("click",async()=>{
+   if(!confirm("Hide this studio from the public directory?"))return;
+   btn.disabled=true;
+   try{
+    const {error}=await supabaseClient.from("producer_studios").update({status:"hidden"}).eq("id",btn.dataset.studioHide).eq("owner_id",session.user.id);
+    if(error)throw error;
+    studioMessage("success","Studio hidden from the public directory.");
+    await loadMyStudios();
+   }catch(e){studioMessage("error",e.message||"Unable to hide studio.");btn.disabled=false;}
+  }));
+ }catch(error){
+  console.error("My studios load error:",error);
+  list.innerHTML='<div class="empty">Unable to load studios: '+escapeHtml(error.message||"Unknown error")+'</div>';
+ }
+}
+
+async function loadMyStudioBookings(){
+ const list=document.getElementById("myStudioBookings");
+ if(!list)return;
+ list.innerHTML='<div class="empty">Loading booking requests…</div>';
+ try{
+  const session=await getStudioSession();
+  const {data:studios,error:studioError}=await supabaseClient.from("producer_studios").select("id,studio_name").eq("owner_id",session.user.id);
+  if(studioError)throw studioError;
+  if(!studios?.length){list.innerHTML='<div class="empty">Register a studio to receive booking requests.</div>';return;}
+  const ids=studios.map(s=>s.id);
+  const names=Object.fromEntries(studios.map(s=>[s.id,s.studio_name]));
+  const {data,error}=await supabaseClient.from("studio_bookings").select("*").in("studio_id",ids).order("created_at",{ascending:false}).limit(100);
+  if(error)throw error;
+  if(!data?.length){list.innerHTML='<div class="empty">No booking requests yet.</div>';return;}
+  list.innerHTML=data.map(b=>{
+   const status=String(b.status||"pending").toLowerCase();
+   const options=["pending","confirmed","declined","cancelled","completed"].map(x=>'<option value="'+x+'" '+(x===status?'selected':'')+'>'+studioStatusLabel(x)+'</option>').join("");
+   return '<article class="studio-booking"><h4>'+escapeHtml(names[b.studio_id]||"Studio booking")+' — '+escapeHtml(b.customer_name||"Customer")+'</h4><p><strong>Status:</strong> '+escapeHtml(studioStatusLabel(status))+'</p><p><strong>Date:</strong> '+escapeHtml(b.requested_date||"Not specified")+' '+escapeHtml(b.requested_time||"")+'</p><p><strong>Duration:</strong> '+escapeHtml(b.duration_hours||1)+' hour(s)</p><p><strong>Service:</strong> '+escapeHtml(b.service_requested||"Not specified")+'</p><p><strong>Contact:</strong> '+escapeHtml(b.customer_email||"No email")+' · '+escapeHtml(b.customer_phone||"No phone")+'</p><p><strong>Notes:</strong> '+escapeHtml(b.notes||"None")+'</p><div class="studio-actions"><label for="booking-status-'+escapeHtml(b.id)+'">Update status</label><select id="booking-status-'+escapeHtml(b.id)+'" data-booking-status="'+escapeHtml(b.id)+'" style="max-width:220px">'+options+'</select><button type="button" class="btn btn-secondary" data-booking-save="'+escapeHtml(b.id)+'">Save status</button></div></article>';
+  }).join("");
+  list.querySelectorAll("[data-booking-save]").forEach(btn=>btn.addEventListener("click",async()=>{
+   const id=btn.dataset.bookingSave;
+   const select=list.querySelector('[data-booking-status="'+id+'"]');
+   const newStatus=select?.value;
+   if(!newStatus)return;
+   btn.disabled=true;btn.textContent="Saving…";
+   try{
+    const {error}=await supabaseClient.from("studio_bookings").update({status:newStatus}).eq("id",id);
+    if(error)throw error;
+    studioMessage("success","Booking status updated.");
+    await loadMyStudioBookings();
+   }catch(e){studioMessage("error",e.message||"Unable to update booking status.");btn.disabled=false;btn.textContent="Save status";}
+  }));
+ }catch(error){
+  console.error("Studio bookings load error:",error);
+  list.innerHTML='<div class="empty">Unable to load booking requests: '+escapeHtml(error.message||"Unknown error")+'</div>';
+ }
+}
+
+document.getElementById("studioResetButton")?.addEventListener("click",studioFormReset);
+document.getElementById("studioForm")?.addEventListener("submit",async event=>{
+ event.preventDefault();
+ const button=document.getElementById("studioSaveButton");
+ button.disabled=true;button.textContent="Saving studio…";
+ try{
+  const session=await getStudioSession();
+  const id=document.getElementById("studioRecordId").value.trim();
+  const {data:existing,error:existingError}=id?await supabaseClient.from("producer_studios").select("id,status,photos").eq("id",id).eq("owner_id",session.user.id).maybeSingle():{data:null,error:null};
+  if(existingError)throw existingError;
+  if(id&&!existing)throw new Error("This studio listing was not found under your account.");
+  if(existing&&!['pending','hidden'].includes(String(existing.status).toLowerCase()))throw new Error("Approved listings must be hidden before editing. Use Hide listing first, then edit and resubmit.");
+  let photos=Array.isArray(existing?.photos)?[...existing.photos]:[...editingStudioPhotos];
+  const files=Array.from(document.getElementById("studioPhotos").files||[]);
+  for(const file of files){
+   if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Studio photos must be JPG, PNG or WEBP.");
+   if(file.size>5*1024*1024)throw new Error("Each studio photo must be 5MB or smaller.");
+  }
+  for(const file of files){
+   const url=await uploadToCloudinary(file,"pasong/studios",session.access_token);
+   photos.push(url);
+  }
+  let openingHours={};
+  const hoursText=document.getElementById("studioOpeningHours").value.trim();
+  if(hoursText){try{openingHours=JSON.parse(hoursText);if(!openingHours||Array.isArray(openingHours)||typeof openingHours!=="object")throw new Error();}catch{throw new Error("Opening hours must be valid JSON, for example {\"Monday\":\"09:00-18:00\"}.");}}
+  const rateText=document.getElementById("studioHourlyRate").value.trim();
+  const rate=rateText===""?null:Number(rateText);
+  if(rate!==null&&(!Number.isFinite(rate)||rate<0))throw new Error("Hourly rate must be zero or greater.");
+  const payload={
+   studio_name:document.getElementById("studioName").value.trim(),
+   studio_type:document.getElementById("studioType").value||null,
+   description:document.getElementById("studioDescription").value.trim()||null,
+   country:document.getElementById("studioCountry").value.trim(),
+   city:document.getElementById("studioCity").value.trim(),
+   address:document.getElementById("studioAddress").value.trim()||null,
+   contact_email:document.getElementById("studioEmail").value.trim()||null,
+   contact_phone:document.getElementById("studioPhone").value.trim()||null,
+   website_url:document.getElementById("studioWebsite").value.trim()||null,
+   whatsapp_number:document.getElementById("studioWhatsapp").value.trim()||null,
+   services:studioSplitList(document.getElementById("studioServices").value),
+   equipment:studioSplitList(document.getElementById("studioEquipment").value),
+   hourly_rate:rate,
+   currency_code:document.getElementById("studioCurrency").value.trim().toUpperCase()||null,
+   opening_hours:openingHours,
+   photos:photos,
+   status:"pending",
+   reviewed_by:null,
+   reviewed_at:null,
+   admin_notes:null
+  };
+  if(!payload.studio_name||!payload.country||!payload.city)throw new Error("Studio name, country and city are required.");
+  if(id){
+   const {error}=await supabaseClient.from("producer_studios").update(payload).eq("id",id).eq("owner_id",session.user.id);
+   if(error)throw error;
+  }else{
+   payload.owner_id=session.user.id;
+   const {error}=await supabaseClient.from("producer_studios").insert(payload);
+   if(error)throw error;
+  }
+  studioFormReset();
+  studioMessage("success","Studio saved and submitted for admin review. It will appear publicly after approval.");
+  await loadMyStudios();await loadMyStudioBookings();
+ }catch(error){
+  console.error("Studio save error:",error);
+  studioMessage("error",error.message||"Unable to save studio listing.");
+ }finally{
+  button.disabled=false;
+  if(!document.getElementById("studioRecordId").value)button.textContent="Submit Studio for Review";
+  else button.textContent="Save and Submit for Review";
+ }
+});
+
 function showSection(section){
 
 sections.forEach(name=>{
@@ -877,6 +1150,7 @@ if(section==="orders"){
 loadProducerOrders();
 }
 if(section==="covers"){loadProducerCoverPrice();loadProducerCoverRequests();}
+if(section==="studio"){loadMyStudios();loadMyStudioBookings();}
 }
 
 document.querySelectorAll(".sidebar button").forEach(button=>{
