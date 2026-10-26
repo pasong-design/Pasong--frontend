@@ -1,94 +1,832 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#111827">
 <title>Promote My Business - PASONG</title>
+<meta name="description" content="Promote your business on PASONG and reach more potential customers.">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.1/dist/umd/supabase.min.js"></script>
 <script src="pasong-global-price-controller.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
-*{font-family:'Inter',sans-serif;box-sizing:border-box}
-body{background:#0f1219;color:#e5e7eb}
-.card{background:#171e2e;border:1px solid #243045}
-.pkg-active{border-color:#f59e0b!important;background:linear-gradient(135deg,#f59e0b20,#1e293b)!important;box-shadow:0 0 0 2px #f59e0b inset}
-.professional-shadow{box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.03) inset}
+* {
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+body {
+  background: #0f1219;
+  color: #e5e7eb;
+}
+.card {
+  background: #171e2e;
+  border: 1px solid #243045;
+}
+.pkg {
+  width: 100%;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.pkg:hover {
+  border-color: #64748b;
+}
+.pkg-active {
+  border-color: #f59e0b !important;
+  background: linear-gradient(135deg, #f59e5b20, #1e293b) !important;
+  box-shadow: 0 0 0 2px #f59e0b inset;
+}
+.professional-shadow {
+  box-shadow: 0 20px 60px rgba(0,0,0,.4),
+              0 0 0 1px rgba(255,255,255,.03) inset;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #fbbf24;
+  outline-offset: 3px;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
 </style>
 </head>
+
 <body class="min-h-screen flex flex-col">
+
 <header class="sticky top-0 z-20 bg-[#0f1219]/90 backdrop-blur-2xl border-b border-white/5">
-<div class="max-w-[1120px] mx-auto w-full px-5 py-4 flex justify-between items-center">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-white">B</div>
-<div><div class="font-black tracking-widest text-white text-[15px]">PASONG</div><div class="text-[10px] text-slate-400 -mt-1">BUSINESS PROMOTION</div></div>
-</div>
-<div class="flex gap-2"><span class="hidden sm:flex items-center gap-2 text-[11px] bg-green-500/10 border border-green-500/20 text-green-300 px-3 py-1.5 rounded-full">● Secure Checkout</span><a href="/advertise.html" class="text-[11px] bg-white text-slate-900 font-bold px-4 py-2 rounded-full">← Back</a></div>
-</div>
+  <div class="max-w-[1120px] mx-auto w-full px-5 py-4 flex justify-between items-center gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-white">B</div>
+      <div>
+        <div class="font-black tracking-widest text-white text-[15px]">PASONG</div>
+        <div class="text-[10px] text-slate-400 -mt-1">BUSINESS PROMOTION</div>
+      </div>
+    </div>
+
+    <div class="flex gap-2 items-center">
+      <span class="hidden sm:flex items-center gap-2 text-[11px] bg-green-500/10 border border-green-500/20 text-green-300 px-3 py-1.5 rounded-full">
+        ● Secure Checkout
+      </span>
+      <a href="/advertise.html"
+         class="whitespace-nowrap text-[11px] bg-white text-slate-900 font-bold px-4 py-2 rounded-full">
+        ← Back
+      </a>
+    </div>
+  </div>
 </header>
+
 <main class="flex-1 max-w-[1120px] mx-auto w-full px-5 pb-20">
-<div class="mt-8 grid lg:grid-cols-[1fr_360px] gap-8">
-<div>
-<h1 class="text-[36px] font-black text-white leading-[0.9] tracking-tight">Promote your<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Business profile.</span></h1>
-<p class="text-slate-400 text-[13px] mt-3">Get real customers for 30 days. Homepage + Search + Business Directory.</p>
 
-<section class="mt-6 card professional-shadow rounded-[24px] p-6">
-<div class="flex justify-between items-center"><h2 class="font-black text-[11px] tracking-widest text-slate-300">01 — SELECT YOUR BUSINESS</h2><span class="text-[10px] text-slate-500">Owned by you</span></div>
-<div id="profilesList" class="mt-4 text-[12px] text-slate-400">Checking your account...</div>
-<div id="dbError" class="hidden mt-3 text-[11px] p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200"></div>
-</section>
+  <div class="mt-8 grid lg:grid-cols-[1fr_360px] gap-8">
 
-<section class="mt-4 card rounded-[20px] p-5 flex gap-4 items-center">
-<div id="prevAvatarFallback" class="w-[56px] h-[56px] rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-white text-[18px]">B</div>
-<div><h2 id="prevName" class="font-black text-white">Select business</h2><p id="prevHandle" class="text-slate-500 text-xs">@business</p><div id="prevStatus" class="mt-1 inline-flex text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400">No business selected</div></div>
-</section>
+    <div class="min-w-0">
 
-<section class="mt-8">
-<h2 class="font-black text-[11px] tracking-widest text-slate-300">02 — CHOOSE BUSINESS PACKAGE • 30 DAYS</h2>
-<div class="grid gap-3 mt-4">
-<button data-package="starter" type="button" class="pkg pkg-active text-left card rounded-[20px] p-5"><h3 class="font-black text-white">Local Biz Boost</h3><p class="text-slate-400 text-[11px] mt-1">Est. 3K–7K views • Business directory top</p><p class="price font-black mt-3 text-amber-400 text-[14px]" data-ugx="75000" data-usd="18.99" data-kes="2200" data-tzs="45000" data-gbp="14.99" data-eur="16.99"></p></button>
-<button data-package="growth" type="button" class="pkg text-left card rounded-[20px] p-5 relative"><span class="absolute -top-3 right-6 bg-amber-600 text-white text-[9px] font-black px-3 py-1 rounded-full">MOST POPULAR</span><h3 class="font-black text-white">City Domination</h3><p class="text-slate-400 text-[11px] mt-1">Est. 15K–30K views • Homepage business section 14 days</p><p class="price font-black mt-3 text-amber-400 text-[14px]" data-ugx="180000" data-usd="42.99" data-kes="5400" data-tzs="110000" data-gbp="33.99" data-eur="39.99"></p></button>
-<button data-package="pro" type="button" class="pkg text-left card rounded-[20px] p-5"><h3 class="font-black text-white">National Brand</h3><p class="text-slate-400 text-[11px] mt-1">Est. 60K+ views • Homepage 30 days + Ads + IG shoutout</p><p class="price font-black mt-3 text-amber-400 text-[14px]" data-ugx="350000" data-usd="79.99" data-kes="10500" data-tzs="210000" data-gbp="64.99" data-eur="74.99"></p></button>
-</div>
-</section>
-</div>
+      <h1 class="text-[36px] sm:text-[42px] font-black text-white leading-[0.98] tracking-tight">
+        Promote your<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+          Business profile.
+        </span>
+      </h1>
 
-<div class="lg:sticky lg:top-[84px] h-fit">
-<section class="card professional-shadow rounded-[24px] p-6 bg-gradient-to-b from-[#2a2216] to-[#171e2e]">
-<h2 class="font-black text-[11px] tracking-widest text-slate-300">SUMMARY</h2>
-<div id="summary" class="mt-4 bg-[#0f1219] border border-white/5 rounded-xl p-4 text-xs text-slate-400 leading-[1.8]">Select a business you own.</div>
-<button id="payBtn" type="button" class="mt-4 w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black py-4 rounded-full disabled:opacity-50 disabled:pointer-events-none" disabled>Continue → Secure Checkout</button>
-<p class="text-[10px] text-slate-500 mt-3 text-center">Server must verify ownership + approved price.</p>
-</section>
-</div>
-</div>
+      <p class="text-slate-400 text-[13px] mt-3">
+        Promote your business for 30 days across PASONG discovery and directory placements.
+      </p>
+
+      <div id="pageMessage"
+           role="alert"
+           aria-live="polite"
+           class="hidden mt-5 text-[12px] p-3 rounded-xl border">
+      </div>
+
+      <section class="mt-6 card professional-shadow rounded-[24px] p-5 sm:p-6">
+        <div class="flex justify-between items-center gap-3">
+          <h2 class="font-black text-[11px] tracking-widest text-slate-300">
+            01 — SELECT YOUR BUSINESS
+          </h2>
+          <span class="text-[10px] text-slate-500">Owned by you</span>
+        </div>
+
+        <div id="profilesList" class="mt-4 text-[12px] text-slate-400" aria-live="polite">
+          Checking your account...
+        </div>
+
+        <div id="dbError"
+             role="alert"
+             class="hidden mt-3 text-[11px] p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-200">
+        </div>
+
+        <button id="retryBtn"
+                type="button"
+                class="hidden mt-3 text-xs font-bold text-amber-300 underline">
+          Try again
+        </button>
+      </section>
+
+      <section class="mt-4 card rounded-[20px] p-5 flex gap-4 items-center min-w-0">
+        <div id="prevAvatarFallback"
+             class="w-[56px] h-[56px] shrink-0 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-white text-[18px]">
+          B
+        </div>
+
+        <div class="min-w-0">
+          <h2 id="prevName" class="font-black text-white break-words">Select business</h2>
+          <p id="prevHandle" class="text-slate-500 text-xs break-all">@business</p>
+          <div id="prevStatus"
+               class="mt-1 inline-flex text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400">
+            No business selected
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-8">
+        <h2 class="font-black text-[11px] tracking-widest text-slate-300">
+          02 — CHOOSE BUSINESS PACKAGE • 30 DAYS
+        </h2>
+
+        <div class="grid gap-3 mt-4">
+
+          <button data-package="starter"
+                  type="button"
+                  aria-pressed="true"
+                  class="pkg pkg-active text-left card rounded-[20px] p-5">
+            <h3 class="font-black text-white">Local Biz Boost</h3>
+            <p class="text-slate-400 text-[11px] mt-1">
+              Est. 3K–7K views • Business directory placement
+            </p>
+            <p class="price font-black mt-3 text-amber-400 text-[14px]"
+               data-ugx="75000"
+               data-usd="18.99"
+               data-kes="2200"
+               data-tzs="45000"
+               data-gbp="14.99"
+               data-eur="16.99">
+              UGX 75,000
+            </p>
+          </button>
+
+          <button data-package="growth"
+                  type="button"
+                  aria-pressed="false"
+                  class="pkg text-left card rounded-[20px] p-5 relative">
+            <span class="absolute -top-3 right-6 bg-amber-600 text-white text-[9px] font-black px-3 py-1 rounded-full">
+              MOST POPULAR
+            </span>
+            <h3 class="font-black text-white">City Domination</h3>
+            <p class="text-slate-400 text-[11px] mt-1">
+              Est. 15K–30K views • Homepage business section for 14 days
+            </p>
+            <p class="price font-black mt-3 text-amber-400 text-[14px]"
+               data-ugx="180000"
+               data-usd="42.99"
+               data-kes="5400"
+               data-tzs="110000"
+               data-gbp="33.99"
+               data-eur="39.99">
+              UGX 180,000
+            </p>
+          </button>
+
+          <button data-package="pro"
+                  type="button"
+                  aria-pressed="false"
+                  class="pkg text-left card rounded-[20px] p-5">
+            <h3 class="font-black text-white">National Brand</h3>
+            <p class="text-slate-400 text-[11px] mt-1">
+              Est. 60K+ views • Homepage for 30 days + Ads + IG shoutout
+            </p>
+            <p class="price font-black mt-3 text-amber-400 text-[14px]"
+               data-ugx="350000"
+               data-usd="79.99"
+               data-kes="10500"
+               data-tzs="210000"
+               data-gbp="64.99"
+               data-eur="74.99">
+              UGX 350,000
+            </p>
+          </button>
+
+        </div>
+
+        <p class="text-[10px] text-slate-500 mt-3 leading-relaxed">
+          Audience estimates are not guaranteed. Confirm the final price and campaign benefits at checkout.
+        </p>
+      </section>
+    </div>
+
+    <aside class="lg:sticky lg:top-[84px] h-fit">
+      <section class="card professional-shadow rounded-[24px] p-5 sm:p-6 bg-gradient-to-b from-[#2a2216] to-[#171e2e]">
+        <h2 class="font-black text-[11px] tracking-widest text-slate-300">
+          ORDER SUMMARY
+        </h2>
+
+        <div id="summary"
+             class="mt-4 bg-[#0f1219] border border-white/5 rounded-xl p-4 text-xs text-slate-400 leading-[1.9]"
+             aria-live="polite">
+          Select a business you own.
+        </div>
+
+        <button id="payBtn"
+                type="button"
+                class="mt-4 w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black py-4 rounded-full"
+                disabled>
+          Continue → Secure Checkout
+        </button>
+
+        <p class="text-[10px] text-slate-500 mt-3 text-center leading-relaxed">
+          Your account and selected business are checked before continuing.
+          The checkout server must independently verify ownership, package and price.
+        </p>
+      </section>
+    </aside>
+
+  </div>
 </main>
+
 <div id="pasong-footer"></div>
 <script src="pasong-footer-loader.js"></script>
+
 <script>
 'use strict';
-const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co'; const SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
-const PACKAGE_PRICES={starter:75000,growth:180000,pro:350000}; const SYMBOLS={UGX:'UGX ',USD:'$',KES:'KSh ',TZS:'TSh ',GBP:'£',EUR:'€'};
-let db=null,currentUser=null,selectedProfile=null,selectedPackage='starter',currency='UGX',isLoading=false,isCheckingOut=false,cachedProfiles=[];
-const $=id=>document.getElementById(id);
-function setText(id,v){ const el=$(id); if(el) el.textContent=v==null?'':String(v); }
-function showMessage(id,m){ setText(id,m); $(id).classList.remove('hidden'); }
-function hideMessage(id){ $(id).classList.add('hidden'); setText(id,''); }
-function getName(p){ return p.business_name||p.company_name||p.name||'Business'; }
-function getHandle(p){ return p.slug||p.business_name||''; }
-async function getUser(){ const {data,error}=await db.auth.getSession(); if(error) throw error; currentUser=data?.session?.user||null; return currentUser; }
-function getDisplayPrice(pid){ const c=document.querySelector(`[data-package="${pid}"] .price`); const k='data-'+currency.toLowerCase(); const r=c?.getAttribute(k); if(r){ const s=SYMBOLS[currency]||''; const a=Number(r); return s+(currency==='UGX'?a.toLocaleString():a.toLocaleString()); } return 'UGX '+PACKAGE_PRICES[pid].toLocaleString(); }
-function updatePrices(){ try{ const i=window.PASONGGlobalPriceController?.getInfo?.(); const d=String(i?.currency||'UGX').toUpperCase(); if(SYMBOLS[d]) currency=d; }catch{} document.querySelectorAll('.price').forEach(el=>{ const id=el.closest('.pkg')?.dataset.package; if(id) el.textContent='From '+getDisplayPrice(id)+' / 30 days (est.)'; }); updateSummary(); }
-window.addEventListener('pasong:currency-ready',e=>{ const d=String(e.detail?.currency||'UGX').toUpperCase(); if(SYMBOLS[d]) currency=d; updatePrices(); });
-function selectPkg(id){ selectedPackage=id; document.querySelectorAll('.pkg').forEach(b=>{ b.classList.toggle('pkg-active',b.dataset.package===id); }); updateSummary(); }
-function setPreview(p){ if(!p||!p.id||!currentUser||!p.user_id||String(p.user_id)!==String(currentUser.id)){ setText('prevStatus','Ownership failed'); return false; } selectedProfile={id:String(p.id),name:getName(p),handle:getHandle(p)}; setText('prevName',selectedProfile.name); setText('prevHandle','@'+selectedProfile.handle); setText('prevStatus','✓ Account match — server must re-verify'); $('payBtn').disabled=false; updateSummary(); return true; }
-function updateSummary(){ const box=$('summary'); box.replaceChildren(); if(!selectedProfile){ box.textContent='Select a business you own.'; return; } const b=document.createElement('b'); b.className='text-white'; b.textContent=selectedProfile.name; box.append(b,document.createTextNode(' @'+selectedProfile.handle),document.createElement('br'),document.createTextNode('Package: '+selectedPackage.toUpperCase()+' — '+getDisplayPrice(selectedPackage))); }
-async function loadOwnProfiles(){ const r=await db.from('business_profiles').select('id,user_id,business_name,company_name,slug').eq('user_id',currentUser.id).limit(50); if(!r.error) return r.data||[]; const r2=await db.from('businesses').select('id,user_id,business_name,slug').eq('user_id',currentUser.id).limit(50); if(!r2.error) return r2.data||[]; throw r.error; }
-function renderProfileList(profiles){ const box=$('profilesList'); box.replaceChildren(); if(!profiles.length){ box.textContent='No businesses for this account.'; return; } profiles.forEach(p=>{ const btn=document.createElement('button'); btn.type='button'; btn.className='w-full text-left bg-[#0f1219] border border-slate-700 rounded-xl p-3 flex gap-3 items-center mt-2 hover:bg-[#151d2e]'; const d=document.createElement('div'); const n=document.createElement('div'); n.className='font-bold text-[13px] text-white'; n.textContent=getName(p); const h=document.createElement('div'); h.className='text-[11px] text-slate-500'; h.textContent='@'+getHandle(p); d.append(n,h); btn.append(d); btn.addEventListener('click',()=>setPreview(p)); box.appendChild(btn); }); if(profiles.length===1) setPreview(profiles[0]); }
-async function loadProfiles(){ if(isLoading) return; isLoading=true; $('profilesList').textContent='Checking...'; try{ const u=await getUser(); if(!u){ $('profilesList').textContent='Please log in.'; return; } const pr=await loadOwnProfiles(); cachedProfiles=pr; renderProfileList(pr); }catch(e){ $('profilesList').textContent='Unable to load.'; showMessage('dbError',e.message); }finally{ isLoading=false; } }
-async function continueToPay(){ if(isCheckingOut) return; if(!selectedProfile){ alert('Select your own business first.'); return; } isCheckingOut=true; $('payBtn').disabled=true; $('payBtn').textContent='Opening checkout...'; try{ const params=new URLSearchParams({type:'business',business_profile_id:selectedProfile.id,profile_id:selectedProfile.id,package:selectedPackage}); window.location.href='promotion-checkout.html?'+params.toString(); }catch(e){ alert('Checkout failed'); isCheckingOut=false; $('payBtn').disabled=false; } }
-document.querySelectorAll('.pkg').forEach(b=>b.addEventListener('click',()=>selectPkg(b.dataset.package))); $('payBtn').addEventListener('click',continueToPay);
-async function init(){ try{ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); selectPkg('starter'); updatePrices(); await loadProfiles(); }catch(e){ showMessage('dbError',e.message); } } init();
+
+/*
+ * PASONG Promote My Business
+ * Keeps the existing checkout destination and package identifiers.
+ * Never trust a client-supplied price or ownership check for payment.
+ */
+
+const SUPABASE_URL = 'https://mtufczmjlkvycarxylgh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+
+const PACKAGE_PRICES = Object.freeze({
+  starter: 75000,
+  growth: 180000,
+  pro: 350000
+});
+
+const PACKAGE_NAMES = Object.freeze({
+  starter: 'Local Biz Boost',
+  growth: 'City Domination',
+  pro: 'National Brand'
+});
+
+const SYMBOLS = Object.freeze({
+  UGX: 'UGX ',
+  USD: '$',
+  KES: 'KSh ',
+  TZS: 'TSh ',
+  GBP: '£',
+  EUR: '€'
+});
+
+const ALLOWED_CURRENCIES = Object.keys(SYMBOLS);
+
+let db = null;
+let currentUser = null;
+let selectedProfile = null;
+let selectedPackage = 'starter';
+let currency = 'UGX';
+let isLoading = false;
+let isCheckingOut = false;
+let authVersion = 0;
+let cachedProfiles = [];
+let priceWarningShown = false;
+
+const $ = id => document.getElementById(id);
+
+function setText(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value == null ? '' : String(value);
+}
+
+function showMessage(id, message) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = String(message || '');
+  el.classList.remove('hidden');
+}
+
+function hideMessage(id) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('hidden');
+}
+
+function showPageMessage(message, type = 'error') {
+  const el = $('pageMessage');
+  el.textContent = String(message || '');
+
+  el.className = 'mt-5 text-[12px] p-3 rounded-xl border ' +
+    (type === 'success'
+      ? 'bg-green-500/10 border-green-500/20 text-green-200'
+      : 'bg-red-500/10 border-red-500/20 text-red-200');
+}
+
+function hidePageMessage() {
+  const el = $('pageMessage');
+  el.textContent = '';
+  el.classList.add('hidden');
+}
+
+function getName(profile) {
+  return String(
+    profile?.business_name ||
+    profile?.company_name ||
+    profile?.name ||
+    'Business'
+  ).trim().slice(0, 160) || 'Business';
+}
+
+function getHandle(profile) {
+  return String(
+    profile?.slug ||
+    profile?.business_name ||
+    profile?.company_name ||
+    profile?.name ||
+    'business'
+  ).trim().slice(0, 160);
+}
+
+function normalizeCurrency(value) {
+  const code = String(value || '').trim().toUpperCase();
+  return ALLOWED_CURRENCIES.includes(code) ? code : null;
+}
+
+function getDisplayPrice(packageId) {
+  const button = document.querySelector(
+    '.pkg[data-package="' + packageId + '"]'
+  );
+  const priceEl = button?.querySelector('.price');
+
+  if (!priceEl || !Object.prototype.hasOwnProperty.call(PACKAGE_PRICES, packageId)) {
+    return 'Price unavailable';
+  }
+
+  const raw = priceEl.getAttribute('data-' + currency.toLowerCase());
+  const amount = Number(raw);
+
+  if (raw === null || raw.trim() === '' ||
+      !Number.isFinite(amount) || amount < 0) {
+    return currency === 'UGX'
+      ? 'UGX ' + PACKAGE_PRICES[packageId].toLocaleString('en-US')
+      : 'Price unavailable';
+  }
+
+  return (SYMBOLS[currency] || currency + ' ') +
+    amount.toLocaleString('en-US', {
+      maximumFractionDigits: currency === 'UGX' || currency === 'KES' || currency === 'TZS' ? 0 : 2,
+      minimumFractionDigits: 0
+    });
+}
+
+function updatePrices() {
+  try {
+    const info = window.PASONGGlobalPriceController?.getInfo?.();
+    const detectedCurrency = normalizeCurrency(info?.currency);
+
+    if (detectedCurrency) {
+      currency = detectedCurrency;
+    }
+  } catch (error) {
+    console.warn('PASONG price controller unavailable:', error);
+  }
+
+  document.querySelectorAll('.pkg').forEach(button => {
+    const id = button.dataset.package;
+    const priceEl = button.querySelector('.price');
+
+    if (!priceEl || !PACKAGE_PRICES[id]) return;
+
+    const displayPrice = getDisplayPrice(id);
+
+    priceEl.textContent = displayPrice === 'Price unavailable'
+      ? 'Price unavailable — confirm at checkout'
+      : displayPrice + ' / 30 days';
+  });
+
+  updateSummary();
+}
+
+function updateSummary() {
+  const box = $('summary');
+  box.replaceChildren();
+
+  if (!selectedProfile) {
+    box.textContent = 'Select a business you own.';
+    return;
+  }
+
+  const title = document.createElement('div');
+  title.className = 'font-bold text-white break-words';
+  title.textContent = selectedProfile.name;
+
+  const handle = document.createElement('div');
+  handle.className = 'text-slate-500 break-all';
+  handle.textContent = '@' + selectedProfile.handle;
+
+  const divider = document.createElement('div');
+  divider.className = 'border-t border-white/10 my-3';
+
+  const packageLabel = document.createElement('div');
+  packageLabel.textContent = 'Package: ' + PACKAGE_NAMES[selectedPackage];
+
+  const price = document.createElement('div');
+  price.className = 'font-black text-amber-400 text-base mt-1';
+  price.textContent = getDisplayPrice(selectedPackage);
+
+  const duration = document.createElement('div');
+  duration.className = 'text-slate-500';
+  duration.textContent = 'Campaign duration: 30 days';
+
+  box.append(title, handle, divider, packageLabel, price, duration);
+
+  if (price.textContent === 'Price unavailable') {
+    const note = document.createElement('p');
+    note.className = 'mt-2 text-amber-200';
+    note.textContent = 'The selected currency is not configured for this package.';
+    box.appendChild(note);
+  }
+}
+
+function setCheckoutEnabled() {
+  $('payBtn').disabled =
+    !currentUser ||
+    !selectedProfile ||
+    !selectedProfile.id ||
+    isCheckingOut ||
+    isLoading;
+}
+
+function clearSelection(message = 'No business selected') {
+  selectedProfile = null;
+
+  setText('prevName', 'Select business');
+  setText('prevHandle', '@business');
+  setText('prevStatus', message);
+  setText('prevAvatarFallback', 'B');
+
+  document.querySelectorAll('#profilesList button').forEach(button => {
+    button.setAttribute('aria-pressed', 'false');
+  });
+
+  updateSummary();
+  setCheckoutEnabled();
+}
+
+function selectPackage(id) {
+  if (!Object.prototype.hasOwnProperty.call(PACKAGE_PRICES, id)) {
+    return;
+  }
+
+  selectedPackage = id;
+
+  document.querySelectorAll('.pkg').forEach(button => {
+    const active = button.dataset.package === id;
+    button.classList.toggle('pkg-active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+
+  updateSummary();
+}
+
+function setPreview(profile, button = null) {
+  if (!profile || !profile.id || !currentUser || !profile.user_id ||
+      String(profile.user_id) !== String(currentUser.id)) {
+    clearSelection('Ownership could not be verified');
+    showPageMessage('Select a business associated with your signed-in account.');
+    return false;
+  }
+
+  selectedProfile = {
+    id: String(profile.id),
+    user_id: String(profile.user_id),
+    name: getName(profile),
+    handle: getHandle(profile)
+  };
+
+  hidePageMessage();
+
+  setText('prevName', selectedProfile.name);
+  setText('prevHandle', '@' + selectedProfile.handle);
+  setText('prevStatus', '✓ Account match — checkout will verify ownership');
+  setText(
+    'prevAvatarFallback',
+    selectedProfile.name.charAt(0).toUpperCase() || 'B'
+  );
+
+  document.querySelectorAll('#profilesList button').forEach(item => {
+    const active = item === button;
+    item.setAttribute('aria-pressed', String(active));
+    item.classList.toggle('border-amber-500', active);
+  });
+
+  updateSummary();
+  setCheckoutEnabled();
+  return true;
+}
+
+async function getUser() {
+  const { data, error } = await db.auth.getSession();
+
+  if (error) throw error;
+
+  currentUser = data?.session?.user || null;
+  return currentUser;
+}
+
+/*
+ * Prefer business_profiles. The businesses table is a compatibility
+ * fallback for projects where the first table is unavailable.
+ */
+async function loadOwnProfiles() {
+  if (!currentUser?.id) {
+    throw new Error('Please sign in to continue.');
+  }
+
+  const first = await db
+    .from('business_profiles')
+    .select('id,user_id,business_name,company_name,slug')
+    .eq('user_id', currentUser.id)
+    .limit(50);
+
+  if (!first.error) {
+    if (first.data?.length) return first.data;
+
+    // Try the existing alternate table if the first query found no rows.
+    const second = await db
+      .from('businesses')
+      .select('id,user_id,business_name,slug')
+      .eq('user_id', currentUser.id)
+      .limit(50);
+
+    if (!second.error) return second.data || [];
+
+    // An empty, successful first query is not necessarily a database failure.
+    // Surface the fallback error only if the first query had no rows.
+    throw second.error;
+  }
+
+  const second = await db
+    .from('businesses')
+    .select('id,user_id,business_name,slug')
+    .eq('user_id', currentUser.id)
+    .limit(50);
+
+  if (!second.error) return second.data || [];
+
+  throw first.error;
+}
+
+function renderProfileList(profiles) {
+  const box = $('profilesList');
+  box.replaceChildren();
+
+  const validProfiles = (profiles || []).filter(profile =>
+    profile &&
+    profile.id != null &&
+    profile.user_id != null &&
+    String(profile.user_id) === String(currentUser?.id)
+  );
+
+  cachedProfiles = validProfiles;
+
+  if (!validProfiles.length) {
+    box.textContent = 'No businesses were found for this account. Sign in with the account that owns your business.';
+    clearSelection('No business available');
+    return;
+  }
+
+  validProfiles.forEach(profile => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className =
+      'w-full text-left bg-[#0f1219] border border-slate-700 rounded-xl p-3 flex gap-3 items-center mt-2 hover:bg-[#151d2e]';
+
+    const avatar = document.createElement('div');
+    avatar.className =
+      'w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-white';
+    avatar.textContent = getName(profile).charAt(0).toUpperCase() || 'B';
+
+    const details = document.createElement('div');
+    details.className = 'min-w-0';
+
+    const name = document.createElement('div');
+    name.className = 'font-bold text-[13px] text-white break-words';
+    name.textContent = getName(profile);
+
+    const handle = document.createElement('div');
+    handle.className = 'text-[11px] text-slate-500 break-all';
+    handle.textContent = '@' + getHandle(profile);
+
+    details.append(name, handle);
+    button.append(avatar, details);
+
+    button.setAttribute('aria-pressed', 'false');
+
+    button.addEventListener('click', () => {
+      setPreview(profile, button);
+    });
+
+    box.appendChild(button);
+  });
+
+  if (validProfiles.length === 1) {
+    const firstButton = box.querySelector('button');
+    setPreview(validProfiles[0], firstButton);
+  } else {
+    clearSelection('Choose one of your businesses');
+  }
+}
+
+async function loadProfiles() {
+  if (isLoading) return;
+
+  isLoading = true;
+  setCheckoutEnabled();
+  $('profilesList').textContent = 'Checking your account...';
+  $('retryBtn').classList.add('hidden');
+  hideMessage('dbError');
+
+  try {
+    const user = await getUser();
+
+    if (!user) {
+      cachedProfiles = [];
+      clearSelection('Sign in required');
+      $('profilesList').textContent = 'Please sign in to your PASONG account to promote your business.';
+      $('retryBtn').classList.remove('hidden');
+      return;
+    }
+
+    const profiles = await loadOwnProfiles();
+
+    // Do not render results if the active account changed during the request.
+    const confirmedUser = await getUser();
+
+    if (!confirmedUser || confirmedUser.id !== user.id) {
+      cachedProfiles = [];
+      clearSelection('Account changed — reload businesses');
+      $('profilesList').textContent = 'Your account changed. Please try again.';
+      $('retryBtn').classList.remove('hidden');
+      return;
+    }
+
+    renderProfileList(profiles);
+  } catch (error) {
+    console.error('PASONG business loading failed:', error);
+    cachedProfiles = [];
+    clearSelection('Unable to verify business');
+    $('profilesList').textContent = 'Unable to load your businesses.';
+    showMessage(
+      'dbError',
+      'We could not load your businesses. Check your connection and account access, then try again.'
+    );
+    $('retryBtn').classList.remove('hidden');
+  } finally {
+    isLoading = false;
+    setCheckoutEnabled();
+  }
+}
+
+async function continueToPay() {
+  if (isCheckingOut || isLoading) return;
+
+  if (!selectedProfile || !currentUser) {
+    showPageMessage('Please sign in and select a business you own.');
+    return;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(PACKAGE_PRICES, selectedPackage)) {
+    showPageMessage('Please select a valid promotion package.');
+    return;
+  }
+
+  const profileId = selectedProfile.id;
+  const packageId = selectedPackage;
+  const originalUserId = currentUser.id;
+
+  isCheckingOut = true;
+  $('payBtn').textContent = 'Verifying account...';
+  setCheckoutEnabled();
+  hidePageMessage();
+
+  try {
+    // Recheck the active session immediately before redirecting.
+    const user = await getUser();
+
+    if (!user || user.id !== originalUserId) {
+      clearSelection('Please select your business again');
+      throw new Error('Your sign-in session changed. Please sign in again.');
+    }
+
+    // Re-fetch account-owned profiles rather than trusting the selected
+    // object or local storage. The checkout server must still verify ownership.
+    const profiles = await loadOwnProfiles();
+
+    const match = profiles.find(profile =>
+      String(profile.id) === profileId &&
+      String(profile.user_id) === String(user.id)
+    );
+
+    if (!match) {
+      clearSelection('Business ownership could not be verified');
+      throw new Error('This business could not be verified for your account. Please select it again.');
+    }
+
+    // Ensure the package hasn't changed while verification was running.
+    if (selectedPackage !== packageId) {
+      throw new Error('Your package selection changed. Please try again.');
+    }
+
+    const params = new URLSearchParams();
+    params.set('type', 'business');
+    params.set('business_profile_id', profileId);
+    params.set('profile_id', profileId);
+    params.set('package', packageId);
+
+    // Preserve the existing PASONG checkout page and parameter names.
+    window.location.href = 'promotion-checkout.html?' + params.toString();
+
+  } catch (error) {
+    console.error('PASONG business checkout redirect failed:', error);
+    showPageMessage(error?.message || 'Unable to continue to checkout. Please try again.');
+    isCheckingOut = false;
+    $('payBtn').textContent = 'Continue → Secure Checkout';
+    setCheckoutEnabled();
+  }
+}
+
+function handleCurrencyChange(event) {
+  const nextCurrency = normalizeCurrency(event?.detail?.currency);
+
+  if (nextCurrency) {
+    currency = nextCurrency;
+  }
+
+  updatePrices();
+}
+
+function init() {
+  try {
+    if (!window.supabase?.createClient) {
+      throw new Error('Supabase failed to load. Please refresh the page.');
+    }
+
+    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    document.querySelectorAll('.pkg').forEach(button => {
+      button.addEventListener('click', () => {
+        selectPackage(button.dataset.package);
+      });
+    });
+
+    $('payBtn').addEventListener('click', continueToPay);
+    $('retryBtn').addEventListener('click', loadProfiles);
+
+    window.addEventListener('pasong:currency-ready', handleCurrencyChange);
+
+    selectPackage('starter');
+    updatePrices();
+    loadProfiles();
+
+    // Handle sign-out, sign-in, or account switching in the same page.
+    db.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') return;
+
+      const nextUser = session?.user || null;
+      const previousId = currentUser?.id || null;
+      const nextId = nextUser?.id || null;
+
+      if (previousId !== nextId) {
+        authVersion++;
+        currentUser = nextUser;
+        cachedProfiles = [];
+        clearSelection(nextUser ? 'Reloading account businesses' : 'Sign in required');
+        loadProfiles();
+      }
+    });
+
+  } catch (error) {
+    console.error('PASONG business promotion initialization failed:', error);
+    $('profilesList').textContent = 'The page could not initialize.';
+    showMessage(
+      'dbError',
+      'PASONG could not initialize this page. Refresh it or try again later.'
+    );
+    $('retryBtn').classList.remove('hidden');
+    $('retryBtn').addEventListener('click', () => window.location.reload());
+  }
+}
+
+init();
 </script>
+
 </body>
 </html>
