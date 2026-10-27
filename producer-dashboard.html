@@ -16,7 +16,7 @@ header{background:#10091c;border-bottom:1px solid #28153d;padding:16px 22px;disp
 .header-right a:hover{color:#c084fc}
 .account{background:#1d1230;border:1px solid #38205a;padding:8px 12px;border-radius:20px;font-size:13px}
 .container{width:min(1180px,94%);margin:auto}
-.hero{margin-top:25px;padding:28px;border:1px solid #38205a;border-radius:20px;background:linear-gradient(135deg,#160b27,#0d0715)}
+.hero{margin-top:  ,;padding:28px;border:1px solid #38205a;border-radius:20px;background:linear-gradient(135deg,#160b27,#0d0715)}
 .hero h1{font-size:30px;margin-bottom:8px}
 .hero p{color:#aaa;line-height:1.6}
 .producer-name{color:#c084fc}
@@ -128,7 +128,7 @@ input[type="file"]{padding:10px}
 .studio-booking{background:#160d24;border:1px solid #2d1944;border-radius:12px;padding:14px;margin-bottom:10px}
 .studio-booking h4{font-size:14px;margin-bottom:8px}
 .studio-booking p{font-size:12px;line-height:1.6;color:#bbb;margin:4px 0;overflow-wrap:anywhere}
-.studio-photo-list{font-size:12px;color:#aaa;line-height:1.6;margin-top:8px;overflow-wrap:anywhere}.studio-photo-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:10px 0 14px}.studio-photo-gallery img{display:block;width:100%;height:105px;object-fit:cover;border-radius:9px;border:1px solid #38204e}.studio-card-photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:7px;margin-bottom:12px}.studio-card-photos img{display:block;width:100%;height:115px;object-fit:cover;border-radius:9px}
+.studio-photo-list{font-size:12px;color:#aaa;line-height:1.6;margin-top:8px;overflow-wrap:anywhere}.studio-photo-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin:10px 0 14px}.studio-photo-gallery .studio-photo-item{position:relative;min-width:0}.studio-photo-gallery img{display:block;width:100%;height:105px;object-fit:cover;border-radius:9px;border:1px solid #38204e}.studio-photo-remove{position:absolute;top:5px;right:5px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:#b91c1c;color:#fff;font-weight:800;font-size:11px;padding:5px 8px;cursor:pointer;box-shadow:0 2px 8px #0008}.studio-photo-remove:hover{background:#dc2626}.studio-photo-note{font-size:12px;color:#b9a8ca;margin:5px 0 8px}.studio-card-photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:7px;margin-bottom:12px}.studio-card-photos img{display:block;width:100%;height:115px;object-fit:cover;border-radius:9px}
 .studio-help{color:#999;font-size:12px;line-height:1.6;margin:0 0 15px}
 @media(max-width:800px){.studio-grid{grid-template-columns:1fr}}
 .loading{padding:25px;text-align:center;color:#999}
@@ -695,7 +695,7 @@ Manage paid beat orders and deliver the files purchased by buyers.
 <div class="field"><label for="studioServices">Services</label><textarea id="studioServices" placeholder="Recording, mixing, mastering — separate with commas or new lines"></textarea></div>
 <div class="field"><label for="studioEquipment">Equipment</label><textarea id="studioEquipment" placeholder="Microphones, interfaces, monitors, instruments — separate with commas or new lines"></textarea></div>
 <div class="field"><label for="studioOpeningHours">Opening hours (optional JSON)</label><textarea id="studioOpeningHours" placeholder='{"Monday":"09:00-18:00","Tuesday":"09:00-18:00"}'></textarea><span class="price-help">Leave blank if you do not want to specify hours.</span></div>
-<div class="field"><label for="studioPhotos">Studio photos (JPG, PNG or WEBP; max 5MB each)</label><input id="studioPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="price-help">New photos are added to the listing's existing photos.</span></div>
+<div class="field"><label for="studioPhotos">Studio photos (JPG, PNG or WEBP; max 5MB each)</label><input id="studioPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="price-help">Choose one or more photos to add. Use Remove on any saved photo below to exclude it when you save.</span><div id="studioNewPhotosNote" class="studio-photo-note">No new photos selected.</div></div>
 </div>
 <div id="studioExistingPhotos" class="studio-photo-list"></div>
 <div class="form-actions">
@@ -939,15 +939,42 @@ function studioStatusLabel(status){
  return s.charAt(0).toUpperCase()+s.slice(1);
 }
 
+function renderStudioPhotoEditor(){
+ const photoBox=document.getElementById("studioExistingPhotos");
+ if(!photoBox)return;
+ photoBox.innerHTML=editingStudioPhotos.length
+  ? '<div>Saved photos: '+editingStudioPhotos.length+'. Tap <b>Remove</b> on any photo you no longer want.</div><div class="studio-photo-gallery">'+editingStudioPhotos.map((url,index)=>'<div class="studio-photo-item"><img src="'+escapeHtml(url)+'" alt="Studio photo '+(index+1)+'" loading="lazy"><button type="button" class="studio-photo-remove" data-remove-studio-photo="'+index+'" aria-label="Remove studio photo '+(index+1)+'">Remove</button></div>').join('')+'</div>'
+  : '<div>No saved photos. You can add new photos using the file picker above.</div>';
+}
+
 function studioFormReset(){
  const form=document.getElementById("studioForm");
  if(form)form.reset();
  document.getElementById("studioRecordId").value="";
  editingStudioPhotos=[];
- document.getElementById("studioExistingPhotos").textContent="";
+ renderStudioPhotoEditor();
+ const newPhotosNote=document.getElementById("studioNewPhotosNote");
+ if(newPhotosNote)newPhotosNote.textContent="No new photos selected.";
  document.getElementById("studioSaveButton").textContent="Submit Studio for Review";
  studioMessage("info","Fill in your studio details. New listings are submitted as pending for admin review.");
 }
+
+// Remove saved photos from the edit list; the change is persisted when the owner saves.
+document.getElementById("studioExistingPhotos")?.addEventListener("click",event=>{
+ const button=event.target.closest("[data-remove-studio-photo]");
+ if(!button)return;
+ const index=Number(button.dataset.removeStudioPhoto);
+ if(!Number.isInteger(index)||index<0||index>=editingStudioPhotos.length)return;
+ editingStudioPhotos.splice(index,1);
+ renderStudioPhotoEditor();
+ studioMessage("info","Photo removed from this edit. Save the studio to apply the change.");
+});
+
+document.getElementById("studioPhotos")?.addEventListener("change",event=>{
+ const files=Array.from(event.target.files||[]);
+ const note=document.getElementById("studioNewPhotosNote");
+ if(note)note.textContent=files.length?files.length+" new photo"+(files.length===1?"":"s")+" selected. They will be added when you save.":"No new photos selected.";
+});
 
 function fillStudioForm(studio){
  document.getElementById("studioRecordId").value=studio.id||"";
@@ -967,10 +994,7 @@ function fillStudioForm(studio){
  document.getElementById("studioEquipment").value=Array.isArray(studio.equipment)?studio.equipment.join(", "):"";
  document.getElementById("studioOpeningHours").value=studio.opening_hours&&Object.keys(studio.opening_hours).length?JSON.stringify(studio.opening_hours,null,2):"";
  editingStudioPhotos=Array.isArray(studio.photos)?[...studio.photos]:[];
- const photoBox=document.getElementById("studioExistingPhotos");
- photoBox.innerHTML=editingStudioPhotos.length
-  ? '<div>Existing photos: '+editingStudioPhotos.length+' (kept when you save).</div><div class="studio-photo-gallery">'+editingStudioPhotos.map((url,index)=>'<img src="'+escapeHtml(url)+'" alt="Existing studio photo '+(index+1)+'" loading="lazy">').join('')+'</div>'
-  : 'No existing photos.';
+ renderStudioPhotoEditor();
  document.getElementById("studioSaveButton").textContent="Save and Submit for Review";
  studioMessage("info",String(studio.status)==="approved"?"This listing is approved. Saving changes will resubmit it for admin review.":"Editing this listing. Saving will submit it for admin review.");
  document.getElementById("studioForm").scrollIntoView({behavior:"smooth",block:"start"});
@@ -1068,7 +1092,8 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
   if(existingError)throw existingError;
   if(id&&!existing)throw new Error("This studio listing was not found under your account.");
   if(existing&&!['pending','hidden'].includes(String(existing.status).toLowerCase()))throw new Error("Approved listings must be hidden before editing. Use Hide listing first, then edit and resubmit.");
-  let photos=Array.isArray(existing?.photos)?[...existing.photos]:[...editingStudioPhotos];
+  // The edit gallery is the source of truth so removals are saved as well as additions.
+  let photos=[...editingStudioPhotos];
   const files=Array.from(document.getElementById("studioPhotos").files||[]);
   for(const file of files){
    if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw new Error("Studio photos must be JPG, PNG or WEBP.");
