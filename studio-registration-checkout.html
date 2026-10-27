@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
+<title>Studio Registration Checkout | PASONG</title>
+<meta name="description" content="Secure checkout for PASONG worldwide studio listing feature packages.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#050b18;--panel:#0a162a;--line:#203b5a;--muted:#a6b7ce;--purple:#b02cff;--cyan:#00c5ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#20113b 0,transparent 45%),var(--bg);color:#f8fafc;font-family:Inter,system-ui,sans-serif;min-height:100vh}.wrap{width:min(980px,calc(100% - 28px));margin:auto}header{border-bottom:1px solid var(--line);background:#050b18d9}.nav{height:70px;display:flex;align-items:center;justify-content:space-between;gap:12px}.logo{color:#fff;text-decoration:none;font-size:22px;font-weight:900}.logo b{color:#d6a1ff}.nav a.back{font-size:12px;color:#d7e6f8;text-decoration:none;border:1px solid #355274;border-radius:99px;padding:10px 14px}.hero{padding:38px 0 20px}.eyebrow{color:#dda3ff;text-transform:uppercase;font-size:10px;font-weight:900;letter-spacing:1.5px}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.1;letter-spacing:-1.4px;margin:12px 0}.grad{background:linear-gradient(90deg,#e4a2ff,#9c4dff,#18c9ff);background-clip:text;color:transparent}.hero p{max-width:650px;color:#b9c9dc;font-size:14px;line-height:1.8}.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;padding:10px 0 45px}.card{background:linear-gradient(145deg,#0b192e,#080f1f);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 20px 55px #0002;min-width:0}.card h2{font-size:17px;margin:0 0 17px}.status{display:flex;align-items:flex-start;gap:11px;padding:14px;border:1px solid #7250a1;background:#29143b;border-radius:13px;color:#f1ddff;font-size:12px;line-height:1.7}.status .symbol{font-size:20px}.muted{color:var(--muted);font-size:12px;line-height:1.75}.detail{display:flex;justify-content:space-between;gap:15px;padding:12px 0;border-bottom:1px solid #1c304a;font-size:12px}.detail span:first-child{color:var(--muted)}.detail strong{text-align:right;overflow-wrap:anywhere}.amount{font-size:32px;font-weight:900;letter-spacing:-1px;margin:20px 0 4px}.amount small{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:600}.pill{display:inline-block;border:1px solid #594078;color:#e3c4ff;background:#2a1740;padding:6px 10px;border-radius:99px;font-size:10px;font-weight:800}.button{display:flex;justify-content:center;align-items:center;width:100%;border:0;border-radius:999px;padding:14px 18px;background:linear-gradient(100deg,#9d21ec,#5751ff,#00b8ef);color:white;font-size:12px;font-weight:900;text-decoration:none;cursor:pointer;margin-top:17px}.button.secondary{background:#0a172b;border:1px solid #345475}.button:disabled{opacity:.6;cursor:not-allowed}.footnote{font-size:10px;line-height:1.7;color:#879bb5;margin-top:15px}.error{color:#ffb5c0}.success{color:#a9f3c2}footer{padding:18px 0;border-top:1px solid var(--line);font-size:10px;color:#8196b1;text-align:center}.hidden{display:none!important}@media(max-width:720px){.layout{grid-template-columns:1fr}.hero{padding-top:28px}.card{padding:18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="logo" href="/Pasong.html"><b>◈</b> PASONG</a><a class="back" href="/producer.html">← Producer Dashboard</a></div></header>
+<main class="wrap">
+<section class="hero"><span class="eyebrow">PASONG Studio Network</span><h1>Studio registration <span class="grad">checkout</span></h1><p>Review your selected worldwide studio feature package. This checkout page is prepared for payment integration; no payment is collected until the secure payment provider is connected.</p></section>
+<div class="layout">
+<section class="card">
+<h2>Order details</h2>
+<div id="loading" class="muted">Checking your studio registration…</div>
+<div id="orderDetails" class="hidden">
+<div class="detail"><span>Studio</span><strong id="studioName">—</strong></div>
+<div class="detail"><span>Package</span><strong id="packageName">—</strong></div>
+<div class="detail"><span>Feature period</span><strong id="packageDays">—</strong></div>
+<div class="detail"><span>Payment status</span><strong id="paymentStatus">Awaiting payment</strong></div>
+<div class="amount" id="amount">UGX —</div>
+<p class="muted">The displayed package is for featured placement. Your studio must still pass PASONG Admin review before appearing publicly. Featured placement will not activate merely by opening this page.</p>
+</div>
+<div id="errorBox" class="status hidden"><span class="symbol">!</span><div id="errorText">Unable to load this checkout.</div></div>
+</section>
+<aside class="card">
+<span class="pill">SECURE CHECKOUT · SETUP PENDING</span>
+<h2 style="margin-top:17px">Payment provider</h2>
+<div class="status"><span class="symbol">🔒</span><div><strong>Payment connection is not enabled yet.</strong><br>Checkout is prepared for the backend payment integration. We will connect and test the provider later, as requested.</div></div>
+<button id="payButton" class="button" disabled>Payment integration coming next</button>
+<a class="button secondary" href="/producer.html">Return to Producer Dashboard</a>
+<p class="footnote">No money has been taken. Do not send money manually or share payment PINs. Once payment is connected, PASONG will verify the transaction on the server before submitting a paid studio to the Admin review queue.</p>
+</aside>
+</div>
+</main>
+<footer>© <span id="year"></span> PASONG · Worldwide Studio Network</footer>
+<script>
+(() => {
+'use strict';
+const SUPABASE_URL='https://mtufczmjlkvycarxylgh.supabase.co';
+const SUPABASE_KEY='sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+const API_URL='https://pasong-api.vercel.app';
+const packages={
+ starter:{label:'Starter Feature',amount:25000,days:7},
+ pro:{label:'Pro Feature',amount:60000,days:14},
+ premium:{label:'Premium Feature',amount:120000,days:30}
+};
+const params=new URLSearchParams(location.search);
+const flow=params.get('flow');
+const studioId=(params.get('studio_id')||'').trim();
+const requestedPackage=(params.get('feature_package')||'').trim().toLowerCase();
+const selected=packages[requestedPackage];
+const $=id=>document.getElementById(id);
+$('year').textContent=new Date().getFullYear();
+function fail(message){$('loading').classList.add('hidden');$('orderDetails').classList.add('hidden');$('errorBox').classList.remove('hidden');$('errorText').textContent=message;}
+function money(amount){return 'UGX '+Number(amount).toLocaleString('en-UG');}
+async function init(){
+ if(flow!=='feature'){fail('This page is for studio owner registration-feature checkout. Customer contact-unlock payments use the separate studio connection checkout.');return;}
+ if(!studioId||!selected){fail('The studio ID or feature package is missing or invalid. Return to Register Studio and submit again.');return;}
+ try{
+  if(!window.supabase)throw new Error('Secure account connection could not load. Please refresh and try again.');
+  const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  const {data:sessionData,error:sessionError}=await client.auth.getSession();
+  if(sessionError)throw sessionError;
+  const user=sessionData?.session?.user;
+  if(!user){fail('Please sign in to the PASONG account that registered this studio, then reopen checkout.');return;}
+  const {data:studio,error}=await client.from('producer_studios').select('id,studio_name,owner_id,status').eq('id',studioId).eq('owner_id',user.id).maybeSingle();
+  if(error)throw error;
+  if(!studio){fail('This studio could not be found under your signed-in account. Please return to the Producer Dashboard and try again.');return;}
+  $('loading').classList.add('hidden');$('orderDetails').classList.remove('hidden');
+  $('studioName').textContent=studio.studio_name||params.get('studio_name')||'Your studio';
+  $('packageName').textContent=selected.label;
+  $('packageDays').textContent=selected.days+' days';
+  $('amount').textContent=money(selected.amount);
+  $('paymentStatus').textContent=String(studio.status||'awaiting_payment').toLowerCase()==='approved'?'Already approved — contact PASONG Admin before changing package':'Awaiting payment';
+  // Price, duration and package name are sourced from this fixed catalogue, not URL amount fields.
+  // The payment button remains disabled until the server-side provider integration is configured.
+  console.info('Studio registration checkout prepared; payment gateway is intentionally not started yet.',{studioId,package:requestedPackage,api:API_URL});
+ }catch(error){console.error('Studio registration checkout:',error);fail(error?.message||'Unable to prepare studio checkout.');}
+}
+init();
+})();
+</script>
+</body>
+</html>
