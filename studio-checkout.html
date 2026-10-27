@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
+<title>Studio Connection Checkout | PASONG</title>
+<meta name="description" content="Connect with recording studios and music professionals worldwide through PASONG.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:#050b18;
+  --panel:#0a172b;
+  --panel2:#0d2039;
+  --line:#244466;
+  --muted:#a8b8ce;
+  --purple:#bd42ff;
+  --cyan:#00c9ff;
+  --green:#36e6a0;
+  --red:#ff647c;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at top left,#241044 0,transparent 40%),
+    radial-gradient(ellipse at bottom right,#062b45 0,transparent 35%),
+    var(--bg);
+  color:#f8fafc;
+  font-family:Inter,system-ui,sans-serif;
+}
+a { color:#d9a2ff; text-decoration:none; }
+a:hover { color:#fff; }
+button,input,select { font:inherit; }
+button,a { -webkit-tap-highlight-color:transparent; }
+.wrap { width:min(1080px,calc(100% - 28px)); margin:auto; }
+header {
+  border-bottom:1px solid #203954;
+  background:#050b18ed;
+  position:sticky;
+  top:0;
+  z-index:10;
+  backdrop-filter:blur(15px);
+}
+.nav {
+  min-height:68px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+}
+.logo {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#fff;
+  font-weight:900;
+  font-size:21px;
+}
+.logo-mark { color:#d49aff; font-size:29px; }
+.logo small {
+  display:block;
+  font-size:8px;
+  letter-spacing:1.3px;
+  color:var(--muted);
+  margin-top:2px;
+}
+.nav-link {
+  font-size:12px;
+  font-weight:800;
+  border:1px solid var(--line);
+  padding:10px 14px;
+  border-radius:999px;
+}
+main { padding:35px 0 55px; }
+.hero { text-align:center; max-width:720px; margin:0 auto 30px; }
+.eyebrow {
+  display:inline-block;
+  color:#e4b4ff;
+  border:1px solid #7944a2;
+  background:#7e22ce1a;
+  border-radius:99px;
+  padding:8px 12px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+h1 {
+  font-size:clamp(32px,6vw,51px);
+  line-height:1.1;
+  letter-spacing:-1.8px;
+  margin:17px 0 12px;
+}
+.gradient {
+  background:linear-gradient(90deg,#e5a7ff,#a94cff,#00c9ff);
+  color:transparent;
+  background-clip:text;
+  -webkit-background-clip:text;
+}
+.lead {
+  color:#c0cde0;
+  font-size:13px;
+  line-height:1.8;
+  max-width:590px;
+  margin:auto;
+}
+.layout {
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:20px;
+  align-items:start;
+}
+.panel {
+  border:1px solid var(--line);
+  border-radius:19px;
+  background:linear-gradient(150deg,#0c1b30f5,#071120f5);
+  padding:23px;
+  box-shadow:0 18px 55px #0002;
+  min-width:0;
+}
+.section-label {
+  font-size:10px;
+  letter-spacing:1.4px;
+  font-weight:900;
+  text-transform:uppercase;
+  color:#d69aff;
+}
+h2 { font-size:21px; margin:8px 0 18px; letter-spacing:-.5px; }
+.studio-art {
+  height:165px;
+  display:grid;
+  place-items:center;
+  border:1px solid #2a4267;
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 25% 20%,#633c98,transparent 48%),
+    linear-gradient(135deg,#102d4a,#071020);
+  overflow:hidden;
+  margin-bottom:17px;
+}
+.studio-art img { width:100%; height:100%; object-fit:cover; }
+.studio-symbol { font-size:53px; color:#d6a2ff; }
+.studio-name { font-size:22px; font-weight:900; overflow-wrap:anywhere; }
+.location { color:var(--muted); font-size:12px; margin-top:8px; }
+.description { color:#c3d0e2; font-size:12px; line-height:1.8; margin-top:13px; overflow-wrap:anywhere; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:13px; }
+.chip {
+  border:1px solid #294763;
+  background:#0b2037;
+  padding:6px 9px;
+  border-radius:99px;
+  font-size:10px;
+  color:#d4e8fa;
+}
+.fee {
+  border:1px solid #3b3876;
+  background:linear-gradient(110deg,#32134d,#102b49);
+  border-radius:15px;
+  padding:18px;
+  margin-top:20px;
+}
+.fee-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.fee-title { font-size:12px; font-weight:800; }
+.fee-amount { font-size:27px; font-weight:900; white-space:nowrap; }
+.fee p { color:#c0cde0; font-size:11px; line-height:1.7; margin:9px 0 0; }
+.notice {
+  border:1px solid #31506f;
+  background:#091b2d;
+  border-radius:12px;
+  padding:12px;
+  font-size:11px;
+  line-height:1.7;
+  color:#c7d7e8;
+  margin-top:15px;
+}
+.notice strong { color:white; }
+.field-label {
+  display:block;
+  color:#e2e8f0;
+  font-size:11px;
+  font-weight:800;
+  margin:15px 0 7px;
+}
+.field {
+  width:100%;
+  padding:13px;
+  border:1px solid #294867;
+  border-radius:11px;
+  background:#061326;
+  color:#fff;
+  outline:none;
+  font-size:12px;
+  min-width:0;
+}
+.field:focus { border-color:#bb5aff; box-shadow:0 0 0 3px #a855f71c; }
+.field::placeholder { color:#7f93ad; }
+select.field option { background:#061326; }
+.methods { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:8px; }
+.method {
+  border:1px solid #294867;
+  background:#071426;
+  color:#d8e5f4;
+  border-radius:12px;
+  padding:13px 5px;
+  text-align:center;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.method.active {
+  border-color:#bd42ff;
+  background:#301047;
+  box-shadow:inset 0 0 0 1px #bd42ff;
+}
+.method:focus-visible,.btn:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+.hidden { display:none !important; }
+.btn {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  border:0;
+  border-radius:999px;
+  padding:15px;
+  margin-top:19px;
+  color:#fff;
+  font-weight:900;
+  font-size:12px;
+  cursor:pointer;
+  background:linear-gradient(100deg,#b10cff,#5551ff,#00b8f5);
+}
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.status {
+  display:none;
+  border:1px solid #31506f;
+  border-radius:12px;
+  padding:13px;
+  margin-top:15px;
+  font-size:11px;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+.status.show { display:block; }
+.status.error { border-color:#9d4057; background:#35131f; color:#ffd1d9; }
+.status.success { border-color:#237b60; background:#082c25; color:#b8ffe4; }
+.status.info { background:#091c30; color:#d6e8fa; }
+.contact-box {
+  border:1px solid #237b60;
+  background:#08251f;
+  border-radius:14px;
+  padding:16px;
+  margin-top:18px;
+  overflow-wrap:anywhere;
+}
+.contact-box h3 { margin:0 0 10px; color:#8cf3c8; font-size:16px; }
+.contact-item { font-size:12px; line-height:1.9; margin:8px 0; }
+.contact-item strong { color:#9baec4; display:block; font-size:10px; text-transform:uppercase; letter-spacing:.7px; }
+.small { font-size:10px; line-height:1.7; color:#9fb1c9; }
+footer { border-top:1px solid #203954; padding:22px 0; color:#9fb1c9; font-size:10px; }
+.footer-inner { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+@media(max-width:760px) {
+  .layout { grid-template-columns:1fr; }
+  .panel { padding:18px; }
+  main { padding-top:27px; }
+  .studio-art { height:150px; }
+}
+@media(max-width:360px) {
+  .methods { grid-template-columns:1fr; }
+  .fee-row { align-items:flex-start; flex-direction:column; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="/Pasong.html">
+      <span class="logo-mark">♫</span>
+      <span>PASONG<small>MUSIC · CREATORS · OPPORTUNITY</small></span>
+    </a>
+    <a class="nav-link" href="/studio.html">← Back to studios</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow">PASONG CREATOR CONNECTION</span>
+    <h1>Connect with your next<br><span class="gradient">creative partner.</span></h1>
+    <p class="lead">
+      Pay a one-time connection fee to unlock the selected provider's contact
+      details. Agree on recording, production and other service prices directly
+      with the provider.
+    </p>
+  </section>
+
+  <div class="layout">
+    <section class="panel" aria-labelledby="studioHeading">
+      <div class="section-label">Your selected provider</div>
+      <h2 id="studioHeading">Studio details</h2>
+
+      <div id="studioLoading" class="notice">Loading the selected studio…</div>
+
+      <div id="studioDetails" class="hidden">
+        <div class="studio-art" id="studioArt">
+          <span class="studio-symbol" aria-hidden="true">♫</span>
+        </div>
+        <div class="studio-name" id="studioName">Studio</div>
+        <div class="location" id="studioLocation"></div>
+        <p class="description" id="studioDescription"></p>
+        <div class="chips" id="studioServices"></div>
+      </div>
+
+      <div class="fee">
+        <div class="fee-row">
+          <div class="fee-title">One-time connection fee</div>
+          <div class="fee-amount">UGX 5,000</div>
+        </div>
+        <p>
+          This fee is for connecting you with this provider. It is not the
+          price of studio time, mixing, mastering, production or any other
+          service.
+        </p>
+      </div>
+
+      <div class="notice">
+        <strong>How it works</strong><br>
+        1. Sign in to your PASONG account.<br>
+        2. Pay the connection fee using an available payment method.<br>
+        3. PASONG verifies the payment with the payment provider.<br>
+        4. The selected provider's contact details are unlocked after verification.
+      </div>
+
+      <div class="notice">
+        <strong>Important:</strong> Agree on service prices, schedules,
+        deliverables and any additional payments directly with the provider.
+        The connection fee does not pay for the provider's services.
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="paymentHeading">
+      <div class="section-label">Secure checkout</div>
+      <h2 id="paymentHeading">Complete your connection</h2>
+
+      <div id="loginNotice" class="notice hidden">
+        You need to sign in to continue.
+        <a id="loginLink" href="/account.html">Sign in to PASONG →</a>
+      </div>
+
+      <form id="checkoutForm">
+        <label class="field-label" for="customerName">Your full name</label>
+        <input class="field" id="customerName" name="customerName"
+          autocomplete="name" maxlength="100" required
+          placeholder="Enter your name">
+
+        <label class="field-label" for="customerEmail">Email address</label>
+        <input class="field" id="customerEmail" name="customerEmail"
+          type="email" autocomplete="email" maxlength="254" required
+          placeholder="you@example.com">
+
+        <label class="field-label" for="customerPhone">Your phone number</label>
+        <input class="field" id="customerPhone" name="customerPhone"
+          type="tel" autocomplete="tel" maxlength="30" required
+          placeholder="+256 7XX XXX XXX">
+
+        <label class="field-label">Choose a payment method</label>
+        <div class="methods" role="group" aria-label="Payment method">
+          <button class="method active" type="button" data-method="MTN">
+            📱 MTN MoMo
+          </button>
+          <button class="method" type="button" data-method="AIRTEL">
+            📱 Airtel Money
+          </button>
+          <button class="method" type="button" data-method="PESAPAL">
+            💳 PesaPal
+          </button>
+        </div>
+
+        <input type="hidden" id="paymentMethod" value="MTN">
+
+        <div id="mobileMoneyFields">
+          <label class="field-label" for="mobileMoneyPhone">
+            Mobile money number to charge
+          </label>
+          <input class="field" id="mobileMoneyPhone" type="tel"
+            autocomplete="tel" maxlength="20"
+            placeholder="+256 7XX XXX XXX">
+          <p class="small">
+            Enter the number that should receive the payment prompt.
+            Your mobile money provider may request confirmation on your phone.
+          </p>
+        </div>
+
+        <button class="btn" id="payButton" type="submit">
+          Continue · Pay UGX 5,000
+        </button>
+
+        <p class="small" style="margin-top:12px">
+          Do not pay anyone privately claiming to be PASONG support.
+          Payments must be initiated through the official checkout.
+        </p>
+      </form>
+
+      <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+      <div id="contactBox" class="contact-box hidden" aria-live="polite">
+        <h3>✓ Connection unlocked</h3>
+        <p class="small">
+          Payment verification succeeded. You can use these details to contact
+          the selected provider.
+        </p>
+        <div id="contactDetails"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span>© <span id="year"></span> PASONG · Music, creators & opportunity</span>
+    <a href="/studio.html">Browse studios</a>
+  </div>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+
+  /*
+   * PASONG Studio Connection Checkout
+   *
+   * Required backend routes:
+   *
+   * POST /api/studio-connections/create-payment
+   * GET  /api/studio-connections/:orderId/status
+   * GET  /api/studio-connections/access?studio_id=...
+   *
+   * These routes must authenticate the Supabase user, set the fee to
+   * UGX 5,000 on the server, verify payment with the payment provider,
+   * and only return provider contacts for a verified paid connection.
+   *
+   * This frontend intentionally does not mark payments as successful.
+   */
+
+  const SUPABASE_URL =
+    window.PASONG_SUPABASE_URL ||
+    'https://mtufczmjlkvycarxylgh.supabase.co';
+
+  const SUPABASE_KEY =
+    window.PASONG_SUPABASE_ANON_KEY ||
+    'sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+
+  const API_BASE = 'https://pasong-api.vercel.app';
+  const CONNECTION_FEE = 5000;
+
+  const params = new URLSearchParams(window.location.search);
+  const studioId = (
+    params.get('studio_id') ||
+    params.get('provider_id') ||
+    ''
+  ).trim();
+
+  const $ = id => document.getElementById(id);
+
+  $('year').textContent = new Date().getFullYear();
+
+  const form = $('checkoutForm');
+  const payButton = $('payButton');
+  const statusBox = $('statusMessage');
+  const contactBox = $('contactBox');
+  const contactDetails = $('contactDetails');
+  const loginNotice = $('loginNotice');
+  const loginLink = $('loginLink');
+  const mobileFields = $('mobileMoneyFields');
+
+  let supabaseClient = null;
+  let currentSession = null;
+  let selectedMethod = 'MTN';
+  let studioLoaded = false;
+  let busy = false;
+
+  function showStatus(message, type = 'info') {
+    statusBox.textContent = message;
+    statusBox.className = 'status show ' + type;
+  }
+
+  function hideStatus() {
+    statusBox.textContent = '';
+    statusBox.className = 'status';
+  }
+
+  function setBusy(value) {
+    busy = value;
+    payButton.disabled = value || !currentSession || !studioLoaded;
+    payButton.textContent = value
+      ? 'Please wait…'
+      : 'Continue · Pay UGX 5,000';
+  }
+
+  function safeText(value, fallback = '') {
+    if (value === null || value === undefined) return fallback;
+    return String(value).trim() || fallback;
+  }
+
+  function setLoginLink() {
+    const redirect = window.location.pathname + window.location.search;
+    loginLink.href = '/account.html?redirect=' + encodeURIComponent(redirect);
+  }
+
+  function showLoginRequired() {
+    loginNotice.classList.remove('hidden');
+    form.classList.add('hidden');
+    setBusy(false);
+  }
+
+  function showCheckout() {
+    loginNotice.classList.add('hidden');
+    form.classList.remove('hidden');
+    setBusy(false);
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+  }
+
+  function normalizeServices(services) {
+    if (Array.isArray(services)) {
+      return services.map(safeText).filter(Boolean).slice(0, 12);
+    }
+    if (typeof services === 'string') {
+      return services.split(/[,\n]/).map(safeText).filter(Boolean).slice(0, 12);
+    }
+    return [];
+  }
+
+  async function getSession() {
+    if (!supabaseClient) throw new Error('Supabase is not configured.');
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) throw error;
+    currentSession = data?.session || null;
+    return currentSession;
+  }
+
+  async function apiFetch(path, options = {}) {
+    if (!currentSession?.access_token) {
+      throw new Error('Please sign in to your PASONG account again.');
+    }
+
+    const headers = new Headers(options.headers || {});
+    headers.set('Authorization', 'Bearer ' + currentSession.access_token);
+    headers.set('Accept', 'application/json');
+
+    if (options.body && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+
+    const response = await fetch(API_BASE + path, {
+      ...options,
+      headers,
+      credentials: 'omit'
+    });
+
+    let data = {};
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const bodyText = await response.text();
+      if (bodyText) data.message = bodyText.slice(0, 500);
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+        data.error ||
+        `Request failed (${response.status}).`
+      );
+    }
+
+    return data;
+  }
+
+  async function loadStudio() {
+    if (!studioId) {
+      $('studioLoading').textContent =
+        'No studio was selected. Return to the studio directory and choose a provider.';
+      showStatus('Missing studio ID. No payment can be started.', 'error');
+      return;
+    }
+
+    try {
+      /*
+       * Public directory query only requests non-sensitive listing fields.
+       * Never request private contact details from this public query.
+       */
+      const { data, error } = await supabaseClient
+        .from('producer_studios')
+        .select(
+          'id,studio_name,studio_type,city,country,description,services,photos,status'
+        )
+        .eq('id', studioId)
+        .eq('status', 'approved')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) {
+        throw new Error('This studio is unavailable or has not been approved.');
+      }
+
+      $('studioName').textContent =
+        safeText(data.studio_name, 'PASONG Studio');
+
+      $('studioLocation').textContent =
+        '📍 ' +
+        [data.city, data.country].map(safeText).filter(Boolean).join(', ');
+
+      $('studioDescription').textContent =
+        safeText(data.description, 'Contact this provider to discuss your project.');
+
+      const services = normalizeServices(data.services);
+      $('studioServices').replaceChildren();
+
+      services.forEach(service => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = service;
+        $('studioServices').appendChild(chip);
+      });
+
+      const art = $('studioArt');
+      const photos = Array.isArray(data.photos) ? data.photos : [];
+      const photo = photos.find(item =>
+        typeof item === 'string' && /^https:\/\//i.test(item)
+      );
+
+      if (photo) {
+        const image = document.createElement('img');
+        image.alt = safeText(data.studio_name, 'Studio') + ' photo';
+        image.referrerPolicy = 'no-referrer';
+        image.src = photo;
+        image.onerror = () => {
+          art.replaceChildren();
+          const symbol = document.createElement('span');
+          symbol.className = 'studio-symbol';
+          symbol.textContent = '♫';
+          art.appendChild(symbol);
+        };
+        art.replaceChildren(image);
+      }
+
+      $('studioLoading').classList.add('hidden');
+      $('studioDetails').classList.remove('hidden');
+
+      studioLoaded = true;
+      setBusy(false);
+    } catch (error) {
+      console.error('Studio loading failed:', error);
+      $('studioLoading').textContent =
+        error.message || 'Could not load this studio.';
+      showStatus(
+        'Could not load an approved studio. Check the listing and try again.',
+        'error'
+      );
+    }
+  }
+
+  /*
+   * Contacts only come from the authenticated backend access endpoint.
+   * The backend must independently confirm a verified payment for this user
+   * and this studio before returning contact information.
+   */
+  async function checkExistingAccess() {
+    if (!currentSession || !studioId) return false;
+
+    try {
+      const result = await apiFetch(
+        '/api/studio-connections/access?studio_id=' +
+        encodeURIComponent(studioId)
+      );
+
+      if (result.verified === true && result.contact) {
+        renderContact(result.contact);
+        showStatus(
+          'Your previous connection has been verified. You do not need to pay again for this studio.',
+          'success'
+        );
+        form.classList.add('hidden');
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      /*
+       * An unavailable endpoint must never grant access.
+       * Let the user see the payment form, but payment creation will still
+       * require a working backend route.
+       */
+      console.warn('Existing connection check unavailable:', error);
+      return false;
+    }
+  }
+
+  function renderContact(contact) {
+    contactDetails.replaceChildren();
+
+    const fields = [
+      ['Studio / provider', contact.name],
+      ['Email', contact.email],
+      ['Phone', contact.phone],
+      ['WhatsApp', contact.whatsapp],
+      ['Website', contact.website],
+      ['Address', contact.address]
+    ];
+
+    fields.forEach(([label, value]) => {
+      const text = safeText(value);
+      if (!text) return;
+
+      const item = document.createElement('div');
+      item.className = 'contact-item';
+
+      const heading = document.createElement('strong');
+      heading.textContent = label;
+
+      const content = document.createElement('div');
+      content.textContent = text;
+
+      item.append(heading, content);
+      contactDetails.appendChild(item);
+    });
+
+    contactBox.classList.remove('hidden');
+  }
+
+  function selectMethod(method) {
+    selectedMethod = method;
+    $('paymentMethod').value = method;
+
+    document.querySelectorAll('.method').forEach(button => {
+      const active = button.dataset.method === method;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    mobileFields.classList.toggle('hidden', method === 'PESAPAL');
+    $('mobileMoneyPhone').required = method !== 'PESAPAL';
+  }
+
+  document.querySelectorAll('.method').forEach(button => {
+    button.setAttribute(
+      'aria-pressed',
+      String(button.dataset.method === selectedMethod)
+    );
+    button.addEventListener('click', () => {
+      selectMethod(button.dataset.method);
+    });
+  });
+
+  function validateUgandaPhone(value) {
+    const phone = String(value || '').replace(/[\s()-]/g, '');
+    return /^(?:\+256|256|0)7\d{8}$/.test(phone);
+  }
+
+  function redirectToCheckout(url) {
+    try {
+      const target = new URL(url, window.location.origin);
+      const allowedProtocols = ['https:'];
+
+      if (!allowedProtocols.includes(target.protocol)) {
+        throw new Error('Invalid checkout link.');
+      }
+
+      window.location.assign(target.href);
+    } catch (error) {
+      throw new Error('The payment provider returned an invalid checkout link.');
+    }
+  }
+
+  async function pollPaymentStatus(orderId) {
+    if (!orderId) {
+      throw new Error('The payment server did not return an order ID.');
+    }
+
+    showStatus(
+      'Payment initiated. Confirm the prompt on your phone if requested. Waiting for PASONG to verify payment…',
+      'info'
+    );
+
+    const maxChecks = 24;
+
+    for (let attempt = 0; attempt < maxChecks; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      const result = await apiFetch(
+        '/api/studio-connections/' +
+        encodeURIComponent(orderId) +
+        '/status'
+      );
+
+      if (result.verified === true && result.contact) {
+        renderContact(result.contact);
+        form.classList.add('hidden');
+        showStatus(
+          'Payment verified successfully. Your provider contact details are unlocked.',
+          'success'
+        );
+        return true;
+      }
+
+      if (
+        result.status === 'failed' ||
+        result.status === 'cancelled' ||
+        result.status === 'expired'
+      ) {
+        throw new Error(
+          'Payment was ' + result.status +
+          '. You can try again if no money was deducted.'
+        );
+      }
+    }
+
+    showStatus(
+      'Payment is not yet confirmed. Do not pay a second time immediately. Check your mobile money message, then use the payment status check when available.',
+      'info'
+    );
+
+    return false;
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    hideStatus();
+
+    if (busy) return;
+
+    if (!currentSession?.access_token) {
+      showLoginRequired();
+      showStatus('Please sign in before making a payment.', 'error');
+      return;
+    }
+
+    if (!studioLoaded || !studioId) {
+      showStatus('A valid approved studio must be selected first.', 'error');
+      return;
+    }
+
+    const name = $('customerName').value.trim();
+    const email = $('customerEmail').value.trim();
+    const phone = $('customerPhone').value.trim();
+    const mobilePhone = $('mobileMoneyPhone').value.trim();
+
+    if (!name || !email || !phone) {
+      showStatus('Please complete your name, email and phone number.', 'error');
+      return;
+    }
+
+    if (selectedMethod !== 'PESAPAL' && !validateUgandaPhone(mobilePhone)) {
+      showStatus(
+        'Enter a valid Uganda mobile money number, such as +2567XXXXXXXX or 07XXXXXXXX.',
+        'error'
+      );
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      /*
+       * The backend must ignore any browser-supplied amount and charge
+       * exactly UGX 5,000 for this connection fee.
+       */
+      const result = await apiFetch(
+        '/api/studio-connections/create-payment',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            studio_id: studioId,
+            provider: selectedMethod,
+            customer_name: name,
+            customer_email: email,
+            customer_phone: phone,
+            mobile_money_phone:
+              selectedMethod === 'PESAPAL' ? null : mobilePhone
+          })
+        }
+      );
+
+      /*
+       * Redirect only to a payment URL returned by the trusted API.
+       * The backend must create the payment with the provider and bind
+       * the order to the authenticated user and selected studio.
+       */
+      const checkoutUrl =
+        result.checkout_url || result.authorization_url;
+
+      if (checkoutUrl) {
+        redirectToCheckout(checkoutUrl);
+        return;
+      }
+
+      if (result.order_id) {
+        await pollPaymentStatus(result.order_id);
+        return;
+      }
+
+      throw new Error(
+        'The payment service did not return a checkout link or order ID.'
+      );
+    } catch (error) {
+      console.error('Studio connection checkout failed:', error);
+
+      const message = String(error.message || '');
+
+      if (
+        message.includes('404') ||
+        message.toLowerCase().includes('not found')
+      ) {
+        showStatus(
+          'Studio connection payments are not enabled on the PASONG API yet. The required backend payment route must be installed before this page can accept payments. No contact details have been unlocked.',
+          'error'
+        );
+      } else {
+        showStatus(
+          message || 'Could not start payment. Please try again later.',
+          'error'
+        );
+      }
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  async function initialize() {
+    setLoginLink();
+
+    if (!window.supabase || !SUPABASE_URL || !SUPABASE_KEY) {
+      $('studioLoading').textContent =
+        'PASONG account configuration is unavailable.';
+      showStatus('Supabase is not configured correctly.', 'error');
+      form.classList.add('hidden');
+      return;
+    }
+
+    try {
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+      await getSession();
+
+      if (currentSession?.user) {
+        showCheckout();
+
+        const user = currentSession.user;
+        if (user.email && !$('customerEmail').value) {
+          $('customerEmail').value = user.email;
+        }
+
+        const metadata = user.user_metadata || {};
+        const profileName =
+          metadata.full_name ||
+          metadata.name ||
+          metadata.display_name ||
+          '';
+
+        if (profileName) $('customerName').value = profileName;
+
+        if (!studioId) {
+          await loadStudio();
+        } else {
+          await Promise.all([
+            loadStudio(),
+            checkExistingAccess()
+          ]);
+        }
+      } else {
+        showLoginRequired();
+        $('studioLoading').textContent =
+          'Sign in to your PASONG account to continue.';
+      }
+
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
+        currentSession = session || null;
+
+        if (!currentSession) {
+          showLoginRequired();
+          return;
+        }
+
+        showCheckout();
+
+        if (currentSession.user?.email && !$('customerEmail').value) {
+          $('customerEmail').value = currentSession.user.email;
+        }
+
+        checkExistingAccess();
+      });
+    } catch (error) {
+      console.error('Checkout initialization failed:', error);
+      showStatus(
+        'Could not initialize PASONG checkout. Refresh the page or sign in again.',
+        'error'
+      );
+      form.classList.add('hidden');
+    }
+  }
+
+  selectMethod('MTN');
+  initialize();
+})();
+</script>
+</body>
+</html>
