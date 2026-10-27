@@ -84,6 +84,7 @@ th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{col
 <button data-section="covers">🎨 Covers</button>
 <button data-section="reports">🚩 Reports</button>
 <button data-section="copyright">⚖️ Copyright</button>
+<button data-section="studios">🎙️ Studio Listings</button>
 <button data-section="ads">📢 Advertisements</button>
 </aside>
 
@@ -136,6 +137,21 @@ th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{col
 <h2>🛡️ Copyright Strikes</h2>
 <div class="sub">Strike history for repeat copyright infringement.</div>
 <div id="copyrightStrikes" class="loading">Loading...</div>
+</div>
+</section>
+
+<section id="section-studios" class="hidden">
+<div class="card">
+<h2>🎙️ Studio Listings Review</h2>
+<div class="sub">Review studio registrations worldwide, inspect submitted photos and contact details, and approve or reject listings before publication.</div>
+<div id="studioReviewNotice"></div>
+<div class="form-actions" style="margin:14px 0">
+<select id="studioReviewFilter" onchange="loadStudioReviewQueue()" aria-label="Filter studio listings" style="background:#0c0c13;color:white;border:1px solid #292936;border-radius:9px;padding:9px">
+<option value="pending">Pending review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="hidden">Hidden</option><option value="all">All studios</option>
+</select>
+<button class="btn secondary small" type="button" onclick="loadStudioReviewQueue()">↻ Refresh studios</button>
+</div>
+<div id="studioReviewQueue" class="loading">Studio registrations will appear here.</div>
 </div>
 </section>
 
@@ -212,6 +228,7 @@ if(name==="orders")loadGenericTable("orders","ordersTable",["id","status","total
 if(name==="covers")loadCovers();
 if(name==="reports")loadReports();
 if(name==="copyright"){loadCopyrightComplaints();loadCopyrightStrikes();}
+if(name==="studios")loadStudioReviewQueue();
 if(name==="ads")loadAds();
 }
 window.showSection=showSection;
@@ -277,6 +294,76 @@ async function countRows(table){
 const r=await supabaseClient.from(table).select("id",{count:"exact",head:true});
 return r.error?null:(r.count??0);
 }
+function studioSafePhotoUrl(value){
+try{const u=new URL(String(value||""));return ["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return "";}
+}
+function studioStatusPill(status){
+const safe=String(status||"pending").toLowerCase();
+const color=safe==="approved"?"#22c55e":safe==="rejected"?"#ef4444":safe==="hidden"?"#9999a8":"#f59e0b";
+return '<span style="display:inline-block;padding:4px 9px;border-radius:99px;border:1px solid '+color+';color:'+color+';font-size:12px;font-weight:800">'+escapeHtml(safe.toUpperCase())+'</span>';
+}
+async function loadStudioReviewQueue(){
+const host=document.getElementById("studioReviewQueue");
+const filter=document.getElementById("studioReviewFilter")?.value||"pending";
+if(!host)return;
+host.innerHTML='<div class="loading">Loading studio registrations…</div>';
+clearNotice("studioReviewNotice");
+try{
+ let query=supabaseClient.from("producer_studios").select("*").order("created_at",{ascending:false}).limit(200);
+ if(filter!=="all")query=query.eq("status",filter);
+ const {data,error}=await query;
+ if(error)throw error;
+ const rows=data||[];
+ if(!rows.length){host.innerHTML='<div class="empty">No '+escapeHtml(filter==='all'?'studio registrations':filter+' studio listings')+' found.</div>';return;}
+ host.innerHTML=rows.map(studio=>{
+  const photos=Array.isArray(studio.photos)?studio.photos:[];
+  const photoMarkup=photos.map(url=>{const safe=studioSafePhotoUrl(url);return safe?'<a href="'+escapeHtml(safe)+'" target="_blank" rel="noopener noreferrer"><img src="'+escapeHtml(safe)+'" alt="Studio photo" loading="lazy" style="width:110px;height:82px;object-fit:cover;border-radius:9px;border:1px solid #292936"></a>':'';}).join("");
+  const services=Array.isArray(studio.services)?studio.services.join(", "):String(studio.services||"");
+  const equipment=Array.isArray(studio.equipment)?studio.equipment.join(", "):String(studio.equipment||"");
+  const price=studio.hourly_rate!==null&&studio.hourly_rate!==undefined&&studio.hourly_rate!==""?escapeHtml(studio.currency_code||"")+" "+escapeHtml(Number(studio.hourly_rate).toLocaleString()):"Not specified";
+  const location=[studio.address,studio.city,studio.country].filter(Boolean).join(", ");
+  const contact=[studio.contact_email,studio.contact_phone,studio.whatsapp_number].filter(Boolean).map(escapeHtml).join(" · ");
+  const website=studioSafePhotoUrl(studio.website_url);
+  const websiteMarkup=website?'<p><strong>Website:</strong> <a href="'+escapeHtml(website)+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(studio.website_url)+'</a></p>':(studio.website_url?'<p><strong>Website:</strong> '+escapeHtml(studio.website_url)+'</p>':'');
+  const notes=studio.admin_notes?'<p><strong>Admin notes:</strong> '+escapeHtml(studio.admin_notes)+'</p>':'';
+  const created=studio.created_at&&!Number.isNaN(Date.parse(studio.created_at))?new Date(studio.created_at).toLocaleString():"—";
+  const status=String(studio.status||"pending").toLowerCase();
+  const actions='<div class="form-actions" style="margin-top:14px;gap:8px">'+
+   (status!=="approved"?'<button class="btn small" type="button" onclick="reviewStudioListing(\''+escapeHtml(studio.id)+'\',\'approved\')">✓ Approve listing</button>':'')+
+   (status!=="rejected"?'<button class="btn secondary small" type="button" onclick="reviewStudioListing(\''+escapeHtml(studio.id)+'\',\'rejected\')">✕ Reject</button>':'')+
+   (status!=="pending"?'<button class="btn secondary small" type="button" onclick="reviewStudioListing(\''+escapeHtml(studio.id)+'\',\'pending\')">↻ Return to pending</button>':'')+'</div>';
+  return '<article style="border:1px solid #292936;background:#0d0d15;border-radius:14px;padding:16px;margin:0 0 14px">'+
+   '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h3 style="font-size:19px;margin-bottom:7px">'+escapeHtml(studio.studio_name||"Untitled studio")+'</h3><div style="color:#9999a8;font-size:13px">'+escapeHtml(studio.studio_type||"Studio type not specified")+' · Submitted '+escapeHtml(created)+'</div></div>'+studioStatusPill(status)+'</div>'+
+   (photoMarkup?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0">'+photoMarkup+'</div>':'<p style="color:#9999a8;margin:12px 0">No studio photos submitted.</p>')+
+   '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-top:12px">'+
+   '<div><strong>Location</strong><p>'+escapeHtml(location||"Not specified")+'</p></div><div><strong>Hourly rate</strong><p>'+price+' / hour</p></div><div><strong>Contact</strong><p>'+escapeHtml(contact||"Not provided")+'</p></div></div>'+
+   websiteMarkup+'<p><strong>Services:</strong> '+escapeHtml(services||"Not listed")+'</p><p><strong>Equipment:</strong> '+escapeHtml(equipment||"Not listed")+'</p>'+
+   (studio.description?'<p style="margin-top:8px"><strong>Description:</strong> '+escapeHtml(studio.description)+'</p>':'')+
+   (studio.opening_hours?'<p style="margin-top:8px"><strong>Opening hours:</strong> '+escapeHtml(typeof studio.opening_hours==="string"?studio.opening_hours:JSON.stringify(studio.opening_hours))+'</p>':'')+notes+actions+'</article>';
+ }).join("");
+ }catch(error){host.innerHTML='<div class="empty">Unable to load studio registrations. '+escapeHtml(error?.message||"Unknown error")+'. Check that the producer_studios table and admin read policy are configured.</div>';}
+}
+async function reviewStudioListing(id,nextStatus){
+ if(!id||!["approved","rejected","pending"].includes(nextStatus))return;
+ const label=nextStatus==="approved"?"approve":nextStatus==="rejected"?"reject":"return to pending";
+ if(!confirm("Are you sure you want to "+label+" this studio listing?"))return;
+ let note=null;
+ if(nextStatus==="rejected")note=prompt("Optional note for the studio owner (leave blank if not needed):")||null;
+ const host=document.getElementById("studioReviewQueue");
+ if(host)host.style.opacity="0.65";
+ try{
+  const update={status:nextStatus,reviewed_at:new Date().toISOString(),reviewed_by:currentSession?.user?.id||null};
+  if(note!==null)update.admin_notes=note;
+  const {error}=await supabaseClient.from("producer_studios").update(update).eq("id",id);
+  if(error)throw error;
+  showNotice("studioReviewNotice","success","Studio listing updated: "+nextStatus+".");
+  await loadStudioReviewQueue();
+ }catch(error){showNotice("studioReviewNotice","error","Could not update this studio. "+(error?.message||"Check the producer_studios update policy and reviewed_by/reviewed_at columns."));}
+ finally{if(host)host.style.opacity="1";}
+}
+window.loadStudioReviewQueue=loadStudioReviewQueue;
+window.reviewStudioListing=reviewStudioListing;
+
 async function loadStats(){
 const [songs,beats,orders,ads]=await Promise.all([countRows("songs"),countRows("beats"),countRows("orders"),countRows("advertisements")]);
 document.getElementById("statSongs").textContent=songs??"—";
