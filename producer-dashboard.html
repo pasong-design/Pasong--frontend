@@ -1117,7 +1117,7 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
   const {data:existing,error:existingError}=id?await supabaseClient.from("producer_studios").select("id,status,photos").eq("id",id).eq("owner_id",session.user.id).maybeSingle():{data:null,error:null};
   if(existingError)throw existingError;
   if(id&&!existing)throw new Error("This studio listing was not found under your account.");
-  if(existing&&!['pending','hidden'].includes(String(existing.status).toLowerCase()))throw new Error("Approved listings must be hidden before editing. Use Hide listing first, then edit and resubmit.");
+  if(existing&&!['pending','hidden','awaiting_payment'].includes(String(existing.status).toLowerCase()))throw new Error("Approved listings must be hidden before editing. Use Hide listing first, then edit and resubmit.");
   // The edit gallery is the source of truth so removals are saved as well as additions.
   let photos=[...editingStudioPhotos];
   const files=Array.from(document.getElementById("studioPhotos").files||[]);
@@ -1152,7 +1152,7 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
    currency_code:document.getElementById("studioCurrency").value.trim().toUpperCase()||null,
    opening_hours:openingHours,
    photos:photos,
-   status:"pending",
+   status:featurePlan!=="standard"?"awaiting_payment":"pending",
    reviewed_by:null,
    reviewed_at:null,
    admin_notes:null
@@ -1173,10 +1173,13 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
   const featureResult=document.getElementById("studioFeatureResult");
   if(featurePlan!=="standard"&&featureAmount>0&&savedStudioId){
    const checkoutParams=new URLSearchParams({flow:"feature",studio_id:String(savedStudioId),studio_name:savedStudioName,feature_package:featurePlan,feature_amount:String(featureAmount),feature_currency:"UGX",feature_days:String(featureDays)});
-   document.getElementById("studioFeatureCheckoutLink").href="studio-checkout.html?"+checkoutParams.toString();
-   document.getElementById("studioFeatureResultText").textContent="Your studio listing has been saved and submitted for admin review. Selected package: "+featurePlan.toUpperCase()+" — UGX "+featureAmount.toLocaleString()+" for "+featureDays+" days. Continue to checkout to proceed. Featured placement will not activate until the payment is verified and the studio is approved.";
+   const checkoutUrl="studio-registration-checkout.html?"+checkoutParams.toString();
+   document.getElementById("studioFeatureCheckoutLink").href=checkoutUrl;
+   document.getElementById("studioFeatureResultText").textContent="Studio details saved. Opening checkout for "+featurePlan.toUpperCase()+" — UGX "+featureAmount.toLocaleString()+" / "+featureDays+" days. Admin review starts after payment is verified.";
    featureResult.hidden=false;
-   studioMessage("success","Studio saved for admin review. Your selected feature package is ready for checkout below; no payment has been taken yet.");
+   studioMessage("success","Studio saved as awaiting payment. Opening registration checkout…");
+   window.location.assign(checkoutUrl);
+   return;
   }else{
    if(featurePlan!=="standard"&&!savedStudioId){
     studioMessage("info","Studio saved, but we could not retrieve its listing ID for checkout. Please open My Studio Listings and try editing/saving again.");
