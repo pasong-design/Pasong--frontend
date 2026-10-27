@@ -71,18 +71,26 @@ async function init(){
   if(sessionError)throw sessionError;
   const user=sessionData?.session?.user;
   if(!user){fail('Please sign in to the PASONG account that registered this studio, then reopen checkout.');return;}
-  const {data:studio,error}=await client.from('producer_studios').select('id,studio_name,owner_id,status').eq('id',studioId).eq('owner_id',user.id).maybeSingle();
-  if(error)throw error;
-  if(!studio){fail('This studio could not be found under your signed-in account. Please return to the Producer Dashboard and try again.');return;}
+  if(!user || !sessionData?.session?.access_token){fail('Please sign in to the PASONG account that registered this studio, then reopen checkout.');return;}
+  const response=await fetch(API_URL+'/api/studio-registration/checkout?'+new URLSearchParams({studio_id:studioId,package:requestedPackage}).toString(),{
+   method:'GET',
+   headers:{'Accept':'application/json','Authorization':'Bearer '+sessionData.session.access_token}
+  });
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok||!payload.success){
+   const message=payload.error|| (response.status===404?'The studio checkout endpoint is not deployed on PASONG API yet. Add the updated server.js and redeploy the API.':'Could not verify this studio with PASONG server.');
+   throw new Error(message);
+  }
+  const studio=payload.studio;
+  const serverPackage=payload.package;
   $('loading').classList.add('hidden');$('orderDetails').classList.remove('hidden');
   $('studioName').textContent=studio.studio_name||params.get('studio_name')||'Your studio';
-  $('packageName').textContent=selected.label;
-  $('packageDays').textContent=selected.days+' days';
-  $('amount').textContent=money(selected.amount);
+  $('packageName').textContent=serverPackage.label;
+  $('packageDays').textContent=serverPackage.days+' days';
+  $('amount').textContent=money(serverPackage.amount);
   $('paymentStatus').textContent=String(studio.status||'awaiting_payment').toLowerCase()==='approved'?'Already approved — contact PASONG Admin before changing package':'Awaiting payment';
-  // Price, duration and package name are sourced from this fixed catalogue, not URL amount fields.
-  // The payment button remains disabled until the server-side provider integration is configured.
-  console.info('Studio registration checkout prepared; payment gateway is intentionally not started yet.',{studioId,package:requestedPackage,api:API_URL});
+  // Package price and duration are returned by server.js. Payment is intentionally disabled until provider integration is added.
+  console.info('Studio registration checkout verified by PASONG API; payment provider remains disabled.',{studioId,package:serverPackage.key,api:API_URL});
  }catch(error){console.error('Studio registration checkout:',error);fail(error?.message||'Unable to prepare studio checkout.');}
 }
 init();
