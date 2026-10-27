@@ -16,7 +16,7 @@ header{background:#10091c;border-bottom:1px solid #28153d;padding:16px 22px;disp
 .header-right a:hover{color:#c084fc}
 .account{background:#1d1230;border:1px solid #38205a;padding:8px 12px;border-radius:20px;font-size:13px}
 .container{width:min(1180px,94%);margin:auto}
-.hero{margin-top:  ,;padding:28px;border:1px solid #38205a;border-radius:20px;background:linear-gradient(135deg,#160b27,#0d0715)}
+.hero{margin-top:25px;padding:28px;border:1px solid #38205a;border-radius:20px;background:linear-gradient(135deg,#160b27,#0d0715)}
 .hero h1{font-size:30px;margin-bottom:8px}
 .hero p{color:#aaa;line-height:1.6}
 .producer-name{color:#c084fc}
@@ -62,6 +62,13 @@ input[type="file"]{padding:10px}
 .btn-primary:disabled{opacity:.45;cursor:not-allowed}
 .btn-secondary{background:#241238;color:#fff;border:1px solid #452567}
 .form-actions{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+.studio-feature-box{margin-top:18px;padding:18px;border:1px solid #4b2870;border-radius:14px;background:linear-gradient(135deg,#170d28,#10091c)}
+.studio-feature-box h3{font-size:17px;margin-bottom:7px;color:#e9d5ff}
+.studio-feature-box p{font-size:12px;color:#aaa;line-height:1.6;margin-bottom:12px}
+.studio-feature-result{margin-top:16px;padding:16px;border:1px solid #4b2870;background:#17112a;border-radius:12px}
+.studio-feature-result h3{margin-bottom:7px;color:#e9d5ff}
+.studio-feature-result p{font-size:12px;color:#bbb;line-height:1.6;margin-bottom:12px}
+.studio-feature-result a{display:inline-block;text-decoration:none}
 .message{display:none;margin-top:15px;padding:12px;border-radius:10px;font-size:13px;line-height:1.5}
 .message.success{display:block;background:#102617;border:1px solid #245d32;color:#9ae6a8}
 .message.error{display:block;background:#2a1017;border:1px solid #6c2636;color:#ff9caf}
@@ -697,12 +704,22 @@ Manage paid beat orders and deliver the files purchased by buyers.
 <div class="field"><label for="studioOpeningHours">Opening hours (optional JSON)</label><textarea id="studioOpeningHours" placeholder='{"Monday":"09:00-18:00","Tuesday":"09:00-18:00"}'></textarea><span class="price-help">Leave blank if you do not want to specify hours.</span></div>
 <div class="field"><label for="studioPhotos">Studio photos (JPG, PNG or WEBP; max 5MB each)</label><input id="studioPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="price-help">Choose one or more photos to add. Use Remove on any saved photo below to exclude it when you save.</span><div id="studioNewPhotosNote" class="studio-photo-note">No new photos selected.</div></div>
 </div>
+<div class="studio-feature-box">
+<h3>⭐ Get Your Studio Featured on PASONG</h3>
+<p>Standard registration stays free. Choose an optional promotion package to request featured placement after saving your studio. Paid placement must only activate after checkout confirms payment and PASONG approves the listing.</p>
+<div class="field"><label for="studioFeaturePlan">Visibility package</label><select id="studioFeaturePlan"><option value="standard">Standard listing — Free</option><option value="starter" data-amount="25000" data-days="7">Starter Feature — UGX 25,000 / 7 days</option><option value="pro" data-amount="60000" data-days="14">Pro Feature — UGX 60,000 / 14 days</option><option value="premium" data-amount="120000" data-days="30">Premium Feature — UGX 120,000 / 30 days</option></select><span class="price-help">Suggested launch prices. These are not yet verified as live payment prices. International currency localization can be connected later.</span></div>
+</div>
 <div id="studioExistingPhotos" class="studio-photo-list"></div>
 <div class="form-actions">
 <button class="btn btn-primary" type="submit" id="studioSaveButton">Submit Studio for Review</button>
 <button class="btn btn-secondary" type="button" id="studioResetButton">Clear Form</button>
 </div>
 </form>
+<div id="studioFeatureResult" class="studio-feature-result" hidden>
+<h3>⭐ Continue to Studio Feature Checkout</h3>
+<p id="studioFeatureResultText">Your studio has been saved. Continue to checkout to pay for the selected feature package. Featured placement is not active until payment is verified and the studio is approved.</p>
+<a id="studioFeatureCheckoutLink" class="btn btn-primary" href="studio-checkout.html">Continue to Checkout →</a>
+</div>
 </div>
 
 <div class="card">
@@ -951,6 +968,8 @@ function studioFormReset(){
  const form=document.getElementById("studioForm");
  if(form)form.reset();
  document.getElementById("studioRecordId").value="";
+ const featureResult=document.getElementById("studioFeatureResult");if(featureResult)featureResult.hidden=true;
+ const featurePlan=document.getElementById("studioFeaturePlan");if(featurePlan)featurePlan.value="standard";
  editingStudioPhotos=[];
  renderStudioPhotoEditor();
  const newPhotosNote=document.getElementById("studioNewPhotosNote");
@@ -978,6 +997,8 @@ document.getElementById("studioPhotos")?.addEventListener("change",event=>{
 
 function fillStudioForm(studio){
  document.getElementById("studioRecordId").value=studio.id||"";
+ const featureResult=document.getElementById("studioFeatureResult");if(featureResult)featureResult.hidden=true;
+ const featurePlan=document.getElementById("studioFeaturePlan");if(featurePlan)featurePlan.value="standard";
  document.getElementById("studioName").value=studio.studio_name||"";
  document.getElementById("studioType").value=studio.studio_type||"";
  document.getElementById("studioCountry").value=studio.country||"";
@@ -1088,6 +1109,11 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
  try{
   const session=await getStudioSession();
   const id=document.getElementById("studioRecordId").value.trim();
+  const featureSelect=document.getElementById("studioFeaturePlan");
+  const featurePlan=featureSelect?.value||"standard";
+  const selectedOption=featureSelect?.selectedOptions?.[0];
+  const featureAmount=Number(selectedOption?.dataset?.amount||0);
+  const featureDays=Number(selectedOption?.dataset?.days||0);
   const {data:existing,error:existingError}=id?await supabaseClient.from("producer_studios").select("id,status,photos").eq("id",id).eq("owner_id",session.user.id).maybeSingle():{data:null,error:null};
   if(existingError)throw existingError;
   if(id&&!existing)throw new Error("This studio listing was not found under your account.");
@@ -1132,16 +1158,32 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
    admin_notes:null
   };
   if(!payload.studio_name||!payload.country||!payload.city)throw new Error("Studio name, country and city are required.");
+  let savedStudioId=id;
   if(id){
    const {error}=await supabaseClient.from("producer_studios").update(payload).eq("id",id).eq("owner_id",session.user.id);
    if(error)throw error;
   }else{
    payload.owner_id=session.user.id;
-   const {error}=await supabaseClient.from("producer_studios").insert(payload);
+   const {data:inserted,error}=await supabaseClient.from("producer_studios").insert(payload).select("id").single();
    if(error)throw error;
+   savedStudioId=inserted?.id||"";
   }
+  const savedStudioName=payload.studio_name;
   studioFormReset();
-  studioMessage("success","Studio saved and submitted for admin review. It will appear publicly after approval.");
+  const featureResult=document.getElementById("studioFeatureResult");
+  if(featurePlan!=="standard"&&featureAmount>0&&savedStudioId){
+   const checkoutParams=new URLSearchParams({flow:"feature",studio_id:String(savedStudioId),studio_name:savedStudioName,feature_package:featurePlan,feature_amount:String(featureAmount),feature_currency:"UGX",feature_days:String(featureDays)});
+   document.getElementById("studioFeatureCheckoutLink").href="studio-checkout.html?"+checkoutParams.toString();
+   document.getElementById("studioFeatureResultText").textContent="Your studio listing has been saved and submitted for admin review. Selected package: "+featurePlan.toUpperCase()+" — UGX "+featureAmount.toLocaleString()+" for "+featureDays+" days. Continue to checkout to proceed. Featured placement will not activate until the payment is verified and the studio is approved.";
+   featureResult.hidden=false;
+   studioMessage("success","Studio saved for admin review. Your selected feature package is ready for checkout below; no payment has been taken yet.");
+  }else{
+   if(featurePlan!=="standard"&&!savedStudioId){
+    studioMessage("info","Studio saved, but we could not retrieve its listing ID for checkout. Please open My Studio Listings and try editing/saving again.");
+   }else{
+    studioMessage("success","Studio saved and submitted for admin review. It will appear publicly after approval.");
+   }
+  }
   await loadMyStudios();await loadMyStudioBookings();
  }catch(error){
   console.error("Studio save error:",error);
