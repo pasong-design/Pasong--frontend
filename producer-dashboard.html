@@ -152,6 +152,9 @@ header{padding:13px 15px}
 .delivery-upload-grid{grid-template-columns:1fr}
 .delivery-upload-grid .field:last-child{grid-column:auto}
 }
+
+.hours-grid{display:grid;gap:8px;margin-top:8px}.hours-row{display:grid;grid-template-columns:minmax(78px,1fr) minmax(82px,.8fr) minmax(100px,1fr) auto minmax(100px,1fr);align-items:center;gap:8px;padding:8px;border:1px solid rgba(148,163,184,.2);border-radius:10px}.hours-row>span:first-child{font-weight:600}.hours-row input,.hours-row select{width:100%;min-width:0}.hours-row [data-hours-status="closed"]~input,.hours-row [data-hours-status="closed"]~span,.hours-row [data-hours-status="closed"]~input{opacity:.45}.hours-row.is-closed input{opacity:.45;pointer-events:none}@media(max-width:560px){.hours-row{grid-template-columns:1fr 1fr;gap:6px}.hours-row>span:first-child{grid-column:1/-1}.hours-row>span:nth-of-type(1){display:none}.hours-row input,.hours-row select{min-height:40px}}
+
 </style>
 </head>
 
@@ -694,7 +697,15 @@ Manage paid beat orders and deliver the files purchased by buyers.
 <div class="field full"><label for="studioDescription">Studio description</label><textarea id="studioDescription" maxlength="4000" placeholder="Describe your studio, room, sound, experience and what makes it special."></textarea></div>
 <div class="field"><label for="studioServices">Services</label><textarea id="studioServices" placeholder="Recording, mixing, mastering — separate with commas or new lines"></textarea></div>
 <div class="field"><label for="studioEquipment">Equipment</label><textarea id="studioEquipment" placeholder="Microphones, interfaces, monitors, instruments — separate with commas or new lines"></textarea></div>
-<div class="field"><label for="studioOpeningHours">Opening hours (optional JSON)</label><textarea id="studioOpeningHours" placeholder='{"Monday":"09:00-18:00","Tuesday":"09:00-18:00"}'></textarea><span class="price-help">Leave blank if you do not want to specify hours.</span></div>
+<div class="field full"><label>Opening hours (optional)</label><div class="hours-grid" id="studioOpeningHoursControls">
+<div class="hours-row" data-day="Monday"><span>Monday</span><select aria-label="Monday status" data-hours-status="Monday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Monday opening time" data-hours-start="Monday" value="09:00"><span>to</span><input type="time" aria-label="Monday closing time" data-hours-end="Monday" value="18:00"></div>
+<div class="hours-row" data-day="Tuesday"><span>Tuesday</span><select aria-label="Tuesday status" data-hours-status="Tuesday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Tuesday opening time" data-hours-start="Tuesday" value="09:00"><span>to</span><input type="time" aria-label="Tuesday closing time" data-hours-end="Tuesday" value="18:00"></div>
+<div class="hours-row" data-day="Wednesday"><span>Wednesday</span><select aria-label="Wednesday status" data-hours-status="Wednesday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Wednesday opening time" data-hours-start="Wednesday" value="09:00"><span>to</span><input type="time" aria-label="Wednesday closing time" data-hours-end="Wednesday" value="18:00"></div>
+<div class="hours-row" data-day="Thursday"><span>Thursday</span><select aria-label="Thursday status" data-hours-status="Thursday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Thursday opening time" data-hours-start="Thursday" value="09:00"><span>to</span><input type="time" aria-label="Thursday closing time" data-hours-end="Thursday" value="18:00"></div>
+<div class="hours-row" data-day="Friday"><span>Friday</span><select aria-label="Friday status" data-hours-status="Friday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Friday opening time" data-hours-start="Friday" value="09:00"><span>to</span><input type="time" aria-label="Friday closing time" data-hours-end="Friday" value="18:00"></div>
+<div class="hours-row" data-day="Saturday"><span>Saturday</span><select aria-label="Saturday status" data-hours-status="Saturday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Saturday opening time" data-hours-start="Saturday" value="09:00"><span>to</span><input type="time" aria-label="Saturday closing time" data-hours-end="Saturday" value="18:00"></div>
+<div class="hours-row" data-day="Sunday"><span>Sunday</span><select aria-label="Sunday status" data-hours-status="Sunday"><option value="">Not set</option><option value="open">Open</option><option value="closed">Closed</option></select><input type="time" aria-label="Sunday opening time" data-hours-start="Sunday" value="09:00"><span>to</span><input type="time" aria-label="Sunday closing time" data-hours-end="Sunday" value="18:00"></div>
+</div><span class="price-help">Choose each day’s hours. Leave days as Not set if you do not want to specify them, or choose Closed if the studio is not open. Times are saved in 24-hour format.</span></div>
 <div class="field"><label for="studioPhotos">Studio photos (JPG, PNG or WEBP; max 5MB each)</label><input id="studioPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="price-help">New photos are added to the listing's existing photos.</span></div>
 </div>
 <div id="studioExistingPhotos" class="studio-photo-list"></div>
@@ -939,9 +950,39 @@ function studioStatusLabel(status){
  return s.charAt(0).toUpperCase()+s.slice(1);
 }
 
+function getStudioOpeningHours(){
+ const hours={};
+ document.querySelectorAll("#studioOpeningHoursControls [data-day]").forEach(row=>{
+  const day=row.dataset.day;
+  const status=row.querySelector("[data-hours-status]").value;
+  if(status===""){return;}
+  if(status==="closed"){hours[day]="Closed";return;}
+  const start=row.querySelector("[data-hours-start]").value;
+  const end=row.querySelector("[data-hours-end]").value;
+  if(!start||!end)throw new Error("Choose both opening and closing times for "+day+", or mark that day Closed.");
+  if(start>=end)throw new Error("For "+day+", closing time must be later than opening time. For overnight hours, use a closing time on the following day only if your directory supports it.");
+  hours[day]=start+"-"+end;
+ });
+ return hours;
+}
+function setStudioOpeningHours(value){
+ const hours=value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+ document.querySelectorAll("#studioOpeningHoursControls [data-day]").forEach(row=>{
+  const day=row.dataset.day;const raw=hours[day];
+  const status=row.querySelector("[data-hours-status]");
+  const start=row.querySelector("[data-hours-start]");const end=row.querySelector("[data-hours-end]");
+  if(!raw){status.value="";start.value="09:00";end.value="18:00";}
+  else if(String(raw).toLowerCase()==="closed"){status.value="closed";start.value="09:00";end.value="18:00";}
+  else{const match=String(raw).match(/^(\d{2}:\d{2})\s*-\s*(\d{2}:\d{2})$/);if(match){status.value="open";start.value=match[1];end.value=match[2];}else{status.value="closed";}}
+  row.classList.toggle("is-closed",status.value!=="open");
+ });
+}
+document.querySelectorAll("#studioOpeningHoursControls [data-hours-status]").forEach(select=>select.addEventListener("change",()=>select.closest(".hours-row").classList.toggle("is-closed",select.value!=="open")));
+
 function studioFormReset(){
  const form=document.getElementById("studioForm");
  if(form)form.reset();
+ setStudioOpeningHours({});
  document.getElementById("studioRecordId").value="";
  editingStudioPhotos=[];
  document.getElementById("studioExistingPhotos").textContent="";
@@ -965,7 +1006,7 @@ function fillStudioForm(studio){
  document.getElementById("studioDescription").value=studio.description||"";
  document.getElementById("studioServices").value=Array.isArray(studio.services)?studio.services.join(", "):"";
  document.getElementById("studioEquipment").value=Array.isArray(studio.equipment)?studio.equipment.join(", "):"";
- document.getElementById("studioOpeningHours").value=studio.opening_hours&&Object.keys(studio.opening_hours).length?JSON.stringify(studio.opening_hours,null,2):"";
+ setStudioOpeningHours(studio.opening_hours||{});
  editingStudioPhotos=Array.isArray(studio.photos)?[...studio.photos]:[];
  document.getElementById("studioExistingPhotos").textContent=editingStudioPhotos.length?"Existing photos: "+editingStudioPhotos.length+" (kept when you save).":"No existing photos.";
  document.getElementById("studioSaveButton").textContent="Save and Submit for Review";
@@ -1075,9 +1116,7 @@ document.getElementById("studioForm")?.addEventListener("submit",async event=>{
    const url=await uploadToCloudinary(file,"pasong/studios",session.access_token);
    photos.push(url);
   }
-  let openingHours={};
-  const hoursText=document.getElementById("studioOpeningHours").value.trim();
-  if(hoursText){try{openingHours=JSON.parse(hoursText);if(!openingHours||Array.isArray(openingHours)||typeof openingHours!=="object")throw new Error();}catch{throw new Error("Opening hours must be valid JSON, for example {\"Monday\":\"09:00-18:00\"}.");}}
+  const openingHours=getStudioOpeningHours();
   const rateText=document.getElementById("studioHourlyRate").value.trim();
   const rate=rateText===""?null:Number(rateText);
   if(rate!==null&&(!Number.isFinite(rate)||rate<0))throw new Error("Hourly rate must be zero or greater.");
