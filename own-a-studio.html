@@ -1,679 +1,135 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#070b18">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
 <title>Register Your Studio | PASONG</title>
-<meta name="description" content="Register your recording studio on PASONG and connect with creators worldwide.">
-
+<meta name="description" content="Register your recording studio on PASONG and connect with artists, producers and creators worldwide.">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#070b18;
-  --panel:#10182b;
-  --border:rgba(148,163,184,.22);
-  --text:#f8fafc;
-  --muted:#a7b4cc;
-  --purple:#8b5cf6;
-  --cyan:#22d3ee;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  min-height:100vh;
-  color:var(--text);
-  background:
-    radial-gradient(ellipse at top left,rgba(124,58,237,.16),transparent 40%),
-    radial-gradient(ellipse at top right,rgba(34,211,238,.10),transparent 35%),
-    var(--bg);
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-a{color:inherit;text-decoration:none}
-button,input,select,textarea{font:inherit}
-.site-header{
-  position:sticky;top:0;z-index:20;
-  border-bottom:1px solid var(--border);
-  background:rgba(7,11,24,.94);
-  backdrop-filter:blur(16px);
-}
-.header-inner{
-  width:min(1120px,calc(100% - 32px));
-  min-height:68px;margin:auto;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;
-}
-.brand{font-size:22px;font-weight:900;letter-spacing:-.8px}
-.brand-mark{color:var(--cyan)}
-.nav-links{display:flex;align-items:center;flex-wrap:wrap;gap:16px;color:#cbd5e1;font-size:13px}
-.nav-links a:hover,.back-link:hover{color:var(--cyan)}
-.page{width:min(1000px,calc(100% - 32px));margin:auto;padding:35px 0 60px}
-.back-link{display:inline-block;color:#c4b5fd;font-size:14px;margin-bottom:24px}
-.eyebrow{color:#67e8f9;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px}
-h1{font-size:clamp(32px,6vw,52px);line-height:1.08;letter-spacing:-1.8px;margin:12px 0;font-weight:900}
-.gradient-text{
-  background:linear-gradient(90deg,#c4b5fd,#67e8f9,#f0abfc);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.hero p{color:var(--muted);line-height:1.8;max-width:720px;margin:0}
-.benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:25px 0}
-.benefit{background:rgba(16,24,43,.8);border:1px solid var(--border);border-radius:15px;padding:17px}
-.benefit-icon{font-size:23px;margin-bottom:8px}
-.benefit strong{display:block;font-size:14px;margin-bottom:5px}
-.benefit span{display:block;color:var(--muted);font-size:12px;line-height:1.6}
-.form-card{
-  background:linear-gradient(145deg,rgba(16,24,43,.98),rgba(10,16,31,.98));
-  border:1px solid var(--border);border-radius:22px;
-  padding:clamp(18px,4vw,32px);
-  box-shadow:0 20px 70px rgba(0,0,0,.22);
-}
-.section-heading{font-size:21px;font-weight:850;margin:0 0 7px}
-.section-description{color:var(--muted);font-size:13px;line-height:1.7;margin:0 0 22px}
-.form-section{margin-top:28px}
-.form-section:first-of-type{margin-top:0}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
-.field{min-width:0}
-.field.full{grid-column:1/-1}
-label{display:block;color:#e2e8f0;font-size:13px;font-weight:750;margin-bottom:8px}
-.required{color:#f9a8d4}
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea{
-  width:100%;border:1px solid #344158;background:#080f20;color:#f8fafc;
-  border-radius:11px;padding:13px 14px;min-height:46px;outline:none;
-}
-textarea{min-height:110px;resize:vertical;line-height:1.65}
-input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
-input::placeholder,textarea::placeholder{color:#72809a}
-.help{display:block;color:#94a3b8;font-size:11px;line-height:1.65;margin-top:7px}
-.separator{border:0;border-top:1px solid var(--border);margin:28px 0}
-
-/* Selectable photo upload box */
-.photo-upload-box{
-  border:1px dashed rgba(34,211,238,.65);
-  border-radius:16px;
-  padding:18px;
-  background:rgba(8,15,32,.75);
-}
-.photo-upload-label{
-  display:flex;align-items:center;gap:13px;
-  cursor:pointer;margin:0;
-}
-.photo-upload-icon{
-  display:grid;place-items:center;flex:0 0 48px;height:48px;
-  border-radius:13px;background:rgba(34,211,238,.12);font-size:24px;
-}
-.photo-upload-title{font-size:14px;font-weight:850;color:#f8fafc}
-.photo-upload-subtitle{font-size:12px;color:#94a3b8;line-height:1.6;margin-top:4px}
-#studioPhotos{display:none}
-.photo-select-button{
-  display:inline-block;margin-top:15px;padding:11px 15px;border-radius:10px;
-  background:linear-gradient(100deg,#7c3aed,#2563eb);
-  color:#fff;font-weight:800;font-size:12px;cursor:pointer;
-}
-.photo-count{font-size:12px;color:#67e8f9;margin-top:12px}
-.photo-preview-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));
-  gap:10px;margin-top:15px;
-}
-.photo-preview-item{position:relative;min-width:0}
-.photo-preview-item img{
-  width:100%;height:105px;object-fit:cover;display:block;
-  border-radius:10px;border:1px solid #344158;background:#080f20;
-}
-.photo-file-name{font-size:10px;color:#cbd5e1;margin-top:5px;overflow-wrap:anywhere}
-.photo-remove{
-  position:absolute;top:5px;right:5px;width:27px;height:27px;border:0;
-  border-radius:50%;background:rgba(127,29,29,.95);color:white;
-  font-size:17px;cursor:pointer;
-}
-.feature-box{
-  border:1px solid rgba(139,92,246,.55);border-radius:17px;
-  padding:clamp(16px,3vw,24px);
-  background:radial-gradient(ellipse at top right,rgba(34,211,238,.09),transparent 55%),rgba(10,15,31,.9);
-}
-.feature-heading-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:9px}
-.feature-star{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:13px;background:rgba(139,92,246,.17);font-size:22px}
-.feature-box h3{font-size:19px;font-weight:850;margin:0 0 7px}
-.feature-box p{color:var(--muted);font-size:13px;line-height:1.75;margin:0 0 18px}
-.free-badge{
-  display:inline-flex;border:1px solid rgba(52,211,153,.4);color:#6ee7b7;
-  background:rgba(52,211,153,.08);border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;
-}
-.package-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
-.package{
-  display:flex;flex-direction:column;gap:8px;text-align:left;padding:15px;
-  border-radius:13px;border:1px solid #344158;background:rgba(7,11,24,.7);
-  cursor:pointer;min-width:0;
-}
-.package:hover{border-color:#8b5cf6}
-.package.selected{border-color:var(--cyan);background:rgba(34,211,238,.07);box-shadow:inset 0 0 0 1px rgba(34,211,238,.2)}
-.package input[type="radio"]{width:17px;height:17px;min-height:0;padding:0;accent-color:var(--cyan);margin:0 0 3px}
-.package-name{font-size:14px;font-weight:850}
-.package-price{font-size:17px;font-weight:900;color:#c4b5fd;overflow-wrap:anywhere}
-.package-days{font-size:11px;color:#67e8f9}
-.package-detail{color:#94a3b8;font-size:11px;line-height:1.55}
-.price-help{display:block;color:#fcd9a5;font-size:11px;line-height:1.7;margin-top:12px}
-.notice{
-  margin-top:16px;border:1px solid rgba(251,191,36,.3);background:rgba(120,53,15,.16);
-  color:#fde68a;padding:13px 14px;border-radius:11px;font-size:12px;line-height:1.7;
-}
-.terms{display:flex;align-items:flex-start;gap:10px;margin:23px 0;color:#cbd5e1;font-size:12px;line-height:1.7}
-.terms input{width:17px;height:17px;flex:0 0 17px;margin-top:2px;accent-color:var(--purple)}
-.terms label{margin:0;font-weight:500}
-.primary-button{
-  width:100%;border:0;border-radius:12px;min-height:51px;padding:14px 18px;
-  background:linear-gradient(100deg,#7c3aed,#2563eb,#0891b2);
-  color:white;font-weight:850;cursor:pointer;box-shadow:0 8px 28px rgba(37,99,235,.2);
-}
-.primary-button:hover{filter:brightness(1.1)}
-.primary-button:disabled{opacity:.55;cursor:wait}
-.status-message{display:none;margin-top:17px;padding:14px;border-radius:12px;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
-.status-message.show{display:block}
-.status-message.success{color:#a7f3d0;border:1px solid rgba(52,211,153,.35);background:rgba(6,78,59,.2)}
-.status-message.error{color:#fecaca;border:1px solid rgba(248,113,113,.35);background:rgba(127,29,29,.2)}
-.status-message.info{color:#bae6fd;border:1px solid rgba(56,189,248,.35);background:rgba(7,89,133,.18)}
-.bottom-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:23px;font-size:13px;color:#c4b5fd}
-footer{border-top:1px solid var(--border);color:#8491a8;font-size:12px;line-height:1.7;text-align:center;padding:23px 16px}
-footer a{color:#c4b5fd}
-@media(max-width:700px){
-  .nav-links{gap:12px;font-size:12px}
-  .benefits{grid-template-columns:1fr}
-  .benefit{display:flex;gap:12px;align-items:flex-start}
-  .benefit-icon{margin:0}
-  .package-grid{grid-template-columns:1fr}
-  .package{display:grid;grid-template-columns:22px 1fr auto;align-items:center;column-gap:9px}
-  .package input[type="radio"]{grid-row:1/span 3}
-  .package-name{grid-column:2}
-  .package-price{grid-column:3;grid-row:1;font-size:15px;text-align:right}
-  .package-days,.package-detail{grid-column:2/-1}
-  .form-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-}
-@media(max-width:380px){
-  .header-inner{width:calc(100% - 22px)}
-  .nav-links{gap:9px}
-  .page{width:calc(100% - 22px)}
-}
+:root{--bg:#050b18;--panel:#0a162a;--line:#203858;--muted:#9fb1c9;--purple:#b42dff;--cyan:#00c4ff;--white:#f8fafc}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 85% 0%,#241044 0,transparent 38%),var(--bg);color:var(--white);font-family:Inter,Arial,sans-serif}
+a{color:inherit}.wrap{width:min(1080px,calc(100% - 30px));margin:auto}
+header{position:sticky;top:0;z-index:10;background:#050b18ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:14px}.logo{font-size:22px;font-weight:900;text-decoration:none;display:flex;gap:9px;align-items:center}.mark{color:#d9a2ff;font-size:29px}.navlinks{display:flex;gap:20px;align-items:center;font-size:12px;color:#d6e0ef}.navlinks a{text-decoration:none}.account{display:inline-flex;align-items:center;gap:8px;background:#f8fafc;color:#071020;padding:10px 14px;border-radius:999px;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
+.hero{padding:52px 0 35px;border-bottom:1px solid var(--line)}.eyebrow{display:inline-block;border:1px solid #7542a6;background:#38105a55;color:#e4b7ff;padding:8px 12px;border-radius:99px;font-size:10px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase}h1{font-size:clamp(34px,5vw,58px);line-height:1.08;letter-spacing:-1.7px;margin:17px 0 14px;max-width:760px}.gradient{background:linear-gradient(90deg,#e2a3ff,#a13dff 48%,#23caff);color:transparent;background-clip:text;-webkit-background-clip:text}.lead{max-width:680px;color:#c4d0e1;font-size:14px;line-height:1.8}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}.step{border:1px solid var(--line);background:#081426c9;border-radius:14px;padding:15px}.step b{display:block;font-size:12px;margin-bottom:5px}.step span{font-size:11px;color:var(--muted);line-height:1.6}
+main{padding:30px 0 55px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}.panel,.sidecard{background:linear-gradient(160deg,#0b1930,#071020);border:1px solid var(--line);border-radius:18px;padding:23px}.panel h2{font-size:20px;margin:0 0 7px}.sub{font-size:12px;color:var(--muted);line-height:1.7;margin:0 0 23px}.section-title{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#dba4ff;font-weight:900;margin:25px 0 13px;padding-bottom:10px;border-bottom:1px solid #203858}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-size:11px;font-weight:800;color:#dce7f6;margin-bottom:7px}label .optional{font-weight:500;color:#8295b0}input,select,textarea{width:100%;border:1px solid #2a4262;background:#050d1b;color:#f8fafc;border-radius:10px;padding:12px;font:inherit;font-size:12px;outline:none}input:focus,select:focus,textarea:focus{border-color:#b34aff;box-shadow:0 0 0 3px #b34aff20}textarea{min-height:94px;resize:vertical}input::placeholder,textarea::placeholder{color:#70839d}select option{background:#081426}.hint{font-size:10px;color:#8195af;line-height:1.6;margin-top:6px}.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.check{display:flex;align-items:center;gap:9px;border:1px solid #243a58;background:#061020;padding:10px;border-radius:9px;font-size:11px;color:#d8e3f2}.check input{width:15px;height:15px;accent-color:#b34aff}.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px}.btn{border:0;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:13px 19px;font-size:12px;font-weight:900;text-decoration:none;cursor:pointer}.primary{color:#fff;background:linear-gradient(100deg,#8b22f5,#08aeea)}.secondary{color:#d8e4f4;background:#101e32;border:1px solid #2a4262}.btn:disabled{opacity:.55;cursor:wait}.notice{display:none;border-radius:10px;padding:13px 14px;font-size:12px;line-height:1.7;margin:0 0 16px}.notice.show{display:block}.notice.error{background:#431520;border:1px solid #9b3346;color:#ffd8df}.notice.success{background:#082f2b;border:1px solid #187a68;color:#c8fff2}.notice.info{background:#142640;border:1px solid #315c8b;color:#d5eaff}.sidecard{margin-bottom:14px}.sidecard h3{font-size:14px;margin:0 0 12px}.sidecard p,.sidecard li{font-size:11px;line-height:1.8;color:#aebed2}.sidecard ul{padding-left:17px;margin:8px 0}.pill{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#c6f6ff;background:#06364b;border:1px solid #13607b;border-radius:99px;padding:6px 9px;margin-bottom:12px}.side-link{font-size:11px;color:#d8a7ff;text-decoration:none;font-weight:800}.safety{font-size:10px;color:#8195af;line-height:1.7;margin-top:13px}
+footer{border-top:1px solid var(--line);padding:25px 0;color:#8195af;font-size:10px}.foot{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.foot a{color:#c4d0e1;text-decoration:none}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.hero{padding-top:35px}.panel{padding:18px}.sidewrap{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sidecard{margin:0}}
+@media(max-width:540px){.nav{min-height:60px}.navlinks{display:none}.logo{font-size:19px}.account{padding:9px 11px;font-size:10px}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.sidewrap{grid-template-columns:1fr}h1{letter-spacing:-1px}.checks{grid-template-columns:1fr 1fr}.panel{padding:15px}}
 </style>
 </head>
-
 <body>
-<header class="site-header">
-  <div class="header-inner">
-    <a class="brand" href="https://pasong-frontend.vercel.app/Pasong.html"><span class="brand-mark">◈</span> PASONG</a>
-    <nav class="nav-links" aria-label="Main navigation">
-      <a href="https://pasong-frontend.vercel.app/studio.html">Find Studios</a>
-      <a href="https://pasong-frontend.vercel.app/producer.html">Producer Dashboard</a>
-    </nav>
-  </div>
-</header>
-
-<main class="page">
-  <a class="back-link" href="https://pasong-frontend.vercel.app/studio.html">← Back to Studio Network</a>
-
-  <section class="hero">
-    <span class="eyebrow">🌍 PASONG Studio Network</span>
-    <h1>Own a studio?<br><span class="gradient-text">Grow your business worldwide.</span></h1>
-    <p>
-      Register your recording studio, showcase your services, equipment and rates,
-      and help artists, producers and creators discover your studio from around the world.
-      Standard studio registration is free.
-    </p>
-  </section>
-
-  <section class="benefits">
-    <div class="benefit"><div class="benefit-icon">🌍</div><div><strong>Reach creators worldwide</strong><span>Make your studio discoverable to creators in different countries.</span></div></div>
-    <div class="benefit"><div class="benefit-icon">🎙️</div><div><strong>Showcase your services</strong><span>List your studio type, services, equipment and hourly rates.</span></div></div>
-    <div class="benefit"><div class="benefit-icon">⭐</div><div><strong>Optional featured placement</strong><span>Explore optional promotion packages after registering your studio.</span></div></div>
-  </section>
-
-  <section class="form-card">
-    <h2 class="section-heading">Register your studio</h2>
-    <p class="section-description">Complete the details below. Your listing will be submitted for review before publication.</p>
-
-    <form id="studioRegistrationForm">
-      <section class="form-section">
-        <h3 class="section-heading">1. Studio information</h3>
-        <p class="section-description">Tell creators about your studio.</p>
-        <div class="form-grid">
-          <div class="field">
-            <label for="studioName">Studio name <span class="required">*</span></label>
-            <input id="studioName" type="text" maxlength="120" required placeholder="e.g. Soundwave Recording Studio">
-          </div>
-          <div class="field">
-            <label for="studioType">Studio type <span class="required">*</span></label>
-            <select id="studioType" required>
-              <option value="">Choose studio type</option>
-              <option>Recording Studio</option>
-              <option>Music Production Studio</option>
-              <option>Mixing and Mastering Studio</option>
-              <option>Podcast Studio</option>
-              <option>Rehearsal Studio</option>
-              <option>Audio Post-Production</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="field full">
-            <label for="description">Studio description <span class="required">*</span></label>
-            <textarea id="description" maxlength="3000" required placeholder="Describe your studio and what makes your services special."></textarea>
-          </div>
-          <div class="field">
-            <label for="country">Country <span class="required">*</span></label>
-            <input id="country" type="text" maxlength="100" required autocomplete="country-name" placeholder="Enter your country">
-          </div>
-          <div class="field">
-            <label for="city">City or region <span class="required">*</span></label>
-            <input id="city" type="text" maxlength="120" required placeholder="Enter your city or region">
-          </div>
-          <div class="field full">
-            <label for="address">Studio address or area</label>
-            <input id="address" type="text" maxlength="250" placeholder="Street, district, building or general location">
-            <span class="help">Only provide an address you are comfortable sharing with potential clients.</span>
-          </div>
-        </div>
-      </section>
-
-      <hr class="separator">
-
-      <section class="form-section">
-        <h3 class="section-heading">2. Services and equipment</h3>
-        <p class="section-description">Help creators understand what they can book at your studio.</p>
-        <div class="form-grid">
-          <div class="field full">
-            <label for="services">Services offered <span class="required">*</span></label>
-            <textarea id="services" maxlength="2000" required placeholder="Recording, beat production, mixing, mastering, songwriting, podcast recording..."></textarea>
-          </div>
-          <div class="field full">
-            <label for="equipment">Equipment and facilities</label>
-            <textarea id="equipment" maxlength="2000" placeholder="Microphones, audio interface, monitors, MIDI keyboards, instruments, vocal booth..."></textarea>
-          </div>
-          <div class="field">
-            <label for="hourlyRate">Hourly rate</label>
-            <input id="hourlyRate" type="number" min="0" step="0.01" placeholder="e.g. 50">
-            <span class="help">Leave empty if you do not want to display a rate.</span>
-          </div>
-          <div class="field">
-            <label for="currencyCode">Rate currency</label>
-            <select id="currencyCode">
-              <option value="USD">USD — US Dollar</option>
-              <option value="UGX">UGX — Ugandan Shilling</option>
-              <option value="GBP">GBP — British Pound</option>
-              <option value="EUR">EUR — Euro</option>
-              <option value="KES">KES — Kenyan Shilling</option>
-              <option value="TZS">TZS — Tanzanian Shilling</option>
-              <option value="NGN">NGN — Nigerian Naira</option>
-              <option value="ZAR">ZAR — South African Rand</option>
-              <option value="GHS">GHS — Ghanaian Cedi</option>
-              <option value="CAD">CAD — Canadian Dollar</option>
-              <option value="AUD">AUD — Australian Dollar</option>
-              <option value="Other">Other / not specified</option>
-            </select>
-          </div>
-
-          <div class="field full">
-            <label for="studioPhotos">Studio photos</label>
-            <div class="photo-upload-box">
-              <label class="photo-upload-label" for="studioPhotos">
-                <span class="photo-upload-icon">📸</span>
-                <span>
-                  <span class="photo-upload-title">Choose photos from your device</span>
-                  <span class="photo-upload-subtitle">Select photos from your phone gallery or computer. You can choose multiple images.</span>
-                </span>
-              </label>
-              <input id="studioPhotos" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
-              <label class="photo-select-button" for="studioPhotos">＋ Select Studio Photos</label>
-              <div class="photo-count" id="photoCount">No photos selected · Maximum 8 photos · 5 MB each</div>
-              <div class="photo-preview-grid" id="studioPhotoPreview"></div>
-            </div>
-            <span class="help">Supported: JPG, PNG, WEBP and GIF. Choose clear photos of your studio, recording equipment or workspace.</span>
-          </div>
-        </div>
-      </section>
-
-      <hr class="separator">
-
-      <section class="form-section feature-box">
-        <div class="feature-heading-row">
-          <div class="feature-star">⭐</div>
-          <div>
-            <h3>Get Your Studio Featured on PASONG</h3>
-            <span class="free-badge">Standard registration stays free</span>
-          </div>
-        </div>
-        <p>
-          Choose an optional promotion package to request featured placement after saving your studio.
-          Paid placement must only activate after checkout confirms payment and PASONG approves the listing.
-        </p>
-
-        <div class="field">
-          <label for="studioFeaturePlan">Visibility package</label>
-          <select id="studioFeaturePlan">
-            <option value="standard">Standard listing — Free</option>
-            <option value="starter">Starter Feature — UGX 25,000 / 7 days</option>
-            <option value="pro">Pro Feature — UGX 60,000 / 14 days</option>
-            <option value="premium">Premium Feature — UGX 120,000 / 30 days</option>
-          </select>
-          <span class="price-help">Suggested launch prices only. These are not verified live payment prices. International currency localization can be connected later.</span>
-        </div>
-
-        <div class="package-grid">
-          <label class="package selected" data-package="standard">
-            <input type="radio" name="featurePackageCard" value="standard" checked>
-            <span class="package-name">Standard</span>
-            <span class="package-price">Free</span>
-            <span class="package-days">Regular listing</span>
-            <span class="package-detail">Submit your studio for review without a promotion fee.</span>
-          </label>
-          <label class="package" data-package="starter">
-            <input type="radio" name="featurePackageCard" value="starter">
-            <span class="package-name">Starter Feature</span>
-            <span class="package-price">UGX 25,000</span>
-            <span class="package-days">7 days · Suggested price</span>
-            <span class="package-detail">Request a short featured placement.</span>
-          </label>
-          <label class="package" data-package="pro">
-            <input type="radio" name="featurePackageCard" value="pro">
-            <span class="package-name">Pro Feature</span>
-            <span class="package-price">UGX 60,000</span>
-            <span class="package-days">14 days · Suggested price</span>
-            <span class="package-detail">Request a longer featured placement.</span>
-          </label>
-          <label class="package" data-package="premium">
-            <input type="radio" name="featurePackageCard" value="premium">
-            <span class="package-name">Premium Feature</span>
-            <span class="package-price">UGX 120,000</span>
-            <span class="package-days">30 days · Suggested price</span>
-            <span class="package-detail">Request the longest featured period displayed here.</span>
-          </label>
-        </div>
-
-        <div class="notice">
-          <strong>Payment notice:</strong> Selecting a package does not charge you or activate featured placement.
-          A verified checkout and backend order integration are required before paid promotion can begin.
-        </div>
-      </section>
-
-      <div class="terms">
-        <input id="terms" type="checkbox" required>
-        <label for="terms">I confirm that I am authorized to register this studio, the information is accurate, and PASONG may review the listing before publication.</label>
-      </div>
-
-      <button id="submitButton" class="primary-button" type="submit">Submit Studio for Review →</button>
-      <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
-    </form>
-
-    <div class="bottom-links">
-      <a href="https://pasong-frontend.vercel.app/studio.html">← Browse studios</a>
-      <a href="https://pasong-frontend.vercel.app/account.html">Sign in to PASONG</a>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div><strong style="color:#c4b5fd">◈ PASONG</strong> — Connecting music creators and studios worldwide.</div>
-  <div>Studio listings are subject to review. Featured placement requires verified payment and approval.</div>
-  <div style="margin-top:8px">
-    <a href="https://pasong-frontend.vercel.app/Pasong.html">Home</a> ·
-    <a href="https://pasong-frontend.vercel.app/studio.html">Studio Network</a>
-  </div>
-</footer>
-
+<header><div class="wrap nav">
+<a class="logo" href="/Pasong.html"><span class="mark">◈</span><span>PASONG</span></a>
+<nav class="navlinks"><a href="/Pasong.html">Home</a><a href="/studio.html">Find Studios</a><a href="/producer.html">Producer Network</a><a href="/events.html">Events</a></nav>
+<a class="account" id="accountLink" href="/account.html"><span>♙</span><span id="accountLabel">Sign in</span></a>
+</div></header>
+<section class="hero"><div class="wrap">
+<span class="eyebrow">PASONG Studio Network · Worldwide</span>
+<h1>Put your studio on the <span class="gradient">world stage.</span></h1>
+<p class="lead">Introduce your recording studio to artists, producers, podcasters and creators around the world. Share your services, equipment and rates, then submit your listing for PASONG review.</p>
+<div class="steps">
+<div class="step"><b>01 · Tell us about your studio</b><span>Add your location, services, facilities and contact details.</span></div>
+<div class="step"><b>02 · Submit for review</b><span>Our team reviews the information before the listing can go live.</span></div>
+<div class="step"><b>03 · Get discovered</b><span>Approved studios can appear in the worldwide PASONG directory.</span></div>
+</div>
+</div></section>
+<main class="wrap"><div class="layout">
+<section class="panel">
+<h2>Studio registration</h2><p class="sub">Complete the details below. Fields marked * are required. You must be signed in to submit a listing.</p>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+<form id="studioForm">
+<div class="section-title">Studio details</div>
+<div class="grid">
+<div class="field"><label for="studio_name">Studio / business name *</label><input id="studio_name" name="studio_name" maxlength="120" required placeholder="e.g. Northstar Recording Studio"></div>
+<div class="field"><label for="studio_type">Studio type *</label><select id="studio_type" name="studio_type" required><option value="">Choose a type</option><option>Recording Studio</option><option>Project / Home Studio</option><option>Mixing & Mastering</option><option>Rehearsal Studio</option><option>Podcast / Voiceover Studio</option><option>Music Production Studio</option><option>Live Recording Facility</option><option>Other</option></select></div>
+<div class="field full"><label for="description">About your studio *</label><textarea id="description" name="description" maxlength="1800" required placeholder="Describe your space, experience, atmosphere and what makes it special."></textarea><div class="hint">Write a clear description that helps creators decide if your studio suits their project.</div></div>
+<div class="field"><label for="country">Country *</label><input id="country" name="country" maxlength="100" required autocomplete="country-name" placeholder="Country"></div>
+<div class="field"><label for="city">City / region *</label><input id="city" name="city" maxlength="120" required autocomplete="address-level2" placeholder="City or region"></div>
+<div class="field full"><label for="address">Studio address <span class="optional">(optional)</span></label><input id="address" name="address" maxlength="240" autocomplete="street-address" placeholder="Street, district or directions"></div>
+</div>
+<div class="section-title">Services & facilities</div>
+<div class="checks" id="serviceChecks">
+<label class="check"><input type="checkbox" value="Recording"> Recording</label>
+<label class="check"><input type="checkbox" value="Music production"> Music production</label>
+<label class="check"><input type="checkbox" value="Mixing"> Mixing</label>
+<label class="check"><input type="checkbox" value="Mastering"> Mastering</label>
+<label class="check"><input type="checkbox" value="Podcast recording"> Podcast recording</label>
+<label class="check"><input type="checkbox" value="Voiceover"> Voiceover</label>
+<label class="check"><input type="checkbox" value="Rehearsal"> Rehearsal</label>
+<label class="check"><input type="checkbox" value="Live recording"> Live recording</label>
+</div>
+<div class="grid" style="margin-top:15px">
+<div class="field full"><label for="equipment">Equipment & facilities <span class="optional">(optional)</span></label><textarea id="equipment" name="equipment" maxlength="1500" placeholder="Microphones, interfaces, monitors, instruments, room types, software..."></textarea></div>
+<div class="field"><label for="hourly_rate">Hourly rate <span class="optional">(optional)</span></label><input id="hourly_rate" name="hourly_rate" type="number" min="0" max="100000000" step="0.01" placeholder="e.g. 50"></div>
+<div class="field"><label for="currency_code">Rate currency <span class="optional">(optional)</span></label><select id="currency_code" name="currency_code"><option value="">Select currency</option><option>USD</option><option>EUR</option><option>GBP</option><option>UGX</option><option>KES</option><option>TZS</option><option>NGN</option><option>ZAR</option><option>GHS</option><option>CAD</option><option>AUD</option><option>INR</option><option>JPY</option><option>Other</option></select></div>
+<div class="field full"><label for="photos">Studio photo URLs <span class="optional">(optional)</span></label><textarea id="photos" name="photos" maxlength="1500" placeholder="Paste one public image URL per line (https://...)"></textarea><div class="hint">Use direct links to images you have permission to share. File uploads can be connected when the approved storage bucket is confirmed.</div></div>
+</div>
+<div class="section-title">Contact & submission</div>
+<div class="grid">
+<div class="field"><label for="contact_name">Contact person <span class="optional">(optional)</span></label><input id="contact_name" name="contact_name" maxlength="120" placeholder="Your name"></div>
+<div class="field"><label for="contact_email">Business email <span class="optional">(optional)</span></label><input id="contact_email" name="contact_email" type="email" maxlength="254" placeholder="studio@example.com"></div>
+<div class="field full"><label for="contact_phone">Phone / WhatsApp <span class="optional">(optional)</span></label><input id="contact_phone" name="contact_phone" type="tel" maxlength="60" placeholder="Include country code"></div>
+<div class="field full"><label class="check" style="align-items:flex-start"><input id="confirm" type="checkbox" required><span>I confirm that I am authorised to submit this studio and that the information is accurate. I understand that submission does not guarantee approval or placement.</span></label></div>
+</div>
+<div class="actions"><button id="submitBtn" class="btn primary" type="submit">Submit studio for review →</button><a class="btn secondary" href="/studio.html">Back to studios</a></div>
+<p class="safety">No payment is collected on this page. Any paid studio package or registration checkout will only be enabled after PASONG confirms its pricing and secure payment flow.</p>
+</form>
+</section>
+<aside class="sidewrap">
+<div class="sidecard"><span class="pill">Worldwide directory</span><h3>Made for every creator community</h3><p>Register from any country. Enter your own local rate and select the currency that matches your pricing.</p></div>
+<div class="sidecard"><h3>Before you submit</h3><ul><li>Use a studio name you are authorised to represent.</li><li>Describe services honestly and clearly.</li><li>Share only images you have permission to use.</li><li>Your listing stays pending until approved.</li></ul></div>
+<div class="sidecard"><h3>Already listed?</h3><p>Return to the studio directory to discover approved recording spaces and services.</p><a class="side-link" href="/studio.html">Explore studios →</a></div>
+</aside>
+</div></main>
+<footer><div class="wrap foot"><span>© <span id="year"></span> PASONG Studio Network</span><span><a href="/Pasong.html">PASONG Home</a> · <a href="/account.html">Account</a> · <a href="/studio.html">Find Studios</a></span></div></footer>
 <script>
-(() => {
-  "use strict";
-
-  const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-
-  const form = document.getElementById("studioRegistrationForm");
-  const submitButton = document.getElementById("submitButton");
-  const statusMessage = document.getElementById("statusMessage");
-  const planSelect = document.getElementById("studioFeaturePlan");
-  const packageCards = [...document.querySelectorAll(".package")];
-  const packageRadios = [...document.querySelectorAll('input[name="featurePackageCard"]')];
-  const photoInput = document.getElementById("studioPhotos");
-  const photoPreview = document.getElementById("studioPhotoPreview");
-  const photoCount = document.getElementById("photoCount");
-
-  const MAX_PHOTOS = 8;
-  const MAX_FILE_SIZE = 5 * 1024 * 1024;
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-
-  let supabaseClient = null;
-  let selectedPhotos = [];
-  let previewUrls = [];
-
-  try {
-    if (window.supabase && window.supabase.createClient) {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-  } catch (error) {
-    console.error("PASONG Supabase initialization error:", error);
+(function(){
+'use strict';
+document.getElementById('year').textContent=new Date().getFullYear();
+const SUPABASE_URL=window.PASONG_SUPABASE_URL||'https://mtufczmjlkvycarxylgh.supabase.co';
+const SUPABASE_ANON_KEY=window.PASONG_SUPABASE_ANON_KEY||'sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP';
+const notice=document.getElementById('notice'),form=document.getElementById('studioForm'),submitBtn=document.getElementById('submitBtn');
+let client=null;
+function message(text,type){notice.textContent=text;notice.className='notice show '+type;notice.scrollIntoView({behavior:'smooth',block:'nearest'});}
+function accountLink(s){const a=document.getElementById('accountLink'),label=document.getElementById('accountLabel');a.href='/account.html';label.textContent=s&&s.user?'My Account':'Sign in';}
+function getServices(){return Array.from(document.querySelectorAll('#serviceChecks input:checked')).map(x=>x.value);}
+function parsePhotos(value){return value.split(/\n/).map(x=>x.trim()).filter(Boolean).filter(x=>{try{const u=new URL(x);return u.protocol==='https:'||u.protocol==='http:';}catch(e){return false;}});}
+async function init(){
+ if(!window.supabase){message('The registration service could not load. Please refresh and try again.','error');submitBtn.disabled=true;return;}
+ client=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ try{const r=await client.auth.getSession();accountLink(r.data.session);if(!r.data.session){message('Please sign in to your PASONG account before submitting a studio. Open Account to sign in, then return here.','info');}}
+ catch(e){console.error(e);message('Could not verify your sign-in. Please refresh and try again.','error');}
+ client.auth.onAuthStateChange((_event,s)=>accountLink(s));
+}
+form.addEventListener('submit',async function(e){
+ e.preventDefault();if(!form.reportValidity())return;
+ if(!client){message('Registration service is not ready. Refresh the page and try again.','error');return;}
+ try{
+  const auth=await client.auth.getUser(),user=auth.data&&auth.data.user;
+  if(auth.error||!user){message('Please sign in first. Open Account, sign in, then return here to submit your studio.','error');return;}
+  const services=getServices();if(!services.length){message('Choose at least one service so artists know what your studio offers.','error');return;}
+  const photoText=document.getElementById('photos').value,photos=parsePhotos(photoText);
+  if(photoText.split(/\n/).map(x=>x.trim()).filter(Boolean).length!==photos.length){message('One or more photo links are invalid. Use complete http:// or https:// image URLs, one per line.','error');return;}
+  const rate=document.getElementById('hourly_rate').value,currency=document.getElementById('currency_code').value;
+  if(rate!==''&&!currency){message('Choose the currency for your hourly rate.','error');return;}
+  const payload={user_id:user.id,studio_name:document.getElementById('studio_name').value.trim(),description:document.getElementById('description').value.trim(),studio_type:document.getElementById('studio_type').value,country:document.getElementById('country').value.trim(),city:document.getElementById('city').value.trim(),address:document.getElementById('address').value.trim()||null,services,equipment:document.getElementById('equipment').value.trim()||null,hourly_rate:rate===''?null:Number(rate),currency_code:currency||null,photos,status:'pending'};
+  submitBtn.disabled=true;submitBtn.textContent='Submitting…';
+  const result=await client.from('producer_studios').insert(payload).select('id').single();
+  if(result.error){
+   console.error('PASONG studio registration insert error:',result.error);
+   if(/user_id|column .* does not exist|schema cache/i.test(result.error.message||''))throw new Error('The studio table schema needs a database adjustment before owner-linked registration can be saved. No listing was created.');
+   if(/row-level security|permission denied|not allowed/i.test(result.error.message||''))throw new Error('The database security policy blocked this submission. No listing was created. An authenticated owner-submission policy is needed for producer_studios.');
+   throw new Error(result.error.message||'The database could not save this studio.');
   }
-
-  function showStatus(message, type) {
-    statusMessage.textContent = message;
-    statusMessage.className = "status-message show " + type;
-  }
-
-  function clearPreviews() {
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
-    previewUrls = [];
-    photoPreview.replaceChildren();
-  }
-
-  function renderPhotoPreviews() {
-    clearPreviews();
-
-    selectedPhotos.forEach((file, index) => {
-      const item = document.createElement("div");
-      item.className = "photo-preview-item";
-
-      const image = document.createElement("img");
-      const objectUrl = URL.createObjectURL(file);
-      previewUrls.push(objectUrl);
-      image.src = objectUrl;
-      image.alt = file.name;
-
-      const fileName = document.createElement("div");
-      fileName.className = "photo-file-name";
-      fileName.textContent = file.name;
-
-      const removeButton = document.createElement("button");
-      removeButton.type = "button";
-      removeButton.className = "photo-remove";
-      removeButton.textContent = "×";
-      removeButton.setAttribute("aria-label", "Remove " + file.name);
-
-      removeButton.addEventListener("click", () => {
-        selectedPhotos.splice(index, 1);
-        updatePhotoInput();
-        renderPhotoPreviews();
-      });
-
-      item.append(image, removeButton, fileName);
-      photoPreview.appendChild(item);
-    });
-
-    photoCount.textContent = selectedPhotos.length
-      ? selectedPhotos.length + " photo(s) selected · " + MAX_PHOTOS + " maximum · 5 MB each"
-      : "No photos selected · Maximum 8 photos · 5 MB each";
-  }
-
-  function updatePhotoInput() {
-    const transfer = new DataTransfer();
-    selectedPhotos.forEach(file => transfer.items.add(file));
-    photoInput.files = transfer.files;
-  }
-
-  photoInput.addEventListener("change", () => {
-    const newFiles = Array.from(photoInput.files || []);
-    const combined = [...selectedPhotos];
-
-    for (const file of newFiles) {
-      if (!allowedTypes.includes(file.type)) {
-        showStatus("Unsupported image: " + file.name + ". Choose JPG, PNG, WEBP or GIF.", "error");
-        updatePhotoInput();
-        return;
-      }
-
-      if (file.size > MAX_FILE_SIZE) {
-        showStatus(file.name + " is larger than 5 MB. Choose a smaller image.", "error");
-        updatePhotoInput();
-        return;
-      }
-
-      const duplicate = combined.some(existing =>
-        existing.name === file.name &&
-        existing.size === file.size &&
-        existing.lastModified === file.lastModified
-      );
-
-      if (!duplicate) combined.push(file);
-    }
-
-    if (combined.length > MAX_PHOTOS) {
-      showStatus("You can select a maximum of 8 studio photos.", "error");
-      updatePhotoInput();
-      return;
-    }
-
-    selectedPhotos = combined;
-    updatePhotoInput();
-    renderPhotoPreviews();
-
-    if (selectedPhotos.length) {
-      statusMessage.className = "status-message";
-    }
-  });
-
-  function syncPackageSelection(value) {
-    planSelect.value = value;
-
-    packageCards.forEach(card => {
-      const selected = card.dataset.package === value;
-      card.classList.toggle("selected", selected);
-      const radio = card.querySelector('input[type="radio"]');
-      if (radio) radio.checked = selected;
-    });
-  }
-
-  planSelect.addEventListener("change", () => syncPackageSelection(planSelect.value));
-
-  packageRadios.forEach(radio => {
-    radio.addEventListener("change", () => {
-      if (radio.checked) syncPackageSelection(radio.value);
-    });
-  });
-
-  form.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    if (!supabaseClient) {
-      showStatus("The registration service could not be initialized. Refresh the page and try again.", "error");
-      return;
-    }
-
-    if (selectedPhotos.length > MAX_PHOTOS) {
-      showStatus("Please select no more than 8 photos.", "error");
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Submitting your studio…";
-    statusMessage.className = "status-message";
-
-    try {
-      const { data: authData, error: authError } = await supabaseClient.auth.getUser();
-
-      if (authError || !authData?.user) {
-        showStatus("Please sign in to your PASONG account before registering your studio. Then return to this page.", "error");
-        return;
-      }
-
-      const rateInput = document.getElementById("hourlyRate").value.trim();
-      const rate = rateInput === "" ? 0 : Number(rateInput);
-
-      if (!Number.isFinite(rate) || rate < 0) {
-        throw new Error("Please enter a valid hourly rate or leave the field empty.");
-      }
-
-      /*
-       * Important:
-       * The selected photo files are previewed locally.
-       * Permanent storage upload has not been connected in this page.
-       * Do not pretend local files have been uploaded or saved.
-       */
-      const studioRecord = {
-        user_id: authData.user.id,
-        studio_name: document.getElementById("studioName").value.trim(),
-        description: document.getElementById("description").value.trim(),
-        studio_type: document.getElementById("studioType").value,
-        country: document.getElementById("country").value.trim(),
-        city: document.getElementById("city").value.trim(),
-        address: document.getElementById("address").value.trim(),
-        services: document.getElementById("services").value.trim(),
-        equipment: document.getElementById("equipment").value.trim(),
-        hourly_rate: rate,
-        currency_code: document.getElementById("currencyCode").value,
-        photos: [],
-        status: "pending"
-      };
-
-      const { error: insertError } = await supabaseClient
-        .from("producer_studios")
-        .insert(studioRecord);
-
-      if (insertError) {
-        console.error("Studio registration database error:", insertError);
-
-        if (insertError.code === "42501" || insertError.code === "401") {
-          throw new Error("The database denied permission to save this studio. Check your sign-in and the producer_studios INSERT policy.");
-        }
-
-        if (insertError.code === "42703" || insertError.code === "PGRST204") {
-          throw new Error("The studio form and database columns do not match. Please verify the producer_studios table schema.");
-        }
-
-        throw new Error(insertError.message || "The studio listing could not be saved.");
-      }
-
-      const selectedPlan = planSelect.value;
-
-      let message = "Your studio registration has been submitted for PASONG review. Your listing is pending approval. No payment was taken.";
-
-      if (selectedPhotos.length > 0) {
-        message += " You selected " + selectedPhotos.length +
-          " photo(s), but they have NOT been uploaded to permanent storage yet. They will not appear in your public listing until a storage upload connection is added.";
-      }
-
-      if (selectedPlan !== "standard") {
-        message += " Your selected featured package has not been purchased or activated. A verified checkout and backend order integration are still required.";
-      }
-
-      showStatus(message, selectedPhotos.length || selectedPlan !== "standard" ? "info" : "success");
-
-      form.reset();
-      selectedPhotos = [];
-      clearPreviews();
-      photoCount.textContent = "No photos selected · Maximum 8 photos · 5 MB each";
-      syncPackageSelection("standard");
-
-    } catch (error) {
-      console.error("PASONG studio registration error:", error);
-      showStatus(
-        error?.message || "Something went wrong while submitting your studio. Please try again.",
-        "error"
-      );
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Submit Studio for Review →";
-    }
-  });
-
-  window.addEventListener("beforeunload", clearPreviews);
-  syncPackageSelection("standard");
+  form.reset();message('Studio submitted successfully for review. It will not appear in the public directory until PASONG approves it. Registration checkout and payments are not active yet.','success');
+ }catch(err){console.error('PASONG studio registration:',err);message(err.message||'We could not submit your studio. Please try again later.','error');}
+ finally{submitBtn.disabled=false;submitBtn.textContent='Submit studio for review →';}
+});
+init();
 })();
 </script>
 </body>
