@@ -54,10 +54,20 @@ const campaignData={
  song:[{key:'song-starter',name:'Starter Boost',price:50000,days:7,detail:'A focused start to help listeners discover your release.'},{key:'song-viral',name:'TikTok Viral Boost',price:150000,days:14,detail:'More time and visibility for a release campaign.',popular:true},{key:'song-hero',name:'Homepage Hero',price:300000,days:30,detail:'Premium homepage promotion request.'}],
  profile:[{key:'profile-starter',name:'Starter Growth',price:55000,days:30,detail:'Estimated 2K–5K profile visits.'},{key:'profile-viral',name:'Viral Growth',price:120000,days:30,detail:'Estimated 10K–25K profile visits.',popular:true},{key:'profile-pro',name:'Pro Artist',price:250000,days:30,detail:'Estimated 50K+ visits and homepage mention request.'}],
  business:[{key:'business-starter',name:'Business Starter',price:105000,days:7,detail:'Introduce your business to PASONG visitors.'},{key:'business-growth',name:'Business Growth',price:220000,days:14,detail:'A longer campaign for your brand.',popular:true},{key:'business-pro',name:'Business Pro',price:450000,days:30,detail:'Extended business promotion request.'}],
- tiktok:[{key:'tiktok-starter',name:'Starter Viral',price:45000,days:30,detail:'Estimated 1K–3K video uses.'},{key:'tiktok-growth',name:'Viral Push',price:84000,days:30,detail:'Estimated 5K–15K video uses.',popular:true},{key:'tiktok-pro',name:'Super Viral',price:180000,days:30,detail:'Estimated 30K+ video uses.'},{key:'tiktok-max',name:'Creator Max',price:350000,days:30,detail:'Priority campaign request.'}]
+ tiktok:[{key:'tiktok-starter',name:'Starter Viral',price:84000,days:30,detail:'Target: 1K–3K video uses.'},{key:'tiktok-growth',name:'Viral Push',price:180000,days:30,detail:'Target: 5K–15K video uses.',popular:true},{key:'tiktok-pro',name:'Super Viral',price:350000,days:30,detail:'Target: 30K+ video uses.'}]
 };
 const labels={song:'My Song',profile:'My Profile',business:'My Business',tiktok:'TikTok'};const paymentLabels={mtn:'MTN Mobile Money',airtel:'Airtel Money',card:'Bank card · PesaPal'};
-let type='song',selected=campaignData.song[0].key;const $=id=>document.getElementById(id);const money=n=>'UGX '+Number(n).toLocaleString('en-UG');
+const incomingParams=new URLSearchParams(window.location.search);
+const incomingTypeRaw=(incomingParams.get('type')||'song').toLowerCase();
+const incomingType=incomingTypeRaw==='profile'||incomingTypeRaw==='business'||incomingTypeRaw==='tiktok'?'song':incomingTypeRaw;
+const incomingPackageRaw=(incomingParams.get('package_key')||incomingParams.get('package')||'').toLowerCase();
+const packageAliases={starter:'song-starter','song-starter':'song-starter',viral:'song-viral',tiktok:'song-viral','song-viral':'song-viral',hero:'song-hero','song-hero':'song-hero'};
+let type=campaignData[incomingType]?incomingType:'song';
+let selected=packageAliases[incomingPackageRaw]||campaignData[type][0].key;
+const $=id=>document.getElementById(id);const money=n=>'UGX '+Number(n).toLocaleString('en-UG');
+const incomingPromotionId=incomingParams.get('promotion_id')||'';
+const incomingSongId=incomingParams.get('song_id')||'';
+const incomingSongTitle=incomingParams.get('song')||'';
 function getPackage(){return (campaignData[type]||[]).find(p=>p.key===selected)||campaignData[type][0]}
 function renderPackages(){const list=campaignData[type];if(!list.some(p=>p.key===selected))selected=list[0].key;$('packages').innerHTML=list.map(p=>`<button type="button" class="pkg ${p.key===selected?'active':''}" data-pkg="${p.key}" aria-pressed="${p.key===selected}">${p.popular?'<span class="popular">POPULAR</span>':''}<span class="name">${p.name}</span><span class="price">${money(p.price)}</span><span class="days">${p.days}-day campaign</span><div class="desc">${p.detail}</div></button>`).join('');document.querySelectorAll('[data-pkg]').forEach(b=>b.addEventListener('click',()=>{selected=b.dataset.pkg;renderPackages();updateSummary()}));const p=getPackage();$('packageHelp').textContent=p.detail+' Campaign reach is an estimate, not a guarantee.'}
 function updateSummary(){const p=getPackage();$('sumType').textContent=labels[type];$('sumPackage').textContent=p.name;$('sumDays').textContent=p.days+' days';$('sumPrice').textContent=money(p.price);$('sumPayment').textContent=paymentLabels[document.querySelector('input[name="payment"]:checked').value]}
@@ -65,7 +75,49 @@ function chooseType(next){if(!campaignData[next])return;type=next;document.query
 function validPublicHttps(raw){try{const u=new URL(raw);return u.protocol==='https:'&&!!u.hostname&&!['localhost','127.0.0.1'].includes(u.hostname)}catch{return false}}
 function validateTarget(){if(type==='song'&&!$('songId').value.trim())return 'Enter the PASONG song link or ID you want to promote.';if(type==='profile'&&!$('profileId').value.trim())return 'Enter your PASONG profile link or ID.';if(type==='business'&&!$('businessName').value.trim())return 'Enter your business or brand name.';if(type==='business'&&$('businessUrl').value.trim()&&!validPublicHttps($('businessUrl').value.trim()))return 'Enter a valid HTTPS business website or leave the field blank.';if(type==='tiktok'&&!validPublicHttps($('tiktokUrl').value.trim()))return 'Enter a valid public HTTPS TikTok link.';if(type==='tiktok'){const host=new URL($('tiktokUrl').value.trim()).hostname.toLowerCase().replace(/^www\./,'');if(!(host==='tiktok.com'||host.endsWith('.tiktok.com')))return 'The link must be on TikTok (tiktok.com).'}return ''}
 document.querySelectorAll('[data-type]').forEach(b=>b.addEventListener('click',()=>chooseType(b.dataset.type)));document.querySelectorAll('input[name="payment"]').forEach(r=>r.addEventListener('change',updateSummary));
-$('continueBtn').addEventListener('click',async()=>{const error=validateTarget();if(error){$('message').className='message error';$('message').textContent=error;const el=type==='song'?'songId':type==='profile'?'profileId':type==='business'?'businessName':'tiktokUrl';$(el).focus();return}const p=getPackage();const provider=document.querySelector('input[name="payment"]:checked').value;const payload={promotion_type:type,package_key:p.key,provider,amount:p.price,currency:'UGX',target:{song_id:type==='song'?$('songId').value.trim():null,profile_id:type==='profile'?$('profileId').value.trim():null,business_name:type==='business'?$('businessName').value.trim():null,business_url:type==='business'?$('businessUrl').value.trim():null,tiktok_url:type==='tiktok'?$('tiktokUrl').value.trim():null}};$('continueBtn').disabled=true;$('continueBtn').textContent='Checking secure checkout…';$('message').className='message info';$('message').textContent='Contacting PASONG checkout securely. No payment is confirmed until the provider verifies it.';try{const response=await fetch('https://pasong-api.vercel.app/api/promotions/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Secure checkout is not ready yet. No payment has been taken.');if(data.checkout_url){window.location.assign(data.checkout_url);return}throw new Error(data.error||'The API did not return a checkout link. No payment has been taken.')}catch(e){$('message').className='message error';$('message').textContent=(e&&e.message)||'Could not reach PASONG checkout. No payment has been taken.'}finally{$('continueBtn').disabled=false;$('continueBtn').textContent='Continue to secure checkout'}});
+$('continueBtn').addEventListener('click',async()=>{const error=validateTarget();if(error){$('message').className='message error';$('message').textContent=error;const el=type==='song'?'songId':type==='profile'?'profileId':type==='business'?'businessName':'tiktokUrl';$(el).focus();return}const p=getPackage();const provider=document.querySelector('input[name="payment"]:checked').value;const payload={promotion_id:incomingPromotionId||null,promotion_type:type,package_key:p.key,provider,amount:p.price,currency:'UGX',target:{song_id:type==='song'?$('songId').value.trim():null,profile_id:type==='profile'?$('profileId').value.trim():null,business_name:type==='business'?$('businessName').value.trim():null,business_url:type==='business'?$('businessUrl').value.trim():null,tiktok_url:type==='tiktok'?$('tiktokUrl').value.trim():null}};$('continueBtn').disabled=true;$('continueBtn').textContent='Checking secure checkout…';$('message').className='message info';$('message').textContent='Contacting PASONG checkout securely. No payment is confirmed until the provider verifies it.';try{const response=await fetch('https://pasong-api.vercel.app/api/promotions/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Secure checkout is not ready yet. No payment has been taken.');if(data.checkout_url){window.location.assign(data.checkout_url);return}throw new Error(data.error||'The API did not return a checkout link. No payment has been taken.')}catch(e){$('message').className='message error';$('message').textContent=(e&&e.message)||'Could not reach PASONG checkout. No payment has been taken.'}finally{$('continueBtn').disabled=false;$('continueBtn').textContent='Continue to secure checkout'}});
+function applyIncomingPromotion(){
+  const params = new URLSearchParams(window.location.search);
+  const incomingType = String(params.get('type') || '').trim().toLowerCase();
+  const incomingPackage = String(params.get('package') || '').trim().toLowerCase();
+  const incomingProfileId = String(params.get('profile_id') || params.get('artist_profile_id') || '').trim();
+  const incomingSongId = String(params.get('song_id') || '').trim();
+  const incomingBusinessName = String(params.get('business_name') || '').trim();
+  const incomingBusinessUrl = String(params.get('business_url') || '').trim();
+  const incomingTikTokUrl = String(params.get('tiktok_url') || '').trim();
+
+  if (incomingType && campaignData[incomingType]) {
+    chooseType(incomingType);
+  }
+  if (type === 'profile' && incomingProfileId) $('profileId').value = incomingProfileId;
+  if (type === 'song' && incomingSongId) $('songId').value = incomingSongId;
+  if (type === 'business') {
+    if (incomingBusinessName) $('businessName').value = incomingBusinessName;
+    if (incomingBusinessUrl) $('businessUrl').value = incomingBusinessUrl;
+  }
+  if (type === 'tiktok' && incomingTikTokUrl) $('tiktokUrl').value = incomingTikTokUrl;
+
+  const aliases = type === 'profile'
+    ? {starter:'profile-starter',growth:'profile-viral',pro:'profile-pro'}
+    : type === 'song'
+      ? {starter:'song-starter',viral:'song-viral',hero:'song-hero'}
+      : type === 'business'
+        ? {starter:'business-starter',growth:'business-growth',pro:'business-pro'}
+        : {starter:'tiktok-starter',growth:'tiktok-growth',pro:'tiktok-pro',max:'tiktok-max'};
+  const normalizedPackage = aliases[incomingPackage] || incomingPackage;
+  if ((campaignData[type] || []).some(p => p.key === normalizedPackage)) selected = normalizedPackage;
+  renderPackages();
+  updateSummary();
+  if (incomingType === 'profile' && incomingProfileId) {
+    $('message').className = 'message info';
+    $('message').textContent = 'Profile and package received from Promote My Profile. Confirm the selected package and payment method. Checkout is not active until the payment provider is configured.';
+  }
+}
+applyIncomingPromotion();
+// Carry the promotion created by promotion.html into checkout.
+if(incomingSongId)$('songId').value=incomingSongId;
+if(incomingSongTitle){$('message').className='message info';$('message').textContent='Promotion received for “'+incomingSongTitle+'”. Confirm the package and payment method to continue.';}
+if(incomingPromotionId){$('message').className='message info';$('message').textContent='Promotion order '+incomingPromotionId+' received. Confirm the selected package and payment method. No payment is taken until the provider verifies it.';}
 renderPackages();updateSummary();
 </script>
 </body></html>
