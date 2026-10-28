@@ -85,14 +85,12 @@ footer{padding:28px 0;background:#030814}
       <span class="logo-mark">♫</span>
       <span>PASONG<span class="logo-sub">MUSIC · CREATORS · OPPORTUNITY</span></span>
     </a>
-
     <nav class="navlinks" aria-label="Main navigation">
       <a href="/Pasong.html">Home</a>
       <a href="/studio.html" aria-current="page">Studios</a>
       <a href="/beats.html">Beats</a>
       <a href="/events.html">Events</a>
     </nav>
-
     <a class="account-btn" id="accountLink" href="/account.html">
       <span id="accountIcon">↪</span>
       <span id="accountLabel">Sign In</span>
@@ -125,17 +123,10 @@ footer{padding:28px 0;background:#030814}
       <div class="filters">
         <label class="sr-only" for="studioSearch">Search studios</label>
         <input class="field" id="studioSearch" placeholder="Search studio, city, country or service…" autocomplete="off">
-
         <label class="sr-only" for="countryFilter">Filter by country</label>
-        <select class="field" id="countryFilter">
-          <option value="">All countries (195+)</option>
-        </select>
-
+        <select class="field" id="countryFilter"><option value="">All countries (195+)</option></select>
         <label class="sr-only" for="serviceFilter">Filter by service</label>
-        <select class="field" id="serviceFilter">
-          <option value="">All services</option>
-        </select>
-
+        <select class="field" id="serviceFilter"><option value="">All services</option></select>
         <button type="button" class="btn btn-outline" id="nearMeBtn">📍 Near me</button>
       </div>
 
@@ -146,14 +137,16 @@ footer{padding:28px 0;background:#030814}
         <div class="empty-icon">🎙️</div>
         <h3 id="emptyTitle">No studios found yet</h3>
         <p class="sub" id="emptyText" style="margin:10px auto 18px">Approved studios will appear here when they are available.</p>
-        <a class="btn btn-outline" href="/producer.html?section=studio">Register a studio</a>
+        <!-- CONNECTED: opens the dedicated studio registration page -->
+        <a class="btn btn-outline" href="/own-a-studio.html">Register a studio</a>
       </div>
 
       <div style="margin-top:30px;padding:22px;border:1px solid #21476c;border-radius:16px;background:#071326">
         <div class="kicker">FOR PRODUCERS & STUDIO OWNERS</div>
         <h2 style="font-size:23px">Own a recording studio?</h2>
         <p class="sub">Register your studio, list your services and rates, and reach creators around the world.</p>
-        <a class="btn btn-grad" href="/producer.html?section=studio">Register Your Studio →</a>
+        <!-- CONNECTED: opens the dedicated studio registration page -->
+        <a class="btn btn-grad" href="/own-a-studio.html">Register Your Studio →</a>
       </div>
     </div>
   </section>
@@ -195,7 +188,6 @@ footer{padding:28px 0;background:#030814}
 
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Public Supabase configuration. Never put service-role keys or payment secrets here.
   const SUPABASE_URL =
     window.PASONG_SUPABASE_URL ||
     'https://mtufczmjlkvycarxylgh.supabase.co';
@@ -214,10 +206,8 @@ footer{padding:28px 0;background:#030814}
 
   function renderAccountLink(session) {
     if (session && session.user) {
-      // Signed-in users see their profile, not the Producer Dashboard.
       accountLink.href = '/account.html';
-      accountIcon.innerHTML =
-        '<span class="profile-icon" aria-hidden="true">♙</span>';
+      accountIcon.innerHTML = '<span class="profile-icon" aria-hidden="true">♙</span>';
       accountLabel.textContent = 'My Profile';
       accountLink.setAttribute('aria-label', 'Open your PASONG profile');
       accountLink.title = 'Your PASONG account';
@@ -230,15 +220,11 @@ footer{padding:28px 0;background:#030814}
     }
   }
 
-  // Set the safe guest state immediately.
   renderAccountLink(null);
 
   try {
     if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
-      client = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
+      client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       client.auth.getSession().then(({data, error}) => {
         if (error) throw error;
@@ -276,7 +262,6 @@ footer{padding:28px 0;background:#030814}
     'Video Production','Photography','Other'
   ];
 
-  // World country list, including commonly used country names.
   const WORLD_COUNTRIES = [
     'Afghanistan','Albania','Algeria','Andorra','Angola',
     'Antigua and Barbuda','Argentina','Armenia','Australia','Austria',
@@ -317,9 +302,7 @@ footer{padding:28px 0;background:#030814}
 
   function servicesOf(studio) {
     let values = studio.services;
-    if (!Array.isArray(values)) {
-      values = values ? String(values).split(/[\n,]/) : [];
-    }
+    if (!Array.isArray(values)) values = values ? String(values).split(/[\n,]/) : [];
     return values.map(clean).filter(Boolean).slice(0, 8);
   }
 
@@ -329,9 +312,7 @@ footer{padding:28px 0;background:#030814}
   }
 
   function money(amount, currency) {
-    if (amount === null || amount === undefined || amount === '') {
-      return 'Rate on request';
-    }
+    if (amount === null || amount === undefined || amount === '') return 'Rate on request';
     const cur = clean(currency).toUpperCase() || 'USD';
     const n = Number(amount);
     if (!Number.isFinite(n)) return `${cur} ${clean(amount)}`;
@@ -340,8 +321,7 @@ footer{padding:28px 0;background:#030814}
       return new Intl.NumberFormat(undefined, {
         style:'currency',
         currency:cur,
-        maximumFractionDigits:
-          ['UGX','KES','TZS','RWF','NGN'].includes(cur) ? 0 : 2
+        maximumFractionDigits:['UGX','KES','TZS','RWF','NGN'].includes(cur) ? 0 : 2
       }).format(n);
     } catch (_) {
       return `${cur} ${n.toLocaleString()}`;
@@ -359,29 +339,19 @@ footer{padding:28px 0;background:#030814}
 
     const services = [...new Set([
       ...COMMON_SERVICES,
-      ...allStudios.flatMap(s =>
-        [...servicesOf(s), clean(s.studio_type)].filter(Boolean)
-      )
+      ...allStudios.flatMap(s => [...servicesOf(s), clean(s.studio_type)].filter(Boolean))
     ])].sort((a,b) => a.localeCompare(b));
 
     countryFilter.replaceChildren();
     serviceFilter.replaceChildren();
-
     countryFilter.add(new Option('All countries (195+)', ''));
     serviceFilter.add(new Option('All services', ''));
 
-    countries.forEach(country => {
-      countryFilter.add(new Option(country, country));
-    });
+    countries.forEach(country => countryFilter.add(new Option(country, country)));
+    services.forEach(service => serviceFilter.add(new Option(service, service)));
 
-    services.forEach(service => {
-      serviceFilter.add(new Option(service, service));
-    });
-
-    countryFilter.value = countries.includes(selectedCountry)
-      ? selectedCountry : '';
-    serviceFilter.value = services.includes(selectedService)
-      ? selectedService : '';
+    countryFilter.value = countries.includes(selectedCountry) ? selectedCountry : '';
+    serviceFilter.value = services.includes(selectedService) ? selectedService : '';
   }
 
   function studioCard(studio) {
@@ -392,9 +362,7 @@ footer{padding:28px 0;background:#030814}
     art.className = 'studio-art';
 
     const photos = Array.isArray(studio.photos) ? studio.photos : [];
-    const photo = photos.find(p =>
-      typeof p === 'string' && /^https:\/\//i.test(p)
-    );
+    const photo = photos.find(p => typeof p === 'string' && /^https:\/\//i.test(p));
 
     if (photo) {
       const img = document.createElement('img');
@@ -409,10 +377,8 @@ footer{padding:28px 0;background:#030814}
     const mark = document.createElement('div');
     mark.className = 'studio-mark';
     mark.textContent = (
-      clean(studio.studio_name)
-        .split(/\s+/).map(word => word[0]).join('').slice(0,2) || '♫'
+      clean(studio.studio_name).split(/\s+/).map(word => word[0]).join('').slice(0,2) || '♫'
     ).toUpperCase();
-
     art.appendChild(mark);
     article.appendChild(art);
 
@@ -421,10 +387,7 @@ footer{padding:28px 0;background:#030814}
 
     const tag = document.createElement('span');
     tag.className = 'tag';
-    tag.textContent =
-      clean(studio.studio_type) ||
-      servicesOf(studio)[0] ||
-      'Recording studio';
+    tag.textContent = clean(studio.studio_type) || servicesOf(studio)[0] || 'Recording studio';
     body.appendChild(tag);
 
     const title = document.createElement('h3');
@@ -448,10 +411,9 @@ footer{padding:28px 0;background:#030814}
     price.textContent = money(studio.hourly_rate, studio.currency_code);
 
     const small = document.createElement('small');
-    small.textContent =
-      studio.hourly_rate == null || studio.hourly_rate === ''
-        ? ' · Ask the studio for pricing'
-        : ' · Rate listed by studio';
+    small.textContent = studio.hourly_rate == null || studio.hourly_rate === ''
+      ? ' · Ask the studio for pricing'
+      : ' · Rate listed by studio';
     price.appendChild(small);
     body.appendChild(price);
 
@@ -477,12 +439,10 @@ footer{padding:28px 0;background:#030814}
 
     btn.addEventListener('click', () => {
       if (!studio.id) {
-        status.textContent =
-          'This studio has no valid listing ID. Please choose another studio.';
+        status.textContent = 'This studio has no valid listing ID. Please choose another studio.';
         return;
       }
 
-      // Keep the selected studio details when opening the required checkout page.
       const params = new URLSearchParams({
         studio_id: String(studio.id),
         studio: clean(studio.studio_name),
@@ -506,16 +466,14 @@ footer{padding:28px 0;background:#030814}
     const service = serviceFilter.value;
 
     const filtered = allStudios.filter(studio => {
-      const listedServices = [
-        ...servicesOf(studio),
-        clean(studio.studio_type)
-      ].filter(Boolean);
+      const listedServices = [...servicesOf(studio), clean(studio.studio_type)].filter(Boolean);
+      const equipment = Array.isArray(studio.equipment)
+        ? studio.equipment
+        : studio.equipment ? [studio.equipment] : [];
 
       const searchable = [
-        studio.studio_name, studio.studio_type, studio.city,
-        studio.country, studio.address, studio.description,
-        ...servicesOf(studio),
-        ...(Array.isArray(studio.equipment) ? studio.equipment : [])
+        studio.studio_name, studio.studio_type, studio.city, studio.country,
+        studio.address, studio.description, ...servicesOf(studio), ...equipment
       ].join(' ').toLowerCase();
 
       const serviceMatches = !service || listedServices.some(item =>
@@ -530,14 +488,10 @@ footer{padding:28px 0;background:#030814}
 
     grid.replaceChildren();
     filtered.forEach(studio => grid.appendChild(studioCard(studio)));
-
     empty.hidden = filtered.length > 0;
 
     if (!filtered.length) {
-      emptyTitle.textContent = allStudios.length
-        ? 'No matching studios'
-        : 'No approved studios available yet';
-
+      emptyTitle.textContent = allStudios.length ? 'No matching studios' : 'No approved studios available yet';
       emptyText.textContent = allStudios.length
         ? 'Try a different search or remove one of the filters.'
         : 'PASONG only displays approved studio listings. Please check back soon.';
@@ -561,21 +515,16 @@ footer{padding:28px 0;background:#030814}
     const providers = [
       async () => {
         const response = await fetch('https://ipapi.co/json/', {
-          headers:{Accept:'application/json'},
-          cache:'no-store'
+          headers:{Accept:'application/json'}, cache:'no-store'
         });
         if (!response.ok) throw new Error('Location lookup failed');
         const data = await response.json();
         if (data.error) throw new Error('Location unavailable');
-        return {
-          city:clean(data.city),
-          country:clean(data.country_name || data.country)
-        };
+        return {city:clean(data.city),country:clean(data.country_name || data.country)};
       },
       async () => {
         const response = await fetch('https://ipwho.is/', {
-          headers:{Accept:'application/json'},
-          cache:'no-store'
+          headers:{Accept:'application/json'}, cache:'no-store'
         });
         if (!response.ok) throw new Error('Location lookup failed');
         const data = await response.json();
@@ -588,14 +537,11 @@ footer{padding:28px 0;background:#030814}
       try {
         const result = await Promise.race([
           provider(),
-          new Promise((_,reject) =>
-            setTimeout(() => reject(new Error('Timed out')),5000)
-          )
+          new Promise((_,reject) => setTimeout(() => reject(new Error('Timed out')),5000))
         ]);
 
         visitor = result;
 
-        // Keep a manually selected country. Otherwise prioritise matching studios.
         if (!countryFilter.value && (visitor.city || visitor.country)) {
           const norm = value => clean(value).toLowerCase();
           const score = studio => {
@@ -604,21 +550,18 @@ footer{padding:28px 0;background:#030814}
             if (visitor.country && norm(studio.country) === norm(visitor.country)) value += 2;
             return value;
           };
-
           allStudios.sort((a,b) => score(b) - score(a));
         }
 
         applyFilters();
 
         if (!countryFilter.value && (visitor.city || visitor.country)) {
-          status.textContent =
-            `${allStudios.length} approved studios worldwide · Prioritising ` +
-            `${[visitor.city,visitor.country].filter(Boolean).join(', ')}. ` +
-            'You can still search or choose any country.';
+          status.textContent = `${allStudios.length} approved studios worldwide · Prioritising ` +
+            `${[visitor.city,visitor.country].filter(Boolean).join(', ')}. You can still search or choose any country.`;
         }
         return;
       } catch (_) {
-        // Try the next IP-location provider.
+        // Try the next location provider.
       }
     }
 
@@ -632,12 +575,10 @@ footer{padding:28px 0;background:#030814}
 
   async function loadStudios() {
     if (!client) {
-      status.textContent =
-        'Studio directory connection is unavailable. Check the public Supabase configuration.';
+      status.textContent = 'Studio directory connection is unavailable. Check the public Supabase configuration.';
       empty.hidden = false;
       emptyTitle.textContent = 'Studio directory connection needed';
-      emptyText.textContent =
-        'The page only displays approved studio listings from PASONG. Check the Supabase URL and publishable key.';
+      emptyText.textContent = 'The page only displays approved studio listings from PASONG. Check the Supabase URL and publishable key.';
       return;
     }
 
@@ -655,25 +596,21 @@ footer{padding:28px 0;background:#030814}
       applyFilters();
 
       if (!allStudios.length) {
-        status.textContent =
-          'No approved studios have been published yet. Listings appear after admin approval.';
+        status.textContent = 'No approved studios have been published yet. Listings appear after admin approval.';
         return;
       }
 
       detectLocation();
     } catch (error) {
       console.error('PASONG studio directory error:',error);
-      status.textContent =
-        'Could not load approved studios. Check the Supabase connection, table columns and public read policy.';
+      status.textContent = 'Could not load approved studios. Check the Supabase connection, table columns and public read policy.';
       empty.hidden = false;
       emptyTitle.textContent = 'Studios could not load';
-      emptyText.textContent =
-        'Please try again later. This page does not invent studio listings.';
+      emptyText.textContent = 'Please try again later. This page does not invent studio listings.';
     }
   }
 
   fillOptions();
-
   search.addEventListener('input',applyFilters);
   countryFilter.addEventListener('change',applyFilters);
   serviceFilter.addEventListener('change',applyFilters);
