@@ -1,86 +1,377 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#8b5cf6"><title>PASONG Premium</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#8b5cf6">
+<meta name="description" content="Upgrade to PASONG Premium for an enhanced music listening experience.">
+<title>PASONG Premium</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{color-scheme:dark;--purple:#8b5cf6;--pink:#ec4899;--muted:#b8b2d0;--line:#342951}
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,system-ui,sans-serif;background:radial-gradient(ellipse at top,#21113e,#090817 58%);color:#fff;min-height:100vh}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:radial-gradient(ellipse at top,#21113e,#090817 58%);color:#fff;min-height:100vh}
 header{max-width:1100px;margin:auto;padding:22px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-size:24px;font-weight:900;letter-spacing:1px}.brand span{color:#c4b5fd}a{color:inherit;text-decoration:none}.back{border:1px solid var(--line);padding:10px 14px;border-radius:12px}
-main{max-width:1040px;margin:auto;padding:25px 20px 65px}.hero{text-align:center;padding:28px 0 36px}
+.brand{font-size:24px;font-weight:900;letter-spacing:1px}.brand span{color:#c4b5fd}
+a{color:inherit;text-decoration:none}
+.back{border:1px solid var(--line);padding:10px 14px;border-radius:12px}
+main{max-width:1040px;margin:auto;padding:25px 20px 65px}
+.hero{text-align:center;padding:28px 0 36px}
 .eyebrow{display:inline-block;border:1px solid #7044b8;background:#24143f;color:#d9c5ff;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:800;letter-spacing:1.5px}
-h1{font-size:clamp(36px,7vw,66px);line-height:1.04;margin:20px 0 16px;letter-spacing:-2px}h1 span{background:linear-gradient(90deg,#c4b5fd,#f0abfc,#f9a8d4);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{max-width:650px;margin:auto;color:var(--muted);font-size:17px;line-height:1.7}.geo{margin:18px auto 0;color:#d8c9f8;font-size:13px;min-height:18px}
-.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:820px;margin:auto}.plan{border:1px solid var(--line);background:linear-gradient(160deg,#1e1637f7,#0f0c1efc);border-radius:24px;padding:28px;box-shadow:0 18px 55px #0005}.featured{border-color:#a78bfa;box-shadow:0 0 0 1px #8b5cf644,0 20px 65px #5b21b544}
-.tag{font-size:11px;font-weight:900;letter-spacing:1px;color:#d8b4fe;margin-bottom:15px}h2{font-size:32px;margin:8px 0 4px}.price{font-size:14px;color:var(--muted);min-height:22px}.desc{color:var(--muted);line-height:1.6;margin:16px 0 20px}
-ul{list-style:none;display:grid;gap:12px;margin:20px 0 25px}li{color:#eee9fa;font-size:14px}li:before{content:"✓";color:#c4b5fd;font-weight:900;margin-right:10px}
-button{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:13px;padding:14px 18px;width:100%;color:white;background:linear-gradient(100deg,#7c3aed,#db2777);box-shadow:0 9px 25px #7c3aed33}button:disabled{opacity:.65;cursor:wait}
-.fine{font-size:12px;color:#a9a1c1;line-height:1.6;text-align:center;margin:25px auto 0;max-width:700px}.status{display:none;margin:18px auto 0;max-width:820px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;line-height:1.5;font-size:14px}.status.show{display:block}.error{border-color:#9f344e;background:#351322;color:#ffd3df}.success{border-color:#386c55;background:#10281f;color:#c5ffe0}.info{background:#17132a;color:#e5dcff}
-@media(max-width:700px){header{padding:17px 15px}main{padding:14px 15px 45px}.hero{padding:25px 0 28px}.plans{grid-template-columns:1fr;gap:15px}.plan{padding:23px}h1{letter-spacing:-1px}.lead{font-size:15px}}
-</style></head>
+h1{font-size:clamp(36px,7vw,66px);line-height:1.04;margin:20px 0 16px;letter-spacing:-2px}
+h1 span{background:linear-gradient(90deg,#c4b5fd,#f0abfc,#f9a8d4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:650px;margin:auto;color:var(--muted);font-size:17px;line-height:1.7}
+.geo{margin:18px auto 0;color:#d8c9f8;font-size:13px;min-height:18px}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;max-width:820px;margin:auto}
+.plan{border:1px solid var(--line);background:linear-gradient(160deg,#1e1637f7,#0f0c1efc);border-radius:24px;padding:28px;box-shadow:0 18px 55px #0005}
+.featured{border-color:#a78bfa;box-shadow:0 0 0 1px #8b5cf644,0 20px 65px #5b21b544}
+.tag{font-size:11px;font-weight:900;letter-spacing:1px;color:#d8b4fe;margin-bottom:15px}
+h2{font-size:32px;margin:8px 0 4px}
+.price{font-size:19px;color:#e9d5ff;font-weight:800;min-height:28px}
+.price small{font-size:13px;font-weight:500;color:var(--muted)}
+.desc{color:var(--muted);line-height:1.6;margin:16px 0 20px}
+ul{list-style:none;display:grid;gap:12px;margin:20px 0 25px}
+li{color:#eee9fa;font-size:14px}
+li:before{content:"✓";color:#c4b5fd;font-weight:900;margin-right:10px}
+button{border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:13px;padding:14px 18px;width:100%;color:white;background:linear-gradient(100deg,#7c3aed,#db2777);box-shadow:0 9px 25px #7c3aed33}
+button:disabled{opacity:.65;cursor:wait}
+.fine{font-size:12px;color:#a9a1c1;line-height:1.6;text-align:center;margin:25px auto 0;max-width:700px}
+.status{display:none;margin:18px auto 0;max-width:820px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;line-height:1.5;font-size:14px}
+.status.show{display:block}
+.error{border-color:#9f344e;background:#351322;color:#ffd3df}
+.success{border-color:#386c55;background:#10281f;color:#c5ffe0}
+.info{background:#17132a;color:#e5dcff}
+@media(max-width:700px){
+header{padding:17px 15px}
+main{padding:14px 15px 45px}
+.hero{padding:25px 0 28px}
+.plans{grid-template-columns:1fr;gap:15px}
+.plan{padding:23px}
+h1{letter-spacing:-1px}
+.lead{font-size:15px}
+.brand{font-size:20px}
+.back{font-size:13px;padding:9px 10px}
+}
+</style>
+</head>
 <body>
-<header><a class="brand" href="index.html">PASONG<span> PREMIUM</span></a><a class="back" href="index.html">← Back to PASONG</a></header>
+<header>
+<a class="brand" href="index.html">PASONG<span> PREMIUM</span></a>
+<a class="back" href="index.html">← Back to PASONG</a>
+</header>
+
 <main>
-<section class="hero"><div class="eyebrow">UPGRADE YOUR LISTENING</div><h1>Music without <span>limits.</span></h1>
+<section class="hero">
+<div class="eyebrow">UPGRADE YOUR LISTENING</div>
+<h1>Music without <span>limits.</span></h1>
 <p class="lead">Support the music you love and unlock the PASONG Premium experience.</p>
-<p id="geoNote" class="geo" aria-live="polite">Detecting your regional price…</p></section>
-<div id="statusBox" class="status" role="status" aria-live="polite"></div>
-<section class="plans" aria-label="PASONG Premium plans">
-<article class="plan"><div class="tag">FLEXIBLE ACCESS</div><h2>Monthly</h2><div id="monthlyPrice" class="price">Loading regional price…</div>
-<p class="desc">Premium access billed monthly.</p><ul><li>Premium member badge</li><li>Ad-free listening experience</li><li>Higher-quality audio where available</li><li>Premium releases and playlists</li></ul><button id="monthlyButton">Choose Monthly</button></article>
-<article class="plan featured"><div class="tag">BEST VALUE</div><h2>Yearly</h2><div id="yearlyPrice" class="price">Loading regional price…</div>
-<p class="desc">One yearly plan for listeners who want Premium all year long.</p><ul><li>Everything in Monthly</li><li>One yearly billing period</li><li>Early access to selected releases</li><li>Support the PASONG music community</li></ul><button id="yearlyButton">Choose Yearly</button></article>
+<p id="geoNote" class="geo" aria-live="polite">Premium prices shown below · Checking regional prices…</p>
 </section>
-<p class="fine">Regional prices are estimated using your connection's country as detected by the PASONG API. The server determines the final price at checkout. Premium is activated only after payment is verified.</p>
+
+<div id="statusBox" class="status" role="status" aria-live="polite"></div>
+
+<section class="plans" aria-label="PASONG Premium plans">
+<article class="plan">
+<div class="tag">FLEXIBLE ACCESS</div>
+<h2>Monthly</h2>
+<div id="monthlyPrice" class="price">UGX 10,000 <small>/ month</small></div>
+<p class="desc">Premium access billed monthly.</p>
+<ul>
+<li>Premium member badge</li>
+<li>Ad-free listening experience</li>
+<li>Higher-quality audio where available</li>
+<li>Premium releases and playlists</li>
+</ul>
+<button id="monthlyButton" type="button">Choose Monthly</button>
+</article>
+
+<article class="plan featured">
+<div class="tag">BEST VALUE</div>
+<h2>Yearly</h2>
+<div id="yearlyPrice" class="price">UGX 100,000 <small>/ year</small></div>
+<p class="desc">One yearly plan for listeners who want Premium all year long.</p>
+<ul>
+<li>Everything in Monthly</li>
+<li>One yearly billing period</li>
+<li>Early access to selected releases</li>
+<li>Support the PASONG music community</li>
+</ul>
+<button id="yearlyButton" type="button">Choose Yearly</button>
+</article>
+</section>
+
+<p class="fine">
+Prices are displayed in your detected region where supported. The PASONG server determines the final price at checkout. A checkout request does not itself activate Premium; payment must be completed and verified.
+</p>
 </main>
+
 <script>
-(()=>{"use strict";
+(()=> {
+"use strict";
+
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_BASE="https://pasong-api.onrender.com";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const box=document.getElementById("statusBox"),note=document.getElementById("geoNote");
-const buttons={monthly:document.getElementById("monthlyButton"),yearly:document.getElementById("yearlyButton")};
+
+/* Use the current PASONG API deployment. */
+const API_BASE="https://pasong-api.vercel.app";
+
+const box=document.getElementById("statusBox");
+const note=document.getElementById("geoNote");
+const monthlyEl=document.getElementById("monthlyPrice");
+const yearlyEl=document.getElementById("yearlyPrice");
+
+const buttons={
+ monthly:document.getElementById("monthlyButton"),
+ yearly:document.getElementById("yearlyButton")
+};
+
 let cached=null;
-function show(type,msg){box.className="status show "+type;box.textContent=msg}
-function money(amount,currency){try{return new Intl.NumberFormat(undefined,{style:"currency",currency:String(currency||"USD"),maximumFractionDigits:2}).format(Number(amount))}catch(e){return String(currency||"")+" "+Number(amount).toLocaleString()}}
-function item(d,k){const x=d&&d[k];if(!x||typeof x!=="object")return null;const amount=Number(x.amount??x.price??x.total);if(!Number.isFinite(amount)||amount<0)return null;return {...x,amount,currency:String(x.currency||d.currency||"USD").toUpperCase()}}
-async function loadPricing(force=false){
- if(cached&&!force)return cached;
- const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);
- try{
-  const r=await fetch(API_BASE+"/api/premium/pricing",{headers:{Accept:"application/json"},cache:"no-store",signal:ctrl.signal});
-  const d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.error||"Pricing service returned an error.");
-  const monthly=item(d,"monthly"),yearly=item(d,"yearly");if(!monthly||!yearly)throw Error("Monthly/yearly prices missing from API response.");
-  cached={...d,monthly,yearly};
-  document.getElementById("monthlyPrice").textContent=money(monthly.amount,monthly.currency)+" / month";
-  document.getElementById("yearlyPrice").textContent=money(yearly.amount,yearly.currency)+" / year";
-  const country=String(d.country||monthly.country||yearly.country||"").toUpperCase();
-  note.textContent=country?"Regional price detected · "+country+" · "+monthly.currency:"Regional price detected · "+monthly.currency;
-  window.PASONG_PREMIUM_GEO={country,currency:monthly.currency,monthly,yearly,detected:true};return cached;
- }catch(e){note.textContent="Could not detect a regional price right now.";document.getElementById("monthlyPrice").textContent="Regional price unavailable";document.getElementById("yearlyPrice").textContent="Regional price unavailable";window.PASONG_PREMIUM_GEO={detected:false,error:e.message};throw e}
- finally{clearTimeout(timer)}
+let sb=null;
+
+/* Prices remain visible if the pricing API is temporarily unavailable. */
+const FALLBACK={
+ monthly:{amount:10000,currency:"UGX",country:"UG",interval:"month"},
+ yearly:{amount:100000,currency:"UGX",country:"UG",interval:"year"}
+};
+
+try {
+ if(window.supabase && window.supabase.createClient){
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+ }
+} catch(e) {
+ console.error("Supabase initialization failed:",e);
 }
+
+function show(type,msg){
+ box.className="status show "+type;
+ box.textContent=msg;
+}
+
+function money(amount,currency){
+ try {
+  return new Intl.NumberFormat(undefined,{
+   style:"currency",
+   currency:String(currency||"USD").toUpperCase(),
+   maximumFractionDigits:2
+  }).format(Number(amount));
+ } catch(e) {
+  return String(currency||"")+" "+Number(amount).toLocaleString();
+ }
+}
+
+function getPlan(data,key){
+ const x=data&&data[key];
+ if(!x||typeof x!=="object")return null;
+
+ const amount=Number(x.amount??x.price??x.total);
+ const currency=String(x.currency||data.currency||"").toUpperCase();
+
+ if(!Number.isFinite(amount)||amount<=0||!currency)return null;
+
+ return {
+  ...x,
+  amount,
+  currency
+ };
+}
+
+function renderPrices(pricing){
+ monthlyEl.replaceChildren();
+ yearlyEl.replaceChildren();
+
+ const monthlyText=document.createTextNode(
+  money(pricing.monthly.amount,pricing.monthly.currency)+" "
+ );
+ const monthlySmall=document.createElement("small");
+ monthlySmall.textContent="/ month";
+ monthlyEl.append(monthlyText,monthlySmall);
+
+ const yearlyText=document.createTextNode(
+  money(pricing.yearly.amount,pricing.yearly.currency)+" "
+ );
+ const yearlySmall=document.createElement("small");
+ yearlySmall.textContent="/ year";
+ yearlyEl.append(yearlyText,yearlySmall);
+}
+
+async function loadPricing(){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),10000);
+
+ try {
+  const response=await fetch(API_BASE+"/api/premium/pricing",{
+   method:"GET",
+   headers:{Accept:"application/json"},
+   cache:"no-store",
+   signal:controller.signal
+  });
+
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok||data.success===false){
+   throw new Error(data.error||"Premium pricing service is unavailable.");
+  }
+
+  const monthly=getPlan(data,"monthly");
+  const yearly=getPlan(data,"yearly");
+
+  if(!monthly||!yearly){
+   throw new Error("The API did not return valid monthly and yearly prices.");
+  }
+
+  cached={...data,monthly,yearly};
+  renderPrices(cached);
+
+  const country=String(
+   data.country||monthly.country||yearly.country||""
+  ).toUpperCase();
+
+  note.textContent=country
+   ?"Regional prices detected · "+country
+   :"Regional prices loaded";
+
+  window.PASONG_PREMIUM_GEO={
+   country,
+   currency:monthly.currency,
+   monthly,
+   yearly,
+   detected:true
+  };
+
+  return cached;
+
+ } catch(error) {
+  /*
+   * Do not clear the visible prices on API failure.
+   * The server still determines the actual checkout price.
+   */
+  note.textContent="Showing default prices · Regional detection unavailable";
+
+  window.PASONG_PREMIUM_GEO={
+   detected:false,
+   fallback:true,
+   error:error.message
+  };
+
+  console.warn("Regional Premium pricing unavailable:",error);
+  return null;
+
+ } finally {
+  clearTimeout(timer);
+ }
+}
+
 async function checkout(plan){
- const b=buttons[plan],old=b.textContent;b.disabled=true;b.textContent="Please wait…";
- try{
-  const {data,error}=await sb.auth.getSession();if(error)throw error;
-  const session=data&&data.session;if(!session||!session.access_token){location.href="login.html?redirect="+encodeURIComponent("premium.html?plan="+plan);return}
-  try{await loadPricing(true)}catch(e){}
-  const r=await fetch(API_BASE+"/api/premium/checkout",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify({plan})});
-  const d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.error||d.message||"Could not start Premium checkout.");
-  const url=d.checkout_url||d.checkoutUrl||d.url;if(url){location.href=url;return}
-  const p=d.pricing||{},pay=d.payment||{};
-  show("success",d.message||("Checkout created ("+(pay.payment_reference||pay.id||"pending")+"). Payment must be completed and verified before Premium is activated."+(p.amount!=null?" Amount: "+money(p.amount,p.currency)+".":"")));
- }catch(e){show("error",e.message||"Unable to start Premium checkout. Please try again.")}
- finally{b.disabled=false;b.textContent=old}
+ const button=buttons[plan];
+ const originalText=button.textContent;
+
+ button.disabled=true;
+ button.textContent="Please wait…";
+
+ try {
+  if(!sb){
+   throw new Error("Login service is unavailable. Please refresh and try again.");
+  }
+
+  const {data,error}=await sb.auth.getSession();
+  if(error)throw error;
+
+  const session=data&&data.session;
+
+  if(!session||!session.access_token){
+   location.href="login.html?redirect="+
+    encodeURIComponent("premium.html?plan="+plan);
+   return;
+  }
+
+  /*
+   * Refresh display pricing, but never send a browser-calculated amount
+   * as the authoritative price. The backend calculates checkout pricing.
+   */
+  await loadPricing();
+
+  const response=await fetch(API_BASE+"/api/premium/checkout",{
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json",
+    "Accept":"application/json",
+    "Authorization":"Bearer "+session.access_token
+   },
+   body:JSON.stringify({plan})
+  });
+
+  const result=await response.json().catch(()=>({}));
+
+  if(!response.ok||result.success===false){
+   throw new Error(
+    result.error||result.message||"Could not start Premium checkout."
+   );
+  }
+
+  const checkoutUrl=
+   result.checkout_url||result.checkoutUrl||result.url;
+
+  if(checkoutUrl){
+   let parsed;
+   try {
+    parsed=new URL(checkoutUrl,location.href);
+   } catch(e) {
+    throw new Error("The checkout service returned an invalid payment link.");
+   }
+
+   if(parsed.protocol!=="https:"&&parsed.origin!==location.origin){
+    throw new Error("The checkout service returned an unsafe payment link.");
+   }
+
+   location.href=parsed.href;
+   return;
+  }
+
+  const pricing=result.pricing||{};
+  const payment=result.payment||{};
+  const amount=pricing.amount??payment.amount;
+  const currency=pricing.currency||payment.currency||"UGX";
+  const reference=payment.payment_reference||payment.id||"pending";
+
+  /*
+   * The current backend may create a pending payment record without
+   * returning a provider checkout URL. Do not claim payment is complete.
+   */
+  show(
+   "info",
+   (result.message||"A Premium checkout record was created.")+
+   " Reference: "+reference+
+   (amount!=null?" · Amount: "+money(amount,currency):"")+
+   " Payment must be completed and verified before Premium is activated."
+  );
+
+ } catch(error) {
+  show(
+   "error",
+   error.message||"Unable to start Premium checkout. Please try again."
+  );
+ } finally {
+  button.disabled=false;
+  button.textContent=originalText;
+ }
 }
-buttons.monthly.addEventListener("click",()=>checkout("monthly"));buttons.yearly.addEventListener("click",()=>checkout("yearly"));
-const cta=document.getElementById("ctaPremiumButton");if(cta)cta.addEventListener("click",()=>checkout("monthly"));
-loadPricing().catch(()=>show("info","Regional pricing could not be loaded. Confirm the PASONG API pricing endpoint is deployed."));
+
+buttons.monthly.addEventListener("click",()=>checkout("monthly"));
+buttons.yearly.addEventListener("click",()=>checkout("yearly"));
+
+/* Support an optional Premium CTA used elsewhere on the page. */
+const cta=document.getElementById("ctaPremiumButton");
+if(cta){
+ cta.addEventListener("click",()=>checkout("monthly"));
+}
+
+/* Prices already appear in HTML; regional prices update when available. */
+loadPricing();
+
 })();
 </script>
+
 <script src="premium-nav.js"></script>
-</body></html>
+</body>
+</html>
