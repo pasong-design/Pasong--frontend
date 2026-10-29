@@ -3,362 +3,733 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090710">
 <meta name="description" content="Support your favourite artist directly on PASONG.">
 <title>Tip an Artist | PASONG</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+:root{
+  --bg:#080710;
+  --panel:#151120;
+  --panel2:#1c1629;
+  --purple:#9b6bff;
+  --pink:#d34bea;
+  --text:#fff;
+  --muted:#aaa2b8;
+  --border:rgba(255,255,255,.10);
+  --green:#45d6a0;
+}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,#24113b 0,#0a0811 42%,#07060b 100%);color:#fff;font-family:Inter,Arial,sans-serif}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+  background:
+    radial-gradient(ellipse at 50% -15%,rgba(130,67,210,.30),transparent 48%),
+    linear-gradient(180deg,#0b0912,#080710 70%);
+}
 a{color:inherit;text-decoration:none}
-header{height:64px;padding:0 max(18px,calc((100% - 1050px)/2));display:flex;align-items:center;gap:14px;background:#0b0912ef;border-bottom:1px solid #ffffff14;position:sticky;top:0}
-.back{font-size:25px;color:#c4b5fd}
-.logo{font-weight:950;letter-spacing:.5px;font-size:20px}
+button,input,select{font:inherit}
+
+header{
+  height:68px;
+  padding:0 max(18px,calc((100% - 1080px)/2));
+  display:flex;
+  align-items:center;
+  gap:16px;
+  background:rgba(9,7,16,.92);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:20;
+  backdrop-filter:blur(16px);
+}
+.back{
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--border);
+  border-radius:11px;
+  color:#d7c4ff;
+  font-size:22px;
+}
+.logo{
+  font-size:21px;
+  font-weight:950;
+  letter-spacing:.5px;
+}
 .logo span{color:#b78aff}
-.account{margin-left:auto;color:#c4b5fd;font-size:12px;font-weight:800}
-main{width:min(960px,92%);margin:38px auto 70px}
-.eyebrow{color:#c4a4ff;font-size:10px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
-h1{font-size:clamp(30px,6vw,48px);letter-spacing:-1.5px;margin:10px 0}
-.intro{color:#aaa3b5;line-height:1.6;max-width:620px;font-size:14px}
-.layout{display:grid;grid-template-columns:1fr 1.1fr;gap:22px;margin-top:28px}
-.panel{background:linear-gradient(145deg,#171222,#100d18);border:1px solid #ffffff12;border-radius:22px;padding:24px;box-shadow:0 25px 70px #0005}
-.artist{display:flex;align-items:center;gap:15px}
-.avatar{width:82px;height:82px;border-radius:20px;object-fit:cover;background:#261638;border:1px solid #ffffff20}
-.artist-name{font-size:21px;font-weight:900;overflow-wrap:anywhere}
-.muted{color:#958da1;font-size:12px;margin-top:6px}
-.support{margin-top:26px;padding:18px;border-radius:16px;background:#8b5cf618;border:1px solid #a78bfa35}
-.support strong{font-size:14px}
-.support p{font-size:12px;color:#b9b0c8;line-height:1.6;margin:8px 0 0}
-.amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.amount{background:#ffffff08;border:1px solid #ffffff1a;border-radius:12px;padding:14px 6px;color:#fff;font-weight:900;cursor:pointer}
-.amount.active{background:#8b5cf633;border-color:#b78aff;color:#e6d7ff}
-.field{margin-top:16px}
-.field label{display:block;color:#bdb5ca;font-size:11px;font-weight:800;margin-bottom:8px}
-.field input,.field select{width:100%;background:#0b0912;border:1px solid #ffffff20;color:#fff;border-radius:11px;padding:14px;font-size:14px;outline:none}
-.field input:focus,.field select:focus{border-color:#a78bfa}
-.summary{margin-top:20px;padding:16px;border-radius:14px;background:#0b0912;border:1px solid #ffffff12}
-.line{display:flex;justify-content:space-between;gap:12px;color:#aaa2b4;font-size:12px;margin:8px 0}
-.line b{color:#fff}
-.cta{width:100%;border:0;border-radius:13px;padding:16px;margin-top:18px;background:linear-gradient(110deg,#8b5cf6,#c026d3);color:#fff;font-size:14px;font-weight:950;cursor:pointer;box-shadow:0 12px 30px #8b5cf633}
-.notice{font-size:11px;color:#8f879a;line-height:1.6;margin-top:14px}
-.status{display:none;padding:13px;border-radius:12px;margin-top:14px;font-size:12px;line-height:1.5}
+.account{
+  margin-left:auto;
+  color:#d3bdff;
+  font-size:11px;
+  font-weight:850;
+  letter-spacing:.7px;
+}
+
+main{
+  width:min(1000px,92%);
+  margin:48px auto 70px;
+}
+.intro{
+  max-width:650px;
+  margin-bottom:30px;
+}
+.eyebrow{
+  color:#c5a6ff;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+h1{
+  margin:12px 0 10px;
+  font-size:clamp(34px,6vw,52px);
+  line-height:1.04;
+  letter-spacing:-1.8px;
+}
+.intro p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.75;
+  margin:0;
+  max-width:580px;
+}
+.layout{
+  display:grid;
+  grid-template-columns:.92fr 1.08fr;
+  gap:22px;
+  align-items:start;
+}
+.panel{
+  min-width:0;
+  padding:26px;
+  border-radius:23px;
+  background:linear-gradient(145deg,rgba(29,22,43,.98),rgba(15,12,23,.98));
+  border:1px solid var(--border);
+  box-shadow:0 22px 65px rgba(0,0,0,.30);
+}
+.artist-card{
+  position:relative;
+  overflow:hidden;
+}
+.artist-card:before{
+  content:"";
+  position:absolute;
+  width:190px;
+  height:190px;
+  right:-100px;
+  top:-100px;
+  background:rgba(155,107,255,.17);
+  filter:blur(35px);
+  border-radius:50%;
+  pointer-events:none;
+}
+.artist{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  position:relative;
+}
+.avatar{
+  width:90px;
+  height:90px;
+  flex:0 0 90px;
+  object-fit:cover;
+  border-radius:19px;
+  background:#281a3b;
+  border:1px solid rgba(255,255,255,.15);
+}
+.artist-name{
+  font-size:22px;
+  line-height:1.2;
+  font-weight:950;
+  overflow-wrap:anywhere;
+}
+.artist-location{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:12px;
+}
+.verified{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-top:8px;
+  padding:5px 9px;
+  border-radius:20px;
+  background:rgba(69,214,160,.10);
+  border:1px solid rgba(69,214,160,.23);
+  color:#7ce8bc;
+  font-size:10px;
+  font-weight:800;
+}
+.support-box{
+  margin-top:27px;
+  padding:20px;
+  border-radius:17px;
+  background:linear-gradient(135deg,rgba(139,92,246,.17),rgba(192,38,211,.08));
+  border:1px solid rgba(167,139,250,.23);
+}
+.support-icon{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:rgba(167,139,250,.16);
+  font-size:20px;
+  margin-bottom:13px;
+}
+.support-box strong{
+  font-size:15px;
+}
+.support-box p{
+  color:#bdb3ca;
+  font-size:12px;
+  line-height:1.75;
+  margin:8px 0 0;
+}
+.note-list{
+  display:grid;
+  gap:13px;
+  margin-top:24px;
+}
+.note-item{
+  display:flex;
+  align-items:flex-start;
+  gap:11px;
+  color:#b8afc4;
+  font-size:12px;
+  line-height:1.6;
+}
+.note-item span:first-child{
+  color:#b995ff;
+  font-size:15px;
+}
+.form-heading{
+  margin-bottom:20px;
+}
+.form-heading h2{
+  font-size:22px;
+  margin:8px 0 6px;
+  letter-spacing:-.5px;
+}
+.form-heading p{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+  margin:0;
+}
+.amounts{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:17px 0 20px;
+}
+.amount{
+  min-height:53px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  color:#eee8f8;
+  background:rgba(255,255,255,.035);
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+}
+.amount:hover{
+  border-color:#a78bfa;
+  background:rgba(139,92,246,.12);
+}
+.amount.active{
+  border-color:#b78aff;
+  background:linear-gradient(135deg,rgba(139,92,246,.30),rgba(192,38,211,.17));
+  color:#fff;
+  box-shadow:inset 0 0 0 1px rgba(183,138,255,.12);
+}
+.field{margin-top:17px}
+.field label{
+  display:block;
+  margin-bottom:8px;
+  color:#c7bfd2;
+  font-size:11px;
+  font-weight:850;
+}
+.field input,
+.field select{
+  width:100%;
+  min-height:49px;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.13);
+  outline:none;
+  color:#fff;
+  background:#0d0a15;
+  font-size:14px;
+}
+.field input:focus,
+.field select:focus{
+  border-color:#a78bfa;
+  box-shadow:0 0 0 3px rgba(139,92,246,.12);
+}
+.field input::placeholder{color:#70697b}
+.field select option{
+  background:#171222;
+  color:#fff;
+}
+.amount-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:22px;
+  padding:17px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  background:rgba(5,4,10,.42);
+}
+.amount-summary span{
+  color:#aaa2b8;
+  font-size:12px;
+}
+.amount-summary strong{
+  color:#fff;
+  font-size:20px;
+  font-weight:950;
+}
+.cta{
+  width:100%;
+  min-height:54px;
+  margin-top:17px;
+  border:0;
+  border-radius:13px;
+  color:#fff;
+  background:linear-gradient(105deg,#8655ee,#bd3ed1);
+  font-size:14px;
+  font-weight:950;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(139,92,246,.23);
+  transition:transform .2s,filter .2s;
+}
+.cta:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.cta:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none;
+}
+.status{
+  display:none;
+  margin-top:14px;
+  padding:13px 14px;
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.6;
+}
 .status.show{display:block}
-.status.error{background:#7f1d1d30;border:1px solid #ef444455;color:#fecaca}
-.status.info{background:#8b5cf620;border:1px solid #a78bfa55;color:#e9ddff}
-.split{margin-top:16px;color:#8f879a;font-size:11px;text-align:center}
-.split b{color:#d8c4ff}
-@media(max-width:700px){main{margin:25px auto 45px}.layout{grid-template-columns:1fr}.panel{padding:19px}.amount{padding:13px 4px}header{height:58px}}
+.status.error{
+  color:#ffcaca;
+  background:rgba(127,29,29,.20);
+  border:1px solid rgba(239,68,68,.30);
+}
+.status.info{
+  color:#e6d7ff;
+  background:rgba(139,92,246,.13);
+  border:1px solid rgba(167,139,250,.27);
+}
+.status.success{
+  color:#a5f3d0;
+  background:rgba(16,185,129,.10);
+  border:1px solid rgba(52,211,153,.25);
+}
+.notice{
+  color:#82798e;
+  font-size:10px;
+  line-height:1.7;
+  margin:15px 0 0;
+}
+.footer{
+  margin-top:35px;
+  text-align:center;
+  color:#777083;
+  font-size:11px;
+}
+.footer a{color:#c3a6ff}
+.hidden{display:none!important}
+
+@media(max-width:760px){
+  header{height:60px}
+  main{margin:31px auto 48px}
+  .layout{grid-template-columns:1fr}
+  .panel{padding:21px}
+  .artist-card{order:0}
+  .tip-panel{order:1}
+  h1{font-size:39px}
+}
+@media(max-width:380px){
+  .panel{padding:17px}
+  .avatar{width:76px;height:76px;flex-basis:76px}
+  .artist-name{font-size:19px}
+  .amount{font-size:12px}
+}
 </style>
 </head>
+
 <body>
+
 <header>
-<a class="back" href="javascript:history.back()" aria-label="Go back">‹</a>
-<a class="logo" href="index.html">PAS<span>ONG</span></a>
-<a class="account" href="account.html">MY ACCOUNT ↗</a>
+  <a class="back" href="javascript:history.back()" aria-label="Go back">‹</a>
+  <a class="logo" href="index.html">PAS<span>ONG</span></a>
+  <a class="account" href="account.html">MY ACCOUNT ↗</a>
 </header>
 
 <main>
-<div class="eyebrow">Support independent music</div>
-<h1>Tip an artist.</h1>
-<p class="intro">Show an artist some love. You can send a tip directly without buying a song or subscribing to Premium.</p>
+  <section class="intro">
+    <div class="eyebrow">Support independent music</div>
+    <h1>Show an artist some love.</h1>
+    <p>
+      Your support helps artists keep creating, recording and sharing
+      the music you enjoy. Send a direct tip to your favourite PASONG artist.
+    </p>
+  </section>
 
-<div class="layout">
-<section class="panel">
- <div class="artist">
-  <img id="artistImage" class="avatar" alt="Artist profile" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='100%25' height='100%25' fill='%23241638'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='48' fill='%23c4b5fd'%3E♫%3C/text%3E%3C/svg%3E">
-  <div>
-   <div class="eyebrow">You are supporting</div>
-   <div class="artist-name" id="artistName">Loading artist…</div>
-   <div class="muted" id="artistLocation">PASONG Artist</div>
+  <div class="layout">
+
+    <section class="panel artist-card">
+      <div class="artist">
+        <img
+          id="artistImage"
+          class="avatar"
+          alt="Artist profile"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect width='100%25' height='100%25' fill='%23241638'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-size='48' fill='%23c4b5ff'%3E%E2%99%AB%3C/text%3E%3C/svg%3E"
+        >
+
+        <div>
+          <div class="eyebrow">You are supporting</div>
+          <div class="artist-name" id="artistName">Loading artist…</div>
+          <div class="artist-location" id="artistLocation">PASONG Artist</div>
+          <div class="verified">✓ PASONG Artist</div>
+        </div>
+      </div>
+
+      <div class="support-box">
+        <div class="support-icon">💜</div>
+        <strong>Every tip makes a difference</strong>
+        <p>
+          A little support can help an artist pay for studio time,
+          production, promotion and their next release.
+        </p>
+      </div>
+
+      <div class="note-list">
+        <div class="note-item">
+          <span>♫</span>
+          <span>Support artists whose music you enjoy.</span>
+        </div>
+        <div class="note-item">
+          <span>♡</span>
+          <span>Choose an amount that works for you.</span>
+        </div>
+        <div class="note-item">
+          <span>✓</span>
+          <span>Direct artist tips are separate from song purchases and Premium subscriptions.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel tip-panel">
+      <div class="form-heading">
+        <div class="eyebrow">Your support</div>
+        <h2>Choose your tip amount</h2>
+        <p>Select an amount below or enter a custom amount.</p>
+      </div>
+
+      <div class="amounts">
+        <button class="amount active" type="button" data-amount="1000">UGX 1,000</button>
+        <button class="amount" type="button" data-amount="2000">UGX 2,000</button>
+        <button class="amount" type="button" data-amount="5000">UGX 5,000</button>
+      </div>
+
+      <div class="field">
+        <label for="customAmount">Custom amount</label>
+        <input
+          id="customAmount"
+          type="number"
+          min="500"
+          step="100"
+          placeholder="Enter amount (minimum 500)"
+          inputmode="numeric"
+        >
+      </div>
+
+      <div class="field">
+        <label for="currency">Currency</label>
+        <select id="currency">
+          <option value="UGX">UGX — Ugandan Shilling</option>
+          <option value="USD">USD — US Dollar</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="network">Payment method</label>
+        <select id="network">
+          <option value="MTN">MTN Mobile Money</option>
+          <option value="AIRTEL">Airtel Money</option>
+          <option value="CARD" disabled>Visa / Mastercard — Coming soon</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="phone">Mobile money number</label>
+        <input
+          id="phone"
+          type="tel"
+          placeholder="e.g. 2567XXXXXXXX"
+          autocomplete="tel"
+          inputmode="tel"
+        >
+      </div>
+
+      <div class="amount-summary">
+        <span>Your tip</span>
+        <strong id="tipTotal">UGX 1,000</strong>
+      </div>
+
+      <button class="cta" id="tipButton" type="button">
+        Continue to tip
+      </button>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <p class="notice">
+        Secure payment processing will be enabled when the direct artist-tip
+        checkout is connected. No payment is taken by this preview page.
+      </p>
+    </section>
+
   </div>
- </div>
- <div class="support">
-  <strong>Every tip makes a difference 💜</strong>
-  <p>Your support helps artists keep creating, recording and sharing their music with the world.</p>
- </div>
- <div class="split">Artist receives <b>70%</b> · PASONG receives <b>30%</b></div>
-</section>
 
-<section class="panel">
- <div class="eyebrow">Choose your support</div>
- <h2 style="font-size:22px;margin:8px 0 4px">How much would you like to tip?</h2>
- <div class="amounts">
-  <button class="amount active" type="button" data-amount="1000">1,000</button>
-  <button class="amount" type="button" data-amount="2000">2,000</button>
-  <button class="amount" type="button" data-amount="5000">5,000</button>
- </div>
- <div class="field">
-  <label for="customAmount">Custom amount</label>
-  <input id="customAmount" type="number" min="500" step="100" placeholder="Enter amount (minimum 500)" inputmode="numeric">
- </div>
- <div class="field">
-  <label for="currency">Currency</label>
-  <select id="currency">
-   <option value="UGX">UGX — Ugandan Shilling</option>
-   <option value="USD">USD — US Dollar</option>
-  </select>
- </div>
- <div class="field">
-  <label for="network">Payment method</label>
-  <select id="network">
-   <option value="MTN">MTN Mobile Money</option>
-   <option value="AIRTEL">Airtel Money</option>
-   <option value="CARD">Card (coming soon)</option>
-  </select>
- </div>
- <div class="field">
-  <label for="phone">Mobile money number</label>
-  <input id="phone" type="tel" placeholder="e.g. 2567XXXXXXXX" autocomplete="tel">
- </div>
- <div class="summary">
-  <div class="line"><span>Your tip</span><b id="tipTotal">UGX 1,000</b></div>
-  <div class="line"><span>Artist share (70%)</span><b id="artistShare">UGX 700</b></div>
-  <div class="line"><span>PASONG share (30%)</span><b id="pasongShare">UGX 300</b></div>
- </div>
- <button class="cta" id="tipButton" type="button">Continue to tip</button>
- <div id="status" class="status"></div>
- <p class="notice">Direct tips are separate from song purchases and Premium subscriptions. This is a development preview: no payment is processed and no money will be charged.</p>
-</section>
-</div>
+  <div class="footer">
+    Powered by <a href="index.html">PASONG</a> · Music deserves support.
+  </div>
 </main>
 
 <script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_URL="https://pasong-api.vercel.app";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+"use strict";
 
-const params=new URLSearchParams(location.search);
-const artistId=params.get("id")||"";
-const userId=params.get("user_id")||"";
-const artistIdParam=params.get("artist_id")||"";
-const artistNameParam=params.get("name")||params.get("artist")||"";
+/* PASONG Supabase configuration */
+const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 
-let selectedAmount=1000;
-let loadedArtist=null;
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 
-const $=id=>document.getElementById(id);
+const params = new URLSearchParams(window.location.search);
 
-function money(v){
- return Number(v||0).toLocaleString("en-US");
+const artistId =
+  params.get("id") ||
+  params.get("artist_id") ||
+  params.get("user_id") ||
+  "";
+
+const artistNameParam =
+  params.get("name") ||
+  params.get("artist") ||
+  "";
+
+let selectedAmount = 1000;
+
+const $ = id => document.getElementById(id);
+
+function money(value) {
+  return Number(value || 0).toLocaleString("en-US");
 }
 
-function amount(){
- const custom=Number($("customAmount").value);
- return custom>0?custom:selectedAmount;
+function getAmount() {
+  const custom = Number($("customAmount").value);
+  return custom > 0 ? custom : selectedAmount;
 }
 
-function update(){
- const n=amount();
- const cur=$("currency").value;
- $("tipTotal").textContent=cur+" "+money(n);
- $("artistShare").textContent=cur+" "+money(n*.7);
- $("pasongShare").textContent=cur+" "+money(n*.3);
+function updateTotal() {
+  const total = getAmount();
+  const currency = $("currency").value;
+
+  $("tipTotal").textContent =
+    currency + " " + money(total);
 }
 
-function showStatus(message,type){
- const el=$("status");
- el.textContent=message;
- el.className="status show "+type;
+function showStatus(message, type) {
+  const element = $("status");
+  element.textContent = message;
+  element.className = "status show " + type;
 }
 
-function artistName(profile){
- return profile?.performing_name||
-        profile?.stage_name||
-        profile?.artist_name||
-        profile?.name||
-        artistNameParam||
-        "PASONG Artist";
+function clearStatus() {
+  $("status").textContent = "";
+  $("status").className = "status";
 }
 
-function artistImage(profile){
- return profile?.profile_image_url||
-        profile?.profile_photo_url||
-        profile?.avatar_url||
-        profile?.image_url||
-        "";
-}
+/* Preset amount selection */
+document.querySelectorAll(".amount").forEach(button => {
+  button.addEventListener("click", () => {
+    selectedAmount = Number(button.dataset.amount);
 
-function getEmbeddedProfile(song){
- return song?.artist||
-        song?.artist_profile||
-        song?.artist_profiles||
-        song?.artistProfile||
-        {};
-}
+    $("customAmount").value = "";
 
-function matchesArtist(song){
- const profile=getEmbeddedProfile(song);
+    document.querySelectorAll(".amount").forEach(item => {
+      item.classList.toggle("active", item === button);
+    });
 
- const ids=[
-  artistId,
-  userId,
-  artistIdParam
- ].filter(Boolean).map(String);
-
- const songIds=[
-  profile?.id,
-  profile?.user_id,
-  profile?.artist_id,
-  song?.artist_id,
-  song?.artist_user_id,
-  song?.artistId
- ].filter(Boolean).map(String);
-
- if(ids.some(id=>songIds.includes(id)))return true;
-
- if(artistNameParam){
-  const names=[
-   artistName(profile),
-   song?.artist_name,
-   song?.performing_name,
-   song?.stage_name
-  ].filter(Boolean).map(v=>String(v).trim().toLowerCase());
-
-  return names.includes(artistNameParam.trim().toLowerCase());
- }
-
- return false;
-}
-
-async function findProfileById(column,value){
- if(!value)return null;
-
- const {data,error}=await db
-  .from("profiles")
-  .select("*")
-  .eq(column,value)
-  .maybeSingle();
-
- if(error){
-  console.warn("Artist profile lookup failed:",column,error.message);
-  return null;
- }
-
- return data||null;
-}
-
-async function loadArtist(){
- $("artistName").textContent=artistNameParam||"Loading artist…";
-
- const ids=[artistId,userId,artistIdParam].filter(Boolean);
-
- // First try the profiles table using the different ID types.
- for(const id of ids){
-  let profile=await findProfileById("id",id);
-  if(profile){
-   loadedArtist=profile;
-   break;
-  }
-
-  profile=await findProfileById("user_id",id);
-  if(profile){
-   loadedArtist=profile;
-   break;
-  }
- }
-
- // If the profile table lookup does not find the record,
- // use the same songs API that powers artist.html.
- if(!loadedArtist){
-  try{
-   const response=await fetch(API_URL+"/api/songs",{
-    headers:{Accept:"application/json"},
-    cache:"no-store"
-   });
-
-   if(!response.ok)throw new Error("Songs API returned HTTP "+response.status);
-
-   const result=await response.json();
-   const allSongs=Array.isArray(result)?result:
-     Array.isArray(result.songs)?result.songs:
-     Array.isArray(result.data)?result.data:[];
-
-   const matchingSong=allSongs.find(matchesArtist);
-
-   if(matchingSong){
-    const embedded=getEmbeddedProfile(matchingSong);
-
-    loadedArtist={
-     ...embedded,
-     id:embedded?.id||matchingSong.artist_id||artistId,
-     user_id:embedded?.user_id||matchingSong.artist_user_id||userId,
-     artist_id:embedded?.artist_id||matchingSong.artist_id||artistIdParam,
-     artist_name:embedded?.artist_name||matchingSong.artist_name,
-     performing_name:embedded?.performing_name||matchingSong.performing_name,
-     stage_name:embedded?.stage_name||matchingSong.stage_name,
-     profile_image_url:embedded?.profile_image_url||matchingSong.profile_image_url,
-     location:embedded?.location||matchingSong.artist_location||"Uganda"
-    };
-   }
-  }catch(error){
-   console.error("Artist songs fallback failed:",error);
-  }
- }
-
- if(!loadedArtist){
-  $("artistName").textContent=artistNameParam||"Artist not found";
-  $("artistLocation").textContent="Artist profile could not be found.";
-  showStatus("We could not match this artist to a PASONG profile. Please open the tip page from the artist's profile.","error");
-  return;
- }
-
- $("artistName").textContent=artistName(loadedArtist);
- $("artistLocation").textContent=loadedArtist.location||"PASONG Artist";
-
- const photo=artistImage(loadedArtist);
- if(photo)$("artistImage").src=photo;
-}
-
-document.querySelectorAll(".amount").forEach(btn=>{
- btn.addEventListener("click",()=>{
-  selectedAmount=Number(btn.dataset.amount);
-  $("customAmount").value="";
-  document.querySelectorAll(".amount").forEach(x=>{
-   x.classList.toggle("active",x===btn);
+    clearStatus();
+    updateTotal();
   });
-  update();
- });
 });
 
-$("customAmount").addEventListener("input",()=>{
- document.querySelectorAll(".amount").forEach(x=>x.classList.remove("active"));
- update();
+/* Custom amount */
+$("customAmount").addEventListener("input", () => {
+  document.querySelectorAll(".amount").forEach(button => {
+    button.classList.remove("active");
+  });
+
+  clearStatus();
+  updateTotal();
 });
 
-$("currency").addEventListener("change",update);
-
-$("tipButton").addEventListener("click",()=>{
- const n=amount();
- const network=$("network").value;
- const phone=$("phone").value.trim();
-
- if(!loadedArtist){
-  showStatus("The artist profile has not loaded. Please return to the artist page and try again.","error");
-  return;
- }
-
- if(!Number.isFinite(n)||n<500){
-  showStatus("Enter a tip of at least 500.","error");
-  return;
- }
-
- if(network==="CARD"){
-  showStatus("Card tips will be enabled when card payment integration is ready.","info");
-  return;
- }
-
- if(!/^(\\+?256\\d{9}|0\\d{9})$/.test(phone.replace(/\\s/g,""))){
-  showStatus("Enter a valid Uganda mobile-money number.","error");
-  return;
- }
-
- showStatus("Artist identified successfully. Direct-tip checkout is not yet connected to the backend. No payment has been made.","info");
+/* Currency selection */
+$("currency").addEventListener("change", () => {
+  clearStatus();
+  updateTotal();
 });
 
+/* Load artist from Supabase */
+async function loadArtist() {
+  if (!artistId) {
+    $("artistName").textContent =
+      artistNameParam || "Artist not selected";
+
+    $("artistLocation").textContent =
+      "Open this page from an artist profile.";
+
+    $("tipButton").disabled = true;
+    showStatus(
+      "The artist could not be identified. Please open this page using the Tip Artist button on an artist profile.",
+      "error"
+    );
+    return;
+  }
+
+  try {
+    const { data, error } = await db
+      .from("profiles")
+      .select("*")
+      .eq("id", artistId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (!data) {
+      throw new Error("Artist profile not found.");
+    }
+
+    const name =
+      data.performing_name ||
+      data.stage_name ||
+      data.artist_name ||
+      data.name ||
+      artistNameParam ||
+      "PASONG Artist";
+
+    $("artistName").textContent = name;
+
+    $("artistLocation").textContent =
+      data.location || "PASONG Artist";
+
+    const photo =
+      data.profile_image_url ||
+      data.profile_photo_url ||
+      data.avatar_url ||
+      data.image_url;
+
+    if (photo) {
+      $("artistImage").src = photo;
+    }
+
+    $("artistImage").alt = name + " profile photo";
+
+  } catch (error) {
+    console.error("PASONG artist lookup:", error);
+
+    $("artistName").textContent =
+      artistNameParam || "Artist";
+
+    $("artistLocation").textContent =
+      "Artist profile could not be loaded.";
+
+    showStatus(
+      error.message || "Unable to load this artist.",
+      "error"
+    );
+  }
+}
+
+/* Validate and prepare the tip */
+$("tipButton").addEventListener("click", () => {
+  const total = getAmount();
+  const network = $("network").value;
+  const phone = $("phone").value.trim().replace(/\s/g, "");
+
+  clearStatus();
+
+  if (!artistId) {
+    showStatus(
+      "Artist ID is missing. Open this page from an artist profile.",
+      "error"
+    );
+    return;
+  }
+
+  if (!Number.isFinite(total) || total < 500) {
+    showStatus(
+      "Please enter a tip of at least 500.",
+      "error"
+    );
+    return;
+  }
+
+  if (network === "CARD") {
+    showStatus(
+      "Card payments will be available when card checkout is connected.",
+      "info"
+    );
+    return;
+  }
+
+  if (!/^(?:\+?256\d{9}|0\d{9})$/.test(phone)) {
+    showStatus(
+      "Enter a valid Uganda mobile-money number, for example 2567XXXXXXXX.",
+      "error"
+    );
+    return;
+  }
+
+  showStatus(
+    "Your tip details are ready. Direct artist-tip checkout is not yet connected, so no payment has been made or charged.",
+    "info"
+  );
+});
+
+/* Initial page setup */
+updateTotal();
 loadArtist();
-update();
 </script>
+
 </body>
 </html>
