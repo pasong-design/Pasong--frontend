@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -675,7 +674,8 @@ main{max-width:1280px;margin:auto;padding:25px 22px 165px}
 <audio id="audioPlayer" preload="metadata"></audio>
 
 <script>
-const API_URL="https://pasong-api.onrender.com";
+/* PASONG API — use the current Vercel backend */
+const API_URL="https://pasong-api.vercel.app";
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -745,12 +745,22 @@ function getSongCover(song){
 }
 
 async function loadSongs(){
-  const response=await fetch(API_URL+"/api/songs",{method:"GET",headers:{Accept:"application/json"},cache:"no-store"});
-  if(!response.ok)throw new Error("Unable to load PASONG music.");
+  const response=await fetch(API_URL+"/api/songs",{
+    method:"GET",
+    headers:{Accept:"application/json"},
+    cache:"no-store"
+  });
+
+  if(!response.ok){
+    throw new Error("PASONG API returned HTTP "+response.status);
+  }
+
   const data=await response.json();
+
   if(Array.isArray(data))return data;
   if(Array.isArray(data.songs))return data.songs;
   if(Array.isArray(data.data))return data.data;
+
   return [];
 }
 
@@ -769,6 +779,7 @@ function findArtist(allSongs){
       profile?.id,song?.artist_id,profile?.user_id,song?.artist_user_id,
       profile?.artist_id,song?.artistId
     ].map(v=>String(v||""));
+
     if(requestedId && ids.includes(requestedId))return true;
 
     if(requestedName){
@@ -776,16 +787,22 @@ function findArtist(allSongs){
         getArtistName(profile),song?.artist_name,song?.performing_name,
         song?.stage_name
       ].filter(Boolean).map(v=>String(v).toLowerCase());
+
       return names.includes(requestedName);
     }
+
     return false;
   });
 
-  if(!matchingSongs.length&&!requestedId&&!requestedName&&allSongs.length)matchingSongs=[allSongs[0]];
+  if(!matchingSongs.length&&!requestedId&&!requestedName&&allSongs.length){
+    matchingSongs=[allSongs[0]];
+  }
+
   if(!matchingSongs.length)return{profile:null,songs:[]};
 
   const first=matchingSongs[0];
   const profile=getSongArtistProfile(first);
+
   const merged={
     ...profile,
     id:profile?.id||first?.artist_id||null,
@@ -796,11 +813,13 @@ function findArtist(allSongs){
     profile_image_url:profile?.profile_image_url||first?.profile_image_url||null,
     bio:profile?.bio||first?.artist_bio||""
   };
+
   return{profile:merged,songs:matchingSongs};
 }
 
 function renderArtist(){
   const container=document.getElementById("pageContent");
+
   if(!artist){
     container.innerHTML=`<div class="error-box">This artist could not be found.<br><br><a href="artists.html" style="color:#c084fc;font-weight:800">Return to Artists</a></div>`;
     return;
@@ -896,6 +915,7 @@ function renderSong(song,index){
   const title=song.title||"Untitled song";
   const genre=song.genre||"Music";
   const plays=Number(song.play_count||song.plays||0);
+
   return`
 <div class="song-card">
   <img class="song-cover" src="${escapeHtml(cover)}" alt="${escapeHtml(title)}"
@@ -913,33 +933,54 @@ function renderSong(song,index){
 }
 
 function setupBioButton(){
-  const bio=document.getElementById("bioText"),button=document.getElementById("readMoreBtn");
+  const bio=document.getElementById("bioText");
+  const button=document.getElementById("readMoreBtn");
+
   if(!bio||!button)return;
+
   requestAnimationFrame(()=>{
-    if(bio.scrollHeight>bio.clientHeight+5)button.style.display="inline-block";
+    if(bio.scrollHeight>bio.clientHeight+5){
+      button.style.display="inline-block";
+    }
   });
 }
+
 function toggleBio(){
-  const bio=document.getElementById("bioText"),button=document.getElementById("readMoreBtn");
+  const bio=document.getElementById("bioText");
+  const button=document.getElementById("readMoreBtn");
+
   if(!bio||!button)return;
+
   const collapsed=bio.classList.toggle("collapsed");
   button.textContent=collapsed?"Read more":"Show less";
 }
 
-function getArtistFollowKey(){return"pasong_follow_"+(artist?.id||artist?.user_id||getArtistName(artist))}
-function getFollowerKey(){return"pasong_artist_followers_"+(artist?.id||artist?.user_id||getArtistName(artist))}
+function getArtistFollowKey(){
+  return"pasong_follow_"+(artist?.id||artist?.user_id||getArtistName(artist));
+}
+
+function getFollowerKey(){
+  return"pasong_artist_followers_"+(artist?.id||artist?.user_id||getArtistName(artist));
+}
 
 function toggleFollow(){
   if(!artist)return;
+
   const key=getArtistFollowKey();
   const newState=localStorage.getItem(key)!=="true";
+
   localStorage.setItem(key,String(newState));
 
   const button=document.getElementById("followButton");
-  if(button){button.classList.toggle("following",newState);button.innerHTML=newState?"✓ Following":"＋ Follow"}
+
+  if(button){
+    button.classList.toggle("following",newState);
+    button.innerHTML=newState?"✓ Following":"＋ Follow";
+  }
 
   let followers=Number(localStorage.getItem(getFollowerKey())||0);
   followers=newState?followers+1:Math.max(0,followers-1);
+
   localStorage.setItem(getFollowerKey(),String(followers));
   updateFanCount(followers);
 }
@@ -953,16 +994,36 @@ function applyFollowState(){
   const button=document.getElementById("followButton");
   const following=localStorage.getItem(getArtistFollowKey())==="true";
   const followers=Number(localStorage.getItem(getFollowerKey())||0);
+
   updateFanCount(followers);
-  if(button&&following){button.classList.add("following");button.innerHTML="✓ Following"}
+
+  if(button&&following){
+    button.classList.add("following");
+    button.innerHTML="✓ Following";
+  }
 }
 
 async function shareArtist(){
-  const name=getArtistName(artist),url=location.href;
+  const name=getArtistName(artist);
+  const url=location.href;
+
   if(navigator.share){
-    try{await navigator.share({title:name+" — PASONG",text:"Listen to "+name+" on PASONG.",url});return}catch(e){}
+    try{
+      await navigator.share({
+        title:name+" — PASONG",
+        text:"Listen to "+name+" on PASONG.",
+        url
+      });
+      return;
+    }catch(e){}
   }
-  try{await navigator.clipboard.writeText(url);alert("Artist link copied.")}catch(e){prompt("Copy this artist link:",url)}
+
+  try{
+    await navigator.clipboard.writeText(url);
+    alert("Artist link copied.");
+  }catch(e){
+    prompt("Copy this artist link:",url);
+  }
 }
 
 /* Opens the standalone artist tipping page for the current artist. */
@@ -1002,7 +1063,9 @@ volumeControl.addEventListener("input",()=>audio.volume=Number(volumeControl.val
 function updateActiveSongCard(){
   document.querySelectorAll(".song-card").forEach((card,i)=>{
     const active=i===currentSongIndex;
+
     card.classList.toggle("is-playing",active);
+
     const btn=card.querySelector(".play-small");
     if(btn)btn.textContent=active&&!audio.paused?"❚❚":"▶";
   });
@@ -1013,6 +1076,7 @@ async function playSong(index){
   if(!song)return;
 
   const audioUrl=getSongAudioUrl(song);
+
   if(!audioUrl){
     console.warn("PASONG: no playable audio URL for song",song);
     setPlayerError("This song is not available for streaming right now.");
@@ -1021,20 +1085,27 @@ async function playSong(index){
 
   if(currentSongIndex===index && audio.src){
     if(audio.paused){
-      try{await audio.play();}catch(e){setPlayerError("Playback could not start.");}
+      try{
+        await audio.play();
+      }catch(e){
+        setPlayerError("Playback could not start.");
+      }
     }else{
       audio.pause();
     }
+
     updateActiveSongCard();
     return;
   }
 
   currentSongIndex=index;
   updateActiveSongCard();
+
   nowTitle.textContent=song.title||"Untitled";
   nowArtist.textContent=getArtistName(artist);
 
   const cover=getSongCover(song)||fallbackImage(song.title||"PASONG");
+
   nowCover.src=cover;
   nowCover.classList.remove("hidden");
   nowPlaceholder.style.display="none";
@@ -1061,44 +1132,90 @@ function setPlayerError(message){
 }
 
 function togglePlayer(){
-  if(!audio.src){if(songs.length)playSong(0);return}
-  if(audio.paused)audio.play().then(()=>mainPlay.textContent="❚❚").catch(()=>setPlayerError("Playback could not start."));
-  else audio.pause();
-}
-function playAll(){if(songs.length)playSong(0)}
-function nextSong(){if(!songs.length)return;playSong((currentSongIndex+1)%songs.length)}
-function previousSong(){if(!songs.length)return;playSong((currentSongIndex-1+songs.length)%songs.length)}
+  if(!audio.src){
+    if(songs.length)playSong(0);
+    return;
+  }
 
-audio.addEventListener("play",()=>{mainPlay.textContent="❚❚";updateActiveSongCard()});
-audio.addEventListener("pause",()=>{mainPlay.textContent="▶";updateActiveSongCard()});
+  if(audio.paused){
+    audio.play()
+      .then(()=>mainPlay.textContent="❚❚")
+      .catch(()=>setPlayerError("Playback could not start."));
+  }else{
+    audio.pause();
+  }
+}
+
+function playAll(){
+  if(songs.length)playSong(0);
+}
+
+function nextSong(){
+  if(!songs.length)return;
+  playSong((currentSongIndex+1)%songs.length);
+}
+
+function previousSong(){
+  if(!songs.length)return;
+  playSong((currentSongIndex-1+songs.length)%songs.length);
+}
+
+audio.addEventListener("play",()=>{
+  mainPlay.textContent="❚❚";
+  updateActiveSongCard();
+});
+
+audio.addEventListener("pause",()=>{
+  mainPlay.textContent="▶";
+  updateActiveSongCard();
+});
+
 audio.addEventListener("ended",()=>nextSong());
-audio.addEventListener("error",()=>{if(currentSongIndex>=0)console.warn("PASONG audio element error",audio.error)});
+
+audio.addEventListener("error",()=>{
+  if(currentSongIndex>=0){
+    console.warn("PASONG audio element error",audio.error);
+  }
+});
+
 audio.addEventListener("loadedmetadata",()=>{
   timeLabel.textContent=formatTime(audio.currentTime)+" / "+formatTime(audio.duration);
 });
+
 audio.addEventListener("timeupdate",()=>{
-  const duration=audio.duration||0,current=audio.currentTime||0;
+  const duration=audio.duration||0;
+  const current=audio.currentTime||0;
+
   progressBar.style.width=(duration?(current/duration)*100:0)+"%";
   timeLabel.textContent=formatTime(current)+" / "+formatTime(duration);
 });
 
-
 document.querySelector(".progress-wrap").addEventListener("click",(event)=>{
   const rect=event.currentTarget.getBoundingClientRect();
   const ratio=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));
-  if(Number.isFinite(audio.duration)&&audio.duration>0) audio.currentTime=ratio*audio.duration;
+
+  if(Number.isFinite(audio.duration)&&audio.duration>0){
+    audio.currentTime=ratio*audio.duration;
+  }
 });
 
+/* Load artist songs from the current PASONG API. */
 async function init(){
+  const container=document.getElementById("pageContent");
+
   try{
     const allSongs=await loadSongs();
     const result=findArtist(allSongs);
+
     artist=result.profile;
     songs=result.songs;
+
     renderArtist();
+
   }catch(error){
     console.error("Artist page error:",error);
-    document.getElementById("pageContent").innerHTML=`
+
+    container.innerHTML=`
       <div class="error-box">
         <strong>PASONG could not load this artist.</strong><br><br>
         Please refresh the page and try again.<br><br>
@@ -1106,8 +1223,8 @@ async function init(){
       </div>`;
   }
 }
+
 init();
 </script>
 </body>
 </html>
-no
