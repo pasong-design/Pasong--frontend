@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +12,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,system-ui,sans-serif;background:radial-gradient(ellipse at top,#21113e,#090817 58%);color:#fff;min-height:100vh}
 header{max-width:1100px;margin:auto;padding:22px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-size:24px;font-weight:900;letter-spacing:1px}.brand span{color:#c4b5fd}
+.brand{font-size:24px;font-weight:900;letter-spacing:1px}
+.brand span{color:#c4b5fd}
 a{color:inherit;text-decoration:none}
 .back{border:1px solid var(--line);padding:10px 14px;border-radius:12px}
 main{max-width:1040px;margin:auto;padding:25px 20px 65px}
@@ -40,7 +40,6 @@ button:disabled{opacity:.65;cursor:wait}
 .status{display:none;margin:18px auto 0;max-width:820px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;line-height:1.5;font-size:14px}
 .status.show{display:block}
 .error{border-color:#9f344e;background:#351322;color:#ffd3df}
-.success{border-color:#386c55;background:#10281f;color:#c5ffe0}
 .info{background:#17132a;color:#e5dcff}
 @media(max-width:700px){
 header{padding:17px 15px}
@@ -102,18 +101,16 @@ h1{letter-spacing:-1px}
 </section>
 
 <p class="fine">
-Prices are displayed in your detected region where supported. The PASONG server determines the final price at checkout. A checkout request does not itself activate Premium; payment must be completed and verified.
+Prices are displayed in your detected region where supported. The PASONG server determines the final price at checkout. Selecting a plan does not activate Premium. Payment must be completed and verified first.
 </p>
 </main>
 
 <script>
-(()=> {
+(function(){
 "use strict";
 
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-
-/* Use the current PASONG API deployment. */
 const API_BASE="https://pasong-api.vercel.app";
 
 const box=document.getElementById("statusBox");
@@ -126,80 +123,60 @@ const buttons={
  yearly:document.getElementById("yearlyButton")
 };
 
-let cached=null;
 let sb=null;
 
-/* Prices remain visible if the pricing API is temporarily unavailable. */
-const FALLBACK={
- monthly:{amount:10000,currency:"UGX",country:"UG",interval:"month"},
- yearly:{amount:100000,currency:"UGX",country:"UG",interval:"year"}
-};
-
-try {
- if(window.supabase && window.supabase.createClient){
+try{
+ if(window.supabase&&window.supabase.createClient){
   sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
  }
-} catch(e) {
- console.error("Supabase initialization failed:",e);
+}catch(error){
+ console.error("Supabase initialization failed:",error);
 }
 
-function show(type,msg){
+function show(type,message){
  box.className="status show "+type;
- box.textContent=msg;
+ box.textContent=message;
 }
 
 function money(amount,currency){
- try {
+ try{
   return new Intl.NumberFormat(undefined,{
    style:"currency",
    currency:String(currency||"USD").toUpperCase(),
    maximumFractionDigits:2
   }).format(Number(amount));
- } catch(e) {
+ }catch(error){
   return String(currency||"")+" "+Number(amount).toLocaleString();
  }
 }
 
 function getPlan(data,key){
- const x=data&&data[key];
- if(!x||typeof x!=="object")return null;
+ const item=data&&data[key];
+ if(!item||typeof item!=="object")return null;
 
- const amount=Number(x.amount??x.price??x.total);
- const currency=String(x.currency||data.currency||"").toUpperCase();
+ const amount=Number(item.amount??item.price??item.total);
+ const currency=String(item.currency||data.currency||"").toUpperCase();
 
  if(!Number.isFinite(amount)||amount<=0||!currency)return null;
 
- return {
-  ...x,
-  amount,
-  currency
- };
+ return {...item,amount,currency};
 }
 
-function renderPrices(pricing){
- monthlyEl.replaceChildren();
- yearlyEl.replaceChildren();
-
- const monthlyText=document.createTextNode(
-  money(pricing.monthly.amount,pricing.monthly.currency)+" "
- );
- const monthlySmall=document.createElement("small");
- monthlySmall.textContent="/ month";
- monthlyEl.append(monthlyText,monthlySmall);
-
- const yearlyText=document.createTextNode(
-  money(pricing.yearly.amount,pricing.yearly.currency)+" "
- );
- const yearlySmall=document.createElement("small");
- yearlySmall.textContent="/ year";
- yearlyEl.append(yearlyText,yearlySmall);
+function renderPrice(element,plan,interval){
+ element.replaceChildren();
+ element.appendChild(document.createTextNode(
+  money(plan.amount,plan.currency)+" "
+ ));
+ const small=document.createElement("small");
+ small.textContent="/ "+interval;
+ element.appendChild(small);
 }
 
 async function loadPricing(){
  const controller=new AbortController();
- const timer=setTimeout(()=>controller.abort(),10000);
+ const timer=setTimeout(function(){controller.abort();},10000);
 
- try {
+ try{
   const response=await fetch(API_BASE+"/api/premium/pricing",{
    method:"GET",
    headers:{Accept:"application/json"},
@@ -207,168 +184,94 @@ async function loadPricing(){
    signal:controller.signal
   });
 
-  const data=await response.json().catch(()=>({}));
+  const data=await response.json().catch(function(){return {};});
 
   if(!response.ok||data.success===false){
-   throw new Error(data.error||"Premium pricing service is unavailable.");
+   throw new Error(data.error||"Premium pricing is temporarily unavailable.");
   }
 
   const monthly=getPlan(data,"monthly");
   const yearly=getPlan(data,"yearly");
 
   if(!monthly||!yearly){
-   throw new Error("The API did not return valid monthly and yearly prices.");
+   throw new Error("The server did not return valid monthly and yearly prices.");
   }
 
-  cached={...data,monthly,yearly};
-  renderPrices(cached);
+  renderPrice(monthlyEl,monthly,"month");
+  renderPrice(yearlyEl,yearly,"year");
 
-  const country=String(
-   data.country||monthly.country||yearly.country||""
-  ).toUpperCase();
-
+  const country=String(data.country||monthly.country||"").toUpperCase();
   note.textContent=country
-   ?"Regional prices detected · "+country
+   ?"Regional prices loaded · "+country
    :"Regional prices loaded";
 
   window.PASONG_PREMIUM_GEO={
-   country,
-   currency:monthly.currency,
-   monthly,
-   yearly,
-   detected:true
+   detected:true,
+   country:country,
+   monthly:monthly,
+   yearly:yearly
   };
 
-  return cached;
-
- } catch(error) {
-  /*
-   * Do not clear the visible prices on API failure.
-   * The server still determines the actual checkout price.
-   */
+ }catch(error){
   note.textContent="Showing default prices · Regional detection unavailable";
-
   window.PASONG_PREMIUM_GEO={
    detected:false,
-   fallback:true,
-   error:error.message
+   fallback:true
   };
-
   console.warn("Regional Premium pricing unavailable:",error);
-  return null;
-
- } finally {
+ }finally{
   clearTimeout(timer);
  }
 }
 
-async function checkout(plan){
+/*
+ * This page selects the plan only.
+ * premium-checkout.html creates the pending payment record.
+ * No payment is taken and Premium is not activated here.
+ */
+async function choosePlan(plan){
  const button=buttons[plan];
  const originalText=button.textContent;
 
  button.disabled=true;
  button.textContent="Please wait…";
 
- try {
+ try{
   if(!sb){
-   throw new Error("Login service is unavailable. Please refresh and try again.");
+   throw new Error("The login service is unavailable. Please refresh and try again.");
   }
 
-  const {data,error}=await sb.auth.getSession();
-  if(error)throw error;
+  const result=await sb.auth.getSession();
 
-  const session=data&&data.session;
+  if(result.error)throw result.error;
+
+  const session=result.data&&result.data.session;
+
+  const checkoutPage="premium-checkout.html?plan="+encodeURIComponent(plan);
 
   if(!session||!session.access_token){
-   location.href="login.html?redirect="+
-    encodeURIComponent("premium.html?plan="+plan);
+   location.href="login.html?redirect="+encodeURIComponent(checkoutPage);
    return;
   }
 
-  /*
-   * Refresh display pricing, but never send a browser-calculated amount
-   * as the authoritative price. The backend calculates checkout pricing.
-   */
-  await loadPricing();
+  location.href=checkoutPage;
 
-  const response=await fetch(API_BASE+"/api/premium/checkout",{
-   method:"POST",
-   headers:{
-    "Content-Type":"application/json",
-    "Accept":"application/json",
-    "Authorization":"Bearer "+session.access_token
-   },
-   body:JSON.stringify({plan})
-  });
-
-  const result=await response.json().catch(()=>({}));
-
-  if(!response.ok||result.success===false){
-   throw new Error(
-    result.error||result.message||"Could not start Premium checkout."
-   );
-  }
-
-  const checkoutUrl=
-   result.checkout_url||result.checkoutUrl||result.url;
-
-  if(checkoutUrl){
-   let parsed;
-   try {
-    parsed=new URL(checkoutUrl,location.href);
-   } catch(e) {
-    throw new Error("The checkout service returned an invalid payment link.");
-   }
-
-   if(parsed.protocol!=="https:"&&parsed.origin!==location.origin){
-    throw new Error("The checkout service returned an unsafe payment link.");
-   }
-
-   location.href=parsed.href;
-   return;
-  }
-
-  const pricing=result.pricing||{};
-  const payment=result.payment||{};
-  const amount=pricing.amount??payment.amount;
-  const currency=pricing.currency||payment.currency||"UGX";
-  const reference=payment.payment_reference||payment.id||"pending";
-
-  /*
-   * The current backend may create a pending payment record without
-   * returning a provider checkout URL. Do not claim payment is complete.
-   */
-  show(
-   "info",
-   (result.message||"A Premium checkout record was created.")+
-   " Reference: "+reference+
-   (amount!=null?" · Amount: "+money(amount,currency):"")+
-   " Payment must be completed and verified before Premium is activated."
-  );
-
- } catch(error) {
-  show(
-   "error",
-   error.message||"Unable to start Premium checkout. Please try again."
-  );
- } finally {
+ }catch(error){
+  show("error",error.message||"Unable to continue. Please try again.");
   button.disabled=false;
   button.textContent=originalText;
  }
 }
 
-buttons.monthly.addEventListener("click",()=>checkout("monthly"));
-buttons.yearly.addEventListener("click",()=>checkout("yearly"));
+buttons.monthly.addEventListener("click",function(){
+ choosePlan("monthly");
+});
 
-/* Support an optional Premium CTA used elsewhere on the page. */
-const cta=document.getElementById("ctaPremiumButton");
-if(cta){
- cta.addEventListener("click",()=>checkout("monthly"));
-}
+buttons.yearly.addEventListener("click",function(){
+ choosePlan("yearly");
+});
 
-/* Prices already appear in HTML; regional prices update when available. */
 loadPricing();
-
 })();
 </script>
 
