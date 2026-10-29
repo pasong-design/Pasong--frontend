@@ -1,0 +1,631 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8b5cf6">
+<meta name="description" content="Manage your PASONG Premium membership, subscription status and payment details.">
+<title>My Premium | PASONG</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  color-scheme:dark;
+  --purple:#8b5cf6;
+  --pink:#ec4899;
+  --muted:#b8b2d0;
+  --line:#342951;
+  --panel:#151127;
+  --green:#86efac;
+  --red:#fda4af;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:radial-gradient(ellipse at top,#21113e,#090817 58%);
+  color:#fff;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+header{
+  max-width:1120px;
+  margin:auto;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.brand{font-size:23px;font-weight:900;letter-spacing:1px}
+.brand span{color:#c4b5fd}
+.nav-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.nav-link{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  border:1px solid var(--line);
+  padding:10px 14px;
+  border-radius:12px;
+  font-size:13px;
+}
+.nav-link.primary{
+  background:linear-gradient(100deg,#7c3aed,#db2777);
+  border:0;
+  font-weight:800;
+}
+main{max-width:1000px;margin:auto;padding:22px 20px 65px}
+.hero{padding:24px 0 28px}
+.eyebrow{
+  display:inline-block;
+  border:1px solid #7044b8;
+  background:#24143f;
+  color:#d9c5ff;
+  border-radius:999px;
+  padding:8px 13px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1.4px;
+}
+h1{
+  font-size:clamp(34px,6vw,54px);
+  line-height:1.08;
+  margin:18px 0 12px;
+  letter-spacing:-1.5px;
+}
+.gradient{
+  background:linear-gradient(90deg,#c4b5fd,#f0abfc,#f9a8d4);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.lead{color:var(--muted);line-height:1.7;max-width:650px}
+.status-banner{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  border:1px solid var(--line);
+  background:#151127;
+  border-radius:18px;
+  padding:19px;
+  margin:18px 0 22px;
+}
+.status-icon{
+  width:48px;height:48px;flex-shrink:0;
+  border-radius:15px;
+  display:grid;place-items:center;
+  background:#30204c;
+  font-size:23px;
+}
+.status-copy{flex:1;min-width:0}
+.status-copy h2{font-size:20px;margin-bottom:5px}
+.status-copy p{font-size:13px;line-height:1.6;color:var(--muted)}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  background:#29233a;
+  color:#ddd6fe;
+}
+.pill.active{background:#123323;color:var(--green)}
+.pill.pending{background:#382b12;color:#fde68a}
+.pill.expired{background:#351522;color:var(--red)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.card{
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:23px;
+  background:linear-gradient(155deg,#1d1634f7,#100d20fc);
+  min-width:0;
+}
+.card h2{font-size:19px;margin-bottom:17px}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.7}
+.plan-name{
+  font-size:28px;
+  font-weight:900;
+  margin-bottom:8px;
+  overflow-wrap:anywhere;
+}
+.amount{
+  font-size:22px;
+  font-weight:850;
+  color:#e9d5ff;
+  margin:14px 0 5px;
+  overflow-wrap:anywhere;
+}
+.amount small{font-size:13px;font-weight:500;color:var(--muted)}
+.details{display:grid;gap:0;margin-top:10px}
+.detail{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:13px 0;
+  border-bottom:1px solid #ffffff12;
+  font-size:13px;
+}
+.detail:last-child{border-bottom:0}
+.detail span:first-child{color:var(--muted)}
+.detail strong{text-align:right;overflow-wrap:anywhere}
+.actions{display:grid;gap:10px;margin-top:20px}
+.btn{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  min-height:46px;
+  border:0;
+  border-radius:12px;
+  padding:12px 16px;
+  font-weight:850;
+  color:#fff;
+  background:linear-gradient(100deg,#7c3aed,#db2777);
+  box-shadow:0 8px 24px #7c3aed22;
+}
+.btn.secondary{
+  background:#211936;
+  border:1px solid #493663;
+  box-shadow:none;
+}
+.btn:disabled{opacity:.6;cursor:wait}
+.wide{grid-column:1/-1}
+.history-empty{
+  text-align:center;
+  padding:24px 12px;
+  border:1px dashed #45375e;
+  border-radius:14px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+.notice{
+  display:none;
+  margin:15px 0;
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  font-size:13px;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+.notice.show{display:block}
+.notice.error{border-color:#9f344e;background:#351322;color:#ffd3df}
+.notice.info{background:#17132a;color:#e5dcff}
+.notice.success{border-color:#386c55;background:#10281f;color:#c5ffe0}
+footer{
+  max-width:1000px;
+  margin:auto;
+  padding:0 20px 28px;
+  color:#8f86a9;
+  font-size:12px;
+  line-height:1.8;
+  text-align:center;
+}
+footer a{color:#d8b4fe}
+.loading{color:var(--muted)}
+.hidden{display:none!important}
+@media(max-width:650px){
+  header{padding:16px 14px;align-items:flex-start}
+  .brand{font-size:19px}
+  .nav-actions{gap:6px}
+  .nav-link{font-size:12px;padding:9px 10px}
+  main{padding:13px 14px 42px}
+  .hero{padding:22px 0}
+  .grid{grid-template-columns:1fr}
+  .wide{grid-column:auto}
+  .card{padding:20px}
+  .status-banner{align-items:flex-start;padding:15px}
+  .status-copy h2{font-size:18px}
+  .status-banner .pill{margin-left:auto}
+  .detail{gap:10px}
+}
+@media(max-width:390px){
+  header{flex-direction:column}
+  .nav-actions{width:100%}
+  .nav-link{flex:1}
+  .status-banner{flex-wrap:wrap}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <a class="brand" href="index.html">PASONG<span> PREMIUM</span></a>
+  <nav class="nav-actions" aria-label="Main navigation">
+    <a class="nav-link" href="index.html">← PASONG</a>
+    <a class="nav-link primary" href="premium.html">View Plans</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">YOUR MEMBERSHIP</div>
+    <h1>My <span class="gradient">Premium.</span></h1>
+    <p class="lead">
+      Manage your PASONG membership and check your subscription details
+      in one place.
+    </p>
+  </section>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <section class="status-banner" aria-live="polite">
+    <div class="status-icon" id="statusIcon" aria-hidden="true">♪</div>
+    <div class="status-copy">
+      <h2 id="statusTitle">Checking membership…</h2>
+      <p id="statusDescription" class="loading">
+        Connecting to your PASONG account.
+      </p>
+    </div>
+    <span id="statusPill" class="pill">Checking</span>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Membership details</h2>
+      <div id="planName" class="plan-name">Loading…</div>
+      <p id="planDescription" class="card-desc">
+        Your confirmed subscription information will appear here.
+      </p>
+
+      <div id="planAmount" class="amount">—</div>
+
+      <div class="details">
+        <div class="detail">
+          <span>Membership status</span>
+          <strong id="membershipStatus">Checking…</strong>
+        </div>
+        <div class="detail">
+          <span>Started</span>
+          <strong id="startedAt">—</strong>
+        </div>
+        <div class="detail">
+          <span>Expires</span>
+          <strong id="expiresAt">—</strong>
+        </div>
+        <div class="detail">
+          <span>Payment reference</span>
+          <strong id="paymentReference">—</strong>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="premium.html">View Premium plans</a>
+        <button id="refreshButton" class="btn secondary" type="button">
+          Refresh membership
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Your Premium benefits</h2>
+      <p class="card-desc">
+        These are intended Premium benefits. Access depends on the features
+        currently implemented and enabled by PASONG.
+      </p>
+      <div class="details">
+        <div class="detail">
+          <span>Premium member badge</span>
+          <strong>Planned benefit</strong>
+        </div>
+        <div class="detail">
+          <span>Ad-free listening</span>
+          <strong>Requires player enforcement</strong>
+        </div>
+        <div class="detail">
+          <span>Higher-quality audio</span>
+          <strong>Where available</strong>
+        </div>
+        <div class="detail">
+          <span>Exclusive releases</span>
+          <strong>Where enabled</strong>
+        </div>
+      </div>
+      <p class="card-desc" style="margin-top:15px">
+        Your membership status alone does not guarantee that every benefit
+        is already enabled across the website.
+      </p>
+    </section>
+
+    <section class="card wide">
+      <h2>Payment history</h2>
+      <div id="historyArea" class="history-empty">
+        Payment history is not connected to this page yet. Your membership
+        details above are loaded from the current Premium status endpoint.
+        No payment records are fabricated or displayed as completed.
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <p>© <span id="year"></span> PASONG. Music connects us.</p>
+  <p><a href="premium.html">Premium plans</a> · <a href="index.html">Back to PASONG</a></p>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+  const API_BASE = "https://pasong-api.vercel.app";
+
+  const $ = (id) => document.getElementById(id);
+
+  let supabaseClient = null;
+  let loading = false;
+
+  $("year").textContent = String(new Date().getFullYear());
+
+  try {
+    if (window.supabase && window.supabase.createClient) {
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+    }
+  } catch (error) {
+    console.error("Supabase initialization failed:", error);
+  }
+
+  function showNotice(type, message) {
+    const el = $("notice");
+    el.className = "notice show " + type;
+    el.textContent = message;
+  }
+
+  function clearNotice() {
+    const el = $("notice");
+    el.className = "notice";
+    el.textContent = "";
+  }
+
+  function formatDate(value) {
+    if (!value) return "Not provided";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Not provided";
+
+    return new Intl.DateTimeFormat(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    }).format(date);
+  }
+
+  function formatMoney(amount, currency) {
+    if (amount === null || amount === undefined || amount === "") {
+      return "Not provided";
+    }
+
+    const numeric = Number(amount);
+    if (!Number.isFinite(numeric)) return "Not provided";
+
+    const code = String(currency || "USD").toUpperCase();
+
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: code,
+        maximumFractionDigits: 2
+      }).format(numeric);
+    } catch {
+      return code + " " + numeric.toLocaleString();
+    }
+  }
+
+  function setPill(status, active) {
+    const pill = $("statusPill");
+    const normalized = String(status || "free").toLowerCase();
+
+    pill.className = "pill";
+    pill.textContent = normalized.replace(/[_-]+/g, " ");
+
+    if (active) {
+      pill.classList.add("active");
+      pill.textContent = "Active";
+    } else if (normalized.includes("pending")) {
+      pill.classList.add("pending");
+    } else if (
+      normalized.includes("expired") ||
+      normalized.includes("cancelled") ||
+      normalized.includes("canceled") ||
+      normalized.includes("failed")
+    ) {
+      pill.classList.add("expired");
+    }
+  }
+
+  function renderFree() {
+    $("statusIcon").textContent = "♪";
+    $("statusTitle").textContent = "You're on PASONG Free";
+    $("statusDescription").textContent =
+      "No active Premium membership was found for this account.";
+    setPill("free", false);
+
+    $("planName").textContent = "Free plan";
+    $("planDescription").textContent =
+      "Explore PASONG Premium plans whenever you're ready.";
+    $("planAmount").textContent = "No active subscription";
+    $("membershipStatus").textContent = "Free";
+    $("startedAt").textContent = "—";
+    $("expiresAt").textContent = "—";
+    $("paymentReference").textContent = "—";
+  }
+
+  function renderSubscription(subscription, active, status) {
+    const sub = subscription || {};
+    const plan = String(sub.plan || "Premium").toLowerCase();
+    const displayPlan = plan === "yearly"
+      ? "Yearly Premium"
+      : plan === "monthly"
+        ? "Monthly Premium"
+        : String(sub.plan || "Premium");
+
+    $("statusIcon").textContent = active ? "★" : "♪";
+    $("statusTitle").textContent = active
+      ? "Your Premium is active"
+      : "Membership: " + String(status || sub.status || "inactive")
+          .replace(/[_-]+/g, " ");
+
+    $("statusDescription").textContent = active
+      ? "Your account has a confirmed active Premium subscription."
+      : "A subscription record exists, but it is not currently confirmed as active.";
+
+    setPill(status || sub.status, active);
+
+    $("planName").textContent = displayPlan;
+    $("planDescription").textContent = active
+      ? "Your confirmed PASONG Premium membership."
+      : "Review the details below or view the available Premium plans.";
+
+    $("planAmount").textContent = formatMoney(sub.amount, sub.currency);
+    $("membershipStatus").textContent = String(
+      status || sub.status || "Unknown"
+    ).replace(/[_-]+/g, " ");
+
+    $("startedAt").textContent = formatDate(sub.started_at);
+    $("expiresAt").textContent = sub.expires_at
+      ? formatDate(sub.expires_at)
+      : "No expiry recorded";
+
+    $("paymentReference").textContent =
+      sub.payment_reference || "Not provided";
+  }
+
+  async function loadMembership() {
+    if (loading) return;
+    loading = true;
+    clearNotice();
+
+    const refreshButton = $("refreshButton");
+    refreshButton.disabled = true;
+    refreshButton.textContent = "Refreshing…";
+
+    try {
+      if (!supabaseClient) {
+        throw new Error(
+          "The login service could not start. Refresh the page and try again."
+        );
+      }
+
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) throw error;
+
+      const session = data && data.session;
+
+      if (!session || !session.access_token) {
+        $("statusTitle").textContent = "Sign in to view your membership";
+        $("statusDescription").textContent =
+          "Log in to the PASONG account used for your subscription.";
+        $("statusIcon").textContent = "↗";
+        setPill("sign in", false);
+        $("planName").textContent = "Sign-in required";
+        $("planDescription").textContent =
+          "Your private membership details are available after login.";
+        $("planAmount").textContent = "—";
+        $("membershipStatus").textContent = "Not signed in";
+        $("startedAt").textContent = "—";
+        $("expiresAt").textContent = "—";
+        $("paymentReference").textContent = "—";
+
+        showNotice(
+          "info",
+          "Please sign in to see your PASONG Premium membership."
+        );
+
+        $("historyArea").textContent =
+          "Sign in to view account-specific membership information.";
+
+        return;
+      }
+
+      const response = await fetch(API_BASE + "/api/premium/status", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer " + session.access_token
+        },
+        cache: "no-store"
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok || result.success === false) {
+        throw new Error(
+          result.error || "Could not retrieve your Premium membership."
+        );
+      }
+
+      if (result.authenticated === false) {
+        renderFree();
+        showNotice(
+          "info",
+          "The server did not authenticate this session. Please sign in again."
+        );
+        return;
+      }
+
+      const subscription = result.subscription || null;
+      const active = result.premium === true;
+
+      if (subscription) {
+        renderSubscription(subscription, active, result.status);
+      } else {
+        renderFree();
+      }
+
+      if (active) {
+        showNotice(
+          "success",
+          "Your membership status was successfully checked with the PASONG server."
+        );
+      } else {
+        showNotice(
+          "info",
+          "No active Premium membership is confirmed. If you recently paid, keep your payment reference and contact PASONG support if your status does not update."
+        );
+      }
+
+    } catch (error) {
+      console.error("Premium membership loading failed:", error);
+
+      $("statusTitle").textContent = "Membership could not be loaded";
+      $("statusDescription").textContent =
+        "We could not confirm your current membership status.";
+      $("statusIcon").textContent = "!";
+      setPill("unavailable", false);
+
+      showNotice(
+        "error",
+        (error && error.message) ||
+          "Unable to load membership. Please try again."
+      );
+    } finally {
+      loading = false;
+      refreshButton.disabled = false;
+      refreshButton.textContent = "Refresh membership";
+    }
+  }
+
+  $("refreshButton").addEventListener("click", loadMembership);
+
+  loadMembership();
+})();
+</script>
+
+<script src="premium-nav.js"></script>
+</body>
+</html>
