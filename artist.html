@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -836,6 +837,7 @@ function renderArtist(){
         <button id="followButton" class="primary-btn" onclick="toggleFollow()">＋ Follow</button>
         <button class="secondary-btn" onclick="playAll()">▶ Play all</button>
         <button class="secondary-btn" onclick="shareArtist()">↗ Share</button>
+        <button class="secondary-btn" onclick="tipArtist()">💜 Tip Artist</button>
       </div>
       <div class="stats">
         <div class="stat"><strong>${songs.length}</strong><span>Songs</span></div>
@@ -961,6 +963,27 @@ async function shareArtist(){
     try{await navigator.share({title:name+" — PASONG",text:"Listen to "+name+" on PASONG.",url});return}catch(e){}
   }
   try{await navigator.clipboard.writeText(url);alert("Artist link copied.")}catch(e){prompt("Copy this artist link:",url)}
+}
+
+/* Opens the standalone artist tipping page for the current artist. */
+function tipArtist(){
+  if(!artist){
+    alert("Artist information is not available.");
+    return;
+  }
+
+  const artistId=artist.id||artist.user_id;
+
+  if(!artistId){
+    alert("Artist profile ID is missing. Please open this artist from the Artists page.");
+    return;
+  }
+
+  const url=new URL("tip-artist.html",window.location.href);
+  url.searchParams.set("id",String(artistId));
+  url.searchParams.set("name",getArtistName(artist));
+
+  window.location.href=url.toString();
 }
 
 const audio=document.getElementById("audioPlayer");
