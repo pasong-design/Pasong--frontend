@@ -1,0 +1,474 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8b5cf6">
+<meta name="description" content="Review your PASONG Premium subscription and continue to checkout.">
+<title>Premium Checkout | PASONG</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  color-scheme:dark;
+  --purple:#8b5cf6;
+  --pink:#ec4899;
+  --muted:#b8b2d0;
+  --line:#342951;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  min-height:100vh;color:#fff;
+  background:radial-gradient(ellipse at top,#21113e,#090817 58%);
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+header{
+  max-width:1080px;margin:auto;padding:20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.brand{font-size:23px;font-weight:900;letter-spacing:1px}
+.brand span{color:#c4b5fd}
+.back{
+  border:1px solid var(--line);border-radius:12px;
+  padding:10px 13px;font-size:13px;
+}
+main{max-width:900px;margin:auto;padding:25px 20px 65px}
+.hero{text-align:center;margin:10px 0 30px}
+.eyebrow{
+  display:inline-block;border:1px solid #7044b8;background:#24143f;
+  color:#d9c5ff;border-radius:999px;padding:8px 13px;
+  font-size:11px;font-weight:900;letter-spacing:1.4px;
+}
+h1{
+  font-size:clamp(34px,6vw,52px);line-height:1.1;
+  margin:17px 0 12px;letter-spacing:-1px;
+}
+.gradient{
+  background:linear-gradient(90deg,#c4b5fd,#f0abfc,#f9a8d4);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.lead{color:var(--muted);line-height:1.7;max-width:620px;margin:auto}
+.layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;
+}
+.card{
+  border:1px solid var(--line);border-radius:22px;padding:25px;
+  background:linear-gradient(155deg,#1e1637f7,#100d20fc);
+  min-width:0;
+}
+.card h2{font-size:20px;margin-bottom:18px}
+.plan-label{
+  display:inline-block;color:#d8b4fe;font-size:11px;
+  font-weight:900;letter-spacing:1px;margin-bottom:12px;
+}
+.plan-title{font-size:30px;font-weight:900;margin-bottom:9px}
+.price{font-size:30px;font-weight:900;color:#e9d5ff;margin:14px 0 7px;overflow-wrap:anywhere}
+.price small{font-size:13px;font-weight:500;color:var(--muted)}
+.muted{color:var(--muted);font-size:13px;line-height:1.7}
+hr{border:0;border-top:1px solid #ffffff14;margin:20px 0}
+.line-item{
+  display:flex;justify-content:space-between;gap:14px;
+  padding:12px 0;border-bottom:1px solid #ffffff12;font-size:13px;
+}
+.line-item:last-child{border-bottom:0}
+.line-item span:first-child{color:var(--muted)}
+.line-item strong{text-align:right;overflow-wrap:anywhere}
+.secure-note{
+  border:1px solid #443465;background:#17132a;border-radius:13px;
+  padding:13px;font-size:12px;color:#d8c9f8;line-height:1.7;margin-top:18px;
+}
+label{display:block;font-size:13px;font-weight:800;margin-bottom:9px}
+select{
+  width:100%;padding:14px;border:1px solid var(--line);
+  background:#100d20;color:#fff;border-radius:12px;font:inherit;
+}
+button{
+  width:100%;border:0;border-radius:13px;padding:15px;
+  font-weight:900;color:#fff;
+  background:linear-gradient(100deg,#7c3aed,#db2777);
+  box-shadow:0 9px 25px #7c3aed33;
+}
+button:disabled{opacity:.6;cursor:wait}
+.secondary{
+  display:block;width:100%;margin-top:10px;text-align:center;
+  border:1px solid var(--line);border-radius:12px;padding:13px;
+  font-size:13px;font-weight:800;
+}
+.notice{
+  display:none;margin:18px 0;padding:14px 15px;
+  border:1px solid var(--line);border-radius:13px;
+  font-size:13px;line-height:1.7;overflow-wrap:anywhere;
+}
+.notice.show{display:block}
+.notice.error{border-color:#9f344e;background:#351322;color:#ffd3df}
+.notice.info{background:#17132a;color:#e5dcff}
+.notice.success{border-color:#386c55;background:#10281f;color:#c5ffe0}
+.reference{
+  padding:12px;background:#090817;border:1px dashed #65518a;
+  border-radius:10px;overflow-wrap:anywhere;margin-top:10px;
+  font-size:12px;
+}
+.benefit{display:flex;gap:10px;padding:9px 0;color:#e8e1f7;font-size:13px}
+.check{color:#c4b5fd;font-weight:900}
+footer{text-align:center;color:#8981a4;font-size:12px;padding:0 20px 28px}
+footer a{color:#d8b4fe}
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr}
+  header{padding:16px}
+  main{padding:20px 15px 45px}
+  .card{padding:20px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <a class="brand" href="Pasong.html">◈ PASONG<span> PREMIUM</span></a>
+  <a class="back" href="premium.html">← Back to plans</a>
+</header>
+
+<main>
+  <section class="hero">
+    <span class="eyebrow">MEMBERSHIP CHECKOUT</span>
+    <h1>Upgrade your <span class="gradient">music experience.</span></h1>
+    <p class="lead">Review your membership, confirm your plan and continue when secure payment is available.</p>
+  </section>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <div class="layout">
+    <section class="card">
+      <span class="plan-label">YOUR SELECTED PLAN</span>
+      <div id="planTitle" class="plan-title">Loading Premium…</div>
+      <p id="planDescription" class="muted">Checking the selected membership.</p>
+      <div id="price" class="price">Checking price…</div>
+      <p id="billingText" class="muted">Price is being confirmed by PASONG.</p>
+
+      <hr>
+
+      <h2>Premium benefits</h2>
+      <div class="benefit"><span class="check">✓</span><span>Premium member badge</span></div>
+      <div class="benefit"><span class="check">✓</span><span>Ad-free listening where supported</span></div>
+      <div class="benefit"><span class="check">✓</span><span>Higher-quality audio where available</span></div>
+      <div class="benefit"><span class="check">✓</span><span>Access to eligible Premium releases and playlists</span></div>
+      <div class="benefit"><span class="check">✓</span><span>Early access to selected releases where offered</span></div>
+
+      <div class="secure-note">
+        <strong>Payment security</strong><br>
+        PASONG must verify payment on the server before activating Premium. Creating an order does not activate membership.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Checkout details</h2>
+
+      <label for="plan">Membership plan</label>
+      <select id="plan">
+        <option value="monthly">Monthly Premium</option>
+        <option value="yearly">Yearly Premium</option>
+      </select>
+
+      <div style="margin-top:22px">
+        <div class="line-item">
+          <span>Membership</span>
+          <strong id="summaryPlan">Monthly</strong>
+        </div>
+        <div class="line-item">
+          <span>Price</span>
+          <strong id="summaryPrice">Loading…</strong>
+        </div>
+        <div class="line-item">
+          <span>Payment status</span>
+          <strong id="summaryStatus">Not paid</strong>
+        </div>
+      </div>
+
+      <div id="referenceBox" hidden>
+        <p class="muted" style="margin-top:18px">Your pending payment reference:</p>
+        <div id="reference" class="reference"></div>
+      </div>
+
+      <div style="margin-top:24px">
+        <button id="checkoutButton" type="button">Continue to secure checkout</button>
+        <a class="secondary" href="my-premium.html">View My Premium</a>
+        <a class="secondary" href="premium.html">Compare plans</a>
+      </div>
+
+      <p class="muted" style="margin-top:16px">
+        Do not share your password, access token or payment details with anyone. Only use payment instructions supplied by the verified PASONG checkout.
+      </p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  © <span id="year"></span> PASONG. Music connects us.
+  <br><br>
+  <a href="Pasong.html">PASONG Home</a> ·
+  <a href="premium.html">Premium Plans</a>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const SUPABASE_URL = "https://mtufczmjlkvycarxylgh.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+  const API_BASE = "https://pasong-api.vercel.app";
+
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(window.location.search);
+
+  let selectedPlan = params.get("plan") === "yearly" ? "yearly" : "monthly";
+  let session = null;
+  let pricing = null;
+  let busy = false;
+
+  $("year").textContent = new Date().getFullYear();
+  $("plan").value = selectedPlan;
+
+  function showNotice(message, type = "info") {
+    const el = $("notice");
+    el.className = "notice show " + type;
+    el.textContent = message;
+  }
+
+  function clearNotice() {
+    $("notice").className = "notice";
+    $("notice").textContent = "";
+  }
+
+  function money(amount, currency) {
+    if (amount === null || amount === undefined || !currency) {
+      return "Price unavailable";
+    }
+
+    const numeric = Number(amount);
+    if (!Number.isFinite(numeric)) return String(amount) + " " + currency;
+
+    try {
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: String(currency).toUpperCase(),
+        maximumFractionDigits: 2
+      }).format(numeric);
+    } catch {
+      return String(amount) + " " + currency;
+    }
+  }
+
+  function getPlanPrice() {
+    if (!pricing) return null;
+    return pricing[selectedPlan] || null;
+  }
+
+  function renderPlan() {
+    const isYearly = selectedPlan === "yearly";
+    const plan = getPlanPrice();
+
+    $("planTitle").textContent = isYearly ? "Yearly Premium" : "Monthly Premium";
+    $("planDescription").textContent = isYearly
+      ? "One subscription for a full year."
+      : "Flexible Premium membership billed monthly.";
+
+    $("summaryPlan").textContent = isYearly ? "Yearly Premium" : "Monthly Premium";
+
+    if (plan && plan.amount !== undefined && plan.currency) {
+      const formatted = money(plan.amount, plan.currency);
+      $("price").textContent = formatted;
+      $("summaryPrice").textContent = formatted;
+      $("billingText").textContent = isYearly
+        ? "For the yearly membership period."
+        : "For the monthly membership period.";
+    } else {
+      $("price").textContent = "Price unavailable";
+      $("summaryPrice").textContent = "Not available";
+      $("billingText").textContent = "Refresh or try again later to load the server price.";
+    }
+
+    $("summaryStatus").textContent = "Not paid";
+  }
+
+  async function loadPricing() {
+    try {
+      const response = await fetch(API_BASE + "/api/premium/pricing", {
+        method: "GET",
+        headers: { "Accept": "application/json" }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.success === false) {
+        throw new Error(data.message || "Could not load Premium pricing.");
+      }
+
+      pricing = data;
+      renderPlan();
+      return true;
+    } catch (error) {
+      console.error("Premium pricing error:", error);
+      $("price").textContent = "Price unavailable";
+      $("summaryPrice").textContent = "Unavailable";
+      $("billingText").textContent = "PASONG could not confirm the current price. Please try again.";
+      $("checkoutButton").disabled = true;
+      showNotice("We couldn't load the current Premium price from PASONG. Please refresh the page before continuing.", "error");
+      return false;
+    }
+  }
+
+  async function loadSession() {
+    if (!window.supabase || !window.supabase.createClient) {
+      showNotice("The sign-in service could not load. Refresh the page and try again.", "error");
+      return false;
+    }
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+      console.error("Session error:", error);
+      showNotice("We couldn't verify your sign-in. Please sign in again.", "error");
+      return false;
+    }
+
+    session = data && data.session ? data.session : null;
+    return !!session;
+  }
+
+  function loginRedirect() {
+    const destination = "premium-checkout.html?plan=" +
+      encodeURIComponent(selectedPlan);
+    window.location.href = "login.html?redirect=" +
+      encodeURIComponent(destination);
+  }
+
+  async function startCheckout() {
+    if (busy) return;
+    clearNotice();
+
+    if (!getPlanPrice()) {
+      showNotice("The current plan price is unavailable. Please refresh and try again.", "error");
+      return;
+    }
+
+    if (!session || !session.access_token) {
+      showNotice("Please sign in to continue to Premium checkout.", "info");
+      loginRedirect();
+      return;
+    }
+
+    busy = true;
+    $("checkoutButton").disabled = true;
+    $("checkoutButton").textContent = "Creating secure order…";
+
+    try {
+      const response = await fetch(API_BASE + "/api/premium/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer " + session.access_token
+        },
+        body: JSON.stringify({ plan: selectedPlan })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401 || response.status === 403) {
+        session = null;
+        showNotice("Your session may have expired. Please sign in again.", "error");
+        return;
+      }
+
+      if (!response.ok || data.success !== true) {
+        throw new Error(data.message || "PASONG could not create the checkout order.");
+      }
+
+      const payment = data.payment || {};
+      const reference =
+        payment.payment_reference ||
+        payment.reference ||
+        payment.transaction_reference ||
+        "";
+
+      $("summaryStatus").textContent = "Pending";
+      $("referenceBox").hidden = false;
+      $("reference").textContent = reference || "Pending reference not returned";
+      showNotice(
+        "Your Premium order has been created, but payment has not been completed. Premium will only activate after PASONG verifies a successful payment.",
+        "info"
+      );
+
+      /*
+       * Never redirect to an unverified URL.
+       * The current API creates a pending payment record. When a real
+       * provider checkout URL is added server-side, its integration
+       * should be reviewed before enabling redirects here.
+       */
+      if (data.checkout_url || data.payment_url || data.url) {
+        showNotice(
+          "PASONG returned a payment link, but this page has not been configured to validate the payment provider redirect. Please contact PASONG support before proceeding.",
+          "error"
+        );
+      }
+
+      $("checkoutButton").textContent = "Order created — payment pending";
+      $("checkoutButton").disabled = true;
+    } catch (error) {
+      console.error("Premium checkout error:", error);
+      showNotice(
+        error.message || "Checkout could not be started. Please try again.",
+        "error"
+      );
+    } finally {
+      busy = false;
+
+      if (!$("referenceBox").hidden) {
+        $("checkoutButton").disabled = true;
+      } else {
+        $("checkoutButton").disabled = false;
+        $("checkoutButton").textContent = "Try checkout again";
+      }
+    }
+  }
+
+  $("plan").addEventListener("change", async event => {
+    selectedPlan = event.target.value === "yearly" ? "yearly" : "monthly";
+
+    const url = new URL(window.location.href);
+    url.searchParams.set("plan", selectedPlan);
+    window.history.replaceState({}, "", url.toString());
+
+    renderPlan();
+    clearNotice();
+    $("referenceBox").hidden = true;
+    $("checkoutButton").disabled = false;
+    $("checkoutButton").textContent = "Continue to secure checkout";
+  });
+
+  $("checkoutButton").addEventListener("click", startCheckout);
+
+  async function init() {
+    $("checkoutButton").disabled = true;
+    const priceLoaded = await loadPricing();
+    const signedIn = await loadSession();
+
+    if (!signedIn) {
+      $("checkoutButton").disabled = !priceLoaded;
+      if (priceLoaded) {
+        showNotice("Please sign in before creating your Premium order.", "info");
+      }
+      return;
+    }
+
+    $("checkoutButton").disabled = !priceLoaded;
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
