@@ -105,7 +105,7 @@ footer div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:r
 
 <div class="actions">
 <div id="heart" class="btn" onclick="toggleFav()">♡ Favorite</div>
-<div class="btn buy" onclick="openBuy()">+ Buy</div>
+<div class="btn buy" onclick="checkout()">+ Buy</div>
 </div>
 
 <div class="share-row">
@@ -262,7 +262,7 @@ const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let list=[],idx=0,current=null,isShuffle=false,isRepeat=false,selectedPrice=10,playCounted=false;
+let list=[],idx=0,current=null,isShuffle=false,isRepeat=false,selectedPrice=10,playCounted=false,playedSeconds=0,lastPlaybackTime=null;
 const audio=document.getElementById("audio");
 
 function qs(k){
@@ -299,7 +299,6 @@ async function init(){
 
   if(id){
     let wantedType=type;
-
     let f=-1;
 
     if(wantedType==="beat"){
@@ -347,9 +346,15 @@ async function init(){
 async function getRealPlays(id){
   try{
     let r=await db.from("song_plays").select("id",{count:"exact",head:true}).eq("song_id",id);
-    if(r.count)return r.count;
-  }catch(e){}
-  return 0;
+    if(r.error){
+      console.error("Could not read song plays:",r.error.message);
+      return 0;
+    }
+    return r.count||0;
+  }catch(e){
+    console.error("Play count read failed:",e);
+    return 0;
+  }
 }
 
 async function load(i){
@@ -359,6 +364,8 @@ async function load(i){
   if(!current)return;
 
   playCounted=false;
+  playedSeconds=0;
+  lastPlaybackTime=null;
 
   let isBeat=current._pasong_type==="beat"||current.producer_id!=null;
 
@@ -366,7 +373,9 @@ async function load(i){
   document.getElementById("artistImg").src=current.cover_url||"";
   document.getElementById("title").textContent=current.title||"Untitled";
 
+  audio.pause();
   audio.src=current.audio_url||current.preview_url||current.stream_url||"";
+  audio.load();
 
   let name="PASONG";
   let img=current.cover_url;
@@ -568,7 +577,9 @@ async function checkFav(){
       b.classList.remove("active");
       b.textContent="♡ Favorite";
     }
-  }catch(e){}
+  }catch(e){
+    console.error("Favorite check failed:",e);
+  }
 }
 
 async function toggleFav(){
@@ -592,23 +603,55 @@ async function toggleFav(){
 
 function toggle(){
   if(audio.paused){
-    audio.play();
-    document.getElementById("playBtn").textContent="⏸";
+    audio.play().then(()=>{
+      document.getElementById("playBtn").textContent="⏸";
+    }).catch(error=>{
+      console.error("Audio playback failed:",error);
+      alert("This audio could not be played. Please try again.");
+    });
   }else{
     audio.pause();
     document.getElementById("playBtn").textContent="▶";
   }
 }
 
+/* Count only time actually listened to. Seeking forward does not count. */
 audio.ontimeupdate=()=>{
   document.getElementById("fill").style.width=(audio.currentTime/(audio.duration||1)*100)+"%";
   document.getElementById("cur").textContent=formatTime(audio.currentTime);
 
-  if(!playCounted&&audio.currentTime>30){
-    playCounted=true;
-    addRealPlay();
+  if(!audio.paused && !playCounted && current && current._pasong_type!=="beat"){
+    if(lastPlaybackTime!==null){
+      const delta=audio.currentTime-lastPlaybackTime;
+      if(delta>0 && delta<=5) playedSeconds+=delta;
+    }
+
+    lastPlaybackTime=audio.currentTime;
+
+    if(playedSeconds>=30){
+      playCounted=true;
+      addRealPlay();
+    }
+  }else{
+    lastPlaybackTime=audio.currentTime;
   }
 };
+
+audio.addEventListener("play",()=>{
+  lastPlaybackTime=audio.currentTime;
+});
+
+audio.addEventListener("pause",()=>{
+  lastPlaybackTime=null;
+});
+
+audio.addEventListener("seeking",()=>{
+  lastPlaybackTime=audio.currentTime;
+});
+
+audio.addEventListener("seeked",()=>{
+  lastPlaybackTime=audio.currentTime;
+});
 
 audio.onloadedmetadata=()=>{
   document.getElementById("dur").textContent=formatTime(audio.duration);
@@ -661,22 +704,48 @@ function toggleRepeat(){
   document.getElementById("repeatBtn").classList.toggle("active",isRepeat);
 }
 
-/* Only songs are inserted into song_plays */
+/* Record a song play after 30 seconds of actual listening. */
 async function addRealPlay(){
-  if(!current||current._pasong_type==="beat")return;
+  if(!current || current._pasong_type==="beat" || !current.id) return;
 
   try{
-    let u=(await db.auth.getUser()).data.user;
+    const authResult=await db.auth.getUser();
+    const user=authResult.data?.user||null;
 
-    await db.from("song_plays").insert({
+    const playRecord={
       song_id:current.id,
-      user_id:u?u.id:null
-    });
-  }catch(e){}
+      user_id:user ? user.id : null
+    };
+
+    // Artist dashboard analytics are grouped by artist_profiles.id.
+    if(current.artist_id){
+      playRecord.artist_id=current.artist_id;
+    }
+
+    const result=await db.from("song_plays").insert(playRecord);
+
+    if(result.error){
+      console.error("PASONG song_plays insert failed:",result.error.message,result.error);
+      return;
+    }
+
+    const count=await getRealPlays(current.id);
+    const meta=document.getElementById("meta");
+
+    if(meta){
+      const genre=current.genre ? " • "+current.genre : "";
+      meta.textContent=count.toLocaleString()+" plays"+genre;
+    }
+
+    console.log("PASONG play recorded:",current.title,"Total:",count);
+
+  }catch(error){
+    console.error("PASONG play counter failed:",error);
+  }
 }
 
 function buy(){
-  openBuy();
+  checkout();
 }
 
 function openBuy(){
@@ -690,7 +759,6 @@ function openBuy(){
   document.getElementById("buyModalTitle").textContent=
     isBeat?"Buy Producer Beat":"Buy Song";
 
-  /* Beat checkout has its own license and price system */
   document.querySelectorAll(".license").forEach(el=>{
     el.style.display=isBeat?"none":"flex";
   });
@@ -710,7 +778,7 @@ function selectLicense(el){
   document.getElementById("buyPrice").textContent="$"+selectedPrice;
 }
 
-/* Connect the Buy button to the correct existing checkout */
+/* Direct to the existing checkout for the selected item type. */
 function checkout(){
   if(!current||!current.id){
     alert("No item is selected.");
@@ -800,7 +868,9 @@ async function loadComments(){
     }
 
     document.getElementById("commentsList").innerHTML=h;
-  }catch(e){}
+  }catch(e){
+    console.error("Comments failed to load:",e);
+  }
 }
 
 async function likeComment(id,cur){
