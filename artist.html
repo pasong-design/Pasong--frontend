@@ -4,70 +4,125 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08060d">
+<meta name="description" content="Discover artists and music on PASONG.">
 <title>PASONG — Artist</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#07060b;--purple:#8b5cf6}
-body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(circle at 50% -10%,rgba(139,92,246,.20),transparent 35%),linear-gradient(180deg,#0a0710 0%,#07060b 45%,#050409 100%);color:#fff;min-height:100vh}
-header{position:sticky;top:0;z-index:1000;height:62px;background:rgba(8,6,13,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}
+html{scroll-behavior:smooth}
+:root{--bg:#07060b;--card:#111018;--purple:#8b5cf6;--purple2:#a855f7;--pink:#d946ef;--text:#fff;--muted:#a7a1b3;--border:rgba(255,255,255,.08)}
+body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(circle at 50% -10%,rgba(139,92,246,.20),transparent 35%),linear-gradient(180deg,#0a0710 0%,#07060b 45%,#050409 100%);color:#fff;min-height:100vh;overflow-x:hidden}
+button,a{font:inherit}
+header{position:sticky;top:0;z-index:1000;height:62px;background:rgba(8,6,13,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}
 .nav{max-width:1280px;height:100%;margin:auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between}
 .logo{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-size:14px;font-weight:900}
-.logo-mark{width:10px;height:10px;border-radius:3px 50% 50% 50%;background:linear-gradient(135deg,#a855f7,#d946ef);transform:rotate(45deg)}
-.nav-links{display:flex;gap:25px}
+.logo-mark{width:10px;height:10px;border-radius:3px 50% 50% 50%;background:linear-gradient(135deg,#a855f7,#d946ef);transform:rotate(45deg);box-shadow:0 0 15px rgba(168,85,247,.75)}
+.nav-links{display:flex;align-items:center;gap:25px}
 .nav-links a{color:#a9a3b1;text-decoration:none;font-size:11px;font-weight:700}
-.nav-links a.active{color:#fff}
-.account-btn{width:30px;height:30px;border-radius:50%;border:0;background:linear-gradient(135deg,#8b5cf6,#d946ef);color:#fff;font-weight:900}
+.nav-links a:hover,.nav-links a.active{color:#fff}
+.account-btn{width:30px;height:30px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#d946ef);color:#fff;font-weight:900;box-shadow:0 0 20px rgba(139,92,246,.30)}
 main{max-width:1280px;margin:auto;padding:25px 22px 100px}
-.back{color:#9e97aa;text-decoration:none;font-size:12px;font-weight:700}
-.artist-hero{position:relative;overflow:hidden;min-height:360px;border-radius:28px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(110deg,rgba(30,17,49,.98),rgba(12,9,18,.96));margin-top:18px}
+.back{display:inline-flex;align-items:center;gap:8px;color:#9e97aa;text-decoration:none;font-size:12px;font-weight:700;margin-bottom:18px}
+.back:hover{color:#fff}
+.artist-hero{position:relative;overflow:hidden;min-height:360px;border-radius:28px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(110deg,rgba(30,17,49,.98),rgba(12,9,18,.96));box-shadow:0 30px 90px rgba(0,0,0,.45)}
+.artist-hero:before{content:"";position:absolute;width:420px;height:420px;right:-180px;top:-220px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,.22),transparent 68%);pointer-events:none}
 .hero-background{position:absolute;inset:0;background-position:center;background-size:cover;filter:blur(25px);transform:scale(1.12);opacity:.16}
+.hero-background:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#170d26 0%,rgba(17,12,25,.96) 45%,rgba(10,7,14,.98) 100%)}
 .hero-content{position:relative;z-index:2;min-height:360px;padding:38px;display:flex;align-items:center;gap:38px}
-.artist-photo{width:250px;height:250px;object-fit:cover;border-radius:26px;background:#1a1325}
-.artist-title h1{font-size:48px;line-height:1;font-weight:900}
-.meta-pill{display:inline-flex;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);color:#c0bac8;font-size:11px;font-weight:700;margin-right:6px}
+.artist-photo-wrap{flex:0 0 250px;position:relative}
+.artist-photo{width:250px;height:250px;object-fit:cover;border-radius:26px;display:block;background:#1a1325;border:1px solid rgba(255,255,255,.10);box-shadow:0 25px 55px rgba(0,0,0,.55),0 0 60px rgba(139,92,246,.18);transition:transform .35s ease,box-shadow .35s ease}
+.artist-photo-wrap:hover .artist-photo{transform:translateY(-4px) scale(1.015);box-shadow:0 30px 65px rgba(0,0,0,.58),0 0 70px rgba(139,92,246,.25)}
+.photo-ring{position:absolute;inset:-8px;border-radius:32px;border:1px solid rgba(168,85,247,.25);pointer-events:none}
+.artist-info{min-width:0;max-width:720px}
+.eyebrow{color:#c084fc;font-size:10px;letter-spacing:2px;font-weight:900;text-transform:uppercase;margin-bottom:9px}
+.artist-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.artist-title h1{font-size:48px;line-height:1;letter-spacing:-1.8px;font-weight:900;overflow-wrap:anywhere}
+.verified{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:#8b5cf6;color:#fff;font-size:12px;font-weight:900;box-shadow:0 0 18px rgba(139,92,246,.45);flex:0 0 auto}
+.artist-badge{display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:4px 8px;border-radius:999px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.20);color:#c4b5fd;font-size:8px;font-weight:900;letter-spacing:.7px;text-transform:uppercase}
+.artist-meta{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:15px}
+.meta-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);color:#c0bac8;font-size:11px;font-weight:700}
 .bio{color:#aaa4b1;line-height:1.65;font-size:13px;margin-top:20px;max-width:680px}
-.stats{display:flex;gap:30px;margin-top:28px}
-.stat strong{font-size:20px;font-weight:900}
+.bio.collapsed{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.read-more{display:none;border:0;background:none;color:#c084fc;cursor:pointer;font-size:11px;font-weight:800;margin-top:6px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:23px}
+.primary-btn,.secondary-btn{border:0;cursor:pointer;border-radius:12px;padding:12px 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:900;transition:.2s ease;text-decoration:none;white-space:nowrap}
+.primary-btn{background:linear-gradient(135deg,#8b5cf6,#a855f7);color:#fff;box-shadow:0 10px 28px rgba(139,92,246,.28)}
+.primary-btn:hover{transform:translateY(-2px);box-shadow:0 15px 35px rgba(139,92,246,.38)}
+.secondary-btn{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);color:#eee}
+.secondary-btn:hover{background:rgba(255,255,255,.09)}
+.following{background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.35)}
+.stats{display:flex;flex-wrap:wrap;gap:30px;margin-top:28px}
+.stat{display:flex;flex-direction:column;gap:4px}
+.stat strong{font-size:20px;font-weight:900;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .stat span{color:#817b89;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:800}
 .section{margin-top:38px}
-.section-title{font-size:21px;font-weight:900;display:flex;align-items:center;gap:8px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.section-title{font-size:21px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:8px}
 .section-title:before{content:"";width:4px;height:18px;border-radius:99px;background:linear-gradient(180deg,#8b5cf6,#d946ef)}
-.featured{position:relative;overflow:hidden;min-height:210px;border-radius:22px;border:1px solid rgba(255,255,255,.07);background:linear-gradient(120deg,rgba(139,92,246,.15),rgba(18,14,25,.96) 65%)}
+.section-subtitle{color:#756f7d;font-size:11px;margin-top:4px}
+.featured{position:relative;overflow:hidden;min-height:210px;border-radius:22px;border:1px solid rgba(255,255,255,.07);background:linear-gradient(120deg,rgba(139,92,246,.15),rgba(18,14,25,.96) 65%);box-shadow:0 20px 60px rgba(0,0,0,.20)}
 .featured-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.12;filter:blur(15px)}
 .featured-content{position:relative;z-index:2;padding:25px;display:flex;align-items:center;gap:24px}
-.featured-cover{width:160px;height:160px;object-fit:cover;border-radius:18px}
-.featured-title{font-size:26px;font-weight:900}
-.song-card{display:grid;grid-template-columns:64px minmax(0,1fr) 40px;align-items:center;gap:14px;min-height:78px;padding:8px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.055);background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.018));transition:.2s}
-.song-card:hover{border-color:rgba(139,92,246,.22);background:linear-gradient(90deg,rgba(139,92,246,.12),rgba(255,255,255,.025))}
-.song-cover{width:64px;height:64px;border-radius:12px;object-fit:cover;background:#171220}
-.song-title{font-size:13px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.play-small{width:40px;height:40px;border-radius:50%;background:#8b5cf6;display:flex;align-items:center;justify-content:center;color:#fff}
-.loading{min-height:320px;display:flex;align-items:center;justify-content:center;color:#918b99}
+.featured-cover{width:160px;height:160px;object-fit:cover;border-radius:18px;flex-shrink:0;box-shadow:0 20px 45px rgba(0,0,0,.45);cursor:pointer}
+.featured-label{color:#c084fc;font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:900;margin-bottom:7px}
+.featured-title{font-size:26px;font-weight:900;letter-spacing:-.7px;overflow-wrap:anywhere;cursor:pointer}
+.featured-artist{color:#908999;font-size:12px;margin-top:5px}
+.featured-meta{color:#777180;font-size:11px;margin-top:13px}
+.featured-actions{margin-top:20px;display:flex;gap:9px;flex-wrap:wrap}
+.music-list{display:flex;flex-direction:column;gap:10px}
+.song-card{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) auto auto;align-items:center;gap:14px;min-height:78px;padding:8px 12px 8px 8px;border-radius:16px;border:1px solid rgba(255,255,255,.055);background:linear-gradient(90deg,rgba(255,255,255,.035),rgba(255,255,255,.018));transition:.2s ease;overflow:hidden}
+.song-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#8b5cf6,#d946ef);transform:scaleY(0);transition:transform .2s ease}
+.song-card:hover{transform:translateY(-1px);background:linear-gradient(90deg,rgba(139,92,246,.12),rgba(255,255,255,.025));border-color:rgba(139,92,246,.22)}
+.song-card:hover:before{transform:scaleY(1)}
+.song-cover{width:64px;height:64px;border-radius:12px;object-fit:cover;background:#171220;cursor:pointer}
+.song-main{min-width:0}
+.song-title{font-size:13px;font-weight:850;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.song-sub{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:6px}
+.song-sub span{color:#7e7887;font-size:10px}
+.dot{width:3px;height:3px;background:#655f6c;border-radius:50%}
+.song-plays{color:#817b89;font-size:10px;white-space:nowrap}
+.play-small{width:40px;height:40px;border-radius:50%;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#8b5cf6;color:#fff;box-shadow:0 7px 20px rgba(139,92,246,.22);transition:.2s ease;position:relative;z-index:2}
+.play-small:hover{transform:scale(1.07)}
+.view-btn{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:#e7e2eb;padding:8px 12px;border-radius:9px;text-decoration:none;font-size:10px;font-weight:800}
+.view-btn:hover{background:rgba(255,255,255,.08)}
+.about-card{padding:24px;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025)}
+.about-card p{color:#96909d;line-height:1.75;font-size:13px;white-space:pre-line}
+.loading{min-height:320px;display:flex;align-items:center;justify-content:center;color:#918b99;font-size:13px}
 .spinner{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.10);border-top-color:#a855f7;animation:spin .8s linear infinite;margin-right:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:760px){.nav-links{display:none}.hero-content{flex-direction:column;text-align:center}.artist-photo{width:170px;height:170px}.artist-title h1{font-size:32px}.featured-cover{width:92px;height:92px}.song-card{grid-template-columns:52px minmax(0,1fr) 39px}}
+.error-box{padding:30px;border-radius:18px;border:1px solid rgba(239,68,68,.18);background:rgba(239,68,68,.06);color:#fca5a5;font-size:13px}
+.mobile-nav{display:none}
+@media(max-width:1100px){header{height:56px}.nav{padding:0 16px}.nav-links{gap:15px}.nav-links a{font-size:9px}main{padding:18px 16px 100px}.artist-hero{border-radius:22px;min-height:0}.hero-content{min-height:0;padding:26px 24px;gap:24px}.artist-photo-wrap{flex-basis:190px}.artist-photo{width:190px;height:190px;border-radius:22px}.artist-title h1{font-size:38px}.bio{font-size:11px;line-height:1.65;margin-top:14px}.hero-actions{margin-top:17px;gap:7px}.primary-btn,.secondary-btn{padding:10px 13px;font-size:10px}.stats{margin-top:19px;gap:24px}.section{margin-top:30px}.section-title{font-size:19px}.featured-content{padding:18px;gap:17px}.featured-cover{width:120px;height:120px;border-radius:15px}.featured-title{font-size:20px}.song-card{grid-template-columns:58px minmax(0,1fr) 40px;gap:12px;padding-bottom:28px}.song-cover{width:58px;height:58px}.song-plays{display:none}.view-btn{position:absolute;left:78px;bottom:7px;padding:4px 8px;font-size:8px}.mobile-nav{display:flex;position:fixed;left:10px;right:10px;bottom:10px;z-index:1400;height:48px;border-radius:15px;background:rgba(18,14,25,.96);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.08);align-items:center;justify-content:space-around;box-shadow:0 15px 40px rgba(0,0,0,.45)}.mobile-nav a{color:#797381;text-decoration:none;font-size:8px;font-weight:800;text-align:center;min-width:48px}.mobile-nav a.active{color:#c084fc}.mobile-nav-icon{display:block;font-size:15px;line-height:17px;margin-bottom:1px}}
+@media(max-width:760px){header{height:54px}.nav-links{display:none}.logo{font-size:12px}main{padding:14px 12px 100px}.back{font-size:10px;margin:2px 4px 12px}.hero-content{padding:20px 15px 18px;flex-direction:column;align-items:center;text-align:center;gap:17px}.artist-photo-wrap{flex:0 0 auto}.artist-photo{width:170px;height:170px;border-radius:20px}.photo-ring{inset:-6px;border-radius:25px}.artist-info{width:100%;max-width:none}.artist-title{justify-content:center}.artist-title h1{font-size:clamp(29px,9vw,38px)}.artist-meta{justify-content:center}.bio{text-align:left}.stats{justify-content:space-around}.section-title{font-size:18px}.featured-content{padding:13px;gap:12px}.featured-cover{width:92px;height:92px}.featured-title{font-size:16px}.featured-meta{font-size:8px;margin-top:6px}.featured-actions{margin-top:9px}.about-card{padding:15px}.about-card p{font-size:10px;line-height:1.72}.song-card{grid-template-columns:52px minmax(0,1fr) 39px;gap:10px;min-height:68px;padding:8px;padding-bottom:29px;border-radius:14px}.song-cover{width:52px;height:52px;border-radius:10px}.song-title{font-size:11px}.song-sub{margin-top:5px;gap:5px}.song-sub span{font-size:8px}.song-plays{display:none}.play-small{width:37px;height:37px;font-size:11px}.view-btn{position:absolute;left:70px;bottom:7px;display:block;padding:4px 8px;border-radius:6px;font-size:8px;background:rgba(255,255,255,.035)}.mobile-nav{bottom:10px}}
+@media(max-width:390px){main{padding-left:9px;padding-right:9px}.hero-content{padding:19px 12px}.artist-photo{width:155px;height:155px}.artist-title h1{font-size:28px}.meta-pill{font-size:8px;padding:5px 7px}.featured-cover{width:82px;height:82px}.song-card{grid-template-columns:50px minmax(0,1fr) 36px}.song-cover{width:50px;height:50px}.play-small{width:35px;height:35px}.view-btn{left:70px}}
 </style>
 </head>
 <body>
 <header>
   <div class="nav">
-    <a href="/index.html" class="logo"><span class="logo-mark"></span>PASONG</a>
+    <a href="index.html" class="logo"><span class="logo-mark"></span>PASONG</a>
     <nav class="nav-links">
-      <a href="/index.html">Home</a>
-      <a href="/store.html">Music Store</a>
-      <a href="/charts.html">Charts</a>
-      <a href="/artists.html" class="active">Artists</a>
-      <a href="/playlists.html">Playlists</a>
-      <a href="/promotion.html">Promotion</a>
+      <a href="index.html">Home</a>
+      <a href="store.html">Music Store</a>
+      <a href="charts.html">Charts</a>
+      <a href="artists.html" class="active">Artists</a>
+      <a href="playlists.html">Playlists</a>
+      <a href="promotion.html">Promotion</a>
     </nav>
-    <button class="account-btn" onclick="location.href='/account.html'">•</button>
+    <button class="account-btn" onclick="location.href='account.html'" aria-label="Account">•</button>
   </div>
 </header>
 <main>
-  <a href="/artists.html" class="back">← Back to Artists</a>
+  <a href="artists.html" class="back">← Back to Artists</a>
   <div id="pageContent"><div class="loading"><div class="spinner"></div>Loading artist...</div></div>
 </main>
+<div class="mobile-nav">
+  <a href="index.html"><span class="mobile-nav-icon">⌂</span>Home</a>
+  <a href="store.html"><span class="mobile-nav-icon">♫</span>Music</a>
+  <a href="artists.html" class="active"><span class="mobile-nav-icon">♟</span>Artists</a>
+  <a href="charts.html"><span class="mobile-nav-icon">▥</span>Charts</a>
+  <a href="account.html"><span class="mobile-nav-icon">●</span>Account</a>
+</div>
 <script>
 const API_URL="https://pasong-api.vercel.app";
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
@@ -80,45 +135,49 @@ function getArtistName(pr){return pr?.performing_name||pr?.stage_name||pr?.artis
 function getArtistImage(pr){return pr?.profile_image_url||pr?.profile_photo_url||pr?.avatar_url||pr?.image_url||""}
 function formatNumber(v){const n=Number(v||0);if(n>=1000000)return (n/1000000).toFixed(n>=10000000?0:1).replace(".0","")+"M";if(n>=1000)return (n/1000).toFixed(n>=10000?0:1).replace(".0","")+"K";return n.toLocaleString()}
 function fallbackImage(t){return `https://via.placeholder.com/300x300/1a1325/8b5cf6?text=${encodeURIComponent(t||"PASONG")}`}
-function getSongId(song){return song?.id||song?.song_id||song?.uuid||""}
-function getSongCover(song){return song?.cover_url||song?.artwork_url||song?.image_url||""}
-function getPlayerLink(song){const id=getSongId(song);return `/player.html?id=${encodeURIComponent(String(id))}`}
+function getSongId(song){return song?.id||song?.song_id||""}
+function getSongCover(song){return song?.cover_url||song?.artwork_url||""}
+function getPlayerLink(song){return `/player.html?id=${encodeURIComponent(String(getSongId(song)))}`}
 
-function renderSong(song){
-  const cover=getSongCover(song)||fallbackImage(song.title);
-  const title=song.title||"Untitled";
-  const plays=formatNumber(song.play_count||song.plays||0);
-  const link=getPlayerLink(song);
-  return `<a href="${link}" style="text-decoration:none;color:inherit;display:block;margin-bottom:10px">
-    <div class="song-card">
-      <img class="song-cover" src="${escapeHtml(cover)}" onerror="this.src='${fallbackImage('PASONG')}'">
-      <div style="min-width:0"><div class="song-title">${escapeHtml(title)}</div><div style="color:#7e7887;font-size:10px;margin-top:6px">${plays} plays • Tap to play</div></div>
-      <div class="play-small">▶</div>
-    </div></a>`;
-}
 function renderFeatured(song){
   if(!song) return "";
   const cover=getSongCover(song)||fallbackImage(song.title);
   const link=getPlayerLink(song);
-  return `<div class="section"><div class="section-title">Featured</div>
-  <a href="${link}" style="text-decoration:none;color:inherit"><div class="featured"><div class="featured-bg" style="background-image:url('${escapeHtml(cover)}')"></div>
-  <div class="featured-content"><img class="featured-cover" src="${escapeHtml(cover)}"><div><div class="featured-title">${escapeHtml(song.title||"Featured")}</div><div style="color:#777180;font-size:11px;margin-top:8px">Click to play in player</div></div></div></div></a></div>`;
+  return `<div class="section"><div class="section-head"><div class="section-title">Featured Track</div></div>
+  <div class="featured"><div class="featured-bg" style="background-image:url('${escapeHtml(cover)}')"></div>
+  <div class="featured-content">
+  <a href="${link}"><img class="featured-cover" src="${escapeHtml(cover)}"></a>
+  <div><div class="featured-label">Featured Track</div><a href="${link}" style="text-decoration:none;color:inherit"><div class="featured-title">${escapeHtml(song.title||"Featured")}</div></a><div class="featured-meta">${formatNumber(song.play_count||0)} plays</div>
+  <div class="featured-actions"><a class="primary-btn" href="${link}">▶ Play in Player</a></div></div></div></div></div>`;
+}
+function renderSong(song, index){
+  const cover=getSongCover(song)||fallbackImage(song.title||"PASONG");
+  const title=song.title||"Untitled";
+  const link=getPlayerLink(song);
+  const plays=formatNumber(song.play_count||0);
+  return `<div class="song-card">
+      <a href="${link}"><img class="song-cover" src="${escapeHtml(cover)}"></a>
+      <div class="song-main"><a href="${link}" style="text-decoration:none;color:inherit"><div class="song-title">${escapeHtml(title)}</div></a><div class="song-sub"><span>${plays} plays</span><span class="dot"></span><span>Tap to play</span></div></div>
+      <div class="song-plays">${plays}</div>
+      <a href="${link}" class="play-small" style="text-decoration:none">▶</a>
+      <a href="${link}" class="view-btn">View</a>
+    </div>`;
 }
 function renderArtist(profile, songList){
   const p = profile || {};
   const name=getArtistName(p)||"Artist";
   const img=getArtistImage(p)||fallbackImage(name);
-  const bio=p.bio||p.description||p.about||"Artist on PASONG. Discover music and tracks.";
-  const totalPlays=songList.reduce((a,b)=>a+Number(b.play_count||b.plays||0),0);
+  const bioText=p?.bio||p?.description||p?.about||"Artist on PASONG. Discover music and tracks.";
+  const totalPlays=songList.reduce((a,b)=>a+Number(b.play_count||0),0);
   return `<div class="artist-hero"><div class="hero-background" style="background-image:url('${escapeHtml(img)}')"></div>
-  <div class="hero-content"><div><img class="artist-photo" src="${escapeHtml(img)}" onerror="this.src='${fallbackImage(name)}'"></div>
-  <div><div style="color:#c084fc;font-size:10px;letter-spacing:2px;font-weight:900;margin-bottom:9px">ARTIST</div><div class="artist-title"><h1>${escapeHtml(name)}</h1></div>
-  <div style="margin-top:15px"><span class="meta-pill">${songList.length} Songs</span><span class="meta-pill">${formatNumber(totalPlays)} Plays</span></div>
-  <div class="bio">${escapeHtml(bio)}</div>
+  <div class="hero-content"><div class="artist-photo-wrap"><img class="artist-photo" src="${escapeHtml(img)}"><div class="photo-ring"></div></div>
+  <div class="artist-info"><div class="eyebrow">Artist</div><div class="artist-title"><h1>${escapeHtml(name)}</h1><span class="verified">✓</span></div>
+  <div class="artist-meta"><span class="meta-pill">${songList.length} Songs</span><span class="meta-pill">${formatNumber(totalPlays)} Plays</span></div>
+  <div class="bio">${escapeHtml(bioText)}</div>
   <div class="stats"><div class="stat"><strong>${songList.length}</strong><span>Songs</span></div><div class="stat"><strong>${formatNumber(totalPlays)}</strong><span>Plays</span></div></div>
   </div></div></div>
   ${renderFeatured(songList[0]||null)}
-  <div class="section"><div class="section-title">All Songs</div><div style="margin-top:16px">${songList.map(s=>renderSong(s)).join("")||"<div style='color:#888'>No songs found</div>"}</div></div>`;
+  <div class="section"><div class="section-head"><div class="section-title">All Songs</div><div class="section-subtitle">Tap any song to open in player.html</div></div><div class="music-list">${songList.map((s,i)=>renderSong(s,i)).join("")||"<div style='color:#888'>No songs found</div>"}</div></div>`;
 }
 async function loadArtist(){
   const params=getParams();
@@ -126,10 +185,7 @@ async function loadArtist(){
   try{
     let profile=null;
     if(params.id){
-      try{
-        const {data} = await supabaseClient.from("profiles").select("*").eq("id",params.id).single();
-        if(data) profile=data;
-      }catch(e){}
+      try{const {data}=await supabaseClient.from("profiles").select("*").eq("id",params.id).single(); if(data) profile=data;}catch(e){}
     }
     if(!profile){
       try{
@@ -139,24 +195,15 @@ async function loadArtist(){
         profile=list.find(a=>String(a.id)===String(params.id)||a.performing_name===params.name||a.stage_name===params.name)||list[0]||null;
       }catch(e){}
     }
-    if(!profile){
-      profile={performing_name: params.name || "Artist", bio: "Artist on PASONG."};
-    }
+    if(!profile){profile={performing_name: params.name || "Artist", bio: "Artist on PASONG."};}
     artist=profile;
     let allSongs=[];
-    try{
-      const resSongs=await fetch(`${API_URL}/api/songs`);
-      const jsonSongs=await resSongs.json();
-      allSongs=Array.isArray(jsonSongs)?jsonSongs:jsonSongs.songs||jsonSongs.data||[];
-    }catch(e){}
+    try{const resSongs=await fetch(`${API_URL}/api/songs`); const jsonSongs=await resSongs.json(); allSongs=Array.isArray(jsonSongs)?jsonSongs:jsonSongs.songs||jsonSongs.data||[];}catch(e){}
     const artistName=getArtistName(profile).toLowerCase();
     songs=allSongs.filter(s=>(s.artist_name||s.performing_name||"").toLowerCase().includes(artistName)||String(s.artist_id)===String(profile?.id)||String(s.user_id)===String(profile?.id));
     if(songs.length===0) songs=allSongs.slice(0,30);
     container.innerHTML=renderArtist(profile,songs);
-  }catch(e){
-    console.error(e);
-    container.innerHTML=`<div style="padding:20px;color:#fca5a5">Error: ${escapeHtml(e.message)}<br><br>Try reload</div>`;
-  }
+  }catch(e){container.innerHTML=`<div class="error-box">Error: ${escapeHtml(e.message)}</div>`}
 }
 loadArtist();
 </script>
