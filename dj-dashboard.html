@@ -5455,5 +5455,138 @@ supabaseClient
 checkAuth();
 </script>
 
+
+<!-- PASONG DJ TABLE CONNECTION PATCH: new DJ tables, separate from songs -->
+<script>
+(function(){
+  const djFormatMoney = n => 'UGX ' + Number(n || 0).toLocaleString();
+  let pasongDjRow = null;
+
+  async function ensurePasongDJ(){
+    if(!currentUser) throw new Error('Please sign in again.');
+    const {data:existing,error:readError}=await supabaseClient
+      .from('djs').select('*').eq('user_id',currentUser.id).maybeSingle();
+    if(readError) throw readError;
+    if(existing){ pasongDjRow=existing; return existing; }
+    const profileName = currentArtistProfile &&
+      (currentArtistProfile.performing_name || currentArtistProfile.real_name);
+    const displayName = profileName || (currentUser.user_metadata &&
+      (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) ||
+      (currentUser.email ? currentUser.email.split('@')[0] : 'PASONG DJ');
+    const {data:created,error}=await supabaseClient.from('djs').insert({
+      user_id:currentUser.id, display_name:displayName, account_status:'pending'
+    }).select('*').single();
+    if(error) throw error;
+    pasongDjRow=created;
+    return created;
+  }
+
+  // Keep the original dashboard layout, but make My DJ Mixes read dj_mixes.
+  window.loadMyMixes = async function(){
+    const list=document.getElementById('mixList');
+    if(!list) return;
+    if(!currentUser){list.innerHTML='<div class="empty">Please log in.</div>';return;}
+    list.innerHTML='<div class="loading">Loading your DJ mixes…</div>';
+    try{
+      const dj=await ensurePasongDJ();
+      const {data,error}=await supabaseClient.from('dj_mixes')
+        .select('id,dj_id,user_id,title,description,genre,cover_url,storage_path,duration_seconds,price_ugx,status,rights_status,play_count,created_at')
+        .eq('user_id',currentUser.id).order('created_at',{ascending:false});
+      if(error) throw error;
+      currentSongs=data||[];
+      renderPasongMixes(currentSongs);
+      await window.loadDashboardStats();
+    }catch(e){
+      console.error('DJ table load error:',e);
+      list.innerHTML='<div class="empty">Could not load DJ mixes: '+escapeHtml(e.message||'Please retry.')+'</div>';
+    }
+  };
+
+  function renderPasongMixes(mixes){
+    const list=document.getElementById('mixList'); if(!list)return;
+    if(!mixes.length){list.innerHTML='<div class="empty">No DJ mixes uploaded yet. Upload your first mix above.</div>';return;}
+    list.innerHTML=mixes.map(m=>{
+      const status=String(m.status||'pending').replaceAll('_',' ');
+      const rights=String(m.rights_status||'pending review').replaceAll('_',' ');
+      const cover=safeImageUrl(m.cover_url);
+      return `<div class="mix-item"><img class="mix-cover" src="${cover}" alt=""><div class="mix-info"><h3>${escapeHtml(m.title||'Untitled Mix')}</h3><p>${escapeHtml(m.genre||'DJ Mix')} · ${Number(m.play_count||0).toLocaleString()} plays</p><p>Status: ${escapeHtml(status)} · Rights: ${escapeHtml(rights)}</p></div><div class="mix-price">UGX 1,000</div></div>`;
+    }).join('');
+  }
+
+  window.loadDashboardStats = async function(){
+    const mixes=currentSongs||[];
+    const plays=mixes.reduce((sum,m)=>sum+Number(m.play_count||0),0);
+    const salesEl=document.getElementById('totalDownloads');
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=String(val);};
+    set('totalSongs',mixes.length);set('analyticsMixes',mixes.length);
+    set('totalPlays',plays);set('analyticsPlays',plays);
+    // This page's old downloads counter is not a verified DJ-sales counter.
+    set('totalDownloads','—');set('analyticsDownloads','—');
+    try{
+      if(!currentUser)return;
+      const {data:dj}=await supabaseClient.from('djs').select('id').eq('user_id',currentUser.id).maybeSingle();
+      if(!dj)return;
+      const {data:earnings,error}=await supabaseClient.from('dj_earnings').select('amount_ugx,payout_status').eq('dj_id',dj.id);
+      if(error)throw error;
+      const available=(earnings||[]).filter(e=>['available','pending'].includes(e.payout_status)).reduce((n,e)=>n+Number(e.amount_ugx||0),0);
+      const earned=(earnings||[]).reduce((n,e)=>n+Number(e.amount_ugx||0),0);
+      // Add/update a compact earnings note without replacing existing dashboard sections.
+      let note=document.getElementById('djTableEarningsNote');
+      if(!note){note=document.createElement('div');note.id='djTableEarningsNote';note.className='alert info show';const stats=document.querySelector('.stats');if(stats)stats.insertAdjacentElement('afterend',note);}
+      note.textContent='DJ table earnings (verified backend entries only): Total '+djFormatMoney(earned)+' · Pending/available '+djFormatMoney(available)+'. Sales are UGX 1,000 each: DJ UGX 700, PASONG UGX 300.';
+    }catch(e){console.warn('DJ earnings not loaded:',e.message);}
+  };
+
+  // Capture submit before the legacy handler so mixes no longer enter /api/songs/create.
+  const form=document.getElementById('uploadForm');
+  if(form){
+    form.addEventListener('submit',async function(ev){
+      ev.preventDefault();ev.stopImmediatePropagation();
+      const title=document.getElementById('songTitle').value.trim();
+      const genre=document.getElementById('genre').value.trim();
+      const label=document.getElementById('label').value.trim();
+      const audio=document.getElementById('audioFile').files[0];
+      const cover=document.getElementById('coverFile').files[0];
+      const rights=document.getElementById('rightsCheck').checked;
+      const terms=document.getElementById('termsCheck').checked;
+      const btn=document.getElementById('uploadBtn');
+      try{
+        if(!currentUser)throw new Error('Please log in again.');
+        if(!title||!genre||!audio||!cover)throw new Error('Enter a title, choose a genre, audio file and cover image.');
+        if(!rights)throw new Error('Please confirm your rights declaration.');
+        if(!terms)throw new Error('Please accept PASONG DJ upload rules.');
+        if(audio.size>500*1024*1024)throw new Error('Audio file exceeds the 500MB limit.');
+        if(!audio.type.startsWith('audio/'))throw new Error('Choose a valid audio file.');
+        if(cover.size>5*1024*1024)throw new Error('Cover image must be 5MB or smaller.');
+        btn.disabled=true;btn.textContent='Uploading…';
+        const dj=await ensurePasongDJ();
+        const safeName=audio.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+        const storagePath=currentUser.id+'/'+crypto.randomUUID()+'-'+safeName;
+        const {error:audioError}=await supabaseClient.storage.from('dj-mixes').upload(storagePath,audio,{contentType:audio.type||'audio/mpeg',upsert:false});
+        if(audioError)throw new Error('Audio upload failed: '+audioError.message);
+        // Existing PASONG cover upload endpoint is retained; only the audio and mix record move to DJ tables.
+        const coverForm=new FormData();coverForm.append('file',cover);coverForm.append('upload_preset','pasong_covers');
+        const coverResponse=await fetch(API_BASE+'/api/upload/cover',{method:'POST',body:coverForm});
+        if(!coverResponse.ok)throw new Error('Cover upload failed. Audio is uploaded privately; please retry after checking the cover upload service.');
+        const coverResult=await coverResponse.json();
+        const {error:insertError}=await supabaseClient.from('dj_mixes').insert({
+          dj_id:dj.id,user_id:currentUser.id,title,description:label||null,genre,
+          cover_url:coverResult.secure_url||coverResult.url||null,
+          storage_path:storagePath,duration_seconds:null,price_ugx:1000,
+          rights_declaration:true,rights_notes:'DJ confirmed upload declaration; track rights still require review.'
+        });
+        if(insertError)throw insertError;
+        showAlert('DJ mix uploaded to the separate dj_mixes table and submitted for review. It is not published or for sale until PASONG clears its rights and approves it.','success');
+        form.reset();
+        const preview=document.getElementById('coverPreview');if(preview)preview.style.display='none';
+        await window.loadMyMixes();await window.loadDashboardStats();
+        showSection('mixes',document.querySelector('.nav button[onclick*="mixes"]'));
+      }catch(e){console.error('DJ table upload failed:',e);showAlert(e.message||'DJ mix upload failed.','error');}
+      finally{btn.disabled=false;btn.textContent='⬆️ Upload DJ Mix';}
+    },true);
+  }
+})();
+</script>
+
 </body>
 </html>
