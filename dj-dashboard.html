@@ -3,795 +3,5590 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#8b5cf6">
-<title>PASONG Admin Control Center</title>
+<title>PASONG DJ Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#09090f;--card:#11111a;--card2:#171722;--line:#292936;--text:#f5f5f7;--muted:#9999a8;--purple:#8b5cf6;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b}
-body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
-header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:20;background:rgba(9,9,15,.95);backdrop-filter:blur(12px)}
-.logo{font-weight:950;letter-spacing:.5px}.logo span{color:var(--purple)}
-.header-right{display:flex;align-items:center;gap:10px}.user-pill{padding:8px 11px;border:1px solid var(--line);border-radius:10px;color:#ddd;font-size:12px}
-.container{max-width:1450px;margin:auto;padding:20px}.layout{display:grid;grid-template-columns:220px 1fr;gap:18px}
-.sidebar{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:10px;height:max-content;position:sticky;top:84px}
-.sidebar button{display:block;width:100%;text-align:left;background:transparent;color:#aaa;border:0;padding:11px 12px;border-radius:9px;margin-bottom:3px;font-weight:700}
-.sidebar button:hover,.sidebar button.active{background:#211832;color:#fff}
-main{min-width:0}.hero{background:linear-gradient(135deg,#181326,#11111a);border:1px solid #30234a;border-radius:17px;padding:22px;margin-bottom:16px}
-.hero h1{font-size:25px;margin-bottom:6px}.hero p{color:var(--muted);font-size:13px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.stat,.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:16px}.stat-num{font-size:24px;font-weight:950}.stat-label{font-size:11px;color:var(--muted);margin-top:4px}
-.card{margin-bottom:16px}.card h2{font-size:18px;margin-bottom:5px}.sub{color:var(--muted);font-size:12px;margin-bottom:15px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.field{margin-bottom:12px}.field label{display:block;font-size:11px;color:#bbb;margin-bottom:6px;font-weight:800}
-.field input,.field select,.field textarea{width:100%;background:#0c0c13;color:white;border:1px solid var(--line);border-radius:9px;padding:10px;outline:none}
-.field textarea{min-height:90px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple)}
-.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;color:white;background:var(--purple)}
-.btn.secondary{background:var(--card2);border:1px solid var(--line)}.btn.danger{background:#32141a;color:#ff9ca7;border:1px solid #5b2029}
-.btn.green{background:#12341f;color:#8df0ad;border:1px solid #205b34}.btn.small{padding:7px 10px;font-size:11px}
-.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:11px}
-table{width:100%;border-collapse:collapse;min-width:700px}th,td{padding:10px;border-bottom:1px solid #20202b;text-align:left;font-size:12px;vertical-align:middle}
-th{color:#aaa;font-size:10px;text-transform:uppercase;letter-spacing:.7px}td{color:#ddd}
-.badge{display:inline-block;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:900}
-.badge.active,.badge.approved,.badge.paid{background:#12341f;color:#7cf3a1}.badge.paused,.badge.pending{background:#392c12;color:#ffd56b}
-.badge.rejected,.badge.failed{background:#35161b;color:#ff929d}.empty,.loading{padding:25px;text-align:center;color:var(--muted)}
-.notice{padding:10px 12px;border-radius:9px;font-size:12px;margin-bottom:12px}.notice.info{background:#16152a;color:#cfc4ff;border:1px solid #30275c}
-.notice.success{background:#10281a;color:#93f2b0;border:1px solid #205b34}.notice.error{background:#32141a;color:#ffabb3;border:1px solid #5b2029}
-.ads-list{display:grid;gap:10px}.ad-row{display:grid;grid-template-columns:180px 1fr auto;gap:13px;background:#0d0d14;border:1px solid var(--line);border-radius:13px;padding:10px;align-items:center}
-.ad-thumb{width:180px;height:100px;border-radius:9px;overflow:hidden;background:#08080d}.ad-thumb img,.ad-thumb video{width:100%;height:100%;object-fit:cover}.ad-info strong{font-size:14px}.ad-info p{font-size:11px;color:var(--muted);margin-top:4px}
-.ad-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ad-preview{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#08080d;min-height:150px;display:flex;align-items:center;justify-content:center}
-.ad-preview img,.ad-preview video{display:block;width:100%;max-height:330px;object-fit:cover}.ad-preview .placeholder{color:#666;font-size:12px;padding:30px}.file-note{font-size:10px;color:#777;margin-top:5px}
-.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.login-box{width:min(430px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:25px}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;overflow:auto;gap:5px}.sidebar button{min-width:max-content;margin:0}.stats{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.ad-row{grid-template-columns:1fr}.ad-thumb{width:100%;height:180px}}
-@media(max-width:520px){header{padding:0 12px}.container{padding:12px}.user-pill{display:none}.hero h1{font-size:21px}}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#08070d;
+  color:#fff;
+  min-height:100vh;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  width:250px;
+  background:#100d18;
+  border-right:1px solid #282033;
+  padding:22px 16px;
+  z-index:100;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:900;
+  margin-bottom:30px;
+  padding:0 10px;
+  background:linear-gradient(90deg,#c084fc,#f472b6);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.nav button,
+.nav a{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#aaa3b7;
+  padding:13px 14px;
+  border-radius:10px;
+  text-align:left;
+  font-weight:700;
+  transition:.2s;
+}
+
+.nav button:hover,
+.nav a:hover,
+.nav .active{
+  background:#21172d;
+  color:#fff;
+}
+
+.logout{
+  margin-top:25px!important;
+  color:#f472b6!important;
+}
+
+.mobile-nav{
+  display:none;
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#100d18;
+  border-top:1px solid #282033;
+  z-index:200;
+  grid-template-columns:repeat(7,1fr);
+}
+
+.mobile-nav button{
+  border:0;
+  background:transparent;
+  color:#aaa3b7;
+  padding:9px 2px;
+  font-size:10px;
+}
+
+.mobile-nav button.active{
+  color:#c084fc;
+}
+
+.main{
+  margin-left:250px;
+  padding:28px;
+  max-width:1500px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:28px;
+}
+
+.topbar h1{
+  font-size:28px;
+}
+
+.user-pill{
+  background:#15111d;
+  border:1px solid #30263b;
+  padding:10px 14px;
+  border-radius:30px;
+  color:#cfc7d8;
+  font-size:13px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.card{
+  background:#11101a;
+  border:1px solid #282132;
+  border-radius:16px;
+  padding:20px;
+}
+
+.card h3{
+  color:#aaa3b7;
+  font-size:13px;
+  margin-bottom:10px;
+}
+
+.card .number{
+  font-size:28px;
+  font-weight:900;
+}
+
+.card .purple{
+  color:#c084fc;
+}
+
+.card .pink{
+  color:#f472b6;
+}
+
+.panel{
+  background:#11101a;
+  border:1px solid #282132;
+  border-radius:17px;
+  padding:22px;
+  margin-bottom:20px;
+}
+
+.panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:18px;
+}
+
+.panel-header h2{
+  font-size:19px;
+}
+
+.muted{
+  color:#aaa3b7;
+  font-size:13px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:17px;
+}
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.form-group.full{
+  grid-column:1/-1;
+}
+
+.form-group label{
+  color:#d9d1e0;
+  font-size:13px;
+  font-weight:700;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  background:#0b0910;
+  border:1px solid #33283f;
+  color:#fff;
+  border-radius:10px;
+  padding:13px;
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#a855f7;
+  box-shadow:0 0 0 2px rgba(168,85,247,.1);
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+small{
+  color:#88808f;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:12px 17px;
+  font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,#9333ea,#db2777);
+}
+
+.btn:hover{
+  opacity:.9;
+}
+
+.btn.secondary{
+  background:#211a2b;
+  border:1px solid #392e48;
+}
+
+.btn.cover-btn{
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+}
+
+.btn.danger{
+  background:#4a172c;
+  border:1px solid #722244;
+}
+
+.check-row{
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:flex-start;
+  gap:10px;
+  line-height:1.5;
+  color:#c8c0d0!important;
+  font-weight:500!important;
+}
+
+.check-row input{
+  width:18px;
+  height:18px;
+  margin-top:2px;
+  accent-color:#a855f7;
+  flex:none;
+}
+
+.read-link{
+  margin-top:8px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#c084fc;
+  font-size:12px;
+  font-weight:800;
+  text-decoration:underline;
+  text-align:left;
+}
+
+.read-link:hover{
+  color:#f472b6;
+}
+
+.need-cover-box{
+  background:
+    radial-gradient(circle at top right,rgba(168,85,247,.16),transparent 35%),
+    radial-gradient(circle at bottom left,rgba(236,72,153,.10),transparent 35%),
+    #11101d;
+  border:1px solid #38294d;
+  border-radius:15px;
+  padding:18px;
+}
+
+.need-cover-box h3{
+  font-size:17px;
+  margin-bottom:6px;
+}
+
+.need-cover-box p{
+  color:#aaa3b7;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:13px;
+}
+
+.cover-price{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:14px 0;
+}
+
+.price-badge{
+  background:#191426;
+  border:1px solid #45325e;
+  padding:9px 13px;
+  border-radius:20px;
+  font-weight:800;
+  color:#d8c7ff;
+}
+
+.cover-photo-preview{
+  display:none;
+  width:180px;
+  height:180px;
+  border-radius:12px;
+  object-fit:cover;
+  margin-top:12px;
+  border:1px solid #393047;
+}
+
+.mix-list{
+  display:grid;
+  gap:12px;
+}
+
+.mix-item{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:#0d0b12;
+  border:1px solid #292230;
+  border-radius:13px;
+  padding:13px;
+}
+
+.mix-cover{
+  width:65px;
+  height:65px;
+  border-radius:9px;
+  object-fit:cover;
+  background:#211a2b;
+}
+
+.mix-info{
+  flex:1;
+  min-width:0;
+}
+
+.mix-info h3{
+  font-size:15px;
+  margin-bottom:5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mix-info p{
+  color:#8f8798;
+  font-size:12px;
+}
+
+.mix-price{
+  color:#c084fc;
+  font-weight:900;
+}
+
+.music-layout{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:20px;
+}
+
+.music-list{
+  display:grid;
+  gap:11px;
+}
+
+.music-item{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  background:#0d0b12;
+  border:1px solid #292230;
+  border-radius:13px;
+  padding:12px;
+}
+
+.music-cover{
+  width:62px;
+  height:62px;
+  border-radius:9px;
+  object-fit:cover;
+  background:#211a2b;
+  flex:none;
+}
+
+.music-info{
+  flex:1;
+  min-width:0;
+}
+
+.music-info h3{
+  font-size:14px;
+  margin-bottom:5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.music-info p{
+  color:#8f8798;
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.music-type{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 8px;
+  border-radius:20px;
+  background:#191329;
+  border:1px solid #463468;
+  color:#cdb8ff;
+  font-size:10px;
+  font-weight:800;
+}
+
+.music-actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.music-actions .btn{
+  padding:8px 10px;
+  font-size:11px;
+}
+
+.playlist-create{
+  display:flex;
+  gap:8px;
+  margin-bottom:15px;
+}
+
+.playlist-create input{
+  flex:1;
+}
+
+.playlist-create .btn{
+  white-space:nowrap;
+}
+
+.playlist-list{
+  display:grid;
+  gap:8px;
+  margin-bottom:18px;
+}
+
+.playlist-item{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:10px 11px;
+  border:1px solid #292230;
+  background:#0d0b12;
+  border-radius:10px;
+}
+
+.playlist-item.active{
+  border-color:#8b5cf6;
+  background:#181226;
+}
+
+.playlist-select{
+  flex:1;
+  border:0;
+  background:transparent;
+  color:#fff;
+  padding:0;
+  text-align:left;
+  cursor:pointer;
+}
+
+.playlist-count{
+  color:#8f8798;
+  font-size:11px;
+}
+
+.playlist-song-list{
+  display:grid;
+  gap:8px;
+}
+
+.playlist-song{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#0d0b12;
+  border:1px solid #292230;
+  border-radius:10px;
+  padding:9px;
+}
+
+.playlist-song img{
+  width:45px;
+  height:45px;
+  border-radius:7px;
+  object-fit:cover;
+}
+
+.playlist-song-info{
+  flex:1;
+  min-width:0;
+}
+
+.playlist-song-info strong{
+  display:block;
+  font-size:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.playlist-song-info span{
+  display:block;
+  color:#8f8798;
+  font-size:10px;
+  margin-top:4px;
+}
+
+.playlist-empty{
+  padding:20px 10px;
+  color:#8f8798;
+  text-align:center;
+  font-size:13px;
+}
+
+.audio-player{
+  width:100%;
+  margin-top:15px;
+  border-radius:10px;
+}
+
+.cover-request-list{
+  display:grid;
+  gap:14px;
+}
+
+.cover-request-item{
+  background:#0d0b12;
+  border:1px solid #292230;
+  border-radius:14px;
+  padding:17px;
+}
+
+.cover-request-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+}
+
+.cover-request-title{
+  font-size:16px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.cover-request-dj{
+  color:#aaa3b7;
+  font-size:13px;
+}
+
+.cover-request-id{
+  color:#777080;
+  font-size:11px;
+  margin-top:8px;
+  word-break:break-all;
+}
+
+.cover-request-date{
+  color:#88808f;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.cover-request-price{
+  color:#c084fc;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.cover-status-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.cover-status{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:900;
+  border:1px solid #3a3044;
+  background:#191520;
+  color:#cfc7d8;
+}
+
+.cover-status.pending{
+  color:#e8c98a;
+  border-color:#5b4825;
+  background:#211b11;
+}
+
+.cover-status.paid{
+  color:#8de0b0;
+  border-color:#245d3d;
+  background:#10251c;
+}
+
+.cover-status.in_design{
+  color:#cdb8ff;
+  border-color:#49376d;
+  background:#171329;
+}
+
+.cover-status.completed,
+.cover-status.approved{
+  color:#8de0b0;
+  border-color:#245d3d;
+  background:#10251c;
+}
+
+.cover-status.rejected,
+.cover-status.cancelled,
+.cover-status.failed{
+  color:#ff9fbb;
+  border-color:#6a263b;
+  background:#2a1018;
+}
+
+.cover-request-finished{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #292230;
+}
+
+.cover-request-finished a{
+  display:inline-block;
+}
+
+.profile-grid{
+  display:grid;
+  grid-template-columns:180px 1fr;
+  gap:25px;
+}
+
+.profile-image{
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#1c1624;
+  border:2px solid #49365c;
+}
+
+.empty{
+  text-align:center;
+  padding:35px 15px;
+  color:#8f8798;
+}
+
+.alert{
+  display:none;
+  padding:13px 15px;
+  border-radius:10px;
+  margin-bottom:18px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.alert.show{
+  display:block;
+}
+
+.alert.success{
+  background:#10251c;
+  border:1px solid #245d3d;
+  color:#8de0b0;
+}
+
+.alert.error{
+  background:#2a1018;
+  border:1px solid #6a263b;
+  color:#ff9fbb;
+}
+
+.alert.info{
+  background:#171329;
+  border:1px solid #49376d;
+  color:#cdb8ff;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1000;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(700px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#12101a;
+  border:1px solid #3a2c48;
+  border-radius:17px;
+  padding:22px;
+  box-shadow:0 20px 70px rgba(0,0,0,.55);
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.modal-header h2{
+  font-size:21px;
+}
+
+.close-btn{
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:50%;
+  background:#241b2d;
+  color:#fff;
+  font-size:23px;
+}
+
+.rules-content{
+  color:#c9c1d0;
+  line-height:1.65;
+  font-size:14px;
+}
+
+.rules-content h3{
+  color:#fff;
+  margin:18px 0 7px;
+  font-size:15px;
+}
+
+.rules-content h3:first-child{
+  margin-top:0;
+}
+
+.rules-content ul{
+  padding-left:20px;
+}
+
+.rules-content li{
+  margin-bottom:7px;
+}
+
+.cover-service{
+  background:
+    radial-gradient(circle at top right,rgba(168,85,247,.15),transparent 40%),
+    #100e17;
+  border:1px solid #352744;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:18px;
+}
+
+.cover-service h3{
+  margin-bottom:8px;
+}
+
+.cover-service p{
+  color:#aaa3b7;
+  font-size:13px;
+  line-height:1.55;
+}
+
+.cover-prices{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.cover-price-card{
+  background:#191426;
+  border:1px solid #403052;
+  border-radius:12px;
+  padding:15px;
+}
+
+.cover-price-card span{
+  display:block;
+  color:#92899d;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.cover-price-card strong{
+  color:#d8c7ff;
+  font-size:18px;
+}
+
+.loading{
+  text-align:center;
+  padding:25px;
+  color:#9990a3;
+}
+
+@media(max-width:1100px){
+  .music-layout{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:1000px){
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:760px){
+  .sidebar{
+    display:none;
+  }
+
+  .mobile-nav{
+    display:grid;
+  }
+
+  .main{
+    margin-left:0;
+    padding:18px 15px 90px;
+  }
+
+  .topbar{
+    align-items:flex-start;
+  }
+
+  .topbar h1{
+    font-size:23px;
+  }
+
+  .user-pill{
+    display:none;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .profile-grid{
+    grid-template-columns:1fr;
+  }
+
+  .profile-image{
+    margin:auto;
+  }
+
+  .cover-prices{
+    grid-template-columns:1fr;
+  }
+
+  .cover-request-top{
+    flex-direction:column;
+  }
+
+  .cover-request-price{
+    white-space:normal;
+  }
+
+  .music-item{
+    align-items:flex-start;
+  }
+
+  .music-actions{
+    flex-direction:column;
+  }
+
+  .music-actions .btn{
+    width:100%;
+  }
+}
+
+@media(max-width:500px){
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .card{
+    padding:15px;
+  }
+
+  .card .number{
+    font-size:22px;
+  }
+
+  .mix-item{
+    align-items:flex-start;
+  }
+
+  .mix-price{
+    font-size:12px;
+  }
+
+  .mobile-nav button{
+    font-size:8px;
+  }
+
+  .mobile-nav{
+    grid-template-columns:repeat(7,1fr);
+  }
+
+  .playlist-create{
+    flex-direction:column;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<div id="loginScreen" class="login">
-  <div class="login-box">
-    <div class="logo" style="font-size:22px;margin-bottom:14px">◈ <span>PASONG</span></div>
-    <h1>Admin Control Center</h1>
-    <p>Sign in with the PASONG administrator account.</p>
-    <div id="loginNotice"></div>
-    <form id="loginForm">
-      <div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"></div>
-      <div class="field"><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
-      <button class="btn" style="width:100%" type="submit" id="loginBtn">Sign In</button>
-    </form>
-  </div>
-</div>
-
-<div id="app" class="hidden">
-<header>
-  <div class="logo">◈ <span>PASONG</span> ADMIN</div>
-  <div class="header-right">
-    <div class="user-pill" id="adminEmail">Loading...</div>
-    <button class="btn secondary small" id="logoutBtn">Logout</button>
-  </div>
-</header>
-
-<div class="container">
-<div class="layout">
 <aside class="sidebar">
-<button class="active" data-section="dashboard">📊 Dashboard</button>
-<button data-section="songs">🎵 Songs</button>
-<button data-section="beats">🎛️ Beats</button>
-<button data-section="mixes">🎧 DJ Mixes</button>
-<button data-section="djs">✅ DJ Verification</button>
-<button data-section="orders">💳 Orders & Payments</button>
-<button data-section="covers">🎨 Covers</button>
-<button data-section="reports">🚩 Reports</button>
-<button data-section="copyright">⚖️ Copyright</button>
-<button data-section="ads">📢 Advertisements</button>
+
+  <div class="logo">PASONG</div>
+
+  <nav class="nav">
+
+    <button class="active" onclick="showSection('dashboard',this)">
+      🏠 Dashboard
+    </button>
+
+    <button onclick="showSection('music',this)">
+      🎵 My Music
+    </button>
+
+    <button onclick="showSection('upload',this)">
+      ⬆️ Upload DJ Mix
+    </button>
+
+    <button onclick="showSection('mixes',this)">
+      🎧 My DJ Mixes
+    </button>
+
+    <button onclick="showSection('cover-requests',this)">
+      🎨 My Cover Requests
+    </button>
+
+    <button onclick="showSection('earnings',this)">
+      💰 Earnings
+    </button>
+
+    <button onclick="showSection('analytics',this)">
+      📊 Analytics
+    </button>
+
+    <button onclick="showSection('profile',this)">
+      👤 DJ Profile
+    </button>
+
+    <button onclick="showSection('account',this)">
+      ⚙️ My Account
+    </button>
+
+    <a href="/">
+      🏠 PASONG Home
+    </a>
+
+    <button class="logout" onclick="logout()">
+      🚪 Logout
+    </button>
+
+  </nav>
+
 </aside>
 
-<main>
-<div id="globalNotice"></div>
+<div class="mobile-nav">
 
-<section id="section-dashboard">
-<div class="hero"><h1>Admin Control Center</h1><p>Manage PASONG content, payments, reports and sponsored advertisements.</p></div>
-<div class="stats">
-<div class="stat"><div class="stat-num" id="statSongs">—</div><div class="stat-label">Songs</div></div>
-<div class="stat"><div class="stat-num" id="statBeats">—</div><div class="stat-label">Beats</div></div>
-<div class="stat"><div class="stat-num" id="statOrders">—</div><div class="stat-label">Orders</div></div>
-<div class="stat"><div class="stat-num" id="statAds">—</div><div class="stat-label">Advertisements</div></div>
-</div>
-<div class="card">
-<h2>Quick Actions</h2><div class="sub">Manage PASONG songs, beats, DJ mixes, payments, reports and advertisements.</div>
-<div class="form-actions">
-<button class="btn" onclick="showSection('ads')">📢 Manage Advertisements</button>
-<button class="btn secondary" onclick="showSection('songs')">🎵 Songs</button>
-<button class="btn secondary" onclick="showSection('beats')">🎛️ Beats</button>
-<button class="btn secondary" onclick="showSection('mixes')">🎧 DJ Mixes</button>
-</div>
-</div>
-</section>
+  <button class="active" onclick="showSection('dashboard',this)">
+    🏠<br>Home
+  </button>
 
-<section id="section-songs" class="hidden">
-<div class="card"><h2>🎵 Song & Artist Verification</h2><div class="sub">Review the song, artist declaration and collecting-society disclosure before approving public release. An artist declaration is not automatic proof of ownership.</div>
-<div class="form-actions" style="margin-bottom:12px"><select id="songReviewFilter" onchange="loadSongReviewQueue()" style="background:#0c0c13;color:white;border:1px solid #292936;border-radius:9px;padding:8px"><option value="pending">Pending review</option><option value="more_information_required">More information required</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All songs</option></select><button class="btn secondary small" onclick="loadSongReviewQueue()">Refresh queue</button></div>
-<div id="songsTable" class="loading">Loading review queue...</div></div></section>
-<section id="section-beats" class="hidden"><div class="card"><h2>🎛️ Beats</h2><div class="sub">View producer beats and their current status.</div><div id="beatsTable" class="loading">Loading...</div></div></section>
-<section id="section-mixes" class="hidden"><div class="card"><h2>🎧 DJ Mixes</h2><div class="sub">View DJ mix records and their current status.</div><div id="mixesTable" class="loading">Loading...</div></div></section>
-<section id="section-djs" class="hidden">
-<div class="card">
-<h2>✅ DJ Applications & Verification</h2>
-<div class="sub">Review registered DJs. Approve & Verify makes the account active and grants the verified badge. Rejection does not activate the account.</div>
-<div id="djNotice"></div>
-<div class="form-actions" style="margin-bottom:12px">
-<select id="djStatusFilter" onchange="loadDJApplications()" style="background:#0c0c13;color:white;border:1px solid #292936;border-radius:9px;padding:8px">
-<option value="pending">Pending accounts</option><option value="active">Active accounts</option><option value="all">All DJ accounts</option>
-</select>
-<button class="btn secondary small" onclick="loadDJApplications()">Refresh DJs</button>
-</div>
-<div id="djsTable" class="loading">Loading DJ applications...</div>
-</div>
-</section>
-<section id="section-orders" class="hidden"><div class="card"><h2>💳 Orders & Payments</h2><div class="sub">Review recent orders and payment records.</div><div id="ordersTable" class="loading">Loading...</div></div></section>
-<section id="section-covers" class="hidden"><div class="card"><h2>🎨 Covers</h2><div class="sub">Review uploaded cover records.</div><div id="coversTable" class="loading">Loading...</div></div></section>
-<section id="section-reports" class="hidden"><div class="card"><h2>🚩 Reports</h2><div class="sub">Review user/content reports.</div><div id="reportsTable" class="loading">Loading...</div></div></section>
-<section id="section-copyright" class="hidden">
-<div class="card">
-<h2>⚖️ Copyright Center</h2>
-<div class="sub">Review copyright notices, counter-notices, takedowns, restorations and repeat-infringer strikes.</div>
-<div id="copyrightNotice"></div>
-<div class="form-actions" style="margin-bottom:12px">
-<button class="btn secondary small" onclick="loadCopyrightComplaints()">Refresh Complaints</button>
-<button class="btn secondary small" onclick="loadCopyrightStrikes()">Refresh Strikes</button>
-<select id="copyrightStatusFilter" onchange="loadCopyrightComplaints()" style="background:#0c0c13;color:white;border:1px solid #292936;border-radius:9px;padding:7px 10px">
-<option value="all">All Complaints</option><option value="submitted">Submitted</option><option value="reviewing">Reviewing</option><option value="takedown">Takedown</option><option value="restored">Restored</option><option value="rejected">Rejected</option><option value="resolved">Resolved</option>
-</select>
-</div>
-<div id="copyrightComplaints" class="loading">Loading...</div>
-</div>
-<div class="card">
-<h2>🛡️ Copyright Strikes</h2>
-<div class="sub">Strike history for repeat copyright infringement.</div>
-<div id="copyrightStrikes" class="loading">Loading...</div>
-</div>
-</section>
+  <button onclick="showSection('music',this)">
+    🎵<br>Music
+  </button>
 
-<section id="section-ads" class="hidden">
-<div class="card">
-<h2>📢 Advertisements</h2>
-<div class="sub">Create image or video advertisements for the PASONG homepage. Active homepage ads appear in the Sponsored section below the hero.</div>
-<div id="adNotice"></div>
-<form id="adForm">
-<input type="hidden" id="adId">
-<!-- Title and description are generated internally; they are not shown on the admin form. -->
-<input type="hidden" id="adTitle" value="PASONG Advertisement">
-<input type="hidden" id="adDescription" value="">
-<div class="field"><label>Target URL</label><input id="adTarget" type="url" placeholder="https://..."></div>
-<div class="grid3">
-<div class="field"><label>Placement</label><select id="adPlacement"><option value="home">Home</option><option value="all">All</option></select></div>
-<div class="field"><label>Start date/time</label><input id="adStart" type="datetime-local"></div>
-<div class="field"><label>End date/time</label><input id="adEnd" type="datetime-local"></div>
-</div>
-<div class="grid2">
-<div class="field"><label>Media type</label><select id="adMediaType"><option value="image">Image</option><option value="video">Video</option></select></div>
-<div class="field"><label>Upload media</label><input id="adFile" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/ogg"><div class="file-note">Images: JPG / PNG / WEBP. Videos: MP4 / WEBM / OGG.</div></div>
-</div>
-<div class="grid2">
-<div><label style="display:block;font-size:11px;color:#bbb;font-weight:800;margin-bottom:6px">Preview</label><div class="ad-preview" id="adPreview"><div class="placeholder">Choose an image or video</div></div></div>
-<div class="card" style="margin:25px 0 0;background:#0d0d14"><strong style="font-size:12px">Advertisement rules</strong><p style="font-size:11px;color:#999;margin-top:7px;line-height:1.5">The advertisement is stored in Supabase. The public homepage should render only active home advertisements inside their schedule.</p></div>
-</div>
-<div class="form-actions"><button class="btn" type="submit" id="saveAdBtn">Save Advertisement</button><button class="btn secondary" type="button" id="clearAdBtn">Clear</button></div>
-</form>
+  <button onclick="showSection('upload',this)">
+    ⬆️<br>Upload
+  </button>
+
+  <button onclick="showSection('mixes',this)">
+    🎧<br>Mixes
+  </button>
+
+  <button onclick="showSection('cover-requests',this)">
+    🎨<br>Covers
+  </button>
+
+  <button onclick="showSection('earnings',this)">
+    💰<br>Earnings
+  </button>
+
+  <button onclick="showSection('profile',this)">
+    👤<br>Profile
+  </button>
+
 </div>
 
-<div class="card">
-<div style="display:flex;gap:8px;margin-bottom:12px">
-<input id="adSearch" placeholder="Search advertisements..." style="flex:1;background:#0c0c13;border:1px solid #292936;border-radius:9px;padding:10px;color:white">
-<button class="btn secondary small" id="refreshAdsBtn">Refresh</button>
-</div>
-<div id="adsList" class="ads-list"><div class="loading">Loading advertisements...</div></div>
-</div>
-</section>
+<main class="main">
+
+  <div class="topbar">
+
+    <div>
+      <h1 id="pageTitle">DJ Dashboard</h1>
+    </div>
+
+    <div class="user-pill" id="userEmail">
+      Loading...
+    </div>
+
+  </div>
+
+  <div id="alertBox" class="alert"></div>
+
+  <section id="dashboard" class="section active">
+
+    <div class="stats">
+
+      <div class="card">
+        <h3>Total DJ Mixes</h3>
+        <div class="number purple" id="totalSongs">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Total Plays</h3>
+        <div class="number" id="totalPlays">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Total Downloads</h3>
+        <div class="number" id="totalDownloads">0</div>
+      </div>
+
+      <div class="card">
+        <h3>Earnings</h3>
+        <div class="number pink" id="totalEarnings">
+          UGX 0
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Welcome to your DJ Dashboard</h2>
+
+          <p class="muted">
+            Upload and manage your DJ mixes on PASONG.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="cover-service">
+
+        <h3>🎨 Need a professional cover?</h3>
+
+        <p>
+          PASONG can design a cover for your DJ mix.
+          You can request the service before uploading your mix.
+        </p>
+
+        <div class="cover-prices">
+
+          <div class="cover-price-card">
+            <span>Uganda</span>
+            <strong>UGX 10,000</strong>
+          </div>
+
+          <div class="cover-price-card">
+            <span>Outside Uganda</span>
+            <strong>US$10</strong>
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn cover-btn"
+            onclick="openCoverRequest()"
+          >
+            🎨 Request PASONG Cover Design
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="music" class="section">
+
+    <div class="music-layout">
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+            <h2>🎵 My Music</h2>
+
+            <p class="muted">
+              Songs connected to your DJ account.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="btn secondary"
+            onclick="loadMyMusic()"
+          >
+            ↻ Refresh
+          </button>
+
+        </div>
+
+        <div
+          id="myMusicList"
+          class="music-list"
+        >
+
+          <div class="loading">
+            Loading your music...
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="panel">
+
+        <div class="panel-header">
+
+          <div>
+            <h2>📋 DJ Playlists</h2>
+
+            <p class="muted">
+              Build playlists from your connected music.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="playlist-create">
+
+          <input
+            type="text"
+            id="newPlaylistName"
+            placeholder="New playlist name"
+          >
+
+          <button
+            type="button"
+            class="btn"
+            onclick="createDJPlaylist()"
+          >
+            + Create
+          </button>
+
+        </div>
+
+        <div
+          id="playlistList"
+          class="playlist-list"
+        >
+          <div class="playlist-empty">
+            No playlists yet.
+          </div>
+        </div>
+
+        <div
+          id="playlistSongs"
+          class="playlist-song-list"
+        >
+          <div class="playlist-empty">
+            Create a playlist to start adding songs.
+          </div>
+        </div>
+
+        <audio
+          id="musicPlayer"
+          class="audio-player"
+          controls
+        ></audio>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="upload" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Upload DJ Mix</h2>
+
+          <p class="muted">
+            Upload your DJ mix to PASONG.
+          </p>
+        </div>
+
+      </div>
+
+      <form id="uploadForm">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+
+            <label for="songTitle">
+              Mix Title *
+            </label>
+
+            <input
+              type="text"
+              id="songTitle"
+              required
+              placeholder="Enter DJ mix title"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="genre">
+              Genre *
+            </label>
+
+            <select id="genre" required>
+
+              <option value="">
+                Select genre
+              </option>
+
+              <option>Afrobeats</option>
+              <option>Amapiano</option>
+              <option>Bongo</option>
+              <option>Gengetone</option>
+              <option>Dancehall</option>
+              <option>Hip Hop</option>
+              <option>R&B</option>
+              <option>House</option>
+              <option>Gospel</option>
+              <option>Other</option>
+
+            </select>
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="label">
+              Label
+            </label>
+
+            <input
+              type="text"
+              id="label"
+              placeholder="Label / Brand (optional)"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label for="djEmail">
+              DJ PASONG Email
+            </label>
+
+            <input
+              type="email"
+              id="djEmail"
+              readonly
+            >
+
+          </div>
+
+          <div class="form-group full">
+
+            <label for="audioFile">
+              DJ Mix Audio *
+            </label>
+
+            <input
+              type="file"
+              id="audioFile"
+              accept=".mp3,.wav,audio/mpeg,audio/wav"
+              required
+            >
+
+            <small>
+              MP3 or WAV • Maximum 10MB
+            </small>
+
+          </div>
+
+          <div class="form-group full">
+
+            <label for="coverFile">
+              Cover Image *
+            </label>
+
+            <input
+              type="file"
+              id="coverFile"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+              required
+              onchange="previewCover(event)"
+            >
+
+            <small>
+              JPG, PNG or WEBP • Maximum 5MB
+            </small>
+
+            <img
+              id="coverPreview"
+              class="cover-photo-preview"
+              alt="Cover preview"
+            >
+
+          </div>
+
+          <div class="form-group full">
+
+            <div class="need-cover-box">
+
+              <h3>
+                🎨 Don't have a cover?
+              </h3>
+
+              <p>
+                Let PASONG design a professional cover for your
+                DJ mix. The cover-design charge is separate from
+                the DJ mix purchase price.
+              </p>
+
+              <div class="cover-price">
+
+                <div class="price-badge">
+                  🇺🇬 Uganda: UGX 10,000
+                </div>
+
+                <div class="price-badge">
+                  🌍 Outside Uganda: US$10
+                </div>
+
+                <div class="price-badge">
+                  ✅ Your valid cover: UGX 0
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                class="btn cover-btn"
+                onclick="openCoverRequest()"
+              >
+                🎨 Need Cover — Request PASONG Design
+              </button>
+
+            </div>
+
+          </div>
+
+          <div class="form-group full">
+
+            <label class="check-row">
+
+              <input
+                type="checkbox"
+                id="rightsCheck"
+                required
+              >
+
+              <span>
+
+                I confirm that I have the rights/permission
+                to upload this DJ mix and artwork on PASONG.
+
+                <br>
+
+                <button
+                  type="button"
+                  class="read-link"
+                  onclick="openDjRules('rights')"
+                >
+                  📄 Read Rights & Permission Requirements
+                </button>
+
+              </span>
+
+            </label>
+
+          </div>
+
+          <div class="form-group full">
+
+            <label class="check-row">
+
+              <input
+                type="checkbox"
+                id="termsCheck"
+                required
+              >
+
+              <span>
+
+                I agree to PASONG's upload terms
+                and DJ rules.
+
+                <br>
+
+                <button
+                  type="button"
+                  class="read-link"
+                  onclick="openDjRules('terms')"
+                >
+                  📜 Read DJ Upload Terms & Rules
+                </button>
+
+              </span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          <button
+            type="submit"
+            class="btn"
+            id="uploadBtn"
+          >
+            ⬆️ Upload DJ Mix
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </section>
+
+  <section id="mixes" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>My DJ Mixes</h2>
+
+          <p class="muted">
+            DJ mixes uploaded from this account.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="loadMyMixes()"
+        >
+          ↻ Refresh
+        </button>
+
+      </div>
+
+      <div id="mixList" class="mix-list">
+
+        <div class="loading">
+          Loading your DJ mixes...
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="cover-requests" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>🎨 My Cover Requests</h2>
+
+          <p class="muted">
+            Track your PASONG cover-design requests and finished artwork.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn secondary"
+          onclick="loadMyCoverRequests()"
+        >
+          ↻ Refresh
+        </button>
+
+      </div>
+
+      <div
+        id="coverRequestList"
+        class="cover-request-list"
+      >
+
+        <div class="loading">
+          Loading your cover requests...
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="earnings" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Earnings</h2>
+
+          <p class="muted">
+            Your DJ mix and support earnings.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="stats">
+
+        <div class="card">
+          <h3>DJ Mix Sales</h3>
+          <div class="number purple" id="salesEarnings">
+            UGX 0
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Tips</h3>
+          <div class="number pink" id="tipEarnings">
+            UGX 0
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Total</h3>
+          <div class="number" id="earningsTotal">
+            UGX 0
+          </div>
+        </div>
+
+      </div>
+
+      <div class="cover-service">
+
+        <h3>DJ Mix Sales</h3>
+
+        <p>
+          DJ mix downloads are priced at
+          <strong>UGX 1,000</strong> in Uganda and
+          <strong>US$1</strong> outside Uganda.
+        </p>
+
+        <p style="margin-top:8px;">
+          DJ receives 60% and PASONG receives 40%.
+        </p>
+
+        <p style="margin-top:8px;">
+          Streaming remains free.
+        </p>
+
+      </div>
+
+      <div class="cover-service">
+
+        <h3>💜 Tip DJ</h3>
+
+        <p>
+          DJ tips are split 70% to the DJ and 30% to PASONG.
+        </p>
+
+        <p style="margin-top:8px;">
+          Example: UGX 10,000 tip =
+          UGX 7,000 DJ / UGX 3,000 PASONG.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="analytics" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Analytics</h2>
+
+          <p class="muted">
+            Performance overview for your DJ mixes.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="stats">
+
+        <div class="card">
+          <h3>Total Plays</h3>
+          <div class="number" id="analyticsPlays">
+            0
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Total Downloads</h3>
+          <div class="number" id="analyticsDownloads">
+            0
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Total Mixes</h3>
+          <div class="number purple" id="analyticsMixes">
+            0
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="profile" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>DJ Profile</h2>
+
+          <p class="muted">
+            Your PASONG DJ profile.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="profile-grid">
+
+        <div>
+
+          <img
+            id="profileImage"
+            class="profile-image"
+            src=""
+            alt="DJ profile"
+          >
+
+        </div>
+
+        <div class="form-grid">
+
+          <div class="form-group">
+
+            <label>
+              Legal / Real Name
+            </label>
+
+            <input
+              id="realName"
+              readonly
+            >
+
+            <small>
+              Your legal name remains private.
+            </small>
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              DJ / Performing Name
+            </label>
+
+            <input
+              id="performingName"
+              readonly
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              Mobile Money Provider
+            </label>
+
+            <input
+              id="mobileProvider"
+              readonly
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              Mobile Money Number
+            </label>
+
+            <input
+              id="mobileNumber"
+              readonly
+            >
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section id="account" class="section">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>My Account</h2>
+
+          <p class="muted">
+            Your PASONG account information.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Email</label>
+          <input id="accountEmail" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>Account Role</label>
+          <input value="DJ / Musician" readonly>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
 </main>
+
+<div
+  class="modal"
+  id="djRulesModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <div>
+        <h2 id="djRulesTitle">
+          DJ Upload Rules
+        </h2>
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        onclick="closeDjRules()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="djRulesContent"
+      class="rules-content"
+    ></div>
+
+    <div class="actions">
+
+      <button
+        type="button"
+        class="btn secondary"
+        onclick="closeDjRules()"
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
-</div>
+
+<div
+  class="modal"
+  id="coverRequestModal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <div>
+
+        <h2>🎨 I Need a Cover</h2>
+
+        <p class="muted" style="margin-top:6px;">
+          Submit your DJ mix information and the photos
+          PASONG Admin should use to create your cover.
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        onclick="closeCoverRequest()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div class="cover-service">
+
+      <h3>
+        🎨 PASONG Cover Design Service
+      </h3>
+
+      <p>
+        PASONG Admin will design your professional DJ mix
+        cover using the information and photos you provide.
+        The finished cover will be attached to your DJ mix
+        after Admin approval.
+      </p>
+
+      <div class="cover-prices">
+
+        <div class="cover-price-card">
+
+          <span>🇺🇬 Uganda</span>
+
+          <strong>
+            UGX 10,000
+          </strong>
+
+        </div>
+
+        <div class="cover-price-card">
+
+          <span>🌍 Outside Uganda</span>
+
+          <strong>
+            US$10
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label>
+          DJ / Performing Name *
+        </label>
+
+        <input
+          type="text"
+          id="coverDjName"
+          placeholder="Example: KV BEATS"
+          required
+        >
+
+        <small>
+          Enter the public DJ/stage name exactly as it
+          should appear on the cover.
+        </small>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Mix Title *
+        </label>
+
+        <input
+          type="text"
+          id="coverRequestTitle"
+          placeholder="Enter your mix title"
+          required
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Subtitle / Tagline
+        </label>
+
+        <input
+          type="text"
+          id="coverSubtitle"
+          placeholder="Example: Weekend Vibes"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Featured Artist(s)
+        </label>
+
+        <input
+          type="text"
+          id="coverFeaturedArtists"
+          placeholder="Example: Patel, J-Lak"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Genre *
+        </label>
+
+        <select
+          id="coverGenre"
+          required
+        >
+
+          <option value="">
+            Select genre
+          </option>
+
+          <option>Afrobeats</option>
+          <option>Amapiano</option>
+          <option>Bongo</option>
+          <option>Gengetone</option>
+          <option>Dancehall</option>
+          <option>Hip Hop</option>
+          <option>R&B</option>
+          <option>House</option>
+          <option>Gospel</option>
+          <option>Other</option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Edition / Year
+        </label>
+
+        <input
+          type="text"
+          id="coverEdition"
+          placeholder="Example: 2026 Edition"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Preferred Cover Style
+        </label>
+
+        <input
+          type="text"
+          id="coverStyle"
+          placeholder="Example: Club, Urban, Premium, Mixtape"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Preferred Colours
+        </label>
+
+        <input
+          type="text"
+          id="coverColours"
+          placeholder="Example: Purple, Black and Pink"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Location
+        </label>
+
+        <input
+          type="text"
+          id="coverLocation"
+          placeholder="Example: Kampala, Uganda"
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Cover Design Price
+        </label>
+
+        <select
+          id="coverRequestLocation"
+        >
+
+          <option value="uganda">
+            🇺🇬 Uganda — UGX 10,000
+          </option>
+
+          <option value="outside">
+            🌍 Outside Uganda — US$10
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group full">
+
+        <label>
+          📷 Photo to Use on the Cover *
+        </label>
+
+        <input
+          type="file"
+          id="coverMainPhoto"
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+          onchange="previewCoverRequestImage(event,'coverMainPhotoPreview')"
+          required
+        >
+
+        <small>
+          JPG, PNG or WEBP • Maximum 5MB
+        </small>
+
+        <img
+          id="coverMainPhotoPreview"
+          class="cover-photo-preview"
+          alt="Main cover photo preview"
+        >
+
+        <small>
+          This is the main photo PASONG Admin will use
+          when designing your cover.
+        </small>
+
+      </div>
+
+      <div class="form-group full">
+
+        <label>
+          🖼️ Reference Photo
+        </label>
+
+        <input
+          type="file"
+          id="coverReferencePhoto"
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+          onchange="previewCoverRequestImage(event,'coverReferencePhotoPreview')"
+        >
+
+        <small>
+          Optional • JPG, PNG or WEBP • Maximum 5MB
+        </small>
+
+        <img
+          id="coverReferencePhotoPreview"
+          class="cover-photo-preview"
+          alt="Reference photo preview"
+        >
+
+        <small>
+          Use this to show Admin the style, background,
+          pose or visual idea you want.
+        </small>
+
+      </div>
+
+      <div class="form-group full">
+
+        <label>
+          🏷️ Logo / Brand Image
+        </label>
+
+        <input
+          type="file"
+          id="coverLogo"
+          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+          onchange="previewCoverRequestImage(event,'coverLogoPreview')"
+        >
+
+        <small>
+          Optional • JPG, PNG or WEBP • Maximum 5MB
+        </small>
+
+        <img
+          id="coverLogoPreview"
+          class="cover-photo-preview"
+          alt="Logo preview"
+        >
+
+      </div>
+
+      <div class="form-group full">
+
+        <label>
+          Extra Cover Details
+        </label>
+
+        <textarea
+          id="coverRequestNotes"
+          placeholder="Tell PASONG Admin exactly what you want on the cover, including text, style, mood, background, effects, logos, colours or other important instructions."
+        ></textarea>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Contact Email *
+        </label>
+
+        <input
+          type="email"
+          id="coverContactEmail"
+          placeholder="your@email.com"
+          required
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Contact Phone
+        </label>
+
+        <input
+          type="tel"
+          id="coverContactPhone"
+          placeholder="Enter phone number"
+        >
+
+      </div>
+
+    </div>
+
+    <div class="cover-service" style="margin-top:20px;">
+
+      <h3>
+        📋 How It Works
+      </h3>
+
+      <p style="margin-top:10px;">
+        <strong>1.</strong>
+        Submit your cover information and photos.
+      </p>
+
+      <p style="margin-top:7px;">
+        <strong>2.</strong>
+        Complete the cover-design payment.
+      </p>
+
+      <p style="margin-top:7px;">
+        <strong>3.</strong>
+        Your request goes to PASONG Admin.
+      </p>
+
+      <p style="margin-top:7px;">
+        <strong>4.</strong>
+        Admin designs the finished cover.
+      </p>
+
+      <p style="margin-top:7px;">
+        <strong>5.</strong>
+        Admin attaches the finished artwork to your DJ mix.
+      </p>
+
+      <p style="margin-top:7px;">
+        <strong>6.</strong>
+        Admin approves the DJ mix.
+      </p>
+
+      <p style="margin-top:7px;">
+        <strong>7.</strong>
+        Your DJ mix goes online.
+      </p>
+
+    </div>
+
+    <div
+      id="coverRequestMessage"
+      class="alert"
+    ></div>
+
+    <div class="actions">
+
+      <button
+        type="button"
+        class="btn cover-btn"
+        onclick="prepareCoverRequest()"
+      >
+        🎨 Submit Cover Request
+      </button>
+
+      <button
+        type="button"
+        class="btn secondary"
+        onclick="closeCoverRequest()"
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
 
 <script>
-const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_BASE="https://pasong-api.vercel.app";
-const CLOUDINARY_CLOUD_NAME="vuehnvkp";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const SUPABASE_URL =
+  "https://mtufczmjlkvycarxylgh.supabase.co";
 
-let currentSession=null;
-let advertisements=[];
+const SUPABASE_ANON_KEY =
+  "sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
+
+const API_BASE =
+  "https://pasong-api.onrender.com";
+
+const PASONG_PRICE =
+  1000;
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+let currentUser = null;
+let currentArtistProfile = null;
+let currentSongs = [];
+let currentMusic = [];
+let djPlaylists = [];
+let selectedPlaylistId = null;
+
+function showAlert(
+  message,
+  type = "info"
+){
+
+  const box =
+    document.getElementById("alertBox");
+
+  box.textContent =
+    message;
+
+  box.className =
+    "alert show " + type;
+
+  setTimeout(
+    () => {
+      box.classList.remove("show");
+    },
+    5000
+  );
+
+}
+
+function showSection(
+  sectionId,
+  button
+){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(
+      section => {
+        section.classList.remove("active");
+      }
+    );
+
+  const section =
+    document.getElementById(sectionId);
+
+  if(section){
+    section.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".nav button,.mobile-nav button")
+    .forEach(
+      item => {
+        item.classList.remove("active");
+      }
+    );
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  const titles = {
+    dashboard:"DJ Dashboard",
+    music:"My Music",
+    upload:"Upload DJ Mix",
+    mixes:"My DJ Mixes",
+    "cover-requests":"My Cover Requests",
+    earnings:"DJ Earnings",
+    analytics:"DJ Analytics",
+    profile:"DJ Profile",
+    account:"My Account"
+  };
+
+  document.getElementById(
+    "pageTitle"
+  ).textContent =
+    titles[sectionId] ||
+    "DJ Dashboard";
+
+  if(sectionId === "music"){
+    loadMyMusic();
+    loadDJPlaylists();
+  }
+
+  if(sectionId === "mixes"){
+    loadMyMixes();
+  }
+
+  if(sectionId === "cover-requests"){
+    loadMyCoverRequests();
+  }
+
+}
+
+function openDjRules(type){
+
+  const modal =
+    document.getElementById("djRulesModal");
+
+  const title =
+    document.getElementById("djRulesTitle");
+
+  const content =
+    document.getElementById("djRulesContent");
+
+  if(type === "rights"){
+
+    title.textContent =
+      "Rights & Permission Requirements";
+
+    content.innerHTML = `
+
+      <h3>Before You Upload</h3>
+
+      <p>
+        By uploading a DJ mix to PASONG, you confirm that
+        you have the necessary rights, permissions or other
+        lawful authorization to upload and distribute the
+        material included in your mix.
+      </p>
+
+      <h3>What You Must Have Permission For</h3>
+
+      <ul>
+        <li>The audio recordings included in your DJ mix.</li>
+        <li>Any artwork, photographs, logos or other images used as the cover.</li>
+        <li>Any other copyrighted material that you upload or make available through PASONG.</li>
+      </ul>
+
+      <h3>Do Not Upload Unauthorized Material</h3>
+
+      <p>
+        Do not upload a DJ mix or artwork when you do not
+        have the necessary permission or legal right to
+        distribute it.
+      </p>
+
+      <h3>Your Responsibility</h3>
+
+      <p>
+        You are responsible for the content you upload and
+        for ensuring that your upload does not infringe the
+        rights of artists, producers, writers, labels,
+        copyright owners or other parties.
+      </p>
+
+      <h3>Copyright Complaints</h3>
+
+      <p>
+        If PASONG receives a valid rights complaint or
+        identifies content that does not meet its
+        requirements, PASONG may restrict, remove or
+        disable the affected content.
+      </p>
+
+      <p>
+        Please only confirm the checkbox when the information
+        you have provided is accurate.
+      </p>
+
+    `;
+
+  }else{
+
+    title.textContent =
+      "PASONG DJ Upload Terms & Rules";
+
+    content.innerHTML = `
+
+      <h3>1. Eligible DJ Accounts</h3>
+
+      <p>
+        DJ mixes must be uploaded through a valid PASONG
+        account. The DJ information provided during upload
+        must be accurate.
+      </p>
+
+      <h3>2. Content Requirements</h3>
+
+      <ul>
+        <li>Upload only audio that you are legally allowed to distribute.</li>
+        <li>Upload a cover image that you have permission to use.</li>
+        <li>Do not intentionally provide misleading information about the DJ mix.</li>
+        <li>Do not upload unlawful or prohibited material.</li>
+      </ul>
+
+      <h3>3. DJ Mix Pricing</h3>
+
+      <p>
+        DJ mix streaming is free on PASONG.
+        Paid download pricing is UGX 1,000 in Uganda
+        and US$1 outside Uganda.
+      </p>
+
+      <h3>4. DJ Mix Revenue</h3>
+
+      <p>
+        DJ mix download revenue is split 60% to the DJ
+        and 40% to PASONG.
+      </p>
+
+      <h3>5. Tip DJ</h3>
+
+      <p>
+        DJ tips are split 70% to the DJ and 30% to PASONG.
+      </p>
+
+      <h3>6. PASONG Cover Design</h3>
+
+      <p>
+        PASONG cover design is a separate service.
+        The current design price is UGX 10,000 in Uganda
+        and US$10 outside Uganda.
+      </p>
+
+      <p>
+        If you already have a valid cover that you are
+        authorized to use, the cover-design charge is UGX 0.
+      </p>
+
+      <h3>7. Accurate Information</h3>
+
+      <p>
+        The mix title, genre, label information and DJ
+        account information should be accurate and not
+        misleading.
+      </p>
+
+      <h3>8. PASONG Review</h3>
+
+      <p>
+        PASONG may review uploaded DJ mixes and may restrict
+        or remove content that violates PASONG requirements,
+        applicable law or the rights of other people.
+      </p>
+
+      <h3>9. Streaming & Downloads</h3>
+
+      <p>
+        DJ mixes can be streamed freely. Paid downloads are
+        subject to the current PASONG pricing and platform
+        rules.
+      </p>
+
+      <h3>10. Your Agreement</h3>
+
+      <p>
+        By checking the upload terms checkbox and submitting
+        the mix, you confirm that you have read these current
+        DJ upload requirements and agree to follow them.
+      </p>
+
+      <p>
+        If you are unsure whether you have the right to
+        upload particular material, do not upload it until
+        you have obtained the necessary permission.
+      </p>
+
+    `;
+
+  }
+
+  modal.classList.add("show");
+
+}
+
+function closeDjRules(){
+
+  document
+    .getElementById("djRulesModal")
+    .classList.remove("show");
+
+}
+
+document
+  .getElementById("djRulesModal")
+  .addEventListener(
+    "click",
+    function(event){
+
+      if(event.target === this){
+        closeDjRules();
+      }
+
+    }
+  );
+
+function openCoverRequest(){
+
+  const modal =
+    document.getElementById("coverRequestModal");
+
+  const titleInput =
+    document.getElementById("coverRequestTitle");
+
+  const songTitle =
+    document.getElementById("songTitle");
+
+  if(
+    songTitle &&
+    songTitle.value.trim()
+  ){
+
+    titleInput.value =
+      songTitle.value.trim();
+
+  }
+
+  if(
+    currentArtistProfile &&
+    currentArtistProfile.performing_name
+  ){
+
+    document.getElementById(
+      "coverDjName"
+    ).value =
+      currentArtistProfile.performing_name;
+
+  }
+
+  if(currentUser){
+
+    document.getElementById(
+      "coverContactEmail"
+    ).value =
+      currentUser.email || "";
+
+  }
+
+  const email =
+    document.getElementById("djEmail");
+
+  if(
+    currentUser &&
+    email
+  ){
+
+    email.value =
+      currentUser.email || "";
+
+  }
+
+  const message =
+    document.getElementById(
+      "coverRequestMessage"
+    );
+
+  message.className =
+    "alert";
+
+  message.innerHTML =
+    "";
+
+  modal.classList.add("show");
+
+}
+
+function closeCoverRequest(){
+
+  document
+    .getElementById("coverRequestModal")
+    .classList.remove("show");
+
+}
+
+document
+  .getElementById("coverRequestModal")
+  .addEventListener(
+    "click",
+    function(event){
+
+      if(event.target === this){
+        closeCoverRequest();
+      }
+
+    }
+  );
+
+async function prepareCoverRequest(){
+
+  if(!currentUser){
+
+    showCoverMessage(
+      "Please log in again before submitting a cover request.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const title =
+    document.getElementById("coverRequestTitle").value.trim();
+
+  const djName =
+    document.getElementById("coverDjName").value.trim();
+
+  const subtitle =
+    document.getElementById("coverSubtitle").value.trim();
+
+  const featuredArtists =
+    document.getElementById("coverFeaturedArtists").value.trim();
+
+  const genre =
+    document.getElementById("coverGenre").value;
+
+  const edition =
+    document.getElementById("coverEdition").value.trim();
+
+  const style =
+    document.getElementById("coverStyle").value.trim();
+
+  const colours =
+    document.getElementById("coverColours").value.trim();
+
+  const locationText =
+    document.getElementById("coverLocation").value.trim();
+
+  const location =
+    document.getElementById("coverRequestLocation").value;
+
+  const mainPhoto =
+    document.getElementById("coverMainPhoto").files[0];
+
+  const referencePhoto =
+    document.getElementById("coverReferencePhoto").files[0];
+
+  const logo =
+    document.getElementById("coverLogo").files[0];
+
+  const notes =
+    document.getElementById("coverRequestNotes").value.trim();
+
+  const contactEmail =
+    document.getElementById("coverContactEmail").value.trim();
+
+  const contactPhone =
+    document.getElementById("coverContactPhone").value.trim();
+
+  if(!djName){
+
+    showCoverMessage(
+      "Please enter the DJ / Performing Name.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(!title){
+
+    showCoverMessage(
+      "Please enter the DJ mix title.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(!genre){
+
+    showCoverMessage(
+      "Please select a genre.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(!mainPhoto){
+
+    showCoverMessage(
+      "Please upload the main photo you want PASONG Admin to use on the cover.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(!contactEmail){
+
+    showCoverMessage(
+      "Please enter your contact email.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const maxImageSize =
+    5 * 1024 * 1024;
+
+  if(mainPhoto.size > maxImageSize){
+
+    showCoverMessage(
+      "The main cover photo is too large. Maximum size is 5MB.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(
+    referencePhoto &&
+    referencePhoto.size > maxImageSize
+  ){
+
+    showCoverMessage(
+      "The reference photo is too large. Maximum size is 5MB.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(
+    logo &&
+    logo.size > maxImageSize
+  ){
+
+    showCoverMessage(
+      "The logo image is too large. Maximum size is 5MB.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  let price = 10000;
+  let currency = "UGX";
+
+  if(location === "outside"){
+
+    price = 10;
+    currency = "USD";
+
+  }
+
+  const submitButton =
+    document.querySelector(
+      '#coverRequestModal .actions button.cover-btn'
+    );
+
+  if(submitButton){
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+  }
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .insert({
+
+        user_id:currentUser.id,
+        dj_name:djName,
+        mix_title:title,
+        subtitle:subtitle || null,
+        featured_artists:featuredArtists || null,
+        genre:genre,
+        edition_year:edition || null,
+        preferred_style:style || null,
+        preferred_colours:colours || null,
+        location:locationText || null,
+        main_photo_url:null,
+        reference_photo_url:null,
+        logo_url:null,
+        extra_details:notes || null,
+        contact_email:contactEmail,
+        contact_phone:contactPhone || null,
+        country:location === "uganda" ? "Uganda" : "Outside Uganda",
+        currency:currency,
+        price:price,
+        payment_status:"pending",
+        request_status:"pending"
+
+      })
+      .select()
+      .single();
+
+    if(error){
+      throw error;
+    }
+
+    const requestId =
+      data.id;
+
+    async function uploadCoverImage(
+      file,
+      imageName
+    ){
+
+      if(!file){
+        return null;
+      }
+
+      const form =
+        new FormData();
+
+      form.append("file",file);
+      form.append("upload_preset","pasong_covers");
+
+      showCoverMessage(
+        "Uploading " +
+        escapeHtml(imageName) +
+        "...",
+        "info"
+      );
+
+      const response =
+        await fetch(
+          API_BASE + "/api/upload/cover",
+          {
+            method:"POST",
+            body:form
+          }
+        );
+
+      if(!response.ok){
+
+        let errorMessage =
+          imageName + " upload failed.";
+
+        try{
+
+          const errorData =
+            await response.json();
+
+          if(
+            errorData &&
+            errorData.error
+          ){
+
+            errorMessage =
+              errorData.error;
+
+          }
+
+        }catch(ignored){}
+
+        throw new Error(errorMessage);
+
+      }
+
+      const result =
+        await response.json();
+
+      if(
+        !result ||
+        !result.secure_url
+      ){
+
+        throw new Error(
+          imageName +
+          " upload did not return a Cloudinary URL."
+        );
+
+      }
+
+      return result.secure_url;
+
+    }
+
+    const mainPhotoUrl =
+      await uploadCoverImage(
+        mainPhoto,
+        "main photo"
+      );
+
+    let referencePhotoUrl = null;
+
+    if(referencePhoto){
+
+      referencePhotoUrl =
+        await uploadCoverImage(
+          referencePhoto,
+          "reference photo"
+        );
+
+    }
+
+    let logoUrl = null;
+
+    if(logo){
+
+      logoUrl =
+        await uploadCoverImage(
+          logo,
+          "logo"
+        );
+
+    }
+
+    const {
+      error:updateError
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .update({
+
+        main_photo_url:mainPhotoUrl,
+        reference_photo_url:referencePhotoUrl,
+        logo_url:logoUrl,
+        updated_at:new Date().toISOString()
+
+      })
+      .eq("id",requestId)
+      .eq("user_id",currentUser.id)
+      .select()
+      .single();
+
+    if(updateError){
+
+      throw new Error(
+        "The photos were uploaded, but PASONG could not save the photo links to your cover request."
+      );
+
+    }
+
+    showCoverMessage(
+      `
+        🎨 <strong>Cover request submitted successfully.</strong>
+        <br><br>
+        <strong>Request ID:</strong>
+        ${escapeHtml(requestId)}
+        <br><br>
+        <strong>DJ:</strong>
+        ${escapeHtml(djName)}
+        <br>
+        <strong>Mix:</strong>
+        ${escapeHtml(title)}
+        <br>
+        <strong>Cover Design:</strong>
+        ${currency === "USD" ? "US$10" : "UGX 10,000"}
+        <br><br>
+        ✅ Main photo uploaded
+        <br>
+        ${referencePhotoUrl ? "✅ Reference photo uploaded" : "ℹ️ No reference photo provided"}
+        <br>
+        ${logoUrl ? "✅ Logo uploaded" : "ℹ️ No logo provided"}
+        <br><br>
+        Your cover request and photos have been sent
+        to PASONG Admin.
+        <br><br>
+        <strong>Payment status:</strong> Pending
+      `,
+      "success"
+    );
+
+    document.getElementById("coverMainPhoto").value = "";
+    document.getElementById("coverReferencePhoto").value = "";
+    document.getElementById("coverLogo").value = "";
+
+    [
+      "coverMainPhotoPreview",
+      "coverReferencePhotoPreview",
+      "coverLogoPreview"
+    ].forEach(
+      function(previewId){
+
+        const preview =
+          document.getElementById(previewId);
+
+        if(preview){
+
+          preview.style.display = "none";
+          preview.removeAttribute("src");
+
+        }
+
+      }
+    );
+
+    await loadMyCoverRequests();
+
+  }catch(error){
+
+    console.error(
+      "Submit cover request error:",
+      error
+    );
+
+    showCoverMessage(
+      error.message ||
+      "Unable to submit your cover request. Please try again.",
+      "error"
+    );
+
+  }finally{
+
+    if(submitButton){
+
+      submitButton.disabled = false;
+      submitButton.textContent =
+        "🎨 Submit Cover Request";
+
+    }
+
+  }
+
+}
+
+function showCoverMessage(
+  message,
+  type
+){
+
+  const box =
+    document.getElementById(
+      "coverRequestMessage"
+    );
+
+  box.innerHTML =
+    message;
+
+  box.className =
+    "alert show " + type;
+
+}
 
 function escapeHtml(value){
-return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-}
-function showNotice(target,type,message){
-const el=document.getElementById(target);if(!el)return;
-el.innerHTML='<div class="notice '+type+'">'+escapeHtml(message)+'</div>';
-}
-function clearNotice(target){const el=document.getElementById(target);if(el)el.innerHTML="";}
 
-function showSection(name){
-document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));
-const section=document.getElementById("section-"+name);
-if(section)section.classList.remove("hidden");
-document.querySelectorAll(".sidebar button").forEach(b=>b.classList.toggle("active",b.dataset.section===name));
-if(name==="dashboard")loadStats();
-if(name==="songs")loadSongReviewQueue();
-if(name==="beats")loadGenericTable("beats","beatsTable",["title","genre","status","created_at"]);
-if(name==="mixes")loadMixes();
-if(name==="djs")loadDJApplications();
-if(name==="orders")loadGenericTable("orders","ordersTable",["id","status","total_amount","currency","created_at"]);
-if(name==="covers")loadCovers();
-if(name==="reports")loadReports();
-if(name==="copyright"){loadCopyrightComplaints();loadCopyrightStrikes();}
-if(name==="ads")loadAds();
-}
-window.showSection=showSection;
-document.querySelectorAll(".sidebar button").forEach(b=>b.addEventListener("click",()=>showSection(b.dataset.section)));
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
-async function isAdmin(user){
-const roles=[user?.app_metadata?.role,user?.app_metadata?.user_role].map(v=>String(v||"").toLowerCase());
-if(roles.includes("admin")||roles.includes("super_admin"))return true;
-try{
-const registry=await supabaseClient.from("user_roles").select("role").eq("user_id",user.id).limit(10);
-if(!registry.error&&(registry.data||[]).some(row=>["admin","super_admin"].includes(String(row.role||"").toLowerCase())))return true;
-}catch(e){console.warn("Admin role registry lookup:",e);}
-for(const table of ["profiles","user_profiles","admin_users"]){
-try{
-const r=await supabaseClient.from(table).select("role").eq("id",user.id).maybeSingle();
-if(!r.error&&["admin","super_admin"].includes(String(r.data?.role||"").toLowerCase()))return true;
-}catch(e){console.warn("Admin role lookup:",table,e);}
-}
-return false;
 }
 
-async function handleSession(session){
-currentSession=session;
-if(!session?.user)return;
-const allowed=await isAdmin(session.user);
-if(!allowed){
-await supabaseClient.auth.signOut();
-document.getElementById("app").classList.add("hidden");
-document.getElementById("loginScreen").classList.remove("hidden");
-showNotice("loginNotice","error","This account does not have PASONG administrator access.");
-return;
-}
-document.getElementById("loginScreen").classList.add("hidden");
-document.getElementById("app").classList.remove("hidden");
-document.getElementById("adminEmail").textContent=session.user.email||"Administrator";
-loadStats();
+function previewCoverRequestImage(
+  event,
+  previewId
+){
+
+  const file =
+    event.target.files &&
+    event.target.files[0];
+
+  const preview =
+    document.getElementById(previewId);
+
+  if(!file){
+
+    preview.style.display = "none";
+    preview.removeAttribute("src");
+
+    return;
+
+  }
+
+  const maxSize =
+    5 * 1024 * 1024;
+
+  if(file.size > maxSize){
+
+    showCoverMessage(
+      "Image is too large. Maximum size is 5MB.",
+      "error"
+    );
+
+    event.target.value = "";
+    preview.style.display = "none";
+
+    return;
+
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload =
+    function(e){
+
+      preview.src =
+        e.target.result;
+
+      preview.style.display =
+        "block";
+
+    };
+
+  reader.readAsDataURL(file);
+
 }
 
-async function boot(){
-const {data:{session}}=await supabaseClient.auth.getSession();
-if(session)await handleSession(session);
-}
-supabaseClient.auth.onAuthStateChange((_event,session)=>{
-if(session)handleSession(session);
-else{
-currentSession=null;
-document.getElementById("app").classList.add("hidden");
-document.getElementById("loginScreen").classList.remove("hidden");
-}
-});
+function previewCover(event){
 
-document.getElementById("loginForm").addEventListener("submit",async e=>{
-e.preventDefault();
-const button=document.getElementById("loginBtn");
-button.disabled=true;button.textContent="Signing in...";clearNotice("loginNotice");
-const {data,error}=await supabaseClient.auth.signInWithPassword({
-email:document.getElementById("loginEmail").value.trim(),
-password:document.getElementById("loginPassword").value
-});
-if(error)showNotice("loginNotice","error",error.message);
-else if(data.session)await handleSession(data.session);
-button.disabled=false;button.textContent="Sign In";
-});
-document.getElementById("logoutBtn").addEventListener("click",async()=>{await supabaseClient.auth.signOut();});
+  const file =
+    event.target.files &&
+    event.target.files[0];
 
-async function countRows(table){
-const r=await supabaseClient.from(table).select("id",{count:"exact",head:true});
-return r.error?null:(r.count??0);
-}
-async function loadStats(){
-const [songs,beats,orders,ads]=await Promise.all([countRows("songs"),countRows("beats"),countRows("orders"),countRows("advertisements")]);
-document.getElementById("statSongs").textContent=songs??"—";
-document.getElementById("statBeats").textContent=beats??"—";
-document.getElementById("statOrders").textContent=orders??"—";
-document.getElementById("statAds").textContent=ads??"—";
+  const preview =
+    document.getElementById("coverPreview");
+
+  if(!file){
+
+    preview.style.display = "none";
+    preview.removeAttribute("src");
+
+    return;
+
+  }
+
+  const maxSize =
+    5 * 1024 * 1024;
+
+  if(file.size > maxSize){
+
+    showAlert(
+      "Cover image is too large. Maximum size is 5MB.",
+      "error"
+    );
+
+    event.target.value = "";
+    preview.style.display = "none";
+
+    return;
+
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload =
+    function(e){
+
+      preview.src =
+        e.target.result;
+
+      preview.style.display =
+        "block";
+
+    };
+
+  reader.readAsDataURL(file);
+
 }
 
-async function loadGenericTable(table,elementId,columns){
-const element=document.getElementById(elementId);
-element.innerHTML='<div class="loading">Loading...</div>';
-const r=await supabaseClient.from(table).select("*").order("created_at",{ascending:false}).limit(100);
-if(r.error){element.innerHTML='<div class="empty">Unable to load '+escapeHtml(table)+'. '+escapeHtml(r.error.message)+'</div>';return;}
-const rows=r.data||[];
-if(!rows.length){element.innerHTML='<div class="empty">No records found.</div>';return;}
-element.innerHTML='<div class="table-wrap"><table><thead><tr>'+columns.map(c=>'<th>'+escapeHtml(c)+'</th>').join("")+'</tr></thead><tbody>'+
-rows.map(row=>'<tr>'+columns.map(c=>'<td>'+formatCell(c,row[c])+'</td>').join("")+'</tr>').join("")+
-'</tbody></table></div>';
+async function checkAuth(){
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .auth
+    .getSession();
+
+  if(
+    error ||
+    !data ||
+    !data.session
+  ){
+
+    window.location.href =
+      "/login.html";
+
+    return;
+
+  }
+
+  currentUser =
+    data.session.user;
+
+  document
+    .getElementById("userEmail")
+    .textContent =
+    currentUser.email || "";
+
+  document
+    .getElementById("djEmail")
+    .value =
+    currentUser.email || "";
+
+  document
+    .getElementById("accountEmail")
+    .value =
+    currentUser.email || "";
+
+  await loadProfile();
+  await loadMyMusic();
+  await loadDJPlaylists();
+  await loadMyMixes();
+  await loadDashboardStats();
+
 }
-function renderAdminRows(element, rows, columns, emptyMessage="No records found."){
-  if(!rows || !rows.length){element.innerHTML='<div class="empty">'+escapeHtml(emptyMessage)+'</div>';return;}
-  element.innerHTML='<div class="table-wrap"><table><thead><tr>'+columns.map(c=>'<th>'+escapeHtml(c.label||c.key)+'</th>').join("")+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+columns.map(c=>'<td>'+formatCell(c.key,row[c.key])+'</td>').join("")+'</tr>').join("")+'</tbody></table></div>';
+
+async function fetchAllSongs(){
+
+  try{
+
+    const response =
+      await fetch(
+        API_BASE + "/api/songs"
+      );
+
+    if(!response.ok){
+
+      throw new Error(
+        "Unable to load songs."
+      );
+
+    }
+
+    const result =
+      await response.json();
+
+    const songs =
+      Array.isArray(result)
+        ? result
+        : (
+          Array.isArray(result.songs)
+            ? result.songs
+            : []
+        );
+
+    return songs;
+
+  }catch(error){
+
+    console.error(
+      "Fetch songs error:",
+      error
+    );
+
+    return [];
+
+  }
+
 }
-async function loadCovers(){
-  const element=document.getElementById("coversTable");
-  element.innerHTML='<div class="loading">Loading cover requests...</div>';
-  const [dj, song]=await Promise.all([
-    supabaseClient.from("cover_requests").select("*").order("created_at",{ascending:false}).limit(100),
-    supabaseClient.from("cover_design_requests").select("*").order("created_at",{ascending:false}).limit(100)
-  ]);
-  const errors=[dj.error&&("DJ mix covers: "+dj.error.message),song.error&&("Song covers: "+song.error.message)].filter(Boolean);
-  const rows=[...(dj.data||[]).map(r=>({...r,_cover_type:"DJ Mix Cover",_display_title:r.mix_title,_display_status:r.request_status||r.payment_status})),...(song.data||[]).map(r=>({...r,_cover_type:"Song Cover",_display_title:r.song_title,_display_status:r.request_status||r.payment_status}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  if(!rows.length && errors.length){element.innerHTML='<div class="empty">Unable to load cover requests. '+escapeHtml(errors.join(" | "))+'</div>';return;}
-  renderAdminRows(element,rows,[{key:"_cover_type",label:"Type"},{key:"_display_title",label:"Title"},{key:"request_status",label:"Request Status"},{key:"payment_status",label:"Payment"},{key:"created_at",label:"Created"}],"No cover requests found.");
-  if(errors.length)element.insertAdjacentHTML("afterbegin",'<div class="notice info">Some cover records could not be loaded: '+escapeHtml(errors.join(" | "))+'</div>');
+
+function isDjMix(song){
+
+  const type =
+    String(
+      song.content_type || ""
+    )
+    .toLowerCase()
+    .replaceAll("-","_");
+
+  return (
+    type === "dj_mix" ||
+    type === "djmix" ||
+    !!song.mix_audio_url ||
+    !!song.mix_preview_url
+  );
+
 }
-async function loadReports(){
-  const element=document.getElementById("reportsTable");
-  element.innerHTML='<div class="loading">Loading report records...</div>';
-  const [complaints,messages]=await Promise.all([
-    supabaseClient.from("copyright_complaints").select("*").order("created_at",{ascending:false}).limit(100),
-    supabaseClient.from("contact_messages").select("*").order("created_at",{ascending:false}).limit(100)
-  ]);
-  const errors=[complaints.error&&("Copyright reports: "+complaints.error.message),messages.error&&("Contact reports: "+messages.error.message)].filter(Boolean);
-  const rows=[...(complaints.data||[]).map(r=>({...r,_report_type:"Copyright complaint",_report_details:r.reason||r.rights_claim||r.material_description||"—",_report_status:r.status})),...(messages.data||[]).map(r=>({...r,_report_type:"Contact message",_report_details:r.subject||r.message||"—",_report_status:r.status||"unreviewed"}))].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
-  if(!rows.length && errors.length){element.innerHTML='<div class="empty">Unable to load report records. '+escapeHtml(errors.join(" | "))+'</div>';return;}
-  renderAdminRows(element,rows,[{key:"_report_type",label:"Type"},{key:"_report_details",label:"Details"},{key:"_report_status",label:"Status"},{key:"created_at",label:"Created"}],"No report records found.");
-  if(errors.length)element.insertAdjacentHTML("afterbegin",'<div class="notice info">Some report records could not be loaded: '+escapeHtml(errors.join(" | "))+'</div>');
+
+function isApprovedSong(song){
+
+  const status =
+    String(
+      song.status || ""
+    )
+    .toLowerCase();
+
+  if(!status){
+    return true;
+  }
+
+  return status === "approved";
+
 }
-async function loadMixes(){
-  const element=document.getElementById("mixesTable");
-  element.innerHTML='<div class="loading">Checking DJ mix records...</div>';
-  const r=await supabaseClient.from("dj_mixes").select("*").order("created_at",{ascending:false}).limit(100);
-  if(!r.error){
-    renderAdminRows(element,r.data||[],[
-      {key:"title",label:"Mix Title"},
-      {key:"dj_name",label:"DJ Name"},
-      {key:"genre",label:"Genre"},
-      {key:"status",label:"Status"},
-      {key:"audio_url",label:"Audio File"},
-      {key:"created_at",label:"Created"}
-    ],"No DJ mixes have been uploaded yet.");
+
+function songConnectedToDJ(song){
+
+  if(!currentUser){
+    return false;
+  }
+
+  const userId =
+    String(currentUser.id);
+
+  const artistProfileId =
+    currentArtistProfile &&
+    currentArtistProfile.id
+      ? String(currentArtistProfile.id)
+      : "";
+
+  const uploaderId =
+    song.uploader_user_id
+      ? String(song.uploader_user_id)
+      : "";
+
+  const artistUserId =
+    song.artist_user_id
+      ? String(song.artist_user_id)
+      : "";
+
+  const producerUserId =
+    song.producer_user_id
+      ? String(song.producer_user_id)
+      : "";
+
+  const writerUserId =
+    song.writer_user_id
+      ? String(song.writer_user_id)
+      : "";
+
+  const artistId =
+    song.artist_id
+      ? String(song.artist_id)
+      : "";
+
+  return (
+    uploaderId === userId ||
+    artistUserId === userId ||
+    producerUserId === userId ||
+    writerUserId === userId ||
+    artistId === artistProfileId
+  );
+
+}
+
+async function loadMyMusic(){
+
+  const list =
+    document.getElementById(
+      "myMusicList"
+    );
+
+  if(!list){
     return;
   }
-  if(/does not exist|schema cache|could not find the table/i.test(r.error.message||"")){
-    element.innerHTML='<div class="empty">DJ mix storage is not set up yet. Run <code>pasong-dj-mixes-schema.sql</code> in the Supabase SQL Editor, then refresh this section.</div>';
+
+  if(!currentUser){
+
+    list.innerHTML =
+      `<div class="empty">Please log in.</div>`;
+
+    return;
+
+  }
+
+  if(!currentArtistProfile){
+
+    await loadProfile();
+
+  }
+
+  list.innerHTML =
+    `<div class="loading">Loading your music...</div>`;
+
+  try{
+
+    const songs =
+      await fetchAllSongs();
+
+    currentMusic =
+      songs.filter(
+        song =>
+          isApprovedSong(song) &&
+          songConnectedToDJ(song)
+      );
+
+    renderMyMusic(
+      currentMusic
+    );
+
+  }catch(error){
+
+    console.error(
+      "My Music error:",
+      error
+    );
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          Unable to load your music right now.
+        </div>
+      `;
+
+  }
+
+}
+
+function renderMyMusic(
+  songs
+){
+
+  const list =
+    document.getElementById(
+      "myMusicList"
+    );
+
+  if(!songs.length){
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          No songs are connected to this DJ account yet.
+          <br><br>
+          Songs uploaded by this account or connected through
+          the artist, producer or writer account will appear here.
+        </div>
+      `;
+
+    return;
+
+  }
+
+  list.innerHTML =
+    songs
+      .map(
+        function(song){
+
+          const title =
+            escapeHtml(
+              song.title ||
+              "Untitled"
+            );
+
+          const genre =
+            escapeHtml(
+              song.genre ||
+              "Music"
+            );
+
+          const cover =
+            safeImageUrl(
+              song.cover_url
+            );
+
+          const mix =
+            isDjMix(song);
+
+          const type =
+            mix
+              ? "🎧 DJ Mix"
+              : "🎵 Song";
+
+          const price =
+            mix
+              ? (
+                song.currency === "USD"
+                  ? "$" + (song.mix_price || 1)
+                  : "UGX " + (song.mix_price || 1000)
+              )
+              : (
+                song.currency === "USD"
+                  ? "$" + (song.price || 1)
+                  : "UGX " + (song.price || 700)
+              );
+
+          const songId =
+            escapeHtml(
+              song.id || ""
+            );
+
+          return `
+            <div class="music-item">
+
+              <img
+                class="music-cover"
+                src="${cover}"
+                alt=""
+              >
+
+              <div class="music-info">
+
+                <h3>
+                  ${title}
+                </h3>
+
+                <p>
+                  ${genre} • ${escapeHtml(price)}
+                </p>
+
+                <span class="music-type">
+                  ${type}
+                </span>
+
+              </div>
+
+              <div class="music-actions">
+
+                ${
+                  song.audio_url || song.mix_audio_url
+                    ? `
+                      <button
+                        type="button"
+                        class="btn"
+                        onclick="playMySong('${songId}')"
+                      >
+                        ▶ Play
+                      </button>
+                    `
+                    : ""
+                }
+
+                ${
+                  !mix
+                    ? `
+                      <button
+                        type="button"
+                        class="btn secondary"
+                        onclick="addSongToSelectedPlaylist('${songId}')"
+                      >
+                        + Playlist
+                      </button>
+                    `
+                    : ""
+                }
+
+              </div>
+
+            </div>
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+function safeImageUrl(
+  value
+){
+
+  if(
+    value &&
+    /^https?:\/\//i.test(
+      String(value)
+    )
+  ){
+
+    return escapeHtml(value);
+
+  }
+
+  return (
+    "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg"
+        width="100"
+        height="100"
+        viewBox="0 0 100 100">
+        <rect width="100" height="100" fill="#211a2b"/>
+        <text x="50" y="56"
+          text-anchor="middle"
+          fill="#c084fc"
+          font-size="28">♪</text>
+      </svg>
+    `)
+  );
+
+}
+
+function getPlaylistStorageKey(){
+
+  if(!currentUser){
+    return "";
+  }
+
+  return (
+    "pasong_dj_playlists_" +
+    currentUser.id
+  );
+
+}
+
+function loadDJPlaylists(){
+
+  if(!currentUser){
     return;
   }
-  element.innerHTML='<div class="empty">Unable to load DJ mixes. '+escapeHtml(r.error.message)+'</div>';
-}
 
-async function loadSongReviewQueue(){
-  const el=document.getElementById("songsTable"); if(!el)return;
-  el.innerHTML='<div class="loading">Loading song review queue...</div>';
+  const key =
+    getPlaylistStorageKey();
+
   try{
-    const filter=document.getElementById("songReviewFilter")?.value||"pending";
-    const data=await copyrightApi("/api/admin/songs/review?status="+encodeURIComponent(filter));
-    const songs=data.songs||[];
-    if(!songs.length){el.innerHTML='<div class="empty">No songs in this review filter.</div>';return;}
-    el.innerHTML='<div style="display:grid;gap:14px">'+songs.map(song=>{
-      const d=song.rights_declaration||{};
-      const society=({none:"Artist declares no collecting-society representation for these rights",registered:"Artist reports collecting-society registration",third_party:"Some rights may be controlled by another party",unsure:"Artist is unsure about rights representation"})[d.collecting_society_status]||"Rights declaration not found";
-      const audio=song.preview_url?'<audio controls preload="none" style="width:100%;margin-top:8px" src="'+escapeHtml(song.preview_url)+'"></audio>':'<p style="color:#999;font-size:12px;margin-top:8px">No preview URL saved.</p>';
-      const actionButtons=String(song.status).toLowerCase()==="pending"||String(song.status).toLowerCase()==="more_information_required"?'<div class="form-actions"><button class="btn green small" onclick="reviewSong(&quot;'+escapeHtml(song.id)+'&quot;,&quot;approve&quot;)">Approve</button><button class="btn secondary small" onclick="reviewSong(&quot;'+escapeHtml(song.id)+'&quot;,&quot;request_info&quot;)">Request more information</button><button class="btn danger small" onclick="reviewSong(&quot;'+escapeHtml(song.id)+'&quot;,&quot;reject&quot;)">Reject</button></div>':'';
-      return '<article class="card" style="margin:0;background:#0d0d14"><div style="display:flex;gap:12px;align-items:flex-start">'+(song.cover_url?'<img src="'+escapeHtml(song.cover_url)+'" alt="Cover" style="width:84px;height:84px;object-fit:cover;border-radius:9px;border:1px solid #292936">':'')+'<div style="flex:1;min-width:0"><h3 style="font-size:16px">'+escapeHtml(song.title||"Untitled song")+'</h3><p style="font-size:11px;color:#aaa;margin-top:5px">Song ID: '+escapeHtml(song.id)+' · Uploaded: '+escapeHtml(song.created_at?new Date(song.created_at).toLocaleString():"—")+'</p><p style="margin-top:8px">Status: '+formatCell("status",song.status)+'</p></div></div>'+audio+'<div style="margin-top:12px;padding:12px;border:1px solid #292936;border-radius:9px"><strong style="font-size:12px">Rights & collecting-society declaration</strong><p style="font-size:12px;margin-top:7px">Agreement accepted: <b>'+((d.contract_accepted===true)?"Yes":"Not recorded")+'</b></p><p style="font-size:12px;margin-top:5px">Version: '+escapeHtml(d.agreement_version||"—")+' · Accepted: '+escapeHtml(d.accepted_at?new Date(d.accepted_at).toLocaleString():"—")+'</p><p style="font-size:12px;margin-top:5px">Disclosure: '+escapeHtml(society)+'</p><p style="font-size:12px;margin-top:5px">Society/third party: '+escapeHtml(d.collecting_society_name||"Not provided")+'</p><p style="font-size:12px;margin-top:5px">Artist notes: '+escapeHtml(d.rights_notes||"None provided")+'</p><p style="font-size:12px;margin-top:5px">Previous admin notes: '+escapeHtml(d.admin_notes||"None")+'</p></div>'+actionButtons+'</article>';
-    }).join('')+'</div>';
-  }catch(e){el.innerHTML='<div class="empty">Unable to load the review queue: '+escapeHtml(e.message||"Unknown error")+'. Check that the SQL migration and updated backend are deployed.</div>';}
-}
-async function reviewSong(songId,action){
-  let notes="";
-  if(action==="reject"||action==="request_info"){
-    notes=prompt(action==="reject"?"Enter the reason for rejection:":"What additional information must the artist provide?");
-    if(notes===null)return;
-    notes=notes.trim();
-    if(!notes){alert("Please enter a reason or request.");return;}
-  }else if(!confirm("Approve this song for PASONG public availability? Confirm that the review checks are complete."))return;
-  try{
-    await copyrightApi("/api/admin/songs/"+encodeURIComponent(songId)+"/review",{method:"POST",body:JSON.stringify({action,admin_notes:notes})});
-    showNotice("globalNotice","success","Song review decision saved.");
-    await loadSongReviewQueue();
-  }catch(e){showNotice("globalNotice","error",e.message||"Could not save the review decision.");}
-}
-window.loadSongReviewQueue=loadSongReviewQueue; window.reviewSong=reviewSong;
 
-function formatCell(key,value){
-if(value===null||value===undefined)return"—";
-if(key==="created_at")return new Date(value).toLocaleString();
-if(key==="status"){
-const status=String(value).toLowerCase();
-let cls="";
-if(["active","approved","paid"].includes(status))cls="active";
-else if(["pending","paused"].includes(status))cls="pending";
-else if(["failed","rejected"].includes(status))cls="failed";
-return'<span class="badge '+cls+'">'+escapeHtml(value)+'</span>';
-}
-if(typeof value==="object")return escapeHtml(JSON.stringify(value));
-return escapeHtml(value);
-}
+    const saved =
+      localStorage.getItem(key);
 
+    djPlaylists =
+      saved
+        ? JSON.parse(saved)
+        : [];
 
-async function djAdminApi(path, options={}){
-  if(!currentSession?.access_token) throw new Error("Your admin session has expired. Please sign in again.");
-  const headers={"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token,...(options.headers||{})};
-  const response=await fetch(API_BASE+path,{...options,headers});
-  const raw=await response.text();
-  let data={};
-  try{data=raw?JSON.parse(raw):{};}catch(e){throw new Error("The PASONG API returned an invalid response.");}
-  if(!response.ok)throw new Error(data.error||data.message||("Request failed: HTTP "+response.status));
-  return data;
-}
+    if(!Array.isArray(djPlaylists)){
+      djPlaylists = [];
+    }
 
-async function loadDJApplications(){
-  const el=document.getElementById("djsTable");
-  if(!el)return;
-  el.innerHTML='<div class="loading">Loading DJ applications...</div>';
-  clearNotice("djNotice");
-  try{
-    const status=document.getElementById("djStatusFilter")?.value||"pending";
-    const data=await djAdminApi("/api/admin/djs?status="+encodeURIComponent(status));
-    const rows=data.djs||[];
-    if(!rows.length){el.innerHTML='<div class="empty">No DJ accounts found for this filter.</div>';return;}
-    el.innerHTML='<div class="table-wrap"><table><thead><tr><th>DJ</th><th>Location</th><th>Account</th><th>Verification</th><th>Registered</th><th>Actions</th></tr></thead><tbody>'+rows.map(d=>{
-      const pending=d.account_status==="pending";
-      const verified=d.verification_status==="verified";
-      const actions=verified&&d.account_status==="active"
-        ? '<span class="badge active">Approved</span>'
-        : '<div class="form-actions"><button class="btn green small" onclick="reviewDJ('+JSON.stringify(d.id)+',\'approve\')">Approve &amp; Verify</button><button class="btn danger small" onclick="reviewDJ('+JSON.stringify(d.id)+',\'reject\')">Reject</button></div>';
-      return '<tr><td><strong>'+escapeHtml(d.display_name||"Unnamed DJ")+'</strong><br><small style="color:#777">'+escapeHtml(d.user_id||"")+'</small></td>'+
-        '<td>'+escapeHtml(d.location||"—")+'</td>'+
-        '<td><span class="badge '+(d.account_status==="active"?"active":d.account_status==="pending"?"pending":"failed")+'">'+escapeHtml(d.account_status||"—")+'</span></td>'+
-        '<td><span class="badge '+(verified?"active":d.verification_status==="rejected"?"failed":"pending")+'">'+escapeHtml(d.verification_status||"unverified")+'</span></td>'+
-        '<td>'+escapeHtml(d.created_at?new Date(d.created_at).toLocaleString():"—")+'</td><td>'+actions+'</td></tr>';
-    }).join("")+'</tbody></table></div>';
   }catch(error){
-    console.error("DJ applications load failed:",error);
-    el.innerHTML='<div class="empty">'+escapeHtml(error.message||"Unable to load DJ applications.")+'</div>';
+
+    console.error(
+      "Playlist load error:",
+      error
+    );
+
+    djPlaylists = [];
+
   }
+
+  if(
+    !selectedPlaylistId ||
+    !djPlaylists.some(
+      playlist =>
+        playlist.id === selectedPlaylistId
+    )
+  ){
+
+    selectedPlaylistId =
+      djPlaylists.length
+        ? djPlaylists[0].id
+        : null;
+
+  }
+
+  renderDJPlaylists();
+
 }
 
-async function reviewDJ(id,action){
-  const label=action==="approve"?"approve and verify this DJ (the account will become active)":"reject this DJ verification application";
-  if(!confirm("Are you sure you want to "+label+"?"))return;
+function saveDJPlaylists(){
+
+  if(!currentUser){
+    return;
+  }
+
+  localStorage.setItem(
+    getPlaylistStorageKey(),
+    JSON.stringify(
+      djPlaylists
+    )
+  );
+
+}
+
+function createDJPlaylist(){
+
+  const input =
+    document.getElementById(
+      "newPlaylistName"
+    );
+
+  const name =
+    input.value.trim();
+
+  if(!name){
+
+    showAlert(
+      "Enter a playlist name first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const playlist = {
+
+    id:
+      "playlist_" +
+      Date.now() +
+      "_" +
+      Math.random()
+        .toString(36)
+        .slice(2,8),
+
+    name:
+      name,
+
+    songIds:
+      []
+
+  };
+
+  djPlaylists.push(
+    playlist
+  );
+
+  selectedPlaylistId =
+    playlist.id;
+
+  saveDJPlaylists();
+
+  input.value = "";
+
+  renderDJPlaylists();
+
+  showAlert(
+    "DJ playlist created.",
+    "success"
+  );
+
+}
+
+function selectDJPlaylist(
+  playlistId
+){
+
+  selectedPlaylistId =
+    playlistId;
+
+  renderDJPlaylists();
+
+}
+
+function deleteDJPlaylist(
+  playlistId
+){
+
+  const playlist =
+    djPlaylists.find(
+      item =>
+        item.id === playlistId
+    );
+
+  if(!playlist){
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      "Delete playlist \"" +
+      playlist.name +
+      "\"?"
+    );
+
+  if(!confirmed){
+    return;
+  }
+
+  djPlaylists =
+    djPlaylists.filter(
+      item =>
+        item.id !== playlistId
+    );
+
+  selectedPlaylistId =
+    djPlaylists.length
+      ? djPlaylists[0].id
+      : null;
+
+  saveDJPlaylists();
+
+  renderDJPlaylists();
+
+}
+
+function addSongToSelectedPlaylist(
+  songId
+){
+
+  if(!djPlaylists.length){
+
+    showAlert(
+      "Create a DJ playlist first.",
+      "info"
+    );
+
+    showSection(
+      "music",
+      document.querySelector(
+        '.nav button[onclick*="music"]'
+      )
+    );
+
+    document
+      .getElementById(
+        "newPlaylistName"
+      )
+      .focus();
+
+    return;
+
+  }
+
+  if(!selectedPlaylistId){
+
+    selectedPlaylistId =
+      djPlaylists[0].id;
+
+  }
+
+  addSongToPlaylist(
+    songId,
+    selectedPlaylistId
+  );
+
+}
+
+function addSongToPlaylist(
+  songId,
+  playlistId
+){
+
+  const playlist =
+    djPlaylists.find(
+      item =>
+        item.id === playlistId
+    );
+
+  if(!playlist){
+    return;
+  }
+
+  const song =
+    currentMusic.find(
+      item =>
+        String(item.id) ===
+        String(songId)
+    );
+
+  if(!song){
+
+    showAlert(
+      "This song is not available in your My Music list.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  if(isDjMix(song)){
+
+    showAlert(
+      "DJ mixes stay in My DJ Mixes and are not added as normal playlist tracks.",
+      "info"
+    );
+
+    return;
+
+  }
+
+  if(
+    playlist.songIds.some(
+      id =>
+        String(id) ===
+        String(songId)
+    )
+  ){
+
+    showAlert(
+      "This song is already in the playlist.",
+      "info"
+    );
+
+    return;
+
+  }
+
+  playlist.songIds.push(
+    song.id
+  );
+
+  saveDJPlaylists();
+
+  renderDJPlaylists();
+
+  showAlert(
+    "Song added to DJ playlist.",
+    "success"
+  );
+
+}
+
+function removeSongFromPlaylist(
+  playlistId,
+  songId
+){
+
+  const playlist =
+    djPlaylists.find(
+      item =>
+        item.id === playlistId
+    );
+
+  if(!playlist){
+    return;
+  }
+
+  playlist.songIds =
+    playlist.songIds.filter(
+      id =>
+        String(id) !==
+        String(songId)
+    );
+
+  saveDJPlaylists();
+
+  renderDJPlaylists();
+
+}
+
+function renderDJPlaylists(){
+
+  const list =
+    document.getElementById(
+      "playlistList"
+    );
+
+  const songsList =
+    document.getElementById(
+      "playlistSongs"
+    );
+
+  if(!list || !songsList){
+    return;
+  }
+
+  if(!djPlaylists.length){
+
+    list.innerHTML =
+      `
+        <div class="playlist-empty">
+          No playlists yet. Create your first DJ playlist above.
+        </div>
+      `;
+
+    songsList.innerHTML =
+      `
+        <div class="playlist-empty">
+          Your playlist songs will appear here.
+        </div>
+      `;
+
+    return;
+
+  }
+
+  list.innerHTML =
+    djPlaylists
+      .map(
+        function(playlist){
+
+          const active =
+            playlist.id ===
+            selectedPlaylistId
+              ? "active"
+              : "";
+
+          return `
+            <div class="playlist-item ${active}">
+
+              <button
+                type="button"
+                class="playlist-select"
+                onclick="selectDJPlaylist('${escapeHtml(playlist.id)}')"
+              >
+                📋 ${escapeHtml(playlist.name)}
+              </button>
+
+              <span class="playlist-count">
+                ${(playlist.songIds || []).length}
+              </span>
+
+              <button
+                type="button"
+                class="btn danger"
+                style="padding:6px 8px;font-size:10px;"
+                onclick="deleteDJPlaylist('${escapeHtml(playlist.id)}')"
+              >
+                Delete
+              </button>
+
+            </div>
+          `;
+
+        }
+      )
+      .join("");
+
+  const selected =
+    djPlaylists.find(
+      playlist =>
+        playlist.id ===
+        selectedPlaylistId
+    );
+
+  if(!selected){
+
+    songsList.innerHTML =
+      `
+        <div class="playlist-empty">
+          Select a playlist.
+        </div>
+      `;
+
+    return;
+
+  }
+
+  const songs =
+    (selected.songIds || [])
+      .map(
+        songId =>
+          currentMusic.find(
+            song =>
+              String(song.id) ===
+              String(songId)
+          )
+      )
+      .filter(Boolean)
+      .filter(
+        song =>
+          !isDjMix(song)
+      );
+
+  if(!songs.length){
+
+    songsList.innerHTML =
+      `
+        <div class="playlist-empty">
+          This playlist has no songs yet.
+          <br><br>
+          Open My Music and press + Playlist.
+        </div>
+      `;
+
+    return;
+
+  }
+
+  songsList.innerHTML =
+    songs
+      .map(
+        function(song,index){
+
+          const title =
+            escapeHtml(
+              song.title ||
+              "Untitled"
+            );
+
+          const cover =
+            safeImageUrl(
+              song.cover_url
+            );
+
+          const artist =
+            escapeHtml(
+              song.label_name ||
+              song.genre ||
+              "PASONG Music"
+            );
+
+          const songId =
+            escapeHtml(
+              song.id
+            );
+
+          return `
+            <div class="playlist-song">
+
+              <img
+                src="${cover}"
+                alt=""
+              >
+
+              <div class="playlist-song-info">
+
+                <strong>
+                  ${index + 1}. ${title}
+                </strong>
+
+                <span>
+                  ${artist}
+                </span>
+
+              </div>
+
+              <button
+                type="button"
+                class="btn"
+                style="padding:7px 9px;font-size:10px;"
+                onclick="playMySong('${songId}')"
+              >
+                ▶
+              </button>
+
+              <button
+                type="button"
+                class="btn danger"
+                style="padding:7px 9px;font-size:10px;"
+                onclick="removeSongFromPlaylist('${escapeHtml(selected.id)}','${songId}')"
+              >
+                ×
+              </button>
+
+            </div>
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+function playMySong(
+  songId
+){
+
+  const song =
+    currentMusic.find(
+      item =>
+        String(item.id) ===
+        String(songId)
+    );
+
+  if(!song){
+
+    showAlert(
+      "Song could not be found.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const audioUrl =
+    isDjMix(song)
+      ? (
+        song.mix_audio_url ||
+        song.audio_url
+      )
+      : song.audio_url;
+
+  if(!audioUrl){
+
+    showAlert(
+      "This song does not have playable audio yet.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const player =
+    document.getElementById(
+      "musicPlayer"
+    );
+
+  player.src =
+    audioUrl;
+
+  player.play()
+    .catch(
+      function(){
+        showAlert(
+          "Press play on the audio player to start the song.",
+          "info"
+        );
+      }
+    );
+
+}
+
+async function loadMyMixes(){
+
+  const list =
+    document.getElementById(
+      "mixList"
+    );
+
+  if(!list){
+    return;
+  }
+
+  if(!currentUser){
+
+    list.innerHTML =
+      `<div class="empty">Please log in.</div>`;
+
+    return;
+
+  }
+
+  if(!currentArtistProfile){
+
+    await loadProfile();
+
+  }
+
+  list.innerHTML =
+    `<div class="loading">Loading your DJ mixes...</div>`;
+
   try{
-    const data=await djAdminApi("/api/admin/djs/"+encodeURIComponent(id)+"/review",{
-      method:"POST",body:JSON.stringify({action})
-    });
-    showNotice("djNotice","success",data.message||"DJ application updated.");
-    await loadDJApplications();
+
+    const songs =
+      await fetchAllSongs();
+
+    currentSongs =
+      songs.filter(
+        song =>
+          isApprovedSong(song) &&
+          isDjMix(song) &&
+          songConnectedToDJ(song)
+      );
+
+    renderMixes(
+      currentSongs
+    );
+
   }catch(error){
-    console.error("DJ review action failed:",error);
-    showNotice("djNotice","error",error.message||"Could not update DJ application.");
+
+    console.error(
+      "Load DJ mixes error:",
+      error
+    );
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          Unable to load your DJ mixes right now.
+        </div>
+      `;
+
   }
-}
-window.loadDJApplications=loadDJApplications;
-window.reviewDJ=reviewDJ;
 
-async function copyrightApi(path, options={}){
-  if(!currentSession?.access_token) throw new Error("Your admin session has expired. Please sign in again.");
-  const headers={"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token,...(options.headers||{})};
-  const response=await fetch(API_BASE+path,{...options,headers});
-  const text=await response.text();
-  let data={}; try{data=text?JSON.parse(text):{};}catch(e){data={};}
-  if(!response.ok) throw new Error(data.error||data.message||("Request failed: HTTP "+response.status));
-  return data;
 }
 
-function copyrightBadge(status){
-  const v=String(status||"").toLowerCase();
-  let cls="";
-  if(["restored","resolved"].includes(v))cls="active";
-  else if(["submitted","reviewing","takedown"].includes(v))cls="pending";
-  else if(["rejected","failed"].includes(v))cls="failed";
-  return '<span class="badge '+cls+'">'+escapeHtml(status||"—")+'</span>';
-}
+function renderMixes(
+  songs
+){
 
-async function loadCopyrightComplaints(){
-  const el=document.getElementById("copyrightComplaints"); if(!el)return;
-  el.innerHTML='<div class="loading">Loading copyright complaints...</div>';
-  try{
-    const filter=document.getElementById("copyrightStatusFilter")?.value||"all";
-    const data=await copyrightApi("/api/admin/copyright/complaints?status="+encodeURIComponent(filter));
-    const rows=data.complaints||[];
-    if(!rows.length){el.innerHTML='<div class="empty">No copyright complaints found.</div>';return;}
-    el.innerHTML='<div class="table-wrap"><table><thead><tr><th>Song</th><th>Claimant</th><th>Status</th><th>Strike</th><th>Response</th><th>Created</th><th>Actions</th></tr></thead><tbody>'+rows.map(c=>{
-      const song=c.song?.title||c.song_id||"Unknown song";
-      const hasResponse=!!c.uploader_response;
-      return '<tr><td><strong>'+escapeHtml(song)+'</strong><br><small style="color:#777">'+escapeHtml(c.song_id||"")+'</small></td>'+
-      '<td>'+escapeHtml(c.complainant_name||"")+'<br><small style="color:#777">'+escapeHtml(c.complainant_email||"")+'</small></td>'+
-      '<td>'+copyrightBadge(c.status)+'</td>'+
-      '<td>'+escapeHtml(c.strike_number??"—")+'</td>'+
-      '<td>'+ (hasResponse?'<span class="badge active">Counter-notice</span>':'<span class="badge">None</span>') +'</td>'+
-      '<td>'+escapeHtml(c.created_at?new Date(c.created_at).toLocaleString():"—")+'</td>'+
-      '<td><div class="form-actions">'+
-      '<button class="btn small secondary" onclick="viewCopyrightComplaint('+JSON.stringify(c.id)+')">View</button>'+
-      '<button class="btn small danger" onclick="copyrightAction('+JSON.stringify(c.id)+',\'takedown\')">Takedown</button>'+
-      '<button class="btn small green" onclick="copyrightAction('+JSON.stringify(c.id)+',\'restore\')">Restore</button>'+
-      '<button class="btn small secondary" onclick="copyrightAction('+JSON.stringify(c.id)+',\'reject\')">Reject</button>'+
-      '</div></td></tr>';
-    }).join("")+'</tbody></table></div>';
-  }catch(error){el.innerHTML='<div class="empty">'+escapeHtml(error.message||"Unable to load copyright complaints.")+'</div>';}
-}
+  const list =
+    document.getElementById(
+      "mixList"
+    );
 
-async function loadCopyrightStrikes(){
-  const el=document.getElementById("copyrightStrikes"); if(!el)return;
-  el.innerHTML='<div class="loading">Loading strikes...</div>';
-  try{
-    const data=await copyrightApi("/api/admin/copyright/strikes");
-    const rows=data.strikes||[];
-    if(!rows.length){el.innerHTML='<div class="empty">No copyright strikes recorded.</div>';return;}
-    el.innerHTML='<div class="table-wrap"><table><thead><tr><th>User</th><th>Strike</th><th>Status</th><th>Reason</th><th>Song</th><th>Created</th></tr></thead><tbody>'+rows.map(s=>'<tr>'+
-      '<td>'+escapeHtml(s.user_id||"")+'</td>'+
-      '<td><strong>#'+escapeHtml(s.strike_number||"")+'</strong></td>'+
-      '<td>'+copyrightBadge(s.status)+'</td>'+
-      '<td>'+escapeHtml(s.reason||"")+'</td>'+
-      '<td>'+escapeHtml(s.song_id||"—")+'</td>'+
-      '<td>'+escapeHtml(s.created_at?new Date(s.created_at).toLocaleString():"—")+'</td>'+
-      '</tr>').join("")+'</tbody></table></div>';
-  }catch(error){el.innerHTML='<div class="empty">'+escapeHtml(error.message||"Unable to load strikes.")+'</div>';}
-}
+  if(!songs.length){
 
-async function viewCopyrightComplaint(id){
-  try{
-    const data=await copyrightApi("/api/admin/copyright/complaints?status=all");
-    const c=(data.complaints||[]).find(x=>x.id===id);
-    if(!c){showNotice("copyrightNotice","error","Complaint not found.");return;}
-    const lines=[
-      "Complaint ID: "+c.id,
-      "Song: "+(c.song?.title||c.song_id),
-      "Claimant: "+(c.complainant_name||""),
-      "Email: "+(c.complainant_email||""),
-      "Phone: "+(c.complainant_phone||""),
-      "Address: "+(c.complainant_address||""),
-      "Role: "+(c.claimant_role||""),
-      "Status: "+(c.status||""),
-      "Rights claim: "+(c.rights_claim||""),
-      "Material: "+(c.material_description||""),
-      "Requested action: "+(c.remedial_action||""),
-      "Reason: "+(c.reason||""),
-      "Evidence: "+(c.evidence_url||"None"),
-      "Counter-notice: "+(c.uploader_response||"None"),
-      "Counter evidence: "+(c.response_evidence_url||"None")
-    ];
-    alert(lines.join("\n\n"));
-  }catch(error){showNotice("copyrightNotice","error",error.message||"Unable to load complaint.");}
-}
-window.loadCopyrightComplaints=loadCopyrightComplaints;
-window.loadCopyrightStrikes=loadCopyrightStrikes;
-window.viewCopyrightComplaint=viewCopyrightComplaint;
+    list.innerHTML =
+      `
+        <div class="empty">
+          You have not uploaded any DJ mixes yet.
+        </div>
+      `;
 
-async function copyrightAction(id,action){
-  let notes="";
-  if(action!=="restore" && action!=="reject"){
-    notes=prompt("Admin notes for this copyright action (optional):","")||"";
+    return;
+
   }
-  if(!confirm("Apply copyright action: "+action+"?"))return;
+
+  list.innerHTML =
+    songs
+      .map(
+        song => {
+
+          const title =
+            escapeHtml(
+              song.title ||
+              "Untitled Mix"
+            );
+
+          const cover =
+            safeImageUrl(
+              song.cover_url
+            );
+
+          const genre =
+            escapeHtml(
+              song.genre ||
+              "DJ Mix"
+            );
+
+          const price =
+            song.mix_currency === "USD"
+              ? "$" + (
+                song.mix_price || 1
+              )
+              : "UGX " + (
+                song.mix_price || 1000
+              );
+
+          const songId =
+            escapeHtml(
+              song.id || ""
+            );
+
+          return `
+
+            <div class="mix-item">
+
+              <img
+                class="mix-cover"
+                src="${cover}"
+                alt=""
+              >
+
+              <div class="mix-info">
+
+                <h3>
+                  ${title}
+                </h3>
+
+                <p>
+                  ${genre} • Free Stream
+                </p>
+
+              </div>
+
+              <div class="mix-price">
+                ${escapeHtml(price)}
+              </div>
+
+              <button
+                type="button"
+                class="btn"
+                style="padding:8px 10px;font-size:11px;"
+                onclick="playMySong('${songId}')"
+              >
+                ▶
+              </button>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+async function loadDashboardStats(){
+
+  const songs =
+    currentSongs || [];
+
+  document
+    .getElementById("totalSongs")
+    .textContent =
+    songs.length;
+
+  document
+    .getElementById("analyticsMixes")
+    .textContent =
+    songs.length;
+
+  let plays = 0;
+  let downloads = 0;
+
+  songs.forEach(
+    song => {
+
+      plays +=
+        Number(
+          song.plays ||
+          song.play_count ||
+          0
+        );
+
+      downloads +=
+        Number(
+          song.downloads ||
+          song.download_count ||
+          0
+        );
+
+    }
+  );
+
+  document
+    .getElementById("totalPlays")
+    .textContent =
+    plays;
+
+  document
+    .getElementById("totalDownloads")
+    .textContent =
+    downloads;
+
+  document
+    .getElementById("analyticsPlays")
+    .textContent =
+    plays;
+
+  document
+    .getElementById("analyticsDownloads")
+    .textContent =
+    downloads;
+
+}
+
+document
+  .getElementById("uploadForm")
+  .addEventListener(
+    "submit",
+    async function(event){
+
+      event.preventDefault();
+
+      if(!currentUser){
+
+        showAlert(
+          "Please log in again.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const title =
+        document
+          .getElementById("songTitle")
+          .value
+          .trim();
+
+      const genre =
+        document
+          .getElementById("genre")
+          .value
+          .trim();
+
+      const label =
+        document
+          .getElementById("label")
+          .value
+          .trim();
+
+      const audioFile =
+        document
+          .getElementById("audioFile")
+          .files[0];
+
+      const coverFile =
+        document
+          .getElementById("coverFile")
+          .files[0];
+
+      const rights =
+        document
+          .getElementById("rightsCheck")
+          .checked;
+
+      const terms =
+        document
+          .getElementById("termsCheck")
+          .checked;
+
+      if(!title){
+
+        showAlert(
+          "Please enter the DJ mix title.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(!genre){
+
+        showAlert(
+          "Please select a genre.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(!audioFile){
+
+        showAlert(
+          "Please select the DJ mix audio file.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(!coverFile){
+
+        showAlert(
+          "Please select a cover image or request a PASONG cover design first.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(!rights){
+
+        showAlert(
+          "Please confirm that you have the rights and permission to upload this DJ mix.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(!terms){
+
+        showAlert(
+          "Please agree to PASONG's DJ upload terms and rules.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(audioFile.size > 10 * 1024 * 1024){
+
+        showAlert(
+          "Audio file is too large. Maximum size is 10MB.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      if(coverFile.size > 5 * 1024 * 1024){
+
+        showAlert(
+          "Cover image is too large. Maximum size is 5MB.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      const uploadBtn =
+        document.getElementById("uploadBtn");
+
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = "Uploading...";
+
+      try{
+
+        const audioForm =
+          new FormData();
+
+        audioForm.append(
+          "file",
+          audioFile
+        );
+
+        audioForm.append(
+          "upload_preset",
+          "pasong_audio"
+        );
+
+        const audioUploadResponse =
+          await fetch(
+            API_BASE +
+            "/api/upload/audio",
+            {
+              method:"POST",
+              body:audioForm
+            }
+          );
+
+        if(!audioUploadResponse.ok){
+
+          throw new Error(
+            "Audio upload failed."
+          );
+
+        }
+
+        const audioResult =
+          await audioUploadResponse.json();
+
+        const coverForm =
+          new FormData();
+
+        coverForm.append(
+          "file",
+          coverFile
+        );
+
+        coverForm.append(
+          "upload_preset",
+          "pasong_covers"
+        );
+
+        const coverUploadResponse =
+          await fetch(
+            API_BASE +
+            "/api/upload/cover",
+            {
+              method:"POST",
+              body:coverForm
+            }
+          );
+
+        if(!coverUploadResponse.ok){
+
+          throw new Error(
+            "Cover upload failed."
+          );
+
+        }
+
+        const coverResult =
+          await coverUploadResponse.json();
+
+        const djUserId =
+          currentUser.id;
+
+        const mixPayload = {
+
+          title:title,
+
+          genre:genre,
+
+          label:label || null,
+
+          price:PASONG_PRICE,
+
+          currency:"UGX",
+
+          status:"approved",
+
+          content_type:"dj_mix",
+
+          mix_price:PASONG_PRICE,
+
+          mix_currency:"UGX",
+
+          mix_audio_url:
+            audioResult.secure_url,
+
+          mix_preview_url:null,
+
+          audio_url:
+            audioResult.secure_url,
+
+          cover_url:
+            coverResult.secure_url,
+
+          artist_user_ids:
+            [djUserId],
+
+          uploader_user_id:
+            djUserId,
+
+          artist_user_id:
+            djUserId,
+
+          producer_user_id:
+            null,
+
+          writer_user_id:
+            null
+
+        };
+
+        const createResponse =
+          await fetch(
+            API_BASE +
+            "/api/songs/create",
+            {
+              method:"POST",
+              headers:{
+                "Content-Type":
+                  "application/json"
+              },
+              body:
+                JSON.stringify(
+                  mixPayload
+                )
+            }
+          );
+
+        if(!createResponse.ok){
+
+          const errorText =
+            await createResponse.text();
+
+          throw new Error(
+            errorText ||
+            "Unable to create DJ mix."
+          );
+
+        }
+
+        showAlert(
+          "DJ mix uploaded successfully.",
+          "success"
+        );
+
+        document
+          .getElementById("uploadForm")
+          .reset();
+
+        document
+          .getElementById("djEmail")
+          .value =
+          currentUser.email || "";
+
+        document
+          .getElementById("coverPreview")
+          .style.display =
+          "none";
+
+        await loadMyMusic();
+        await loadMyMixes();
+        await loadDashboardStats();
+
+        showSection(
+          "mixes",
+          document.querySelector(
+            '.nav button[onclick*="mixes"]'
+          )
+        );
+
+      }catch(error){
+
+        console.error(
+          "Upload error:",
+          error
+        );
+
+        showAlert(
+          error.message ||
+          "DJ mix upload failed.",
+          "error"
+        );
+
+      }finally{
+
+        uploadBtn.disabled =
+          false;
+
+        uploadBtn.textContent =
+          "⬆️ Upload DJ Mix";
+
+      }
+
+    }
+  );
+
+async function loadMyCoverRequests(){
+
+  const list =
+    document.getElementById(
+      "coverRequestList"
+    );
+
+  if(!list){
+    return;
+  }
+
+  if(!currentUser){
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          Please log in.
+        </div>
+      `;
+
+    return;
+
+  }
+
+  list.innerHTML =
+    `
+      <div class="loading">
+        Loading your cover requests...
+      </div>
+    `;
+
   try{
-    const data=await copyrightApi("/api/admin/copyright/complaints/"+encodeURIComponent(id)+"/action",{
-      method:"POST",
-      body:JSON.stringify({action,admin_notes:notes})
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .from("cover_requests")
+      .select(`
+        id,
+        dj_name,
+        mix_title,
+        price,
+        currency,
+        payment_status,
+        request_status,
+        finished_cover_url,
+        created_at,
+        updated_at
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+    if(error){
+      throw error;
+    }
+
+    renderCoverRequests(
+      data || []
+    );
+
+  }catch(error){
+
+    console.error(
+      "Load cover requests error:",
+      error
+    );
+
+    list.innerHTML =
+      `
+        <div class="empty">
+          Unable to load your cover requests right now.
+          <br><br>
+          <button
+            type="button"
+            class="btn secondary"
+            onclick="loadMyCoverRequests()"
+          >
+            Try Again
+          </button>
+        </div>
+      `;
+
+  }
+
+}
+
+function formatCoverRequestDate(
+  value
+){
+
+  if(!value){
+    return "Date unavailable";
+  }
+
+  const date =
+    new Date(value);
+
+  if(Number.isNaN(date.getTime())){
+    return "Date unavailable";
+  }
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year:"numeric",
+      month:"short",
+      day:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
+    }
+  );
+
+}
+
+function formatCoverStatus(
+  value
+){
+
+  const status =
+    String(
+      value || "pending"
+    ).toLowerCase();
+
+  const labels = {
+
+    pending:"Pending",
+    paid:"Paid",
+    in_design:"In Design",
+    completed:"Completed",
+    approved:"Approved",
+    rejected:"Rejected",
+    cancelled:"Cancelled",
+    failed:"Failed"
+
+  };
+
+  if(labels[status]){
+    return labels[status];
+  }
+
+  return status
+    .replaceAll("_"," ")
+    .replace(/\b\w/g,function(letter){
+      return letter.toUpperCase();
     });
-    showNotice("copyrightNotice","success",data.message||"Copyright action applied.");
-    await loadCopyrightComplaints();
-    await loadCopyrightStrikes();
-  }catch(error){showNotice("copyrightNotice","error",error.message||"Unable to apply copyright action.");}
-}
-window.copyrightAction=copyrightAction;
 
-function getAdMediaType(ad){
-const explicit=String(ad.media_type||ad.type||"").toLowerCase();
-if(explicit.includes("video"))return"video";
-const url=String(ad.video_url||ad.media_url||ad.image_url||"").toLowerCase();
-if(url.includes("/video/upload/"))return"video";
-if(/\.(mp4|webm|ogg)(\?|#|$)/i.test(url))return"video";
-return"image";
-}
-function getAdMediaUrl(ad){return ad.video_url||ad.media_url||ad.image_url||"";}
-
-function renderAdPreview(url,type){
-const element=document.getElementById("adPreview");
-if(!url){element.innerHTML='<div class="placeholder">Choose an image or video</div>';return;}
-if(type==="video"){
-element.innerHTML='<video src="'+escapeHtml(url)+'" controls muted playsinline preload="metadata"></video>';
-}else{
-element.innerHTML='<img src="'+escapeHtml(url)+'" alt="Advertisement preview">';
-}
 }
 
-document.getElementById("adFile").addEventListener("change",e=>{
-const file=e.target.files[0];if(!file)return;
-const type=file.type.startsWith("video/")?"video":"image";
-document.getElementById("adMediaType").value=type;
-renderAdPreview(URL.createObjectURL(file),type);
-});
-document.getElementById("adMediaType").addEventListener("change",()=>{
-const file=document.getElementById("adFile").files[0];
-if(file)renderAdPreview(URL.createObjectURL(file),document.getElementById("adMediaType").value);
-});
+function coverStatusClass(
+  value
+){
 
-async function getCloudinarySignature(folder){
-if(!currentSession?.access_token)throw new Error("Your admin session has expired. Please sign in again.");
-const response=await fetch(API_BASE+"/api/cloudinary/signature",{
-method:"POST",
-headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},
-body:JSON.stringify({folder})
-});
-const text=await response.text();
-let data={};try{data=text?JSON.parse(text):{};}catch(e){throw new Error("Invalid Cloudinary signature response.");}
-if(!response.ok)throw new Error(data.error||data.message||"Cloudinary signature failed.");
-if(!data.api_key||!data.timestamp||!data.signature||!data.folder)throw new Error("PASONG returned incomplete Cloudinary upload information.");
-return data;
+  const status =
+    String(
+      value || "pending"
+    ).toLowerCase();
+
+  const allowed = [
+    "pending",
+    "paid",
+    "in_design",
+    "completed",
+    "approved",
+    "rejected",
+    "cancelled",
+    "failed"
+  ];
+
+  return allowed.includes(status)
+    ? status
+    : "pending";
+
 }
 
-async function uploadAdMedia(file){
-const signature=await getCloudinarySignature("pasong/ads");
-const form=new FormData();
-form.append("file",file);
-form.append("api_key",signature.api_key);
-form.append("timestamp",String(signature.timestamp));
-form.append("signature",signature.signature);
-form.append("folder",signature.folder);
-const cloudName=signature.cloud_name||CLOUDINARY_CLOUD_NAME;
-const response=await fetch("https://api.cloudinary.com/v1_1/"+encodeURIComponent(cloudName)+"/auto/upload",{method:"POST",body:form});
-const text=await response.text();
-let data={};try{data=text?JSON.parse(text):{};}catch(e){throw new Error("Cloudinary returned an invalid response.");}
-if(!response.ok)throw new Error(data?.error?.message||data?.message||"Cloudinary upload failed.");
-if(!data.secure_url)throw new Error("Cloudinary did not return a secure file URL.");
-return data.secure_url;
+function formatCoverPrice(
+  price,
+  currency
+){
+
+  const amount =
+    Number(price || 0);
+
+  if(currency === "USD"){
+
+    return (
+      "US$" +
+      amount.toLocaleString()
+    );
+
+  }
+
+  return (
+    "UGX " +
+    amount.toLocaleString()
+  );
+
 }
 
-function toIsoFromLocal(value){return value?new Date(value).toISOString():null;}
-function fromIsoToLocal(value){
-if(!value)return"";
-const date=new Date(value),pad=n=>String(n).padStart(2,"0");
-return date.getFullYear()+"-"+pad(date.getMonth()+1)+"-"+pad(date.getDate())+"T"+pad(date.getHours())+":"+pad(date.getMinutes());
+function renderCoverRequests(
+  requests
+){
+
+  const list =
+    document.getElementById(
+      "coverRequestList"
+    );
+
+  if(!requests.length){
+
+    list.innerHTML =
+      `
+        <div class="empty">
+
+          🎨 You have not submitted any cover requests yet.
+
+          <br><br>
+
+          <button
+            type="button"
+            class="btn cover-btn"
+            onclick="openCoverRequest()"
+          >
+            🎨 Request PASONG Cover Design
+          </button>
+
+        </div>
+      `;
+
+    return;
+
+  }
+
+  list.innerHTML =
+    requests
+      .map(
+        function(request){
+
+          const id =
+            escapeHtml(
+              request.id
+            );
+
+          const djName =
+            escapeHtml(
+              request.dj_name ||
+              "DJ"
+            );
+
+          const mixTitle =
+            escapeHtml(
+              request.mix_title ||
+              "Untitled Mix"
+            );
+
+          const paymentStatus =
+            coverStatusClass(
+              request.payment_status
+            );
+
+          const requestStatus =
+            coverStatusClass(
+              request.request_status
+            );
+
+          const paymentLabel =
+            formatCoverStatus(
+              request.payment_status
+            );
+
+          const requestLabel =
+            formatCoverStatus(
+              request.request_status
+            );
+
+          const price =
+            formatCoverPrice(
+              request.price,
+              request.currency
+            );
+
+          const date =
+            escapeHtml(
+              formatCoverRequestDate(
+                request.created_at
+              )
+            );
+
+          let finishedCover = "";
+
+          if(
+            request.finished_cover_url &&
+            /^https?:\/\//i.test(
+              request.finished_cover_url
+            )
+          ){
+
+            const finishedUrl =
+              escapeHtml(
+                request.finished_cover_url
+              );
+
+            finishedCover =
+              `
+                <div class="cover-request-finished">
+
+                  <p
+                    class="muted"
+                    style="margin-bottom:10px;"
+                  >
+                    🎨 Finished cover available
+                  </p>
+
+                  <a
+                    class="btn cover-btn"
+                    href="${finishedUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    🖼️ View Finished Cover
+                  </a>
+
+                </div>
+              `;
+
+          }
+
+          return `
+
+            <div class="cover-request-item">
+
+              <div class="cover-request-top">
+
+                <div>
+
+                  <div class="cover-request-title">
+                    ${mixTitle}
+                  </div>
+
+                  <div class="cover-request-dj">
+                    🎧 ${djName}
+                  </div>
+
+                  <div class="cover-request-id">
+                    Request ID: ${id}
+                  </div>
+
+                  <div class="cover-request-date">
+                    Submitted: ${date}
+                  </div>
+
+                </div>
+
+                <div class="cover-request-price">
+                  ${escapeHtml(price)}
+                </div>
+
+              </div>
+
+              <div class="cover-status-row">
+
+                <span
+                  class="cover-status ${paymentStatus}"
+                >
+                  💳 Payment: ${escapeHtml(paymentLabel)}
+                </span>
+
+                <span
+                  class="cover-status ${requestStatus}"
+                >
+                  🎨 Design: ${escapeHtml(requestLabel)}
+                </span>
+
+              </div>
+
+              ${finishedCover}
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
 }
 
-document.getElementById("adForm").addEventListener("submit",async e=>{
-e.preventDefault();
-const button=document.getElementById("saveAdBtn");
-button.disabled=true;button.textContent="Saving...";clearNotice("adNotice");
-try{
-const id=document.getElementById("adId").value.trim();
-const file=document.getElementById("adFile").files[0];
-let mediaType=document.getElementById("adMediaType").value;
-let mediaUrl=null;
-if(file){
-mediaType=file.type.startsWith("video/")?"video":"image";
-if(mediaType==="video"&&file.size>100*1024*1024)throw new Error("Video is too large. Keep advertisement videos under 100 MB.");
-if(mediaType==="image"&&file.size>15*1024*1024)throw new Error("Image is too large. Keep advertisement images under 15 MB.");
-button.textContent="Uploading media...";
-mediaUrl=await uploadAdMedia(file);
-}
-const payload={
-title:document.getElementById("adTitle").value.trim()||"PASONG Advertisement",
-description:document.getElementById("adDescription").value.trim()||null,
-target_url:document.getElementById("adTarget").value.trim()||null,
-placement:document.getElementById("adPlacement").value,
-start_at:toIsoFromLocal(document.getElementById("adStart").value),
-end_at:toIsoFromLocal(document.getElementById("adEnd").value)
-};
+async function logout(){
 
-if(payload.start_at&&payload.end_at&&new Date(payload.end_at)<=new Date(payload.start_at))throw new Error("End date must be after start date.");
-if(mediaUrl)payload.image_url=mediaUrl;
+  await supabaseClient
+    .auth
+    .signOut();
 
-let result;
-if(id){
-result=await supabaseClient.from("advertisements").update(payload).eq("id",id);
-}else{
-payload.status="active";payload.clicks=0;payload.impressions=0;payload.created_by=currentSession.user.id;
-result=await supabaseClient.from("advertisements").insert(payload).select("id").single();
-}
-if(result.error)throw new Error(result.error.message);
+  window.location.href =
+    "/login.html";
 
-const adId=id||result.data?.id;
-if(adId&&mediaUrl){
-const mediaResult=await supabaseClient.from("advertisements").update({media_type:mediaType}).eq("id",adId);
-if(mediaResult.error&&!/media_type/i.test(mediaResult.error.message))console.warn(mediaResult.error);
-}
-showNotice("adNotice","success",id?"Advertisement updated successfully.":"Advertisement created successfully.");
-clearAdForm();await loadAds();await loadStats();
-}catch(error){
-console.error("Advertisement save error:",error);
-showNotice("adNotice","error",error?.message||"Unable to save advertisement.");
-}finally{
-button.disabled=false;button.textContent="Save Advertisement";
-}
-});
-
-function clearAdForm(){
-document.getElementById("adForm").reset();
-document.getElementById("adId").value="";
-document.getElementById("adMediaType").value="image";
-document.getElementById("adPreview").innerHTML='<div class="placeholder">Choose an image or video</div>';
-}
-document.getElementById("clearAdBtn").addEventListener("click",clearAdForm);
-
-async function loadAds(){
-const element=document.getElementById("adsList");
-element.innerHTML='<div class="loading">Loading advertisements...</div>';
-const r=await supabaseClient.from("advertisements").select("*").order("created_at",{ascending:false});
-if(r.error){element.innerHTML='<div class="empty">Unable to load advertisements. '+escapeHtml(r.error.message)+'</div>';return;}
-advertisements=r.data||[];renderAds();
 }
 
-function renderAds(){
-const query=document.getElementById("adSearch").value.trim().toLowerCase();
-const rows=advertisements.filter(ad=>
-String(ad.title||"").toLowerCase().includes(query)||
-String(ad.description||"").toLowerCase().includes(query)
-);
-if(!rows.length){document.getElementById("adsList").innerHTML='<div class="empty">No advertisements found.</div>';return;}
-document.getElementById("adsList").innerHTML=rows.map(ad=>{
-const type=getAdMediaType(ad),url=getAdMediaUrl(ad),status=String(ad.status||"paused").toLowerCase();
-let media;
-if(url){
-if(type==="video")media='<video src="'+escapeHtml(url)+'" muted playsinline preload="metadata"></video>';
-else media='<img src="'+escapeHtml(url)+'" alt="">';
-}else media='<div class="placeholder">No media</div>';
-const statusClass=status==="active"?"active":status==="pending"?"pending":"paused";
-return '<div class="ad-row">'+
-'<div class="ad-thumb">'+media+'</div>'+
-'<div class="ad-info">'+
-'<strong>'+escapeHtml(ad.title||"Untitled")+'</strong>'+
-'<p>'+escapeHtml(ad.description||"No description")+'</p>'+
-'<p><span class="badge '+statusClass+'">'+escapeHtml(status)+'</span> · '+escapeHtml(type)+' · '+escapeHtml(ad.placement||"home")+'</p>'+
-'<p>'+((ad.start_at?"Starts: "+new Date(ad.start_at).toLocaleString():"No start date"))+' · '+((ad.end_at?"Ends: "+new Date(ad.end_at).toLocaleString():"No end date"))+'</p>'+
-'</div>'+
-'<div class="ad-actions">'+
-'<button class="btn secondary small" onclick="editAd(\''+escapeHtml(String(ad.id))+'\')">Edit</button>'+
-(status==="active"?
-'<button class="btn secondary small" onclick="setAdStatus(\''+escapeHtml(String(ad.id))+'\',\'paused\')">Pause</button>':
-'<button class="btn green small" onclick="setAdStatus(\''+escapeHtml(String(ad.id))+'\',\'active\')">Activate</button>')+
-'<button class="btn danger small" onclick="deleteAd(\''+escapeHtml(String(ad.id))+'\')">Delete</button>'+
-'</div></div>';
-}).join("");
+async function loadProfile(){
+
+  if(!currentUser){
+    return;
+  }
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+    .from("artist_profiles")
+    .select("*")
+    .eq(
+      "user_id",
+      currentUser.id
+    )
+    .maybeSingle();
+
+  if(error){
+
+    console.error(
+      "Profile error:",
+      error
+    );
+
+    return;
+
+  }
+
+  if(!data){
+    return;
+  }
+
+  currentArtistProfile =
+    data;
+
+  document
+    .getElementById("realName")
+    .value =
+    data.real_name || "";
+
+  document
+    .getElementById("performingName")
+    .value =
+    data.performing_name || "";
+
+  document
+    .getElementById("mobileProvider")
+    .value =
+    data.mobile_money_provider || "";
+
+  document
+    .getElementById("mobileNumber")
+    .value =
+    data.mobile_money_number || "";
+
+  const image =
+    document.getElementById(
+      "profileImage"
+    );
+
+  if(data.profile_image_url){
+
+    image.src =
+      data.profile_image_url;
+
+  }else{
+
+    image.src =
+      "data:image/svg+xml;charset=UTF-8," +
+      encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg"
+          width="160"
+          height="160"
+          viewBox="0 0 160 160">
+          <rect width="160" height="160" fill="#1c1624"/>
+          <text x="80" y="90"
+            text-anchor="middle"
+            fill="#c084fc"
+            font-size="45">DJ</text>
+        </svg>
+      `);
+
+  }
+
 }
 
-async function editAd(id){
-const ad=advertisements.find(x=>String(x.id)===String(id));if(!ad)return;
-document.getElementById("adId").value=ad.id||"";
-document.getElementById("adTitle").value=ad.title||"PASONG Advertisement";
-document.getElementById("adDescription").value=ad.description||"";
-document.getElementById("adTarget").value=ad.target_url||"";
-document.getElementById("adPlacement").value=ad.placement||"home";
-document.getElementById("adStart").value=fromIsoToLocal(ad.start_at);
-document.getElementById("adEnd").value=fromIsoToLocal(ad.end_at);
-document.getElementById("adMediaType").value=getAdMediaType(ad);
-document.getElementById("adFile").value="";
-renderAdPreview(getAdMediaUrl(ad),getAdMediaType(ad));
-document.getElementById("saveAdBtn").textContent="Update Advertisement";
-window.scrollTo({top:document.getElementById("section-ads").offsetTop-80,behavior:"smooth"});
-}
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    function(
+      event,
+      session
+    ){
 
-window.editAd=editAd;
+      if(
+        event ===
+        "SIGNED_OUT"
+      ){
 
-async function setAdStatus(id,status){
-const r=await supabaseClient.from("advertisements").update({status}).eq("id",id);
-if(r.error){showNotice("adNotice","error",r.error.message);return;}
-await loadAds();await loadStats();showNotice("adNotice","success","Advertisement "+status+".");
-}
+        window.location.href =
+          "/login.html";
 
-window.setAdStatus=setAdStatus;
+      }
 
-async function deleteAd(id){
-if(!confirm("Delete this advertisement? This cannot be undone."))return;
-const r=await supabaseClient.from("advertisements").delete().eq("id",id);
-if(r.error){showNotice("adNotice","error",r.error.message);return;}
-await loadAds();await loadStats();showNotice("adNotice","success","Advertisement deleted.");
-}
-window.deleteAd=deleteAd;
+    }
+  );
 
-document.getElementById("adSearch").addEventListener("input",renderAds);
-document.getElementById("refreshAdsBtn").addEventListener("click",loadAds);
-
-boot();
+checkAuth();
 </script>
+
+
+<!-- PASONG DJ TABLE CONNECTION PATCH: new DJ tables, separate from songs -->
+<script>
+(function(){
+  const djFormatMoney = n => 'UGX ' + Number(n || 0).toLocaleString();
+  let pasongDjRow = null;
+
+  async function ensurePasongDJ(){
+    if(!currentUser) throw new Error('Please sign in again.');
+    const {data:existing,error:readError}=await supabaseClient
+      .from('djs').select('*').eq('user_id',currentUser.id).maybeSingle();
+    if(readError) throw readError;
+    if(existing){ pasongDjRow=existing; return existing; }
+    const profileName = currentArtistProfile &&
+      (currentArtistProfile.performing_name || currentArtistProfile.real_name);
+    const displayName = profileName || (currentUser.user_metadata &&
+      (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) ||
+      (currentUser.email ? currentUser.email.split('@')[0] : 'PASONG DJ');
+    const {data:created,error}=await supabaseClient.from('djs').insert({
+      user_id:currentUser.id, display_name:displayName, account_status:'pending'
+    }).select('*').single();
+    if(error) throw error;
+    pasongDjRow=created;
+    return created;
+  }
+
+  // Keep the original dashboard layout, but make My DJ Mixes read dj_mixes.
+  window.loadMyMixes = async function(){
+    const list=document.getElementById('mixList');
+    if(!list) return;
+    if(!currentUser){list.innerHTML='<div class="empty">Please log in.</div>';return;}
+    list.innerHTML='<div class="loading">Loading your DJ mixes…</div>';
+    try{
+      const dj=await ensurePasongDJ();
+      const {data,error}=await supabaseClient.from('dj_mixes')
+        .select('id,dj_id,user_id,title,description,genre,cover_url,storage_path,duration_seconds,price_ugx,status,rights_status,play_count,created_at')
+        .eq('user_id',currentUser.id).order('created_at',{ascending:false});
+      if(error) throw error;
+      currentSongs=data||[];
+      renderPasongMixes(currentSongs);
+      await window.loadDashboardStats();
+    }catch(e){
+      console.error('DJ table load error:',e);
+      list.innerHTML='<div class="empty">Could not load DJ mixes: '+escapeHtml(e.message||'Please retry.')+'</div>';
+    }
+  };
+
+  function renderPasongMixes(mixes){
+    const list=document.getElementById('mixList'); if(!list)return;
+    if(!mixes.length){list.innerHTML='<div class="empty">No DJ mixes uploaded yet. Upload your first mix above.</div>';return;}
+    list.innerHTML=mixes.map(m=>{
+      const status=String(m.status||'pending').replaceAll('_',' ');
+      const rights=String(m.rights_status||'pending review').replaceAll('_',' ');
+      const cover=safeImageUrl(m.cover_url);
+      return `<div class="mix-item"><img class="mix-cover" src="${cover}" alt=""><div class="mix-info"><h3>${escapeHtml(m.title||'Untitled Mix')}</h3><p>${escapeHtml(m.genre||'DJ Mix')} · ${Number(m.play_count||0).toLocaleString()} plays</p><p>Status: ${escapeHtml(status)} · Rights: ${escapeHtml(rights)}</p></div><div class="mix-price">UGX 1,000</div></div>`;
+    }).join('');
+  }
+
+  window.loadDashboardStats = async function(){
+    const mixes=currentSongs||[];
+    const plays=mixes.reduce((sum,m)=>sum+Number(m.play_count||0),0);
+    const salesEl=document.getElementById('totalDownloads');
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=String(val);};
+    set('totalSongs',mixes.length);set('analyticsMixes',mixes.length);
+    set('totalPlays',plays);set('analyticsPlays',plays);
+    // This page's old downloads counter is not a verified DJ-sales counter.
+    set('totalDownloads','—');set('analyticsDownloads','—');
+    try{
+      if(!currentUser)return;
+      const {data:dj}=await supabaseClient.from('djs').select('id').eq('user_id',currentUser.id).maybeSingle();
+      if(!dj)return;
+      const {data:earnings,error}=await supabaseClient.from('dj_earnings').select('amount_ugx,payout_status').eq('dj_id',dj.id);
+      if(error)throw error;
+      const available=(earnings||[]).filter(e=>['available','pending'].includes(e.payout_status)).reduce((n,e)=>n+Number(e.amount_ugx||0),0);
+      const earned=(earnings||[]).reduce((n,e)=>n+Number(e.amount_ugx||0),0);
+      // Add/update a compact earnings note without replacing existing dashboard sections.
+      let note=document.getElementById('djTableEarningsNote');
+      if(!note){note=document.createElement('div');note.id='djTableEarningsNote';note.className='alert info show';const stats=document.querySelector('.stats');if(stats)stats.insertAdjacentElement('afterend',note);}
+      note.textContent='DJ table earnings (verified backend entries only): Total '+djFormatMoney(earned)+' · Pending/available '+djFormatMoney(available)+'. Sales are UGX 1,000 each: DJ UGX 700, PASONG UGX 300.';
+    }catch(e){console.warn('DJ earnings not loaded:',e.message);}
+  };
+
+  // Capture submit before the legacy handler so mixes no longer enter /api/songs/create.
+  const form=document.getElementById('uploadForm');
+  if(form){
+    form.addEventListener('submit',async function(ev){
+      ev.preventDefault();ev.stopImmediatePropagation();
+      const title=document.getElementById('songTitle').value.trim();
+      const genre=document.getElementById('genre').value.trim();
+      const label=document.getElementById('label').value.trim();
+      const audio=document.getElementById('audioFile').files[0];
+      const cover=document.getElementById('coverFile').files[0];
+      const rights=document.getElementById('rightsCheck').checked;
+      const terms=document.getElementById('termsCheck').checked;
+      const btn=document.getElementById('uploadBtn');
+      try{
+        if(!currentUser)throw new Error('Please log in again.');
+        if(!title||!genre||!audio||!cover)throw new Error('Enter a title, choose a genre, audio file and cover image.');
+        if(!rights)throw new Error('Please confirm your rights declaration.');
+        if(!terms)throw new Error('Please accept PASONG DJ upload rules.');
+        if(audio.size>500*1024*1024)throw new Error('Audio file exceeds the 500MB limit.');
+        if(!audio.type.startsWith('audio/'))throw new Error('Choose a valid audio file.');
+        if(cover.size>5*1024*1024)throw new Error('Cover image must be 5MB or smaller.');
+        btn.disabled=true;btn.textContent='Uploading…';
+        const dj=await ensurePasongDJ();
+        const safeName=audio.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+        const storagePath=currentUser.id+'/'+crypto.randomUUID()+'-'+safeName;
+        const {error:audioError}=await supabaseClient.storage.from('dj-mixes').upload(storagePath,audio,{contentType:audio.type||'audio/mpeg',upsert:false});
+        if(audioError)throw new Error('Audio upload failed: '+audioError.message);
+        // Existing PASONG cover upload endpoint is retained; only the audio and mix record move to DJ tables.
+        const coverForm=new FormData();coverForm.append('file',cover);coverForm.append('upload_preset','pasong_covers');
+        const coverResponse=await fetch(API_BASE+'/api/upload/cover',{method:'POST',body:coverForm});
+        if(!coverResponse.ok)throw new Error('Cover upload failed. Audio is uploaded privately; please retry after checking the cover upload service.');
+        const coverResult=await coverResponse.json();
+        const {error:insertError}=await supabaseClient.from('dj_mixes').insert({
+          dj_id:dj.id,user_id:currentUser.id,title,description:label||null,genre,
+          cover_url:coverResult.secure_url||coverResult.url||null,
+          storage_path:storagePath,duration_seconds:null,price_ugx:1000,
+          rights_declaration:true,rights_notes:'DJ confirmed upload declaration; track rights still require review.'
+        });
+        if(insertError)throw insertError;
+        showAlert('DJ mix uploaded to the separate dj_mixes table and submitted for review. It is not published or for sale until PASONG clears its rights and approves it.','success');
+        form.reset();
+        const preview=document.getElementById('coverPreview');if(preview)preview.style.display='none';
+        await window.loadMyMixes();await window.loadDashboardStats();
+        showSection('mixes',document.querySelector('.nav button[onclick*="mixes"]'));
+      }catch(e){console.error('DJ table upload failed:',e);showAlert(e.message||'DJ mix upload failed.','error');}
+      finally{btn.disabled=false;btn.textContent='⬆️ Upload DJ Mix';}
+    },true);
+  }
+})();
+</script>
+
 </body>
 </html>
