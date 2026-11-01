@@ -1668,7 +1668,7 @@ small{
         </p>
 
         <p style="margin-top:8px;">
-          DJ receives 60% and PASONG receives 40%.
+          DJ receives 70% and PASONG receives 30%.
         </p>
 
         <p style="margin-top:8px;">
@@ -1768,6 +1768,12 @@ small{
             alt="DJ profile"
           >
 
+          <div class="form-group" style="margin-top:14px;">
+            <label for="djAvatarFile">Public DJ Profile Picture</label>
+            <input type="file" id="djAvatarFile" accept="image/jpeg,image/png,image/webp" onchange="previewDJAvatar(event)">
+            <small>Choose a picture from your phone. JPG, PNG or WEBP · Maximum 5MB.</small>
+          </div>
+
         </div>
 
         <div class="form-grid">
@@ -1800,6 +1806,28 @@ small{
               readonly
             >
 
+          </div>
+
+          <div class="form-group full">
+            <label for="djPublicName">Public DJ Name</label>
+            <input id="djPublicName" type="text" maxlength="80" placeholder="Name shown on your public DJ page">
+          </div>
+
+          <div class="form-group full">
+            <label for="djPublicBio">DJ Bio</label>
+            <textarea id="djPublicBio" maxlength="1000" placeholder="Tell listeners about yourself, your style and the music you play."></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label for="djPublicLocation">Location</label>
+            <input id="djPublicLocation" type="text" maxlength="120" placeholder="Example: Kampala, Uganda">
+          </div>
+
+          <div class="form-group full">
+            <div class="actions" style="margin-top:0;">
+              <button type="button" class="btn" id="saveDJProfileBtn" onclick="saveDJPublicProfile()">💾 Save Public DJ Profile</button>
+            </div>
+            <small>Your public DJ page uses this name, picture, bio and location. Your legal name and mobile money details remain private.</small>
           </div>
 
           <div class="form-group">
@@ -2579,8 +2607,8 @@ function openDjRules(type){
       <h3>4. DJ Mix Revenue</h3>
 
       <p>
-        DJ mix download revenue is split 60% to the DJ
-        and 40% to PASONG.
+        DJ mix download revenue is split 70% to the DJ
+        and 30% to PASONG.
       </p>
 
       <h3>5. Tip DJ</h3>
@@ -5344,92 +5372,156 @@ async function logout(){
 }
 
 async function loadProfile(){
+  if(!currentUser) return;
 
-  if(!currentUser){
-    return;
+  const {data,error} = await supabaseClient
+    .from("artist_profiles").select("*")
+    .eq("user_id",currentUser.id).maybeSingle();
+
+  if(error) console.error("Artist profile error:",error);
+  currentArtistProfile = data || null;
+
+  if(data){
+    document.getElementById("realName").value = data.real_name || "";
+    document.getElementById("performingName").value = data.performing_name || "";
+    document.getElementById("mobileProvider").value = data.mobile_money_provider || "";
+    document.getElementById("mobileNumber").value = data.mobile_money_number || "";
   }
 
-  const {
-    data,
-    error
-  } =
-  await supabaseClient
-    .from("artist_profiles")
-    .select("*")
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .maybeSingle();
+  try{
+    const {data:dj,error:djError} = await supabaseClient
+      .from("djs")
+      .select("id,user_id,display_name,bio,avatar_url,location,account_status,verification_status")
+      .eq("user_id",currentUser.id).maybeSingle();
+    if(djError) throw djError;
 
-  if(error){
+    const publicName = document.getElementById("djPublicName");
+    const publicBio = document.getElementById("djPublicBio");
+    const publicLocation = document.getElementById("djPublicLocation");
 
-    console.error(
-      "Profile error:",
-      error
-    );
-
-    return;
-
+    if(dj){
+      window.currentPasongDJ = dj;
+      publicName.value = dj.display_name || (data && data.performing_name) || "";
+      publicBio.value = dj.bio || "";
+      publicLocation.value = dj.location || "";
+      setDJAvatarPreview(dj.avatar_url || (data && data.profile_image_url));
+    }else{
+      window.currentPasongDJ = null;
+      publicName.value = (data && (data.performing_name || data.real_name)) ||
+        (currentUser.user_metadata && (currentUser.user_metadata.full_name || currentUser.user_metadata.name)) ||
+        (currentUser.email ? currentUser.email.split("@")[0] : "");
+      publicBio.value = "";
+      publicLocation.value = "";
+      setDJAvatarPreview(data && data.profile_image_url);
+    }
+  }catch(djError){
+    console.error("Public DJ profile load error:",djError);
+    showAlert("Could not load your public DJ profile: "+(djError.message || "Please refresh."),"error");
   }
-
-  if(!data){
-    return;
-  }
-
-  currentArtistProfile =
-    data;
-
-  document
-    .getElementById("realName")
-    .value =
-    data.real_name || "";
-
-  document
-    .getElementById("performingName")
-    .value =
-    data.performing_name || "";
-
-  document
-    .getElementById("mobileProvider")
-    .value =
-    data.mobile_money_provider || "";
-
-  document
-    .getElementById("mobileNumber")
-    .value =
-    data.mobile_money_number || "";
-
-  const image =
-    document.getElementById(
-      "profileImage"
-    );
-
-  if(data.profile_image_url){
-
-    image.src =
-      data.profile_image_url;
-
-  }else{
-
-    image.src =
-      "data:image/svg+xml;charset=UTF-8," +
-      encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg"
-          width="160"
-          height="160"
-          viewBox="0 0 160 160">
-          <rect width="160" height="160" fill="#1c1624"/>
-          <text x="80" y="90"
-            text-anchor="middle"
-            fill="#c084fc"
-            font-size="45">DJ</text>
-        </svg>
-      `);
-
-  }
-
 }
+
+function setDJAvatarPreview(url){
+  const image = document.getElementById("profileImage");
+  if(!image) return;
+  if(url && /^https?:\/\//i.test(url)){
+    image.src = url;
+  }else{
+    image.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" fill="#1c1624"/><text x="80" y="90" text-anchor="middle" fill="#c084fc" font-size="45">DJ</text></svg>'
+    );
+  }
+}
+
+function previewDJAvatar(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+    event.target.value = "";
+    showAlert("Choose a JPG, PNG or WEBP profile picture.","error");
+    return;
+  }
+  if(file.size > 5*1024*1024){
+    event.target.value = "";
+    showAlert("Profile picture must be 5MB or smaller.","error");
+    return;
+  }
+  document.getElementById("profileImage").src = URL.createObjectURL(file);
+}
+
+async function saveDJPublicProfile(){
+  const btn = document.getElementById("saveDJProfileBtn");
+  const fileInput = document.getElementById("djAvatarFile");
+  const file = fileInput.files && fileInput.files[0];
+  const displayName = document.getElementById("djPublicName").value.trim();
+  const bio = document.getElementById("djPublicBio").value.trim();
+  const location = document.getElementById("djPublicLocation").value.trim();
+
+  try{
+    if(!currentUser) throw new Error("Please sign in again.");
+    if(!displayName) throw new Error("Enter your public DJ name.");
+    if(displayName.length > 80) throw new Error("DJ name must be 80 characters or fewer.");
+    if(bio.length > 1000) throw new Error("DJ bio must be 1,000 characters or fewer.");
+    if(location.length > 120) throw new Error("Location must be 120 characters or fewer.");
+    if(file && !["image/jpeg","image/png","image/webp"].includes(file.type)) throw new Error("Choose a JPG, PNG or WEBP picture.");
+    if(file && file.size > 5*1024*1024) throw new Error("Profile picture must be 5MB or smaller.");
+
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+
+    let avatarUrl = window.currentPasongDJ && window.currentPasongDJ.avatar_url
+      ? window.currentPasongDJ.avatar_url : null;
+
+    if(file){
+      const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+      const storagePath = currentUser.id + "/dj-profile-" + crypto.randomUUID() + "." + ext;
+      const {error:uploadError} = await supabaseClient.storage.from("dj-profile-images")
+        .upload(storagePath,file,{cacheControl:"3600",contentType:file.type,upsert:false});
+      if(uploadError) throw new Error("Profile picture upload failed: " + uploadError.message);
+
+      const {data:publicData} = supabaseClient.storage.from("dj-profile-images").getPublicUrl(storagePath);
+      avatarUrl = publicData && publicData.publicUrl;
+      if(!avatarUrl) throw new Error("Could not get the public profile picture URL.");
+    }
+
+    const profileValues = {
+      display_name:displayName,
+      bio:bio || null,
+      location:location || null,
+      avatar_url:avatarUrl
+    };
+
+    const {data:existing,error:readError} = await supabaseClient
+      .from("djs").select("id,user_id").eq("user_id",currentUser.id).maybeSingle();
+    if(readError) throw readError;
+
+    let savedDJ;
+    if(existing){
+      const {data,error} = await supabaseClient.from("djs").update(profileValues)
+        .eq("id",existing.id).eq("user_id",currentUser.id)
+        .select("id,user_id,display_name,bio,avatar_url,location,account_status,verification_status").single();
+      if(error) throw error;
+      savedDJ = data;
+    }else{
+      const {data,error} = await supabaseClient.from("djs")
+        .insert({user_id:currentUser.id,...profileValues,account_status:"pending"})
+        .select("id,user_id,display_name,bio,avatar_url,location,account_status,verification_status").single();
+      if(error) throw error;
+      savedDJ = data;
+    }
+
+    window.currentPasongDJ = savedDJ;
+    setDJAvatarPreview(savedDJ.avatar_url);
+    fileInput.value = "";
+    showAlert("Your public DJ profile has been saved. Your public DJ page can now show your picture, bio and location.","success");
+  }catch(error){
+    console.error("Save public DJ profile failed:",error);
+    showAlert(error.message || "Could not save your DJ profile.","error");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = "💾 Save Public DJ Profile";
+  }
+}
+
 
 supabaseClient
   .auth
