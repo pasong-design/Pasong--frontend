@@ -1022,6 +1022,10 @@ small{
       🎨 My Cover Requests
     </button>
 
+    <button onclick="showSection('bookings',this)">
+      📅 DJ Bookings
+    </button>
+
     <button onclick="showSection('earnings',this)">
       💰 Earnings
     </button>
@@ -1070,6 +1074,10 @@ small{
 
   <button onclick="showSection('cover-requests',this)">
     🎨<br>Covers
+  </button>
+
+  <button onclick="showSection('bookings',this)">
+    📅<br>Bookings
   </button>
 
   <button onclick="showSection('earnings',this)">
@@ -1616,6 +1624,14 @@ small{
 
   </section>
 
+  <section id="bookings" class="section">
+    <div class="panel">
+      <div class="panel-header"><div><h2>📅 DJ Booking Requests</h2><p class="muted">Review event requests sent to your DJ profile. Only you can see your requests.</p></div><button class="btn" type="button" onclick="loadDJBookings()">Refresh</button></div>
+      <div id="djBookingsStatus" class="muted" style="margin:12px 0">Loading booking requests…</div>
+      <div id="djBookingsList" style="display:grid;gap:12px"></div>
+    </div>
+  </section>
+
   <section id="earnings" class="section">
 
     <div class="panel">
@@ -1825,6 +1841,7 @@ small{
 
           <div class="form-group full">
             <div class="actions" style="margin-top:0;">
+              <div class="form-group full"><label for="djBookingWhatsApp">Booking WhatsApp number</label><input id="djBookingWhatsApp" type="tel" maxlength="30" placeholder="e.g. 256700000000"><small>Include country code. This number receives booking requests via WhatsApp.</small></div>
               <button type="button" class="btn" id="saveDJProfileBtn" onclick="saveDJPublicProfile()">💾 Save Public DJ Profile</button>
             </div>
             <small>Your public DJ page uses this name, picture, bio and location. Your legal name and mobile money details remain private.</small>
@@ -2477,6 +2494,7 @@ function showSection(
     upload:"Upload DJ Mix",
     mixes:"My DJ Mixes",
     "cover-requests":"My Cover Requests",
+    bookings:"DJ Bookings",
     earnings:"DJ Earnings",
     analytics:"DJ Analytics",
     profile:"DJ Profile",
@@ -2500,6 +2518,10 @@ function showSection(
 
   if(sectionId === "cover-requests"){
     loadMyCoverRequests();
+  }
+
+  if(sectionId === "bookings"){
+    loadDJBookings();
   }
 
 }
@@ -5391,7 +5413,7 @@ async function loadProfile(){
   try{
     const {data:dj,error:djError} = await supabaseClient
       .from("djs")
-      .select("id,user_id,display_name,bio,avatar_url,location,account_status,verification_status")
+      .select("id,user_id,display_name,bio,avatar_url,location,booking_whatsapp,account_status,verification_status")
       .eq("user_id",currentUser.id).maybeSingle();
     if(djError) throw djError;
 
@@ -5404,6 +5426,7 @@ async function loadProfile(){
       publicName.value = dj.display_name || (data && data.performing_name) || "";
       publicBio.value = dj.bio || "";
       publicLocation.value = dj.location || "";
+      const waInput = document.getElementById("djBookingWhatsApp"); if(waInput) waInput.value = dj.booking_whatsapp || "";
       setDJAvatarPreview(dj.avatar_url || (data && data.profile_image_url));
     }else{
       window.currentPasongDJ = null;
@@ -5412,6 +5435,7 @@ async function loadProfile(){
         (currentUser.email ? currentUser.email.split("@")[0] : "");
       publicBio.value = "";
       publicLocation.value = "";
+      const waInput = document.getElementById("djBookingWhatsApp"); if(waInput) waInput.value = "";
       setDJAvatarPreview(data && data.profile_image_url);
     }
   }catch(djError){
@@ -5487,6 +5511,7 @@ async function saveDJPublicProfile(){
       display_name:displayName,
       bio:bio || null,
       location:location || null,
+      booking_whatsapp:(document.getElementById("djBookingWhatsApp")?.value || "").trim() || null,
       avatar_url:avatarUrl
     };
 
@@ -5498,13 +5523,13 @@ async function saveDJPublicProfile(){
     if(existing){
       const {data,error} = await supabaseClient.from("djs").update(profileValues)
         .eq("id",existing.id).eq("user_id",currentUser.id)
-        .select("id,user_id,display_name,bio,avatar_url,location,account_status,verification_status").single();
+        .select("id,user_id,display_name,bio,avatar_url,location,booking_whatsapp,account_status,verification_status").single();
       if(error) throw error;
       savedDJ = data;
     }else{
       const {data,error} = await supabaseClient.from("djs")
         .insert({user_id:currentUser.id,...profileValues,account_status:"pending"})
-        .select("id,user_id,display_name,bio,avatar_url,location,account_status,verification_status").single();
+        .select("id,user_id,display_name,bio,avatar_url,location,booking_whatsapp,account_status,verification_status").single();
       if(error) throw error;
       savedDJ = data;
     }
@@ -5545,6 +5570,18 @@ supabaseClient
   );
 
 checkAuth();
+
+async function loadDJBookings(){
+ const statusEl=document.getElementById('djBookingsStatus'), list=document.getElementById('djBookingsList'); if(!statusEl||!list)return;
+ if(!currentUser){statusEl.textContent='Please sign in to view booking requests.';return;}
+ statusEl.textContent='Loading booking requests…';list.innerHTML='';
+ try{const {data,error}=await supabaseClient.from('dj_bookings').select('*').eq('dj_user_id',currentUser.id).eq('payment_status','paid').order('created_at',{ascending:false}).limit(100);if(error)throw error;
+ if(!data||!data.length){statusEl.textContent='No paid booking requests yet. Requests appear here only after PASONG verifies the UGX 5,000 booking fee.';return;}
+ statusEl.textContent=data.length+' booking request(s)';
+ data.forEach(b=>{const card=document.createElement('article');card.style.cssText='padding:16px;border:1px solid #34264b;border-radius:14px;background:#151124';const h=document.createElement('h3');h.textContent=(b.event_type||'Event')+' — '+(b.customer_name||'Customer');h.style.cssText='font-size:17px;font-weight:800;margin:0 0 8px';card.appendChild(h);const p=document.createElement('p');p.style.cssText='color:#b9b0ca;font-size:13px;line-height:1.8;white-space:pre-line';p.textContent='Payment: VERIFIED (UGX '+Number(b.booking_fee_amount||5000).toLocaleString()+')\nDate: '+b.event_date+'\nLocation: '+b.event_location+'\nCustomer phone: '+b.customer_phone+'\nHours: '+(b.event_hours||'Not specified')+'\nBudget: '+(b.budget||'Not specified')+'\nMusic requests: '+(b.music_style||'None')+'\nMessage: '+(b.message||'None')+'\nSubmitted: '+new Date(b.created_at).toLocaleString();card.appendChild(p);const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px';const sel=document.createElement('select');sel.style.cssText='background:#0b0913;color:#fff;border:1px solid #40334f;border-radius:8px;padding:10px';['pending','accepted','declined','completed','cancelled'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v[0].toUpperCase()+v.slice(1);o.selected=v===b.status;sel.appendChild(o)});const save=document.createElement('button');save.type='button';save.textContent='Save status';save.style.cssText='background:linear-gradient(100deg,#9333ea,#db2777);color:white;border:0;border-radius:8px;padding:10px 14px;font-weight:800';save.onclick=async()=>{save.disabled=true;try{const {error}=await supabaseClient.from('dj_bookings').update({status:sel.value,updated_at:new Date().toISOString()}).eq('id',b.id).eq('dj_user_id',currentUser.id);if(error)throw error;showAlert('Booking status updated.','success');loadDJBookings()}catch(e){showAlert('Could not update booking: '+e.message,'error');save.disabled=false}};const wa=document.createElement('a');wa.href='https://wa.me/'+String(b.customer_phone||'').replace(/\D/g,'')+'?text='+encodeURIComponent('Hello '+b.customer_name+', this is '+((window.currentPasongDJ&&window.currentPasongDJ.display_name)||'your PASONG DJ')+' regarding your '+b.event_type+' booking for '+b.event_date+'.');wa.target='_blank';wa.rel='noopener';wa.textContent='Reply on WhatsApp';wa.style.cssText='color:#d8b4fe;font-size:12px;font-weight:800';row.append(sel,save,wa);card.appendChild(row);list.appendChild(card)});
+ }catch(e){console.error('DJ booking load failed',e);statusEl.textContent='Could not load bookings. Run dj-bookings-setup.sql in Supabase, then refresh. '+(e.message||'');}
+}
+
 </script>
 
 
