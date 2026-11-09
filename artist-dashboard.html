@@ -2669,38 +2669,28 @@ async function uploadToCloudinary(file, options = {}){
    USER LOOKUP  
 ============================================================ */  
   
-async function findUserByEmail(email){  
-  
-  const response =  
-    await fetch(  
-      API_BASE +  
-      "/api/users/find?email=" +  
-      encodeURIComponent(email),  
-      {  
-        method:"GET",  
-        headers:authHeaders()  
-      }  
-    );  
-  
-  
-  if(!response.ok){  
-  
-    return null;  
-  
-  }  
-  
-  
-  const result =  
-    await response.json();  
-  
-  
-  return (  
-    result?.user ||  
-    result?.data ||  
-    result ||  
-    null  
-  );  
-  
+async function findUserByEmail(email){
+  const response=await fetch(API_BASE+"/api/users/resolve-account",{
+    method:"POST",headers:authHeaders(),body:JSON.stringify({email:String(email||"").trim().toLowerCase()})
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok) throw new Error(result.error||("PASONG account not found: "+email));
+  return result.user||null;
+}
+
+async function createThirtySecondPreviewFile(file){
+  const AudioCtx=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtx) throw new Error("This browser cannot prepare the 30-second preview.");
+  const context=new AudioCtx();
+  try{
+    const audio=await context.decodeAudioData(await file.arrayBuffer());
+    const rate=audio.sampleRate,frames=Math.min(audio.length,Math.floor(rate*30)),channels=Math.min(audio.numberOfChannels,2);
+    const buffer=new ArrayBuffer(44+frames*channels*2),view=new DataView(buffer);
+    const str=(o,v)=>{for(let i=0;i<v.length;i++)view.setUint8(o+i,v.charCodeAt(i));};
+    str(0,"RIFF");view.setUint32(4,36+frames*channels*2,true);str(8,"WAVE");str(12,"fmt ");view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,channels,true);view.setUint32(24,rate,true);view.setUint32(28,rate*channels*2,true);view.setUint16(32,channels*2,true);view.setUint16(34,16,true);str(36,"data");view.setUint32(40,frames*channels*2,true);
+    let offset=44;for(let i=0;i<frames;i++)for(let ch=0;ch<channels;ch++){const v=Math.max(-1,Math.min(1,audio.getChannelData(ch)[i]));view.setInt16(offset,v<0?v*32768:v*32767,true);offset+=2;}
+    return new File([buffer],"pasong-preview-30s.wav",{type:"audio/wav"});
+  }finally{await context.close();}
 }  
   
   
@@ -3028,25 +3018,17 @@ document
         button.textContent =  
           "☁️ Uploading files...";  
 
-        // Full song audio must be uploaded as Cloudinary authenticated delivery.
-        const audioResult = await uploadToCloudinary(audioFile, {
-          folder:"pasong-songs",
-          type:"authenticated"
-        });
-
-        // Artwork remains a normal public image so the store can display it.
-        const coverResult = await uploadToCloudinary(coverFile, {
-          folder:"pasong/covers",
-          type:"upload"
-        });
+        // Create a separate real 30-second preview file; never expose the full song URL.
+        const previewFile = await createThirtySecondPreviewFile(audioFile);
+        const audioResult = await uploadToCloudinary(audioFile, { folder:"pasong-songs", type:"authenticated" });
+        const previewResult = await uploadToCloudinary(previewFile, { folder:"pasong-previews", type:"upload" });
+        const coverResult = await uploadToCloudinary(coverFile, { folder:"pasong/covers", type:"upload" });
   
   
         button.textContent =  
           "🎵 Creating song...";  
   
   
-        // The backend creates a signed, 30-second preview from the authenticated
-        // Cloudinary asset. Never expose the full audio URL as a public preview.
 
         const songPayload = {  
   
@@ -3073,7 +3055,7 @@ document
             audioResult.secure_url,
 
           preview_url:
-            null,
+            previewResult.secure_url,
   
           cover_url:  
             coverResult.secure_url,
