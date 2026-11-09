@@ -2585,14 +2585,20 @@ function authHeaders(){
    CLOUDINARY SIGNATURE  
 ============================================================ */  
   
-async function getCloudinarySignature(){
+async function getCloudinarySignature(options = {}){
   if(!currentSession?.access_token){
     throw new Error("Your PASONG login session has expired. Please log in again.");
   }
 
+  const folder = options.folder || "pasong-songs";
+  const type = options.type || "upload";
   const response = await fetch(
     API_BASE + "/api/cloudinary/signature",
-    { method:"GET", headers:authHeaders() }
+    {
+      method:"POST",
+      headers:authHeaders(),
+      body:JSON.stringify({ folder, type })
+    }
   );
 
   const raw = await response.text();
@@ -2617,10 +2623,10 @@ async function getCloudinarySignature(){
    - Correct resource type for audio/images
    - Shows Cloudinary's real error when upload fails
 ============================================================ */
-async function uploadToCloudinary(file){
+async function uploadToCloudinary(file, options = {}){
   if(!file) throw new Error("No file was selected.");
 
-  const signature = await getCloudinarySignature();
+  const signature = await getCloudinarySignature(options);
   const formData = new FormData();
   formData.append("file", file);
   formData.append("api_key", String(signature.api_key));
@@ -3022,26 +3028,25 @@ document
         button.textContent =  
           "☁️ Uploading files...";  
 
-        const audioResult = await uploadToCloudinary(audioFile);  
-  
-  
-        const coverResult =  
-          await uploadToCloudinary(coverFile);  
+        // Full song audio must be uploaded as Cloudinary authenticated delivery.
+        const audioResult = await uploadToCloudinary(audioFile, {
+          folder:"pasong-songs",
+          type:"authenticated"
+        });
+
+        // Artwork remains a normal public image so the store can display it.
+        const coverResult = await uploadToCloudinary(coverFile, {
+          folder:"pasong/covers",
+          type:"upload"
+        });
   
   
         button.textContent =  
           "🎵 Creating song...";  
   
   
-        // Cloudinary stores audio as a video resource. Deliver a 30-second
-        // preview using a transformation URL while keeping the original audio URL.
-        const previewUrl = (() => {
-          const fullUrl = audioResult.secure_url;
-          if (!fullUrl.includes("/video/upload/")) {
-            throw new Error("The audio upload did not return a Cloudinary video URL, so PASONG could not create a preview URL.");
-          }
-          return fullUrl.replace("/video/upload/", "/video/upload/so_0,du_30/");
-        })();
+        // The backend creates a signed, 30-second preview from the authenticated
+        // Cloudinary asset. Never expose the full audio URL as a public preview.
 
         const songPayload = {  
   
@@ -3068,7 +3073,7 @@ document
             audioResult.secure_url,
 
           preview_url:
-            previewUrl,
+            null,
   
           cover_url:  
             coverResult.secure_url,
