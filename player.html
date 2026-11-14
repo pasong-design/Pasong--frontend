@@ -251,13 +251,15 @@ audio.addEventListener("pause",()=>{if(streamSessionId)sendPasongHeartbeat(false
 
 async function init(){
   const id=qs("id"),type=qs("type");
-  const [b,s]=await Promise.all([db.from("beats").select("*").order("created_at",{ascending:false}).limit(80),db.from("songs").select("*").order("created_at",{ascending:false}).limit(80)]);
-  if(b.error)console.error("Could not load beats:",b.error);if(s.error)console.error("Could not load songs:",s.error);
-  list=[...(b.data||[]).map(x=>({...x,_pasong_type:"beat"})),...(s.data||[]).map(x=>({...x,_pasong_type:"song"}))];
+  const [b,sResponse]=await Promise.all([db.from("beats").select("*").order("created_at",{ascending:false}).limit(80),fetch(PASONG_API+"/api/songs",{cache:"no-store"})]);
+  if(b.error)console.error("Could not load beats:",b.error);
+  const sPayload=await sResponse.json().catch(()=>({}));
+  if(!sResponse.ok)console.error("Could not load songs:",sPayload.error||sResponse.status);
+  list=[...(b.data||[]).map(x=>({...x,_pasong_type:"beat"})),...(sResponse.ok?(sPayload.songs||[]):[]).map(x=>({...x,_pasong_type:"song"}))];
   if(id){
     let f=list.findIndex(x=>String(x.id)===String(id)&&(type==="beat"?x._pasong_type==="beat":type==="song"?x._pasong_type==="song":true));
     if(f<0&&type!=="song"){const one=await db.from("beats").select("*").eq("id",id).maybeSingle();if(one.data){list.unshift({...one.data,_pasong_type:"beat"});f=0;}}
-    if(f<0&&type!=="beat"){const one=await db.from("songs").select("*").eq("id",id).maybeSingle();if(one.data){list.unshift({...one.data,_pasong_type:"song"});f=0;}}
+    if(f<0&&type!=="beat"){const oneResponse=await fetch(PASONG_API+"/api/songs/"+encodeURIComponent(id),{cache:"no-store"});const onePayload=await oneResponse.json().catch(()=>({}));const one=onePayload.song||onePayload.data;if(oneResponse.ok&&one){list.unshift({...one,_pasong_type:"song"});f=0;}}
     if(f>=0)idx=f;
   }
   if(list.length)await load(idx);else document.getElementById("title").textContent="No music found";
