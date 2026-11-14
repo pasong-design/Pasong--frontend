@@ -108,25 +108,6 @@ async function uploadToCloudinary(file,signature,resourceType="video"){
   if(!response.ok||data.error) throw new Error(data.error?.message||"Cloudinary upload failed.");
   return data;
 }
-async function makeThirtySecondPreview(file){
-  const AudioCtx=window.AudioContext||window.webkitAudioContext;
-  if(!AudioCtx) throw new Error("This browser cannot prepare the 30-second preview. Please use a supported browser.");
-  const context=new AudioCtx();
-  try{
-    const buffer=await context.decodeAudioData(await file.arrayBuffer());
-    const rate=buffer.sampleRate, frames=Math.min(buffer.length,Math.floor(rate*30));
-    const channels=Math.min(buffer.numberOfChannels,2);
-    const wavBuffer=new ArrayBuffer(44+frames*channels*2), view=new DataView(wavBuffer);
-    const write=(offset,value)=>{for(let i=0;i<value.length;i++)view.setUint8(offset+i,value.charCodeAt(i))};
-    write(0,"RIFF");view.setUint32(4,36+frames*channels*2,true);write(8,"WAVE");write(12,"fmt ");view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,channels,true);view.setUint32(24,rate,true);view.setUint32(28,rate*channels*2,true);view.setUint16(32,channels*2,true);view.setUint16(34,16,true);write(36,"data");view.setUint32(40,frames*channels*2,true);
-    let offset=44;
-    for(let i=0;i<frames;i++) for(let ch=0;ch<channels;ch++){
-      const sample=Math.max(-1,Math.min(1,buffer.getChannelData(ch)[i]));
-      view.setInt16(offset,sample<0?sample*0x8000:sample*0x7fff,true);offset+=2;
-    }
-    return new File([wavBuffer],"pasong-preview-30s.wav",{type:"audio/wav"});
-  }finally{await context.close();}
-}
 async function uploadSong(){
   const artistName=document.getElementById("artistName").value.trim();
   const songTitle=document.getElementById("songTitle").value.trim();
@@ -148,24 +129,18 @@ async function uploadSong(){
   try{
     const token=await getAccessToken();
     const producer=await verifyProducerAccount();
-    btn.textContent="Preparing secure upload...";setStatus("Producer verified. Preparing protected audio, preview and cover uploads...");
-    const [audioSig,previewSig,coverSig]=await Promise.all([
+    btn.textContent="Preparing secure upload...";setStatus("Producer verified. Preparing protected full-song and cover uploads...");
+    const [audioSig,coverSig]=await Promise.all([
       requestCloudinarySignature("pasong-songs","authenticated",token),
-      requestCloudinarySignature("pasong-previews","upload",token),
       requestCloudinarySignature("pasong/covers","upload",token)
     ]);
-    btn.textContent="Creating 30-second preview...";
-    const previewFile=await makeThirtySecondPreview(songFile);
-    btn.textContent="Uploading full song...";setStatus("Uploading protected full song...");
+    btn.textContent="Uploading full song...";setStatus("Uploading the complete song to protected storage...");
     const audioResult=await uploadToCloudinary(songFile,audioSig,"video");
-    btn.textContent="Uploading preview...";setStatus("Full song uploaded. Uploading the separate 30-second preview...");
-    const previewResult=await uploadToCloudinary(previewFile,previewSig,"video");
-    btn.textContent="Uploading cover...";setStatus("Preview uploaded. Uploading cover image...");
+    btn.textContent="Uploading cover...";setStatus("Full song uploaded. Uploading cover image...");
     const coverResult=await uploadToCloudinary(coverFile,coverSig,"image");
-    if(!audioResult.secure_url||!previewResult.secure_url||!coverResult.secure_url) throw new Error("Cloudinary did not return all required upload URLs.");
-    if(audioResult.secure_url===previewResult.secure_url) throw new Error("Preview and full audio must be separate files.");
-    btn.textContent="Saving song...";setStatus("All files uploaded. Saving song and producer attribution...");
-    const createRes=await fetch(API_BASE+"/api/songs/create",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title:songTitle,audio_url:audioResult.secure_url,preview_url:previewResult.secure_url,cover_url:coverResult.secure_url,label_name:artistName,artist_user_ids:[],producer_user_id:producer.id})});
+    if(!audioResult.secure_url||!coverResult.secure_url) throw new Error("Cloudinary did not return the full-song or cover URL.");
+    btn.textContent="Saving song...";setStatus("Files uploaded. Saving song and producer attribution...");
+    const createRes=await fetch(API_BASE+"/api/songs/create",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title:songTitle,audio_url:audioResult.secure_url,cover_url:coverResult.secure_url,label_name:artistName,artist_user_ids:[],producer_user_id:producer.id})});
     const createData=await createRes.json().catch(()=>({}));
     if(!createRes.ok) throw new Error(createData.error||"Song files uploaded but PASONG could not save the song record.");
     btn.textContent="Upload Complete";setStatus("Song uploaded successfully. Producer account verified: "+producer.name+". Your song has been saved to PASONG.");
