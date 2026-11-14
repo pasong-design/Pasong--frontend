@@ -382,6 +382,10 @@ function playPlus(id,type){
   }
 
   if(!obj)return;
+  if(type==="song"){
+    location.href="player.html?id="+encodeURIComponent(id);
+    return;
+  }
 
   let url=obj.audio_url||obj.file_url||obj.preview_url||"";
   let a=document.getElementById("audio");
@@ -440,12 +444,9 @@ async function init(){
   document.getElementById("chips").innerHTML=
     GENRES.map(g=>`<div class="chip ${g===activeGenre?'active':''}" onclick="setGenre('${g}')">${g}</div>`).join("");
 
-  let sRes=await db.from("songs")
-    .select("*")
-    .order("created_at",{ascending:false})
-    .limit(100);
-
-  allSongs=sRes.data||[];
+  let sRes=await fetch("https://pasong-api.onrender.com/api/songs",{cache:"no-store"});
+  let sData=await sRes.json().catch(()=>({}));
+  allSongs=sRes.ok?(sData.songs||[]):[];
 
   let bRes=await db.from("beats").select("*").limit(50);
 
