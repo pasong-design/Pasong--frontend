@@ -51,7 +51,7 @@ h1 span{color:#a855f7}
 
 <main class="wrap">
 <h1>Music <span>Store</span></h1>
-<p class="sub">Listen preview then support artist. <span id="yourPrice"></span></p>
+<p class="sub">Listen to the full song free, then support the artist. <span id="yourPrice"></span></p>
 
 <div class="search">
 <span>Search</span>
@@ -125,7 +125,7 @@ el.innerHTML=list.map(s=>`
 <div class="price">${esc(currentPricing.label)}</div>
 </div>
 <div class="actions">
-<button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Preview</button>
+<button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Listen Full Song</button>
 <button class="btn btn-buy" onclick="buySong('${esc(s.id)}')">BUY NOW</button>
 </div>
 </div>
@@ -133,12 +133,9 @@ el.innerHTML=list.map(s=>`
 }
 
 function previewSong(id){
-let s=songs.find(x=>String(x.id)===String(id));
+const s=songs.find(x=>String(x.id)===String(id));
 if(!s)return;
-let url=s.audio_url||s.file_url||s.song_url||"";
-if(!url){alert("No audio for "+s.title);return;}
-let a=new Audio(url);
-a.play();
+window.location.href="player.html?id="+encodeURIComponent(id);
 }
 
 function buySong(id){
@@ -156,8 +153,9 @@ window.location.href="song.html?id="+encodeURIComponent(id);
 
 async function init(){
 await detectPrice();
-let res=await db.from("songs").select("*").order("created_at",{ascending:false}).limit(100);
-songs=res.data||[];
+let res=await fetch("https://pasong-api.onrender.com/api/songs",{cache:"no-store"});
+let payload=await res.json().catch(()=>({}));
+songs=res.ok?(payload.songs||[]):[];
 render();
 }
 
