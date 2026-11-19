@@ -129,16 +129,16 @@ async function uploadSong(){
   try{
     const token=await getAccessToken();
     const producer=await verifyProducerAccount();
-    btn.textContent="Preparing secure upload...";setStatus("Producer verified. Preparing protected full-song and cover uploads...");
+    btn.textContent="Preparing secure upload...";setStatus("Producer verified. Preparing protected full-song audio and cover uploads...");
     const [audioSig,coverSig]=await Promise.all([
       requestCloudinarySignature("pasong-songs","authenticated",token),
       requestCloudinarySignature("pasong/covers","upload",token)
     ]);
-    btn.textContent="Uploading full song...";setStatus("Uploading the complete song to protected storage...");
+    btn.textContent="Uploading full song...";setStatus("Uploading the protected full song...");
     const audioResult=await uploadToCloudinary(songFile,audioSig,"video");
     btn.textContent="Uploading cover...";setStatus("Full song uploaded. Uploading cover image...");
     const coverResult=await uploadToCloudinary(coverFile,coverSig,"image");
-    if(!audioResult.secure_url||!coverResult.secure_url) throw new Error("Cloudinary did not return the full-song or cover URL.");
+    if(!audioResult.secure_url||!coverResult.secure_url) throw new Error("Cloudinary did not return both required upload URLs.");
     btn.textContent="Saving song...";setStatus("Files uploaded. Saving song and producer attribution...");
     const createRes=await fetch(API_BASE+"/api/songs/create",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({title:songTitle,audio_url:audioResult.secure_url,cover_url:coverResult.secure_url,label_name:artistName,artist_user_ids:[],producer_user_id:producer.id})});
     const createData=await createRes.json().catch(()=>({}));
