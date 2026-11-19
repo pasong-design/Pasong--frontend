@@ -182,7 +182,8 @@ function cover(s){
 }
 
 function getArtistRaw(s){
-  return (s.artist_name||s.producer_name||s.producer||s.artist||"").trim();
+  const nested=typeof s.artist==="string"?s.artist:(s.artist?.artist_name||s.artist?.stage_name||s.artist?.performing_name||"");
+  return String(s.artist_name||s.producer_name||s.producer||nested||"").trim();
 }
 
 function isRealArtist(a){
@@ -382,8 +383,10 @@ function playPlus(id,type){
   }
 
   if(!obj)return;
-  if(type==="song"){
-    location.href="player.html?id="+encodeURIComponent(id);
+
+  if(type==='song'){
+    // Full song streams are free and use the protected PASONG player.
+    location.href="player.html?id="+encodeURIComponent(obj.id);
     return;
   }
 
@@ -444,9 +447,15 @@ async function init(){
   document.getElementById("chips").innerHTML=
     GENRES.map(g=>`<div class="chip ${g===activeGenre?'active':''}" onclick="setGenre('${g}')">${g}</div>`).join("");
 
-  let sRes=await fetch("https://pasong-api.onrender.com/api/songs",{cache:"no-store"});
-  let sData=await sRes.json().catch(()=>({}));
-  allSongs=sRes.ok?(sData.songs||[]):[];
+  try{
+    const sRes=await fetch("https://pasong-api.onrender.com/api/songs",{cache:"no-store"});
+    const songPayload=await sRes.json().catch(()=>({}));
+    if(!sRes.ok)throw new Error(songPayload.error||("Song catalogue unavailable (HTTP "+sRes.status+")."));
+    allSongs=Array.isArray(songPayload.songs)?songPayload.songs:[];
+  }catch(error){
+    console.error("PASONG safe song catalogue error:",error);
+    allSongs=[];
+  }
 
   let bRes=await db.from("beats").select("*").limit(50);
 
