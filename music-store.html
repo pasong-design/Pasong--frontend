@@ -51,7 +51,7 @@ h1 span{color:#a855f7}
 
 <main class="wrap">
 <h1>Music <span>Store</span></h1>
-<p class="sub">Listen to the full song free, then support the artist. <span id="yourPrice"></span></p>
+<p class="sub">Listen preview then support artist. <span id="yourPrice"></span></p>
 
 <div class="search">
 <span>Search</span>
@@ -105,7 +105,7 @@ let query="";
 
 function esc(t){return String(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function cover(s){return s.cover_url||s.cover_image_url||"";}
-function getArtist(s){return s.artist_name||"Unknown";}
+function getArtist(s){return s.artist_name||s.artist?.artist_name||s.artist?.stage_name||s.artist?.performing_name||"Unknown";}
 
 function render(){
 let list=songs.filter(s=>{
@@ -125,7 +125,7 @@ el.innerHTML=list.map(s=>`
 <div class="price">${esc(currentPricing.label)}</div>
 </div>
 <div class="actions">
-<button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Listen Full Song</button>
+<button class="btn btn-play" onclick="previewSong('${esc(s.id)}')">Preview</button>
 <button class="btn btn-buy" onclick="buySong('${esc(s.id)}')">BUY NOW</button>
 </div>
 </div>
@@ -133,9 +133,10 @@ el.innerHTML=list.map(s=>`
 }
 
 function previewSong(id){
-const s=songs.find(x=>String(x.id)===String(id));
+let s=songs.find(x=>String(x.id)===String(id));
 if(!s)return;
-window.location.href="player.html?id="+encodeURIComponent(id);
+// Full songs stream free through PASONG's protected player; no short preview URL.
+location.href="player.html?id="+encodeURIComponent(s.id);
 }
 
 function buySong(id){
@@ -153,9 +154,15 @@ window.location.href="song.html?id="+encodeURIComponent(id);
 
 async function init(){
 await detectPrice();
-let res=await fetch("https://pasong-api.onrender.com/api/songs",{cache:"no-store"});
-let payload=await res.json().catch(()=>({}));
-songs=res.ok?(payload.songs||[]):[];
+try{
+  let res=await fetch("https://pasong-api.onrender.com/api/songs",{cache:"no-store"});
+  let payload=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(payload.error||("Song catalogue unavailable (HTTP "+res.status+")."));
+  songs=Array.isArray(payload.songs)?payload.songs:[];
+}catch(error){
+  console.error("Music Store catalogue error:",error);
+  document.getElementById("songList").innerHTML='<div style="grid-column:1/-1;padding:20px;text-align:center;color:#ff9b9b">Music is temporarily unavailable. Please try again shortly.</div>';
+}
 render();
 }
 
