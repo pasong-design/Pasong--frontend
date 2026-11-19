@@ -169,6 +169,9 @@ async function getProtectedSongUrl(songId){
   const response=await fetch(PASONG_API+"/api/songs/"+encodeURIComponent(songId)+"/playback-url",{method:"GET",cache:"no-store"});
   const result=await response.json().catch(()=>({}));
   if(!response.ok||!result.success||!result.url){
+    if(response.status===409){
+      throw new Error(result.error||"This song is still on public Cloudinary storage. PASONG must secure this audio before protected playback can start.");
+    }
     throw new Error(result.message||result.error||("Protected playback unavailable (HTTP "+response.status+")."));
   }
   return result.url;
@@ -251,18 +254,36 @@ audio.addEventListener("pause",()=>{if(streamSessionId)sendPasongHeartbeat(false
 
 async function init(){
   const id=qs("id"),type=qs("type");
-  const [b,sResponse]=await Promise.all([db.from("beats").select("*").order("created_at",{ascending:false}).limit(80),fetch(PASONG_API+"/api/songs",{cache:"no-store"})]);
-  if(b.error)console.error("Could not load beats:",b.error);
-  const sPayload=await sResponse.json().catch(()=>({}));
-  if(!sResponse.ok)console.error("Could not load songs:",sPayload.error||sResponse.status);
-  list=[...(b.data||[]).map(x=>({...x,_pasong_type:"beat"})),...(sResponse.ok?(sPayload.songs||[]):[]).map(x=>({...x,_pasong_type:"song"}))];
-  if(id){
-    let f=list.findIndex(x=>String(x.id)===String(id)&&(type==="beat"?x._pasong_type==="beat":type==="song"?x._pasong_type==="song":true));
-    if(f<0&&type!=="song"){const one=await db.from("beats").select("*").eq("id",id).maybeSingle();if(one.data){list.unshift({...one.data,_pasong_type:"beat"});f=0;}}
-    if(f<0&&type!=="beat"){const oneResponse=await fetch(PASONG_API+"/api/songs/"+encodeURIComponent(id),{cache:"no-store"});const onePayload=await oneResponse.json().catch(()=>({}));const one=onePayload.song||onePayload.data;if(oneResponse.ok&&one){list.unshift({...one,_pasong_type:"song"});f=0;}}
-    if(f>=0)idx=f;
+  try{
+    const [beatResult,songResponse]=await Promise.all([
+      db.from("beats").select("*").order("created_at",{ascending:false}).limit(80),
+      fetch(PASONG_API+"/api/songs",{cache:"no-store"})
+    ]);
+    if(beatResult.error)console.error("Could not load beats:",beatResult.error);
+    const songPayload=await songResponse.json().catch(()=>({}));
+    if(!songResponse.ok)throw new Error(songPayload.error||("Song catalogue unavailable (HTTP "+songResponse.status+")."));
+    const safeSongs=Array.isArray(songPayload.songs)?songPayload.songs:[];
+    list=[...(beatResult.data||[]).map(x=>({...x,_pasong_type:"beat"})),...safeSongs.map(x=>({...x,_pasong_type:"song"}))];
+    if(id){
+      let f=list.findIndex(x=>String(x.id)===String(id)&&(type==="beat"?x._pasong_type==="beat":type==="song"?x._pasong_type==="song":true));
+      if(f<0&&type!=="song"){
+        const one=await db.from("beats").select("*").eq("id",id).maybeSingle();
+        if(one.data){list.unshift({...one.data,_pasong_type:"beat"});f=0;}
+      }
+      if(f<0&&type!=="beat"){
+        const oneResponse=await fetch(PASONG_API+"/api/songs/"+encodeURIComponent(id),{cache:"no-store"});
+        const onePayload=await oneResponse.json().catch(()=>({}));
+        if(oneResponse.ok&&onePayload.song){list.unshift({...onePayload.song,_pasong_type:"song"});f=0;}
+      }
+      if(f>=0)idx=f;
+    }
+    if(list.length)await load(idx);else document.getElementById("title").textContent="No music found";
+  }catch(error){
+    console.error("PASONG player catalogue error:",error);
+    document.getElementById("title").textContent="Music is temporarily unavailable";
+    const meta=document.getElementById("meta");
+    if(meta)meta.textContent=error.message||"Please try again shortly.";
   }
-  if(list.length)await load(idx);else document.getElementById("title").textContent="No music found";
 }
 async function getRealPlays(id){
   try{const {data,error}=await db.rpc("get_song_play_count",{p_song_id:id});if(error)throw error;return Number(data||0);}
