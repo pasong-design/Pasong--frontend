@@ -3850,24 +3850,19 @@ async function loadMySongs(){
     }  
   
   
-    const response =  
-      await fetch(  
-        API_BASE +  
-        "/api/songs"  
-      );  
-  
-  
-    if(!response.ok){  
-  
-      throw new Error(  
-        "Could not load songs."  
-      );  
-  
+    const response = await fetch(
+      API_BASE + "/api/songs",
+      { headers: { "Accept": "application/json" }, cache: "no-store" }
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const apiMessage = typeof result.error === "string" && result.error.trim()
+        ? result.error.trim()
+        : "The PASONG API could not return the song catalogue.";
+      throw new Error(`${apiMessage} (HTTP ${response.status}${result.code ? `, ${result.code}` : ""})`);
     }  
-  
-  
-    const result =  
-      await response.json();  
   
   
     const songs =  
@@ -3877,15 +3872,10 @@ async function loadMySongs(){
   
   
     const mySongs =  
-      songs.filter(  
-        song=>  
-          String(  
-            song.artist_id ||  
-            ""  
-          ) ===  
-          String(  
-            artistProfile.id  
-          )  
+      songs.filter(
+        song =>
+          String(song.artist_id || "").toLowerCase() === String(artistProfile.id || "").toLowerCase() ||
+          String(song.artist_user_id || "").toLowerCase() === String(currentUser.id || "").toLowerCase()
       );  
   
   
@@ -3980,23 +3970,12 @@ async function loadMySongs(){
   
                 <div class="song-actions">  
   
-                  ${  
-                    song.audio_url  
-  
-                    ?  
-  
-                    `<a  
-                      class="btn secondary"  
-                      href="${escapeHtml(song.audio_url)}"  
-                      target="_blank"  
-                      rel="noopener"  
-                    >  
-                      ▶ Preview  
-                    </a>`  
-  
-                    :  
-  
-                    ""  
+                  ${
+                    song.id
+                    ?
+                    `<a class="btn secondary" href="player.html?id=${encodeURIComponent(song.id)}">▶ Open Player</a>`
+                    :
+                    ""
                   }  
   
   
@@ -4214,15 +4193,10 @@ async function loadDashboardStats(){
   
   
     const mine =  
-      songs.filter(  
-        song=>  
-          String(  
-            song.artist_id ||  
-            ""  
-          ) ===  
-          String(  
-            artistProfile.id  
-          )  
+      songs.filter(
+        song =>
+          String(song.artist_id || "").toLowerCase() === String(artistProfile.id || "").toLowerCase() ||
+          String(song.artist_user_id || "").toLowerCase() === String(currentUser.id || "").toLowerCase()
       );  
   
   
