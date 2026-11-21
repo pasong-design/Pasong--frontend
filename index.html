@@ -495,7 +495,7 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
 </div>
 
 <div class="mobile-home">
-<div class="mobile-top"><a class="mobile-menu-button" href="store.html" aria-label="Open music menu">☰</a><div class="brand"><i>♫</i> PASONG</div><div class="mobile-top-actions"><a class="mobile-round notification-button" href="notifications.html" aria-label="Notifications"><svg class="notification-bell" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="mobileNotificationBadge" class="notification-badge" hidden>0</span></a><a class="mobile-round" href="cart.html" aria-label="Shopping cart">🛒</a></div></div>
+<div class="mobile-top"><a class="mobile-menu-button" href="store.html" aria-label="Open music menu">☰</a><div class="brand"><i>♫</i> PASONG</div><div class="mobile-top-actions"><a class="mobile-round notification-button" href="notifications.html" aria-label="Notifications"><svg class="notification-bell" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="mobileNotificationBadge" class="notification-badge" hidden>0</span></a><a class="mobile-round cart-count-link" href="cart.html" aria-label="Shopping cart">🛒<span id="cartCountBadge" class="notification-badge" hidden>0</span></a></div></div>
 <div class="mobile-search"><span>⌕</span><input id="mobileSearch" type="search" placeholder="Search songs, artists, producers..."></div>
 
 <section class="mobile-hero"><div class="slide active" id="mobileHeroSlide" style="background-image:url('assets/hero-king-saha.jpg')"><div class="slide-overlay"></div><div class="slide-content"><h2>FEATURED ARTIST</h2><h1>KV BEATS</h1><p>New Afrobeat • Discover the sound</p><a href="artists.html" class="hero-btn">▶ Play Now</a></div></div></section>
@@ -511,7 +511,7 @@ body{background:#101016;color:#f8f7fb}.mobile-menu-button{display:grid;place-ite
 
 <footer><div class="footer-inner"><div class="footer-brand"><h2>◈ PASONG</h2><p>Music. Opportunity. Support. A music marketplace built to connect creators with listeners and create new opportunities across Africa.</p></div><div class="footer-col"><h4>Music</h4><a href="store.html">Music Store</a><a href="charts.html">Charts</a><a href="playlists.html">Playlists</a></div><div class="footer-col"><h4>Creators</h4><a href="artists.html">Artists</a><a href="djs.html">DJs</a><a href="writers.html">Writers</a></div><div class="footer-col"><h4>PASONG</h4><a href="premium.html">Premium</a><a href="promotion.html">Promotion</a><a href="licensing-centre.html">⚖ Licensing Centre</a><a href="advertise.html">📢 Advertise</a><a href="account.html">Account</a><a href="admin.html">⚙ Admin Dashboard</a></div></div></footer>
 
-<nav class="mobile-bottom" aria-label="Main navigation"><a class="active" href="index.html" aria-current="page"><span>⌂</span><b>Home</b></a><a href="store.html"><span>⌕</span><b>Browse</b></a><a href="playlists.html"><span>▤</span><b>Library</b></a><a href="cart.html"><span>🛒</span><b>Cart</b></a><a href="account.html"><span>♙</span><b>Profile</b></a></nav>
+<nav class="mobile-bottom" aria-label="Main navigation"><a class="active" href="index.html" aria-current="page"><span>⌂</span><b>Home</b></a><a href="store.html"><span>⌕</span><b>Browse</b></a><a href="playlists.html"><span>▤</span><b>Library</b></a><a href="cart.html" class="bottom-cart-link"><span>🛒</span><b>Cart</b><span id="bottomCartCountBadge" class="notification-badge cart-bottom-badge" hidden>0</span></a><a href="account.html"><span>♙</span><b>Profile</b></a></nav>
 
 <div class="mini-player" id="miniPlayer"><img id="miniCover" class="mini-cover" src="" alt=""><div class="mini-info"><div class="mini-title" id="miniTitle">Nothing playing</div><div class="mini-artist" id="miniArtist"></div></div><div class="mini-controls"><button id="miniPlay">▶</button><button id="miniClose">×</button></div></div>
 <audio id="audioPlayer"></audio>
@@ -528,7 +528,7 @@ const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 const cover=s=>s.cover_url||s.cover_image_url||s.cover||s.image_url||"";
 const artist=s=>{const p=artistMap[s.artist_id]||artistMap[s.artist_profile_id]||artistMap[s.artist_user_id];return s.performing_name||s.stage_name||s.artist_name||p?.performing_name||p?.stage_name||"Unknown Artist"};
 async function loadArtistMap(){return artistMap}
-function addSongToCart(s){if(!s||!s.id){alert("This song cannot be added right now.");return}const key="pasong_cart_v1";let items=[];try{const parsed=JSON.parse(localStorage.getItem(key)||"[]");if(Array.isArray(parsed))items=parsed}catch{}if(items.some(x=>String(x.id)===String(s.id))){alert("This song is already in your PASONG cart.");return}const rawPrice=s.price_ugx??s.price??s.sale_price??s.purchase_price??songPriceAmount;const price=Number(rawPrice);items.push({id:String(s.id),title:s.title||"Untitled",artist:artist(s),cover:cover(s),price:Number.isFinite(price)&&price>=0?price:700,currency:String(s.currency||songPriceCurrency||"UGX").toUpperCase()});try{localStorage.setItem(key,JSON.stringify(items));const btn=document.querySelector(`[data-cart-song="${CSS.escape(String(s.id))}"]`);if(btn){btn.textContent="✓ Added to Cart";btn.disabled=true;setTimeout(()=>{btn.textContent="＋ Add to Cart";btn.disabled=false},1400)} }catch(e){alert("PASONG could not save the cart on this device. Please check browser storage settings.");return}}
+function addSongToCart(s){if(!s||!s.id){alert("This song cannot be added right now.");return}const key="pasong_cart_v1";let items=[];try{const parsed=JSON.parse(localStorage.getItem(key)||"[]");if(Array.isArray(parsed))items=parsed}catch{}if(items.some(x=>String(x.id)===String(s.id))){alert("This song is already in your PASONG cart.");return}const rawPrice=s.price_ugx??s.price??s.sale_price??s.purchase_price??songPriceAmount;const price=Number(rawPrice);items.push({id:String(s.id),title:s.title||"Untitled",artist:artist(s),cover:cover(s),price:Number.isFinite(price)&&price>=0?price:700,currency:String(s.currency||songPriceCurrency||"UGX").toUpperCase()});try{localStorage.setItem(key,JSON.stringify(items));if(window.updatePasongCartCount)window.updatePasongCartCount();const btn=document.querySelector(`[data-cart-song="${CSS.escape(String(s.id))}"]`);if(btn){btn.textContent="✓ Added to Cart";btn.disabled=true;setTimeout(()=>{btn.textContent="＋ Add to Cart";btn.disabled=false},1400)} }catch(e){alert("PASONG could not save the cart on this device. Please check browser storage settings.");return}}
 function songCard(s){const c=document.createElement("div");c.className="song-card";c.innerHTML=`<div class="cover-wrap"><img src="${esc(cover(s)||"https://via.placeholder.com/500?text=PASONG")}" alt=""><button class="play-overlay" aria-label="Play ${esc(s.title||"song")}">▶</button></div><div class="song-info"><div class="song-title">${esc(s.title||"Untitled")}</div><div class="song-artist">${esc(artist(s))}</div><div class="song-meta"><span class="price">${esc(songPriceLabel)}</span><span class="genre">${esc(s.genre||"Music")}</span></div><button class="add-cart-btn" type="button" data-cart-song="${esc(s.id||"")}">＋ Add to Cart</button></div>`;c.querySelector(".play-overlay").onclick=e=>{e.stopPropagation();if(s.id)location.href=`player.html?id=${encodeURIComponent(s.id)}`};c.querySelector(".add-cart-btn").onclick=e=>{e.stopPropagation();addSongToCart(s)};c.onclick=e=>{if(!e.target.closest("button")&&s.id)location.href=`player.html?id=${encodeURIComponent(s.id)}`};return c}
 function render(id,songs){const c=document.getElementById(id);if(!c)return;c.innerHTML="";(songs||[]).forEach(s=>c.appendChild(songCard(s)));if(!songs?.length)c.innerHTML='<div style="grid-column:1/-1;padding:25px;text-align:center;color:#858592">No music available yet.</div>'}
 function makeMobileSong(s){const el=document.createElement("div");el.className="mobile-song-card";el.innerHTML=`<div class="mobile-cover-wrap"><img class="cover" src="${esc(cover(s)||"https://via.placeholder.com/300?text=PASONG")}" alt=""><button type="button" class="mobile-play-overlay" aria-label="Play ${esc(s.title||"song")}">▶</button></div><div class="m-info"><b>${esc(s.title||"Untitled")}</b><span>${esc(artist(s))}</span><em class="mobile-song-price">${esc(songPriceLabel)}</em><button type="button" class="mobile-cart-btn" data-cart-song="${esc(s.id||"")}">＋ Add to Cart</button></div>`;el.querySelector(".mobile-play-overlay").onclick=e=>{e.stopPropagation();if(s.id)location.href=`player.html?id=${encodeURIComponent(s.id)}`};el.querySelector(".mobile-cart-btn").onclick=e=>{e.stopPropagation();addSongToCart(s)};el.onclick=e=>{if(!e.target.closest("button")&&s.id)location.href=`player.html?id=${encodeURIComponent(s.id)}`};return el}
@@ -811,5 +811,26 @@ document.addEventListener('DOMContentLoaded', function(){
 .mobile-shortcuts{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-flow:row!important;align-items:stretch!important;gap:8px 6px!important}
 .mobile-shortcuts>.mobile-shortcut:nth-child(n){grid-column:auto!important}
 </style>
+
+<style id="pasong-cart-count-badge">
+.cart-count-link,.bottom-cart-link{position:relative;text-decoration:none}
+.cart-count-link .notification-badge{top:-5px;right:-5px;min-width:16px;height:16px;font-size:9px}
+.bottom-cart-link .cart-bottom-badge{top:4px;right:calc(50% - 23px);min-width:16px;height:16px;font-size:9px}
+</style>
+<script id="pasong-cart-count-sync">
+(function(){
+  function updatePasongCartCount(){
+    let count=0;
+    try{const items=JSON.parse(localStorage.getItem("pasong_cart_v1")||"[]");count=Array.isArray(items)?items.length:0;}catch(e){count=0;}
+    [document.getElementById("cartCountBadge"),document.getElementById("bottomCartCountBadge")].forEach(function(badge){
+      if(!badge)return;badge.textContent=count>99?"99+":String(count);badge.hidden=count===0;
+    });
+  }
+  window.updatePasongCartCount=updatePasongCartCount;
+  updatePasongCartCount();
+  window.addEventListener("pageshow",updatePasongCartCount);
+  window.addEventListener("storage",function(e){if(!e.key||e.key==="pasong_cart_v1")updatePasongCartCount();});
+})();
+</script>
 </body>
 </html>
