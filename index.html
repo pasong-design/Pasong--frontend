@@ -617,13 +617,27 @@ async function init(){
   if(mq)mq.onkeydown=e=>{if(e.key==="Enter")doSearch(mq.value)};
 
   try{
-    const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(),15000);
-    let response;
-    try{response=await fetch(`${PASONG_API_BASE}/api/songs`,{headers:{"Accept":"application/json"},cache:"no-store",signal:controller.signal});}
-    finally{clearTimeout(timeout)}
-    const payload=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(payload.error||`Song catalogue request failed (HTTP ${response.status})`);
+    let response=null,payload={},lastError=null;
+    /* Retry temporary Render wake-ups and gateway/network failures. */
+    for(let attempt=1;attempt<=3;attempt++){
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),40000);
+      try{
+        response=await fetch(`${PASONG_API_BASE}/api/songs`,{
+          headers:{"Accept":"application/json"},
+          cache:"no-store",
+          signal:controller.signal
+        });
+        if(response.ok){payload=await response.json().catch(()=>({}));break;}
+        const retryable=[429,502,503,504].includes(response.status);
+        const errorBody=await response.json().catch(()=>({}));
+        lastError=new Error(errorBody.error||`Song catalogue request failed (HTTP ${response.status})`);
+        if(!retryable||attempt===3)throw lastError;
+      }catch(error){lastError=error;if(attempt===3)throw error;}
+      finally{clearTimeout(timeout);}
+      await new Promise(resolve=>setTimeout(resolve,attempt*2500));
+    }
+    if(!response||!response.ok)throw lastError||new Error("Unable to connect to the PASONG API");
     const pricing=payload.pricing||payload;
     if(pricing&&pricing.label){songPriceLabel=String(pricing.label)}
     if(pricing&&Number.isFinite(Number(pricing.amount??pricing.price))){songPriceAmount=Number(pricing.amount??pricing.price)}
