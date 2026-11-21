@@ -627,7 +627,7 @@ Beats uploaded through your Producer Dashboard.
 <h2>🎨 PASONG Cover Design Service</h2>
 <p class="card-subtitle">PASONG Admin will design professional beat artwork using your information and photos. The cover-design charge is separate from any beat licence purchase.</p>
 <div class="form-grid" style="margin-bottom:18px">
-<div class="field"><label>🇺🇬 Uganda</label><div class="rule">UGX 10,000</div></div>
+<div class="field"><label>🇺🇬 Uganda</label><div class="rule">UGX 15,000</div></div>
 <div class="field"><label>🌍 Outside Uganda</label><div class="rule">US$10</div></div>
 </div>
 <form id="producerCoverForm">
@@ -643,7 +643,7 @@ Beats uploaded through your Producer Dashboard.
 <div class="field"><label for="producerCoverColours">Preferred Colours</label><input id="producerCoverColours" maxlength="200" placeholder="Example: Purple, Black and Pink"></div>
 <div class="field"><label for="producerCoverLocation">Location</label><input id="producerCoverLocation" maxlength="200" placeholder="Example: Kampala, Uganda"></div>
 <div class="field"><label for="producerCoverLabel">Label / Brand (optional)</label><input id="producerCoverLabel" maxlength="150" placeholder="Label / Brand"></div>
-<div class="field full"><label>Cover Design Price</label><div id="producerCoverPrice" class="rule">🇺🇬 Uganda — UGX 10,000 / 🌍 Outside Uganda — US$10</div></div>
+<div class="field full"><label>Cover Design Price</label><div id="producerCoverPrice" class="rule">🇺🇬 Uganda — UGX 15,000 / 🌍 Outside Uganda — US$10</div></div>
 <div class="field full"><label for="producerCoverMainPhoto">📷 Main Photo to Use on the Cover *</label><input id="producerCoverMainPhoto" type="file" accept="image/jpeg,image/png,image/webp" required><small class="price-help">JPG, PNG or WEBP • Maximum 5MB. This is the main photo PASONG Admin will use.</small></div>
 <div class="field full"><label for="producerCoverReferencePhoto">🖼️ Reference Photo</label><input id="producerCoverReferencePhoto" type="file" accept="image/jpeg,image/png,image/webp"><small class="price-help">Optional • JPG, PNG or WEBP • Maximum 5MB. Use it to show the style, background, pose or visual idea.</small></div>
 <div class="field full"><label for="producerCoverLogo">🏷️ Logo / Brand Image</label><input id="producerCoverLogo" type="file" accept="image/jpeg,image/png,image/webp"><small class="price-help">Optional • JPG, PNG or WEBP • Maximum 5MB.</small></div>
@@ -783,7 +783,7 @@ Current Producer Beat Store rules.
 <script>
 const SUPABASE_URL="https://mtufczmjlkvycarxylgh.supabase.co";
 const SUPABASE_KEY="sb_publishable_XDIZ0_nd4PAYJy2Oz4VaxQ_R4Trs3VP";
-const API_URL="https://pasong-api.vercel.app";
+const API_URL="https://pasong-api.onrender.com";
 const CLOUDINARY_UPLOAD_URL="https://api.cloudinary.com/v1_1/vuehnvkp/auto/upload";
 const AGREEMENT_VERSION="PASONG-PRODUCER-BEAT-v2.0";
 
@@ -876,7 +876,7 @@ return getProfileValue(profile,[
 
 async function loadProducerCoverPrice(){
  const el=document.getElementById("producerCoverPrice");
- try{const r=await fetch(API_URL+"/api/cover-design-price",{cache:"no-store"});const d=await r.json();if(!r.ok)throw new Error();el.textContent=d.label||((d.currency||"UGX")==="UGX"?"🇺🇬 Uganda — UGX "+Number(d.price||10000).toLocaleString()+" / 🌍 Outside Uganda — US$10":"🌍 Outside Uganda — US$"+Number(d.price||10));}catch(e){el.textContent="🇺🇬 Uganda — UGX 10,000 / 🌍 Outside Uganda — US$10";}
+ try{const r=await fetch(API_URL+"/api/cover-design-price",{cache:"no-store"});const d=await r.json();if(!r.ok)throw new Error();el.textContent=d.label||((d.currency||"UGX")==="UGX"?"🇺🇬 Uganda — UGX "+Number(d.price||15000).toLocaleString()+" / 🌍 Outside Uganda — US$10":"🌍 Outside Uganda — US$"+Number(d.price||10));}catch(e){el.textContent="🇺🇬 Uganda — UGX 15,000 / 🌍 Outside Uganda — US$10";}
 }
 function producerCoverMsg(message,type="info"){const el=document.getElementById("producerCoverMessage");el.className="message "+type;el.textContent=message;}
 async function loadProducerCoverRequests(){
@@ -912,7 +912,7 @@ document.getElementById("producerCoverForm")?.addEventListener("submit",async e=
   const profile=currentProducerProfile||await loadProducer();if(!profile)throw new Error("Your Producer profile could not be loaded.");
   const mainFile=document.getElementById("producerCoverMainPhoto").files[0];const refFile=document.getElementById("producerCoverReferencePhoto").files[0];const logoFile=document.getElementById("producerCoverLogo").files[0];
   validateProducerCoverImage(mainFile,true);validateProducerCoverImage(refFile);validateProducerCoverImage(logoFile);
-  let pricing={price:10000,currency:"UGX",country:"UG"};try{const pr=await fetch(API_URL+"/api/cover-design-price",{cache:"no-store"});const pd=await pr.json();if(pr.ok)pricing=pd;}catch{}
+  let pricing={price:15000,currency:"UGX",country:"UG"};try{const pr=await fetch(API_URL+"/api/cover-design-price",{cache:"no-store"});const pd=await pr.json();if(pr.ok)pricing=pd;}catch{}
   const mainUrl=await uploadToCloudinary(mainFile,"pasong/covers",session.access_token);
   btn.textContent="Uploading optional photos…";
   const referenceUrl=refFile?await uploadToCloudinary(refFile,"pasong/covers",session.access_token):"";
@@ -929,7 +929,7 @@ document.getElementById("producerCoverForm")?.addEventListener("submit",async e=
    ["Logo / Brand Image URL",logoUrl],
    ["Extra Cover Details",document.getElementById("producerCoverText").value.trim()]
   ].filter(x=>x[1]).map(x=>x[0]+": "+x[1]).join("\n");
-  const payload={artist_id:profile.id,artist_email:document.getElementById("producerCoverEmail").value.trim()||session.user.email||"",requester_type:"producer",song_title:document.getElementById("producerCoverTitle").value.trim(),performing_artists:document.getElementById("producerCoverArtists").value.trim()||null,producer:document.getElementById("producerCoverName").value.trim()||profile.performing_name||profile.artist_name||profile.stage_name||"Producer",genre:document.getElementById("producerCoverGenre").value.trim()||null,label:document.getElementById("producerCoverLabel").value.trim()||null,cover_text:extra||null,photo_url:mainUrl,country:pricing.country==="UG"?"Uganda":(pricing.country||"International"),fee_amount:Number(pricing.price||10000),fee_currency:pricing.currency||"UGX",payment_status:"pending",request_status:"awaiting_payment",design_status:"pending"};
+  const payload={artist_id:profile.id,artist_email:document.getElementById("producerCoverEmail").value.trim()||session.user.email||"",requester_type:"producer",song_title:document.getElementById("producerCoverTitle").value.trim(),performing_artists:document.getElementById("producerCoverArtists").value.trim()||null,producer:document.getElementById("producerCoverName").value.trim()||profile.performing_name||profile.artist_name||profile.stage_name||"Producer",genre:document.getElementById("producerCoverGenre").value.trim()||null,label:document.getElementById("producerCoverLabel").value.trim()||null,cover_text:extra||null,photo_url:mainUrl,country:pricing.country==="UG"?"Uganda":(pricing.country||"International"),fee_amount:Number(pricing.price||15000),fee_currency:pricing.currency||"UGX",payment_status:"pending",request_status:"awaiting_payment",design_status:"pending"};
   const {error}=await supabaseClient.from("cover_design_requests").insert(payload);if(error)throw error;
   producerCoverMsg("Cover request saved as awaiting payment. The current backend does not yet start the cover-design checkout, so no payment has been taken. The Admin design queue must only show this request after payment is verified.","success");e.target.reset();await loadProducerCoverRequests();
  }catch(err){producerCoverMsg(err?.message||"Unable to save cover request.","error");}finally{btn.disabled=false;btn.textContent="🎨 Submit Cover Request";}
@@ -2964,6 +2964,10 @@ exclusiveSold
 
 </div>
 
+<div class="form-actions" style="margin-top:12px">
+<a class="btn btn-secondary" href="player.html?type=beat&id=${encodeURIComponent(String(beat.id||beat.beat_id||""))}" style="display:inline-block;text-decoration:none" ${(beat.id||beat.beat_id)?"":"aria-disabled=\"true\""}>▶ Play in PASONG Player</a>
+</div>
+
 </div>
 
 </article>
@@ -3762,6 +3766,7 @@ error?.message||
 
 })();
 </script>
+<script src="pasong-player.js"></script>
 
 </body>
 </html>
