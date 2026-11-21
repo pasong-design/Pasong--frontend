@@ -1,6 +1,9 @@
-/* PASONG SERVICE WORKER - FINAL v4 */
+/* PASONG SERVICE WORKER - FIXED v5
+   External API requests are passed through unchanged.
+   Do not manufacture HTTP 503 responses when the network fails.
+*/
 
-const CACHE_NAME = "pasong-v4";
+const CACHE_NAME = "pasong-v5";
 
 const APP_SHELL = [
   "/",
@@ -41,19 +44,36 @@ async function handleRequest(request) {
   if (url.origin !== self.location.origin) return fetch(request);
   if (request.method !== "GET") return fetch(request);
 
-  // Don't touch JS, CSS, API, icons
-  if (url.pathname.endsWith(".js") || url.pathname.endsWith(".css") || url.pathname.endsWith(".png") || url.pathname.startsWith("/api/") || url.pathname === CONTROLLER_PATH) {
+  // Don't touch JS, CSS, API, icons, or the price controller.
+  if (
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.startsWith("/api/") ||
+    url.pathname === CONTROLLER_PATH
+  ) {
     return fetch(request);
   }
 
-  // Notification page - load clean, no injection
+  // Notification page - load clean, use its cached copy only if available.
   if (url.pathname === "/notification.html" || url.pathname === "/notif") {
-    return fetch(request).catch(() => caches.match("/notification.html"));
+    try {
+      return await fetch(request);
+    } catch (error) {
+      const cached = await caches.match("/notification.html");
+      if (cached) return cached;
+      throw error;
+    }
   }
 
   let response;
-  try { response = await fetch(request); }
-  catch (e) { const c = await caches.match(request); if (c) return c; throw e; }
+  try {
+    response = await fetch(request);
+  } catch (error) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    throw error;
+  }
 
   const type = response.headers.get("content-type") || "";
   if (!response.ok || !type.includes("text/html")) return response;
@@ -61,18 +81,36 @@ async function handleRequest(request) {
   const html = await response.text();
   const newHtml = injectController(html);
   const headers = new Headers(response.headers);
-  headers.delete("content-length"); headers.delete("etag");
+  headers.delete("content-length");
+  headers.delete("etag");
   headers.set("cache-control", "no-cache");
   const newResp = new Response(newHtml, { status: response.status, headers });
-  try { const cache = await caches.open(CACHE_NAME); await cache.put(request, newResp.clone()); } catch(e){}
+
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.put(request, newResp.clone());
+  } catch (error) {}
+
   return newResp;
 }
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
-  event.respondWith(handleRequest(event.request).catch(async () => {
-    const cached = await caches.match(event.request);
-    if (cached) return cached;
-    return new Response("PASONG is temporarily unavailable.", { status: 503 });
-  }));
+
+  // External requests (including the Render API) must never be converted
+  // into a synthetic PASONG 503 response by this service worker.
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  event.respondWith(
+    handleRequest(event.request).catch(async error => {
+      const cached = await caches.match(event.request);
+      if (cached) return cached;
+      // Preserve the real network error; do not invent an HTTP 503.
+      throw error;
+    })
+  );
 });
